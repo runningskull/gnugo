@@ -65,6 +65,12 @@ static int dragon2_initialized;
 static int lively_white_dragons;
 static int lively_black_dragons;
 
+/* This is a private array to obtain a list of worms belonging to each
+ * dragon. Public access is via first_worm_in_dragon() and
+ * next_worm_in_dragon().
+ */
+static int next_worm_list[BOARDMAX];
+
 /* Alternative for DRAGON2 macro with asserts. */
 struct dragon_data2 *
 dragon2_func(int pos)
@@ -700,6 +706,7 @@ initialize_dragon_data(void)
 	      "Initializing dragon from worm at %1m, size %d\n", 
 	      str, worm[str].size);
     }
+  memset(next_worm_list, 0, sizeof(next_worm_list));
 }
 
 
@@ -1272,6 +1279,10 @@ join_dragons(int d1, int d2)
   /* Normalize dragon coordinates. */
   d1 = dragon[d1].origin;
   d2 = dragon[d2].origin;
+
+  /* If d1 and d2 are the same dragon, we do nothing. */
+  if (d1 == d2)
+    return;
   
   gg_assert(board[d1] == board[d2]);
   gg_assert(dragon2_initialized == 0);
@@ -1295,6 +1306,17 @@ join_dragons(int d1, int d2)
   dragon[origin].size  = dragon[d2].size + dragon[d1].size;
   dragon[origin].effective_size  = (dragon[d2].effective_size
 				    + dragon[d1].effective_size);
+
+  /* Join the second next_worm_in_dragon chain at the end of the first one. */
+  {
+    int last_worm_origin_dragon = origin;
+    while (next_worm_list[last_worm_origin_dragon] != NO_MOVE)
+      last_worm_origin_dragon = next_worm_list[last_worm_origin_dragon];
+    if (origin == d1)
+      next_worm_list[last_worm_origin_dragon] = d2;
+    else
+      next_worm_list[last_worm_origin_dragon] = d1;
+  }
 
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
     if (ON_BOARD(ii)
@@ -1883,6 +1905,26 @@ are_neighbor_dragons(int d1, int d2)
 
   return 0;
 }
+
+
+/* The following two functions allow to traverse all worms in a dragon:
+ * for (ii = first_worm_in_dragon(pos); ii != NO_MOVE;
+ *      ii = next_worm_in_dragon(ii);)
+ *   ...
+ * At the moment first_worm(pos) will always be the origin of the dragon,
+ * but you should not rely on that.
+ */
+int first_worm_in_dragon(int w)
+{
+  return dragon[w].origin;
+}
+
+int next_worm_in_dragon(int w)
+{
+  gg_assert(worm[w].origin == w);
+  return next_worm_list[w];
+}
+
 
 /* ================================================================ */
 /*                       A few status functions                     */

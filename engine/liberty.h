@@ -339,6 +339,8 @@ void join_dragons(int d1, int d2);
 int dragon_escape(char goal[BOARDMAX], int color, int escape_value[BOARDMAX]);
 int is_same_dragon(int d1, int d2);
 int are_neighbor_dragons(int d1, int d2);
+int first_worm_in_dragon(int w);
+int next_worm_in_dragon(int w);
 int lively_dragon_exists(int color);
 int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);

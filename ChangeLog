@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- infrastructure for loops walking across a dragon: next_wormlist[],
+  first_worm_in_dragon(), next_worm_in_dragon()
+- mark_changed_dragon() revised using dragon loop
 - bugfix in fill_liberty()
 - filllib_confirm_safety() revised
 - In make_dragon(): resolve inconsistent owl result by calling

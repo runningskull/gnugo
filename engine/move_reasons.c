@@ -1471,30 +1471,28 @@ mark_changed_dragon(int pos, int color, int affected_dragon,
       ASSERT1(0, pos);
   }
 
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-    if (board[ii] == board[affected_dragon]
-	&& is_same_dragon(ii, affected_dragon)) {
-      if (new_status == INFLUENCE_CAPTURED_STONE)
-	changed_stones[ii] = new_status;
-      else if (worm[ii].origin == ii) {
-	int worm_is_safe = 0;
-	if (worm[ii].attack_codes[0] == NO_MOVE
-	    || defense_move_reason_known(pos, find_worm(ii)))
-	  worm_is_safe = 1;
-	else if (trymove(pos, color, "mark-changed-dragon", ii,
-	      		 EMPTY, NO_MOVE)) {
-	    if (REVERSE_RESULT(attack(ii, NULL)) >= result_to_beat)
-	      worm_is_safe = 1;
-	    popgo();
-	  }
-	if (worm_is_safe) {
-	  /* This string can now be considered safe. Hence we mark the
-	   * whole string as such:
-	   */
-	  mark_string(ii, changed_stones, new_status);
-	  if (effective_size != NULL)
-	    *effective_size += worm[ii].effective_size;
+  for (ii = first_worm_in_dragon(affected_dragon); ii != NO_MOVE; 
+       ii = next_worm_in_dragon(ii)) {
+    if (new_status == INFLUENCE_CAPTURED_STONE)
+      mark_string(ii, changed_stones, new_status);
+    else {
+      int worm_is_safe = 0;
+      if (worm[ii].attack_codes[0] == NO_MOVE
+	  || defense_move_reason_known(pos, find_worm(ii)))
+	worm_is_safe = 1;
+      else if (trymove(pos, color, "mark-changed-dragon", ii,
+		       EMPTY, NO_MOVE)) {
+	  if (REVERSE_RESULT(attack(ii, NULL)) >= result_to_beat)
+	    worm_is_safe = 1;
+	  popgo();
 	}
+      if (worm_is_safe) {
+	/* This string can now be considered safe. Hence we mark the
+	 * whole string as such:
+	 */
+	mark_string(ii, changed_stones, new_status);
+	if (effective_size != NULL)
+	  *effective_size += worm[ii].effective_size;
       }
     }
   }
