@@ -1483,6 +1483,33 @@ Xaf
 # CC5xx - experimental connection patterns
 #
 ####################################################################
+#
+# Note about patterns CC501, CC502, CC502b, CC511
+#
+# In theory, these patterns go against the connection policy that the
+# involved strings must be tactically stable (not capturable) and
+# consequently, they should not be needed at all. In practice though,
+# problems arise with the optics/owl analysis when such strings aren't
+# amalgamated. An example (see owl:50)
+#
+# +------
+# |...X.O
+# |XXX.XO
+# |.OOXXO
+# |O.OOOO
+#
+# In the absence of the mentioned patterns, the topmost X stone would
+# NOT be amalgamated with the others, because all attempts at
+# defending these kosumi connections result in a tactical capture of
+# the whole string, thus a successful cut.
+#
+# As a consequence, the owl code would be run against separate targets,
+# and in the above case, it would even fail to find a way to kill the
+# topmost X stone (the lack of context is then responsible for the 
+# optics/owl code not being able to return vital points)
+#
+####################################################################
+
 
 Pattern CC501
 # Connect even if stones not tactically safe.
