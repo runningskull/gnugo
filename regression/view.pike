@@ -4,7 +4,7 @@ class GtpResponse
 {
     string status;
     string text;
-
+    
     void create(string|void _status, string|void _text)
     {
 	status = _status;
