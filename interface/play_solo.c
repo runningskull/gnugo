@@ -79,7 +79,7 @@ play_solo(Gameinfo *gameinfo, int moves)
   
   t1 = gg_cputime();
   memset(&totalstats, '\0', sizeof(totalstats));
-  while (passes < 2 && --moves >= 0 && !time_to_die) {
+  while (passes < 2 && --moves >= 0) {
     reset_owl_node_counter();
     move_val = gnugo_genmove(&i, &j, gameinfo->to_move);
 

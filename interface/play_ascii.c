@@ -590,7 +590,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
       computer_move(gameinfo, &passes);
     
     /* main ASCII Play loop */
-    while (passes < 2 && !time_to_die) {
+    while (passes < 2) {
       /* Display game board. */
       if (opt_showboard)
 	ascii_showboard();

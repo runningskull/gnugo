@@ -44,8 +44,6 @@
 # endif
 #endif
 
-#include <signal.h>
-
 #include <liberty.h>
 
 #include "gg-getopt.h"
@@ -257,8 +255,6 @@ static struct gg_option const long_options[] =
 
 float memory = (float) DEFAULT_MEMORY;	  /* Megabytes used for hash table. */
 
-static void sigterm_handler(int);
-
 
 int
 main(int argc, char *argv[])
@@ -298,9 +294,6 @@ main(int argc, char *argv[])
 
   komi = 0.0;
   
-  /* Set SIGTERM handler. */
-  signal(SIGTERM, sigterm_handler);
-
   level = DEFAULT_LEVEL;
   semeai_variations = DEFAULT_SEMEAI_VARIATIONS;
 
@@ -1191,40 +1184,6 @@ main(int argc, char *argv[])
   return 0;
 }  /* end main */
 
-
-
-/* 
- * Cgoban sends us a sigterm when it wants us to die. But it doesn't
- * close the pipe, so we cannot rely on gmp to pick up an error.
- * 
- * We want to keep control so we can close the output sgf file
- * properly, so we trap the signal.
- */
-
-volatile int time_to_die = 0;   /* set by signal handlers */
-
-static void 
-sigterm_handler(int sig)
-{
-  time_to_die = 1;
-  if (!quiet)
-    write(2, "*SIGTERM*\n", 10);  /* bad to use stdio in a signal handler */
-
-  close(0);                  /* this forces gmp.c to return an gmp_err */
-
-  /* I thought signal handlers were one-shot, yet on my linux box it is kept.
-   * Restore the default behaviour so that a second signal has the
-   * original effect - in case we really are stuck in a loop.
-   */
-  signal(sig, SIG_DFL);
-
-  /* schedule a SIGALRM in 5 seconds, in case we haven't cleaned up by then
-   * - cgoban sends the SIGTERM only once 
-   */
-#ifdef HAVE_ALARM
-  alarm(5);
-#endif
-}
 
 
 static void

@@ -160,10 +160,9 @@ AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
 
 dnl results of setlinebuf test used in interface/play_ascii.c
-dnl alarm not available in VC
 dnl vsnprintf not universally available
 dnl usleep not available in Unicos and mingw32
-AC_CHECK_FUNCS(setlinebuf alarm vsnprintf gettimeofday usleep times)
+AC_CHECK_FUNCS(setlinebuf vsnprintf gettimeofday usleep times)
 
 dnl if snprintf not available try to use g_snprintf from glib
 if test $ac_cv_func_vsnprintf = no; then

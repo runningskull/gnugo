@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- configure test for alarm removed
+- sigterm_handler() and volatile variable time_to_die removed
 - functions special_rescue(), special_rescue2() converted to .._moves()
 - break_chain2() removed; use new function break_chain2_defense_moves()
   instead

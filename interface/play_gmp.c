@@ -66,9 +66,7 @@ play_gmp(Gameinfo *gameinfo)
     gmp_startGame(ge, -1, -1, 5.5, 0, -1);	
   do {
     message = gmp_check(ge, 1, NULL, NULL, &error);
-  } while (!time_to_die
-	   && (message == gmp_nothing
-	       || message == gmp_reset));
+  } while (message == gmp_nothing || message == gmp_reset);
   
   if (message == gmp_err)  {
     fprintf(stderr, "gnugo-gmp: Error \"%s\" occurred.\n", error);
@@ -120,7 +118,7 @@ play_gmp(Gameinfo *gameinfo)
   sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 
   /* main GMP loop */
-  while (passes < 2 && !time_to_die) {
+  while (passes < 2) {
 
     if (to_move == yourcolor) {
       moveval = 0;
@@ -213,7 +211,7 @@ play_gmp(Gameinfo *gameinfo)
   sgfWriteResult(sgftree.root, score, 1);
   sgffile_output(&sgftree);
   
-  while (!time_to_die) {
+  while (1) {
     message = gmp_check(ge, 1, &j, &i, &error);
     if (!quiet)
       fprintf(stderr, "Message %d from gmp\n", message);
