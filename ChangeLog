@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- improved printing of hashvalues
 - bugfix in atari_atari_blunder_size()	
 - new static function dump_board_sgf() in printutils.c
 - abortgo() revised to no longer unwind the stack and to print an sgf

@@ -168,8 +168,8 @@ goal_to_hashvalue(const char *goal)
 }
 
 
-#define BUFFER_SIZE (1 + NUM_HASHVALUES * (1 + (CHAR_BIT * SIZEOF_HASHVALUE \
-						- 1) / 4))
+#define HASHVALUE_NUM_DIGITS (1 + (CHAR_BIT * SIZEOF_HASHVALUE - 1) / 4)
+#define BUFFER_SIZE (1 + NUM_HASHVALUES * HASHVALUE_NUM_DIGITS)
 char *
 hashdata_to_string(Hash_data *hashdata)
 {
@@ -178,7 +178,8 @@ hashdata_to_string(Hash_data *hashdata)
   int k;
   
   for (k = 0; k < NUM_HASHVALUES; k++) {
-    n += sprintf(buffer + n, HASHVALUE_PRINT_FORMAT, hashdata->hashval[k]);
+    n += sprintf(buffer + n, HASHVALUE_PRINT_FORMAT,
+		 HASHVALUE_NUM_DIGITS, hashdata->hashval[k]);
     gg_assert(n < BUFFER_SIZE);
   }
 
