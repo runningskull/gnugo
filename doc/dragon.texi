@@ -137,7 +137,7 @@ fourth order liberties, respectively.
 The definition of liberties of order >1 is adapted to the
 problem of detecting the shape of the surrounding
 empty space. In particular we want to be able to see if a group
-is loosely surrounded. @dfn{a liberty of order n} is an empty
+is loosely surrounded. A @dfn{liberty of order n} is an empty
 vertex which may be connected to the string by placing n
 stones of the same color on the board, but no fewer. The
 path of connection may pass through an intervening group

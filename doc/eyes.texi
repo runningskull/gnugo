@@ -501,21 +501,25 @@ this file. Some of them might be slightly counterintuitive, so we
 explain one important case here. Consider
 
 @example
+@group
 Pattern 6141
 
  X
 XX.@@x
 
 :1122
+@end group
 @end example
 
 which e.g. matches in this position:
 
 @example
+@group
 .OOOXXX
 OOXOXOO
 OXXba.O
 OOOOOOO
+@end group
 @end example
 
 Now it may look like @samp{X} could take away both eyes by playing @samp{a}
@@ -527,12 +531,14 @@ crucial property of this shape is that when @samp{X} plays at a to destroy
 (at least) one eye, @samp{O} can answer at @samp{b}, giving:
 
 @example
+@group
 
 .OOOXXX
 OO.OXOO
 O.cOX.O
 OOOOOOO
 
+@end group
 @end example
 
 Now @samp{X} has to continue at @samp{c} in order to keep @samp{O}
@@ -543,11 +549,17 @@ indeed 1122.
 As a final note, some of the eye values indicating a threat depend
 on suicide to be allowed, e.g.
 
+@example
+@group
+
 Pattern 301
  
 X.X
 
 :1222
+
+@end group
+@end example
 
 We always assume suicide to be allowed in this database. It is easy
 enough to sort out such moves at a higher level when suicide is
@@ -625,7 +637,7 @@ criteria above and classify the point from the sum of the values.
 
 
 This section extends the topological eye analysis to handle ko. We
-distinguish between a ko in favor of @samp{O}' and one in favor of @samp{X}:
+distinguish between a ko in favor of @samp{O} and one in favor of @samp{X}:
 
 @example
 @group
@@ -867,9 +879,11 @@ The following situation is rare but special enough to warrant separate
 attention:
 
 @example
+@group
    OOOOXX
    OXaX..
    ------
+@end group
 @end example
 
 Here @samp{a} may be characterized by the fact that it is adjacent

@@ -11,7 +11,7 @@ value (including captures or life-and-death effects), and possible
 strategical effects (such as strengthening a weak group).
 
 Note that while GNU Go does, of course, do a lot of reading to analyze
-possible captures, life and death of groups etc., it does not (yet?) have
+possible captures, life and death of groups etc., it does not (yet) have
 a fullboard lookahead.
 
 @menu
@@ -36,12 +36,12 @@ Bad judgement of weaknesses of groups make strategic mistakes likely.
 This information gathering is done by the function @code{examine_position()}.
 It first calls @code{make_worms()}.
 
-Its first steps are very simple: It identifies sets of directly connected
-stones--we call them @dfn{worms}--, and notes their sizes and their number of
+Its first steps are very simple: it identifies sets of directly connected
+stones, called @dfn{worms}, and notes their sizes and their number of
 liberties.
 
 Soon after comes the most important step of the worm analysis:
-The tactical reading code (@pxref{Tactical Reading}) is called for every
+the tactical reading code (@pxref{Tactical Reading}) is called for every
 worm. It tries to read
 out which worms can be captured directly, giving up as soon as a worm
 can reach 5 liberties. If a worm can be captured, the engine of course
@@ -50,7 +50,7 @@ is made to find virtually all moves that achieve the capture or defense
 of a worm.
 
 After knowing which worms are tactically stable, we can make a first
-picture of the balance of power across the board: The @ref{Influence}
+picture of the balance of power across the board: the @ref{Influence}
 code is called for the first time.
 
 This is to aid the next step, the analysis of dragons. By a @dfn{dragon}
@@ -84,7 +84,7 @@ explanations of the data structures used to store the information),
 see @xref{Worms and Dragons}.
 
 The influence code is then called second time to make a detailed analysis
-of likely territory. Of course, the life-and-death status' of dragons are
+of likely territory. Of course, the life-and-death status of dragons are
 now taken into account.
 
 The territorial results of the influence module get corrected by the break-in
