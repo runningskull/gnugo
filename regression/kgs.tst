@@ -177,4 +177,61 @@ loadsgf games/kgs/yagr-justre1.sgf 133
 370 restricted_genmove white H11 G12
 #? [G12]
 
+# I think P9 as played in the game is ok. /ab
+#loadsgf games/kgs/evand-TheGNUGo.sgf 8
+#380 reg_genmove black
+##? [P8|P12|Q12]
+
+loadsgf games/kgs/evand-TheGNUGo.sgf 10
+390 reg_genmove black
+#? [P8|P7]
+
+#N12 is really bad
+loadsgf games/kgs/evand-TheGNUGo.sgf 12
+400 reg_genmove black
+#? [P8|P7|Q13]
+
+#cut and fight somewhere
+loadsgf games/kgs/evand-TheGNUGo.sgf 20
+410 reg_genmove black
+#? [O8|O11|P11]
+
+loadsgf games/kgs/evand-TheGNUGo.sgf 36
+420 owl_attack R14
+#? [0]
+
+#The M9-O5 exchange is bad
+loadsgf games/kgs/evand-TheGNUGo.sgf 70
+430 reg_genmove black
+#? [K18]
+
+#loadsgf games/kgs/evand-TheGNUGo.sgf 80
+#440 reg_genmove black
+##? [R18]
+
+loadsgf games/kgs/evand-TheGNUGo.sgf 84
+450 reg_genmove black
+#? [L15]
+
+#fight the ko
+loadsgf games/kgs/evand-TheGNUGo.sgf 98
+460 reg_genmove black
+#? [M19]
+
+loadsgf games/kgs/evand-TheGNUGo.sgf 178
+470 reg_genmove black
+#? [G13]
+
+#block somehow
+loadsgf games/kgs/evand-TheGNUGo.sgf 190
+480 reg_genmove black
+#? [H9|G9|G8]
+
+loadsgf games/kgs/evand-TheGNUGo.sgf 242
+490 reg_genmove black
+#? [H13]
+
+loadsgf games/kgs/evand-TheGNUGo.sgf 270
+500 reg_genmove black
+#? [O15|P13]
 
