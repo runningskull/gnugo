@@ -234,7 +234,7 @@ gnugo_is_suicide(int i, int j, int color)
 }
 
 
-/* Interface to placehand. Sets up handicap pieces and
+/* Interface to placehand. Sets up handicap stones and
  * returns the number of placed handicap stones. */
 int
 gnugo_placehand(int handicap)
@@ -251,7 +251,7 @@ gnugo_recordboard(SGFNode *root)
 }
 
 /* Interface to placehand. Sets up handicap stones and
- * returns the number of placed handicap stones, updating the sgf file
+ * returns the number of placed handicap stones, updating the sgf file.
  */
 int
 gnugo_sethand(int handicap, SGFNode *node)

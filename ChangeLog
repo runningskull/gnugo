@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new file engine/handicap.c
+- placehand() moved from genmove.c to handicap.c
 - bug fix in adjusted_worm_attack_value()
 - FIXME added regarding several EITHER_MOVE reasons
 

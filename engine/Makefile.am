@@ -26,6 +26,7 @@ libengine_a_SOURCES = \
       fuseki.c \
       genmove.c \
       globals.c \
+      handicap.c \
       hash.c \
       influence.c \
       interface.c \

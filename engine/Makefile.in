@@ -108,6 +108,7 @@ libengine_a_SOURCES = \
       fuseki.c \
       genmove.c \
       globals.c \
+      handicap.c \
       hash.c \
       influence.c \
       interface.c \
@@ -155,7 +156,7 @@ libengine_a_LIBADD =
 am_libengine_a_OBJECTS = aftermath.$(OBJEXT) board.$(OBJEXT) \
 	cache.$(OBJEXT) clock.$(OBJEXT) combination.$(OBJEXT) \
 	dragon.$(OBJEXT) filllib.$(OBJEXT) fuseki.$(OBJEXT) \
-	genmove.$(OBJEXT) globals.$(OBJEXT) hash.$(OBJEXT) \
+	genmove.$(OBJEXT) globals.$(OBJEXT) handicap.$(OBJEXT) hash.$(OBJEXT) \
 	influence.$(OBJEXT) interface.$(OBJEXT) life.$(OBJEXT) \
 	matchpat.$(OBJEXT) move_reasons.$(OBJEXT) movelist.$(OBJEXT) \
 	optics.$(OBJEXT) owl.$(OBJEXT) printutils.$(OBJEXT) \
@@ -176,7 +177,7 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/combination.Po $(DEPDIR)/dragon.Po \
 @AMDEP_TRUE@	$(DEPDIR)/filllib.Po $(DEPDIR)/fuseki.Po \
 @AMDEP_TRUE@	$(DEPDIR)/genmove.Po $(DEPDIR)/globals.Po \
-@AMDEP_TRUE@	$(DEPDIR)/hash.Po $(DEPDIR)/influence.Po \
+@AMDEP_TRUE@	$(DEPDIR)/handicap.Po $(DEPDIR)/hash.Po $(DEPDIR)/influence.Po \
 @AMDEP_TRUE@	$(DEPDIR)/interface.Po $(DEPDIR)/life.Po \
 @AMDEP_TRUE@	$(DEPDIR)/matchpat.Po $(DEPDIR)/move_reasons.Po \
 @AMDEP_TRUE@	$(DEPDIR)/movelist.Po $(DEPDIR)/optics.Po \
@@ -239,6 +240,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/fuseki.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/genmove.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/globals.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/handicap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/influence.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/interface.Po@am__quote@
