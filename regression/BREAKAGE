@@ -1,3 +1,40 @@
+========================== 3.3.16 pre 1 ============================
+
+./regress.sh . atari_atari.tst 
+19 unexpected PASS!
+./regress.sh . blunder.tst 
+20 unexpected PASS!
+./regress.sh . nngs1.tst 
+31 unexpected PASS!
+40 unexpected PASS!
+./regress.sh . neurogo.tst 
+11 unexpected FAIL: Correct 'N5', got 'R12'
+./regress.sh . golife.tst 
+4 unexpected FAIL: Correct 'H5', got 'B4'
+./regress.sh . trevorb.tst 
+620 unexpected PASS!
+./regress.sh . nicklas1.tst 
+1207 unexpected PASS!
+./regress.sh . trevorc.tst 
+580 unexpected PASS!
+./regress.sh . strategy3.tst 
+123 unexpected FAIL: Correct 'P4', got 'N3'
+./regress.sh . global.tst 
+26 unexpected FAIL: Correct 'D12', got 'B10'
+32 unexpected FAIL: Correct 'G8', got 'E13'
+./regress.sh . 13x13.tst 
+10 unexpected PASS!
+./regress.sh . trevord.tst 
+340 unexpected PASS!
+./regress.sh . nngs2.tst 
+150 unexpected PASS!
+./regress.sh . nngs4.tst 
+90 unexpected PASS!
+./regress.sh . century2002.tst 
+60 unexpected FAIL: Correct 'Q14', got 'R18'
+
+8496.910 seconds
+
 ========================== 3.3.15 ============================
 
 ./regress.sh . endgame.tst 

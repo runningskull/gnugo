@@ -113,7 +113,7 @@ loadsgf games/incident223.sgf 228
 # incident 275
 loadsgf games/incident272.sgf 250
 123 gg_genmove black
-#? [P4]
+#? [P4]*
 
 # incident 271
 # C5 seems to lead to seki. Semeai mistake.

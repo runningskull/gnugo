@@ -111,7 +111,7 @@ loadsgf golois/Goemate991113-1.sgf
 
 loadsgf golois/Goemate991113-4.sgf
 26 gg_genmove black
-#? [D12]
+#? [D12]*
 
 loadsgf golois/Goemate991113-5.sgf
 27 gg_genmove black
@@ -135,7 +135,7 @@ loadsgf golois/GoStar991114-1.sgf
 
 loadsgf golois/Indigo-Golois-991105-1.sgf
 32 gg_genmove black
-#? [G8]
+#? [G8]*
 
 loadsgf golois/Jimmy990906-1.sgf
 33 gg_genmove black

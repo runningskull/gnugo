@@ -146,7 +146,7 @@ loadsgf games/trevor/auto/d03.sgf 162
 
 loadsgf games/trevor/auto/d03.sgf 176
 340 gg_genmove white
-#? [H10]*
+#? [H10]
 
 
 loadsgf games/trevor/auto/d03.sgf 210

@@ -62,7 +62,7 @@ loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 72
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 12
 10 gg_genmove white
-#? [C2]*
+#? [C2]
 
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 20

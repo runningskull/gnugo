@@ -172,7 +172,7 @@ loadsgf games/nicklas/nicklas12.sgf 103
 #SEVERITY=7
 loadsgf games/nicklas/nicklas12.sgf 113
 1207 restricted_genmove black B18 C18 B17 C17
-#? [C17]*
+#? [C17]
 
 loadsgf games/nicklas/nicklas12.sgf 117
 1208 gg_genmove black

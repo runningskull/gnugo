@@ -130,7 +130,7 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 10
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 18
 31 gg_genmove white
-#? [N17]*
+#? [N17]
 
 # better to avoid attack on one of the two top groups
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 34
@@ -163,7 +163,7 @@ loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 131
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 141
 40 gg_genmove black
-#? [R6]*
+#? [R6]
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 145
 41 gg_genmove black

@@ -95,7 +95,7 @@ loadsgf games/blunder14.sgf
 # P11 got incorrectly rejected as a blunder.
 loadsgf games/handtalk/handtalk13.sgf 123
 20 gg_genmove black
-#? [P11]*
+#? [P11]
 
 # L9 got incorrectly rejected as a blunder.
 loadsgf games/handtalk/handtalk13.sgf 131

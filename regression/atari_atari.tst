@@ -80,4 +80,4 @@ loadsgf games/nngs/gnugo-3.3.12-guest-200212171626.sgf 148
 
 loadsgf games/nngs/gnugo-3.3.10-deye-200210211347.sgf 135
 19 combination_attack black
-#? [P9|Q7]*
+#? [P9|Q7]

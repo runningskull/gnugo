@@ -364,7 +364,7 @@ loadsgf games/trevor/auto/b52.sgf 60
 
 loadsgf games/trevor/auto/b56.sgf 78
 620 gg_genmove white
-#? [!J10]*
+#? [!J10]
 
 
 
