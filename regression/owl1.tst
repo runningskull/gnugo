@@ -132,7 +132,7 @@ loadsgf games/gunnar/gunnar3.sgf 88
 #? [1 T4]*
 
 loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 80
-293 defend Q6
+293 owl_defend Q6
 #? [0]*
 
 ########### end of tests #####################
