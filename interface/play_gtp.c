@@ -458,7 +458,7 @@ static int
 gtp_get_komi(char *s, int id)
 {
   UNUSED(s);
-  return gtp_success(id, "%4.1f",komi);
+  return gtp_success(id, "%4.1f", komi);
 }
 
 

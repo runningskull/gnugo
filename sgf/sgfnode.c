@@ -116,7 +116,8 @@ sgfNewNode()
  */
 
 void
-sgfFreeNode(SGFNode *node) {
+sgfFreeNode(SGFNode *node)
+{
   if (node == NULL)
     return;
   sgfFreeNode(node->next);
@@ -377,7 +378,8 @@ sgfMkProperty(const char *name, const  char *value,
  */
 
 void
-sgfFreeProperty(SGFProperty *prop) {
+sgfFreeProperty(SGFProperty *prop)
+{
   if (prop == NULL)
     return;
   sgfFreeProperty(prop->next);

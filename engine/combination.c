@@ -1190,7 +1190,7 @@ get_aa_value(int str)
         else if (dists[pos] < (dist)) \
           dists[pos] = (dist); \
       } \
-    } while(0);
+    } while (0);
 
 static int
 update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX], int apos,

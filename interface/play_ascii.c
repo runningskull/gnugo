@@ -270,7 +270,7 @@ ascii_showboard(Position *pos)
 	 last_pos_was_move = 0;
 	 break;
        default: 
-	 fprintf(stderr,"Illegal board value %d\n", pos->board[i][j]);
+	 fprintf(stderr, "Illegal board value %d\n", pos->board[i][j]);
 	 exit(EXIT_FAILURE);
 	 break;
        }

@@ -112,7 +112,7 @@ static double estimate_time_by_move(int color, int move);
 /* Echo a time value in STANDARD format */
 
 static void
-timeval_print (FILE* f, double tv)
+timeval_print(FILE* f, double tv)
 {
   int min;
   double sec;

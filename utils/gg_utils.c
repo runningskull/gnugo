@@ -170,15 +170,16 @@ write_color_char_no_space(int c, int x)
     }
   }
 
-  /*Red & Blue are switched from what MS-Windows wants:
+  /* Red & Blue are switched from what MS-Windows wants:
    *   FOREGROUND_BLUE      0x0001 // text color contains blue.
    *   FOREGROUND_GREEN     0x0002 // text color contains green.
    *   FOREGROUND_RED       0x0004 // text color contains red
-   *This magic switches the bits back: */
+   * This magic switches the bits back:
+   */
   c = (c & 1) * 4 + (c & 2) + (c & 4) / 4;
   c += FOREGROUND_INTENSITY;
   succeed32 = GetConsoleScreenBufferInfo(hStdErr, &bufInfo);
-  if (!succeed32) {  //Probably redirecting output, just give plain text.
+  if (!succeed32) {  /* Probably redirecting output, just give plain text. */
     fprintf(stderr, "%c", x);
     return;
   }
@@ -229,7 +230,8 @@ gg_vsnprintf(char *dest, unsigned long len, const char *fmt, va_list args)
 }
 
 void
-gg_snprintf(char *dest, unsigned long len, const char *fmt, ...) {
+gg_snprintf(char *dest, unsigned long len, const char *fmt, ...)
+{
   va_list args;
   va_start(args, fmt);
   gg_vsnprintf(dest, len, fmt, args);
@@ -263,7 +265,8 @@ gg_gettimeofday(void)
 }
 
 const char *
-gg_version(void) {
+gg_version(void)
+{
   return VERSION;
 }
 

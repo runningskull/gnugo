@@ -741,7 +741,7 @@ dfa_prepare_for_match(int color)
  * 
  */
 static int
-read_board (int ll, int m, int n, int row)
+read_board(int ll, int m, int n, int row)
 {
   int i2, j2;
 
@@ -814,7 +814,7 @@ scan_for_patterns(dfa_t *pdfa, int l, int m, int n, int *pat_list)
 #if DFA_SORT
 /* used to sort patterns */
 static int
-compare_int (const void *a, const void *b)
+compare_int(const void *a, const void *b)
 {
   const int *da = (const int *) a;
   const int *db = (const int *) b;
