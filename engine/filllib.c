@@ -364,6 +364,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
   int success = 0;
   int acode;
   int saved_move = NO_MOVE;
+  int opponent_libs;
   
   /* Play (move) and identify all liberties and adjacent strings. */
   if (!trymove(move, color, "find_backfilling_move", move, EMPTY, NO_MOVE))
@@ -390,9 +391,10 @@ find_backfilling_move(int move, int color, int *backfill_move)
    * trust it but keep it around if we don't find anything else. (See
    * filllib:17 for a position where this matters.)
    *
-   * FIXME: Maybe we should take care to find the neighbor with the
-   * fewest liberties, since that string probably can be removed
-   * fastest. For the moment we assume this to be nonimportant.
+   * It is also necessary to take care to first attack the string with
+   * the fewest liberties, which can probably by removed the fastest.
+   * See filllib:37 for an example (J5 tactically attacks K7 but the
+   * correct move is H5).
    *
    * FIXME: It seems we have to return immediately when we find an
    * attacking move, because recursing for further backfilling might
@@ -400,14 +402,18 @@ find_backfilling_move(int move, int color, int *backfill_move)
    * before the attacking move itself. This is not ideal but probably
    * good enough.
    */
-  for (k = 0; k < neighbors; k++) {
-    if (attack(adjs[k], &bpos) == WIN) {
-      if (liberty_of_string(bpos, adjs[k])) {
-	*backfill_move = bpos;
-	return 1;
+  for (opponent_libs = 1; opponent_libs <= 5; opponent_libs++) {
+    for (k = 0; k < neighbors; k++) {
+      if (opponent_libs < 5 && countlib(adjs[k]) != opponent_libs)
+	continue;
+      if (attack(adjs[k], &bpos) == WIN) {
+	if (liberty_of_string(bpos, adjs[k])) {
+	  *backfill_move = bpos;
+	  return 1;
+	}
+	else
+	  saved_move = bpos;
       }
-      else
-	saved_move = bpos;
     }
   }
   

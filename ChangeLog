@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- find_backfilling_move() in filllib.c revised
 - new debug flag DEBUG_TOP_MOVES
 - regression revisions
 	
