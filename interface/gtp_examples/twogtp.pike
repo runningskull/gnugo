@@ -1339,8 +1339,8 @@ main(int argc, array(string) argv)
     games = max(games, 1);
     int board_size = (int) Getopt.find_option(argv, "s", "board-size",
 					      UNDEFINED, "19");
-    if (board_size < 5 || 25 < board_size) {
-      werror("GTP only supports boards with size from 5 to 25.\n");
+    if (board_size < 1 || 25 < board_size) {
+      werror("GTP only supports boards with size from 1 to 25.\n");
       return 1;
     }
 
