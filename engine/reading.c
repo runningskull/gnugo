@@ -421,7 +421,6 @@ attack_either(int astr, int bstr)
     int alibs = findlib(astr, 2, libs);
     int defended0 = WIN;
     int defended1 = WIN;
-    int attackable = 0;
     int othercolor = 3 - board[astr];
     /* Let's just try the case where the group with the fewest liberties
      * has only 2, and try each atari in turn.*/
@@ -704,7 +703,6 @@ break_through_helper(int apos, int bpos, int cpos,
   if (trymove(dpos, other, "break_through_helper-A", Fpos, EMPTY, NO_MOVE)) {
     /* If F can be attacked we can't start in this way. */
     if (!attack(Fpos, NULL)) {
-      int can_attack_d=1;
       /* If d is safe too, we have at least managed to break through. */
       if (!attack(dpos, &gpos)) {
 	success = CUT;
