@@ -6242,7 +6242,7 @@ Pattern D1373
 
 o*XO        capture to escape
 
-:-,E,value(85)
+:-,bE,value(85)
 
 a*BO
 
