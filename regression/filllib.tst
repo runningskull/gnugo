@@ -137,3 +137,7 @@ loadsgf games/nngs/gnugo-3.1.34-guest1-200204242025.sgf 86
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 244
 41 gg_genmove white
 #? [M8]*
+
+loadsgf games/nngs/gnugo-3.3.11-rcde05-200211090008.sgf 271
+42 gg_genmove white
+#? [N19]

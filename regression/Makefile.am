@@ -4,7 +4,7 @@ TST =  13x13.tst arb.tst arend.tst arion.tst atari_atari.tst \
        century2002.tst connect.tst connect_rot.tst \
        connection.tst connection_rot.tst cutstone.tst \
        dniwog.tst ego.tst endgame.tst endgame_rot.tst \
-       filllib.tst global.tst golife.tst handtalk.tst \
+       filllib.tst global.tst golife.tst gunnar.tst handtalk.tst \
        heikki.tst lazarus.tst ld_owl.tst ld_owl_rot.tst \
        manyfaces.tst manyfaces1.tst neurogo.tst newscore.tst \
        nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst \
@@ -103,6 +103,9 @@ golife: golife.tst
 
 global: global.tst
 	$(srcdir)/eval.sh global.tst $(GG_OPTIONS)
+
+gunnar: gunnar.tst
+	$(srcdir)/eval.sh gunnar.tst $(GG_OPTIONS)
 
 handtalk: handtalk.tst
 	$(srcdir)/eval.sh handtalk.tst
@@ -346,3 +349,4 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) ninestones.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) tactics1.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) manyfaces1.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) gunnar.tst $(GG_OPTIONS)

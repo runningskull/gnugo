@@ -121,6 +121,12 @@ loadsgf games/nngs/gnugo-3.3.9-pogonyshev-200210142137.sgf 62
 289 owl_defend H8
 #? [1 H6]
 
+loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 253
+290 owl_attack M19
+#? [1 O19]
+291 owl_defend M19
+#? [2 O19]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

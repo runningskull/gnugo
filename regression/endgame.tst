@@ -195,6 +195,23 @@ loadsgf games/endgame6.sgf 2
 604 gg_genmove white
 #? [D1]*
 
+# G5 is one point in sente or 2 points in gote for white. E3 is bigger.
+loadsgf games/endgame7.sgf 1
+701 gg_genmove black
+#? [E3]
+
+loadsgf games/endgame7.sgf 1
+702 gg_genmove white
+#? [E3]
+
+loadsgf games/endgame7.sgf 2
+703 gg_genmove black
+#? [G5]
+
+loadsgf games/endgame7.sgf 2
+704 gg_genmove white
+#? [G5]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
