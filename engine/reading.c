@@ -490,6 +490,14 @@ attack_either(int astr, int bstr)
 	&& findlib(bstr, 2, blibs) == 2) {
       defended0 = gg_min(defended0, defended1);
       defended1 = defended0;
+
+      /* We may get here even if alib==1, in case there is a snapback.
+       * To avoid referencing uninitialized memory in this case we
+       * explicitly set alibs[1] to NO_MOVE.
+       */
+      if (alib == 1)
+	alibs[1] = NO_MOVE;
+
       if (blibs[0] != alibs[0] && blibs[0] != alibs[1]
 	  && trymove(blibs[0], other, "attack_either-C", bstr,
 		     EMPTY, NO_MOVE)) {
@@ -2244,7 +2252,8 @@ set_up_snapback_moves(int str, int lib, struct reading_moves *moves)
   if (stackp <= backfill_depth
       && countstones(str) == 1
       && approxlib(lib, other, 2, libs2) == 1
-      && !is_self_atari(libs2[0], color))
+      && (!is_self_atari(libs2[0], color)
+	  || is_ko(libs2[0], color, NULL)))
     ADD_CANDIDATE_MOVE(libs2[0], 0, *moves, "set_up_snapback");
 }
 
@@ -3055,7 +3064,14 @@ attack1(int str, int *move, int komaster, int kom_pos)
   int color = board[str];
   int other = OTHER_COLOR(color);
   int xpos;
-  int result = -1;
+  int savemove = 0;
+  int savecode = 0;
+  int liberties;
+  int libs[6];
+  int k;
+  int adjs[MAXCHAIN];
+  int apos;
+  
   
   SETUP_TRACE_INFO("attack1", str);
   reading_node_counter++;
@@ -3067,28 +3083,35 @@ attack1(int str, int *move, int komaster, int kom_pos)
    * attack never fails. (This assumes simple ko rule. With superko
    * rule it could still be a ko violation.)
    */
-  if (countstones(str) > 1)
-    result = WIN;
+  if (countstones(str) > 1) {
+    RETURN_RESULT(WIN, xpos, move, "last liberty");
+  }
   
   /* Try to play on the liberty. This fails if and only if it is an
    * illegal ko capture.
    */
-  else if (trymove(xpos, other, "attack1-A", str, komaster, kom_pos)) {
+  if (trymove(xpos, other, "attack1-A", str, komaster, kom_pos)) {
     /* Is the attacker in atari? If not the attack was successful. */
-    if (countlib(xpos) > 1)
-      result = WIN;
+    if (countlib(xpos) > 1) {
+      popgo();
+      RETURN_RESULT(WIN, xpos, move, "last liberty");
+    }
 
     /* If the attacking string is also a single stone, a possible
      * recapture would be a ko violation, so the defender has to make
      * a ko threat first.
      */
     else if (countstones(xpos) == 1) {
-      /* If the defender is allowed to take the ko the result is KO_A. */
-      if (komaster != other)
-	result = KO_A;
-      else 
+      if (komaster != other) {
+	/* If the defender is allowed to take the ko the result is KO_A. */
+	CHECK_RESULT_UNREVERSED(savecode, savemove, KO_A, xpos, move,
+				"last liberty - ko");
+      }
+      else {
 	/* But if the attacker is komaster, the attack was successful. */
-	result = WIN;
+	popgo();
+	RETURN_RESULT(WIN, xpos, move, "last liberty");
+      }
     }
       
     /* Otherwise, do recapture. Notice that the liberty must be
@@ -3101,58 +3124,88 @@ attack1(int str, int *move, int komaster, int kom_pos)
        */
       if (countlib(str) > 1) {
 	/* Proper snapback, attack fails. */
-	result = 0;
+	popgo();
       }
-      else
-	result = WIN;
-      popgo();
+      else {
+	popgo();
+	popgo();
+	RETURN_RESULT(WIN, xpos, move, "last liberty");
+      }
     }
     popgo();
   }
   else {/* Illegal ko capture. */
-    if (komaster != color) 
-      result = KO_B;
-    else
-      result = 0;
+    if (komaster != color) {
+      CHECK_RESULT_UNREVERSED(savecode, savemove, KO_B, xpos, move,
+			      "last liberty - ko");
+    }
   }
 
-  /* If not yet successful, try backfilling.
+  /* If not yet successful, try backfilling and back-capturing.
    * FIXME: Maybe only meaningful to do this in positions involving ko.
    */
-  if (result != WIN) {
-    int liberties;
-    int libs[6];
-    int k;
-    liberties = approxlib(xpos, color, 6, libs);
-    if (liberties <= 5)
-      for (k = 0; k < liberties; k++) {
-	int apos = libs[k];
-	if (!is_self_atari(apos, other)
-	    && trymove(apos, other, "attack1-C", str, komaster, kom_pos)) {
-	  int dcode = do_find_defense(str, NULL, komaster, kom_pos);
-	  if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
-	    if (dcode == 0) {
-	      popgo();
-	      SGFTRACE(apos, WIN, "backfilling");
-	      *move = apos;
-	      return WIN;
-	    }
-	    UPDATE_SAVED_KO_RESULT(result, xpos, dcode, apos);
+  liberties = approxlib(xpos, color, 6, libs);
+  if (liberties <= 5)
+    for (k = 0; k < liberties; k++) {
+      apos = libs[k];
+      if (!is_self_atari(apos, other)
+	  && trymove(apos, other, "attack1-C", str, komaster, kom_pos)) {
+	int dcode = do_find_defense(str, NULL, komaster, kom_pos);
+	if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
+	  if (dcode == 0) {
+	    popgo();
+	    RETURN_RESULT(WIN, apos, move, "backfilling");
+	  }
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, apos);
+	}
+	popgo();
+      }
+    }
+  
+  if (chainlinks2(str, adjs, 1) == 1) {
+    int adjs2[MAXCHAIN];
+    int adj2;
+    adj2 = chainlinks2(adjs[0], adjs2, 1);
+    for (k = 0; k < adj2; k++) {
+      int new_komaster;
+      int new_kom_pos;
+      int ko_move;
+      if (adjs2[k] == str)
+	continue;
+      findlib(adjs2[k], 1, &apos);
+      if (komaster_trymove(apos, other, "attack1-D", str, komaster,
+			   kom_pos, &new_komaster, &new_kom_pos,
+			   &ko_move, stackp <= ko_depth && savecode == 0)) {
+	if (!ko_move) {
+	  int dcode = do_find_defense(str, NULL, new_komaster,
+				      new_kom_pos);
+	  if (dcode != WIN
+	      && do_attack(str, NULL, new_komaster, new_kom_pos)) {
+	    popgo();
+	    CHECK_RESULT(savecode, savemove, dcode, apos, move,
+			 "attack effective");
+	  }
+	  else
+	    popgo();
+	}
+	else {
+	  if (do_find_defense(str, NULL, new_komaster,
+			      new_kom_pos) != WIN
+	      && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
+	    savemove = apos;
+	    savecode = KO_B;
 	  }
 	  popgo();
 	}
       }
+    }
   }
   
-  if (result > 0) {
-    *move = xpos;
-    SGFTRACE(xpos, result, NULL);
-  }
-  else {
-    SGFTRACE(0, 0, NULL);
+  if (savecode == 0) {
+    RETURN_RESULT(0, 0, move, NULL);
   }
   
-  return result;
+  RETURN_RESULT(savecode, savemove, move, "saved move");
 }
 
 

@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in attack_either()
+- back-capturing added in attack1() and code restructured
+- new regression script regress.pike
 - hashtable_clear() doesn't clear already clean parts of the table
 - `stackp' pseudofield in Read_result renamed `remaining_depth'
 - endgame1.sgf removed from the distribution
