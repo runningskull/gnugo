@@ -1391,6 +1391,7 @@ main(int argc, char *argv[])
     report_pattern_profiling();
 
   clock_report_autolevel(NULL, gameinfo.computer_player);
+  sgfFreeNode(gameinfo.game_record.root);
  
   return 0;
 }  /* end main */
