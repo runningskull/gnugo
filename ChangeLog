@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- infl_followup_value in struct move_data renamed to
+  influence_followup_value and initialized
+
 3.1.31 released April 4, 2002
 
 - boardsize field added to persistent caches in reading.c and owl.c

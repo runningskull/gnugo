@@ -136,6 +136,7 @@ clear_move_reasons(void)
       move[ii].maxneg_shape           = 0.0;
       move[ii].numneg_shape           = 0;
       move[ii].followup_value         = 0.0;
+      move[ii].influence_followup_value = 0.0;
       move[ii].reverse_followup_value = 0.0;
       move[ii].secondary_value        = 0.0;
       move[ii].min_value              = 0.0;

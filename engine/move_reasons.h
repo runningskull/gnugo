@@ -101,8 +101,8 @@ struct move_data {
   int numneg_shape;        /* Number of negative contributions to shape */
 
   float followup_value;    /* Value of followup move (our sente). */
-  float infl_followup_value;  /* Followup value of move as reported by
-                                 experimental influence. */
+  float influence_followup_value;  /* Followup value of move as reported by
+                                      experimental influence. */
   float reverse_followup_value;	/* Value of opponents followup move
 				   (reverse sente). */
   float secondary_value;   /* Secondary move value. */

@@ -1638,7 +1638,7 @@ estimate_territorial_value(int pos, int color, float score)
   if (does_block && move[pos].move_safety) {
     if (experimental_influence)
       this_value = influence_delta_territory(pos, color, saved_stones,
-                                             &move[pos].infl_followup_value);
+                                             &move[pos].influence_followup_value);
     else
       this_value = influence_delta_territory(pos, color, saved_stones, NULL);
     if (this_value != 0.0)
@@ -2181,9 +2181,9 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     float followup_value;
     if (experimental_influence) {
       followup_value = move[pos].followup_value
-                       + move[pos].infl_followup_value;
+                       + move[pos].influence_followup_value;
       TRACE("  %1m:   %f - total followup value, added %f as territorial followup\n",
-            pos, followup_value, move[pos].infl_followup_value);
+            pos, followup_value, move[pos].influence_followup_value);
     }
     else
       followup_value = move[pos].followup_value;
