@@ -446,6 +446,7 @@ do_genmove(int *move, int color, float pure_threat_value)
       && !doing_scoring
       && (play_out_aftermath || capture_all_dead)
       && aftermath_genmove(move, color, NULL, 0) > 0) {
+    ASSERT1(is_legal(*move, color), *move);
     val = 1.0;
     TRACE("Aftermath move at %1m\n", *move);
     move_considered(*move, val);
@@ -459,6 +460,7 @@ do_genmove(int *move, int color, float pure_threat_value)
       && !doing_scoring
       && capture_all_dead
       && aftermath_genmove(move, color, NULL, 1) > 0) {
+    ASSERT1(is_legal(*move, color), *move);
     val = 1.0;
     TRACE("Aftermath move at %1m\n", *move);
     move_considered(*move, val);

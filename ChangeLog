@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in aftermath_genmove()
 - bugfixes in the atari_atari code
 - obsolete atari_atari code removed
 - tuning

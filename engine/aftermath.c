@@ -669,19 +669,19 @@ aftermath_genmove(int *aftermath_move, int color,
    * The solution is to look for tactically attackable opponent stones
    * that still remain on the board but should be removed.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      pos = POS(m, n);
-      if (board[pos] == other
-	  && (worm[pos].unconditional_status == UNKNOWN
-	      || do_capture_dead_stones)
-	  && (DRAGON2(pos).safety == DEAD
-	      || DRAGON2(pos).safety == TACTICALLY_DEAD)
-	  && worm[pos].attack_codes[0] != 0) {
-	*aftermath_move = worm[pos].attack_points[0];
-	return 1;
-      }
-      
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == other
+	&& (worm[pos].unconditional_status == UNKNOWN
+	    || do_capture_dead_stones)
+	&& (DRAGON2(pos).safety == DEAD
+	    || DRAGON2(pos).safety == TACTICALLY_DEAD)
+	&& worm[pos].attack_codes[0] != 0
+	&& !is_illegal_ko_capture(worm[pos].attack_points[0], color)) {
+      *aftermath_move = worm[pos].attack_points[0];
+      return 1;
+    }
+  }
+  
   /* No move found. */
   return -1;
 }
