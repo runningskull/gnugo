@@ -1822,7 +1822,7 @@ dragon_escape(char goal[BOARDMAX], int color,
 	      && board[WEST(ii)] == EMPTY
 	      && !mx[SW(ii)]
 	      && (board[SW(ii)] == color
-		  || (board[SW(ii)] == color
+		  || (board[SW(ii)] == EMPTY
 		      && ON_BOARD(SOUTH(SW(ii)))
 		      && board[SOUTH(SW(ii))] != other
 		      && ON_BOARD(WEST(SW(ii)))
@@ -1833,7 +1833,7 @@ dragon_escape(char goal[BOARDMAX], int color,
 	      && board[NORTH(ii)] == EMPTY
 	      && !mx[NW(ii)]
 	      && (board[NW(ii)] == color
-		  || (board[NW(ii)] == color
+		  || (board[NW(ii)] == EMPTY
 		      && ON_BOARD(WEST(NW(ii)))
 		      && board[WEST(NW(ii))] != other
 		      && ON_BOARD(NORTH(NW(ii)))
@@ -1844,7 +1844,7 @@ dragon_escape(char goal[BOARDMAX], int color,
 	      && board[EAST(ii)] == EMPTY
 	      && !mx[NE(ii)]
 	      && (board[NE(ii)] == color
-		  || (board[NE(ii)] == color
+		  || (board[NE(ii)] == EMPTY
 		      && ON_BOARD(NORTH(NE(ii)))
 		      && board[NORTH(NE(ii))] != other
 		      && ON_BOARD(EAST(NE(ii)))
@@ -1855,7 +1855,7 @@ dragon_escape(char goal[BOARDMAX], int color,
 	      && board[SOUTH(ii)] == EMPTY
 	      && !mx[SE(ii)]
 	      && (board[SE(ii)] == color
-		  || (board[SE(ii)] == color
+		  || (board[SE(ii)] == EMPTY
 		      && ON_BOARD(EAST(SE(ii)))
 		      && board[EAST(SE(ii))] != other
 		      && ON_BOARD(SOUTH(SE(ii)))
