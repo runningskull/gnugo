@@ -1,6 +1,6 @@
-;;; ID: $Id: gnugo.el,v 1.2 2003-01-10 14:16:05 bump Exp $
+;;; ID: $Id: gnugo.el,v 1.3 2003-07-21 16:33:19 bump Exp $
 ;;;
-;;; This is GNU GO, a Go program. Contact gnugo@gnu.org, or see
+;;; This is GNU Go, a Go program. Contact gnugo@gnu.org, or see
 ;;; http://www.gnu.org/software/gnugo/ for more information.   
 ;;;                                                            
 ;;; Copyright 1999, 2000, 2001 by the Free Software Foundation.            
@@ -659,4 +659,4 @@ See also variable `gnugo-option-history'."
 
 (provide 'gnugo)
 
-;;; $RCSfile: gnugo.el,v $$Revision: 1.2 $ ends here
+;;; $RCSfile: gnugo.el,v $$Revision: 1.3 $ ends here

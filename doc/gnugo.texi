@@ -33,7 +33,7 @@ Software Foundation, Inc.
 @sp 2
 
 This is Edition @value{EDITION} of @cite{The GNU Go Project documentation}, @*
-for the @value{VERSION} version of the GNU GO program.
+for the @value{VERSION} version of the GNU Go program.
 
 @sp 2
 Published by the Free Software Foundation @*
@@ -60,7 +60,7 @@ are respected.
 @ifinfo
 @unnumbered GNU GO
 
-This file documents @code{GNU Go}, a Go program and its sources.
+This manual documents @code{GNU Go}, a Go program and its sources.
 This is Edition @value{EDITION} of the @cite{GNU Go Program Documentation}
 
 Copyright 1999, 2000, 2001 and 2002, The Free Software Foundation, Inc.

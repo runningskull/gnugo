@@ -193,7 +193,7 @@ you may resume it instead of starting a new one.
 See function `gnugo-board-mode' for more info."
   (interactive)
   (if (and (get 'gnugo 'proc)
-	   (y-or-n-p "GNU GO game in progress, resume play? "))
+	   (y-or-n-p "GNU Go game in progress, resume play? "))
       (progn
 	(put 'gnugo 'orig (current-buffer))	; update
 	(switch-to-buffer (get 'gnugo 'bbuf))
@@ -203,7 +203,7 @@ See function `gnugo-board-mode' for more info."
     (put 'gnugo 'console-p t)
     (put 'gnugo 'last 1)
     (let* ((name "gnugo")
-           (args (read-string "GNU GO options: "
+           (args (read-string "GNU Go options: "
                               (car gnugo-option-history)
                               'gnugo-option-history 1))
            (proc (apply 'start-process name nil name (split-string args)))
