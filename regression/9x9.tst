@@ -35,7 +35,7 @@ loadsgf games/nngs/evand-gnugo-3.5.2-200312060932.sgf 32
 #something better than H6
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312041808.sgf 6
 90 reg_genmove black
-#? [E4|F5]*
+#? [E4|F5|E3]*
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312041808.sgf 10
 100 reg_genmove black
@@ -126,9 +126,9 @@ loadsgf games/nngs/whitemouse-gnugo-3.5.2gf1-200312161704.sgf 26
 280 reg_genmove black
 #? [E4]*
 
-loadsgf games/nngs/sjfried-gnugo-3.5.2gf1-200312210441.sgf 20
+loadsgf games/nngs/sjfried-gnugo-3.5.2gf1-200312210441.sgf 22
 290 reg_genmove black
-#? [D2]*
+#? [F5]*
 
 loadsgf games/nngs/sjfried-gnugo-3.5.2gf1-200312210441.sgf 24
 300 reg_genmove black

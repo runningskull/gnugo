@@ -428,6 +428,51 @@ loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 78
 980 reg_genmove white
 #? [!E5]
 
+loadsgf games/nngs/gnugo-3.5.3-JanErik-200401081615.sgf 10
+990 reg_genmove white
+#? [R16|R15|Q15]
+
+loadsgf games/nngs/gnugo-3.5.3-JanErik-200401081615.sgf 22
+1000 reg_genmove white
+#? [F14|F15|D15|D14]
+
+loadsgf games/nngs/gnugo-3.5.3-JanErik-200401081615.sgf 28
+1010 reg_genmove white
+#? [K13]
+
+#something better than C13
+loadsgf games/nngs/gnugo-3.5.3-JanErik-200401081615.sgf 34
+1020 reg_genmove white
+#? [G13]
+
+loadsgf games/nngs/gnugo-3.5.3-JanErik-200401081615.sgf 78
+1030 restricted_genmove white R13 N11
+#? [N11]
+
+#S12 seems to live in ko
+loadsgf games/nngs/gnugo-3.5.3-JanErik-200401081615.sgf 90
+1040 restricted_genmove white T13 S12
+#? [S12]
+
+loadsgf games/nngs/ccwills-gnugo-3.5.3-200401100810.sgf 55
+1050 reg_genmove black
+#? [O9|O10]
+
+#O6 is pointless
+loadsgf games/nngs/ccwills-gnugo-3.5.3-200401100810.sgf 73
+1060 reg_genmove black
+#? [N9]
+
+loadsgf games/nngs/gnugo-3.5.3-dbr-200401121534.sgf 26
+1070 restricted_genmove white B3 C8 C10 B10 D6 D14 F16
+#? [C8]
+
+#Q18 is very bad
+loadsgf games/nngs/gnugo-3.5.3-dbr-200401121534.sgf 83
+1080 reg_genmove white
+#? [!Q18]
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
