@@ -40,7 +40,7 @@
  * Nasty bodge: %o at the start means outdent, i.e. cancel indent.
  */
 
-static void 
+void 
 vgprintf(FILE *outputfile, const char *fmt, va_list ap)
 {
   if (fmt[0] == '%' && fmt[1] == 'o')

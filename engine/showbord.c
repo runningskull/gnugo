@@ -351,10 +351,12 @@ result_to_string(int result)
 int 
 DEBUG_func(int flag, const char *fmt, ...)
 {
-  va_list ap;
-
-  if (debug & flag)
-    gprintf(fmt, ap);
+  if (debug & flag) {
+    va_list ap;
+    va_start(ap, fmt);
+    vgprintf(stderr, fmt, ap);
+    va_end(ap);
+  }
 
   return 1;
 }

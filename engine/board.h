@@ -24,6 +24,7 @@
 #define _BOARD_H_
 
 #include "sgftree.h"
+#include <stdarg.h>
 
 /* local versions of absolute value, min and max */
 
@@ -359,6 +360,7 @@ extern struct stats_data stats;
 
 /* printutils.c */
 int gprintf(const char *fmt, ...);
+void vgprintf(FILE *outputfile, const char *fmt, va_list ap);
 void mprintf(const char *fmt, ...);
 void gfprintf(FILE *outfile, const char *fmt, ...);
 
