@@ -4739,7 +4739,7 @@ owl_substantial(int str)
 	  && trymove(libs[k+1], owl->color, NULL, 0, EMPTY, 0)) {
 	if (level >= 10)
 	  increase_depth_values();
-	owl->goal[libs[k]] = 1;
+	owl->goal[libs[k+1]] = 1;
 	libs[k+1] = libs[k];
       }
       else {

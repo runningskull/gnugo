@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in owl_substantial()
 - merge various code to generate superstring related tactical moves into
   new function superstring_moves()
 - resigning of hopeless games implemented (over GTP and in replay mode)
