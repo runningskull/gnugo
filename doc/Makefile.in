@@ -110,6 +110,9 @@ CLEANFILES = *.log *.dvi *.aux *.vr *.tp *.ky *.pg *.cps *.fns *.toc \
              *.fn *.cp *~
 
 
+TEXI2PDF = texi2pdf
+TEXI2HTML = texi2html
+
 BUILT_SOURCES = gtp-commands.texi
 
 cmdsrc = $(srcdir)/../interface/play_gtp.c
@@ -141,7 +144,6 @@ Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.s
 
 gnugo.info: gnugo.texi $(gnugo_TEXINFOS)
 gnugo.dvi: gnugo.texi $(gnugo_TEXINFOS)
-gnugo.ps: gnugo.texi $(gnugo_TEXINFOS)
 
 .texi.info:
 	@cd $(srcdir) && rm -f $@ $@-[0-9] $@-[0-9][0-9]
@@ -163,17 +165,8 @@ gnugo.ps: gnugo.texi $(gnugo_TEXINFOS)
 MAKEINFO = @MAKEINFO@
 TEXI2DVI = texi2dvi
 DVIPS = dvips
-TEXI2PDF = texi2pdf
-TEXI2HTML = texi2html
-
 .dvi.ps:
 	$(DVIPS) $< -o $@
-
-gnugo.pdf: gnugo.texi $(gnugo_TEXINFOS)
-	$(TEXI2PDF) $<
-
-gnugo.html: gnugo.texi $(gnugo_TEXINFOS)
-	$(TEXI2HTML) -split=chapter -nosec_nav -expand=tex $<
 
 uninstall-info-am:
 	$(PRE_UNINSTALL)
@@ -206,7 +199,7 @@ dist-info: $(INFO_DEPS)
 
 mostlyclean-aminfo:
 	-rm -f gnugo.aux gnugo.cp gnugo.dvi gnugo.fn gnugo.ky gnugo.log gnugo.pg \
-	  gnugo.ps gnugo.toc gnugo.tp gnugo.vr gnugo.pdf gnugo*.html
+	  gnugo.ps gnugo.toc gnugo.tp gnugo.vr
 
 maintainer-clean-aminfo:
 	cd $(srcdir) && \
@@ -389,6 +382,12 @@ uninstall-man: uninstall-man6
 
 gnugo.6: $(srcdir)/gnugo.pod
 	pod2man $(srcdir)/gnugo.pod --section 6 --release @VERSION@ > gnugo.6
+
+gnugo.pdf: gnugo.texi $(gnugo_TEXINFOS)
+	$(TEXI2PDF) $<
+
+gnugo.html: gnugo.texi $(gnugo_TEXINFOS)
+	$(TEXI2HTML) -split=chapter -nosec_nav -expand=tex $<
 
 gtp-commands.texi: $(cmdsrc)
 	cat $(srcdir)/gtp-commands.sed > TMP.sed

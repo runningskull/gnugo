@@ -28,12 +28,21 @@ EXTRA_DIST = automake-1.4.patch gnugo.6 gnugo.pod gtp-commands.sed \
 CLEANFILES = *.log *.dvi *.aux *.vr *.tp *.ky *.pg *.cps *.fns *.toc \
              *.fn *.cp *~
 
+TEXI2PDF = texi2pdf
+TEXI2HTML = texi2html
+
 gnugo.6: $(srcdir)/gnugo.pod
 	pod2man $(srcdir)/gnugo.pod --section 6 --release @VERSION@ > gnugo.6
 
 BUILT_SOURCES = gtp-commands.texi
 
 cmdsrc = $(srcdir)/../interface/play_gtp.c
+
+gnugo.pdf: gnugo.texi $(gnugo_TEXINFOS)
+	$(TEXI2PDF) $<
+
+gnugo.html: gnugo.texi $(gnugo_TEXINFOS)
+	$(TEXI2HTML) -split=chapter -nosec_nav -expand=tex $<
 
 gtp-commands.texi: $(cmdsrc)
 	cat $(srcdir)/gtp-commands.sed > TMP.sed
@@ -43,3 +52,5 @@ gtp-commands.texi: $(cmdsrc)
 	    $(cmdsrc) >> TMP.sed
 	sed -f TMP.sed $(cmdsrc) > $(srcdir)/gtp-commands.texi
 	rm -f TMP.sed
+
+
