@@ -379,7 +379,7 @@ loadsgf games/semeai/semeai16.sgf 230
 
 loadsgf games/nngs/beedee-gnugo-3.5.3-200401140035.sgf 280
 99 analyze_semeai R13 Q13
-#? [1 0 (M12|K9|M6|L7|S17)]
+#? [1 0 (L12|K9|M6|L7|S17)]
 100 analyze_semeai Q13 R13
 #? [1 1 (P10|Q11|S10|T11)]
 

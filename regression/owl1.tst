@@ -366,6 +366,20 @@ loadsgf games/olympiad2004/19x19/gnu-int.sgf 175
 350 owl_defend F11
 #? [0]
 
+# The problem is that the G19 string is not considered as part of an
+# eyespace but as a string that can be tactically defended at F18.
+# Unfortunately white F18 gives black a seki.
+loadsgf games/scoring/score11.sgf
+play white C15
+play white A13
+play white E14
+351 owl_attack E16
+#? [1 (PASS|E11|F19|G18)]
+
+loadsgf games/scoring/score14.sgf
+352 owl_attack B19
+#? [0]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

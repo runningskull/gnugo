@@ -265,5 +265,5 @@ loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 96
 # A classic, should be attempted.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 126
 560 reg_genmove black
-#? [B2]
+#? [B1]
 

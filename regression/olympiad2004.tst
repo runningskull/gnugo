@@ -249,9 +249,10 @@ loadsgf games/olympiad2004/9x9/gnu-mag.sgf 9
 501 reg_genmove black
 #? [F3]
 
-# Hane at A6 leads nowhere. The clamp at B5
+# Hane at A6 leads nowhere. The clamp at B5 has more potential.
+# The cut at C6 is captured right out in a ladder.
 loadsgf games/olympiad2004/9x9/gnu-mag.sgf 25
-502 restricted_genmove black A6 B5
+502 restricted_genmove black A6 B5 C6
 #? [B5]
 
 # Wrong atari. F6 is better than E7.
@@ -260,16 +261,16 @@ loadsgf games/olympiad2004/9x9/gnu-mag.sgf 35
 #? [F6]
 
 # F6 really bad shape.
-loadsgf games/olympiad2004/9x9/gnu-mag.sgf 11
+loadsgf games/olympiad2004/9x9/gnu-dbg.sgf 11
 601 restricted_genmove black F7 F6 H4 G3
 #? [!F6]
 
 # G6 about as bad shape as one can get. E6 has more promise.
-loadsgf games/olympiad2004/9x9/gnu-mag.sgf 23
+loadsgf games/olympiad2004/9x9/gnu-dbg.sgf 23
 602 reg_genmove black
 #? [E6]
 
 # Always connect from the secure end. A1 goes before A4.
-loadsgf games/olympiad2004/9x9/gnu-mag.sgf 63
+loadsgf games/olympiad2004/9x9/gnu-dbg.sgf 63
 603 reg_genmove black
 #? [A1]

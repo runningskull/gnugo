@@ -39,6 +39,7 @@ loadsgf games/scoring/score10.sgf
 10 final_score
 #? [W\+104.5]
 
+# See also owl1:351
 loadsgf games/scoring/score11.sgf
 11 final_score
 #? [W\+132.5]*
@@ -51,6 +52,7 @@ loadsgf games/scoring/score13.sgf
 13 final_score
 #? [W\+223.5]
 
+# See also owl1:352
 loadsgf games/scoring/score14.sgf
 14 final_score
 #? [W\+73.5]*

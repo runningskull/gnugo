@@ -304,6 +304,24 @@ loadsgf games/gunnar/gunnar13.sgf
 54 restricted_genmove white J4 F6 D9
 #? [D9]
 
+# White must find a ko threat. In the choice between C13 and D13, the
+# former has absolutely no followup potential and in this case also
+# happens to lose a point right out.
+#
+# Notice that C1 must be included among the considered moves to
+# provoke generation of ko threats in the first place.
+loadsgf games/gunnar/gunnar14.sgf
+play black B1
+55 restricted_genmove white C13 D13 C1
+#? [D13]
+
+# White must find a ko threat. A11 is neither a ko threat, nor worth a
+# point.
+loadsgf games/gunnar/gunnar15.sgf
+play black R1
+56 reg_genmove white
+#? [P18|E15|O12|N11|T12|T10|S7|T5]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

@@ -26,9 +26,10 @@ loadsgf games/scoring/score37.sgf
 37 final_score
 #? [B\+3.5]
 
-loadsgf games/scoring/score38.sgf
-38 final_score
-#? [B\+8.5]*
+# The lower left corner is unsettled.
+# loadsgf games/scoring/score38.sgf
+# 38 final_score
+# #? [B\+8.5]*
 
 loadsgf games/scoring/score39.sgf
 39 final_score
@@ -50,9 +51,11 @@ loadsgf games/scoring/score43.sgf
 43 final_score
 #? [B\+29.5]*
 
-loadsgf games/scoring/score44.sgf
-44 final_score
-#? [B\+76.5]*
+# This is not a proper scoring problem at all, rather a full board
+# life and death problem.
+# loadsgf games/scoring/score44.sgf
+# 44 final_score
+# #? [B\+76.5]*
 
 loadsgf games/scoring/score45.sgf
 45 final_score
