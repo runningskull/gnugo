@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function defend_secondary_chain_moves() in reading.c
+- new parameter be_aggressive to break_chain2_moves(),
+  break_chain2_defense_moves() and break_chain3_moves()
+- new depth value: break_chain_depth
+- defend2() no longer plays on self atari liberties
+- superstring_breakchain_moves() renamed superstring_break_chain_moves()
 - fix "no moves found" logic in various readconnect.c functions
 - new debug flag DEBUG_BREAKIN
 - "smaller goal" in breakin.c revised

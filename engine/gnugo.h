@@ -300,6 +300,7 @@ extern int attack_by_pattern;  /* use patterns for tactical reading attack */
 extern int mandated_depth;
 extern int mandated_backfill_depth;
 extern int mandated_backfill2_depth;
+extern int mandated_break_chain_depth;
 extern int mandated_superstring_depth;
 extern int mandated_fourlib_depth;
 extern int mandated_ko_depth;

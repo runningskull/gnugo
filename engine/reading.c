@@ -182,17 +182,21 @@ static void edge_block_moves(int str, int apos,
 static void propose_edge_moves(int str, int *libs, int liberties,
 			       struct reading_moves *moves, int color);
 static void break_chain_moves(int str, struct reading_moves *moves);
+static void defend_secondary_chain_moves(int str, struct reading_moves *moves,
+					 int min_liberties);
 static void break_chain2_efficient_moves(int str, 
 					 struct reading_moves *moves);
 static void do_find_break_chain2_efficient_moves(int str, int adj,
 						 struct reading_moves *moves);
 static void break_chain2_moves(int str, struct reading_moves *moves,
-			       int require_safe);
-static void break_chain2_defense_moves(int str, struct reading_moves *moves);
-static void break_chain3_moves(int str, struct reading_moves *moves);
+			       int require_safe, int be_aggressive);
+static void break_chain2_defense_moves(int str, struct reading_moves *moves,
+				       int be_aggressive);
+static void break_chain3_moves(int str, struct reading_moves *moves,
+			       int be_aggressive);
 static void superstring_moves(int str, struct reading_moves *moves, 
     		  	      int liberty_cap, int does_attack);
-static void superstring_breakchain_moves(int str, int liberty_cap,
+static void superstring_break_chain_moves(int str, int liberty_cap,
 					 struct reading_moves *moves);
 static void double_atari_chain2_moves(int str,
     				      struct reading_moves *moves);
@@ -1284,6 +1288,8 @@ defend2(int str, int *move, int komaster, int kom_pos)
   int k;
   int r;
   int suggest_move = NO_MOVE;
+  int string_size;
+  int be_aggressive;
 
   SETUP_TRACE_INFO("defend2", str);
   reading_node_counter++;
@@ -1305,13 +1311,18 @@ defend2(int str, int *move, int komaster, int kom_pos)
    * 3. Second order liberties moving up from first line to second.
    * 4. Edge clamps.
    */
-  for (k = 0; k < liberties; k++) {
-    moves.pos[k] = libs[k];
-    moves.score[k] = 0;
-    moves.message[k] = "liberty";
-  }
-  moves.num = liberties;
-  
+  moves.num = 0;
+
+  /* We don't want to play self-atari liberties, unless the string is a
+   * single stone (in which case it might be a snapback move).  Sacrifices
+   * might be good moves, but not in tactical reading.
+   */
+  string_size = countstones(str);
+  if (string_size == 1 || !is_self_atari(libs[0], color))
+    ADD_CANDIDATE_MOVE(libs[0], 0, moves, "liberty");
+  if (string_size == 1 || !is_self_atari(libs[1], color))
+    ADD_CANDIDATE_MOVE(libs[1], 0, moves, "liberty");
+
   break_chain_moves(str, &moves);
   break_chain2_efficient_moves(str, &moves);
   propose_edge_moves(str, libs, liberties, &moves, color);
@@ -1370,11 +1381,11 @@ defend2(int str, int *move, int komaster, int kom_pos)
 	 * stone, we don't even try.
 	 */
 	if (!is_self_atari(xpos, color)
-	    || has_neighbor(xpos, color))
+	    && has_neighbor(xpos, color))
 	  ADD_CANDIDATE_MOVE(xpos, 0, moves, "backfill-A");
-
       }
     }
+
     liberties2 = approxlib(libs[k], other, 3, libs2);
     if (liberties2 <= 2) {
       for (r = 0; r < liberties2; r++) {
@@ -1416,9 +1427,13 @@ defend2(int str, int *move, int komaster, int kom_pos)
 
   saved_num_moves = moves.num;
 
-  if (stackp <= superstring_depth) {
-    superstring_breakchain_moves(str, 4, &moves);
-  }
+  /* If we haven't found any useful moves in first batches, be more
+   * aggressive in break_chain[23]_moves().
+   */
+  be_aggressive = (moves.num == 0);
+
+  if (stackp <= superstring_depth)
+    superstring_break_chain_moves(str, 4, &moves);
 
   /* If nothing else works, we try playing a liberty of the
    * super_string.
@@ -1426,15 +1441,14 @@ defend2(int str, int *move, int komaster, int kom_pos)
   if (stackp <= superstring_depth)
     superstring_moves(str, &moves, 3, 0);
 
-  break_chain2_defense_moves(str, &moves);
+  break_chain2_defense_moves(str, &moves, be_aggressive);
 
-  if (stackp <= backfill_depth) {
+  if (stackp <= backfill_depth)
     special_rescue5_moves(str, libs, &moves);
-  }
 
-  if (stackp <= backfill2_depth) {
-    break_chain3_moves(str, &moves);
-  }
+  if (stackp <= break_chain_depth
+      || (be_aggressive && stackp <= backfill_depth))
+    break_chain3_moves(str, &moves, be_aggressive);
 
   /* Only order and test the new set of moves. */
   order_moves(str, &moves, other, read_function_name, saved_num_moves, NO_MOVE);
@@ -1633,10 +1647,10 @@ defend3(int str, int *move, int komaster, int kom_pos)
   }
 
   if (level >= 10 && stackp <= backfill2_depth)
-    superstring_breakchain_moves(str, 4, &moves);
+    superstring_break_chain_moves(str, 4, &moves);
 
-  if (stackp <= backfill2_depth)
-    break_chain2_defense_moves(str, &moves);
+  if (stackp <= break_chain_depth)
+    break_chain2_defense_moves(str, &moves, 0);
 
   if (stackp <= backfill_depth) {
     special_rescue5_moves(str, libs, &moves);
@@ -1679,8 +1693,8 @@ defend3(int str, int *move, int komaster, int kom_pos)
   if (level >= 10 && stackp <= backfill2_depth)
     superstring_moves(str, &moves, 3, 0);
 
-  if (stackp <= backfill2_depth)
-    break_chain3_moves(str, &moves);
+  if (stackp <= break_chain_depth)
+    break_chain3_moves(str, &moves, 0);
 
   /* Only order and test the new set of moves. */
   order_moves(str, &moves, other, read_function_name, saved_num_moves, *move);
@@ -1765,7 +1779,7 @@ defend4(int str, int *move, int komaster, int kom_pos)
   break_chain2_efficient_moves(str, &moves);
 
   if (stackp <= backfill_depth) {
-    break_chain2_defense_moves(str, &moves);
+    break_chain2_defense_moves(str, &moves, 0);
 #if 0 
     hane_rescue_moves(str, libs, &moves);
 #endif
@@ -3543,7 +3557,7 @@ attack3(int str, int *move, int komaster, int kom_pos)
 	      && approxlib(libs2[1], other, 4, NULL) > 3)
 	    continue;
           break_chain_moves(adjs[r], &moves);
-          break_chain2_moves(adjs[r], &moves, 1);
+          break_chain2_moves(adjs[r], &moves, 1, 0);
           for (k = 0; k < 2; k++)
 	    ADD_CANDIDATE_MOVE(libs2[k], 0, moves, "save_boundary-2");
         }
@@ -4326,6 +4340,38 @@ break_chain_moves(int str, struct reading_moves *moves)
 }
 
 
+/* defend_secondary_chain_moves() tries to break a chain by defending
+ * "secondary chain", that is, own strings surrounding a given
+ * opponent string (which is in turn a chainlink for another own
+ * string, phew... :).  Currently, it only defends own strings in
+ * atari.
+ *
+ * It is required that the defending stone played gets at least
+ * `min_liberties', or one less if it is adjacent to the opponent
+ * chainlink.
+ */
+static void
+defend_secondary_chain_moves(int str, struct reading_moves *moves,
+			     int min_liberties)
+{
+  int r;
+  int color = OTHER_COLOR(board[str]);
+  int xpos;
+  int adj;
+  int adjs[MAXCHAIN];
+
+  /* Find links in atari. */
+  adj = chainlinks2(str, adjs, 1);
+
+  for (r = 0; r < adj; r++) {
+    findlib(adjs[r], 1, &xpos);
+    if (approxlib(xpos, color, min_liberties, NULL)
+	+ neighbor_of_string(xpos, str) >= min_liberties)
+      ADD_CANDIDATE_MOVE(xpos, 0, *moves, "defend_secondary_chain");
+  }
+}
+
+
 /*
  * Find moves which immediately capture chain links with 2
  * liberties, in the sense that the links cannot escape atari.
@@ -4428,48 +4474,45 @@ do_find_break_chain2_efficient_moves(int str, int adj,
     ADD_CANDIDATE_MOVE(libs[0], 1, *moves, "break_chain2_efficient-C");
 }
 
-/*
- * (str) points to a group with two liberties. break_chain2_moves
- * tries to defend this worm by attacking * a neighbouring worm with
+
+/* (str) points to a group with two liberties. break_chain2_moves()
+ * tries to defend this string by attacking a neighbouring string with
  * two liberties.
  * This is done by playing on either of its liberties
  * (if (require_safe) is true these are only used if they are not
  * self-ataris), taking a neighbour out of atari or by backfilling if
  * both liberties are self-ataris.
  */
-
 static void
-break_chain2_moves(int str, struct reading_moves *moves, int require_safe)
+break_chain2_moves(int str, struct reading_moves *moves, int require_safe,
+		   int be_aggressive)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
   int r;
-  int k;
-  int apos;
   int adj;
   int adjs[MAXCHAIN];
-  int dummy_adjs[MAXCHAIN];
-  int libs[2];
-  int unsafe[2];
 
   adj = chainlinks2(str, adjs, 2);
-  
+
   for (r = 0; r < adj; r++) {
-    apos = adjs[r];
+    int k;
+    int apos = adjs[r];
+    int libs[2];
+    int unsafe[2];
+    int dummy_adjs[MAXCHAIN];
+
+    findlib(apos, 2, libs);
 
     /* If stackp > backfill_depth, don't bother playing liberties of
      * 2-liberty strings if those also have at least one neighbor in
      * atari. This is intended to solve reading:171 and generally reduce
      * the number of nodes.
-     *
-     * FIXME: We may need to still accept these moves if they happen to
-     * take the ataried string out of atari.
      */
     if (stackp > backfill_depth
 	&& chainlinks2(apos, dummy_adjs, 1) > 0)
       continue;
-      
-    findlib(apos, 2, libs);
+
     for (k = 0; k < 2; k++) {
       unsafe[k] = is_self_atari(libs[k], color);
       if (!unsafe[k]
@@ -4479,17 +4522,26 @@ break_chain2_moves(int str, struct reading_moves *moves, int require_safe)
 	ADD_CANDIDATE_MOVE(libs[k], 0, *moves, "break_chain2-A");
     }
 
-    if (stackp <= backfill2_depth || have_common_lib(str, apos, NULL)) {
-      break_chain_moves(apos, moves);
-      if (unsafe[0] && unsafe[1]) {
+    if (stackp <= break_chain_depth
+	|| (be_aggressive && stackp <= backfill_depth)) {
+      /* If the chain link cannot escape easily, try to defend all adjacent
+       * friendly stones in atari (if any).
+       */
+      if (approxlib(libs[0], other, 4, NULL) < 4
+	  && approxlib(libs[1], other, 4, NULL) < 4)
+	defend_secondary_chain_moves(adjs[r], moves, 2);
+    }
+
+    if (unsafe[0] && unsafe[1]
+	&& (stackp <= backfill2_depth || have_common_lib(str, apos, NULL))) {
+      /* Find backfilling moves. */
+      for (k = 0; k < 2; k++) {
 	int libs2[3];
-	for (k = 0; k < 2; k++) {
-	  if (approxlib(libs[k], other, 3, libs2) == 2) {
-	    int s;
-	    for (s = 0; s < 2; s++)
-	      if (!is_self_atari(libs2[s], color))
-		ADD_CANDIDATE_MOVE(libs2[s], 0, *moves, "break_chain2-B");
-	  }
+	if (approxlib(libs[k], other, 3, libs2) == 2) {
+	  if (!is_self_atari(libs2[0], color))
+	    ADD_CANDIDATE_MOVE(libs2[0], 0, *moves, "break_chain2-B");
+	  if (!is_self_atari(libs2[1], color))
+	    ADD_CANDIDATE_MOVE(libs2[1], 0, *moves, "break_chain2-B");
 	}
       }
     }
@@ -4508,12 +4560,13 @@ break_chain2_moves(int str, struct reading_moves *moves, int require_safe)
  */
 
 static void
-break_chain2_defense_moves(int str, struct reading_moves *moves)
+break_chain2_defense_moves(int str, struct reading_moves *moves,
+			   int be_aggressive)
 {
   int saved_num_moves = moves->num;
   int k;
 
-  break_chain2_moves(str, moves, !(stackp <= backfill_depth));
+  break_chain2_moves(str, moves, !(stackp <= backfill_depth), be_aggressive);
   for (k = saved_num_moves; k < moves->num; k++)
     moves->score[k] = -2;
 }
@@ -4528,7 +4581,7 @@ break_chain2_defense_moves(int str, struct reading_moves *moves)
  */
 
 static void
-break_chain3_moves(int str, struct reading_moves *moves)
+break_chain3_moves(int str, struct reading_moves *moves, int be_aggressive)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -4593,8 +4646,11 @@ break_chain3_moves(int str, struct reading_moves *moves)
 	possible_moves[u++] = libs[k];
       }
     }
+
+    if (stackp <= backfill2_depth
+	|| (be_aggressive && stackp <= backfill_depth))
+      defend_secondary_chain_moves(adjs[r], moves, 3);
   }
-  
 
   for (v = 0; v < u; v++) {
     /* We do not wish to consider the move if it can be 
@@ -4604,7 +4660,8 @@ break_chain3_moves(int str, struct reading_moves *moves)
      * (This currently only makes a difference at stackp == backfill2_depth.)
      */
     int xpos = possible_moves[v];
-    if (stackp < backfill2_depth
+    if (stackp <= break_chain_depth
+	|| (be_aggressive && stackp <= backfill_depth)
 	|| approxlib(xpos, color, 2, NULL) > 1)
       /* We use a negative initial score here as we prefer to find
        * direct defense moves.
@@ -4613,6 +4670,7 @@ break_chain3_moves(int str, struct reading_moves *moves)
   }
 }
 
+
 /* This function looks for moves attacking those components
  * of the surrounding chain of the superstring (see find_superstring
  * for the definition) which have fewer than liberty_cap liberties,
@@ -4620,8 +4678,8 @@ break_chain3_moves(int str, struct reading_moves *moves)
  * are tested by break_chain_moves.
  */
 static void
-superstring_breakchain_moves(int str, int liberty_cap,
-    			     struct reading_moves *moves)
+superstring_break_chain_moves(int str, int liberty_cap,
+			      struct reading_moves *moves)
 {
   int adj;
   int adjs[MAXCHAIN];
@@ -4633,7 +4691,7 @@ superstring_breakchain_moves(int str, int liberty_cap,
     int liberties = countlib(adjs[k]);
     if (liberties == 1) {
       findlib(adjs[k], 1, &apos);
-      ADD_CANDIDATE_MOVE(apos, 0, *moves, "superstring_breakchain");
+      ADD_CANDIDATE_MOVE(apos, 0, *moves, "superstring_break_chain");
     }
     else if (liberties == 2)
       do_find_break_chain2_efficient_moves(str, adjs[k], moves);
@@ -5184,6 +5242,7 @@ order_moves(int str, struct reading_moves *moves, int color,
       moves->message[i] = temp_message;
     }
   }
+
 
   if (0) {
     gprintf("%oVariation %d:\n", count_variations);

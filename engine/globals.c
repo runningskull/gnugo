@@ -69,6 +69,7 @@ int position_number;    /* position number */
 int depth;              /* deep reading cut off */
 int backfill_depth;     /* deep reading cut off */
 int backfill2_depth;    /* deep reading cut off */
+int break_chain_depth;  /* deep reading cut off */
 int superstring_depth;  /* deep reading cut off */
 int fourlib_depth;      /* deep reading cut off */
 int ko_depth;           /* deep reading cut off */
@@ -89,6 +90,7 @@ int breakin_depth;
 int mandated_depth;             /* deep reading cut off, mandated value */
 int mandated_backfill_depth;    /* deep reading cut off, mandated value */
 int mandated_backfill2_depth;   /* deep reading cut off, mandated value */
+int mandated_break_chain_depth; /* deep reading cut off, mandated value */
 int mandated_superstring_depth; /* deep reading cut off, mandated value */
 int mandated_fourlib_depth;     /* deep reading cut off, mandated value */
 int mandated_ko_depth;          /* deep reading cut off, mandated value */

@@ -103,6 +103,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_DECIDE_COMBINATION,
       OPT_BRANCH_DEPTH,
       OPT_BACKFILL2_DEPTH,
+      OPT_BREAK_CHAIN_DEPTH,
       OPT_SUPERSTRING_DEPTH,
       OPT_AA_DEPTH,
       OPT_DEBUG_FLAGS,
@@ -203,6 +204,7 @@ static struct gg_option const long_options[] =
   {"backfill-depth", required_argument, 0, 'B'},
   {"branch-depth",   required_argument, 0, OPT_BRANCH_DEPTH},
   {"backfill2-depth",   required_argument, 0, OPT_BACKFILL2_DEPTH},
+  {"break_chain-depth", required_argument, 0, OPT_BREAK_CHAIN_DEPTH},
   {"superstring-depth", required_argument, 0, OPT_SUPERSTRING_DEPTH},
   {"fourlib-depth",  required_argument, 0, 'F'},
   {"ko-depth",       required_argument, 0, 'K'},
@@ -318,6 +320,7 @@ main(int argc, char *argv[])
   mandated_depth               = -1;
   mandated_backfill_depth      = -1;
   mandated_backfill2_depth     = -1;
+  mandated_break_chain_depth   = -1;
   mandated_superstring_depth   = -1;
   mandated_fourlib_depth       = -1;
   mandated_ko_depth            = -1;
@@ -717,6 +720,10 @@ main(int argc, char *argv[])
 	
       case OPT_BACKFILL2_DEPTH:
 	mandated_backfill2_depth = atoi(gg_optarg);
+	break;
+	
+      case OPT_BREAK_CHAIN_DEPTH:
+	mandated_break_chain_depth = atoi(gg_optarg);
 	break;
 	
       case OPT_SUPERSTRING_DEPTH:
@@ -1351,6 +1358,7 @@ Options that affect strength (higher = stronger, slower):\n\
    -K, --ko-depth <depth>       deep reading cutoff (default %d)\n\
    --branch-depth <depth>       deep reading cutoff (default %d)\n\
    --backfill2-depth <depth>    deep reading cutoff (default %d)\n\
+   --break_chain-depth <depth>  deep reading cutoff (default %d)\n\
    --superstring-depth <depth>  deep reading cutoff (default %d)\n\
    --aa-depth <depth>           deep reading cutoff (default %d)\n\
    --owl-distrust <depth>       owl distrust depth (default %d)\n\
@@ -1502,7 +1510,7 @@ show_help(void)
   set_depth_values(DEFAULT_LEVEL);
   fprintf(stderr, USAGE,
 	  depth, backfill_depth, fourlib_depth, ko_depth, branch_depth,
-	  backfill2_depth, superstring_depth, aa_depth, 
+	  backfill2_depth, break_chain_depth, superstring_depth, aa_depth, 
 	  owl_distrust_depth, owl_branch_depth,
 	  owl_reading_depth, owl_node_limit, DEFAULT_LEVEL);
   fprintf(stderr, USAGE1,

@@ -610,6 +610,7 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
 #define BRANCH_DEPTH         13
 #define BACKFILL_DEPTH       12
 #define BACKFILL2_DEPTH       5
+#define BREAK_CHAIN_DEPTH     7
 #define SUPERSTRING_DEPTH     7
 #define FOURLIB_DEPTH         7
 #define KO_DEPTH              8
@@ -678,10 +679,11 @@ set_depth_values(int level)
   else 
     depth_level = level - 8;
 
-  depth               = gg_max(6, DEPTH           + depth_level);
-  backfill_depth      = gg_max(2, BACKFILL_DEPTH  + depth_level);
-  backfill2_depth     = gg_max(1, BACKFILL2_DEPTH + depth_level);
-  branch_depth        = gg_max(3, BRANCH_DEPTH    + depth_level);
+  depth               = gg_max(6, DEPTH 	    + depth_level);
+  branch_depth        = gg_max(3, BRANCH_DEPTH	    + depth_level);
+  backfill_depth      = gg_max(2, BACKFILL_DEPTH    + depth_level);
+  backfill2_depth     = gg_max(1, BACKFILL2_DEPTH   + depth_level);
+  break_chain_depth   = gg_max(2, BREAK_CHAIN_DEPTH + depth_level);
   if (level >= 8)
     owl_distrust_depth  = gg_max(1, (2 * OWL_DISTRUST_DEPTH + depth_level) / 2);
   else
@@ -741,14 +743,16 @@ set_depth_values(int level)
     backfill_depth = mandated_backfill_depth;
   if (mandated_backfill2_depth != -1)
     backfill2_depth = mandated_backfill2_depth;
+  if (mandated_break_chain_depth != -1)
+    break_chain_depth = mandated_break_chain_depth;
   if (mandated_superstring_depth != -1)
     superstring_depth = mandated_superstring_depth;
+  if (mandated_branch_depth != -1)
+    branch_depth = mandated_branch_depth;
   if (mandated_fourlib_depth != -1)
     fourlib_depth = mandated_fourlib_depth;
   if (mandated_ko_depth != -1)
     ko_depth = mandated_ko_depth;
-  if (mandated_branch_depth != -1)
-    branch_depth = mandated_branch_depth;
   if (mandated_aa_depth != -1)
     aa_depth = mandated_aa_depth;
   if (mandated_owl_distrust_depth != -1)
@@ -777,6 +781,7 @@ modify_depth_values(int n)
   depth              += n;
   backfill_depth     += n;
   backfill2_depth    += n;
+  break_chain_depth  += n;
   superstring_depth  += n;
   branch_depth       += n;
   fourlib_depth      += n;
@@ -804,6 +809,7 @@ decrease_depth_values(void)
 static int save_depth;
 static int save_backfill_depth;
 static int save_backfill2_depth;
+static int save_break_chain_depth;
 static int save_superstring_depth;
 static int save_branch_depth;
 static int save_fourlib_depth;
@@ -812,11 +818,13 @@ static int save_ko_depth;
 /* Currently this function is never called. */
 
 void
-set_temporary_depth_values(int d, int b, int f, int k, int br, int b2, int ss)
+set_temporary_depth_values(int d, int b, int b2, int bc,
+			   int ss, int br, int f, int k)
 {
   save_depth             = depth;
   save_backfill_depth    = backfill_depth;
   save_backfill2_depth   = backfill2_depth;
+  save_break_chain_depth = break_chain_depth;
   save_superstring_depth = superstring_depth;
   save_branch_depth      = branch_depth;
   save_fourlib_depth     = fourlib_depth;
@@ -825,6 +833,7 @@ set_temporary_depth_values(int d, int b, int f, int k, int br, int b2, int ss)
   depth             = d;
   backfill_depth    = b;
   backfill2_depth   = b2;
+  break_chain_depth = bc;
   superstring_depth = ss;
   branch_depth      = br;
   fourlib_depth     = f;
@@ -837,6 +846,7 @@ restore_depth_values()
   depth             = save_depth;
   backfill_depth    = save_backfill_depth;
   backfill2_depth   = save_backfill2_depth;
+  break_chain_depth = save_break_chain_depth;
   superstring_depth = save_superstring_depth;
   branch_depth      = save_branch_depth;
   fourlib_depth     = save_fourlib_depth;

@@ -401,8 +401,8 @@ void set_depth_values(int level);
 void modify_depth_values(int n);
 void increase_depth_values(void);
 void decrease_depth_values(void);
-void set_temporary_depth_values(int d, int b, int f, int k, 
-				int br, int b2, int ss);
+void set_temporary_depth_values(int d, int b, int b2, int bc,
+				int ss, int br, int f, int k);
 void restore_depth_values(void);
 
 int safe_move(int move, int color);
@@ -795,6 +795,7 @@ extern const int    transformation2[8][2][2];
 extern int depth;               /* deep reading cutoff */
 extern int backfill_depth;      /* deep reading cutoff */
 extern int backfill2_depth;     /* deep reading cutoff */
+extern int break_chain_depth;   /* deep reading cutoff */
 extern int superstring_depth;   /* deep reading cutoff */
 extern int branch_depth;        /* deep reading cutoff */
 extern int fourlib_depth;       /* deep reading cutoff */
