@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- constrain thrashing dragons more often
 - hashing cleanups
 - missing files added to EXTRADIST in Makefile.* in doc/ and regression/
 - new file logo-36.pdf

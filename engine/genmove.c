@@ -452,7 +452,7 @@ do_genmove(int *move, int color, float pure_threat_value,
    * dragon dangerous and change its status from DEAD to
    * UNKNOWN. This may generate a move.
    */
-  if (val < 10.0 && !doing_scoring && !limit_search) {
+  if (val < 0.4 * our_score && !doing_scoring && !limit_search) {
     if (revise_thrashing_dragon(color, our_score, 15.0)) {
       shapes(color);
       if (!disable_endgame_patterns)
