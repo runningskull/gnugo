@@ -89,6 +89,7 @@ DTR = aa_attackpats.dtr owl_attackpats.dtr owl_defendpats.dtr \
 EXTRA_DIST = $(DSP)\
         $(DTR)\
 	dfa.c\
+	gnugo-db.el\
 	hoshi_keima.sgf\
 	hoshi_other.sgf\
 	komoku.sgf\
