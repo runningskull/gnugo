@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- breakin and readconnect fixes
 - first implementation of owl threat combinator--intended for improving
   move ordering
 - pattern attributes (shape, followup etc.) are now stored in lists, not

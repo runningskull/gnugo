@@ -2753,12 +2753,21 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
 
   compute_connection_distances(str, NO_MOVE, 2.501, &conn1, 1);
   for (k = 0; k < conn1.queue_end; k++)
-    if (goal[conn1.queue[k]]
-	&& board[conn1.queue[k]] == color) {
-      str2 = conn1.queue[k];
-      TRACE("%oUsing %1m as secondary target.\n", str2);
-      mark_string(str2, breakin_shadow, 1);
-      break;
+    if (board[conn1.queue[k]] == color) {
+      int stones[MAX_BOARD * MAX_BOARD];
+      int num_stones = findstones(conn1.queue[k],
+	  			  MAX_BOARD * MAX_BOARD, stones);
+      int i;
+      for (i = 0; i < num_stones; i++) {
+	if (goal[stones[i]]) {
+	  str2 = find_origin(stones[i]);
+	  TRACE("%oUsing %1m as secondary target.\n", str2);
+	  mark_string(str2, breakin_shadow, 1);
+	  break;
+	}
+      }
+      if (i < num_stones)
+	break;
     }
 
   /* Add all stones in the goal to the queue. */
@@ -2802,7 +2811,7 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
 				      moves, *total_distance, cutoff);
   }
 
-  {
+  if (color_to_move != board[str]) {
     int move;
     if (num_moves < MAX_MOVES
 	&& ON_BOARD(str2)
@@ -2810,6 +2819,7 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
       moves[num_moves++] = move;
     }
   }
+
   for (k = 0; k < num_moves; k++)
     breakin_shadow[moves[k]] = 1;
 
@@ -4093,7 +4103,7 @@ compute_connection_distances(int str, int target, float cutoff,
   clear_connection_data(conn);
 
   /* Add the origin of the initial string to the queue. */
-  add_to_start_queue(str, 0.0, conn);
+  add_to_start_queue(find_origin(str), 0.0, conn);
 
   conn->target = target;
   conn->cutoff_distance = cutoff;
