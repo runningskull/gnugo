@@ -327,7 +327,7 @@ void end_draw_board(void);
 void showboard(int xo);  /* ascii rep. of board to stdout */
 
 /* printutils.c */
-void gprintf(const char *fmt, ...);
+int gprintf(const char *fmt, ...);
 void mprintf(const char *fmt, ...);
 void gfprintf(FILE *outfile, const char *fmt, ...);
 const char *color_to_string(int color);
@@ -357,13 +357,14 @@ void debug_influence_move(int i, int j);
 
 #else
 
-#define TRACE  if (!(verbose)) ; else gprintf
-#define RTRACE if (!(verbose >= 3)) ; else gprintf
-#define VTRACE if (!(verbose >= 4)) ; else gprintf
+/* These can cause harmless compiler warnings. */
+#define TRACE  (verbose) && gprintf
+#define RTRACE (verbose >= 3) && gprintf
+#define VTRACE (verbose >= 4) && gprintf
 /* if debug == 0, then can skip the function call. */
-#define DEBUG  if (!debug) ; else DEBUG_func
+#define DEBUG  (debug) && DEBUG_func
 
-void DEBUG_func(int level, const char *fmt, ...);
+int DEBUG_func(int level, const char *fmt, ...);
 
 #endif
 

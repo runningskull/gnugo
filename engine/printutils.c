@@ -175,15 +175,17 @@ gfprintf(FILE *outfile, const char *fmt, ...)
 
 /*
  * required wrapper around vgprintf, writes to stderr.
+ * Always returns 1 to allow use in short-circuit logical expressions.
  */
 
-void 
+int 
 gprintf(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
   vgprintf(stderr, fmt, ap);
   va_end(ap);
+  return 1;
 }
 
 
@@ -205,6 +207,8 @@ mprintf(const char *fmt, ...)
 
 /* Some C compilers allows us to define these as macros in liberty.h */
 
+#if 0
+/* See liberty.h for a simpler non-variadic macro define for these. */
 void 
 TRACE_func(const char *fmt, ...)
 {
@@ -243,8 +247,10 @@ RTRACE_func(const char *fmt, ...)
   }
 }
 
+#endif 
 
-void 
+/* Always returns 1 to allow use in short-circuit logical expressions. */
+int 
 DEBUG_func(int flag, const char *fmt, ...)
 {
   va_list ap;
@@ -254,6 +260,8 @@ DEBUG_func(int flag, const char *fmt, ...)
     vgprintf(stderr, fmt, ap);
     va_end(ap);
   }
+
+  return 1;
 }
 
 #endif
@@ -323,9 +331,17 @@ color_to_string(int color)
 const char *
 location_to_string(int pos)
 {
-  static char buf[5];
-  location_to_buffer(pos, buf);
-  return buf;
+  static int init = 0;
+  static char buf[BOARDSIZE][5];
+  if (!init) {
+    int pos;
+    for (pos =0; pos < BOARDSIZE; pos++) {
+      location_to_buffer(pos, buf[pos]);
+    }
+    init = 1;
+  }
+  ASSERT1(pos >= 0 && pos < BOARDSIZE, pos);
+  return buf[pos];
 }
 
 /* Convert a location to a string. */
