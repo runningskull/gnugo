@@ -452,7 +452,7 @@ store_persistent_reading_cache(int routine, int str, int result, int move,
     if ((ON_BOARD(SOUTH(k)) && active[SOUTH(k)] > 0 && active[SOUTH(k)] < 4)
 	|| (ON_BOARD(WEST(k)) && active[WEST(k)] > 0 && active[WEST(k)] < 4)
 	|| (ON_BOARD(NORTH(k)) && active[NORTH(k)] > 0 && active[NORTH(k)] < 4)
-	|| (ON_BOARD(EAST(k)) && active[EAST(k)] > 1 && active[EAST(k)] < 4))
+	|| (ON_BOARD(EAST(k)) && active[EAST(k)] > 0 && active[EAST(k)] < 4))
       active[k] = 4;
   }
 
