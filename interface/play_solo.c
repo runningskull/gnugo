@@ -270,7 +270,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
      * dragon status is computed. Therefore the call to
      * examine_position().
      */
-    examine_position(next, EXAMINE_ALL);
+    examine_position(EXAMINE_ALL);
     score = gnugo_estimate_score(NULL, NULL);
   }
   

@@ -51,6 +51,9 @@
 #include "gg_utils.h"
 
 static void initialize_supplementary_dragon_data(void);
+static void find_lunches(void);
+static void eye_computations(void);
+static void revise_inessentiality(void);
 static void find_neighbor_dragons(void);
 static void add_adjacent_dragons(int a, int b);
 static void add_adjacent_dragon(int a, int b);
@@ -97,7 +100,7 @@ dragon2_func(int pos)
  */
 
 void 
-make_dragons(int color, int stop_before_owl)
+make_dragons(int stop_before_owl)
 {
   int str;
   int d;
@@ -119,87 +122,15 @@ make_dragons(int color, int stop_before_owl)
   initialize_supplementary_dragon_data();
   
   /* Find adjacent worms which can be easily captured: */
-  
-  for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
-      int food;
-
-      if (worm[str].origin != str
-	  || board[str] == EMPTY
-	  || worm[str].lunch == NO_MOVE)
-	continue;
-
-      food = worm[str].lunch;
-
-      /* In contrast to worm lunches, a dragon lunch must also be
-       * able to defend itself. 
-       */
-      if (worm[food].defense_codes[0] == 0)
-	continue;
-
-      /* Tell the move generation code about the lunch. */
-      if (IS_STONE(color))
-	add_lunch(str, food);
-	
-      /* If several lunches are found, we pick the juiciest.
-       * First maximize cutstone, then minimize liberties.
-       */
-      {
-	int origin = dragon[str].origin;
-	int lunch = DRAGON2(origin).lunch;
-
-	if (lunch == NO_MOVE
-	    || worm[food].cutstone > worm[lunch].cutstone
-	    || (worm[food].cutstone == worm[lunch].cutstone
-		&& (worm[food].liberties < worm[lunch].liberties))) {
-	  DRAGON2(origin).lunch = worm[food].origin;
-	  TRACE("at %1m setting %1m.lunch to %1m (cutstone=%d)\n",
-		str, origin,
-		worm[food].origin, worm[food].cutstone);
-	}
-      }
-    }
+  find_lunches();
 
   /* Find topological half eyes and false eyes. */
   find_half_and_false_eyes(BLACK, black_eye, half_eye, NULL);
   find_half_and_false_eyes(WHITE, white_eye, half_eye, NULL);
 
-  /* Compute the number of eyes, half eyes, etc. in an eye space. */
-  for (str = BOARDMIN; str < BOARDMAX; str++) {
-    if (!ON_BOARD(str))
-      continue;
-
-    if (black_eye[str].color == BLACK
-	&& black_eye[str].origin == str) {
-      struct eyevalue value;
-      int attack_point, defense_point;
-      
-      compute_eyes(str, &value, &attack_point, &defense_point, 
-		   black_eye, half_eye, 1, color);
-      DEBUG(DEBUG_EYES, "Black eyespace at %1m: %s\n", str,
-	    eyevalue_to_string(&value));
-      black_eye[str].value = value;
-      black_eye[str].attack_point = attack_point;
-      black_eye[str].defense_point = defense_point;
-      propagate_eye(str, black_eye);
-    }
-    
-    if (white_eye[str].color == WHITE
-	&& white_eye[str].origin == str) {
-      struct eyevalue value;
-      int attack_point, defense_point;
-      
-      compute_eyes(str, &value, &attack_point, &defense_point,
-		   white_eye, half_eye, 1, color);
-      DEBUG(DEBUG_EYES, "White eyespace at %1m: %s\n", str,
-	    eyevalue_to_string(&value));
-      white_eye[str].value = value;
-      white_eye[str].attack_point = attack_point;
-      white_eye[str].defense_point = defense_point;
-      propagate_eye(str, white_eye);
-    }
-  }
-
+  /* Compute the number of eyes, half eyes, determine attack/defense points
+   * etc. for all eye spaces. */
+  eye_computations();
   /* Try to determine whether topologically false and half eye points
    * contribute to territory even if the eye doesn't solidify.
    */
@@ -550,6 +481,128 @@ make_dragons(int color, int stop_before_owl)
     if (ON_BOARD(str))
       dragon[str].status = dragon[dragon[str].origin].status;
 
+  /* Revise inessentiality of critical worms and dragons. */
+  revise_inessentiality();
+
+  semeai();
+  time_report(2, "  semeai module", NO_MOVE, 1.0);
+  
+  identify_thrashing_dragons();
+
+  /* Count the non-dead dragons. */
+  lively_white_dragons = 0;
+  lively_black_dragons = 0;
+  for (d = 0; d < number_of_dragons; d++)
+    if (DRAGON(d).crude_status != DEAD) {
+      if (DRAGON(d).color == WHITE)
+        lively_white_dragons++;
+      else
+        lively_black_dragons++;
+    }
+}
+
+
+/* Find capturable worms adjacent to each dragon. */
+static void
+find_lunches()
+{
+  int str;
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
+      int food;
+
+      if (worm[str].origin != str
+	  || board[str] == EMPTY
+	  || worm[str].lunch == NO_MOVE)
+	continue;
+
+      food = worm[str].lunch;
+
+      /* In contrast to worm lunches, a dragon lunch must also be
+       * able to defend itself. 
+       */
+      if (worm[food].defense_codes[0] == 0)
+	continue;
+
+      /* Tell the move generation code about the lunch. */
+      add_lunch(str, food);
+	
+      /* If several lunches are found, we pick the juiciest.
+       * First maximize cutstone, then minimize liberties.
+       */
+      {
+	int origin = dragon[str].origin;
+	int lunch = DRAGON2(origin).lunch;
+
+	if (lunch == NO_MOVE
+	    || worm[food].cutstone > worm[lunch].cutstone
+	    || (worm[food].cutstone == worm[lunch].cutstone
+		&& (worm[food].liberties < worm[lunch].liberties))) {
+	  DRAGON2(origin).lunch = worm[food].origin;
+	  TRACE("at %1m setting %1m.lunch to %1m (cutstone=%d)\n",
+		str, origin,
+		worm[food].origin, worm[food].cutstone);
+	}
+      }
+    }
+}
+
+
+/* Compute the value of each eye space. Store its attack and defense point.
+ * A more comlete list of attack and defense points is stored in the lists
+ * black_vital_points and white_vital_points.
+ */
+static void
+eye_computations()
+{ 
+  int str;
+  memset(black_vital_points, 0, BOARDMAX * sizeof(struct vital_eye_points));
+  memset(white_vital_points, 0, BOARDMAX * sizeof(struct vital_eye_points));
+
+  for (str = BOARDMIN; str < BOARDMAX; str++) {
+    if (!ON_BOARD(str))
+      continue;
+
+    if (black_eye[str].color == BLACK
+	&& black_eye[str].origin == str) {
+      struct eyevalue value;
+      int attack_point, defense_point;
+      
+      compute_eyes(str, &value, &attack_point, &defense_point, 
+		   black_eye, half_eye, 1);
+      DEBUG(DEBUG_EYES, "Black eyespace at %1m: %s\n", str,
+	    eyevalue_to_string(&value));
+      black_eye[str].value = value;
+      black_eye[str].attack_point = attack_point;
+      black_eye[str].defense_point = defense_point;
+      propagate_eye(str, black_eye);
+    }
+    
+    if (white_eye[str].color == WHITE
+	&& white_eye[str].origin == str) {
+      struct eyevalue value;
+      int attack_point, defense_point;
+      
+      compute_eyes(str, &value, &attack_point, &defense_point,
+		   white_eye, half_eye, 1);
+      DEBUG(DEBUG_EYES, "White eyespace at %1m: %s\n", str,
+	    eyevalue_to_string(&value));
+      white_eye[str].value = value;
+      white_eye[str].attack_point = attack_point;
+      white_eye[str].defense_point = defense_point;
+      propagate_eye(str, white_eye);
+    }
+  }
+}
+
+
+/* This function revises the inessentiality of critical worms and dragons
+ * according to the criteria explained in the comments below.
+ */
+static void
+revise_inessentiality()
+{
+  int str;
   /* Revise essentiality of critical worms. Specifically, a critical
    * worm which is adjacent to no enemy dragon with status
    * better than DEAD, is considered INESSENTIAL.
@@ -640,24 +693,7 @@ make_dragons(int color, int stop_before_owl)
       }
     }
   }
-
-  semeai();
-  time_report(2, "  semeai module", NO_MOVE, 1.0);
-  
-  identify_thrashing_dragons();
-
-  /* Count the non-dead dragons. */
-  lively_white_dragons = 0;
-  lively_black_dragons = 0;
-  for (d = 0; d < number_of_dragons; d++)
-    if (DRAGON(d).crude_status != DEAD) {
-      if (DRAGON(d).color == WHITE)
-	lively_white_dragons++;
-      else
-	lively_black_dragons++;
-    }
 }
-
 
 /* Initialize the dragon[] array. */
 

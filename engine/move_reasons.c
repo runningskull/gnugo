@@ -243,27 +243,6 @@ find_pair_data(int what1, int what2)
   return next_either - 1;
 }
 
-/*
- * Find the index of an eye space in the list of eye spaces.
- * If necessary, add a new entry.
- */
-static int
-find_eye(int eye, int color)
-{
-  int k;
-  ASSERT_ON_BOARD1(eye);
-  
-  for (k = 0; k < next_eye; k++)
-    if (eyes[k] == eye && eyecolor[k] == color)
-      return k;
-  
-  /* Add a new entry. */
-  gg_assert(next_eye < MAX_EYES);
-  eyes[next_eye] = eye;
-  eyecolor[next_eye] = color;
-  next_eye++;
-  return next_eye - 1;
-}
 
 /* Interprets the object of a reason and returns its position.
  * If the object is a pair (of worms or dragons), the position of the first
@@ -288,7 +267,6 @@ get_pos(int reason, int what)
 
   case SEMEAI_MOVE:
   case SEMEAI_THREAT:
-  case VITAL_EYE_MOVE:
   case STRATEGIC_ATTACK_MOVE:
   case STRATEGIC_DEFEND_MOVE:
   case OWL_ATTACK_MOVE:
@@ -890,23 +868,6 @@ add_semeai_threat(int pos, int dr)
 {
   ASSERT_ON_BOARD1(dr);
   add_move_reason(pos, SEMEAI_THREAT, dragon[dr].origin);
-}
-
-/*
- * Add to the reasons for the move at (pos) that it's the vital
- * point for the eye space at (eyespace) of color.
- */
-void
-add_vital_eye_move(int pos, int eyespace, int color)
-{
-  int eye;
-
-  ASSERT_ON_BOARD1(eyespace);
-  if (color == WHITE)
-    eye = find_eye(white_eye[eyespace].origin, color);
-  else
-    eye = find_eye(black_eye[eyespace].origin, color);
-  add_move_reason(pos, VITAL_EYE_MOVE, eye);
 }
 
 /*
@@ -1648,7 +1609,6 @@ list_move_reasons(FILE *out, int move_pos)
   int bb = NO_MOVE;
   int worm1 = -1;
   int worm2 = -1;
-  int ecolor = 0;
   int num_move_reasons = 0;
 
   gprintf("\nMove reasons:\n");
@@ -1742,17 +1702,6 @@ list_move_reasons(FILE *out, int move_pos)
 	  aa = move_reasons[r].what;
 	  gfprintf(out, "Move at %1m threatens to win semeai for %1m\n",
 		   pos, aa);
-	  break;
-	  
-	case VITAL_EYE_MOVE:
-	  aa = eyes[move_reasons[r].what];
-	  ecolor = eyecolor[move_reasons[r].what];
-	  if (ecolor == WHITE)
-	    gfprintf(out, "Move at %1m vital eye point for eye %1m\n",
-		     pos, aa);
-	  else
-	    gfprintf(out, "Move at %1m vital eye point for eye %1m\n",
-		     pos, aa);
 	  break;
 	  
 	case EITHER_MOVE:

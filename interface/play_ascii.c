@@ -877,7 +877,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  break;
 
 	case CMD_DEAD:
-	  examine_position(gameinfo->to_move, FULL_EXAMINE_DRAGONS);
+	  examine_position(FULL_EXAMINE_DRAGONS);
 	  showdead = !showdead;
 	  break;
 
@@ -894,7 +894,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	case CMD_SHOWMOYO:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_MOYO;
-	  examine_position(gameinfo->to_move, EXAMINE_DRAGONS);
+	  examine_position(EXAMINE_DRAGONS);
 	  print_moyo();
 	  printmoyo = tmp;
 	  break;
@@ -902,7 +902,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	case CMD_SHOWTERRI:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_TERRITORY;
-	  examine_position(gameinfo->to_move, EXAMINE_DRAGONS);
+	  examine_position(EXAMINE_DRAGONS);
 	  print_moyo();
 	  printmoyo = tmp;
 	  break;
@@ -910,13 +910,13 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	case CMD_SHOWAREA:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_AREA;
-	  examine_position(gameinfo->to_move, EXAMINE_DRAGONS);
+	  examine_position(EXAMINE_DRAGONS);
 	  print_moyo();
 	  printmoyo = tmp;
 	  break;
 
 	case CMD_SHOWDRAGONS:
-	  examine_position(gameinfo->to_move, EXAMINE_DRAGONS);
+	  examine_position(EXAMINE_DRAGONS);
 	  showboard(1);
 	  break;
 
@@ -963,7 +963,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  break;
 
 	case CMD_LISTDRAGONS:
-	  examine_position(gameinfo->to_move, EXAMINE_DRAGONS);
+	  examine_position(EXAMINE_DRAGONS);
 	  show_dragons();
 	  break;
 

@@ -952,14 +952,16 @@ struct aftermath_data {
   enum dragon_status final_status[BOARDMAX];
 };
 
+#define MAX_EYE_ATTACKS 3
+
 struct eye_data {
   int color;/* BLACK, WHITE, BLACK_BORDERED, WHITE_BORDERED or GRAY_BORDERED */
   int esize;         /* size of the eyespace                                 */
   int msize;         /* number of marginal vertices                          */
   int origin;        /* The origin                                           */
   struct eyevalue value; /* Number of eyes.                                  */
-  int attack_point;  /* vital point for attack                               */
-  int defense_point; /* vital point for defense                              */
+  int attack_point;  /* vital point for attack */
+  int defense_point; /* vital point for defense	*/
 
   /* The above fields are constant on the whole eyespace. */
   /* ---------------------------------------------------------------- */
@@ -972,6 +974,14 @@ struct eye_data {
   char cut;                  /* Opponent can cut at vertex.                */
 };
 
+struct vital_eye_points {
+  int attack_points[MAX_EYE_ATTACKS];
+  int defense_points[MAX_EYE_ATTACKS];
+};
+
+extern struct vital_eye_points black_vital_points[BOARDMAX];
+extern struct vital_eye_points white_vital_points[BOARDMAX];
+
 extern struct eye_data white_eye[BOARDMAX];
 extern struct eye_data black_eye[BOARDMAX];
 
@@ -983,7 +993,7 @@ void compute_eyes(int pos, struct eyevalue *value,
                   int *attack_point, int *defense_point,
                   struct eye_data eye[BOARDMAX],
                   struct half_eye_data heye[BOARDMAX],
-                  int add_moves, int color);
+		  int add_moves);
 void compute_eyes_pessimistic(int pos, struct eyevalue *value,
                               int *pessimistic_min,
                               int *attack_point, int *defense_point,

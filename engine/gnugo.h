@@ -106,7 +106,6 @@ int  gnugo_find_defense(int m, int n, int *i, int *j);
 
 void  gnugo_who_wins(int color, FILE *outfile);
 float gnugo_estimate_score(float *upper, float *lower);
-void  gnugo_examine_position(int color, int how_much);
 
 float gnugo_get_komi(void);
 void  gnugo_get_board(int b[MAX_BOARD][MAX_BOARD]);
@@ -324,8 +323,8 @@ int DEBUG_func(int level, const char *fmt, ...);
 #define EXAMINE_ALL                 99
 
 void reset_engine(void);
-void examine_position(int color, int how_much);
-void silent_examine_position(int color, int how_much);
+void examine_position(int how_much);
+void silent_examine_position(int how_much);
 
 
 /* ================================================================ */
@@ -365,7 +364,7 @@ void make_worms(void);
 void compute_worm_influence(void);
 
 /* dragon.c */
-void make_dragons(int color, int stop_before_owl);
+void make_dragons(int stop_before_owl);
 void initialize_dragon_data(void);
 void show_dragons(void);
 int crude_status(int pos);
@@ -394,7 +393,7 @@ void decide_owl(int pos);
 void decide_dragon_data(int pos);
 void decide_semeai(int apos, int bpos);
 void decide_tactical_semeai(int apos, int bpos);
-void decide_position(int color);
+void decide_position(void);
 void decide_eye(int pos);
 void decide_combination(int color);
 void decide_surrounded(int pos);

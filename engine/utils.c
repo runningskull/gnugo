@@ -1810,7 +1810,7 @@ who_wins(int color, FILE *outfile)
 {
   float result;
 
-  silent_examine_position(WHITE, EXAMINE_DRAGONS);
+  silent_examine_position(EXAMINE_DRAGONS);
 
 #if 0
   float white_score;

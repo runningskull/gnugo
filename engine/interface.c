@@ -344,18 +344,10 @@ gnugo_who_wins(int color, FILE *outfile)
 float
 gnugo_estimate_score(float *upper, float *lower)
 {
-  silent_examine_position(WHITE, EXAMINE_DRAGONS);
+  silent_examine_position(EXAMINE_DRAGONS);
   return estimate_score(upper, lower);
 }
 
-
-/* Interface to examine_position(). */
-
-void
-gnugo_examine_position(int color, int how_much)
-{
-  examine_position(color, how_much);
-}
 
 /* Accessor functions for internal board state. */
 

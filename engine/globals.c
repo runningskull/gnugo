@@ -149,11 +149,10 @@ struct dragon_data    dragon[BOARDMAX];
 int                   number_of_dragons;
 struct dragon_data2   *dragon2 = NULL;
 struct half_eye_data  half_eye[BOARDMAX];
-struct half_eye_data  owl_half_eye[BOARDMAX];
 struct eye_data       black_eye[BOARDMAX];
 struct eye_data       white_eye[BOARDMAX];
-struct eye_data       owl_black_eye[BOARDMAX];
-struct eye_data       owl_white_eye[BOARDMAX];
+struct vital_eye_points black_vital_points[BOARDMAX];
+struct vital_eye_points white_vital_points[BOARDMAX];
 struct surround_data  surroundings[MAX_SURROUND];
 int                   surround_pointer;
 

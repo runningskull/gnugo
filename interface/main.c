@@ -1276,7 +1276,7 @@ main(int argc, char *argv[])
       color = gameinfo.to_move;
       if (mandated_color != EMPTY)
 	color = mandated_color;
-      decide_position(color);
+      decide_position();
     }
     break;
     

@@ -211,7 +211,7 @@ decide_owl(int pos)
   /* Prepare pattern matcher and reading code. */
   reset_engine();
 
-  silent_examine_position(board[pos], EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf("finished examine_position\n");
 
   /* We want to see the reading performed, not just a result picked
@@ -298,7 +298,7 @@ decide_dragon_data(int pos)
     return;
   }
   reset_engine();
-  silent_examine_position(board[pos], FULL_EXAMINE_DRAGONS);
+  silent_examine_position(FULL_EXAMINE_DRAGONS);
 
   gprintf("Dragon at %1m:\n", pos);
   report_dragon(stderr, pos);
@@ -324,7 +324,7 @@ decide_semeai(int apos, int bpos)
   /* Prepare pattern matcher and reading code. */
   reset_engine();
 
-  silent_examine_position(board[apos], EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf("finished examine_position\n");
   count_variations = 1;
 
@@ -377,7 +377,7 @@ decide_tactical_semeai(int apos, int bpos)
   /* Prepare pattern matcher and reading code. */
   reset_engine();
 
-  silent_examine_position(board[apos], EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf("finished examine_position\n");
   count_variations = 1;
 
@@ -414,7 +414,7 @@ decide_tactical_semeai(int apos, int bpos)
  */
 
 void
-decide_position(int color)
+decide_position()
 {
   int pos;
   int move = NO_MOVE;
@@ -426,7 +426,7 @@ decide_position(int color)
   /* Prepare pattern matcher and reading code. */
   reset_engine();
 
-  silent_examine_position(color, EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
 
   /* We want to see the reading performed, not just a result picked
    * from the cache. Thus we clear the cache here. */
@@ -525,7 +525,7 @@ decide_eye(int pos)
   SGFTree tree;
 
   reset_engine();
-  silent_examine_position(BLACK, EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
   color = black_eye[pos].color;
   if (!IS_STONE(color)) {
@@ -544,7 +544,7 @@ decide_eye(int pos)
   if (black_eye[pos].color == BLACK) {
     eyepos = black_eye[pos].origin;
     compute_eyes(eyepos, &value, &attack_point, &defense_point,
-		 black_eye, half_eye, 0, EMPTY);
+		 black_eye, half_eye, 0);
     gprintf("Black eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
     if (eye_move_urgency(&value) > 0) {
       gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
@@ -555,7 +555,7 @@ decide_eye(int pos)
   if (white_eye[pos].color == WHITE) {
     eyepos = white_eye[pos].origin;
     compute_eyes(eyepos, &value, &attack_point, &defense_point,
-		 white_eye, half_eye, 0, EMPTY);
+		 white_eye, half_eye, 0);
     gprintf("White eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
     if (eye_move_urgency(&value) > 0) {
       gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
@@ -586,7 +586,7 @@ decide_combination(int color)
   /* Prepare pattern matcher and reading code. */
   reset_engine();
 
-  silent_examine_position(color, EXAMINE_ALL);
+  silent_examine_position(EXAMINE_ALL);
 
   if (*outfilename)
     sgffile_begindump(&tree);
@@ -627,7 +627,7 @@ decide_surrounded(int pos)
   /* Prepare pattern matcher and reading code. */
   reset_engine();
 
-  silent_examine_position(board[pos], EXAMINE_ALL);
+  silent_examine_position(EXAMINE_ALL);
   surround_status = compute_surroundings(pos, NO_MOVE, 1, NULL);
   if (surround_status == 1)
     gprintf("the dragon at %1m is SURROUNDED!\n", pos);

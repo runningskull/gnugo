@@ -299,22 +299,9 @@ do_find_more_owl_attack_and_defense_moves(int color, int pos,
 	   || move_reason_type == ATTACK_MOVE_BAD_KO
 	   || move_reason_type == DEFEND_MOVE
 	   || move_reason_type == DEFEND_MOVE_GOOD_KO
-	   || move_reason_type == DEFEND_MOVE_BAD_KO)
+	   || move_reason_type == DEFEND_MOVE_BAD_KO
+	   || move_reason_type == VITAL_EYE_MOVE)
     dd1 = what;
-  else if (move_reason_type == VITAL_EYE_MOVE) {
-    int ee = eyes[what];
-    int ecolor = eyecolor[what];
-
-    if (ecolor == WHITE)
-      find_eye_dragons(ee, white_eye, WHITE, &dd1, 1);
-    else
-      find_eye_dragons(ee, black_eye, BLACK, &dd1, 1);
-
-    if (dd1 == NO_MOVE) { /* Maybe we should assert this not to happen. */
-      verbose = save_verbose;
-      return;
-    }
-  }
   else if (move_reason_type == CONNECT_MOVE) {
     int worm1 = conn_worm1[what];
     int worm2 = conn_worm2[what];
@@ -576,6 +563,10 @@ find_more_owl_attack_and_defense_moves(int color)
   int dd = NO_MOVE;
   int worth_trying;
   int save_verbose;
+  struct eye_data* our_eyes;
+  struct eye_data* your_eyes;
+  struct vital_eye_points * our_vital_points;
+  struct vital_eye_points * your_vital_points;
 
   if (verbose)
     gprintf("\nTrying to upgrade strategical attack and defense moves.\n");
@@ -592,6 +583,50 @@ find_more_owl_attack_and_defense_moves(int color)
       do_find_more_owl_attack_and_defense_moves(color, pos,
 						move_reasons[r].type,
 						move_reasons[r].what);
+    }
+  }
+
+  if (verbose)
+    gprintf("\nTrying vital eye moves as owl attacks.\n");
+  if (color == WHITE) {
+    our_eyes = white_eye;
+    your_eyes = black_eye;
+    our_vital_points = white_vital_points;
+    your_vital_points = black_vital_points;
+  }
+  else {
+    our_eyes = black_eye;
+    your_eyes = white_eye;
+    our_vital_points = black_vital_points;
+    your_vital_points = white_vital_points;
+  }
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    if (our_eyes[pos].origin == pos
+	&& our_eyes[pos].defense_point != NO_MOVE) {
+      int k, dr;
+      find_eye_dragons(pos, our_eyes, color, &dr, 1);
+      for (k = 0; k < MAX_EYE_ATTACKS; k++) {
+	int move = our_vital_points[pos].defense_points[k];
+	if (move == NO_MOVE)
+	  break;
+	do_find_more_owl_attack_and_defense_moves(color, move,
+						  VITAL_EYE_MOVE, dr);
+      }
+    }
+    if (your_eyes[pos].origin == pos
+	&& your_eyes[pos].attack_point != NO_MOVE) {
+      int k, dr;
+      find_eye_dragons(pos, your_eyes, OTHER_COLOR(color), &dr, 1);
+      for (k = 0; k < MAX_EYE_ATTACKS; k++) {
+	int move = your_vital_points[pos].attack_points[k];
+	if (move == NO_MOVE)
+	  break;
+	do_find_more_owl_attack_and_defense_moves(color, move,
+						  VITAL_EYE_MOVE, dr);
+      }
     }
   }
 
@@ -1987,13 +2022,6 @@ estimate_territorial_value(int pos, int color, float our_score,
 	    pos, 2 * dragon[aa].effective_size, aa);
       break;
       
-    case VITAL_EYE_MOVE:
-      /* These are upgraded to owl attacks or defenses in
-       * find_more_owl_attack_and_defense_moves() and should no longer
-       * be counted here.
-       */
-      break;
-	
     case SEMEAI_MOVE:
     case OWL_ATTACK_MOVE:
     case OWL_ATTACK_MOVE_GOOD_KO:
@@ -2588,47 +2616,6 @@ estimate_strategical_value(int pos, int color, float our_score)
 
 	break;
 	
-      case VITAL_EYE_MOVE:
-#if 0
-	/*
-	 * The value of the threatened group itself has already been
-	 * accounted for in territorial_value. Now we need to determine
-	 * the effect this has on surrounding groups.
-	 *
-	 * FIXME: Valuation not implemented.
-	 */
-	aa = eyes[move_reasons[r].what];
-	ecolor = eyecolor[move_reasons[r].what];
-
-	if (ecolor == WHITE) 
-	  bb = white_eye[aa].dragon;
-	else
-	  bb = black_eye[aa].dragon;
-
-	if (bb == NO_MOVE) /* Maybe we should assert this not to happen. */
-	  break; 
-
-	/* If there is an owl attack/defend move reason for this location,
-	 * we don't care about it, since otherwise we would count the
-	 * points twice.
-	 */
-	if (owl_defense_move_reason_known(pos, bb)
-	    || owl_attack_move_reason_known(pos, bb)) {
-	  DEBUG(DEBUG_MOVE_REASONS,
-		"    %1m: 0.0 - vital for %1m: owl attack/defense as well\n",
-		pos, bb);
-	  break;
-	}
-
-       if (dragon[bb].status == CRITICAL) {
-	  this_value = ???
-         TRACE("  %1m: %f - vital for %1m\n",
-               pos, this_value, bb);
-	  tot_value += this_value;
-	}
-#endif
-	break;
-
       case STRATEGIC_ATTACK_MOVE:
       case STRATEGIC_DEFEND_MOVE:	
 	/* The right way to do this is to estimate the safety of the

@@ -1442,7 +1442,7 @@ semeai_propose_eyespace_filling_move(struct local_owl_data *owla,
 	  int dummy_defense;
 
 	  compute_eyes(origin, &new_value, &dummy_attack, &dummy_defense,
-		       owlb->my_eye, owlb->half_eye, 0, owlb->color);
+		       owlb->my_eye, owlb->half_eye, 0);
 	  if (max_eyes(&new_value) <= 1)
 	    good_move = 1;
 

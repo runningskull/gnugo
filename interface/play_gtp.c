@@ -1383,7 +1383,7 @@ gtp_owl_attack(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
@@ -1422,7 +1422,7 @@ gtp_owl_defend(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
@@ -1460,7 +1460,7 @@ gtp_owl_threaten_attack(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
@@ -1499,7 +1499,7 @@ gtp_owl_threaten_defense(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
@@ -1547,7 +1547,7 @@ gtp_owl_does_attack(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("dragon vertex must not be empty");
 
-  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
@@ -1588,7 +1588,7 @@ gtp_owl_does_defend(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("dragon vertex must not be empty");
 
-  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
@@ -1638,7 +1638,7 @@ gtp_owl_connection_defends(char *s)
   if (BOARD(ai, aj) != BOARD(bi, bj))
     return gtp_failure("dragon vertices must have the same color");
 
-  silent_examine_position(BOARD(ai, aj), EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
@@ -1706,8 +1706,7 @@ gtp_owl_substantial(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(OTHER_COLOR(BOARD(i, j)),
-			  EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
@@ -1745,7 +1744,7 @@ gtp_analyze_semeai(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
     reading_cache_clear();
@@ -1801,7 +1800,7 @@ gtp_analyze_semeai_after_move(char *s)
   if (board[dragonb] == EMPTY)
     return gtp_failure("dragon vertex must not be empty");
 
-  silent_examine_position(board[dragona], EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
     reading_cache_clear();
@@ -1848,7 +1847,7 @@ gtp_tactical_analyze_semeai(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
     reading_cache_clear();
@@ -2066,17 +2065,17 @@ gtp_eval_eye(char *s)
   if (!gtp_decode_coord(s, &m, &n))
     return gtp_failure("invalid coordinate");
 
-  silent_examine_position(BLACK, EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
   if (black_eye[POS(m, n)].color == BLACK) {
     pos = black_eye[POS(m, n)].origin;
     compute_eyes(pos, &value, &attack_point, &defense_point,
-		 black_eye, half_eye, 0, EMPTY);
+		 black_eye, half_eye, 0);
   }
   else if (white_eye[POS(m, n)].color == WHITE) {
     pos = white_eye[POS(m, n)].origin;
     compute_eyes(pos, &value, &attack_point, &defense_point,
-		 white_eye, half_eye, 0, EMPTY);
+		 white_eye, half_eye, 0);
   }
   else
     /* Not an eye or not of unique color. */
@@ -2126,7 +2125,7 @@ gtp_dragon_status(char *s)
   else if (sscanf(s, "%*s") != EOF)
     return gtp_failure("invalid coordinate");
 
-  silent_examine_position(BLACK, EXAMINE_DRAGONS);
+  silent_examine_position(EXAMINE_DRAGONS);
   
   gtp_start_response(GTP_SUCCESS);
 
@@ -2186,7 +2185,7 @@ gtp_same_dragon(char *s)
   if (BOARD(ai, aj) == EMPTY || BOARD(bi, bj) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(BLACK, EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
   return gtp_success("%d", dragon[POS(ai, aj)].id == dragon[POS(bi, bj)].id);
 }
@@ -2214,7 +2213,7 @@ gtp_unconditional_status(char *s)
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
 
-  silent_examine_position(BLACK, EXAMINE_WORMS);
+  silent_examine_position(EXAMINE_WORMS);
   
   status = worm[POS(i, j)].unconditional_status;
   if (status == UNKNOWN)
@@ -2245,7 +2244,7 @@ gtp_combination_attack(char *s)
   if (!n)
     return gtp_failure("invalid color");
 
-  silent_examine_position(BLACK, EXAMINE_ALL);
+  silent_examine_position(EXAMINE_ALL);
 
   if (!atari_atari(color, &attack_point, NULL, verbose))
     attack_point = NO_MOVE;
@@ -2276,7 +2275,7 @@ gtp_combination_defend(char *s)
   if (!n)
     return gtp_failure("invalid color");
 
-  silent_examine_position(BLACK, EXAMINE_ALL);
+  silent_examine_position(EXAMINE_ALL);
 
   memset(defense_points, 0, sizeof(defense_points));
   if (!atari_atari(color, NULL, defense_points, verbose))
@@ -3283,7 +3282,7 @@ gtp_estimate_score(char *s)
   float upper_bound, lower_bound;
   UNUSED(s);
 
-  silent_examine_position(WHITE, EXAMINE_DRAGONS);
+  silent_examine_position(EXAMINE_DRAGONS);
   
   score = estimate_score(&upper_bound, &lower_bound);
   gtp_start_response(GTP_SUCCESS);
@@ -3710,7 +3709,7 @@ gtp_initial_influence(char *s)
 
   q = INITIAL_INFLUENCE(color);
   
-  silent_examine_position(color, EXAMINE_ALL);
+  silent_examine_position(EXAMINE_ALL);
 
   return print_influence_data(q, s + n);
 }
@@ -3873,7 +3872,7 @@ gtp_worm_data(char *s)
   if (sscanf(s, "%*c") >= 0 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid color or coordinate");
 
-  examine_position(EMPTY, EXAMINE_WORMS);
+  examine_position(EXAMINE_WORMS);
 
   gtp_start_response(GTP_SUCCESS);
   
@@ -3981,7 +3980,7 @@ gtp_worm_cutstone(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  examine_position(EMPTY, EXAMINE_WORMS);
+  examine_position(EXAMINE_WORMS);
 
   return gtp_success(" %d", worm[POS(i, j)].cutstone);
 }
@@ -4004,7 +4003,7 @@ gtp_dragon_data(char *s)
   if (stackp > 0)
     return gtp_failure("dragon data unavailable when stackp > 0");
 
-  examine_position(EMPTY, FULL_EXAMINE_DRAGONS);
+  examine_position(FULL_EXAMINE_DRAGONS);
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -4049,7 +4048,7 @@ gtp_dragon_stones(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("dragon_stones called on an empty vertex");
 
-  examine_position(EMPTY, EXAMINE_DRAGONS);
+  examine_position(EXAMINE_DRAGONS);
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -4093,7 +4092,7 @@ gtp_eye_data(char *s)
   if (stackp > 0)
     return gtp_failure("eye data unavailable when stackp > 0");
 
-  examine_position(EMPTY, EXAMINE_DRAGONS_WITHOUT_OWL);
+  examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -4141,7 +4140,7 @@ gtp_half_eye_data(char *s)
   if (stackp > 0)
     return gtp_failure("half eye data unavailable when stackp > 0");
 
-  examine_position(EMPTY, EXAMINE_DRAGONS_WITHOUT_OWL);
+  examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -4459,7 +4458,7 @@ gtp_is_surrounded(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("dragon vertex must be nonempty");
 
-  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS);
+  silent_examine_position(EXAMINE_DRAGONS);
   return gtp_success("%d", DRAGON2(POS(i, j)).surround_status);
 }
 
@@ -4488,7 +4487,7 @@ gtp_does_surround(char *s)
   if (BOARD(di, dj) == EMPTY)
     return gtp_failure("dragon vertex must be nonempty");
 
-  silent_examine_position(BOARD(di, dj), EXAMINE_DRAGONS);
+  silent_examine_position(EXAMINE_DRAGONS);
   return gtp_success("%d", does_surround(POS(si, sj), POS(di, dj)));
 }
 
@@ -4516,7 +4515,7 @@ gtp_surround_map(char *s)
   if (n == 0)
     return gtp_failure("invalid coordinate");
 
-  silent_examine_position(BOARD(di, dj), EXAMINE_DRAGONS);
+  silent_examine_position(EXAMINE_DRAGONS);
   return gtp_success("%d", surround_map(POS(di, dj), POS(mi, mj)));
 }
 

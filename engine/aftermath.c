@@ -800,7 +800,7 @@ reduced_genmove(int *move, int color)
   reset_engine();
 
   /* Find out information about the worms and dragons. */
-  examine_position(color, EXAMINE_ALL);
+  examine_position(EXAMINE_ALL);
 
   /* Make a score estimate. This can be used in later stages of the 
    * move generation.  If we are ahead, we can play safely and if

@@ -107,7 +107,7 @@ reset_engine()
  */
 
 void
-examine_position(int color, int how_much)
+examine_position(int how_much)
 {
   int save_verbose = verbose;
 
@@ -144,14 +144,14 @@ examine_position(int color, int how_much)
 
     if (how_much == EXAMINE_DRAGONS_WITHOUT_OWL) {
       if (NEEDS_UPDATE(dragons_examined_without_owl))
-	make_dragons(color, 1);
+	make_dragons(1);
       verbose = save_verbose;
       gg_assert(test_gray_border() < 0);
       return;
     }
     
     if (NEEDS_UPDATE(dragons_examined)) {
-      make_dragons(color, 0);
+      make_dragons(0);
       /* We have automatically done a partial dragon analysis as well. */
       dragons_examined_without_owl = position_number;
     }
@@ -197,7 +197,7 @@ examine_position(int color, int how_much)
  * output, and sgf traces are turned off.
  */
 void
-silent_examine_position(int color, int how_much)
+silent_examine_position(int how_much)
 {
   int save_verbose = verbose;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
@@ -211,7 +211,7 @@ silent_examine_position(int color, int how_much)
   debug = 0;
   printmoyo = 0;
   
-  examine_position(color, how_much);
+  examine_position(how_much);
 
   verbose = save_verbose;
   sgf_dumptree = save_sgf_dumptree;
@@ -354,7 +354,7 @@ do_genmove(int *move, int color, float pure_threat_value,
 
   /* Find out information about the worms and dragons. */
   start_timer(1);
-  examine_position(color, EXAMINE_ALL);
+  examine_position(EXAMINE_ALL);
   time_report(1, "examine position", NO_MOVE, 1.0);
 
   /* Make a score estimate. This can be used in later stages of the 

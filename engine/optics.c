@@ -58,7 +58,7 @@ static int read_eye(int pos, int *attack_point, int *defense_point,
 		    struct eyevalue *value,
 		    struct eye_data eye[BOARDMAX],
 		    struct half_eye_data heye[BOARDMAX],
-		    int add_moves, int color);
+		    int add_moves);
 static int recognize_eye(int pos, int *attack_point, int *defense_point,
 			 struct eyevalue *value,
 			 struct eye_data eye[BOARDMAX],
@@ -762,8 +762,7 @@ void
 compute_eyes(int pos, struct eyevalue *value,
 	     int *attack_point, int *defense_point,
 	     struct eye_data eye[BOARDMAX],
-	     struct half_eye_data heye[BOARDMAX],
-	     int add_moves, int color)
+	     struct half_eye_data heye[BOARDMAX], int add_moves)
 {
   if (attack_point)
     *attack_point = NO_MOVE;
@@ -776,8 +775,7 @@ compute_eyes(int pos, struct eyevalue *value,
   }
   
   /* Look up the eye space in the graphs database. */
-  if (read_eye(pos, attack_point, defense_point, value,
-	       eye, heye, add_moves, color))
+  if (read_eye(pos, attack_point, defense_point, value, eye, heye, add_moves))
     return;
 
   /* Ideally any eye space that hasn't been matched yet should be two
@@ -875,7 +873,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   
   /* Look up the eye space in the graphs database. */
   if (read_eye(pos, attack_point, defense_point, value,
-	       eye, heye, 0, EMPTY)) {
+	       eye, heye, 0)) {
     *pessimistic_min = min_eyes(value) - margins;
 
     /* A single point eye which is part of a ko can't be trusted. */
@@ -1063,7 +1061,7 @@ static int
 read_eye(int pos, int *attack_point, int *defense_point,
 	 struct eyevalue *value, struct eye_data eye[BOARDMAX], 
 	 struct half_eye_data heye[BOARDMAX], 
-	 int add_moves, int color)
+	 int add_moves)
 {
   int eye_color;
   int k;
@@ -1209,14 +1207,15 @@ read_eye(int pos, int *attack_point, int *defense_point,
   }
 
   if (add_moves) {
-    if (eye_color == color) {
-      for (k = 0; k < best_vp->num_defenses; k++)
-	add_vital_eye_move(best_vp->defenses[k], pos, eye_color);
-    }
-    else {
-      for (k = 0; k < best_vp->num_attacks; k++)
-	add_vital_eye_move(best_vp->attacks[k], pos, eye_color);
-    }
+    struct vital_eye_points* vital;
+    if (eye_color == WHITE)
+      vital = white_vital_points;
+    else
+      vital = black_vital_points;
+    for (k = 0; k < best_vp->num_defenses && k < MAX_EYE_ATTACKS; k++)
+      vital[pos].defense_points[k] = best_vp->defenses[k];
+    for (k = 0; k < best_vp->num_attacks; k++)
+      vital[pos].attack_points[k] = best_vp->attacks[k];
   }
 
   return 1;
@@ -2348,7 +2347,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
      * done with help from the owl code. First we must prepare for
      * this though.
      */
-    examine_position(WHITE, EXAMINE_DRAGONS_WITHOUT_OWL);
+    examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
 
     attack_code = owl_attack(str, &attack_point, NULL, NULL);
 
