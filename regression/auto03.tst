@@ -1,10 +1,10 @@
 loadsgf games/auto_gen/auto013.sgf 47
 1 owl_defend h16
-#? [!0]
+#? [!0]*
 
 loadsgf games/auto_gen/auto013.sgf 51
 2 owl_defend h16
-#? [!0]
+#? [!0]*
 
 loadsgf games/auto_gen/auto013.sgf 53
 3 owl_attack l17
@@ -25,7 +25,7 @@ loadsgf games/auto_gen/auto015.sgf 145
 
 loadsgf games/auto_gen/auto016.sgf 37
 9 owl_defend j15
-#? [!0]
+#? [!0]*
 
 loadsgf games/auto_gen/auto016.sgf 48
 10 owl_defend p16
@@ -37,8 +37,8 @@ loadsgf games/auto_gen/auto016.sgf 53
 
 loadsgf games/auto_gen/auto016.sgf 55
 12 owl_defend n5
-#? [!0]
+#? [!0]*
 
 loadsgf games/auto_gen/auto017.sgf 45
 14 owl_defend q4
-#? [!0]
+#? [!0]*
