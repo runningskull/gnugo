@@ -27,3 +27,4 @@ owl_defendpat.c
 read_attack.c
 read_defend.c
 handipat.c
+oracle.c
