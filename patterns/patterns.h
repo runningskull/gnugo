@@ -310,6 +310,9 @@ extern struct fullboard_pattern fuseki19[];
 extern struct fullboard_pattern fuseki13[];
 extern struct fullboard_pattern fuseki9[];
 
+/* Experimental reading */
+extern struct pattern_db read_attack_db;
+extern struct pattern_db read_defend_db;
 
 #endif
 

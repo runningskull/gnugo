@@ -106,7 +106,8 @@ EXTRA_DIST = $(DSP)\
 	fuseki.db\
 	fuseki9.db\
 	fuseki13.db\
-	fuseki19.db
+	fuseki19.db\
+	read_attack.db
 
 
 mkpat_SOURCES = mkpat.c transform.c
@@ -137,7 +138,8 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  influence.c barriers.c endgame.c aa_attackpat.c\
                  owl_attackpat.c\
 		 owl_vital_apat.c owl_defendpat.c fusekipat.c\
-                 fuseki9.c fuseki13.c fuseki19.c josekidb.c
+                 fuseki9.c fuseki13.c fuseki19.c josekidb.c\
+		 read_attack.c
 
 
 DBBUILT = hoshi.db komoku.db sansan.db mokuhazushi.db takamoku.db
@@ -170,7 +172,8 @@ am_libpatterns_a_OBJECTS = connections.$(OBJEXT) helpers.$(OBJEXT) \
 	barriers.$(OBJEXT) endgame.$(OBJEXT) aa_attackpat.$(OBJEXT) \
 	owl_attackpat.$(OBJEXT) owl_vital_apat.$(OBJEXT) \
 	owl_defendpat.$(OBJEXT) fusekipat.$(OBJEXT) fuseki9.$(OBJEXT) \
-	fuseki13.$(OBJEXT) fuseki19.$(OBJEXT) josekidb.$(OBJEXT)
+	fuseki13.$(OBJEXT) fuseki19.$(OBJEXT) josekidb.$(OBJEXT) \
+	read_attack.$(OBJEXT)
 libpatterns_a_OBJECTS = $(am_libpatterns_a_OBJECTS)
 EXTRA_PROGRAMS = transpat$(EXEEXT)
 noinst_PROGRAMS = mkpat$(EXEEXT) joseki$(EXEEXT) mkeyes$(EXEEXT) \
@@ -222,8 +225,8 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/owl_attackpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/owl_defendpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/owl_vital_apat.Po $(DEPDIR)/patlib.Po \
-@AMDEP_TRUE@	$(DEPDIR)/patterns.Po $(DEPDIR)/transform.Po \
-@AMDEP_TRUE@	$(DEPDIR)/transpat.Po
+@AMDEP_TRUE@	$(DEPDIR)/patterns.Po $(DEPDIR)/read_attack.Po \
+@AMDEP_TRUE@	$(DEPDIR)/transform.Po $(DEPDIR)/transpat.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -311,6 +314,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl_vital_apat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/patlib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/patterns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/read_attack.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/transform.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/transpat.Po@am__quote@
 
@@ -536,6 +540,9 @@ fuseki13.c : $(srcdir)/fuseki13.db mkpat$(EXEEXT)
 
 fuseki19.c : $(srcdir)/fuseki19.db mkpat$(EXEEXT)
 	./mkpat -b -f fuseki19 < $(srcdir)/fuseki19.db >fuseki19.c
+
+read_attack.c : $(srcdir)/read_attack.db mkpat$(EXEEXT)
+	./mkpat -b read_attack < $(srcdir)/read_attack.db >read_attack.c
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -1,0 +1,443 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 1999, 2000, 2001 by the Free Software Foundation.   #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA.                                        #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  read_attack.db - pattern database for finding tactical attack moves
+#
+##################################################################
+
+
+# thoughts:
+#  Need some way to specify two patterns, one on this end, one on that end.
+#  Need some better backfill & superstring helpers.
+
+
+Pattern RA000
+
+O??  geta
+.X?
+.X?
+*.O
+
+:8,A,value(80)
+
+O??
+.X?
+.a?
+*.O
+
+; rgoal[a] == 1 &&  lib(a) == 3
+
+
+Pattern RA000a
+# FIXME: May want to add a helper here to test if X playing
+# on remaining liberty leaves only one liberty, creating a
+# very high value, indeed.
+
+X*    ladder, or similar
+
+:-,A,value(80)
+
+a*
+
+; rgoal[a] == 1 && lib(a) == 2 && olib(*) > 1 && xlib(*) >=4
+
+
+Pattern RA000b
+# FIXME: May want to add a helper here to test if X playing
+# on remaining liberty leaves only one liberty, creating a
+# very high value, indeed.
+
+X*    ladder, or similar
+
+:-,A,value(70)
+
+a*
+
+; rgoal[a] == 1 && lib(a) == 2 && olib(*) > 1
+
+
+Pattern RA001
+
+X*    fill liberty (4)
+
+:-,A,value(97)
+
+a*
+
+; rgoal[a] == 1 && 
+; (lib(a) == 1
+;  || xlib(*) > lib(a)+4)
+
+
+Pattern RA002
+
+X*    fill liberty (3)
+
+:-,A,value(96)
+
+a*
+
+; rgoal[a] == 1 &&  xlib(*) > lib(a)+3 && olib(*) > 1
+
+
+Pattern RA003
+
+X*    fill liberty (2)
+
+:-,A,value(95)
+
+a*
+
+; rgoal[a] == 1 &&  xlib(*) > lib(a)+2 && olib(*) > 1
+
+Pattern RA004a
+
+X*    fill liberty (1-2)
+
+:-,A,value(52)
+
+a*
+
+; rgoal[a] == 1 && xlib(*) > lib(a)+1 && olib(*) > 2
+
+
+Pattern RA004b
+
+X*    fill liberty (1-1)
+
+:-,A,value(51)
+
+a*
+
+; rgoal[a] == 1 && xlib(*) > lib(a)+1 && olib(*) > 1
+
+
+Pattern RA004
+
+X*    fill liberty (1)
+
+:-,A,value(50)
+
+a*
+
+; rgoal[a] == 1 && xlib(*) > lib(a)+1  && olib(*) > 1
+
+
+
+Pattern RA005
+
+X*    fill liberty (0)
+
+:-,A,value(30)
+
+a*
+
+; rgoal[a] == 1 && xlib(*) > lib(a) && olib(*) > 1
+
+
+Pattern RA007
+
+X*   snapback
+X.
+
+:-,A,value(75)
+
+aA   snapback
+ab
+
+; rgoal[a] == 1 
+; && NORTH(A) != color
+; && SOUTH(A) != color
+; && EAST(A) != color
+; && WEST(A) != color
+; && olib(A) == 1 && xlib(b)==1
+
+Pattern RA008
+
+X*    atari w/out escape
+X.
+
+:8,A,value(68)
+
+a*
+ab
+
+; rgoal[a] == 1 && xlib(b) <= 2 && olib(*) > 1
+
+###################
+#Protect boundary:#
+###################
+
+Pattern RA100
+
+XO
+?*
+
+:8,A,value(60)
+
+XA
+?*
+
+; lib(A) == 1 && olib(*) > 1
+
+
+Pattern RA100a
+
+XO*
+
+:-,A,value(60)
+
+XA*
+
+; lib(A) == 1 && olib(*) > 1
+
+
+Pattern RA101
+
+XO   capture for liberties
+*?
+
+:8,A,value(67)
+
+ab
+C.
+
+#; gprintf("RA101: %1m %1m; %d %d %d\n", a, b, lib(a), lib(b), ko(C)),
+; lib(a) == 1  && lib(b) <=2 && !ko(C)
+
+
+Pattern RA102
+
+O*	extend or connect for liberties
+
+:-,A,value(72)
+
+A*
+
+; lib(A) == 1 && olib(*) > 1
+
+###########
+#backfill #
+###########
+Pattern RA200
+
+XXO
+.O*
+
+:8,A,value(14)
+
+XXO
+aO*
+
+;olib(a) == 1
+
+
+Pattern RA201
+
+XO    backfill
+O*
+
+:8,A,value(13)
+
+XO
+A*
+
+;lib(A) == 2 && olib(*) >= 2
+
+
+Pattern RA202
+# FIXME: Need a better way to protect border.
+
+OX*   Protect border (maybe with ko)
+
+:-,A,value(50)
+
+Ba*
+
+; rgoal[B] == 2 && lib(a) <= 2 && lib(B) <= goallib() && (ko(*) || olib(*) > 1)
+
+
+Pattern RA202a
+# FIXME: Need a better way to protect border.
+
+OX   Protect border (maybe with ko)
+?*
+
+:8,A,value(50)
+
+Ba
+?*
+
+; rgoal[B] == 2 && lib(a) <= 2 && lib(B) <= goallib() && (ko(*) || olib(*) > 1)
+
+Pattern RA203
+# FIXME: Need a better way to double back
+
+X.O*   double-back to gain liberties
+
+:-,A,value(50)
+
+acB*
+
+; rgoal[a] == 1 && lib(a) >= olib(c) && olib(*) > lib(B)
+
+
+Pattern RA203a
+# FIXME: Need a better way to double back
+
+X.O   double-back to gain liberties
+??*
+
+:8,A,value(50)
+
+acB
+??*
+
+; rgoal[a] == 1 && lib(a) >= olib(c) && olib(*) > lib(B)
+
+
+Pattern RA204
+
+OXO   back-atari
+.X*
+
+:8,A,value(50)
+
+AbO
+.X*
+
+; rgoal[A] == 2 && lib(b) == 2 && olib(*) >= 2
+
+
+
+###############################
+#superstring attacks (need to add entire superstring to rgoal?)
+################################
+
+Pattern RA300
+
+*X?
+?.X
+
+:8,A,value(59)
+
+*a?
+?.X
+
+;lib(a) == 2 && olib(*) > 1
+
+
+Pattern RA301
+
+*.    attack superstring
+OX
+
+:8,A,value(58)
+
+*b
+Oa
+
+; rgoal[a] == 3 && olib(b) <= 1  && olib(*) > 2
+
+
+Pattern RA302
+
+*X    attack superstring
+
+:8,A,value(59)
+
+*a
+
+; lib(a) <= 2 && olib(*) >= 2
+
+
+Pattern RA303
+
+X*
+X.
+
+:8,A,value(50)
+
+X*
+ab
+
+; goallib() < lib(a) && lib(a) <=3 && olib(*) >= 2 && xlib(b) <= 4
+
+###########
+#draw back#
+###########
+Pattern RA301
+
+*O
+.X
+
+:8,A,value(59)
+
+*A
+bX
+
+;lib(A) == 2 && olib(b) <= 3 && xlib(*) > 2
+
+
+Pattern RA997
+
+X.*    second order liberty
+
+:-,A,value(9)
+
+a.*
+
+; rgoal[a] == 1 && goallib() < 3
+
+Pattern RA998
+
+X.    diagonal liberty
+?*
+
+:8,A,value(9)
+
+a.    diagonal liberty
+?*
+
+; rgoal[a] == 1
+
+Pattern RA999
+
+X*    fill liberty (low value)
+
+:-,A,value(15)
+
+a*    fill liberty (really low)
+
+; rgoal[a] == 1 && xlib(*) >= lib(a) && olib(*) > 1
+
+Pattern RA999a
+
+X*    fill liberty (lowest value)
+
+:-,A,value(2)
+
+a*
+
+; rgoal[a] == 1
+
+

@@ -779,10 +779,29 @@ restore_depth_values()
 int
 accurate_approxlib(int pos, int color, int maxlib, int *libs)
 {
+  int fast_liberties = 0;
   int liberties = 0;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
+  sgf_dumptree = 0;
 
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(color), pos);
+
+  /* FIXME: When we trust this algorithm, short-circuit here, and
+   * remove assert below */
+  if (!libs) {
+    int k;
+    for (k = 0; k < 4; k++) {
+      if (board[pos + delta[k]] == color
+	  || (board[pos + delta[k]] == OTHER_COLOR(color) 
+	      && countlib(pos + delta[k]) == 1)) {
+	fast_liberties = 0;
+	break;
+      }
+      fast_liberties += board[pos + delta[k]] == EMPTY;
+    }
+  }
 
   /* Use tryko() since we don't care whether the move would violate
    * the ko rule.
@@ -794,7 +813,14 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
       liberties = countlib(pos);
     popgo();
   }
+
+  if (fast_liberties)
+    ASSERT1(fast_liberties == liberties, pos);
   
+
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+
   return liberties;
 }
 

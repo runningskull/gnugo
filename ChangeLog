@@ -2,8 +2,16 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- EXPERIMENTAL_READING code (pattern based) added.
+- added "tried" parameter to special_rescue
+- defend2-[CD] won't re-try moves (avoid cache check).
+- faster implementation of accurate_approxlib.
+- mkpat takes multiple -i parameters, outputs in binary
+- Visual C now uses _vsnprintf
+- sgf output tweeking.
 - bugfix in experimental influence: floating point exception cure
 - bugfix in regress.plx: handling of gtp worm_stones
+- tuning
 
 3.1.23 released January 28, 2002
 

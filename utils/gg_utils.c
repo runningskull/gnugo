@@ -219,6 +219,8 @@ gg_vsnprintf(char *dest, unsigned long len, const char *fmt, va_list args)
   vsnprintf(dest, len, fmt, args);
 #elif HAVE_G_VSNPRINTF
   g_vsnprintf(dest, len, fmt, args);
+#elif HAVE_VISUAL_C
+  _vsnprintf(dest, len, fmt, args);
 #else
   UNUSED(len);
   vsprintf(dest, fmt, args);

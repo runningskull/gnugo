@@ -576,6 +576,10 @@ extern int alternate_connections;    /* use alternate connection module */
 extern int owl_threats;              /* compute owl threats */
 extern int experimental_influence;   /* use experimental influence module */
 
+/* Experimental reading */
+extern char *rgoal;
+extern int goallib;
+
 extern int stackp;                /* stack pointer */
 extern int count_variations;      /* count (decidestring) */
 extern SGFTree *sgf_dumptree;

@@ -3436,7 +3436,6 @@ C*O?     Extend side eye-space in sente
 ;&& oplay_attack(*,b,C)
 
 
-
 #########################################################
 #                                                       #
 #                  Prevent intrusion                    #
@@ -4442,6 +4441,7 @@ Oa??
 
 Pattern D1138
 # tm New Pattern (3.1.17)
+# tm modified (3.1.23)
 
 ????
 .X*?   breakout!
@@ -4456,8 +4456,8 @@ AOCd
 ; lib(C) == 2
 ; && (owl_escape_value(e) > 0 || vital_chain(A))
 ; && (owl_escape_value(f) > 0 || vital_chain(C))
+; && olib(*) > 1
 ; && oplay_attack_either(*,d,B,A)
-
 
 Pattern D1139
 # tm New Pattern (3.1.20) (see nngs:110)
@@ -6074,13 +6074,14 @@ B.
 
 Pattern D1383
 # tm New Pattern (3.1.20)
+# tm added b attribute (3.1.23)
 
 ?Oo
 ...
 ?*.
 ?.?
 
-:8,s,value(71)
+:8,sb,value(71)
 
 ?Bo
 ...

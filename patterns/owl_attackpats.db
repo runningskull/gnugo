@@ -2983,7 +2983,6 @@ oc*A
 #########################################################
 
 
-
 Pattern A1100
 #tm New Pattern (3.1.22) (see pattern D1100)
 # gf Fixed diagram inconsistency. (3.1.23)
@@ -3376,23 +3375,27 @@ Dcb
 
 Pattern A1120
 # tm New Pattern (3.1.20)
-#   see also D1380
 # tm Modified (3.1.20)
 #   see global:40 (owl_does_defend F4 H2)
+# tm Modified (3.1.23) (see D1343b, D1380)
 
-?..	block escape
-.*.
-X.?
+????
+?..?	block escape
+.*.?
+X.??
 
 :8,-,value(65)
 
-?AB
-.*C
-X.?
+?ge?
+?abf
+.*ch
+X.??
 
-; (owl_escape_value(A) > 0)
-; + (owl_escape_value(B) > 0)
-; + (owl_escape_value(C) > 0) > 1
+; (owl_escape_value(a) > 0)
+; + (owl_escape_value(b) > 0)
+; + (owl_escape_value(c) > 0) > 1
+; || (!o_somewhere(g) && !o_somewhere(h) &&
+;     owl_escape_value(e) + owl_escape_value(f) > 0)
 
 
 Pattern A1121

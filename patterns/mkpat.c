@@ -50,6 +50,8 @@ Usage : mkpat [-cvh] <prefix>\n\
            -f = compile a fullboard pattern database\n\
            -m = try to place the anchor in the center of the pattern\n\
                 (reduce dfa size)\n\
+	   -i = one or more input files (typically *.db).\n\
+	   -o = output file (typically *.c).\n\
 \n\
  If compiled with --enable-dfa the following options also work:\n\n\
            -D = generate a dfa and save it as a C file.\n\
@@ -69,7 +71,10 @@ Usage : mkpat [-cvh] <prefix>\n\
 
 #include "patterns.h"
 #include "gg-getopt.h"
-#include "gg_utils.h"
+/* FIXME: Debug build of Visual C breaks with this include. */
+#if !(_DEBUG && HAVE_VISUAL_C)
+ #include "gg_utils.h"
+#endif
 
 #include "dfa.h"
 
@@ -89,6 +94,7 @@ Usage : mkpat [-cvh] <prefix>\n\
 #define MAXPATNO 5000
 #define MAXLABELS 20
 #define MAXPARAMS 15
+#define MAX_INPUT_FILE_NAMES 10
 
 #define UNUSED(x)  x=x
 
@@ -172,6 +178,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"lib2",            1, "worm[%s].liberties2"},
   {"lib3",            1, "worm[%s].liberties3"},
   {"lib4",            1, "worm[%s].liberties4"},
+  {"goallib",         0, "goallib"},
   {"lib",             1, "countlib(%s)"},
   {"alive",           1, "(dragon[%s].matcher_status == ALIVE)"},
   {"unknown",         1, "(dragon[%s].matcher_status == UNKNOWN)"},
@@ -1536,13 +1543,17 @@ int
 main(int argc, char *argv[])
 {
   char line[MAXLINE];  /* current line from file */
-  char *input_file_name = NULL;
+  char *input_file_names[MAX_INPUT_FILE_NAMES];
   char *output_file_name = NULL;
   FILE *input_FILE;
   FILE *output_FILE;
   int state = 0;
+  int ifc = 0;
   int i;
   
+  input_file_names[0] = 0;
+  input_file_names[1] = 0;
+
   {
     /* parse command-line args */
     while ((i = gg_getopt(argc, argv, "i:o:V:vcbXfmtD")) != EOF) {
@@ -1553,7 +1564,15 @@ main(int argc, char *argv[])
       case 'X': anchor = ANCHOR_X; break;
       case 'f': fullboard = 1; break;
       case 'm': choose_best_anchor = 1; break;
-      case 'i': input_file_name = gg_optarg; break;
+      case 'i': 
+	if (ifc == MAX_INPUT_FILE_NAMES) {
+	  fprintf(stderr, "Error : Too many input files; %s", gg_optarg);
+	  exit(1);
+        } else {
+	  input_file_names[ifc++] = gg_optarg;
+	  input_file_names[ifc] = 0;
+	}
+	break;
       case 'o': output_file_name = gg_optarg; break;
       case 'D':
 	dfa_generate = 1; dfa_c_output = 1; 
@@ -1566,23 +1585,11 @@ main(int argc, char *argv[])
     }
   }
   
-  if (input_file_name == NULL) {
-    input_FILE = stdin;
-    current_file = "<stdin>";
-  }
-  else {
-    if ((input_FILE = fopen(input_file_name, "r")) == NULL) {
-      fprintf(stderr, "Cannot open file %s\n", input_file_name);
-      exit(1);
-    }
-    current_file = input_file_name;  
-  }
-  
   if (output_file_name == NULL) {
     output_FILE = stdout;
   }
   else {
-    if ((output_FILE = fopen(output_file_name, "w")) == NULL) {
+    if ((output_FILE = fopen(output_file_name, "wb")) == NULL) {
       fprintf(stderr, "Cannot write to file %s\n", output_file_name);
       exit(1);
     }
@@ -1627,153 +1634,174 @@ main(int argc, char *argv[])
    * FIXME: This state machine should be possible to simplify.
    *
    */
-  
-  while (fgets(line, MAXLINE, input_FILE)) {
-    current_line_number++;
-    if (line[strlen(line)-1] != '\n') {
-      fprintf(stderr, "mkpat: line truncated: %s, length %d\n", line,
-	      (int) strlen(line));
 
-      fatal_errors++;
+  for (ifc = 0; ifc < MAX_INPUT_FILE_NAMES; ifc++) {
+    if (input_file_names[ifc] == 0 && ifc == 0) {
+      input_FILE = stdin;
+      current_file = "<stdin>";
     }
-
-    /* remove trailing white space from line */
-
-    i = strlen(line)-2;	/* start removing backwards just before newline */
-    while (i >= 0 
-	   && (line[i] == ' ' || line[i] == '\t' || line[i] == '\r')) {
-      line[i]   = '\n';
-      line[i+1] = '\0';
-      i--;
+    else {
+      if (input_file_names[ifc] == 0) {
+	break;
+      } else {
+	if ((input_FILE = fopen(input_file_names[ifc], "r")) == NULL) {
+	  fprintf(stderr, "Error: Cannot open file %s\n", 
+		  input_file_names[ifc]);
+	  exit(1);
+	  break;
+	}
+      }
+      current_file = input_file_names[ifc];  
     }
-
-    /* FIXME: We risk overruning a buffer here. */
-    if (sscanf(line, "Pattern %s", pattern_names[patno+1]) == 1) {
-      char *p = strpbrk(pattern_names[patno+1], " \t");
-
-      if (p)
-	*p = 0;
-      if (patno >= 0) {
-	switch (state) {
-	case 1:
-	  fprintf(stderr, "%s(%d) : Warning: empty pattern %s\n",
-		  current_file, current_line_number, pattern_names[patno]);
-	  break;
-	case 2:
-	case 3:
-	  fprintf(stderr, "%s(%d) : Error : No entry line for pattern %s\n",
-		  current_file, current_line_number, pattern_names[patno]);
-	  fatal_errors++;
-	  break;
-	case 5:
-	case 6:
-	  fprintf(stderr,
-		  "%s(%d) : Warning: constraint diagram but no constraint line for pattern %s\n",
-		  current_file, current_line_number, pattern_names[patno]);
-	  break;
-	case 7:
-	case 8:
-	  finish_constraint_and_action(argv[gg_optind]); /* fall through */
-	case 0:
-	case 4:
-	  check_constraint_diagram();
+    current_line_number = 0;
+    while (fgets(line, MAXLINE, input_FILE)) {
+      current_line_number++;
+      if (line[strlen(line)-1] != '\n') {
+	fprintf(stderr, "mkpat: line truncated: %s, length %d\n", line,
+		(int) strlen(line));
+	
+	fatal_errors++;
+      }
+      
+      /* remove trailing white space from line */
+      
+      i = strlen(line)-2;  /* start removing backwards just before newline */
+      while (i >= 0 
+	     && (line[i] == ' ' || line[i] == '\t' || line[i] == '\r')) {
+	line[i]   = '\n';
+	line[i+1] = '\0';
+	i--;
+      }
+      
+      /* FIXME: We risk overruning a buffer here. */
+      if (sscanf(line, "Pattern %s", pattern_names[patno+1]) == 1) {
+	char *p = strpbrk(pattern_names[patno+1], " \t");
+	
+	if (p)
+	  *p = 0;
+	if (patno >= 0) {
+	  switch (state) {
+	  case 1:
+	    fprintf(stderr, "%s(%d) : Warning: empty pattern %s\n",
+		    current_file, current_line_number, pattern_names[patno]);
+	    break;
+	  case 2:
+	  case 3:
+	    fprintf(stderr, "%s(%d) : Error : No entry line for pattern %s\n",
+		    current_file, current_line_number, pattern_names[patno]);
+	    fatal_errors++;
+	    break;
+	  case 5:
+	  case 6:
+	    fprintf(stderr,
+		    "%s(%d) : Warning: constraint diagram but no constraint line for pattern %s\n",
+		    current_file, current_line_number, pattern_names[patno]);
+	    break;
+	  case 7:
+	  case 8:
+	    finish_constraint_and_action(argv[gg_optind]); /* fall through */
+	  case 0:
+	  case 4:
+	    check_constraint_diagram();
+	    patno++;
+	    reset_pattern();
+	  }
+	}
+	else {
 	  patno++;
 	  reset_pattern();
 	}
+	state = 1;
       }
-      else {
-	patno++;
-	reset_pattern();
+      else if (line[0] == '\n' || line[0] == '#') { 
+	/* nothing */
+	if (state == 2 || state == 5) {
+	  if (state == 5)
+	    check_constraint_diagram_size();
+	  state++;
+	}
       }
-      state = 1;
-    }
-    else if (line[0] == '\n' || line[0] == '#') { 
-      /* nothing */
-      if (state == 2 || state == 5) {
+      else if (strchr(VALID_PATTERN_CHARS, line[0])
+	       || strchr(VALID_EDGE_CHARS, line[0])
+	       || strchr(VALID_CONSTRAINT_LABELS, line[0])) { 
+	/* diagram line */
+	switch (state) {
+	case 0:
+	case 3:
+	case 6:
+	case 7:
+	case 8:
+	  fprintf(stderr, 
+		  "%s(%d) : error : What, another diagram here? (pattern %s)\n",
+		  current_file, current_line_number, pattern_names[patno]);
+	  fatal_errors++;
+	  break;
+	case 1:
+	  state++; /* fall through */
+	case 2:
+	  read_pattern_line(line);
+	  current_i++;
+	  break;
+	case 4:
+	  state++; /* fall through */
+	case 5:
+	  read_constraint_diagram_line(line);
+	  break;
+	}	
+      }
+      else if (line[0] == ':') {
+	if (state == 2 || state == 3) {
+	  finish_pattern(line);
+	  
+	  write_elements(output_FILE, argv[gg_optind]);
+	  if (dfa_generate)
+	    write_to_dfa(patno);
+	  state = 4;
+	}
+	else {
+	  fprintf(stderr,
+		  "%s(%d) : warning : Unexpected entry line in pattern %s\n",
+		  current_file, current_line_number, pattern_names[patno]);
+	}
+      } 
+      else if (line[0] == ';') {
 	if (state == 5)
 	  check_constraint_diagram_size();
-	state++;
-      }
-    }
-    else if (strchr(VALID_PATTERN_CHARS, line[0])
-	     || strchr(VALID_EDGE_CHARS, line[0])
-	     || strchr(VALID_CONSTRAINT_LABELS, line[0])) { 
-      /* diagram line */
-      switch (state) {
-      case 0:
-      case 3:
-      case 6:
-      case 7:
-      case 8:
-	fprintf(stderr, 
-		"%s(%d) : error : What, another diagram here? (pattern %s)\n",
-		current_file, current_line_number, pattern_names[patno]);
-        fatal_errors++;
-	break;
-      case 1:
-	state++; /* fall through */
-      case 2:
-	read_pattern_line(line);
-	current_i++;
-	break;
-      case 4:
-	state++; /* fall through */
-      case 5:
-	read_constraint_diagram_line(line);
-	break;
-      }	
-    }
-    else if (line[0] == ':') {
-      if (state == 2 || state == 3) {
-	finish_pattern(line);
-
-	write_elements(output_FILE, argv[gg_optind]);
-	if (dfa_generate)
-	  write_to_dfa(patno);
-	state = 4;
-      }
+	
+	if (state == 5 || state == 6 || state == 7) {
+	  read_constraint_line(line+1);
+	  state = 7;
+	}
+	else {
+	  fprintf(stderr, "Warning: unexpected constraint line in pattern %s\n",
+		  pattern_names[patno]);
+	}
+      } 
+      else if (line[0] == '>') {
+	if (state == 4 || state == 5 || state == 6 
+	    || state == 7 || state == 8) {
+	  if (state == 5)
+	    check_constraint_diagram_size();
+	  read_action_line(line+1);
+	  state = 8;
+	}
+	else {
+	  fprintf(stderr, "Warning: unexpected action line in pattern %s\n",
+		  pattern_names[patno]);
+	}
+      } 
       else {
-	fprintf(stderr,
-		"%s(%d) : warning : Unexpected entry line in pattern %s\n",
-		current_file, current_line_number, pattern_names[patno]);
+	int i = strlen(line);
+	char c = line[i-1];
+	line[i-1] = 0;  /* Chop off \n */
+	fprintf(stderr, "%s(%d) : error : Malformed line \"%s\" in pattern %s\n",
+		current_file, current_line_number, line, pattern_names[patno]);
+	line[i-1] = c;  /* Put it back - maybe not necessary at this point. */
+	fatal_errors++;
       }
-    } 
-    else if (line[0] == ';') {
-      if (state == 5)
-	check_constraint_diagram_size();
-      
-      if (state == 5 || state == 6 || state == 7) {
-	read_constraint_line(line+1);
-	state = 7;
-      }
-      else {
-	fprintf(stderr, "Warning: unexpected constraint line in pattern %s\n",
-		pattern_names[patno]);
-      }
-    } 
-    else if (line[0] == '>') {
-      if (state == 4 || state == 5 || state == 6 || state == 7 || state == 8) {
-	if (state == 5)
-	  check_constraint_diagram_size();
-	read_action_line(line+1);
-	state = 8;
-      }
-      else {
-	fprintf(stderr, "Warning: unexpected action line in pattern %s\n",
-		pattern_names[patno]);
-      }
-    } 
-    else {
-      int i = strlen(line);
-      char c = line[i-1];
-      line[i-1] = 0;  /* Chop off \n */
-      fprintf(stderr, "%s(%d) : error : Malformed line \"%s\" in pattern %s\n",
-	      current_file, current_line_number, line, pattern_names[patno]);
-      line[i-1] = c;  /* Put it back - maybe not necessary at this point. */
-      fatal_errors++;
-    }
-  }
-
+    } /* while not EOF */
+  } /* for each file */
+  
   if (patno >= 0) {
     switch (state) {
     case 1:
@@ -1801,9 +1829,8 @@ main(int argc, char *argv[])
       patno++;
       reset_pattern();
     }
-  }
-
-
+  } 
+ 
   if (verbose)
     fprintf(stderr, "%d / %d patterns have edge-constraints\n",
 	    pats_with_constraints, patno);

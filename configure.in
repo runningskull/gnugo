@@ -77,6 +77,10 @@ AC_ARG_ENABLE(experimental-semeai,
  [  --enable-experimental-semeai    use the experimental semeai module
   --disable-experimental-semeai    use standard semeai module (default)])
 
+AC_ARG_ENABLE(experimental-reading,
+ [  --enable-experimental-reading    use experimental pattern-based reading
+  --disable-experimental-reading    use standard reading (default)])
+
 AC_ARG_ENABLE(experimental-connections,
  [  --enable-experimental-connections    use experimental connection analysis
   --disable-experimental-connections    use standard connection analysis (default)])
@@ -375,6 +379,17 @@ if test "$enable_experimental_semeai" = "yes" ; then
    AC_DEFINE(EXPERIMENTAL_SEMEAI, 1)
 else
    AC_DEFINE(EXPERIMENTAL_SEMEAI, 0)
+fi
+
+dnl ------------ Reading -------------------
+
+AH_TEMPLATE([EXPERIMENTAL_READING],
+[Experimental pattern based reading. Disabled by default.])
+
+if test "$enable_experimental_reading" = "yes" ; then
+   AC_DEFINE(EXPERIMENTAL_READING, 1)
+else
+   AC_DEFINE(EXPERIMENTAL_READING, 0)
 fi
 
 dnl ------------ Connections -------------------

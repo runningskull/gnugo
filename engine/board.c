@@ -392,12 +392,13 @@ trymove(int pos, int color, const char *message, int str,
   if (!do_trymove(pos, color, 0))
     return 0;
 
-  if (message == NULL)
-    message = "UNKNOWN";
-  
   /* Store the move in an sgf tree if one is available. */
   if (sgf_dumptree) {
     char buf[100];
+
+    if (message == NULL)
+      message = "UNKNOWN";
+
     if (str == 0) {
       if (komaster != EMPTY)
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx, komaster %s:%s)", 
@@ -632,6 +633,9 @@ popgo()
   
   memcpy(&hashdata, &(hashdata_stack[stackp]), sizeof(hashdata));
   if (sgf_dumptree) {
+    char buf[100];
+    gg_snprintf(buf,100,"(next variation: %d)", count_variations);
+    sgftreeAddComment(sgf_dumptree, NULL, buf);
     sgf_dumptree->lastnode = sgf_dumptree->lastnode->parent;
     /* After tryko() we need to undo two pass nodes too. Since we have
      * no other way to identify ko moves, we skip all pass nodes.
@@ -874,7 +878,8 @@ is_legal(int pos, int color)
  * This is the case if
  * 1. There is no neighboring empty intersection.
  * 2. There is no neighboring opponent string with exactly one liberty.
- * 3. There is no neighboring friendly string with more than one liberty.
+ * 3. Thers is a neighboring friendly string with more than one liberty.
+ *
  */
 int 
 is_suicide(int pos, int color)

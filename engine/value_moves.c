@@ -1974,7 +1974,7 @@ estimate_strategical_value(int pos, int color, float score)
 	tot_value += excess_value;
       }
       else {
-	TRACE(" %1m:   %f - %1m strategic value already counted.\n",
+	TRACE("  %1m:   %f - %1m strategic value already counted.\n",
 	      pos, dragon_value[k], aa);
       }
       
