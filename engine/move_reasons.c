@@ -2232,7 +2232,7 @@ connection_value(int dragona, int dragonb, int tt, float margin)
   else impact = 0.05*margin*cautious_impact_values[safety1][safety2]
 	 + (1-0.05*margin)*impact_values[safety1][safety2];
   
-  return impact * 2.0 * dragon[ai][bj].effective_size;
+  return impact * 2.0 * dragon[ai][aj].effective_size;
 }
 
 /*
