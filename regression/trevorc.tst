@@ -243,6 +243,7 @@ loadsgf games/trevor/auto/c24.sgf 34
 #? [!J10]
 
 
+# J2 looks bigger to me. /gf
 loadsgf games/trevor/auto/c24.sgf 62
 500 gg_genmove white
 #? [E7]*
@@ -703,12 +704,13 @@ loadsgf games/trevor/auto/c69.sgf 14
 
 
 
-# games/trevor/auto/c70.sgf problems:
-
-#DESCRIPTION=D2 was the move played - find the pattern & kill it.
-loadsgf games/trevor/auto/c70.sgf 2
-1230 gg_genmove white
-#? [FAILED]*
+# # games/trevor/auto/c70.sgf problems:
+# 
+# #DESCRIPTION=D2 was the move played - find the pattern & kill it.
+# # The pattern was Fuseki216 in fuseki13.db. /gf
+# loadsgf games/trevor/auto/c70.sgf 2
+# 1230 gg_genmove white
+# #? [FAILED]*
 
 
 
