@@ -29,7 +29,7 @@ loadsgf games/ego.sgf 52
 # E18 and gives black an endgame sente move at H19.
 loadsgf games/ego.sgf 54
 4 gg_genmove white
-#? [!G19]*
+#? [!(G19|H19|K17)]*
 
 # D7 is a good move.
 loadsgf games/ego.sgf 68

@@ -816,6 +816,18 @@ loadsgf games/incident169.sgf 224
 223 owl_defend R17
 #? [3 S16]
 
+loadsgf games/ego.sgf 198
+224 owl_attack T17
+#? [2 T18]*
+
+loadsgf games/ego.sgf 198
+225 owl_defend T17
+#? [3 Q19|S16]*
+
+loadsgf games/owl29.sgf 132
+226 owl_attack J10
+#? [1 O8]*
+
 ########### end of tests #####################
 
 

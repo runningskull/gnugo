@@ -174,6 +174,11 @@ loadsgf games/seki02.sgf
 185 gg_genmove black
 #? [E7]
 
+# O8 only move.
+loadsgf games/owl29.sgf 134
+186 gg_genmove white
+#? [1 O8]*
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
