@@ -6,17 +6,15 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 38
 2 gg_genmove black
 #? [M4]
 
-# gf Anything wrong with P8?
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 48
 3 gg_genmove black
-#? [Q8]*
+#? [Q8|P8]*
 
-# gf M8 also looks reasonable.
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
 4 gg_genmove black
-#? [R12|Q12]*
+#? [R12|Q12|M8]*
 
-# gf M8 also looks reasonable.
+# M8 is better than the game move but R13 seems best
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 70
 5 gg_genmove black
 #? [R13]*
@@ -45,6 +43,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 262
 11 gg_genmove black
 #? [S15]*
 
+# Semeai problem
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 268
 12 gg_genmove black
 #? [T18]*
@@ -61,7 +60,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 102
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 108
 15 gg_genmove black
-#? [Q15|T5|H5]*
+#? [Q15|T5|H5|H3]*
 
 # Locally, L16 is better than L17.
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 192

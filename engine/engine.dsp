@@ -203,6 +203,10 @@ SOURCE=.\utils.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\value_moves.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\worm.c
 # End Source File
 # End Group
