@@ -30,6 +30,7 @@
 #include "liberty.h"
 #include "interface.h"
 #include "sgftree.h"
+#include "gg_utils.h"
 
 #define DEBUG_COMMANDS "\
 capture <pos>    try to capture indicated group\n\

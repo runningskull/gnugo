@@ -29,6 +29,7 @@
 #include "interface.h"
 #include "gmp.h"
 #include "sgftree.h"
+#include "gg_utils.h"
 
 /* --------------------------------------------------------------*/
 /* Play a game against a go-modem-protocol (GMP) client.         */
