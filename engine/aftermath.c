@@ -164,43 +164,45 @@ aftermath_genmove(int *aftermath_move, int color,
   }
   
   if (debug & DEBUG_AFTERMATH) {
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (!ON_BOARD(pos))
-	continue;
-      else if (distance[pos] > 0)
-	fprintf(stderr, "%2d", distance[pos]);
-      else if (distance[pos] == 0) {
-	if (board[pos] == WHITE)
-	  gprintf(" o");
-	else if (board[pos] == BLACK)
-	  gprintf(" x");
-	else
-	  gprintf(" ?");
+    int m, n;
+    for (m = 0; m < board_size; m++) {
+      for (n = 0; n < board_size; n++) {
+	pos = POS(m, n);
+	if (distance[pos] > 0)
+	  fprintf(stderr, "%2d", distance[pos]);
+	else if (distance[pos] == 0) {
+	  if (board[pos] == WHITE)
+	    gprintf(" o");
+	  else if (board[pos] == BLACK)
+	    gprintf(" x");
+	  else
+	    gprintf(" ?");
+	}
+	else {
+	  if (board[pos] == WHITE)
+	    gprintf(" O");
+	  else if (board[pos] == BLACK)
+	    gprintf(" X");
+	  else
+	    gprintf(" .");
+	}
       }
-      else {
-	if (board[pos] == WHITE)
-	  gprintf(" O");
-	else if (board[pos] == BLACK)
-	  gprintf(" X");
-	else
-	  gprintf(" .");
-      }
+      gprintf("\n");
     }
-    gprintf("\n");
   
     gprintf("Closest opponent %1m", closest_opponent);
     if (closest_opponent != NO_MOVE)
       gprintf(", distance %d\n", distance[closest_opponent]);
     else
       gprintf("\n");
-    
+
     gprintf("Closest own %1m", closest_own);
     if (closest_own != NO_MOVE)
       gprintf(", distance %d\n", distance[closest_own]);
     else
       gprintf("\n");
   }
-  
+
   /* Case 0. This is a special measure to avoid a certain kind of
    * tactical reading inefficiency.
    *
