@@ -333,7 +333,7 @@ XX..
 
 OX.x
 A.*.
-AA.x
+AA..
 ----
 
 ;lib(A)==2 && owl_big_eyespace(*,A)

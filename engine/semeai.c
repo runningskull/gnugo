@@ -358,10 +358,12 @@ analyze_semeai(int my_dragon, int your_dragon)
    */
 
   if (dragon[my_dragon].owl_status == CRITICAL
+      && dragon[my_dragon].owl_attack_point != NO_MOVE
       && !liberty_of_string(dragon[my_dragon].owl_attack_point, my_dragon))
     mylibs++;
   
   if (dragon[your_dragon].owl_status == CRITICAL
+      && dragon[your_dragon].owl_attack_point != NO_MOVE
       && !liberty_of_string(dragon[your_dragon].owl_attack_point, your_dragon))
     yourlibs++;
   

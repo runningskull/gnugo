@@ -2844,7 +2844,7 @@ estimate_territorial_value(int pos, int color,
   tot_value += this_value;
   /* subtract one point for a sacrifice (playing in opponent's territory) */
   if (tot_value > 1.0 && safe_move(pos, color) != WIN) {
-    TRACE("  %1m:   -1 - unsafe move, assumed sacrifice\n", pos, this_value);
+    TRACE("  %1m:   -1 - unsafe move, assumed sacrifice\n", pos);
     tot_value -= 1.0;
   }
 

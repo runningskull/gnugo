@@ -199,7 +199,7 @@ loadsgf games/incident201.sgf 297
 56 owl_attack M19
 #? [1 (Q19|T13)]
 57 owl_defend M19
-#? [1 T13]*
+#? [1 (T13|N19)]*
 58 owl_attack T19
 #? [1 (T13|N19)]
 59 owl_defend T19

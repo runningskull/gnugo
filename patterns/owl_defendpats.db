@@ -819,6 +819,46 @@ a*X
 ;owl_goal_dragon(a) && owl_escape_value(b)>0
 
 
+Pattern D227
+# gf New pattern. (3.1.13)
+
+X.O.	      jump and threaten to cut, connect, or force
+OX..
+O.*.
+o...
+----
+
+:8,-,value(65)
+
+X.O.
+aX..
+a.*.
+o...
+----
+
+;owl_goal_dragon(a) && !oplay_attack(*,a)
+
+
+Pattern D228
+# gf New pattern. (3.1.13)
+
+X.O.	      followup
+OXX*
+O.O.
+o...
+----
+
+:8,-,value(65)
+
+X.O.
+aXX*
+a.O.
+o...
+----
+
+;owl_goal_dragon(a) && !oplay_attack(*,a)
+
+
 #########################################################
 #                                                       #
 #          Expanding moves in the center                #

@@ -10564,6 +10564,7 @@ Pattern CD100
 # This should strictly give an "attack one out of three" move reason,
 # but since there is no support for these, we do something ad hoc
 # instead.
+# gf Revised constraint. (3.1.13)
 
 ?OOX         atari twice to capture something
 XOX.
@@ -10572,16 +10573,18 @@ XOX.
 
 :8,Xads,value(7)
 
-?OOX
-EOXa
+?ffX
+EfXa
 bD*o
 ?co?
 
 ;olib(b)>=2 && !attack(E) && !attack(D) && oplay_attack_either(*,a,b,c,D,E)
+;&& !oplay_attack(*,f)
 
 
 Pattern CD101
 # Converse of previous pattern. Same comment applies.
+# gf Revised constraint. (3.1.13)
 
 ?XXO         defend against atari sequence
 OXO.
@@ -10590,12 +10593,13 @@ OXO.
 
 :8,Xad,value(7)
 
-?XXO
-eXOa
+?FFO
+eFOa
 bd*o
 ?co?
 
-;xlib(b)>=2 && !attack(e) && !attack(d) && xplay_attack_either(*,a,b,c,d,e)
+;xlib(b)>=2 && !attack(e) && !attack(d) && !attack(F)
+;&& xplay_attack_either(*,a,b,c,d,e)
 
 
 Pattern CD102
@@ -10614,6 +10618,7 @@ cb.
 
 
 Pattern CD103
+# gf Revised constraint. (3.1.13)
 
 ?XOX?       capture something!
 .*X..
@@ -10621,11 +10626,11 @@ Pattern CD103
 
 :|,sa,value(12)
 
-?XOX?
+?XbX?
 .*Xa.
 ?...?
 
-; o_aa_attack(*,a) && o_aa_attack(a,*)
+;!oplay_attack(*,b) && o_aa_attack(*,a) && o_aa_attack(a,*)
 
 
 Pattern CD103a
