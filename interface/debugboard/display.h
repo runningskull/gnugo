@@ -130,9 +130,11 @@ int display_cur_row(void);
 int display_cur_col(void);
 int display_cur_tabchoice(void);
 
+typedef void (display_board_function)(int m, int n);
 void display_board_cursor(void);
+void display_board_char(int i, int j, int ch);
 void display_board_intersection(int i, int j, int color);
-void display_board_position(Position *pos);
+void display_board_position(Position *pos, display_board_function *func);
 void display_board_moveto(int i, int j);
 void display_board_move(int di, int dj);
 

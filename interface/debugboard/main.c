@@ -76,6 +76,8 @@ SGFNode  *sgf_root;
 
 int       current_color = WHITE;
 
+static void main_loop(void);
+
 void choose_worms_tab(void);
 void choose_dragons_tab(void);
 void choose_eyes_tab(void);
@@ -87,7 +89,6 @@ void show_current_info(void);
 int
 main(int argc, char *argv[])
 {
-  int  ch;
   char *until = NULL;
   int  next;
   char *infilename;
@@ -135,10 +136,20 @@ main(int argc, char *argv[])
 
   tab_window_draw(tabs);
 
-  display_board_position(&gameinfo.position);
+  display_board_position(&gameinfo.position, NULL);
   gnugo_examine_position(&gameinfo.position, next, EXAMINE_ALL);
 
   choose_worms_tab();
+  main_loop();
+  display_cleanup();
+
+  exit(0);
+}
+
+static void
+main_loop()
+{
+  int  ch;
 
   while (1) {
     ch = display_input();
@@ -261,12 +272,11 @@ main(int argc, char *argv[])
       display_message("Unkown character (%d) received", ch);
     }
   }
+  }
 
-  display_cleanup();
 
-  exit(0);
-}
 
+/* ---------------------------------------------------------------- */
 
 void
 choose_worms_tab()
@@ -314,16 +324,19 @@ show_current_info()
 {
   switch (display_cur_tabchoice()) {
   case 0: 
+    display_board_position(&gameinfo.position, display_worm_tactical_data);
     display_worm(POS(display_cur_row(), display_cur_col()));
     break;
-  case 1: 
-    display_dragon(display_cur_row(), display_cur_col());
+  case 1:
+    display_board_position(&gameinfo.position, NULL);
+    display_dragon(POS(display_cur_row(), display_cur_col()));
     break;
   case 2: 
+    display_board_position(&gameinfo.position, NULL);
     if (current_color == WHITE)
-      display_eye(WHITE, white_eye, display_cur_row(), display_cur_col());
+      display_eye(WHITE, white_eye, POS(display_cur_row(), display_cur_col()));
     else
-      display_eye(BLACK, black_eye, display_cur_row(), display_cur_col());
+      display_eye(BLACK, black_eye, POS(display_cur_row(), display_cur_col()));
   default:
     break;
   }

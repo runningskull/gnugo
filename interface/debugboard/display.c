@@ -294,6 +294,13 @@ display_cur_tabchoice()
 
 
 void
+display_board_char(int i, int j, int ch)
+{
+  mvwaddch(board_window, i+1, 2*j+1, ch);
+}
+
+
+void
 display_board_intersection(int i, int j, int color)
 {
   int  ch;
@@ -311,7 +318,7 @@ display_board_intersection(int i, int j, int color)
 }
 
 void
-display_board_position(Position *pos)
+display_board_position(Position *pos, display_board_function *func)
 {
   int  ch;
   int  i;
@@ -327,6 +334,9 @@ display_board_position(Position *pos)
       }
       mvwaddch(board_window, i+1, 2*j+1, ch);
     }
+
+  if (func)
+    func(display_cur_row(), display_cur_col());
 
   display_board_cursor();
 }

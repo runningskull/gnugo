@@ -38,26 +38,30 @@ prepare_worms_tab()
   gg_wprintw(info_window, "size:           ");
 
   wmove(info_window, 5, 2);
-  gg_wprintw(info_window, "liberties:      1   2   3   4");
-
-  wmove(info_window, 8, 2);
   gg_wprintw(info_window, "cutstone:        ");
-  wmove(info_window, 9, 2);
+  wmove(info_window, 6, 2);
   gg_wprintw(info_window, "cutstone2:       ");
-  wmove(info_window, 10, 2);
+  wmove(info_window, 7, 2);
   gg_wprintw(info_window, "genus:           ");
 
   wmove(info_window, 3, 36);
-  gg_wprintw(info_window, "attack:          ");
-  wmove(info_window, 4, 36);
-  gg_wprintw(info_window, "defense:         ");
-  wmove(info_window, 5, 36);
-  gg_wprintw(info_window, "lunch: ");
+  gg_wprintw(info_window, "liberties:      1   2   3   4");
 
-  wmove(info_window, 7, 36);
+  wmove(info_window, 6, 36);
   gg_wprintw(info_window, "uncond. status:  ");
-  wmove(info_window, 8, 36);
+  wmove(info_window, 7, 36);
   gg_wprintw(info_window, "flags:           ");
+
+  wmove(info_window, 9, 2);
+  gg_wprintw(info_window, "attack:          ");
+  wmove(info_window, 10, 2);
+  gg_wprintw(info_window, "defense:         ");
+  wmove(info_window, 11, 2);
+  gg_wprintw(info_window, "attack threats:  ");
+  wmove(info_window, 12, 2);
+  gg_wprintw(info_window, "defense threats: ");
+  wmove(info_window, 13, 2);
+  gg_wprintw(info_window, "lunch: ");
 
   wrefresh(info_window);
 }
@@ -66,6 +70,8 @@ prepare_worms_tab()
 void
 display_worm(int w)
 {
+  int  i;
+
   wmove(info_window, 1, 2);
   gg_wprintw(info_window, "%3s: %5s worm   ",
 	     location_to_string(w),
@@ -77,56 +83,96 @@ display_worm(int w)
   gg_wprintw(info_window, "%3d  %5.3f ",
 	     worm[w].size, worm[w].effective_size);
 
-  wmove(info_window, 6, 16);
+  wmove(info_window, 5, 19);
+  gg_wprintw(info_window, "%d", worm[w].cutstone);
+  wmove(info_window, 6, 19);
+  gg_wprintw(info_window, "%d", worm[w].cutstone2);
+  wmove(info_window, 7, 19);
+  gg_wprintw(info_window, "%d", worm[w].genus);
+
+  wmove(info_window, 4, 50);
   gg_wprintw(info_window, "%3d %3d %3d %3d ", 
 	     worm[w].liberties, worm[w].liberties2,
 	     worm[w].liberties3, worm[w].liberties4);
 
-  wmove(info_window, 8, 18);
-  gg_wprintw(info_window, "%d", worm[w].cutstone);
-  wmove(info_window, 9, 18);
-  gg_wprintw(info_window, "%d", worm[w].cutstone2);
-  wmove(info_window, 10, 18);
-  gg_wprintw(info_window, "%d", worm[w].genus);
-
-  wmove(info_window, 3, 55);
-  if (worm[w].attack_points[0] == 0)
-    gg_wprintw(info_window, "--- [code %d]",
-	       worm[w].attack_codes[0]);
-  else
-    gg_wprintw(info_window, "%3s [code %d]", 
-	    location_to_string(worm[w].attack_points[0]),
-	    worm[w].attack_codes[0]);
-  
-  wmove(info_window, 4, 55);
-  if (worm[w].defense_points[0] == 0)
-    gg_wprintw(info_window, "--- [code %d]",
-	       worm[w].defend_codes[0]);
-  else
-    gg_wprintw(info_window, "%3s [code %d]", 
-	    location_to_string(worm[w].defense_points[0]),
-	    worm[w].defend_codes[0]);
-
-  wmove(info_window, 5, 55);
-  if (worm[w].lunch == NO_MOVE)
-    gg_wprintw(info_window, "---");
-  else
-    gg_wprintw(info_window, "%3s", location_to_string(worm[w].lunch));
-
-  wmove(info_window, 7, 55);
+  wmove(info_window, 6, 55);
   gg_wprintw(info_window, "%s         ", 
 	     status_to_string(worm[w].unconditional_status));
   /* FIXME: Is status_to_string() correct here? */
 
-  wmove(info_window, 8, 49);
+  wmove(info_window, 7, 49);
   gg_wprintw(info_window, "                          ");
-  wmove(info_window, 8, 49);
+  wmove(info_window, 7, 49);
   if (worm[w].inessential)
     gg_wprintw(info_window, "inessential ");
   if (worm[w].invincible)
     gg_wprintw(info_window, "invincible ");
 
+  for (i = 0; i < MAX_TACTICAL_POINTS; i++) {
+    wmove(info_window, 9, 19 + i * 6);
+    if (worm[w].attack_points[i] == 0)
+      gg_wprintw(info_window, "---:0 ", worm[w].attack_codes[i]);
+    else
+      gg_wprintw(info_window, "%3s:%d ", 
+		 location_to_string(worm[w].attack_points[i]),
+		 worm[w].attack_codes[i]);
+  
+    wmove(info_window, 10, 19 + i * 6);
+    if (worm[w].defense_points[i] == 0)
+      gg_wprintw(info_window, "---:0 ", worm[w].defend_codes[i]);
+    else
+      gg_wprintw(info_window, "%3s:%d ", 
+		 location_to_string(worm[w].defense_points[i]),
+		 worm[w].defend_codes[i]);
+
+    wmove(info_window, 11, 19 + i * 6);
+    if (worm[w].attack_threat_points[i] == 0)
+      gg_wprintw(info_window, "---:0", worm[w].attack_threat_codes[i]);
+    else
+      gg_wprintw(info_window, "%3s:%d ", 
+		 location_to_string(worm[w].attack_threat_points[i]),
+		 worm[w].attack_threat_codes[i]);
+  
+    wmove(info_window, 12, 19 + i * 6);
+    if (worm[w].defense_threat_points[i] == 0)
+      gg_wprintw(info_window, "---:0 ", worm[w].defense_threat_codes[i]);
+    else
+      gg_wprintw(info_window, "%3s:%d ", 
+		 location_to_string(worm[w].defense_threat_points[i]),
+		 worm[w].defense_threat_codes[i]);
+  }
+
+  wmove(info_window, 13, 19);
+  if (worm[w].lunch == NO_MOVE)
+    gg_wprintw(info_window, "---");
+  else
+    gg_wprintw(info_window, "%3s", location_to_string(worm[w].lunch));
+
   wrefresh(info_window);
+}
+
+
+void
+display_worm_tactical_data(int m, int n)
+{
+  int i;
+  int ii;
+
+  ii = POS(m, n);
+  for (i = 0; i < MAX_TACTICAL_POINTS; i++) {
+    if (worm[ii].attack_codes[i] != 0)
+      display_board_char(I(worm[ii].attack_points[i]),
+			 J(worm[ii].attack_points[i]), 'A');
+    if (worm[ii].defend_codes[i] != 0)
+      display_board_char(I(worm[ii].defense_points[i]),
+			 J(worm[ii].defense_points[i]), 'D');
+    if (worm[ii].attack_threat_codes[i] != 0)
+      display_board_char(I(worm[ii].attack_threat_points[i]),
+			 J(worm[ii].attack_threat_points[i]), 'a');
+    if (worm[ii].defense_threat_codes[i] != 0)
+      display_board_char(I(worm[ii].defense_threat_points[i]),
+			 J(worm[ii].defense_threat_points[i]), 'd');
+  }
 }
 
 
@@ -176,13 +222,13 @@ prepare_dragons_tab()
 
 
 void
-display_dragon(int i, int j)
+display_dragon(int pos)
 {
-  struct dragon_data *d = &dragon[POS(i, j)];
+  struct dragon_data *d = &dragon[pos];
   struct dragon_data2 *d2 = &(dragon2[d->id]);
   wmove(info_window, 1, 2);
   gg_wprintw(info_window, "%3s: %5s dragon ",
-	     location_to_string(POS(i, j)), color_to_string(d->color));
+	     location_to_string(pos), color_to_string(d->color));
   gg_wprintw(info_window, "(origin %s)  id %d   ",
 	     location_to_string(d->origin), d->id);
 
@@ -190,9 +236,12 @@ display_dragon(int i, int j)
   gg_wprintw(info_window, "%3d  %5.3f ", d->size, d->effective_size);
 
   wmove(info_window, 8, 18);
-  gg_wprintw(info_window, "%d  ", d2->heyes);
+  if (board[pos] == EMPTY)
+    gg_wprintw(info_window, "    ", d2->heyes);
+  else
+    gg_wprintw(info_window, "%d  ", d2->heyes);
   wmove(info_window, 8, 21);
-  if (d2->heyes > 0)
+  if (board[pos] != EMPTY && d2->heyes > 0)
     gg_wprintw(info_window, "[%s] ", location_to_string(d2->heye));
   else
     gg_wprintw(info_window, "[---]");
@@ -200,16 +249,19 @@ display_dragon(int i, int j)
   wmove(info_window, 9, 18);
   gg_wprintw(info_window, "%d  ", d2->genus);
   wmove(info_window, 10, 18);
-  gg_wprintw(info_window, "%d  ", d2->escape_route);
+  gg_wprintw(info_window, "%d  ", 
+	     board[pos] == EMPTY ? 0 : d2->escape_route);
   wmove(info_window, 11, 18);
   if (d2->lunch == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%3s", location_to_string(d2->lunch));
 
+  /* status */
   wmove(info_window, 3, 55);
   gg_wprintw(info_window, "%s     ", status_to_string(d->status));
 
+  /* owl status */
   wmove(info_window, 4, 55);
   gg_wprintw(info_window, "%-12s", status_to_string(d->owl_status));
   if (d->owl_attack_point == NO_MOVE)
@@ -225,6 +277,11 @@ display_dragon(int i, int j)
 
   wmove(info_window, 5, 55);
   switch (d->owl_threat_status) {
+  case DEAD:
+  case ALIVE:
+    gg_wprintw(info_window, "%-12s[---] [---]", 
+	       status_to_string(d->owl_threat_status));
+    break;
   case UNCHECKED:
     gg_wprintw(info_window, "unchecked   [---] [---]");
     break;
@@ -246,7 +303,7 @@ display_dragon(int i, int j)
 
   wmove(info_window, 8, 55);
   wmove(info_window, 9, 55);
-  gg_wprintw(info_window, "%s     ", status_to_string(d2->safety));
+  gg_wprintw(info_window, "%s     ", safety_to_string(d2->safety));
   wmove(info_window, 10, 55);
   gg_wprintw(info_window, "%d  ", d2->semeai);
 
@@ -306,64 +363,63 @@ prepare_eyes_tab()
 
 
 void
-display_eye(int color, struct eye_data eyedata[BOARDMAX], 
-	    int i, int j)
+display_eye(int color, struct eye_data eyedata[BOARDMAX], int pos)
 {
   wmove(info_window, 1, 24);
   gg_wprintw(info_window, "%s", color == WHITE ? "WHITE" : "BLACK");
   wmove(info_window, 2, 9);
-  gg_wprintw(info_window, "%s ", location_to_string(POS(i, j)));
+  gg_wprintw(info_window, "%s ", location_to_string(pos));
 
   wmove(info_window, 2, 24);
-  if (eyedata[POS(i, j)].origin == NO_MOVE)
+  if (eyedata[pos].origin == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%s ", 
-	       location_to_string(eyedata[POS(i, j)].origin));
+	       location_to_string(eyedata[pos].origin));
 
   wmove(info_window, 4, 18);
-  gg_wprintw(info_window, "%-12s", color_to_string(eyedata[POS(i, j)].color));
+  gg_wprintw(info_window, "%-12s", color_to_string(eyedata[pos].color));
   wmove(info_window, 5, 18);
-  gg_wprintw(info_window, "%d   ", eyedata[POS(i, j)].esize);
+  gg_wprintw(info_window, "%d   ", eyedata[pos].esize);
   wmove(info_window, 6, 18);
-  gg_wprintw(info_window, "%d   ", eyedata[POS(i, j)].msize);
+  gg_wprintw(info_window, "%d   ", eyedata[pos].msize);
   wmove(info_window, 7, 18);
-  if (eyedata[POS(i, j)].dragon == NO_MOVE)
+  if (eyedata[pos].dragon == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%s ",
-	       location_to_string(eyedata[POS(i, j)].dragon));
+	       location_to_string(eyedata[pos].dragon));
 
   wmove(info_window, 11, 18);
-  gg_wprintw(info_window, "%d  ", eyedata[POS(i, j)].type);
+  gg_wprintw(info_window, "%d  ", eyedata[pos].type);
   wmove(info_window, 12, 18);
-  gg_wprintw(info_window, "%d  ", eyedata[POS(i, j)].marginal);
+  gg_wprintw(info_window, "%d  ", eyedata[pos].marginal);
 
   wmove(info_window, 4, 55);
-  gg_wprintw(info_window, "%d ", eyedata[POS(i, j)].maxeye);
+  gg_wprintw(info_window, "%d ", eyedata[pos].maxeye);
   wmove(info_window, 5, 55);
-  gg_wprintw(info_window, "%d ", eyedata[POS(i, j)].mineye);
+  gg_wprintw(info_window, "%d ", eyedata[pos].mineye);
 
   wmove(info_window, 6, 55);
-  if (eyedata[POS(i, j)].attack_point == NO_MOVE)
+  if (eyedata[pos].attack_point == NO_MOVE)
     gg_wprintw(info_window, "---          ");
   else
     gg_wprintw(info_window, "%3s", 
-	       location_to_string(eyedata[POS(i, j)].attack_point));
+	       location_to_string(eyedata[pos].attack_point));
 
   wmove(info_window, 7, 55);
-  if (eyedata[POS(i, j)].defense_point == NO_MOVE)
+  if (eyedata[pos].defense_point == NO_MOVE)
     gg_wprintw(info_window, "---          ");
   else
     gg_wprintw(info_window, "%3s", 
-	       location_to_string(eyedata[POS(i, j)].defense_point));
+	       location_to_string(eyedata[pos].defense_point));
   
   wmove(info_window, 11, 55);
-  gg_wprintw(info_window, "%d ", eyedata[POS(i, j)].neighbors);
+  gg_wprintw(info_window, "%d ", eyedata[pos].neighbors);
   wmove(info_window, 12, 55);
-  gg_wprintw(info_window, "%d ", eyedata[POS(i, j)].marginal_neighbors);
+  gg_wprintw(info_window, "%d ", eyedata[pos].marginal_neighbors);
   wmove(info_window, 13, 55);
-  gg_wprintw(info_window, "%d ", eyedata[POS(i, j)].cut);
+  gg_wprintw(info_window, "%d ", eyedata[pos].cut);
 
   wrefresh(info_window);
 }

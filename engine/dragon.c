@@ -429,8 +429,7 @@ make_dragons(int color, int stop_before_owl)
 	  || dragon[ii].origin != ii)
 	continue;
 
-      /* Some dragons can be ignored. But
-       * Be extra careful with big dragons. */
+      /* Some dragons can be ignored but be extra careful with big dragons. */
       if (DRAGON2(ii).escape_route > 25
 	  || DRAGON2(ii).moyo > 20
 	  || (DRAGON2(ii).moyo > 10

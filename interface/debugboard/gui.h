@@ -36,11 +36,14 @@
 
 void prepare_worms_tab(void);
 void display_worm(int w);
+void display_worm_tactical_data(int m, int n);
+
 void prepare_dragons_tab(void);
-void display_dragon(int i, int j);
+void display_dragon(int pos);
+
 void prepare_eyes_tab(void);
-void display_eye(int color, struct eye_data eyedata[BOARDMAX], 
-		 int i, int j);
+void display_eye(int color, struct eye_data eyedata[BOARDMAX], int pos);
+
 void prepare_help_tab(void);
 
 

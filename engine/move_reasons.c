@@ -2333,12 +2333,12 @@ connection_value(int dragona, int dragonb, int tt, float margin)
 
 
 /*
- * Usually the value of a worm is twice its effective size, but when
- * evaluating certain move reasons we need to adjust this to take
- * effects on neighbors into account, e.g. for an attack_either move
- * reason. This does not apply to the attack and defense move reasons,
- * however, because then the neighbors already have separate attack or
- * defense move reasons (if such apply).
+ * Usually the value of attacking a worm is twice its effective size,
+ * but when evaluating certain move reasons we need to adjust this to
+ * take effects on neighbors into account, e.g. for an attack_either
+ * move reason. This does not apply to the attack and defense move
+ * reasons, however, because then the neighbors already have separate
+ * attack or defense move reasons (if such apply).
  *
  * If the worm has an adjacent (friendly) dead dragon we add its
  * value. At least one of the surrounding dragons must be alive. 
@@ -2349,11 +2349,11 @@ connection_value(int dragona, int dragonb, int tt, float margin)
  * On the other hand if it has an adjacent critical worm, and
  * if (pos) does not defend that worm, we subtract the value of the
  * worm, since (pos) may be defended by attacking that worm. We make at
- * most one adjustment of each type. 
+ * most one adjustment of each type.
  */
 
 static float
-adjusted_worm_value(int pos, int ww)
+adjusted_worm_attack_value(int pos, int ww)
 {
   int color;
   int num_adj;
@@ -3174,8 +3174,8 @@ estimate_strategical_value(int pos, int color, float score)
 	  float bb_value;
 
 	  if (move_reasons[r].type == ATTACK_EITHER_MOVE) {
-	    aa_value = adjusted_worm_value(pos, aa);
-	    bb_value = adjusted_worm_value(pos, bb);
+	    aa_value = adjusted_worm_attack_value(pos, aa);
+	    bb_value = adjusted_worm_attack_value(pos, bb);
 	    this_value = gg_min(aa_value, bb_value);
 
 	    TRACE("  %1m: %f - attacks either %1m (%f) or %1m (%f)\n",
