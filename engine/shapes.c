@@ -70,6 +70,14 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 
   /* Make a local copy of the classification that we may modify. */
   int class = pattern->class;
+  
+  /* Y patterns get rejected if F flag does not match with
+   * experimental_influence mode.
+   */
+  if (class & CLASS_Y)
+    if (!((experimental_influence && !(class & CLASS_F))
+	  ||(!experimental_influence && (class & CLASS_F))))
+      return;
 
   /* Don't need auxiliary data in this callback. */
   UNUSED(data);

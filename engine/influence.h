@@ -32,11 +32,11 @@
 
 /* default attenuation coefficient. */
 #define DEFAULT_ATTENUATION 3.0
-#define EXP_DEFAULT_ATTENUATION 2.2
+#define EXP_DEFAULT_ATTENUATION 2.4
 
 /* Extra damping coefficient for spreading influence diagonally. */
 #define DIAGONAL_DAMPING 2.0
-#define EXP_DIAGONAL_DAMPING 1.5
+#define EXP_DIAGONAL_DAMPING 1.7
 
 /* Default strength of the influence from a stone. May be lowered if
  * it is unsafe.

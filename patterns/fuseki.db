@@ -111,6 +111,7 @@ Pattern F1
 
 
 Pattern F2
+# Made attack dependent on extension space (3.1.25) /ab
 
 |..???.ooo   low kakari against star
 |...X.....
@@ -119,7 +120,7 @@ Pattern F2
 |.........
 +---------
 
-:8,FEea
+:8,FEe
 
 
 Pattern F3
@@ -135,6 +136,7 @@ Pattern F3
 
 
 Pattern F4
+# Made attack dependent on extension space (3.1.25) /ab
 
 |.........   high kakari against star
 |...X.*...
@@ -143,10 +145,23 @@ Pattern F4
 |.........
 +---------
 
+:8,FE
+
+
+Pattern F4a
+
+|.........oo   high kakari against star
+|...X.*...oo
+|.........oo
+|...........
+|...........
++-----------
+
 :8,FEa
 
 
 Pattern F5
+# Made attack dependent on extension space (3.1.25) /ab
 
 |.........   far high kakari against star
 |...X..*..
@@ -154,6 +169,18 @@ Pattern F5
 |.........
 |.........
 +---------
+
+:8,FE
+
+
+Pattern F5a
+
+|.........oo   far high kakari against star
+|...X..*..oo
+|.........oo
+|.........oo
+|.........oo
++-----------
 
 :8,FEa
 
@@ -1040,7 +1067,7 @@ O..*..xxx
 .........
 ---------
 
-:8,Fted
+:8,ted
 
 ......xxx
 ......abx
@@ -2187,7 +2214,7 @@ Pattern J36
 |.....
 +-----
 
-:8,Fj
+:8,Fjad
 
 
 Pattern J37

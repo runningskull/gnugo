@@ -229,7 +229,6 @@ Pattern EE6
 
 
 Pattern EE6Y
-# gf Added followup value. (3.1.14)
 
 .OOOXX
 ...*..
@@ -1007,7 +1006,7 @@ XX.X       sente endgame move
 ....
 ----       
 
-:8,eOXY,terri(1),followup(3)
+:8,eOXFY,terri(1),followup(3)
 
 OO*?
 XX.X
@@ -1074,7 +1073,7 @@ x.X
 ..*
 ---
 
-:8,OX,followup(4)
+:8,OXFY,followup(4)
 
 ?b?
 a.X
@@ -1092,7 +1091,7 @@ Pattern EF2
 O*..
 ----
 
-:8,OX,followup(2)
+:8,OXFY,followup(2)
 
 ?XX.
 O*ab
@@ -1107,7 +1106,7 @@ Pattern EF2b
 O*...
 -----
 
-:8,OX,followup(4)
+:8,OXFY,followup(4)
 
 ?XX..
 O*ab.
@@ -1122,7 +1121,7 @@ Pattern EF2c
 O*....
 ------
 
-:8,OX,followup(6)
+:8,OXFY,followup(6)
 
 ?XX...
 O*ab..
@@ -1139,7 +1138,7 @@ Pattern EF3
 ....
 ----
 
-:8,X,followup(3)
+:8,XFY,followup(3)
 
 ..X?
 .DO*
@@ -1417,7 +1416,7 @@ XO          endgame move
 .*          one point sente
 xX
 
-:8,eXOY,terri(1),followup(2)
+:8,eXOY,terri(1)
 
 XO
 a*
@@ -1629,7 +1628,7 @@ Pattern CF1
 *..
 ?X?
 
-:-,XY,followup(1)
+:-,XFY,followup(1)
 
 ?X?
 *a.
@@ -1647,7 +1646,7 @@ xxx
 x.x
 X*X
 
-:|,XY,followup(2)
+:|,XFY,followup(2)
 
 xBx
 AdC

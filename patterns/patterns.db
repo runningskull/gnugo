@@ -5007,7 +5007,16 @@ Pattern EB709
 |...
 +---
 
-:8,OXb,followup(1),reverse_followup(3)
+:8,OXbFY,followup(1),reverse_followup(3)
+
+Pattern EB709Y
+
+|.XO    extending in the corner is huge: double sente
+|*O.
+|...
++---
+
+:8,OXbY,reverse_followup(3)
 
 
 Pattern EB709b
@@ -5815,7 +5824,7 @@ Pattern EB1101
 O*..
 ----
 
-:8,OXe,followup(6)
+:8,OXeFY,followup(6)
 
 ?x??
 ?Xbc
@@ -5823,6 +5832,22 @@ O*a.
 ----
 
 ;xmoyo(c) && oplay_attack(*,a,a) && !oplay_attack(*,a,b,*)
+
+Pattern EB1101Y
+
+?x??       big push in sente
+?X..
+O*..
+----
+
+:8,OXeY
+
+?x??
+?Xbc
+O*a.
+----
+
+;xmoyo(c) 
 
 
 Pattern EB1102
@@ -5832,7 +5857,7 @@ Pattern EB1102
 O*..
 ----
 
-:8,OXe,followup(4)
+:8,OXeFY,followup(4)
 
 ?x??
 ?Xbd

@@ -818,6 +818,40 @@ XO
 
 ;oplay_attack(a,b,b)
 
+Pattern Barrier60a
+
+.X.
+...
+.!.
+.!.
+---
+
+:|,AX
+
+
+Pattern Barrier60b
+
+.O.
+.,.
+.!.
+.!.
+---
+
+:|,DO
+
+
+Pattern Barrier61
+
+|oooooo
+|!!...o
+|...O.o
+|..X..o
+|....!o
+|....!o
++------
+
+:/,D
+
 
 Pattern Intrusion1
 
@@ -896,13 +930,13 @@ xXx?
 
 :8,B,value(30)
 
-
 xXx?
-..ab
-!!..
+..bd
+a!c.
 ----
 
->return (!xplay_attack(a,b));
+;!oplay_attack(a,b,c,d)
+>return (!xplay_attack(b,d));
 
 
 Pattern Intrusion3
@@ -921,6 +955,7 @@ a!c.
 ----
 
 ;!oplay_attack(a,b,c,d)
+>return (!xplay_attack(b,d));
 
 
 Pattern Intrusion4
@@ -941,7 +976,7 @@ baC.
 >return (!xplay_attack(a,d));
 
 
-Pattern Intrusion5
+Pattern Intrusion5a
 
 X.OX
 .!X.
@@ -957,6 +992,19 @@ XbdX
 
 ;oplay_attack(a,b,C)
 >return (!xplay_attack(b,d));
+
+Pattern Intrusion5b
+
+.OX
+!X.
+
+:8,BY,value(30)
+
+bfE
+aDc
+
+;!oplay_defend_both(a,b,c,D,E)
+>return (!xplay_attack(b,f));
 
 
 Pattern Intrusion6
@@ -976,11 +1024,12 @@ X.x
 
 :8,BFY,value(30)
 
-OA.
-.!!
+cA.
+b!!
 X.x
 
 ;lib(A)==2
+>return (!xplay_attack(b,c));
 
 
 Pattern Intrusion7b
@@ -988,14 +1037,12 @@ Pattern Intrusion7b
 OX
 !!
 
-
 :8,BY,value(30)
 
-cA
+cC
 ba
 
-
-;oplay_attack_either(a,b,A,b);
+;oplay_attack_either(a,b,C,b);
 >return (!xplay_attack(b,c));
 
 
@@ -1009,10 +1056,11 @@ O!!
 :8,B,value(30)
 
 B.X
-Oa!
+ca!
 ?X.
 
 ;oplay_attack(a,B) && !attack(B)
+>return (!xplay_attack(a,c));
 
 
 Pattern Intrusion9
@@ -1069,7 +1117,7 @@ cXa
 ;oplay_attack(a,b,b) && oplay_attack(c,d,d)
 
 
-Pattern Intrusion12
+Pattern Intrusion12a
 # O can intrude on either side. The position of the influence source
 # here isn't entirely accurate.
 
@@ -1085,6 +1133,7 @@ dOb
 cXa
 ...
 ...
+---
 
 ;oplay_attack(a,b,b) || oplay_attack(c,d,d)
 
@@ -1102,6 +1151,34 @@ oOb
 
 ;o_somewhere(b) || oplay_attack_either(a,b,b,C)
 
+Pattern Intrusion12b
+
+oOo
+.X!
+...
+
+:8,OBY,value(30)
+
+odb
+.Ca
+...
+
+;o_somewhere(b) || oplay_attack_either(a,b,b,C)
+>return (!xplay_attack(b,d));
+
+
+# Pattern Intrusion12c
+# 
+# O!
+# X.
+# 
+# :8,OB,value(5)
+#   
+# ab
+# X.
+# 
+# >return (!xplay_attack(b,a));
+# 
 
 Pattern Intrusion13
 
@@ -1226,6 +1303,12 @@ x..
 
 :8,B,value(30)
 
+b.X
+a!.
+x..
+
+>return(!xplay_attack(a,b));
+
 
 Pattern Intrusion21b
 
@@ -1235,6 +1318,11 @@ x..
 
 :8,B,value(30)
 
+ooX
+ba.
+x..
+
+>return(!xplay_attack(a,b));
 
 Pattern Intrusion22
 
@@ -1243,6 +1331,12 @@ O.X
 .!.
 
 :8,B,value(10)
+
+b.X
+a..
+.!.
+  
+>return(!xplay_attack(a,b));
 
 
 Pattern Intrusion23
@@ -1464,10 +1558,11 @@ oX
 :8,B,value(30)
 
 ?X
-Oa
+ba
 oX
 
 ;safe_omove(a)
+> return (!xplay_attack(a,b));
 
 
 Pattern Intrusion38
@@ -1569,12 +1664,13 @@ Pattern Intrusion44
 
 :8,B,value(30)
 
-cDO
+cDf
 bae
 
 ;safe_omove(a)
 ;&& (o_somewhere(e) || oplay_attack(a,e,e))
 ;&& !oplay_defend_both(a,b,c,b,D)
+>return (!xplay_attack(e,f));
 
 
 Pattern Intrusion45
@@ -1667,6 +1763,24 @@ bcX
 
 ;oplay_attack(a,b) && ! attack(b)
 >return (!xplay_attack(a,c));
+
+Pattern Intrusion50
+# ab added (3.1.25)
+
+?..
+OX!
+...
+---
+
+:8,BO,value(30)
+  
+?c.
+dXa
+.b.
+---
+
+;!oplay_attack_either(a,b,c,c,d)
+
 
 Pattern Nonterritory1
 

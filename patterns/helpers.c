@@ -381,7 +381,6 @@ edge_double_sente_helper(int move, int apos, int bpos, int cpos)
 
   return success;
 }
-	
 
 /*
  * This is intended for use in autohelpers.
