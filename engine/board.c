@@ -68,13 +68,13 @@ struct string_data {
 };
 
 
-/* we keep the adress and the old value */
+/* we keep the address and the old value */
 struct change_stack_entry {
   int *address;
   int value;
 };
 
-/* we keep the adress and the old value */
+/* we keep the address and the old value */
 struct vertex_stack_entry {
   Intersection *address;
   int value;
@@ -93,17 +93,17 @@ struct vertex_stack_entry {
 (change_stack_pointer = change_stack, \
  vertex_stack_pointer = vertex_stack)
 
-/* Begin a record : adress == NULL */
+/* Begin a record : address == NULL */
 #define BEGIN_CHANGE_RECORD()\
 ((change_stack_pointer++)->address = NULL,\
  (vertex_stack_pointer++)->address = NULL)
 
-/* Save a value : store the adress and the value in the stack */
+/* Save a value : store the address and the value in the stack */
 #define PUSH_VALUE(v)\
 (change_stack_pointer->address = &(v),\
  (change_stack_pointer++)->value = (v))
 
-/* Save a board value : store the adress and the value in the stack */
+/* Save a board value : store the address and the value in the stack */
 #define PUSH_VERTEX(v)\
 (vertex_stack_pointer->address = &(v),\
  (vertex_stack_pointer++)->value = (v))
