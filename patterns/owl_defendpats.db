@@ -3617,6 +3617,26 @@ obO.X
 ;xplay_attack(a,*,b,b)
 
 
+Pattern D911
+# db added (3.3.4)
+
+oo????         stop the monkey jump
+oooo??
+.*...X
+..X...
+------
+
+:8,-,value(70)
+
+ob????
+acdo??
+.*...X
+..X...
+------
+
+; o_somewhere(a,b,c,d)
+
+
 #########################################################
 #                                                       #
 #                    Prevent a cut                      #
