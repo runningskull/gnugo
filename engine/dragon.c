@@ -490,8 +490,6 @@ make_dragons(int stop_before_owl)
   
   identify_thrashing_dragons();
 
-  time_report(2, "  thrashing dragons", NO_MOVE, -1.0);
-
   /* Count the non-dead dragons. */
   lively_white_dragons = 0;
   lively_black_dragons = 0;
