@@ -39,7 +39,7 @@ sub exec_cmd {
 
     print $hin "$cmd\n";
 
-# parse the 2-line response of the GTP program
+# parse the response of the GTP program
 
     my $line;
     my $repchar;
@@ -51,7 +51,12 @@ sub exec_cmd {
     ($repchar, $result) = split(/\s*/, $line, 2);
     print STDERR "$hin 2:repchar $repchar\n" if ($debug);
     print STDERR "$hin 3:result $result\n" if ($debug);
+
     $line = <$hout>;
+    while (!($line =~ /^\s*$/)) {
+	$result .= $line;
+	$line = <$hout>;
+    }
     print STDERR "$hin 4:$line" if ($debug);
     if ($repchar eq '?') {
 	return "ERROR";
@@ -86,8 +91,9 @@ use FileHandle;
 use IPC::Open2;
 
 struct('GTP::Player' => {
-    'in'	=> 'FileHandle',
-    'out'	=> 'FileHandle'
+    'in'	    => 'FileHandle',
+    'out'	    => 'FileHandle',
+    'gtp_version'   => '$',
 }
 );
 
@@ -101,6 +107,10 @@ sub initialize {
     my $cmd = shift;
 
     my $pid = open2($self->{out}, $self->{in}, $cmd);
+    $self->{gtp_version} = GTP::exec_cmd($self->{in},
+	$self->{out}, "protocol_version");
+    $self->{gtp_version} eq 1 or $self->{gtp_version} eq 2 or
+	die "Unsupported gtp version $self->{gtp_version}\n";
     return $pid;
 }
 
@@ -109,10 +119,15 @@ sub genmove {
     my $color = shift;
 
     my $cmd;
+    if ($self->{gtp_version} eq 1) {
+	$cmd = "genmove_";
+    } else {
+	$cmd = "genmove ";
+    }
     if ($color =~ /^b/i) {
-    	$cmd = "genmove black";
+    	$cmd .= "black";
     } elsif ($color =~ /^w/i) {
-    	$cmd = "genmove white";
+    	$cmd .= "white";
     } else {
     	die "Illegal color $color\n";
     }
@@ -122,15 +137,27 @@ sub genmove {
 sub black {
     my $self = shift;
     my $move = shift;
+    my $cmd;
+    if ($self->{gtp_version} eq 1) {
+	$cmd = "black ";
+    } else {
+	$cmd = "play black ";
+    }
 
-    GTP::exec_cmd($self->{in}, $self->{out}, "play black $move");
+    GTP::exec_cmd($self->{in}, $self->{out}, $cmd . $move);
 }
 
 sub white {
     my $self = shift;
     my $move = shift;
+    my $cmd;
+    if ($self->{gtp_version} eq 1) {
+	$cmd = "white ";
+    } else {
+	$cmd = "play white ";
+    }
 
-    GTP::exec_cmd($self->{in}, $self->{out}, "play white $move");
+    GTP::exec_cmd($self->{in}, $self->{out}, $cmd . $move);
 }
 
 sub komi {
@@ -179,8 +206,13 @@ sub quit {
 
 sub showboard {
     my $self = shift;
+    my $board;
 
-    GTP::exec_cmd($self->{in}, $self->{out}, "showboard");
+    $board = GTP::exec_cmd($self->{in}, $self->{out}, "showboard");
+
+    if ($self->{gtp_version} eq 2) {
+	print $board;
+    }
 }
 
 sub get_random_seed {
