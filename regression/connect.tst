@@ -34,9 +34,10 @@ loadsgf golois/Connecter990427-1.sgf
 9 disconnect G6 E5
 #? [0]
 
+# Added A7, A5, B7, and C6. /gf
 loadsgf golois/Connecter990428-1.sgf
 10 disconnect B5 B8
-#? [1 A6]*
+#? [1 (A6|A7|A5|B7|C6)]*
 
 loadsgf golois/Connecter990428-1.sgf
 11 connect B5 B8
@@ -96,14 +97,14 @@ loadsgf golois/Connecter990628-2.sgf
 24 disconnect G15 F17
 #? [0]
 
-# Added F3. /gf
 loadsgf golois/Connecter990628-2.sgf
 25 connect E2 J3
-#? [1 (G1|F3)]*
+#? [1 G1]*
 
+# Added D3. /gf
 loadsgf golois/Connecter990630-1.sgf
 26 connect F2 D2
-#? [1 F1]*
+#? [1 (F1|D3)]*
 
 loadsgf golois/Goemate990902-11.sgf
 27 disconnect L13 K15
@@ -206,9 +207,10 @@ loadsgf golois/Handtalk980819-1.sgf
 50 disconnect J5 H4
 #? [1 H5]
 
+# Added O14 and P14. /gf
 loadsgf golois/Handtalk980820-1.sgf
 51 disconnect P16 Q15
-#? [1 O15]*
+#? [1 (O15|O14|P14)]*
 
 # Added B15. /gf
 loadsgf golois/Handtalk980820-2.sgf
@@ -322,7 +324,7 @@ loadsgf golois/Neurogo97-1.sgf
 # Added J3 and J4. /gf
 loadsgf golois/Neurogo97-1.sgf
 77 disconnect H2 H4
-#? [1 J2]*
+#? [1 (J2|J3|J4)]*
 
 loadsgf golois/Neurogo97-3.sgf
 78 disconnect E3 C3

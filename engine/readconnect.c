@@ -147,7 +147,7 @@ static int connection_one_move(int str1, int str2) {
   /* If one string is missing we have already failed. */
   if (board[str1] == EMPTY || board[str2] == EMPTY)
     return 0;
-  
+
   /* Common liberties. */
   if (have_common_lib(str1, str2, NULL))
     return WIN;
@@ -473,8 +473,11 @@ static int prevent_connection_two_moves (int *moves, int str1, int str2) {
  */
 
 static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
-  int r;
+  int r, s;
   int liberties, libs[MAXLIBS];
+  int adj, adjs[MAXCHAIN];
+  int adjadj, adjadjs[MAXCHAIN];
+  int move;
   int k;
   int mx[BOARDMAX];
   
@@ -497,8 +500,39 @@ static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
       if (ON_BOARD(libs[r] + delta[k]) && mx[libs[r] + delta[k]])
 	add_array(moves, libs[r] + delta[k]);
 
+  /* Capture a neighbor of str1 which is in atari. The captured string
+   * must in turn have a neighbor which can connect to str2 easily.
+   */
+  adj = chainlinks2(str1, adjs, 1);
+  for (r = 0; r < adj; r++) {
+    adjadj = chainlinks(adjs[r], adjadjs);
+    for (s = 0; s < adjadj; s++) {
+      if (!same_string(adjadjs[s], str1)
+	  && quiescence_connect(adjadjs[s], str2, &move)) {
+	findlib(adjs[r], 1, libs);
+	add_array(moves, libs[0]);
+	add_array(moves, move);
+      }
+    }
+  }
+
+  /* And vice versa. */
+  adj = chainlinks2(str2, adjs, 1);
+  for (r = 0; r < adj; r++) {
+    adjadj = chainlinks(adjs[r], adjadjs);
+    for (s = 0; s < adjadj; s++) {
+      if (!same_string(adjadjs[s], str2)
+	  && quiescence_connect(adjadjs[s], str1, &move)) {
+	findlib(adjs[r], 1, libs);
+	add_array(moves, libs[0]);
+	add_array(moves, move);
+      }
+    }
+  }
+  
   return 0;
 }
+
 
 /* Not yet written.
  *
@@ -508,7 +542,7 @@ static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
 
 static int moves_to_prevent_connection_in_three_moves (int *moves,
 						       int str1, int str2) {
-  if (moves_to_prevent_connection_in_two_moves(moves, str1, str2))
+  if (moves_to_connect_in_three_moves(moves, str1, str2))
     return 1;
   return 0;
 }
@@ -888,11 +922,13 @@ static int prevent_capture_one_move(int *moves, int str1) {
   
   liberties = findlib(str1, MAXLIBS, libs);
   if (liberties==1) {
+    add_array(moves, libs[0]);
     res = WIN;
     adj = chainlinks2(str1, adjs, 1);
-    for (r = 0; r < adj; r++)
-      add_array(moves, adjs[r]);
-    add_array(moves, libs[0]);
+    for (r = 0; r < adj; r++) {
+      findlib(adjs[r], 1, libs);
+      add_array(moves, libs[0]);
+    }
   }
   return res;
 }

@@ -119,6 +119,41 @@ loadsgf games/trevor/auto/a035.sgf 28
 33 disconnect B4 C6
 #? [B5]*
 
+# Monkey jumps and relatives.
+loadsgf games/connection3.sgf
+34 disconnect B11 A9
+#? [0]
+35 disconnect L12 H13
+#? [0]
+36 connect M3 N7
+#? [1 (N4|M4|N5|N6)]
+37 disconnect M3 N7
+#? [1 (N4|M4|N5|M5|M6)]
+38 connect B2 G1
+#? [1 E1]
+39 disconnect B2 G1
+#? [1 (F2|F1|E2|E1|D2|D1|C2|C1|G2|H1|B1)]
+
+# More monkey jumps and relatives.
+loadsgf games/connection4.sgf
+40 connect B11 A8
+#? [1 B9]
+41 disconnect B11 A8
+#? [1 (B9|A10|B10|B8|A7)]
+42 connect L12 H13
+#? [1 K12]
+43 disconnect L12 H13
+#? [1 (K12|J12|J13|H12|G13)]
+44 connect M3 N7
+#? [3 M6]
+45 disconnect M3 N7
+#? [1 (N4|M4|N5|M5|M6|M7|N8|M8)]
+46 connect B2 G1
+#? [1 (B1|C1|C2|D2|E1|F1)]
+47 disconnect B2 G1
+#? [1 (C1|E1)]
+
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
