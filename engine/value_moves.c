@@ -841,7 +841,7 @@ examine_move_safety(int color)
  */
 
 static float
-dragon_safety(int dr, int ignore_dead_dragons)
+dragon_weakness(int dr, int ignore_dead_dragons)
 {
   int dragon_safety = DRAGON2(dr).safety;
 
@@ -852,13 +852,13 @@ dragon_safety(int dr, int ignore_dead_dragons)
       && (dragon_safety == DEAD
 	  || dragon_safety == INESSENTIAL
 	  || dragon_safety == TACTICALLY_DEAD))
-    return 1.0;
+    return 0.0;
 
   /* When scoring, we don't want to reinforce ALIVE dragons. */
   if (doing_scoring && dragon_safety == ALIVE)
-    return 1.0;
+    return 0.0;
   
-  return (1.0 - DRAGON2(dr).weakness);
+  return DRAGON2(dr).weakness;
 }
 
 /*
@@ -1939,8 +1939,8 @@ estimate_strategical_value(int pos, int color, float score)
 	     * alone is not enough. The question is whether the dragon is
 	     * threatened or defended by the move or not.  
 	     */
-	    this_value = (dragon[bb].effective_size
-			  * (1.0 - dragon_safety(bb, 0)));
+           this_value = (1.8 * strategic_effective_size(bb)
+                         * dragon_weakness(bb, 0));
 
 	    /* If this dragon consists of only one worm and that worm
 	     * can be tactically captured or defended by this move, we
@@ -2209,13 +2209,8 @@ estimate_strategical_value(int pos, int color, float score)
 	 * dragon safety alone is not enough. The question is whether
 	 * the dragon is threatened by the move or not.
 	 */
-	this_value = (dragon[aa].effective_size
-		      * (1.0 - dragon_safety(aa, 1)));
-
-	/* To prefer good connections and cuts, we lower this value
-	 * somewhat.
-	 */
-	this_value *= 0.75;
+       this_value = (1.8 * strategic_effective_size(aa)
+                     * dragon_weakness(aa, 1));
 
 	/* No strategical attack value is awarded if the dragon at (aa)
 	 * has an adjacent (friendly) critical dragon, which is not

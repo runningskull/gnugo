@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new strategic_effective_size()
+- computation of strategic effect is modified
 - new static read_eye() tries to improve recognize_eye() results
 - recognize_eye() sets vp->num_attacks/defenses to 0 when eye is found
 - new file surround.c

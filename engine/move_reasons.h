@@ -203,6 +203,8 @@ void mark_changed_dragon(int pos, int color, int affected, int affected2,
 			 int move_reason_type, char changed_stones[BOARDMAX],
 			 float *effective_size);
 
+float strategic_effective_size(int pos);
+
 /*
  * Local Variables:
  * tab-width: 8
