@@ -69,8 +69,7 @@ char dfa_val2asc[4] = {
  *********************/
 
 /* the private board */
-int dfa_p[DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
-int reverse_spiral[8][DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
+int dfa_p[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
 
 /* auxiliary dfa's for high level functions */
 static dfa_t aux_dfa1;		/* used to store strings */
@@ -121,7 +120,7 @@ static void sync_product(dfa_t *pout, dfa_t *pleft, dfa_t *pright);
  *                                6        dfa.
  */
 
-order_t spiral[8][MAX_ORDER];
+int spiral[8][MAX_ORDER];
 
 /*
  * Build the spiral order for each
@@ -142,17 +141,18 @@ order_t spiral[8][MAX_ORDER];
  * 
  */
 
-static const order_t generator[4] =
-  { { 1, 0}, { 0,  1}, {-1, 0}, {0, -1}  };
+static const int generator[4] =
+  { 4 * DFA_MAX_BOARD, 1, -4 * DFA_MAX_BOARD, -1 };
 
 void
-buildSpiralOrder(order_t order[8][MAX_ORDER])
+buildSpiralOrder(int order[8][MAX_ORDER])
 {
-  int Mark[DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
-  order_t fifo[8 * MAX_ORDER];
+  int Mark[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
+  int fifo[8 * MAX_ORDER];
   int top = 0, end = 0;
-  int i, j, k, ll;
-  int di, dj;
+  int i, j, i0, j0;
+  int k, ll;
+  int ii;
   int delta;
 
   
@@ -164,40 +164,30 @@ buildSpiralOrder(order_t order[8][MAX_ORDER])
 
   /* initialization */
 
-  for (i = 0; i != DFA_MAX_BOARD * 4; i++)
-    for (j = 0; j != DFA_MAX_BOARD * 4; j++) {
-      for (ll = 0; ll != 8; ll++)
-	reverse_spiral[ll][i][j] = MAX_ORDER;
-      Mark[i][j] = 1;
-    }
+  for (ii = 0; ii < DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4; ii++)
+    Mark[ii] = 1;
 
-  for (i = DFA_MAX_BOARD; i != DFA_MAX_BOARD * 3; i++)
-    for (j = DFA_MAX_BOARD; j != DFA_MAX_BOARD * 3; j++)
-      Mark[i][j] = 0;
+  for (i = DFA_MAX_BOARD; i < DFA_MAX_BOARD * 3; i++)
+    for (j = DFA_MAX_BOARD; j < DFA_MAX_BOARD * 3; j++)
+      Mark[DFA_POS(i, j)] = 0;
 
   end = 0;
   top = 1;
-  fifo[end].i = DFA_MAX_BOARD * 2;
-  fifo[end].j = DFA_MAX_BOARD * 2;
-  Mark[fifo[end].i][fifo[end].j] = 1;
+  fifo[end] = 2 * DFA_OFFSET;
+  Mark[fifo[end]] = 1;
 
   /* generation */
   while (end < MAX_ORDER) {
-    i = fifo[end].i;
-    j = fifo[end].j;
-    order[0][end].i = i - DFA_MAX_BOARD * 2;
-    order[0][end].j = j - DFA_MAX_BOARD * 2;
-    reverse_spiral[0][i][j] = end;
+    ii = fifo[end];
+    order[0][end] = ii - 2 * DFA_OFFSET;
     end++;
     
     for (k = 0; k != 4; k++) {
-      di = generator[k].i;
-      dj = generator[k].j;
+      delta = generator[k];
       
-      if (!Mark[i + di][j + dj]) {
-	fifo[top].i = i + di;
-	fifo[top].j = j + dj;
-	Mark[i + di][j + dj] = 1;
+      if (!Mark[ii + delta]) {
+	fifo[top] = ii + delta;
+	Mark[ii + delta] = 1;
 	top++;
       }
     }
@@ -205,13 +195,18 @@ buildSpiralOrder(order_t order[8][MAX_ORDER])
 
   /* Then we compute all the geometric transformations
      on this order */
-  for (ll = 1; ll != 8; ll++)
-    for (k = 0; k != MAX_ORDER; k++) {
-      delta = DFA_MAX_BOARD * 2;
-      TRANSFORM(order[0][k].i, order[0][k].j,
-		&(order[ll][k].i), &(order[ll][k].j), ll);
-      reverse_spiral[ll][order[ll][k].i + delta][order[ll][k].j + delta] = k;
+  for (k = 0; k < MAX_ORDER; k++) {
+    j0 = order[0][k] % (4 * DFA_MAX_BOARD);
+    if (j0 >= 2 * DFA_MAX_BOARD)
+      j0 -= 4 * DFA_MAX_BOARD;
+    if (j0 < - 2 * DFA_MAX_BOARD)
+      j0 += 4 * DFA_MAX_BOARD;
+    i0 = (order[0][k] - j0) / (4 * DFA_MAX_BOARD);
+    for (ll = 1; ll != 8; ll++) {
+      TRANSFORM(i0, j0, &i, &j, ll);
+      order[ll][k] = DFA_POS(i, j);
     }
+  }
 
 }
 
@@ -792,7 +787,7 @@ sync_product(dfa_t *pout, dfa_t *pleft, dfa_t *pright)
 void
 dfa_init(void)
 {
-  int i, j;
+  int ii;
 
   if (dfa_verbose > 1)
     fprintf(stderr, "dfa: init\n");
@@ -802,9 +797,8 @@ dfa_init(void)
   new_dfa(&aux_dfa2, "copyAux ");
 
   /* set the private board to OUT_BOARD */
-  for (i =0; i!= DFA_MAX_BOARD*4; i++)
-    for (j =0; j!= DFA_MAX_BOARD*4; j++)
-      dfa_p[i][j] = OUT_BOARD;
+  for (ii = 0; ii < 4 * DFA_MAX_BOARD * 4 * DFA_MAX_BOARD; ii++)
+    dfa_p[ii] = OUT_BOARD;
 }
 
 void
@@ -980,8 +974,12 @@ pattern_2_string(struct pattern *pat, char *str, int trans, int ci, int cj)
   for (k = 0;
        (k != MAX_ORDER - 1) && ((borders > 0) || edges || to_test > 0);
        k++) {
-    i = spiral[trans][k].i;
-    j = spiral[trans][k].j;
+    j = spiral[trans][k] % (4 * DFA_MAX_BOARD);
+    if (j >= 2 * DFA_MAX_BOARD)
+      j -= 4 * DFA_MAX_BOARD;
+    if (j <  - 2 * DFA_MAX_BOARD)
+      j += 4 * DFA_MAX_BOARD;
+    i = (spiral[trans][k] - j) / (4 * DFA_MAX_BOARD);
 
     if (i == pat->maxi)
       borders &= ~SOUTH_EDGE;

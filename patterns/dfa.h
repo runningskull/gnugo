@@ -98,12 +98,14 @@ dfa_t;
 
 /* scan order */
 
+#if 0
 typedef struct
 {
   int i;
   int j;
 }
 order_t;
+#endif
 
 
 /********************************
@@ -112,7 +114,7 @@ order_t;
 
 void dfa_init(void);	/* Every call to a fda function must be done */
 void dfa_end(void);	/* between calls of those 2 functions. */
-void buildSpiralOrder(order_t order[8][MAX_ORDER]); /* Needed by matchpat */
+void buildSpiralOrder(int order[8][MAX_ORDER]); /* Needed by matchpat */
 
 /* basic dfa manipulation */
 void print_c_dfa(FILE* of, const char *name, dfa_t *pdfa);
@@ -143,16 +145,11 @@ extern char dfa_val2asc[4];
 #define ASC2VAL(c) (c < 90 ? dfa_asc2val[(int)c] : 3)
 #define VAL2ASC(n) (n < 4 ? dfa_val2asc[n] : '!')
 
-extern int reverse_spiral[8][DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
-
 /* incremental macro */
 
 #define BASE DFA_MAX_BOARD * 2
-
-/* Give the row in spiral order of (i,j) when the scan start at (i0,j0) */
-#define GIVE_SPIRAL_ROW(ll, i0, j0, i, j) \
- (reverse_spiral[ll][BASE + (i) - (i0)][BASE + (j) - (j0)])
-
+#define DFA_POS(i, j)  (4 * DFA_MAX_BOARD * (i) + (j))
+#define DFA_OFFSET DFA_POS(DFA_MAX_BOARD, DFA_MAX_BOARD)
 
 
 /********************************
@@ -162,12 +159,5 @@ extern int reverse_spiral[8][DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
 extern int dfa_verbose;		/* the verbose level */
 
 #endif /* _DFA_H_ */
-
-
-
-
-
-
-
 
 

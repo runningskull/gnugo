@@ -637,13 +637,12 @@ matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 /* data */
 extern int board_size;
 static int dfa_board_size = -1;
-extern int dfa_p[DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
-extern order_t spiral[8][MAX_ORDER];
+extern int dfa_p[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
+extern int spiral[8][MAX_ORDER];
 const int convert[3][4];
 
 /* Forward declarations. */
 static void dfa_prepare_for_match(int color);
-static int read_board(int ll, int m, int n, int row);
 static int scan_for_patterns(dfa_t *pdfa, int l, int m, int n, 
 			     int *pat_list);
 #if DFA_SORT
@@ -716,48 +715,23 @@ static void
 dfa_prepare_for_match(int color)
 {
   int i, j;
+  int ii;
     
   if (dfa_board_size != board_size) {
     dfa_board_size = board_size;
     /* clean up the board */
-    for (i = 0; i != DFA_MAX_BOARD * 4; i++)
-      for (j = 0; j != DFA_MAX_BOARD * 4; j++)
-	dfa_p[i][j] = OUT_BOARD;
+    for (ii = 0; ii < 4 * DFA_MAX_BOARD * 4 * DFA_MAX_BOARD; ii++)
+      dfa_p[ii] = OUT_BOARD;
   }
 
   /* copy the board */
-  for (i = 0; i != dfa_board_size; i++)
-    for (j = 0; j != dfa_board_size; j++)
-      dfa_p[DFA_MAX_BOARD+i][DFA_MAX_BOARD+j] = 
+  for (i = 0; i < dfa_board_size; i++)
+    for (j = 0; j < dfa_board_size; j++)
+      dfa_p[DFA_POS(i, j) + DFA_OFFSET] = 
 	EXPECTED_COLOR(color, p[i][j]);
 
   prepare_for_match(color);
 }
-
-
-/*
- * A function to read the board's values folowing order
- * spiral[ll] from anchor (m, n).
- * 
- */
-static int
-read_board(int ll, int m, int n, int row)
-{
-  int i2, j2;
-
-  i2 = DFA_MAX_BOARD + m + spiral[ll][row].i;
-  j2 = DFA_MAX_BOARD + n + spiral[ll][row].j;
-
-#ifdef DFA_TRACE
-  gg_assert(row < MAX_ORDER);
-  gg_assert(i2 < DFA_MAX_BOARD*4 && j2 < DFA_MAX_BOARD*4);
-  gg_assert(i2 >= 0 && j2 >= 0);
-  fprintf(stderr, "(%d,%d)=%c ", m, n, VAL2ASC(dfa_p[i2][j2]));
-#endif
-
-  return dfa_p[i2][j2];
-}
-
 
 #if 0
 /* debug function */
@@ -769,7 +743,7 @@ dump_dfa_board(int m, int n)
   for (i = DFA_MAX_BOARD / 2; i < DFA_MAX_BOARD*1.5 ; i++) {
     for (j = DFA_MAX_BOARD / 2 ; j < DFA_MAX_BOARD*1.5 ; j++)
       if (i != (m+DFA_MAX_BOARD) || j != (n+DFA_MAX_BOARD))
-	fprintf(stderr, "%1d", dfa_p[i][j]);
+	fprintf(stderr, "%1d", dfa_p[DFA_PSO(i, j)]);
       else
 	fprintf(stderr, "*");
     fprintf(stderr, "\n");
@@ -788,7 +762,9 @@ static int
 scan_for_patterns(dfa_t *pdfa, int l, int m, int n, int *pat_list)
 {
   int state, att, id, row;
+  int dfa_pos;
 
+  dfa_pos = DFA_POS(m, n) + DFA_OFFSET;
   state = 1; /* initial state */
   row = 0; /* initial row */
   id = 0; /* position in id_list */ 
@@ -803,13 +779,14 @@ scan_for_patterns(dfa_t *pdfa, int l, int m, int n, int *pat_list)
     }
       
     /* go to next state */
-    state = pdfa->states[state].next[read_board(l, m, n, row)];
+    state = pdfa->states[state].next[dfa_p[dfa_pos + spiral[l][row]]];
     row++;
   }
 
   ASSERT2(row < MAX_ORDER, m, n);
   return id;
 }
+
 
 #if DFA_SORT
 /* used to sort patterns */
