@@ -217,6 +217,24 @@ Pattern Conn206
 ;oplay_attack(*,a,a)
 
 
+Pattern Conn207
+# gf New pattern. (3.7.1)
+# See olympiad2004:102.
+
+?.X   kikashi to give bad shape before connecting
+..X
+*XO
+.O.
+
+:8,C
+
+?.X
+..X
+*Xa
+.O.
+
+;lib(a)>1
+
 #####################
 #
 # Connection of keima

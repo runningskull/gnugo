@@ -1508,18 +1508,20 @@ X*.A
 ; omoyo(b) && lib(A)==2
 
 
-Pattern CE25
-# tm New pattern (3.1.15)  (see trevora:320)
-
-O*X
-XX.
-
-:8,OX,terri(1)
-
-O*X
-Xa.
-
-;lib(a)==2
+# Pattern CE25
+# # tm New pattern (3.1.15)  (see trevora:320)
+# # gf Bad pattern, see olympiad2004:121.
+# # gf Also no longer needed in trevora:320, removed. (3.7.1)
+# 
+# O*X
+# XX.
+# 
+# :8,OX,terri(1)
+# 
+# O*X
+# Xa.
+# 
+# ;lib(a)==2
 
 
 Pattern CE26
