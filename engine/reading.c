@@ -57,8 +57,7 @@
 int defend_by_pattern = 0;
 int attack_by_pattern = 1;
 
-static int do_tactical_pat(int is_attack, int str, int *move, 
-			    int kom_pos);
+static int do_tactical_pat(int is_attack, int str, int *move);
 static int do_defend_pat(int str, int *move);
 static int do_attack_pat(int str, int *move);
 
@@ -2725,8 +2724,9 @@ reading_callback(int anchor, int color,
 {
   int k;
   int move;
-  int value = gg_max(pattern->maxvalue, pattern->value);
+  int value = pattern->value;
   struct reading_move_data *moves = data;
+  struct pattern_attribute *attribute;
   UNUSED(data);
   UNUSED(k);
 
@@ -2736,6 +2736,15 @@ reading_callback(int anchor, int color,
     gprintf("  Pattern %s called back at %1m (variation %d) orientation %d.\n", 
             pattern->name, move, count_variations, ll);
 
+  for (attribute = pattern->attributes; attribute->type != LAST_ATTRIBUTE;
+       attribute++) {
+    if (attribute->type == MAX_VALUE && attribute->value > value) {
+      value = attribute->value;
+      break;
+    }
+  }
+
+  
   if (r_scan_moves(move, value, moves))
     return;
 
@@ -2850,8 +2859,7 @@ do_tactical_pat(int is_attack, int str, int *move)
   int ko_move = 0;
   int libs;
   int skipped = 0;
-  const char * attack_defend_str = is_attack ? "Attack" : "Defend";
-  const char * trace_str = is_attack ? "attack_pat" : "defend_pat";
+  const char *trace_str = is_attack ? "attack_pat" : "defend_pat";
 
 
   SETUP_TRACE_INFO(trace_str, str);
@@ -2952,15 +2960,16 @@ do_tactical_pat(int is_attack, int str, int *move)
       ASSERT1(countlib(str) >= 1, str);
       if (sgf_dumptree) {
         char buf[500];
-        sprintf(buf, "tactical_pat komaster: %d %1m  ko_move: %d", 
+        sprintf(buf, "tactical_pat komaster: %d %d  ko_move: %d", 
 		get_komaster(), get_kom_pos(), ko_move);
         sgftreeAddComment(sgf_dumptree, buf);
       }
       
       if (stackp > 100) {
         popgo();
-        gprintf("komaster: %d %1m  ko_move: %d\n", 
-		get_komaster(), get_kom_pos(), ko_move);
+	if (0)
+	  gprintf("komaster: %d %1m  ko_move: %d\n", 
+		  get_komaster(), get_kom_pos(), ko_move);
         continue;  /* Short circuit */
       }
       
