@@ -77,7 +77,7 @@ loadsgf games/gunnar/gunnar2.sgf 164
 # Necessary to block at Q11. O13 is a rather bad idea.
 loadsgf games/gunnar/gunnar2.sgf 168
 14 gg_genmove white
-#? [Q11]*
+#? [Q11]
 
 # O6 is clearly locally better than P6.
 loadsgf games/gunnar/gunnar3.sgf 140

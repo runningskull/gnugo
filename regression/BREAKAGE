@@ -1,3 +1,9 @@
+========================== SPEC-tests_update2 ================
+
+connect:70      PASS 0 [0]
+gunnar:14       PASS Q11 [Q11]
+Total nodes: 1289315598 1922900 6414212
+
 ========================== SPEC-tests_update =================
 
 viking:2        FAIL C4 [E2]

@@ -41,8 +41,7 @@ static int recursive_disconnect2(int str1, int str2, int *move,
 
 int nodes_connect = 0;
 int max_nodes_connect = 2000;
-int max_connect_depth = 64;
-int max_connect_depth2 = 20; /* Used by the alternate algorithm. */
+int max_connect_depth2 = 20;
 
 /* Statistics. */
 static int global_connection_node_counter = 0;
@@ -56,9 +55,6 @@ string_connect(int str1, int str2, int *move)
   int dummy_move;
   int save_verbose;
   int result;
-  int reading_nodes_when_called = get_reading_node_counter();
-  double start = 0;
-  int tactical_nodes;
 
   if (move == NULL)
     move = &dummy_move;
@@ -69,21 +65,8 @@ string_connect(int str1, int str2, int *move)
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
-  start = gg_cputime();
   result = recursive_connect2(str1, str2, move, EMPTY, NO_MOVE, 0);
   verbose = save_verbose;
-  tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
-
-  if (0) {
-    gprintf("%oconnect    %1M %1M, result %d %1M (%d, %d nodes, %f seconds)\n",
-	    str1, str2, result, *move,
-	    nodes_connect, tactical_nodes, gg_cputime() - start);
-    dump_stack();
-  }
-  if (0) {
-    gprintf("%oconnect %1m %1m %d %1m ", str1, str2, result, *move);
-    dump_stack();
-  }
 
   return result;
 }
@@ -97,9 +80,6 @@ disconnect(int str1, int str2, int *move)
   int dummy_move;
   int result;
   int save_verbose;
-  int reading_nodes_when_called = get_reading_node_counter();
-  double start = 0;
-  int tactical_nodes;
   
   if (move == NULL)
     move = &dummy_move;
@@ -110,21 +90,8 @@ disconnect(int str1, int str2, int *move)
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
-  start = gg_cputime();
   result = recursive_disconnect2(str1, str2, move, EMPTY, NO_MOVE, 0);
   verbose = save_verbose;
-  tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
-
-  if (0) {
-    gprintf("%odisconnect %1m %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
-	    str1, str2, result, *move,
-	    nodes_connect, tactical_nodes, gg_cputime() - start);
-    dump_stack();
-  }
-  if (0) {
-    gprintf("%odisconnect %1m %1m %d %1m ", str1, str2, result, *move);
-    dump_stack();
-  }
 
   return result;
 }
@@ -173,8 +140,8 @@ get_connection_node_counter()
 
 
 struct connection_data {
-  float distances[BOARDMAX];
-  float deltas[BOARDMAX];
+  int distances[BOARDMAX];
+  int deltas[BOARDMAX];
   int coming_from[BOARDMAX];
   int vulnerable1[BOARDMAX];
   int vulnerable2[BOARDMAX];
@@ -183,10 +150,10 @@ struct connection_data {
   int queue_end;
 };
 
-#define HUGE_CONNECTION_DISTANCE 100.0
+#define HUGE_CONNECTION_DISTANCE 100000
 
 static int find_connection_moves(int str1, int str2, int color_to_move,
-				 int moves[MAX_MOVES], float *total_distance);
+				 int moves[MAX_MOVES], int *total_distance);
 static void compute_connection_distances(int str, int target,
 					 struct connection_data *conn);
 static void print_connection_distances(struct connection_data *conn);
@@ -224,7 +191,7 @@ recursive_connect2(int str1, int str2, int *move, int komaster, int kom_pos,
   int color = board[str1];
   int moves[MAX_MOVES];
   int num_moves;
-  float distance = 0.0;
+  int distance = 0;
   int k;
   int xpos;
   int savemove = NO_MOVE;
@@ -320,7 +287,7 @@ recursive_connect2(int str1, int str2, int *move, int komaster, int kom_pos,
     }
   }
 
-  if (num_moves == 0 && distance < 1.0) {
+  if (num_moves == 0 && distance < 1000) {
     SGFTRACE2(NO_MOVE, WIN, "no move, probably connected");
     READ_RETURN_CONN(read_result, move, NO_MOVE, WIN);
   }
@@ -360,7 +327,7 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
   int other = OTHER_COLOR(color);
   int moves[MAX_MOVES];
   int num_moves;
-  float distance = 0.0;
+  int distance = 0;
   int k;
   int xpos;
   int savemove = NO_MOVE;
@@ -459,7 +426,7 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
   }
 
   if (num_moves == 0
-      && distance >= 1.0
+      && distance >= 1000
       && (has_passed
 	  || !recursive_connect2(str1, str2, NULL, komaster, kom_pos, 1))) {
     SGFTRACE2(NO_MOVE, WIN, "no move, probably disconnected");
@@ -497,7 +464,7 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
  */
 static int
 find_connection_moves(int str1, int str2, int color_to_move,
-		      int moves[MAX_MOVES], float *total_distance)
+		      int moves[MAX_MOVES], int *total_distance)
 {
   int color = board[str1];
   int other = OTHER_COLOR(color);
@@ -505,7 +472,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
   int r;
   struct connection_data conn1;
   struct connection_data conn2;
-  float distances[MAX_MOVES];
+  int distances[MAX_MOVES];
   int num_moves = 0;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
@@ -513,8 +480,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
   int attack_move = NO_MOVE;
   int dcode = 0;
   int defense_move = NO_MOVE;
-  float max_dist1;
-  float max_dist2;
+  int max_dist1;
+  int max_dist2;
   int lib;
   int k;
   int i, j;
@@ -559,24 +526,24 @@ find_connection_moves(int str1, int str2, int color_to_move,
    */
   for (r = 0; r < conn1.queue_end; r++) {
     int pos = conn1.queue[r];
-    float dist1 = conn1.distances[pos];
-    float deltadist1 = conn1.deltas[pos];
-    float dist2 = conn2.distances[pos];
-    float deltadist2 = conn2.deltas[pos];
-    float d1;
-    float d2;
-    float distance;
+    int dist1 = conn1.distances[pos];
+    int deltadist1 = conn1.deltas[pos];
+    int dist2 = conn2.distances[pos];
+    int deltadist2 = conn2.deltas[pos];
+    int d1;
+    int d2;
+    int distance;
     
-    if (dist1 - deltadist1 + dist2 - deltadist2 > 2.5
-	|| dist1 > max_dist1 + 0.2
-	|| dist2 > max_dist2 + 0.2)
+    if (dist1 - deltadist1 + dist2 - deltadist2 > 2500
+	|| dist1 > max_dist1 + 200
+	|| dist2 > max_dist2 + 200)
       continue;
 
     if (IS_STONE(board[pos]) && find_origin(pos) != pos)
       continue;
 
     if (verbose > 0)
-      gprintf("%oMove %1m, (%f, %f, %f, %f)\n",
+      gprintf("%oMove %1m, (%d, %d, %d, %d)\n",
 	      pos, dist1, deltadist1, dist2, deltadist2);
 
     /* The basic quality of the move is the sum of the distances to
@@ -588,13 +555,13 @@ find_connection_moves(int str1, int str2, int color_to_move,
     d2 = dist2 - deltadist2;
     distance = d1 + d2;
     if (verbose > 0)
-      gprintf("%o  %f, primary distance\n", distance);
+      gprintf("%o  %d, primary distance\n", distance);
     
     /* Bonus if d1 and d2 are well balanced. */
-    if (1.50001 * d1 > d2 && 1.50001 * d2 > d1) {
-      distance -= 0.1;
+    if (3 * d1 > 2 * d2 && 3 * d2 > 2 * d1) {
+      distance -= 100;
       if (verbose > 0)
-	gprintf("%o  -0.1, well balanced\n");
+	gprintf("%o  -100, well balanced\n");
     }
 
     /* Check whether the move is "between" the two strings. */
@@ -622,28 +589,28 @@ find_connection_moves(int str1, int str2, int color_to_move,
       
       if (connect_move && acode != 0) {
 	if (dcode == 0) {
-	  distance += 0.5;
+	  distance += 500;
 	  if (verbose > 0)
-	    gprintf("%o  +0.5, no defense\n");
+	    gprintf("%o  +500, no defense\n");
 	}
 	else {
 	  if (conn1.distances[attack_move]
 	      + conn2.distances[attack_move] > dist1 + dist2) {
-	    distance += 0.5;
+	    distance += 500;
 	    if (verbose > 0)
-	      gprintf("%o  +0.5, attack point not on shortest path\n");
+	      gprintf("%o  +500, attack point not on shortest path\n");
 	  }
 	}
-	ADD_CANDIDATE_MOVE(attack_move, distance - 0.15, moves, distances,
+	ADD_CANDIDATE_MOVE(attack_move, distance - 150, moves, distances,
 			   num_moves);
 	if (verbose > 0)
-	  gprintf("%o  -0.15 at %1m, capturing a string\n", attack_move);
+	  gprintf("%o  -150 at %1m, capturing a string\n", attack_move);
       }
       else if (!connect_move && acode != 0 && dcode != 0) {
-	ADD_CANDIDATE_MOVE(defense_move, distance - 0.5, moves, distances,
+	ADD_CANDIDATE_MOVE(defense_move, distance - 500, moves, distances,
 			   num_moves);
 	if (verbose > 0)
-	  gprintf("%o  -0.5 at %1m, defending a string\n", defense_move);
+	  gprintf("%o  -500 at %1m, defending a string\n", defense_move);
       }
     }
     else if (board[pos] == color) {
@@ -664,14 +631,14 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	  if (check_self_atari(apos, color_to_move)) {
 	    ADD_CANDIDATE_MOVE(apos, distance, moves, distances, num_moves);
 	    if (verbose > 0)
-	      gprintf("%o  +0.0 at %1m, vulnerability\n", apos);
+	      gprintf("%o  +0 at %1m, vulnerability\n", apos);
 	  }
 
 	  if (bpos != apos
 	      && check_self_atari(bpos, color_to_move)) {
 	    ADD_CANDIDATE_MOVE(bpos, distance, moves, distances, num_moves);
 	    if (verbose > 0)
-	      gprintf("%o  +0.0 at %1m, vulnerability\n", bpos);
+	      gprintf("%o  +0 at %1m, vulnerability\n", bpos);
 	  }
 	}
       } 
@@ -691,39 +658,39 @@ find_connection_moves(int str1, int str2, int color_to_move,
       int pos = move + delta[k];
       if (board[pos] == other) {
 	adjacent_to_attacker = 1;
-	distances[r] -= 0.15;
+	distances[r] -= 150;
 	if (verbose > 0)
-	  gprintf("%o%1M -0.15, adjacent to attacker string\n", move);
+	  gprintf("%o%1M -150, adjacent to attacker string\n", move);
 	if (countlib(pos) <= 2) {
-	  distances[r] -= 0.2;
+	  distances[r] -= 200;
 	  if (verbose > 0)
-	    gprintf("%o%1M -0.2, adjacent to attacker string with at most two liberties\n", move);
-	  if ((conn1.distances[move] - conn1.deltas[move] <= 0.5
-	       || conn1.distances[pos] - conn1.deltas[pos] <= 0.5)
-	      && (conn2.distances[move] - conn2.deltas[move] <= 0.5
-		  || conn2.distances[pos] - conn2.deltas[pos] <= 0.5)
+	    gprintf("%o%1M -200, adjacent to attacker string with at most two liberties\n", move);
+	  if ((conn1.distances[move] - conn1.deltas[move] <= 500
+	       || conn1.distances[pos] - conn1.deltas[pos] <= 500)
+	      && (conn2.distances[move] - conn2.deltas[move] <= 500
+		  || conn2.distances[pos] - conn2.deltas[pos] <= 500)
 	      && conn1.distances[pos] < *total_distance
 	      && conn2.distances[pos] < *total_distance) {
-	    distances[r] -= 0.7;
+	    distances[r] -= 700;
 	    if (verbose > 0)
-	      gprintf("%o%1M -0.7, capture or atari of immediately connecting string\n", move);
+	      gprintf("%o%1M -700, capture or atari of immediately connecting string\n", move);
 	  }
 	}
       }
       else if (board[pos] == color) {
 	if (countlib(pos) <= 2) {
-	  distances[r] -= 0.2;
+	  distances[r] -= 200;
 	  if (verbose > 0)
-	    gprintf("%o%1M -0.2, adjacent to defender string with at most two liberties\n", move);
+	    gprintf("%o%1M -200, adjacent to defender string with at most two liberties\n", move);
 	}
       }
     }
     if (adjacent_to_attacker
 	&& color != color_to_move
 	&& is_edge_vertex(move)) {
-      distances[r] -= 0.1;
+      distances[r] -= 100;
       if (verbose > 0)
-	gprintf("%o%1M -0.1, disconnect move on edge\n", move);
+	gprintf("%o%1M -100, disconnect move on edge\n", move);
     }
 
     /* Bonus for moves adjacent to endpoint strings with 3 liberties.
@@ -734,19 +701,12 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	 && countlib(str1) == 3)
 	|| (liberty_of_string(move, str2)
 	    && countlib(str2) == 3)) {
-      distances[r] -= 0.1;
+      distances[r] -= 100;
       if (verbose > 0)
-	gprintf("%o%1M -0.1, liberty of endpoint string with 3 libs\n", move);
+	gprintf("%o%1M -100, liberty of endpoint string with 3 libs\n", move);
     }
   }
 
-  /* Normalize distance values. See comment to gg_normalize_float() in
-   * utils/gg_utils.c for an explanation of this operation. It is
-   * assumed that all distance values are integral multiples of 0.001.
-   */
-  for (i = 0; i < num_moves; i++)
-    distances[i] = gg_normalize_float(distances[i], 0.001);
-  
   /* Now sort the moves.  We use selection sort since this array will
    * probably never be more than 10 moves long.  In this case, the
    * overhead imposed by quicksort will probably overshadow the gains
@@ -755,7 +715,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
    */
   for (i = 0; i < num_moves; i++) {
     /* Find the move with the smallest distance. */
-    float mindistance = distances[i];
+    int mindistance = distances[i];
     int min_at = i;
     for (j = i + 1; j < num_moves; j++) {
       if (distances[j] < mindistance) {
@@ -769,7 +729,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
      */
     if (min_at != i) {
       int temp = moves[i];
-      float tempmin = distances[i];
+      int tempmin = distances[i];
 
       moves[i] = moves[min_at];
       distances[i] = distances[min_at];
@@ -782,7 +742,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
   if (verbose > 0) {
     gprintf("%oSorted moves:\n");
     for (i = 0; i < num_moves; i++)
-      gprintf("%o%1M %f\n", moves[i], distances[i]);
+      gprintf("%o%1M %d\n", moves[i], distances[i]);
   }
 
   if (sgf_dumptree) {
@@ -793,7 +753,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	    color_to_move == color ? "" : "dis", &chars);
     pos = buf + chars;
     for (i = 0; i < num_moves; i++) {
-      sprintf(pos, "%c%d (%4.2f) %n", J(moves[i]) + 'A' + (J(moves[i]) >= 8),
+      sprintf(pos, "%c%d (%d) %n", J(moves[i]) + 'A' + (J(moves[i]) >= 8),
 	      board_size - I(moves[i]), distances[i], &chars);
       pos += chars;
     }
@@ -801,11 +761,11 @@ find_connection_moves(int str1, int str2, int color_to_move,
   }
 
 
-  /* Filter out moves with distance at least 1.5 more than the best
+  /* Filter out moves with distance at least 1500 more than the best
    * move.
    */
   for (r = 0; r < num_moves; r++)
-    if (distances[r] > distances[0] + 1.50001)
+    if (distances[r] > distances[0] + 1500)
       break;
   num_moves = r;
 
@@ -838,7 +798,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
           conn->vulnerable1[stones[r]] = v1; \
           conn->vulnerable2[stones[r]] = v2; \
 	  if (stones[r] == target && dist < cutoff_distance) \
-	    cutoff_distance = dist - 0.0001; \
+	    cutoff_distance = dist - 1; \
 	} \
       } \
     } \
@@ -911,10 +871,10 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
   int other = OTHER_COLOR(color);
   int pos;
   int k;
-  float distance;
+  int distance;
   int stones[MAX_BOARD * MAX_BOARD];
   int num_stones = findstones(str, MAX_BOARD * MAX_BOARD, stones);
-  float cutoff_distance = 3.0001;
+  int cutoff_distance = 3001;
   
   conn->queue_start = 0;
   conn->queue_end = 0;
@@ -924,7 +884,7 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     conn->distances[pos] = HUGE_CONNECTION_DISTANCE;
-    conn->deltas[pos] = 0.0;
+    conn->deltas[pos] = 0;
     conn->coming_from[pos] = NO_MOVE;
     conn->vulnerable1[pos] = NO_MOVE;
     conn->vulnerable2[pos] = NO_MOVE;
@@ -932,12 +892,12 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 
   /* Add all stones in the initial string to the queue. */
   for (k = 0; k < num_stones; k++) {
-    ENQUEUE(conn, NO_MOVE, stones[k], 0.0, 0.0, NO_MOVE, NO_MOVE);
+    ENQUEUE(conn, NO_MOVE, stones[k], 0, 0, NO_MOVE, NO_MOVE);
   }
 
   /* Loop until we reach the end of the queue. */
   for (; conn->queue_start < conn->queue_end; conn->queue_start++) {
-    float smallest_dist = HUGE_CONNECTION_DISTANCE;
+    int smallest_dist = HUGE_CONNECTION_DISTANCE;
     int best_index = -1;
 
     gg_assert(conn->queue_end <= MAX_BOARD * MAX_BOARD);
@@ -995,12 +955,12 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	
 	/* Case 1. "a" is empty and would be suicide for the opponent. */
 	if (board[apos] == EMPTY && is_suicide(apos, other)) {
-	  ENQUEUE(conn, pos, apos, distance, 0.0, apos, NO_MOVE);
+	  ENQUEUE(conn, pos, apos, distance, 0, apos, NO_MOVE);
 	}
 	
 	/* Case 2. "a" is empty and would be self atari for the opponent. */
 	if (board[apos] == EMPTY
-	    && conn->distances[apos] > distance + 0.1
+	    && conn->distances[apos] > distance + 100
 	    && is_self_atari(apos, other)) {
 	  int lib;
 	  int vulnerable1 = NO_MOVE;
@@ -1030,7 +990,7 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	  if (!common_vulnerabilities(conn->vulnerable1[pos],
 				      conn->vulnerable2[pos],
 				      vulnerable1, vulnerable2, color)) {
-	    ENQUEUE(conn, pos, apos, distance + 0.1, 0.1,
+	    ENQUEUE(conn, pos, apos, distance + 100, 100,
 		    vulnerable1, vulnerable2);
 	  }
 	}
@@ -1044,8 +1004,8 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	if (board[apos] == color && board[bpos] == EMPTY
 	    && board[fpos] == color && board[epos] == color
 	    && board[gpos] == EMPTY) {
-	  ENQUEUE(conn, pos, bpos, distance + 0.1, 0.1, NO_MOVE, NO_MOVE);
-	  ENQUEUE(conn, pos, gpos, distance + 0.1, 0.1, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, bpos, distance + 100, 100, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, gpos, distance + 100, 100, NO_MOVE, NO_MOVE);
 	}
 	   
 	/* Case 4. Diagonal connection to another stone "b" through
@@ -1057,12 +1017,12 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && !common_vulnerabilities(conn->vulnerable1[pos],
 				       conn->vulnerable2[pos],
 				       apos, gpos, color)
-	    && conn->distances[bpos] > distance + 0.1) {
+	    && conn->distances[bpos] > distance + 100) {
 #if 0
-	  ENQUEUE(conn, pos, apos, distance + 0.2, 0.2, NO_MOVE, NO_MOVE);
-	  ENQUEUE(conn, pos, gpos, distance + 0.2, 0.2, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, apos, distance + 200, 200, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, gpos, distance + 200, 200, NO_MOVE, NO_MOVE);
 #endif
-	  ENQUEUE(conn, pos, bpos, distance + 0.1, 0.1, apos, gpos);
+	  ENQUEUE(conn, pos, bpos, distance + 100, 100, apos, gpos);
 	}
 	   
 	/* Case 5. Almost bamboo joint.
@@ -1070,7 +1030,7 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	 */
 	if (board[gpos] == EMPTY
 	    && board[epos] == color
-            && conn->distances[epos] > distance + 0.2
+            && conn->distances[epos] > distance + 200
 	    && approxlib(gpos, other, 3, NULL) <= 2) {
 	  if (board[bpos] == EMPTY
 	      && approxlib(bpos, color, 3, NULL) >= 3
@@ -1087,16 +1047,16 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 						 fpos, gpos, color)
 		      && approxlib(fpos, other, 3, NULL) <= 2))) {
 	    if (board[apos] == EMPTY && board[fpos] == EMPTY) {
-	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, apos, fpos);
+	      ENQUEUE(conn, pos, epos, distance + 200, 200, apos, fpos);
 	    }
 	    else if (board[apos] == EMPTY && board[fpos] != EMPTY) {
-	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, apos, NO_MOVE);
+	      ENQUEUE(conn, pos, epos, distance + 200, 200, apos, NO_MOVE);
 	    }
 	    else if (board[apos] != EMPTY && board[fpos] == EMPTY) {
-	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, fpos, NO_MOVE);
+	      ENQUEUE(conn, pos, epos, distance + 200, 200, fpos, NO_MOVE);
 	    }
 	    else if (board[apos] != EMPTY && board[fpos] != EMPTY) {
-	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, NO_MOVE, NO_MOVE);
+	      ENQUEUE(conn, pos, epos, distance + 200, 200, NO_MOVE, NO_MOVE);
 	    }
 	  }
 	  if (board[ipos] == EMPTY
@@ -1114,16 +1074,16 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 						 jpos, gpos, color)
 		      && approxlib(jpos, other, 3, NULL) <= 2))) {
 	    if (board[hpos] == EMPTY && board[jpos] == EMPTY) {
-	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, hpos, jpos);
+	      ENQUEUE(conn, pos, epos, distance + 200, 200, hpos, jpos);
 	    }
 	    else if (board[hpos] == EMPTY && board[jpos] != EMPTY) {
-	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, hpos, NO_MOVE);
+	      ENQUEUE(conn, pos, epos, distance + 200, 200, hpos, NO_MOVE);
 	    }
 	    else if (board[hpos] != EMPTY && board[jpos] == EMPTY) {
-	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, jpos, NO_MOVE);
+	      ENQUEUE(conn, pos, epos, distance + 200, 200, jpos, NO_MOVE);
 	    }
 	    else if (board[hpos] != EMPTY && board[jpos] != EMPTY) {
-	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, NO_MOVE, NO_MOVE);
+	      ENQUEUE(conn, pos, epos, distance + 200, 200, NO_MOVE, NO_MOVE);
 	    }
 	  }
 	}
@@ -1132,16 +1092,16 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	 * a ladder.
 	 */
 	if (board[apos] == EMPTY
-	    && conn->distances[apos] > distance + 0.7
+	    && conn->distances[apos] > distance + 700
 	    && ladder_capturable(apos, other)) {
-	  ENQUEUE(conn, pos, apos, distance + 0.7, 0.7, apos, NO_MOVE);
+	  ENQUEUE(conn, pos, apos, distance + 700, 700, apos, NO_MOVE);
 	}
 
 	/* Case 7. "a" is empty or occupied by opponent.
 	 */
 	if ((board[apos] == EMPTY || board[apos] == other)
-	    && conn->distances[apos] > distance + 1.0) {
-	  ENQUEUE(conn, pos, apos, distance + 1.0, 1.0, NO_MOVE, NO_MOVE);
+	    && conn->distances[apos] > distance + 1000) {
+	  ENQUEUE(conn, pos, apos, distance + 1000, 1000, NO_MOVE, NO_MOVE);
 	}
 
 	/* Case 8. Diagonal connection to empty vertex "b" through
@@ -1150,16 +1110,16 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	 */
 	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY
-	    && conn->distances[bpos] > distance + 1.1
+	    && conn->distances[bpos] > distance + 1100
 	    && does_secure(color, bpos, apos)) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.1, 1.0, apos, NO_MOVE);
+	  ENQUEUE(conn, pos, bpos, distance + 1100, 1000, apos, NO_MOVE);
 	}
 
 	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
-	    && conn->distances[bpos] > distance + 1.1
+	    && conn->distances[bpos] > distance + 1100
 	    && does_secure(color, bpos, gpos)) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.1, 1.0, gpos, NO_MOVE);
+	  ENQUEUE(conn, pos, bpos, distance + 1100, 1000, gpos, NO_MOVE);
 	}
 
 	/* Case 9. One-space jump to empty vertex "e" through empty
@@ -1167,9 +1127,9 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	 */
 	if (board[gpos] == EMPTY
 	    && board[epos] == EMPTY
-	    && conn->distances[epos] > distance + 1.1
+	    && conn->distances[epos] > distance + 1100
 	    && does_secure(color, epos, gpos)) {
-	  ENQUEUE(conn, pos, epos, distance + 1.1, 1.0, gpos, NO_MOVE);
+	  ENQUEUE(conn, pos, epos, distance + 1100, 1000, gpos, NO_MOVE);
 	}
 
 	/* Case 10. One-space jump to empty vertex "e" through empty
@@ -1177,12 +1137,12 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	 */
 	if (board[gpos] == EMPTY
 	    && board[epos] == EMPTY
-	    && conn->distances[epos] > distance + 1.1
+	    && conn->distances[epos] > distance + 1100
 	    && ((board[apos] == color && board[fpos] == color
 		 && board[bpos] == EMPTY)
 		|| (board[hpos] == color && board[jpos] == color
 		    && board[ipos] == EMPTY))){
-	  ENQUEUE(conn, pos, epos, distance + 1.1, 1.0, gpos, NO_MOVE);
+	  ENQUEUE(conn, pos, epos, distance + 1100, 1000, gpos, NO_MOVE);
 	}
 
 	/* Case 11. Diagonal connection to empty vertex "b" through
@@ -1190,8 +1150,8 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	 */
 	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY && board[gpos] == EMPTY
-            && conn->distances[bpos] > distance + 1.3) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.3, 1.0, apos, gpos);
+            && conn->distances[bpos] > distance + 1300) {
+	  ENQUEUE(conn, pos, bpos, distance + 1300, 1000, apos, gpos);
 	}
 
 	/* Case 12. Keima to f or j on edge and one space jump on
@@ -1202,12 +1162,12 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[gpos] == EMPTY
 	    && board[epos] == EMPTY
 	    && board[fpos] == EMPTY
-	    && (conn->distances[fpos] > distance + 1.3
-		|| conn->distances[epos] > distance + 1.3)
+	    && (conn->distances[fpos] > distance + 1300
+		|| conn->distances[epos] > distance + 1300)
 	    && countlib(pos) >= 3
 	    && (!ON_BOARD(cpos) || !ON_BOARD(hpos))) {
-	  ENQUEUE(conn, pos, fpos, distance + 1.3, 1.0, NO_MOVE, NO_MOVE);
-	  ENQUEUE(conn, pos, epos, distance + 1.3, 1.0, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, fpos, distance + 1300, 1000, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, epos, distance + 1300, 1000, NO_MOVE, NO_MOVE);
 	}
 
 	if (countlib(pos) >= 3
@@ -1216,11 +1176,11 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[gpos] == EMPTY
 	    && board[epos] == EMPTY
 	    && board[jpos] == EMPTY
-	    && (conn->distances[jpos] > distance + 1.3
-		|| conn->distances[epos] > distance + 1.3)
+	    && (conn->distances[jpos] > distance + 1300
+		|| conn->distances[epos] > distance + 1300)
 	    && (!ON_BOARD(apos) || !ON_BOARD(kpos))) {
-	  ENQUEUE(conn, pos, jpos, distance + 1.3, 1.0, NO_MOVE, NO_MOVE);
-	  ENQUEUE(conn, pos, epos, distance + 1.3, 1.0, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, jpos, distance + 1300, 1000, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, epos, distance + 1300, 1000, NO_MOVE, NO_MOVE);
 	}
 
 	/* Case 13. Diagonal connection to empty vertex "b" through
@@ -1229,16 +1189,16 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	 */
 	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY
-	    && conn->distances[bpos] > distance + 1.2
+	    && conn->distances[bpos] > distance + 1200
 	    && does_secure_through_ladder(color, bpos, apos)) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.2, 1.0, apos, NO_MOVE);
+	  ENQUEUE(conn, pos, bpos, distance + 1200, 1000, apos, NO_MOVE);
 	}
 
 	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
-	    && conn->distances[bpos] > distance + 1.2
+	    && conn->distances[bpos] > distance + 1200
 	    && does_secure_through_ladder(color, bpos, gpos)) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.2, 1.0, gpos, NO_MOVE);
+	  ENQUEUE(conn, pos, bpos, distance + 1200, 1000, gpos, NO_MOVE);
 	}
 
 	/* Case 13b. Diagonal connection to empty vertex "b" through
@@ -1249,16 +1209,16 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[apos] == EMPTY
 	    && board[gpos] == other
 	    && countlib(gpos) <= 3
-	    && conn->distances[bpos] > distance + 1.5) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.5, 1.0, apos, NO_MOVE);
+	    && conn->distances[bpos] > distance + 1500) {
+	  ENQUEUE(conn, pos, bpos, distance + 1500, 1000, apos, NO_MOVE);
 	}
 
 	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && board[apos] == other
 	    && countlib(apos) <= 3
-	    && conn->distances[bpos] > distance + 1.5) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.5, 1.0, gpos, NO_MOVE);
+	    && conn->distances[bpos] > distance + 1500) {
+	  ENQUEUE(conn, pos, bpos, distance + 1500, 1000, gpos, NO_MOVE);
 	}
 
 	/* Case 14. Diagonal connection to empty vertex "b" through
@@ -1266,30 +1226,30 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	 */
 	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY
-	    && conn->distances[bpos] > distance + 1.8) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.8, 0.9, NO_MOVE, NO_MOVE);
+	    && conn->distances[bpos] > distance + 1800) {
+	  ENQUEUE(conn, pos, bpos, distance + 1800, 900, NO_MOVE, NO_MOVE);
 	}
 
 	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
-	    && conn->distances[bpos] > distance + 1.8) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.8, 0.9, NO_MOVE, NO_MOVE);
+	    && conn->distances[bpos] > distance + 1800) {
+	  ENQUEUE(conn, pos, bpos, distance + 1800, 900, NO_MOVE, NO_MOVE);
 	}
 
 	/* Case 15. Clamp at "e" of single stone at "g".
 	 */
 	if (board[gpos] == other
 	    && board[epos] == EMPTY
-	    && conn->distances[epos] > distance + 2.0
+	    && conn->distances[epos] > distance + 2000
 	    && countstones(gpos) == 1) {
-	  ENQUEUE(conn, pos, epos, distance + 2.0, 1.0, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, epos, distance + 2000, 1000, NO_MOVE, NO_MOVE);
 	}
 
 	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
-	    && conn->distances[bpos] > distance + 1.8
+	    && conn->distances[bpos] > distance + 1800
 	    && does_secure_through_ladder(color, bpos, gpos)) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.8, 0.9, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, bpos, distance + 1800, 900, NO_MOVE, NO_MOVE);
 	}
 
 	/* Case 16. Diagonal connection to empty vertex "b" through
@@ -1298,9 +1258,9 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	if (board[bpos] == EMPTY
 	    && board[apos] == other
 	    && board[gpos] == other
-	    && conn->distances[bpos] > distance + 2.0
+	    && conn->distances[bpos] > distance + 2000
 	    && (countlib(apos) + countlib(gpos) <= 6)) {
-	  ENQUEUE(conn, pos, bpos, distance + 2.0, 1.0, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, bpos, distance + 2000, 1000, NO_MOVE, NO_MOVE);
 	}
 
 	/* Case 17. Diagonal connection to own stone "b" through
@@ -1309,26 +1269,26 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	if (board[bpos] == color
 	    && board[apos] == other
 	    && board[gpos] == other
-	    && conn->distances[bpos] > distance + 2.0
+	    && conn->distances[bpos] > distance + 2000
 	    && (countlib(apos) + countlib(gpos) <= 5)) {
-	  ENQUEUE(conn, pos, bpos, distance + 2.0, 1.0, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, bpos, distance + 2000, 1000, NO_MOVE, NO_MOVE);
 	}
 
 	/* Case 18. Adjacent opponent stone at "a" which can't avoid atari.
 	 */
 	if (board[apos] == other
-	    && conn->distances[apos] > distance + 0.1
+	    && conn->distances[apos] > distance + 100
 	    && no_escape_from_atari(apos)) {
-	  ENQUEUE(conn, pos, apos, distance + 0.1, 0.1, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, apos, distance + 100, 100, NO_MOVE, NO_MOVE);
 	}
 
 	/* Case 19. Adjacent opponent stone at "a" which can't avoid
 	 * ladder capture.
 	 */
 	if (board[apos] == other
-	    && conn->distances[apos] > distance + 0.3
+	    && conn->distances[apos] > distance + 300
 	    && no_escape_from_ladder(apos)) {
-	  ENQUEUE(conn, pos, apos, distance + 0.3, 0.3, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, apos, distance + 300, 300, NO_MOVE, NO_MOVE);
 	}
       }
     }
@@ -1365,11 +1325,11 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 #endif
 	
 	if (board[apos] == color) {
-	  ENQUEUE(conn, pos, apos, distance, 0.0,
+	  ENQUEUE(conn, pos, apos, distance, 0,
 		  conn->vulnerable1[pos], conn->vulnerable2[pos]);
 	}
 	else if (ON_BOARD(apos)) {
-	  ENQUEUE(conn, pos, apos, distance + 1.0, 1.0, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, apos, distance + 1000, 1000, NO_MOVE, NO_MOVE);
 	}
 
 	/* Case 1. Diagonal connection to empty vertex "b" through
@@ -1378,8 +1338,8 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY
 	    && board[gpos] == EMPTY
-            && conn->distances[bpos] > distance + 1.5) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.5, 1.0, NO_MOVE, NO_MOVE);
+            && conn->distances[bpos] > distance + 1500) {
+	  ENQUEUE(conn, pos, bpos, distance + 1500, 1000, NO_MOVE, NO_MOVE);
 	}
 	
 	/* Case 2. Diagonal connection to friendly stone at "b" through
@@ -1388,8 +1348,8 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	if (board[bpos] == color
 	    && board[apos] == EMPTY
 	    && board[gpos] == EMPTY
-	    && conn->distances[bpos] > distance + 1.3) {
-	  ENQUEUE(conn, pos, bpos, distance + 1.3, 1.0, NO_MOVE, NO_MOVE);
+	    && conn->distances[bpos] > distance + 1300) {
+	  ENQUEUE(conn, pos, bpos, distance + 1300, 1000, NO_MOVE, NO_MOVE);
 	}
       }
     }
@@ -1426,7 +1386,7 @@ print_connection_distances(struct connection_data *conn)
 	  fprintf(stderr, " .  ");
       }
       else {
-	fprintf(stderr, "%3.1f ", conn->distances[pos]);
+	fprintf(stderr, "%d ", conn->distances[pos]);
       }
     }
     fprintf(stderr, "\n");
