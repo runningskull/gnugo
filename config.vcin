@@ -6,6 +6,9 @@
 
 #define HAVE_VISUAL_C 1
 
+/* Connection module. Default standard. */
+#define ALTERNATE_CONNECTIONS 0
+
 /* Ruleset. Default Japanese */
 #define CHINESE_RULES 0
 
@@ -21,11 +24,11 @@
 /* Connection module. Default standard. */
 #define EXPERIMENTAL_CONNECTIONS 0
 
-/* Connection module. Default standard. */
-#define ALTERNATE_CONNECTIONS 0
-
 /* Influence module. Default standard. */
 #define EXPERIMENTAL_INFLUENCE 0
+
+/* Experimental pattern based reading. Disabled by default. */
+#define EXPERIMENTAL_READING 0
 
 /* Semeai module. Default standard. */
 #define EXPERIMENTAL_SEMEAI 0

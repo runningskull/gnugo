@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- Added EXPERIMENTAL_READING to config.vc(in)
+- Updated makevcdist.pl
+- bugfix in owl.c:dump_pattern_list() 
 - alternative reorganized owl callback structure for substantial speed-up:
 - owl_shapes revised, new functions get_next_move_from_list() et al.
 - new function dump_pattern_list(...) for debugging

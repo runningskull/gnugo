@@ -2890,8 +2890,8 @@ dump_pattern_list(struct matched_patterns_list_data *list)
   struct matched_pattern_data *matched_pattern;
   if (!list->initialized)
     return;
-  gprintf("%oList size %d. %d Patterns in list, %d have been used, odered up to
-      %d.\n",
+  gprintf("%oList size %d. %d Patterns in list, "
+          "%d have been used, ordered up to %d.\n",
           list->list_size, list->counter, list->used, list->ordered_up_to);
   for (i = 0; i < list->counter; i++) {
     matched_pattern = &list->pattern_list[i];
