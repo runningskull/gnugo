@@ -89,11 +89,6 @@ hash_init(void)
    */
   gg_get_rand_state(&state);
   
-#if TRACE_READ_RESULTS
-  /* We need consistent hash values when this option is enabled. */
-  gg_srand(1);
-#endif
-  
   for (i = 0; i < NUM_HASHVALUES; i++)
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       /* Note: We initialize _all_ positions, not just those on board.

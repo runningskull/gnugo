@@ -806,12 +806,8 @@ dump_stack(void)
   for (n = 0; n < stackp; n++)
     gprintf("%o%s:%1m ", move_color[n] == BLACK ? "B" : "W", stack[n]);
   
-#if !TRACE_READ_RESULTS
   if (count_variations)
     gprintf("%o (variation %d)", count_variations-1);
-#else
-  gprintf("%o (%d)", hashdata.hashval[0]);
-#endif
 
   gprintf("%o\n");
   fflush(stdout);
