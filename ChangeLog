@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- make delta territory cache aware of base influence recomputation
 - owl_find_lunches() revised
 - owl_determine_life() bugfixed
 - owl.c made completely 1D and other revisions

@@ -66,16 +66,15 @@ static struct influence_data escape_influence;
 /* Pointer to influence data used during pattern matching. */
 static struct influence_data *current_influence = NULL;
 
-/* Cache of delta_territory_values. */
-static float delta_territory_cache[BOARDMAX];
-static float followup_territory_cache[BOARDMAX];
-static int territory_cache_position_number = -1;
-static int territory_cache_color = -1;
-
 /* If set, print influence map when computing this move. Purely for
  * debugging.
  */
 static int debug_influence = NO_MOVE;
+
+/* Assigns an id to all influence computations for reference in the
+ * delta territory cache.
+ */
+static int influence_id = 0;
 
 /* This is the core of the influence function. Given the coordinates
  * and color of an influence source, it radiates the influence
@@ -1010,6 +1009,9 @@ compute_influence(int color, const char safe_stones[BOARDMAX],
       || (move != NO_MOVE && move != debug_influence))
     debug = debug &~ DEBUG_INFLUENCE;
 
+  influence_id++;
+  q->id = influence_id;
+
   do_compute_influence(color, safe_stones, strength, q, move, trace_message);
 
   debug = save_debug;
@@ -1603,18 +1605,37 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
   active_caches[cache_number] = 1;
 }
 
+
+/* Cache of delta_territory_values. */
+static float delta_territory_cache[BOARDMAX];
+static float followup_territory_cache[BOARDMAX];
+static int territory_cache_position_number = -1;
+static int territory_cache_influence_id = -1;
+static int territory_cache_color = -1;
+
 /* We cache territory computations. This avoids unnecessary re-computations
  * when review_move_reasons is run a second time for the endgame patterns.
+ *
+ * (*base) points to the initial_influence data that would be used
+ * to make the territory computation against.
  */
 int 
 retrieve_delta_territory_cache(int pos, int color, float *move_value,
-    			       float *followup_value)
+    			       float *followup_value,
+			       const struct influence_data *base)
 {
   ASSERT_ON_BOARD1(pos);
   ASSERT1(IS_STONE(color), pos);
 
+#if 1
+  return 0;
+#endif
+  /* We check whether the color, the board position, or the base influence
+   * data has changed since the cache entry got entered.
+   */
   if (territory_cache_position_number == position_number
       && territory_cache_color == color
+      && territory_cache_influence_id == base->id
       && delta_territory_cache[pos] != NOT_COMPUTED) {
     *move_value = delta_territory_cache[pos];
     *followup_value = followup_territory_cache[pos];
@@ -1628,17 +1649,20 @@ retrieve_delta_territory_cache(int pos, int color, float *move_value,
 
 void 
 store_delta_territory_cache(int pos, int color,
-			    float move_value, float followup_value)
+			    float move_value, float followup_value,
+			    const struct influence_data *base)
 {
   ASSERT_ON_BOARD1(pos);
   ASSERT1(IS_STONE(color), pos);
 
   if (territory_cache_position_number != position_number
-      || territory_cache_color != color) {
+      || territory_cache_color != color
+      || territory_cache_influence_id != base->id) {
     int ii;
     for (ii = BOARDMIN; ii < BOARDMAX; ii++)
       delta_territory_cache[ii] = NOT_COMPUTED;
     territory_cache_position_number = position_number;
+    territory_cache_influence_id = base->id;
     territory_cache_color = color;
     if (0)
       gprintf("Cleared delta territory cache.\n");

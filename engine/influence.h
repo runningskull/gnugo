@@ -113,6 +113,8 @@ struct influence_data
 
   int intrusion_counter;
   struct intrusion_data intrusions[MAX_INTRUSIONS];
+
+  int id;
 };
 
 /* Typedef for pointer to either of the functions whose_territory(),

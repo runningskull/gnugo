@@ -1938,7 +1938,8 @@ estimate_territorial_value(int pos, int color, float score)
   if (does_block && move[pos].move_safety
       && tryko(pos, color, "estimate_territorial_value", EMPTY, NO_MOVE)) {
     if (!retrieve_delta_territory_cache(pos, color, &this_value, 
-	  				&move[pos].influence_followup_value)) {
+	  				&move[pos].influence_followup_value,
+					OPPOSITE_INFLUENCE(color))) {
       compute_influence(OTHER_COLOR(color), safe_stones, strength, 
 	  		&move_influence, pos, "after move");
       compute_followup_influence(&move_influence, &followup_influence,
@@ -1953,7 +1954,8 @@ estimate_territorial_value(int pos, int color, float score)
 	= influence_delta_territory(&move_influence, &followup_influence,
 	    			    color, pos);
       store_delta_territory_cache(pos, color, this_value,
-	 			  move[pos].influence_followup_value);	
+	 			  move[pos].influence_followup_value,
+				  OPPOSITE_INFLUENCE(color));	
     }
     else {
       if (this_value != 0.0)
@@ -2199,6 +2201,8 @@ estimate_strategical_value(int pos, int color, float score)
 	 * This does not apply if we are doing scoring.
 	 *
 	 * FIXME: The margin of victory limit is not implemented.
+	 * FIXME: We need some heuristic whether this connection is
+	 * relevant at all, see e.g. thrash:4.
 	 */
       
 	if (!doing_scoring) {
