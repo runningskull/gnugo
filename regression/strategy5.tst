@@ -36,13 +36,13 @@ loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 54
 # F1 was played in the game as an owl defense of E4.
 loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 66
 227 gg_genmove white
-#? [!F1]*
+#? [!F1]
 
 #CATEGORY=STRATEGY
 # Don't run away with an unimportant, weak stone.
 loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 90
 228 gg_genmove white
-#? [!N12]*
+#? [!N12]
 
 loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 41
 229 gg_genmove black
@@ -50,11 +50,11 @@ loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 41
 
 loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 53
 230 gg_genmove black
-#? [H9]
+#? [H9]*
 
 loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 107
 231 gg_genmove black
-#? [J2|J3]
+#? [J2|J3]*
 
 # If tuning this position be sure GNU Go plays subsequent moves acceptably
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 17
@@ -63,11 +63,11 @@ loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 17
 
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 23
 233 gg_genmove black
-#? [E13]
+#? [E13]*
 
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 29
 234 gg_genmove black
-#? [H14]
+#? [H14]*
 
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 47
 235 gg_genmove black
@@ -75,7 +75,7 @@ loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 47
 
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 91
 236 gg_genmove black
-#? [R12]
+#? [R12]*
 
 
 

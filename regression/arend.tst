@@ -150,7 +150,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 17
 # Black C15 is sente here, so W C14 is mandatory.
 loadsgf games/arend/gnugo-gnugo7.sgf 24
 29 gg_genmove white
-#? [B14|C14]*
+#? [B14|C14]
 
 #CATEGORY=BLUNDER
 # GNU Go played F8.
@@ -172,7 +172,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 137
  
 loadsgf games/arend/gnugo-gnugo7.sgf 140
 33 gg_genmove white
-#? [F9]*
+#? [F9]
  
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/arend/gnugo-gnugo7.sgf 173

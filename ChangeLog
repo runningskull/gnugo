@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.5 released Autust 13, 2002
+
 - extended_chainlinks() revised
 - MAX_REASONS increased from 80 to 100
 - modify_stupid_eye_vital_point() revised

@@ -156,7 +156,7 @@ loadsgf golois/MeilleurCoup0001.sgf
 
 loadsgf golois/MeilleurCoup0002.sgf
 37 owl_defend D4
-#? [1 B6]*
+#? [1 B6]
 
 # db added A4
 loadsgf golois/MeilleurCoup0003.sgf
@@ -174,7 +174,7 @@ loadsgf golois/MeilleurCoup0005.sgf
 
 loadsgf golois/MeilleurCoup0007.sgf
 41 owl_defend B6
-#? [1 B4]
+#? [1 B4]*
 
 loadsgf golois/Neurogo97-1.sgf
 42 owl_defend H2
@@ -212,7 +212,7 @@ loadsgf golois/Vivre990706-3.sgf
 # However, B:H15 lives quite handily.
 loadsgf golois/Vivre990706-4.sgf
 50 owl_defend F16
-#? [1 H15]
+#? [1 H15]*
 
 loadsgf golois/Vivre990706-5.sgf
 51 owl_attack G3

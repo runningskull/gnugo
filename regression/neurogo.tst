@@ -40,7 +40,7 @@ loadsgf games/FSF-neurogo.sgf 90
 
 loadsgf games/FSF-neurogo.sgf 92
 8 gg_genmove white
-#? [O2]*
+#? [O2]
 
 loadsgf games/FSF-neurogo.sgf 124
 9 gg_genmove white
@@ -63,7 +63,7 @@ loadsgf games/FSF-neurogo.sgf 176
 # This may be hard to fix at this point but since we
 # can't win the ko we shouldn't start it.
 13 gg_genmove white
-#? [!P7]
+#? [!P7]*
 
 loadsgf games/FSF-neurogo.sgf 178
 14 gg_genmove white
@@ -136,7 +136,7 @@ loadsgf games/FSF-neurogo.sgf 96
 27 owl_defend B16
 #? [0]
 28 gg_genmove white
-#? [O2]*
+#? [O2]
 
 ############ End of Tests #################
 

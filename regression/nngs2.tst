@@ -24,7 +24,7 @@ loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 112
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 158
 40 gg_genmove black
-#? [!K18]
+#? [!K18]*
 
 # semeai problem
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 162
@@ -60,25 +60,25 @@ loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 34
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 42
 120 gg_genmove black
-#? [E12|D13]
+#? [E12|D13]*
 
 # See also connection:93
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 100
 130 gg_genmove black
-#? [S13]
+#? [S13]*
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 130
 140 gg_genmove black
-#? [P5]
+#? [P5]*
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 138
 150 gg_genmove black
-#? [M3|L3]
+#? [M3|L3]*
 
 # same bug as century-2002:30
 loadsgf games/nngs/gnugo-3.3.2-Programmer-200206021522.sgf 52
 160 gg_genmove black
-#? [J14]
+#? [J14]*
 
 # R9 is clearly worse than Q9.
 loadsgf games/nngs/kumu-gnugo-3.2-200205070903.sgf 116
@@ -92,11 +92,11 @@ loadsgf games/nngs/gnugo-3.3.2-mr23-200205120953.sgf 132
 
 loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 86
 190 gg_genmove black
-#? [!S8]*
+#? [!S8]
 
 loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 124
 200 gg_genmove black
-#? [G2]*
+#? [G2]
 
 loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 148
 210 gg_genmove black

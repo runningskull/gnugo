@@ -51,7 +51,7 @@ loadsgf games/viking3.sgf 113
 
 loadsgf games/viking3.sgf 137
 12 gg_genmove white
-#? [S14|S15]
+#? [S14|S15]*
 
 # J9 is an overplay since it can be cut off.
 #CATEGORY=CONNECTION

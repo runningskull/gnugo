@@ -8,7 +8,7 @@ reset_trymove_counter
 
 loadsgf games/strategy26.sgf 259
 101 gg_genmove black
-#? [M16]*
+#? [M16]
 
 # Playing N18 instead of O19 leaves the threat to make a point on the edge.
 loadsgf games/strategy26.sgf 265

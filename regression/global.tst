@@ -36,7 +36,7 @@ loadsgf golois/Aya991113-8.sgf
 
 loadsgf golois/Aya991113-9.sgf
 10 gg_genmove black
-#? [A5]
+#? [A5]*
 
 # Changed D8 to E8 as correct answer. /gf
 loadsgf golois/bug96.sgf
@@ -143,7 +143,7 @@ loadsgf golois/Jimmy990906-1.sgf
 
 loadsgf golois/Lanka991113-1.sgf
 34 gg_genmove black
-#? [N6]*
+#? [N6]
 
 loadsgf golois/MeilleurCoup0001.sgf
 35 gg_genmove black
@@ -171,7 +171,7 @@ loadsgf golois/MeilleurCoup0006.sgf
 
 loadsgf golois/MeilleurCoup0007.sgf
 41 gg_genmove black
-#? [B4]
+#? [B4]*
 
 loadsgf golois/MeilleurCoup0008.sgf
 42 gg_genmove black

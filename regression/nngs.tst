@@ -295,7 +295,7 @@ loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 146
 
 loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 152
 690 gg_genmove white
-#? [N13]*
+#? [N13]
 
 
 

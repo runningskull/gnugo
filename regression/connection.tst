@@ -68,12 +68,12 @@ loadsgf games/doublecut2.sgf 151
 
 loadsgf games/arion.sgf 63
 18 same_dragon N17 P17
-#? [1]*
+#? [1]
 
 # FIXME: Strange test. Wrong move number?
 loadsgf games/dublin1.sgf 71
 19 same_dragon B15 E16
-#? [0]*
+#? [0]
 
 loadsgf games/nicklas/nicklas12.sgf 69
 20 connect K17 N17
@@ -289,7 +289,7 @@ loadsgf games/ego.sgf 191
 
 loadsgf games/trevor/auto/b13.sgf 48
 90 same_dragon D4 F4
-#? [0]
+#? [0]*
 
 loadsgf games/trevor/auto/c18.sgf 82
 91 same_dragon J8 J10

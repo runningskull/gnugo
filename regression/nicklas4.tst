@@ -17,7 +17,7 @@ loadsgf games/nicklas/nicklas8.sgf 146
 
 loadsgf games/nicklas/nicklas8.sgf 212
 809 gg_genmove black
-#? [B10]*
+#? [B10]
 
 # Changed correct answer from K12 to J12. /gf
 # K14 also secures a connection of all important stones but is one
