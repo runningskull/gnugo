@@ -432,6 +432,14 @@ find_more_owl_attack_and_defense_moves(int color)
 
 
 
+static int 
+bdist(int pos1, int pos2)
+{
+  int idist = I(pos1) - I(pos2);
+  int jdist = J(pos1) - J(pos2);
+  return idist*idist + jdist*jdist;
+}
+
 /*
  * Any move that captures or defends a worm also potentially connects
  * or cuts the surrounding strings. Find these secondary move reasons
@@ -441,6 +449,15 @@ find_more_owl_attack_and_defense_moves(int color)
  * neighbors of the owl attacked dragon. We only do this for
  * tactically safe dragons, however, because otherwise the effects of
  * capturing have already been taken into account elsewhere.
+ *
+ * Also, connecting moves played on inhibited points possibly remove
+ * nearby connection inhibitions like in following example :
+ * 
+ * .OX.   The * move connects _all_ O stones together, not only
+ * O...   the 2 lower ones.
+ * XO*O
+ * X.X.
+ *
  */
 
 static void
@@ -561,6 +578,31 @@ induce_secondary_move_reasons(int color)
 	  if (dragon[bb].color == color && worm[bb].attack_codes[0] == 0)
 	    add_strategical_defense_move(pos, bb);
 	}
+      }
+      else if (move_reasons[r].type == CONNECT_MOVE
+	      && cut_possible(pos, OTHER_COLOR(color))) {
+	int worm1 = worms[conn_worm1[move_reasons[r].what]];
+	int worm2 = worms[conn_worm2[move_reasons[r].what]];
+	int pos2;
+	for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
+	  if (ON_BOARD(pos2) && board[pos2] == EMPTY
+	      && cut_possible(pos2, OTHER_COLOR(color))
+	      && bdist(pos, pos2) <= 5)
+	    for (j = 0; j < 8; j++) {
+	      int pos3 = pos2 + delta[j];
+	      if (ON_BOARD(pos3) && board[pos3] == color
+		  && !is_same_worm(pos3, worm1)
+		  && !is_same_worm(pos3, worm2)) {
+		if (trymove(pos, color, "induce_secondary_move_reasons-B",
+			    worm1, EMPTY, NO_MOVE)) {
+		  if (!disconnect(pos3, worm1, NULL))
+		    add_connection_move(pos, pos3, worm1);
+		  if (!disconnect(pos3, worm2, NULL))
+		    add_connection_move(pos, pos3, worm2);
+		  popgo();
+		}
+	      }
+	    }
       }
     }
   }
