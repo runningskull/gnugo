@@ -1,3 +1,64 @@
+========================== 3.5.6 =====================================
+
+With gcc 2.96 you may get the following different results:
+
+nicklas3:401 unexpected PASS!
+strategy5:286 unexpected PASS!
+
+The following results are with gcc 3.2.2.
+
+./regress.sh . owl.tst 
+262 unexpected FAIL: Correct '0', got '1 E8'
+./regress.sh . connection.tst 
+111 unexpected FAIL: Correct '0', got '1 P19'
+./regress.sh . blunder.tst 
+11 unexpected FAIL: Correct 'D4|E4|E5|F4|C6', got 'B3'
+./regress.sh . nicklas3.tst 
+401 unexpected PASS!
+./regress.sh . nngs.tst 
+875 unexpected PASS!
+./regress.sh . strategy3.tst 
+114 unexpected PASS!
+./regress.sh . global.tst 
+44 unexpected PASS!
+./regress.sh . 13x13.tst 
+31 unexpected FAIL: Correct 'M4|N4', got 'M6'
+./regress.sh . owl1.tst 
+338 unexpected FAIL: Correct '1 M16', got '0'
+./regress.sh . nngs2.tst 
+1 unexpected PASS!
+./regress.sh . century2002.tst 
+60 unexpected FAIL: Correct 'Q14', got 'R18'
+./regress.sh . ninestones.tst 
+190 unexpected FAIL: Correct '0', got '1 H8'
+./regress.sh . gunnar.tst 
+50 unexpected FAIL: Correct 'O8', got 'R13'
+51 unexpected FAIL: Correct 'S7', got 'T4'
+52 unexpected FAIL: Correct 'Q14', got 'J11'
+53 unexpected FAIL: Correct 'S17', got 'R18'
+./regress.sh . nando.tst 
+32 unexpected FAIL: Correct 'N13|O13', got 'O14'
+./regress.sh . thrash.tst 
+12 unexpected FAIL: Correct 'K10', got 'H18'
+13 unexpected FAIL: Correct 'P11', got 'H9'
+14 unexpected FAIL: Correct 'N17', got 'L18'
+15 unexpected FAIL: Correct 'P16', got 'N18'
+./regress.sh . seki.tst 
+703 unexpected FAIL: Correct 'B2', got 'B1'
+1001 unexpected PASS!
+./regress.sh . 9x9.tst 
+50 unexpected FAIL: Correct 'F4', got 'E4'
+193 unexpected FAIL: Correct 'E8', got 'D8'
+197 unexpected FAIL: Correct 'E8|H5', got 'D8'
+265 unexpected FAIL: Correct 'G6', got 'G5'
+355 unexpected FAIL: Correct '1 (A5|D2)', got '0'
+./regress.sh . kgs.tst 
+10 unexpected FAIL: Correct 'A11', got 'B15'
+20 unexpected FAIL: Correct 'C10', got 'A14'
+40 unexpected FAIL: Correct 'A6', got 'A7'
+50 unexpected FAIL: Correct 'D15', got 'D17'
+70 unexpected FAIL: Correct 'B2', got 'N15'
+
 ========================== 3.5.5 =====================================
 
 ./regress.sh . nicklas3.tst 

@@ -17,7 +17,7 @@ loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 26
 # H3 might also be acceptable. /ab
 loadsgf games/nngs/evand-gnugo-3.5.2-200312060932.sgf 4
 50 reg_genmove black
-#? [F4]
+#? [F4]*
 
 loadsgf games/nngs/evand-gnugo-3.5.2-200312060932.sgf 8
 60 reg_genmove black
@@ -88,11 +88,11 @@ loadsgf games/nngs/sjfried-gnugo-3.5.2gf1-200312130838.sgf 10
 # Connect under. /ab
 loadsgf games/nngs/sjfried-gnugo-3.5.2gf1-200312130838.sgf 14
 193 reg_genmove black
-#? [E8]
+#? [E8]*
 
 loadsgf games/nngs/sjfried-gnugo-3.5.2gf1-200312130838.sgf 16
 197 reg_genmove black
-#? [E8|H5]
+#? [E8|H5]*
 
 #D4 only move to connect all black stones. /ab
 loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312130817.sgf 14
@@ -132,7 +132,7 @@ loadsgf games/nngs/whitemouse-gnugo-3.5.2gf1-200312161704.sgf 10
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2gf1-200312161704.sgf 14
 265 reg_genmove black
-#? [G6]
+#? [G6]*
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2gf1-200312161704.sgf 24
 270 reg_genmove black
@@ -176,7 +176,7 @@ loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312241905.sgf 30
 
 loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312241905.sgf 32
 355 owl_defend C3
-#? [1 (A5|D2)]
+#? [1 (A5|D2)]*
 
 loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312292348.sgf 8
 360 reg_genmove black

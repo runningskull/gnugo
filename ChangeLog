@@ -2,12 +2,15 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.5.5 released April 23, 2004
+
 - new configure and runtime option large-scale
 - new change_owl_nodes()
 - gprintf supports %r
 - cleanup of patterns/*.sgf
 - revision of dragon_invincible()
-- default to quiet unless in ASCII playing mode
+- suppress copyright notice in ASCII playing mode or with --version
+- copyright string shortened
 - new GTP commands move_probabilities and move_uncertainty
 - bugfix in unconditional_life()
 - owl_update_goal() overrides same_dragon == 0 in obvious cases

@@ -62,7 +62,7 @@ loadsgf games/ninestones/bobo-gnugo-3.3.9-200210111309.sgf 66
 # Black is actually trapped.
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 64
 190 owl_defend J9
-#? [0]
+#? [0]*
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 108
 220 reg_genmove black

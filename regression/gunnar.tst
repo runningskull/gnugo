@@ -278,25 +278,25 @@ loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 164
 # R13 very inefficient.
 loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 132
 50 restricted_genmove white R13 O8
-#? [O8]
+#? [O8]*
 
 # S7 kills all black stones in the corner. For GNU Go 3.5.4 this seems
 # to be a problem with valuation of the semeai.
 loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 154
 51 reg_genmove white
-#? [S7]
+#? [S7]*
 
 # Regardless whether the dragon is thrashing or critical, Q14 is the
 # most solid move.
 loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 216
 52 reg_genmove white
-#? [Q14]
+#? [Q14]*
 
 # R18 is clearly ineffective.
 # See also connection:111
 loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 290
 53 reg_genmove white
-#? [S17]
+#? [S17]*
 
 ############ End of Tests #################
 

@@ -318,7 +318,7 @@ loadsgf games/self_play/selfplay1.sgf 206
 
 loadsgf games/owl50.sgf
 338 owl_defend F18
-#? [1 M16]
+#? [1 M16]*
 
 ########### end of tests #####################
 

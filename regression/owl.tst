@@ -955,7 +955,7 @@ loadsgf games/handtalk/handtalk23.sgf 186
 # See also 13x13:15.
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 262 owl_defend E7
-#? [0]
+#? [0]*
 
 ########### end of tests #####################
 

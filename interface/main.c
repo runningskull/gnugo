@@ -442,7 +442,7 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_QUIET:
-	quiet = 2;
+	quiet = 1;
 	break;
 	
       case OPT_GTP_INPUT:
@@ -637,11 +637,8 @@ main(int argc, char *argv[])
 	break;
 
       case OPT_MODE: 
-	if (strcmp(gg_optarg, "ascii") == 0) {
+	if (strcmp(gg_optarg, "ascii") == 0)
 	  playmode = MODE_ASCII;
-	  if (quiet == 1)
-	    quiet = 0;
-	}
 	else if (strcmp(gg_optarg, "emacs") == 0)
 	  playmode = MODE_ASCII_EMACS;
 	else if (strcmp(gg_optarg, "gtp") == 0)
@@ -945,6 +942,7 @@ main(int argc, char *argv[])
 
       case 'v':
 	show_version();
+	show_copyright(stderr);
 	return EXIT_SUCCESS;
 	break;
 	
@@ -993,15 +991,6 @@ main(int argc, char *argv[])
       }
     }
 
-
-
-  /* Display copyright message in ASCII mode unless --quiet option used. */
-  if (!quiet) {
-    fprintf(stderr, "\n");
-    show_version();
-    show_copyright(stderr);
-  }
-  
   /* Start random number seed. */
   if (!seed_specified)
     seed = time(0);
@@ -1390,6 +1379,13 @@ main(int argc, char *argv[])
     if (mandated_color != EMPTY)
       gameinfo.computer_player = OTHER_COLOR(mandated_color);
 
+  /* Display copyright message in ASCII mode unless --quiet option used. */
+    if (!quiet) {
+      fprintf(stderr, "\n");
+      show_version();
+      show_copyright(stderr);
+    }
+  
     play_ascii(&sgftree, &gameinfo, infilename, untilstring);
     break;
   }
@@ -1408,6 +1404,7 @@ static void
 show_version(void)
 {
   printf("GNU Go Version %s\n", VERSION);
+
 }
 
 
@@ -1497,7 +1494,7 @@ Game Options: (--mode ascii)\n\
        --byo-period <stones>  Initialize the byo-yomi period.\n\
 \n\
 Informative Output:\n\
-   -v, --version         Display the version of GNU Go\n\
+   -v, --version         Display the version and copyright of GNU Go\n\
    --options             Display configure options\n\
    -h, --help            Display this help message\n\
        --help debug      Display help about debugging options\n\
@@ -1506,24 +1503,14 @@ Informative Output:\n\
 "
 
 
-#define COPYRIGHT "\n\n\
-This is GNU Go, a Go program. Contact gnugo@gnu.org, or see\n\
-http://www.gnu.org/software/gnugo/ for more information.\n\n\
-Copyright 1999, 2000, 2001, 2002, 2003 and 2004\n\
-by the Free Software Foundation.\n\n\
-This program is free software; you can redistribute it and/or\n\
-modify it under the terms of the GNU General Public License\n\
-as published by the Free Software Foundation - version 2.\n\n\
-This program is distributed in the hope that it will be\n\
-useful, but WITHOUT ANY WARRANTY; without even the implied\n\
-warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR\n\
-PURPOSE.  See the GNU General Public License in file COPYING\n\
-for more details.\n\n\
-You should have received a copy of the GNU General Public\n\
-License along with this program; if not, write to the Free\n\
-Software Foundation, Inc., 59 Temple Place - Suite 330,\n\
-Boston, MA 02111, USA.\n\n\
-"
+#define COPYRIGHT \
+"Copyright 1999, 2000, 2001, 2002, 2003 and 2004 by the Free Software\n\
+Foundation, Inc. See http://www.gnu.org/software/gnugo/ or contact\n\
+gnugo@gnu.org for information about GNU Go. GNU Go comes with NO WARRANTY to\n\
+the extent permitted by law. This program is free software; you can\n\
+redistribute it and/or modify it under the terms of the GNU General Public\n\
+License as published by the Free Software Foundation - version 2.  For more\n\
+information about these matters, see the files named COPYING.\n"
 
 /* USAGE_DEBUG Split in half because of VC limit on constant string 
  * length of 2048 characters!*/

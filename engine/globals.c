@@ -77,7 +77,7 @@ int mandated_owl_node_limit;
 
 
 /* Miscellaneous. */
-int quiet             = 1;  /* minimal output */
+int quiet             = 0;  /* minimal output */
 int showstatistics    = 0;  /* print statistics */
 int profile_patterns  = 0;  /* print statistics of pattern usage */
 int allpats           = 0;  /* generate all patterns, even small ones */

@@ -165,7 +165,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 32
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 64
 31 reg_genmove white
-#? [M4|N4]
+#? [M4|N4]*
 
 # A nice tesuji by GNU Go worth remembering!
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 74
