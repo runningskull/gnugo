@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new tests
 - new COSMIC_GNUGO function choose_best_strategy() sets tuning parameters
 - new global tuning parameters: minimum_value_weight, maximum_value_weight,
   invasion_malus_weight, strategical_weight, territorial_weight,

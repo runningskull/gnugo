@@ -276,6 +276,44 @@ loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 42
 650 reg_genmove black
 #? [Q2]*
 
+loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 4
+660 reg_gemove black
+#? [O16]
+
+loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 12
+670 reg_genmove black
+#? [O14]
+
+loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 52
+680 reg_genmove black
+#? [P9]
+
+loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 64
+690 reg_genmove black
+#? [N6]
+
+loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 74
+700 reg_genmove black
+#? [K7]
+
+#don't tenuki
+loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 88
+710 reg_genmove black
+#? [J3|H7|G5|H3|G6]
+
+#play something local and helpful; H11 is bad
+loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 190
+720 reg_genmove black
+#? [B15|B16|B17]
+
+loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 194
+730 reg_genmove black
+#? [C17]
+
+loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 220
+740 reg_genmove black
+#? [D2]
+
 
 ############ End of Tests #################
 
