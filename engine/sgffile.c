@@ -137,9 +137,13 @@ sgffile_enddump(const char *filename)
 {
   /* Check if we have a valid filename and a tree. */
   if (filename && *filename && sgf_dumptree) {
-    writesgf(sgf_dumptree->root, filename);
-    sgfFreeNode(sgf_dumptree->root);
-    sgf_dumptree = NULL;
+    if (writesgf(sgf_dumptree->root, filename)) {
+      /* Only delete the tree if writesgf() succeeds. If it doesn't, one
+       * will most likely wish to save into another (writable) file.
+       */
+      sgfFreeNode(sgf_dumptree->root);
+      sgf_dumptree = NULL;
+    }
   }
 }
 

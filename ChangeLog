@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- finish_sgftrace() will not free the trace tree if not written successfully
 - remove tabs from twogtp.py
 - twogtp.py checks that board is not empty before indexing it
 - active area for persistent breakin cache shrinked
