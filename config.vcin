@@ -12,29 +12,23 @@
 /* Ruleset. Default Japanese */
 #define CHINESE_RULES 0
 
-/* Resignation allowed. Default disabled. */
-#define RESIGNATION_ALLOWED 0
-
 /* Default level (strength). Up to 10 supported */
 #define DEFAULT_LEVEL 10
 
 /* Default hash table size in megabytes */
 #define DEFAULT_MEMORY 8
 
-/* Semeai Variations. 500 default */
-#define DEFAULT_SEMEAI_VARIATIONS 500
-
-/* Connection module. Default standard. */
+/* Connection module. Default experimental. */
 #define EXPERIMENTAL_CONNECTIONS 1
+
+/* GAIN/LOSS codes. Disabled by default. */
+#define EXPERIMENTAL_OWL_EXT 0
 
 /* Experimental pattern based reading. Disabled by default. */
 #define EXPERIMENTAL_READING 0
 
 /* Semeai module. Default standard. */
 #define EXPERIMENTAL_SEMEAI 1
-
-/* GAIN/LOSS codes. Disabled by default. */
-#define EXPERIMENTAL_OWL_EXT 0
 
 /* Define as 1 to use the grid optimisation, or 2 to run it in self-test mode
    */
@@ -43,11 +37,21 @@
 /* Hashing scheme. Default scheme 2 (new). */
 #define HASHING_SCHEME 2
 
+/* Oracle. Default not enabled. */
+#define ORACLE 0
+
 /* Owl Node Limit */
 #define OWL_NODE_LIMIT 1000
 
 /* Owl Threats. 0 standard. */
 #define OWL_THREATS 0
+
+/* Allow resignation. Default disabled */
+#define RESIGNATION_ALLOWED 0
+
+/* Semeai Variations. 500 default */
+#define SEMEAI_NODE_LIMIT 500
+
 
 /* Version number of package */
 #define PACKAGE "gnugo"
@@ -60,9 +64,6 @@
 
 /* The number of bytes in a long.  */
 #define SIZEOF_LONG 4
-
-/* Use Oracle module (UNIX and GNU/Unix only) */
-#define ORACLE 0
 
 /* Version number of package */
 #define VERSION "@VERSION@"

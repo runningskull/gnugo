@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- hoshi.sgf split into hoshi_keima.sgf and hoshi_other.sgf
 - new functions recursive_break(), recursive_block() in readconnect.c:
   decide whether a string can be connected to an arbitrary goal area
 - new functions break_in(), block_off(), frontends to the functions above
@@ -28,8 +29,7 @@
 - new static function endgame_find_backfilling_dame() in endgame.c
 - new static function endgame_find_liberties() broken out of
   endgame_analyze_worm_liberties()
-- new functions owl_mineye() and owl_maxeye() and corresponding
-  autohelper functions
+- new owl_mineye() and owl_maxeye() and corresponding autohelper functions
 - move_connects_strings revised not to care about connecting
   invincible strings
 - ALL_MOVE move reasons no longer considered to guarantee a safe move
