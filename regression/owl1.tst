@@ -127,6 +127,10 @@ loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 253
 291 owl_defend M19
 #? [2 O19]*
 
+loadsgf games/gunnar/gunnar3.sgf 88
+292 owl_defend T2
+#? [1 T4]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

@@ -71,8 +71,7 @@ loadsgf games/arion.sgf 63
 18 same_dragon N17 P17
 #? [1]
 
-# FIXME: Strange test. Wrong move number?
-loadsgf games/dublin1.sgf 71
+loadsgf games/dublin1.sgf 72
 19 same_dragon B15 E16
 #? [0]*
 
@@ -198,7 +197,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 216
 59 disconnect D18 E15
 #? [1 D15|F15|B15|D19|E19]
 60 connect D14 B18
-#? [1 D15|F15|B15|D19|E19]
+#? [1 D15|F15|B15|D19|E19|C13]
 61 connect O9 Q9
 #? [1 D15|F15|B15|D19|E19]*
 
@@ -325,6 +324,10 @@ loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 201
 loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 185
 98 disconnect N4 Q6
 #? [1 O5]
+
+loadsgf games/gunnar/gunnar3.sgf 74
+99 disconnect N3 P3
+#? [0]
 
 
 # Report number of nodes visited by the tactical reading
