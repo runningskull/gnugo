@@ -1988,12 +1988,6 @@ do_owl_defend(int str, int *move, int *wormid,
 	READ_RETURN(read_result, move, shape_moves[0].pos, WIN);
       }
       moves = shape_moves;
-
-      if (eyemax == 0 && escape_route == 0)
-	move_cutoff = 67;
-      else if (eyemax <= 1 && escape_route <= 2)
-	move_cutoff = 32;
-
       break;
 
     case 0:
