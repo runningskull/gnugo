@@ -32,9 +32,11 @@
 
 /* default attenuation coefficient. */
 #define DEFAULT_ATTENUATION 3.0
+#define EXP_DEFAULT_ATTENUATION 2.1
 
 /* Extra damping coefficient for spreading influence diagonally. */
 #define DIAGONAL_DAMPING 2.0
+#define EXP_DIAGONAL_DAMPING 1.5
 
 /* Default strength of the influence from a stone. May be lowered if
  * it is unsafe.
@@ -76,6 +78,16 @@
  */ 
 #define MAX_REGIONS (3*MAX_BOARD*MAX_BOARD + 1)
 
+#define MAX_INTRUSIONS (MAX_BOARD * MAX_BOARD)
+
+struct intrusion_data
+{
+  int source_pos; 	/* Stone from which intrusion originates.*/
+  int strength_pos;     /* Position of the intrusion influence soure. */
+  float strength;
+  float attenuation;
+};
+
 struct influence_data
 {
   float white_influence[MAX_BOARD][MAX_BOARD]; /* Accumulated influence. */
@@ -103,6 +115,9 @@ struct influence_data
   float w[MAX_BOARD][MAX_BOARD];         /* Working area. */
   int queuei[MAX_BOARD * MAX_BOARD];     /* Points receiving influence. */
   int queuej[MAX_BOARD * MAX_BOARD];
+
+  int intrusion_counter;
+  struct intrusion_data intrusions[MAX_INTRUSIONS];
 };
 
 /* Typedef for pointer to either of the functions whose_territory(),

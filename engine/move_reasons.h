@@ -61,8 +61,6 @@
 #define YOUR_ATARI_ATARI_MOVE   52
 #define VITAL_EYE_MOVE          54
 
-#define DEFEND_BOTH_MOVE        62
-
 #define ANTISUJI_MOVE           70
 
 #define EITHER_MOVE             100
@@ -105,6 +103,8 @@ struct move_data {
   int numneg_shape;        /* Number of negative contributions to shape */
 
   float followup_value;    /* Value of followup move (our sente). */
+  float infl_followup_value;  /* Followup value of move as reported by
+                                 experimental influence. */
   float reverse_followup_value;	/* Value of opponents followup move
 				   (reverse sente). */
   float secondary_value;   /* Secondary move value. */
@@ -198,6 +198,7 @@ int  attack_move_reason_known(int pos, int what);
 int  defense_move_reason_known(int pos, int what);
 int  owl_attack_move_reason_known(int pos, int what);
 int  owl_defense_move_reason_known(int pos, int what);
+int  get_biggest_owl_target(int pos);
 int  is_antisuji_move(int pos);
 
 int  move_connects_strings(int pos, int color);

@@ -12939,27 +12939,28 @@ X..
 #
 ######################################################################
 
-
-Pattern Reinforce101
-#FIXME: This should at least be contingent on being ahead.
-#  see trevorc:1170
-
-oO?      Eliminate aji
-.*X
-...
-...
----
-
-:8,O,value(5)
-
-oO?
-.*A
-...
-...
----
-
-; has_aji(A)
-
+# ab: I think this is well treated by our "attack dragon XX, although
+# it seems dead, as we are ahead"-policy.
+# Pattern Reinforce101
+# #FIXME: This should at least be contingent on being ahead.
+# #  see trevorc:1170
+# 
+# oO?      Eliminate aji
+# .*X
+# ...
+# ...
+# ---
+# 
+# :8,O,value(5)
+# 
+# oO?
+# .*A
+# ...
+# ...
+# ---
+# 
+# ; has_aji(A)
+# 
 
 Pattern Reinforce102
 # This pattern should be contingent on being clearly ahead.

@@ -357,8 +357,6 @@ get_pos(int reason, int what)
   case OWL_DEFEND_MOVE_GOOD_KO:
   case OWL_DEFEND_MOVE_BAD_KO:
     return dragons[what];
-  case DEFEND_BOTH_MOVE:
-    return worms[worm_pair1[what]];
   case EITHER_MOVE:
     /* FIXME: What should we return here? */
     return worms[either_data[what].what1];
@@ -781,6 +779,40 @@ get_defense_threats(int pos, int max_strings, int strings[])
   return num_strings;
 }
 
+/* Report the biggest dragon that is owl-affected (possibily with ko)
+ * by a move at (pos).
+ */
+int
+get_biggest_owl_target(int pos)
+{
+  int k;
+  int biggest_target = -1;
+  float target_size = 0.0;
+  for (k = 0; k < MAX_REASONS; k++) {
+    int r = move[pos].reason[k];
+    if (r < 0)
+      break;
+
+    switch (move_reasons[r].type) {
+    case OWL_ATTACK_MOVE:
+    case OWL_ATTACK_MOVE_GOOD_KO:
+    case OWL_ATTACK_MOVE_BAD_KO:
+    case OWL_ATTACK_THREAT:
+    case OWL_DEFEND_MOVE:
+    case OWL_DEFEND_MOVE_GOOD_KO:
+    case OWL_DEFEND_MOVE_BAD_KO:
+    case OWL_DEFEND_THREAT:
+    case OWL_PREVENT_THREAT:
+      if (dragon[dragons[move_reasons[r].what]].effective_size
+          > target_size) {
+        biggest_target = move_reasons[r].what;
+        target_size = dragon[dragons[move_reasons[r].what]].effective_size;
+      }
+    }
+  }
+  return biggest_target;
+}
+
 /*
  * Add to the reasons for the move at (pos) that it connects the
  * dragons at (dr1) and (dr2). Require that the dragons are
@@ -1018,23 +1050,6 @@ add_all_move(int pos, int reason1, int target1, int reason2, int target2)
   add_move_reason(pos, ALL_MOVE, index);
 }
 
-
-/*
- * Add to the reasons for the move at (pos) that it defends
- * both (str1) and (str2) (e.g. from a double atari). This move
- * reason is only used for defense of own stones.
- */
-void
-add_defend_both_move(int pos, int str1, int str2)
-{
-  int worm1 = find_worm(worm[str1].origin);
-  int worm2 = find_worm(worm[str2].origin);
-  int worm_pair = find_worm_pair(worm1, worm2);
-
-  ASSERT_ON_BOARD1(str1);
-  ASSERT_ON_BOARD1(str2);
-  add_move_reason(pos, DEFEND_BOTH_MOVE, worm_pair);
-}
 
 /*
  * Add to the reasons for the move at (pos) that it secures
@@ -1586,14 +1601,6 @@ list_move_reasons(int color)
 		    pos, black_eye[aa].dragon, aa);
 	  break;
 	  
-	case DEFEND_BOTH_MOVE:
-	  worm1 = worm_pair1[move_reasons[r].what];
-	  worm2 = worm_pair2[move_reasons[r].what];
-	  aa = worms[worm1];
-	  bb = worms[worm2];
-	  gprintf("Move at %1m defends both %1m and %1m\n", pos, aa, bb);
-	  break;
-	  	
 	case EITHER_MOVE:
 	case ALL_MOVE:
 	  /* FIXME: Generalize this. */

@@ -91,6 +91,7 @@ DECLARE(gtp_final_status_list);
 DECLARE(gtp_findlib);
 DECLARE(gtp_finish_sgftrace);
 DECLARE(gtp_fixed_handicap);
+DECLARE(gtp_get_handicap);
 DECLARE(gtp_genmove);
 DECLARE(gtp_genmove_black);
 DECLARE(gtp_genmove_white);
@@ -136,6 +137,7 @@ DECLARE(gtp_same_dragon);
 DECLARE(gtp_set_boardsize);
 DECLARE(gtp_set_orientation);
 DECLARE(gtp_set_komi);
+DECLARE(gtp_get_komi);
 DECLARE(gtp_set_level);
 DECLARE(gtp_showboard);
 DECLARE(gtp_start_sgftrace);
@@ -182,6 +184,7 @@ static struct gtp_command commands[] = {
   {"findlib",          	      gtp_findlib},
   {"finish_sgftrace",  	      gtp_finish_sgftrace},
   {"fixed_handicap",   	      gtp_fixed_handicap},
+  {"get_handicap",   	      gtp_get_handicap},
   {"genmove_black",           gtp_genmove_black},
   {"genmove_white",           gtp_genmove_white},
   {"get_connection_node_counter", gtp_get_connection_node_counter},
@@ -195,6 +198,7 @@ static struct gtp_command commands[] = {
   {"influence",               gtp_influence},
   {"is_legal",         	      gtp_is_legal},
   {"komi",        	      gtp_set_komi},
+  {"get_komi",        	      gtp_get_komi},
   {"level",        	      gtp_set_level},
   {"list_stones",    	      gtp_list_stones},
   {"loadsgf",          	      gtp_loadsgf},
@@ -441,6 +445,23 @@ gtp_set_komi(char *s, int id)
 }
 
 
+/***************************
+ * Getting komi            *
+ ***************************/
+
+/* Function:  Get the komi
+ * Arguments: none
+ * Fails:     never
+ * Returns:   Komi 
+ */
+static int
+gtp_get_komi(char *s, int id)
+{
+  UNUSED(s);
+  return gtp_success(id, "%4.1f",komi);
+}
+
+
 /******************
  * Playing moves. *
  ******************/
@@ -545,6 +566,19 @@ gtp_fixed_handicap(char *s, int id)
   store_position(&starting_position);
   move_stack_pointer = 0;
   return gtp_finish_response();
+}
+
+
+/* Function:  Get the handicap
+ * Arguments: none
+ * Fails:     never
+ * Returns:   handicap
+ */
+static int
+gtp_get_handicap(char *s, int id)
+{
+  UNUSED(s);
+  return gtp_success(id, "%d", handicap);
 }
 
 
@@ -2493,6 +2527,7 @@ gtp_worm_stones(char *s, int id)
   int color = EMPTY;
   int m, n;
   int u, v;
+  int board_empty = 1;
 
   if (sscanf(s, "%*c") >= 0) {
     if (!gtp_decode_coord(s, &i, &j)
@@ -2510,6 +2545,7 @@ gtp_worm_stones(char *s, int id)
       if (BOARD(u, v) == EMPTY
 	  || (color != EMPTY && BOARD(u, v) != color))
 	continue;
+      board_empty = 0;
       if (find_origin(POS(u, v)) != POS(u, v))
 	continue;
       if (ON_BOARD2(i, j) 
@@ -2523,6 +2559,8 @@ gtp_worm_stones(char *s, int id)
       gtp_printf("\n");
     }
   
+  if (board_empty) 
+    gtp_printf("\n"); /* in case no stones have been printed */
   gtp_printf("\n");
   return GTP_OK;
 }

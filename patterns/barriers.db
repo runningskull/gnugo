@@ -24,20 +24,20 @@
 #
 #  ? - don't care
 #  . - empty
-#  O - color of dragon looking for escape
+#  O - color to move
 #  X - opposite color of O
 #  o - O or empty
 #  x - X or empty
 #  , - point which influence can't pass through
 #
 #
-# Two different classes of patterns are used here.
+# Four different classes of patterns are used here.
 #
-#  C - Territorial connection, stopping opponent influence from
-#      passing through.
-#  E - Enhance influence. By convention, the influence is enhanced
-#      in the eastwards direction. The value of the pattern decides
-#      the level of influence enhancement.
+#  A - Patterns stopping O influence
+#  D - Patterns stopping X influence
+#  B - Intrusions (where O can intrude into X'x territory)
+#  t - Nonterritory patterns indicating points where one color cannot
+#      get territory
 
 Pattern Barrier1
 
@@ -927,19 +927,34 @@ x..
 :8,B,value(30)
 
 
-Pattern Intrusion7
+Pattern Intrusion7a
 
 OX.
 .!!
 X.x
 
-:8,B,value(30)
+:8,BFY,value(30)
 
 OA.
 .!!
 X.x
 
 ;lib(A)==2
+
+
+Pattern Intrusion7b
+
+OX
+!!
+
+
+:8,BY,value(30)
+
+OA
+ba
+
+
+;oplay_attack_either(a,b,A,b);
 
 
 Pattern Intrusion8
@@ -1535,6 +1550,25 @@ a....
 -----
 
 ;lib(a)>2
+
+Pattern Intrusion48
+# ab New pattern. (3.1.23)
+
+?X.
+...
+O.!
+..X
+
+:8,B,value(30)
+
+
+# .X.
+# fce
+# Oba
+# .dX
+# 
+# ;oplay_attack(a,b,c,d,e,f,f)
+
 
 
 Pattern Nonterritory1

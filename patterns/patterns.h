@@ -157,7 +157,12 @@ typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
 #define CLASS_U 0x100000 /* very urgent joseki move */
 #define CLASS_T 0x200000 /* joseki trick move */
 #define CLASS_W 0x400000 /* worthwhile threat move */
-#define CLASS_F 0x800000 /* a fuseki pattern */
+#define CLASS_F 0x800000 /* for joseki moves: a fuseki pattern; for CLASS_Y
+                          * patterns: pattern only for standard influence
+                          * FIXME: This is ugly. */
+#define CLASS_Y 0x80000000 /* a pattern that should only be matched for 
+                            * either standard or experimental influence
+                            * (CLASS_F indicating which one). */
 
 /* Collection of the classes inducing move reasons. */
 #define CLASS_MOVE_REASONS (CLASS_C | CLASS_B | CLASS_b | \

@@ -2,6 +2,15 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- experimental influence: followup value computed in influence.c
+- experimental influence: new_value_territory revised
+- experimental influence: new handling for intrusion patterns
+- experimental influence: support for standard/experimental specific patterns
+- reevaluate_ko_threats now makes checks
+- new get_biggest_owl_target()
+- DEFEND_BOTH_MOVE reason taken down
+- new gtp functions get_komi and get_handicap
+- bugfix in gtp worm_stones: did not print newline if board empty
 - support for two strings and two results in cache.[ch]
 - simplified code to do cache lookup in reading.c and owl.c
 - bugfix in estimate_territorial_value()

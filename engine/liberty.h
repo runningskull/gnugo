@@ -331,7 +331,6 @@ void add_owl_uncertain_attack_move(int pos, int dr);
 void add_my_atari_atari_move(int pos, int size);
 void add_your_atari_atari_move(int pos, int size);
 void add_vital_eye_move(int pos, int eyespace, int color);
-void add_defend_both_move(int pos, int str1, int str2);
 void add_block_territory_move(int pos);
 void add_expand_territory_move(int pos);
 void add_expand_moyo_move(int pos);
@@ -483,7 +482,8 @@ struct moyo_data
 void compute_initial_influence(int color, int dragons_known);
 void resegment_initial_influence(void);
 float influence_delta_territory(int pos, int color,
-				char saved_stones[BOARDMAX]);
+				char saved_stones[BOARDMAX],
+                                float *followup_value);
 int influence_territory_color(int pos);
 int influence_moyo_color(int pos);
 int influence_moyo_color_opposite(int pos);

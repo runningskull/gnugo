@@ -89,8 +89,7 @@ find_more_attack_and_defense_moves(int color)
 	    || move_reasons[r].type == DEFEND_MOVE_GOOD_KO
 	    || move_reasons[r].type == DEFEND_MOVE_BAD_KO
 	    || move_reasons[r].type == CONNECT_MOVE
-	    || move_reasons[r].type == CUT_MOVE
-	    || move_reasons[r].type == DEFEND_BOTH_MOVE)
+	    || move_reasons[r].type == CUT_MOVE)
 	  break;
 	/* FIXME: Add code for EITHER_MOVE and ALL_MOVE here. */
       }
@@ -571,7 +570,6 @@ examine_move_safety(int color)
 	   */
 	  break;
 	case SEMEAI_MOVE:
-	case DEFEND_BOTH_MOVE:    /* Maybe need better check for this case. */
 	case OWL_DEFEND_MOVE:
 	case OWL_DEFEND_MOVE_GOOD_KO:
 	case OWL_DEFEND_MOVE_BAD_KO:
@@ -1523,7 +1521,11 @@ estimate_territorial_value(int pos, int color, float score)
   
   /* tm added move_safety check (3.1.22) (see trevorc:880) */
   if (does_block && move[pos].move_safety) {
-    this_value = influence_delta_territory(pos, color, saved_stones);
+    if (experimental_influence)
+      this_value = influence_delta_territory(pos, color, saved_stones,
+                                             &move[pos].infl_followup_value);
+    else
+      this_value = influence_delta_territory(pos, color, saved_stones, NULL);
     if (this_value != 0.0)
       TRACE("  %1m: %f - change in territory\n", pos, this_value);
     else
@@ -1736,35 +1738,6 @@ estimate_strategical_value(int pos, int color, float score)
 
 	TRACE("  %1m: %f - both defends %1m (%f) and defends %1m (%f)\n",
 	      pos, this_value, aa, aa_value, bb, bb_value);
-
-	tot_value += this_value;
-	break;
-	
-      case DEFEND_BOTH_MOVE:
-	/* This is complete nonsense, but still better than nothing.
-	 * FIXME: Do this in a reasonable way.
-	 */
-	worm1 = worm_pair1[move_reasons[r].what];
-	worm2 = worm_pair2[move_reasons[r].what];
-	aa = worms[worm1];
-	bb = worms[worm2];
-
-	/* If both worms are dead, this move reason has no value. */
-	if (dragon[aa].matcher_status == DEAD 
-	    && dragon[bb].matcher_status == DEAD)
-	  break;
-
-	/* Also if there is a combination attack, we assume it covers
-         * the same thing.
-	 */
-	if (move_reason_known(pos, YOUR_ATARI_ATARI_MOVE, -1))
-	  break;
-
-	this_value = 2 * gg_min(worm[aa].effective_size, 
-				worm[bb].effective_size);
-
-	TRACE("  %1m: %f - defends both %1m and %1m\n",
-	      pos, this_value, aa, bb);
 
 	tot_value += this_value;
 	break;
@@ -2081,6 +2054,15 @@ value_move_reasons(int pos, int color, float pure_threat_value,
 
   if (tot_value > 0.0) {
     int c;
+    float followup_value;
+    if (experimental_influence) {
+      followup_value = move[pos].followup_value
+                       + move[pos].infl_followup_value;
+      TRACE("  %1m:   %f - total followup value, added %f as territorial followup\n",
+            pos, followup_value, move[pos].infl_followup_value);
+    }
+    else
+      followup_value = move[pos].followup_value;
     
     /* In the endgame, there are a few situations where the value can
      * be 0 points + followup.  But we want to take the intersections first
@@ -2096,10 +2078,10 @@ value_move_reasons(int pos, int color, float pure_threat_value,
       /* We adjust the value according to followup and reverse followup
        * values.
        */
-      contribution = gg_min(gg_min(0.5 * move[pos].followup_value
+      contribution = gg_min(gg_min(0.5 * followup_value
 				   + 0.5 * move[pos].reverse_followup_value,
 				   1.0 * tot_value
-				   + move[pos].followup_value),
+				   + followup_value),
 			    1.1 * tot_value
 			    + move[pos].reverse_followup_value);
       tot_value += contribution;
@@ -2113,7 +2095,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
       
       if (contribution != 0.0) {
 	TRACE("  %1m: %f - added due to followup (%f) and reverse followup values (%f)\n",
-              pos, contribution, move[pos].followup_value,
+              pos, contribution, followup_value,
               move[pos].reverse_followup_value);
       }
 
@@ -2122,7 +2104,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
        * additional contribution for later access.
        */
       move[pos].additional_ko_value =
-	move[pos].followup_value 
+	followup_value 
 	+ move[pos].reverse_followup_value 
 	- (tot_value - old_tot_value);
 
@@ -2331,22 +2313,123 @@ print_top_moves(void)
  * the opponent fills in the ko (or resolves it in another way.)
  */
 static void
-reevaluate_ko_threats(void)
+reevaluate_ko_threats(int ko_move, int color)
 {
+  int ko_stone;
+  int opp_ko_move;
   int m, n;
   int pos;
+  int k;
+  int type, what;
+  int threat_does_work = 0;
+  int ko_move_target;
+  float threat_size;
 
+  ko_move_target = get_biggest_owl_target(ko_move);
+  
+  /* Find the ko stone. */
+  for (k = 0; k <= 3; k++) {
+    ko_stone = ko_move + delta[k];
+    if (ON_BOARD(ko_stone) && countlib(ko_stone))
+      break;
+  }
+  
   TRACE("Reevaluating ko threats.\n");
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       pos = POS(m, n);
+      if (pos == ko_move)
+        continue;
+      if (move[pos].additional_ko_value <= 0.0) 
+        continue;
 
-      if (move[pos].additional_ko_value > 0.0) {
+      /* Otherwise we look for the biggest threat, and then check whether
+       * it still works after ko has been resolved.
+       */
+      threat_size = 0.0;
+      type = -1;
+      what = -1;
+      for (k = 0; k < MAX_REASONS; k++) {
+        int r = move[pos].reason[k];
+        if (r < 0)
+          break;
+        if (! (move_reasons[r].type & THREAT_BIT))
+          continue;
+        switch (move_reasons[r].type) {
+        case ATTACK_THREAT:
+        case DEFEND_THREAT:
+          if (worm[worms[move_reasons[r].what]].effective_size
+              > threat_size) {
+            threat_size = worm[worms[move_reasons[r].what]].effective_size;
+            type = move_reasons[r].type;
+            what = move_reasons[r].what;
+          }
+          break;
+        case OWL_ATTACK_THREAT:
+        case OWL_DEFEND_THREAT:   
+        case SEMEAI_THREAT:
+          if (dragon[dragons[move_reasons[r].what]].effective_size
+              > threat_size) {
+            threat_size = dragon[dragons[move_reasons[r].what]]\
+                          .effective_size;
+            type = move_reasons[r].type;
+            what = move_reasons[r].what;
+          }
+          break;
+        default:
+          /* This means probably someone has introduced a new threat type
+           * without adding the corresponding case above.
+           */
+          gg_assert(0);
+          break;
+        }
+      } 
+      /* If there is no threat recorded, the followup value is probably
+       * contributed by a pattern. We can do nothing but accept this value.
+       * (although this does cause problems).
+       */
+      if (type == -1)
+        threat_does_work = 1;
+      else
+        if (trymove(pos, color, "reevaluate_ko_threats", ko_move,
+                    EMPTY, ko_move)) {
+          if (!find_defense(ko_stone, &opp_ko_move))
+            threat_does_work = 1;
+          else {
+            if (trymove(opp_ko_move, OTHER_COLOR(color),
+                        "reevaluate_ko_threats", ko_move, EMPTY, NO_MOVE)) {
+              switch (type) {
+              case ATTACK_THREAT:
+                threat_does_work = attack(worms[what], NULL);
+                break;
+              case DEFEND_THREAT:
+                threat_does_work = (board[worms[what]] != EMPTY
+                                    && find_defense(worms[what], NULL));
+                break;
+              case OWL_ATTACK_THREAT:
+              case OWL_DEFEND_THREAT:
+                /* Should we call do_owl_attack/defense here?
+                 * Maybe too expensive? For the moment we just assume
+                 * that the attack does not work if it concerns the
+                 * same dragon as ko_move. (Can this really happen?)
+                 */
+                threat_does_work = (ko_move_target != what);
+              }
+              popgo();
+            }
+          }
+          popgo();
+        }
+ 
+      if (threat_does_work) {
 	TRACE("%1m: %f + %f = %f\n", pos, move[pos].value,
 	      move[pos].additional_ko_value,
 	      move[pos].value + move[pos].additional_ko_value);
 	move[pos].value += move[pos].additional_ko_value;
       }
+      else
+        DEBUG(DEBUG_MOVE_REASONS,
+              "%1m: no additional ko value (threat does not work as ko threat)\n", pos);
     }
 }
 
@@ -2491,7 +2574,7 @@ review_move_reasons(int *the_move, float *val, int color,
      */
     if (bestval > 0.0 && is_illegal_ko_capture(best_move, color)) {
       TRACE("Move at %1m would be an illegal ko capture.\n", best_move);
-      reevaluate_ko_threats();
+      reevaluate_ko_threats(best_move, color);
       redistribute_points();
       time_report(2, "  reevaluate_ko_threats", NO_MOVE, 1.0);
       ko_values_have_been_added = 1;

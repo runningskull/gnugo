@@ -946,6 +946,7 @@ finish_pattern(char *line)
 	  case 'U': pattern[patno].class |= CLASS_U; break;
 	  case 'W': pattern[patno].class |= CLASS_W; break;
 	  case 'F': pattern[patno].class |= CLASS_F; break;
+	  case 'Y': pattern[patno].class |= CLASS_Y; break;
 	  case '-': break;
 	  default:
 	    if (!isgraph((int) *p))

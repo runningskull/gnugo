@@ -33,9 +33,8 @@
 #
 # Two different classes of patterns are used here.
 #
-#  C - Territorial connection, stopping opponent influence from
-#      passing through.
 #  E - Enhance influence.
+#  I - Invasion points.
 
 Pattern Enhance1
 
