@@ -4560,7 +4560,7 @@ test_owl_attack_move(int pos, int dr, int kworm, int acode)
       || acode == GAIN) {
     add_owl_attack_move(pos, dr, kworm, acode);
     DEBUG(DEBUG_OWL, "owl: %1m attacks %1m (%s) at move %d\n",
-	  pos, dr, result_to_string(DRAGON2(pos).owl_attack_code),
+	  pos, dr, result_to_string(DRAGON2(dr).owl_attack_code),
 	  movenum+1);
   }
   else {
@@ -4581,7 +4581,7 @@ test_owl_attack_move(int pos, int dr, int kworm, int acode)
     else {
       add_owl_attack_move(pos, dr, kworm, acode);
       DEBUG(DEBUG_OWL, "owl: %1m attacks %1m (%s) at move %d\n",
-	    pos, dr, result_to_string(DRAGON2(pos).owl_attack_code),
+	    pos, dr, result_to_string(DRAGON2(dr).owl_attack_code),
 	    movenum+1);
     }
   }
