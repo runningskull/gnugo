@@ -97,7 +97,7 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX],
 	    work[ii]--;
 	  if (i < board_size-1 && gb[ii+NS] < 0)
 	    work[ii]--;
-	  if (j > 0 && gb[i-1] < 0)
+	  if (j > 0 && gb[ii-1] < 0)
 	    work[ii]--;
 	  if (j < board_size-1 && gb[ii+1] < 0)
 	    work[ii]--;
