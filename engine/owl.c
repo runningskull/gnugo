@@ -54,6 +54,11 @@
 #define MAX_LUNCHES 10
 #define MAX_WORMS 10          /* maximum number of worms in a dragon to be cataloged */
 
+/* If set, pattern constraint are only checked if the pattern might produce
+ * a candidate move.
+ */
+#define PATTERN_CHECK_ON_DEMAND 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -88,6 +93,14 @@ struct local_owl_data {
   int local_owl_node_counter;
 };
 
+#if PATTERN_CHECK_ON_DEMAND
+/* Cache for owl_safe_move when called from owl_shapes. */
+static int *owl_safe_move_cache_stack;
+/* Cache for owl_safe_move when called for vital attack moves. */
+static int owl_safe_move_cache_size = 0;
+/* Set this before calling owl_shapes_callback or get_next_move_from_list. */
+static int *current_owl_safe_move_cache;
+#endif
 
 static int owl_safe_move_cache[BOARDMAX];
 static int result_certain;
@@ -104,6 +117,23 @@ struct owl_move_data {
   const char *name; /* name of the pattern suggesting the move */
   int same_dragon;  /* whether the move extends the dragon or not */
 };
+
+#if PATTERN_CHECK_ON_DEMAND
+struct matched_pattern_data {
+  int move;
+  int ll;
+  struct pattern *pattern;
+};
+  
+struct matched_patterns_list_data {
+  int initialized;
+  int counter; 		/* Number of patterns in the list. */
+  int used;		/* How many patterns have already been used?*/
+  int ordered_up_to;	/* How far the list has been ordered. */
+  int list_size;	
+  struct matched_pattern_data *pattern_list;
+};
+#endif
 
 /* Persistent owl result cache to reuse owl results between moves. */
 struct owl_cache {
@@ -158,9 +188,23 @@ static int do_owl_attack(int str, int *move,
 static int do_owl_defend(int str, int *move,
 			 struct local_owl_data *owl,
 			 int komaster, int kom_pos);
+#if PATTERN_CHECK_ON_DEMAND
+static int owl_shapes(struct matched_patterns_list_data *list,
+                      struct owl_move_data moves[MAX_MOVES], int color,
+		      struct local_owl_data *owl, struct pattern_db *type);
+static void owl_shapes_collect_callback(int m, int n, int color,
+					struct pattern *pattern_db,
+					int ll, void *data);
+static int get_next_move_from_list(struct matched_patterns_list_data *list,
+                                   int color, struct owl_move_data *moves,
+				   int cutoff);
+static void  init_pattern_list(struct matched_patterns_list_data *list);
+static void close_pattern_list(struct matched_patterns_list_data *list);
+#else
 static int owl_shapes(struct owl_move_data moves[MAX_MOVES], int color,
 		      struct local_owl_data *owl,
 		      struct pattern_db *type);
+#endif
 static void owl_shapes_callback(int m, int n, int color,
 				struct pattern *pattern_db,
 				int ll, void *data);
@@ -222,7 +266,6 @@ static int catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS]);
  * then owl attack and defense moves for that owl are given
  * priority.
  */
-
 static int owl_phase;
 
 void
@@ -293,6 +336,10 @@ do_owl_analyze_semeai(int apos, int bpos,
   struct owl_move_data vital_offensive_moves[MAX_MOVES];
   struct owl_move_data shape_defensive_moves[MAX_MOVES];
   struct owl_move_data shape_offensive_moves[MAX_MOVES];
+#if PATTERN_CHECK_ON_DEMAND
+  struct matched_patterns_list_data shape_offensive_patterns;
+  struct matched_patterns_list_data shape_defensive_patterns;
+#endif
   struct owl_move_data moves[2*MAX_SEMEAI_MOVES+2];
   struct owl_move_data outside_liberty;
   struct owl_move_data common_liberty;
@@ -322,6 +369,11 @@ do_owl_analyze_semeai(int apos, int bpos,
   int this_variation_number = count_variations - 1;
   
   SETUP_TRACE_INFO2("do_owl_analyze_semeai", apos, bpos);
+
+#if PATTERN_CHECK_ON_DEMAND
+  shape_offensive_patterns.initialized = 0;
+  shape_defensive_patterns.initialized = 0;
+#endif
   
   global_owl_node_counter++;
   owla->local_owl_node_counter++;
@@ -545,14 +597,29 @@ do_owl_analyze_semeai(int apos, int bpos,
       }
     }
     
-    /* Next the shape moves. FIXME: We generate more moves than we use if
+    /* Next the shape moves. */
+#if PATTERN_CHECK_ON_DEMAND
+    owl_shapes(&shape_defensive_patterns, shape_defensive_moves, color, owla, 
+	       &owl_defendpat_db);
+    for (k = 0; k < MAX_SEMEAI_MOVES; k++)
+      if (!get_next_move_from_list(&shape_defensive_patterns, color,
+	                           shape_defensive_moves, 1))
+	break;
+    owl_shapes(&shape_offensive_patterns, shape_offensive_moves, color, owlb, 
+	       &owl_attackpat_db);
+    for (k = 0; k < MAX_SEMEAI_MOVES; k++)
+      if (!get_next_move_from_list(&shape_offensive_patterns, color,
+	                           shape_offensive_moves, 1))
+	break;
+#else
+    /* FIXME: We generate more moves than we use if
      * MAX_SEMEAI_MOVE < MAX_MOVES.  
      */
-    
     owl_shapes(shape_defensive_moves, color, owla, 
 	       &owl_defendpat_db);
     owl_shapes(shape_offensive_moves, color, owlb, 
 	       &owl_attackpat_db);
+#endif
     
     /* Now we review the moves already considered, while collecting
      * them into a single list. If no owl moves are found, we end the owl
@@ -739,6 +806,10 @@ do_owl_analyze_semeai(int apos, int bpos,
 	      sgf_dumptree = save_sgf_dumptree;
 	      count_variations = save_count_variations;
 	      SGFTRACE2(upos, ALIVE, "tactical win found");
+#if PATTERN_CHECK_ON_DEMAND
+	      close_pattern_list(&shape_defensive_patterns);
+	      close_pattern_list(&shape_offensive_patterns);
+#endif
 	      READ_RETURN_SEMEAI(read_result, move, upos, ALIVE, DEAD);
 	    }
 	    /* we mark the strings we've tried and failed to prevent 
@@ -788,7 +859,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	&& stackp < MAX_SEMEAI_DEPTH
 	&& semeai_trymove(mpos, color, moves[k].name, apos, bpos,
 			  owl_phase, moves[k].value)) {
-      if (0)
+      if (1)
 	if (debug & DEBUG_SEMEAI)
 	  dump_stack();
       if (board[bpos] == EMPTY) {
@@ -814,6 +885,10 @@ do_owl_analyze_semeai(int apos, int bpos,
 	*resultb = DEAD;
 	if (move) *move = mpos;
 	SGFTRACE2(mpos, ALIVE, moves[k].name);
+#if PATTERN_CHECK_ON_DEMAND
+	close_pattern_list(&shape_defensive_patterns);
+	close_pattern_list(&shape_offensive_patterns);
+#endif
 	READ_RETURN_SEMEAI(read_result, move, mpos, ALIVE, DEAD);
       }
       if (this_resulta == ALIVE_IN_SEKI
@@ -837,6 +912,11 @@ do_owl_analyze_semeai(int apos, int bpos,
       owl_phase = save_owl_phase;
     }
   }
+
+#if PATTERN_CHECK_ON_DEMAND
+  close_pattern_list(&shape_defensive_patterns);
+  close_pattern_list(&shape_offensive_patterns);
+#endif
   /* If we can't find a move and opponent passed, it's seki */
   if (best_resulta == UNKNOWN && pass == 1) {
     *resulta = ALIVE_IN_SEKI;
@@ -863,7 +943,6 @@ do_owl_analyze_semeai(int apos, int bpos,
   SGFTRACE2(best_move, best_resulta, moves[best_move_k].name);
   READ_RETURN_SEMEAI(read_result, move, best_move, best_resulta, best_resultb);
 }
-
 				   
 /* Returns the number of liberties gained by the first goal minus the
  * number of liberties lost by the second goal when a move is played
@@ -1076,6 +1155,9 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
   struct owl_move_data vital_moves[MAX_MOVES];
   struct owl_move_data shape_moves[MAX_MOVES];
   struct owl_move_data *moves;
+#if PATTERN_CHECK_ON_DEMAND
+  struct matched_patterns_list_data shape_patterns;
+#endif
   char mw[BOARDMAX];
   int number_tried_moves = 0;
   int pass;
@@ -1092,6 +1174,10 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
   int this_variation_number = count_variations - 1;
   
   SETUP_TRACE_INFO("owl_attack", str);
+
+#if PATTERN_CHECK_ON_DEMAND
+  shape_patterns.initialized = 0;
+#endif
 
   if ((stackp <= owl_branch_depth) && (hashflags & HASH_OWL_ATTACK)) {
     found_read_result = get_read_result(OWL_ATTACK, komaster, kom_pos,
@@ -1159,6 +1245,9 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
     
     current_owl_data = owl;
     memset(owl_safe_move_cache, 0, sizeof(owl_safe_move_cache));
+#if PATTERN_CHECK_ON_DEMAND
+    current_owl_safe_move_cache = owl_safe_move_cache;
+#endif
 
     matches_found = 0;
     memset(found_matches, 0, sizeof(found_matches));
@@ -1215,7 +1304,12 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
       if (stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
       
+#if PATTERN_CHECK_ON_DEMAND
+      owl_shapes(&shape_patterns, shape_moves, other, owl, &owl_attackpat_db);
+      get_next_move_from_list(&shape_patterns, other, shape_moves, 99);
+#else
       owl_shapes(shape_moves, other, owl, &owl_attackpat_db);
+#endif
       /* A move of value 100 is considered a win */
       if (shape_moves[0].value >= 100) {
 	/* to make sure this move is recorded in the sgf file */
@@ -1225,6 +1319,9 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	TRACE("%oVariation %d: DEAD (Winning owl_attackpat)\n",
 	      this_variation_number);
 	SGFTRACE(shape_moves[0].pos, WIN, "winning attack pattern");
+#if PATTERN_CHECK_ON_DEMAND
+	close_pattern_list(&shape_patterns);
+#endif
 	READ_RETURN(read_result, move, shape_moves[0].pos, WIN);
       }
 
@@ -1232,10 +1329,17 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
        * be considered. If there are two of these on the board, we lose.
        */
       if (shape_moves[0].value == 99) {
+#if PATTERN_CHECK_ON_DEMAND
+	if (get_next_move_from_list(&shape_patterns, other, shape_moves, 99)) {
+#else
 	if (shape_moves[1].value == 99) {
+#endif
 	  TRACE("%oVariation %d: ALIVE (multiple forced moves)\n",
 		this_variation_number);
 	  SGFTRACE(0, 0, "multiple forced moves");
+#if PATTERN_CHECK_ON_DEMAND
+	  close_pattern_list(&shape_patterns);
+#endif
 	  READ_RETURN0(read_result);
 	}
 	move_cutoff = 99;
@@ -1298,6 +1402,9 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	TRACE("%oVariation %d: DEAD (no defense)\n",
 	      this_variation_number);
 	SGFTRACE(0, WIN, "no defense");
+#if PATTERN_CHECK_ON_DEMAND
+	close_pattern_list(&shape_patterns);
+#endif
 	READ_RETURN(read_result, move, 0, WIN);
       }
       else if (dpos != NO_MOVE) {
@@ -1325,6 +1432,9 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
        */
       TRACE("%oVariation %d: ALIVE (escaped)\n", this_variation_number);
       SGFTRACE(0, 0, "escaped");
+#if PATTERN_CHECK_ON_DEMAND
+      close_pattern_list(&shape_patterns);
+#endif
       READ_RETURN0(read_result);
     }
 #endif
@@ -1343,19 +1453,26 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
       int new_kom_pos;
       int origin = 0;
 
-      if (moves[k].value < move_cutoff)
-	break;
-
-      mpos = moves[k].pos;
-
-      ASSERT_ON_BOARD1(mpos);
-            
       /* Consider only the highest scoring move if we're deeper than
        * owl_branch_depth.
        */
       if (stackp > owl_branch_depth && k > 0)
 	break;
-    
+
+#if PATTERN_CHECK_ON_DEMAND
+      /* Shape moves are selected on demand. */
+      if (pass == 1) {
+        if (!get_next_move_from_list(&shape_patterns, other,
+	                             shape_moves, move_cutoff))
+          break;
+      }
+      else
+#endif
+      if (moves[k].value < move_cutoff)
+	break;
+
+      mpos = moves[k].pos;
+      ASSERT_ON_BOARD1(mpos);
       gg_assert(mpos != NO_MOVE);
     
       /* Have we already tested this move? */
@@ -1421,6 +1538,9 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	  		    count_variations - this_variation_number);
 	    SGFTRACE(mpos, WIN, winstr);
 	  }
+#if PATTERN_CHECK_ON_DEMAND
+          close_pattern_list(&shape_patterns);
+#endif
 	  READ_RETURN(read_result, move, mpos, WIN);
 	}
 	UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, mpos);
@@ -1453,6 +1573,9 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
   
   if (savecode) {
     SGFTRACE(savemove, savecode, "attack effective (ko) - E");
+#if PATTERN_CHECK_ON_DEMAND
+    close_pattern_list(&shape_patterns);
+#endif
     READ_RETURN(read_result, move, savemove, savecode);
   }
 
@@ -1462,13 +1585,16 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	  	    count_variations - this_variation_number);
     SGFTRACE(0, 0, winstr);
   }
+#if PATTERN_CHECK_ON_DEMAND
+  close_pattern_list(&shape_patterns);
+#endif
   READ_RETURN0(read_result);
 }
 
 
-/* Returns true if the dragon at (m, n) can be captured given
+/* Returns true if the dragon at (target) can be captured given
  * two moves in a row. The first two moves to capture the
- * dragon are given as (*ui, *uj) and (*vi, *vj).
+ * dragon are given as (*attack1) and (*attack2).
  */
 
 int
@@ -1485,7 +1611,11 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
   int tactical_nodes;
   int move = 0;
   int move2 = 0;
+#if PATTERN_CHECK_ON_DEMAND
+  struct matched_patterns_list_data shape_patterns;
 
+  shape_patterns.initialized = 0;
+#endif
   result_certain = 1;
   if (search_persistent_owl_cache(OWL_THREATEN_ATTACK, target, 0, 0,
 				  &result, attack1, attack2, NULL))
@@ -1502,8 +1632,16 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
   memcpy(saved_boundary, owl.boundary, sizeof(saved_boundary));
   compute_owl_escape_values(&owl);
   owl_make_domains(&owl, NULL);
+#if PATTERN_CHECK_ON_DEMAND
+  owl_shapes(&shape_patterns, moves, other, &owl, &owl_attackpat_db);
+  for (k = 0; k < MAX_MOVES; k++) {
+    if (!get_next_move_from_list(&shape_patterns, other, moves, 1))
+      break;
+    else {
+#else
   if (owl_shapes(moves, other, &owl, &owl_attackpat_db)) {
     for (k = 0; k < MAX_MOVES; k++) {
+#endif
       int mpos = moves[k].pos;
 
       if (mpos != NO_MOVE && moves[k].value > 0)
@@ -1567,6 +1705,9 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
   if (attack2)
     *attack2 = move2;
 
+#if PATTERN_CHECK_ON_DEMAND
+  close_pattern_list(&shape_patterns);
+#endif
   return result;
 }
 
@@ -1649,6 +1790,9 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
   struct owl_move_data shape_moves[MAX_MOVES];
   struct owl_move_data vital_moves[MAX_MOVES];
   struct owl_move_data *moves;
+#if PATTERN_CHECK_ON_DEMAND
+  struct matched_patterns_list_data shape_patterns;
+#endif 
   char mw[BOARDMAX];
   int number_tried_moves = 0;
   int pass;
@@ -1663,9 +1807,13 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
   int found_read_result;
   Read_result *read_result = NULL;
   int this_variation_number = count_variations - 1;
-  
+
   SETUP_TRACE_INFO("owl_defend", str);
 
+#if PATTERN_CHECK_ON_DEMAND
+  shape_patterns.initialized = 0;
+#endif
+  
   if ((stackp <= owl_branch_depth) && (hashflags & HASH_OWL_DEFEND)) {
     found_read_result = get_read_result(OWL_DEFEND, komaster, kom_pos,
 					&str, &read_result);
@@ -1749,6 +1897,9 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
     
     current_owl_data = owl;
     memset(owl_safe_move_cache, 0, sizeof(owl_safe_move_cache));
+#if PATTERN_CHECK_ON_DEMAND
+    current_owl_safe_move_cache = owl_safe_move_cache;
+#endif
 
     /* We don't care about the moves, just whether matches are found.
      * The content of shape_moves[] will be discarded when we call
@@ -1806,7 +1957,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
    * 3. Tactical defense moves
    */
   for (pass = 0; pass < 4; pass++) {
-    int newpass=pass;
+    int newpass = pass;
     moves = NULL;
     move_cutoff = 1;
     
@@ -1824,7 +1975,12 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       if (stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
       
+#if PATTERN_CHECK_ON_DEMAND
+      owl_shapes(&shape_patterns, shape_moves, color, owl, &owl_defendpat_db);
+      get_next_move_from_list(&shape_patterns, color, shape_moves, 100);
+#else
       owl_shapes(shape_moves, color, owl, &owl_defendpat_db);
+#endif
       /* A move of value 100 is considered a win */
       if (shape_moves[0].value >= 100) {
 	/* to make sure this move is recorded in the sgf file */
@@ -1834,6 +1990,9 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	TRACE("%oVariation %d: ALIVE (Winning owl_defendpat)\n", 
 	      this_variation_number);
 	SGFTRACE(shape_moves[0].pos, WIN, "winning defense pattern");
+#if PATTERN_CHECK_ON_DEMAND
+	close_pattern_list(&shape_patterns);
+#endif
 	READ_RETURN(read_result, move, shape_moves[0].pos, WIN);
       }
       moves = shape_moves;
@@ -1911,19 +2070,26 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       int mpos;
       int new_komaster, new_kom_pos;
       int ko_move = -1;
-      
-      if (moves[k].value < move_cutoff)
-	break;
 
-      mpos = moves[k].pos;
-
-      ASSERT_ON_BOARD1(mpos);
       /* Consider only the highest scoring move if we're deeper than
        * owl_branch_depth.
        */
       if (stackp > owl_branch_depth && k > 0)
 	break;
       
+#if PATTERN_CHECK_ON_DEMAND
+      if (pass == 1) {
+        if (!get_next_move_from_list(&shape_patterns, color, shape_moves,
+	                             move_cutoff))
+	  break;
+      }
+      else
+#endif
+      if (moves[k].value < move_cutoff)
+	break;
+
+      mpos = moves[k].pos;
+      ASSERT_ON_BOARD1(mpos);
       gg_assert(mpos != NO_MOVE);
 
       /* Have we already tested this move? */
@@ -1962,6 +2128,9 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	  		    count_variations - this_variation_number);
 	    SGFTRACE(mpos, WIN, winstr);
 	  }
+#if PATTERN_CHECK_ON_DEMAND
+	  close_pattern_list(&shape_patterns);
+#endif
 	  READ_RETURN(read_result, move, mpos, WIN);
 	}
 	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, mpos);
@@ -1978,6 +2147,10 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       popgo();
     }
   }
+
+#if PATTERN_CHECK_ON_DEMAND
+  close_pattern_list(&shape_patterns);
+#endif
   
   if (savecode) {
     SGFTRACE(savemove, savecode, "defense effective (ko) - B");
@@ -2002,9 +2175,9 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 }
 
 
-/* Returns true if the dragon at (m, n) can be defended given
+/* Returns true if the dragon at (target) can be defended given
  * two moves in a row. The first two moves to defend the
- * dragon are given as (*ui, *uj) and (*vi, *vj).
+ * dragon are given as (*defend1) and (*defend2).
  */
 
 int
@@ -2021,6 +2194,11 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
   int tactical_nodes;
   int move = 0;
   int move2 = 0;
+#if PATTERN_CHECK_ON_DEMAND
+  struct matched_patterns_list_data shape_patterns;
+
+  shape_patterns.initialized = 0;
+#endif
 
   result_certain = 1;
   if (worm[target].unconditional_status == DEAD)
@@ -2039,8 +2217,16 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
   memcpy(saved_goal, owl.goal, sizeof(saved_goal));
   compute_owl_escape_values(&owl);
   owl_make_domains(&owl, NULL);
+#if PATTERN_CHECK_ON_DEMAND
+  owl_shapes(&shape_patterns, moves, color, &owl, &owl_defendpat_db);
+  for (k = 0; k < MAX_MOVES; k++) {
+    if (!get_next_move_from_list(&shape_patterns, color, moves, 1))
+      break;
+    else {
+#else
   if (owl_shapes(moves, color, &owl, &owl_defendpat_db)) {
     for (k = 0; k < MAX_MOVES; k++) {
+#endif
       if (moves[k].pos != NO_MOVE && moves[k].value > 0)
 	if (trymove(moves[k].pos, color, moves[k].name, target, EMPTY, 0)) {
 	  owl.lunches_are_current = 0;
@@ -2077,6 +2263,9 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
   if (defend2)
     *defend2 = move2;
 
+#if PATTERN_CHECK_ON_DEMAND
+  close_pattern_list(&shape_patterns);
+#endif
   return result;
 }
 
@@ -2524,11 +2713,19 @@ modify_stupid_eye_vital_point(int *vital_point)
  * available this is indicated by value and coordinates in the
  * array being -1.
  *
- * Returns 1 if at least one move is found, or 0 if no move is found.  */
-
+ * This function automatically initializes the owl_safe_move cache and,
+ * if PATTERN_CHECK_ON_DEMAND is set, the pattern list. WATCH OUT: This has
+ * to be matched with a call to close_pattern_list(pattern_list)!!!
+ *
+ * Returns 1 if at least one move is found, or 0 if no move is found. 
+ */
 static int 
-owl_shapes(struct owl_move_data moves[MAX_MOVES], int color,
-	   struct local_owl_data *owl, struct pattern_db *type)
+owl_shapes(
+#if PATTERN_CHECK_ON_DEMAND
+	   struct matched_patterns_list_data *pattern_list,
+#endif
+           struct owl_move_data moves[MAX_MOVES],
+	   int color, struct local_owl_data *owl, struct pattern_db *type)
 {
   int k;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
@@ -2539,7 +2736,7 @@ owl_shapes(struct owl_move_data moves[MAX_MOVES], int color,
   current_owl_data = owl;
   
   for (k = 0; k < MAX_MOVES; k++) {
-    moves[k].pos = 0;
+    moves[k].pos = NO_MOVE;
     moves[k].value = -1;
     moves[k].name = NULL;
     moves[k].same_dragon = 2;
@@ -2548,25 +2745,279 @@ owl_shapes(struct owl_move_data moves[MAX_MOVES], int color,
   /* We must reset the owl_safe_move_cache before starting the
    * pattern matching. The cache is used by owl_shapes_callback().
    */
+#if PATTERN_CHECK_ON_DEMAND
+  init_pattern_list(pattern_list);
+  if (stackp >= owl_safe_move_cache_size) {
+    int new_size = gg_max(stackp+1, owl_reading_depth);
+    owl_safe_move_cache_stack
+      = realloc(owl_safe_move_cache_stack, new_size * BOARDMAX * sizeof(int));
+    if (0)
+      gprintf("New size for owl safe move cache stack: %d\n", new_size);
+    gg_assert(owl_safe_move_cache_stack != NULL);
+    owl_safe_move_cache_size = new_size;
+  }
+  memset(&owl_safe_move_cache_stack[stackp * BOARDMAX],
+         0, BOARDMAX * sizeof(int));
+  matchpat(owl_shapes_collect_callback, color, type, pattern_list, owl->goal);
+#else
   memset(owl_safe_move_cache, 0, sizeof(owl_safe_move_cache));
   matchpat(owl_shapes_callback, color, type, moves, owl->goal);
+#endif
 
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
 
+#if PATTERN_CHECK_ON_DEMAND
+  return 0;
+#else
   if (moves[0].value > 0)
     return 1;
   else
     return 0;
+#endif
 }  
 
 
+/* This function contains all the expensive checks for a matched pattern. */
+static int
+check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
+{
+  /* For sacrifice patterns, the survival of the stone to be played is
+   * not checked. Otherwise we discard moves which can be captured. 
+   * Illegal ko captures are accepted for ko analysis.
+   */
+  if (! (pattern->class & CLASS_s)) {
+    if (!owl_safe_move(move, color)) {
+      if (0)
+	TRACE("  move at %1m wasn't safe, discarded\n", move);
+      return 0;
+    }
+    if (!is_legal(move, color)) {
+      if (0)
+	TRACE("  move at %1m wasn't legal, discarded\n", move);
+      return 0;
+    }
+  }
+  
+  /* For class n patterns, the pattern is contingent on an opponent
+   * move at * not being captured.
+   *
+   * We can't use owl_safe_move() here because we would try the wrong color.
+   */
+  if (pattern->class & CLASS_n) {
+    if (safe_move(move, OTHER_COLOR(color)) == 0) {
+      if (0)
+	TRACE("  opponent can't play safely at %1m, move discarded\n", move);
+      return 0;
+    }
+  }
+
+  /* If the pattern has a constraint, call the autohelper to see
+   * if the pattern must be rejected.
+   */
+  if (pattern->autohelper_flag & HAVE_CONSTRAINT)
+    if (!pattern->autohelper(pattern, ll, move, color, 0))
+      return 0;
+  return 1;
+}
+
+#if PATTERN_CHECK_ON_DEMAND
+
+/* This initializes a pattern list, allocating memory for 200 patterns.
+ * If more patterns need to be stored, owl_shapes_collect_callback will
+ * dynamically reallocate additional memory.
+ * Only the space for list->pattern_list is allocated here, *list needs to
+ * have been allocated by the calling function.
+ *
+ * This function is automatically called from owl_shapes. Every call here
+ * has to be matched by a call to close_pattern_list below.
+ */
+static void
+init_pattern_list(struct matched_patterns_list_data *list)
+{
+  list->counter = 0;
+  list->used = 0;
+  list->ordered_up_to = 0;
+  gg_assert(!list->initialized);
+  list->pattern_list = malloc(200*sizeof(list->pattern_list[0]));
+  if (0)
+    gprintf("List at %x has new array at %x\n", list, list->pattern_list);
+  gg_assert(list->pattern_list != NULL);
+  list->list_size = 200;
+  list->initialized = 1;
+}
+
+/* This function has to get called before the memory of *list is freed
+ * in the calling function.
+ */
+static void
+close_pattern_list(struct matched_patterns_list_data *list)
+{
+  /* FIXME: The allpats option should be taken into account here. */
+  if (list->initialized) {
+    if (0)
+      gprintf("%d patterns matched, %d patterns checked\n", list->counter,
+	      list->used);
+    if (0)
+      gprintf("Pattern list at %x freed for list at %x\n",
+	      list->pattern_list, list);
+    free(list->pattern_list);
+  }
+  list->counter = -1;
+}
+
+
+/* This function stores a found pattern in the list for later evaluation.
+ * The only processing done is computing the position of the move, and
+ * forgetting the color.
+ */
+static void
+owl_shapes_collect_callback(int m, int n, int color, struct pattern *pattern,
+			    int ll, void *data)
+{
+  struct matched_patterns_list_data *matched_patterns = data;
+  struct matched_pattern_data *next_pattern;
+
+  UNUSED(color); /* The calling function has to remember that. */
+
+  if (matched_patterns->counter >= matched_patterns->list_size) {
+    matched_patterns->list_size += 100;
+    matched_patterns->pattern_list
+        = realloc(matched_patterns->pattern_list,
+	          matched_patterns->list_size
+	          * sizeof(matched_patterns->pattern_list[0]));
+  }
+  next_pattern = &matched_patterns->pattern_list[matched_patterns->counter];
+  next_pattern->move = AFFINE_TRANSFORM(pattern->movei, pattern->movej,
+			                ll, m, n);
+  next_pattern->pattern = pattern;
+  next_pattern->ll = ll;
+  matched_patterns->counter++;
+}
+
+/* This function searches in the previously stored list of matched patterns
+ * for the highest valued unused patterns that have a valid constraint.
+ * It returns the moves at the next empty positions in the array (moves[]).
+ * (Empty positions in the moves array are marked by having value <=0. There
+ * must be enough empty positions in the list.)
+ * If the highest valued pattern found has a value less than cutoff,
+ * no move is returned.
+ * Returns 1 if a move is found, 0 otherwise.
+ *
+ * One bubble sort-like iteration is used to find the next highest valued
+ * pattern; then it is checked whether this move has not been tried before,
+ * and if the pattern constraint is valid. This is repeated until enough
+ * moves are found or the end of the list is reached.
+ */
+
+static int
+get_next_move_from_list(struct matched_patterns_list_data *list, int color,
+                        struct owl_move_data *moves, int cutoff)
+{
+  int top, bottom;
+  float top_val;
+  int k;
+  int i;
+  int move;
+  struct matched_pattern_data matched_pattern;
+  int move_found = 0;
+  int same_dragon;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
+    
+  sgf_dumptree = NULL;
+  count_variations = 0;
+
+  gg_assert(owl_safe_move_cache_size > stackp);
+  current_owl_safe_move_cache = &owl_safe_move_cache_stack[stackp * BOARDMAX];
+
+  /* The patterns above list->used have already been either discarded or
+   * used by the calling function.
+   */
+  for (top = list->used; top < list->counter; top++) {
+    /* Maybe we already know the top entry (if previous call was ended
+     * by a value cutoff.
+     */
+    top_val = (int) list->pattern_list[top].pattern->value;
+    if (top >= list->ordered_up_to) {
+      /* One bubble sort iteration. */
+      for (bottom = list->counter-1; bottom > top; bottom--)
+	if (list->pattern_list[bottom].pattern->value > top_val) {
+	  matched_pattern = list->pattern_list[bottom];
+	  list->pattern_list[bottom] = list->pattern_list[top];
+	  list->pattern_list[top] = matched_pattern;
+	  top_val = list->pattern_list[top].pattern->value;
+	}
+      list->ordered_up_to++;
+    }
+    matched_pattern = list->pattern_list[top];
+    if (top_val < cutoff) {
+      list->ordered_up_to = top + 1;
+      list->used = top;
+      sgf_dumptree = save_sgf_dumptree;
+      count_variations = save_count_variations;
+      return 0;
+    }
+    move = matched_pattern.move;
+    ASSERT_ON_BOARD1(move);
+    for (k = 0; k < MAX_MOVES; k++) {
+      if (moves[k].pos == move || moves[k].value <= 0)
+	break;
+    }
+    if (moves[k].pos == move)
+      continue;
+    gg_assert(k < MAX_MOVES); /* There has to be an empty space. */
+    if (check_pattern_hard(move, color, matched_pattern.pattern,
+			   matched_pattern.ll)) {
+      moves[k].pos = move;
+      moves[k].value = (int) top_val;
+      moves[k].name = matched_pattern.pattern->name;
+      move_found = 1;
+      TRACE("Pattern %s found at %1m with value %d\n",
+	    matched_pattern.pattern->name, move, moves[k].value);
+
+      if (matched_pattern.pattern->class & CLASS_B)
+	same_dragon = 0;
+      else if (matched_pattern.pattern->class & CLASS_b)
+	same_dragon = 1;
+      else
+	same_dragon = 2;
+
+      /* If we do not yet know whether the move belongs to the same dragon,
+       * we see whether another pattern can clarify.
+       */
+      for (i = top + 1; (i < list->counter && same_dragon == 1); i++)
+        if ((list->pattern_list[i].move == move) 
+ 	    && ((list->pattern_list[i].pattern->class & CLASS_B)
+	        || !(list->pattern_list[i].pattern->class & CLASS_b))
+	    && check_pattern_hard(move, color, list->pattern_list[i].pattern,
+	                          list->pattern_list[i].ll)) {
+	  TRACE("Additionally pattern %s found at %1m\n",
+		list->pattern_list[i].pattern->name, move);
+	  if (list->pattern_list[i].pattern->class & CLASS_B)
+	    same_dragon = 0;
+	  else
+	    same_dragon = 2;
+        }
+      moves[k].same_dragon = same_dragon;
+
+      break;
+    } /* if check_pattern_hard */
+  }
+
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+  list->ordered_up_to = top+1;
+  list->used = top+1;
+  return (move_found);
+}
+
+#endif  /* PATTERN_CHECK_ON_DEMAND */
 
 /* This function takes an array of already found moves (passed as
  * 'data') and looks for moves to replace these. Only moves near
  * (goali, goalj) are considered.
  */
-
 static void
 owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
 		    int ll, void *data)
@@ -2599,47 +3050,13 @@ owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
       return;
   }
   
-  /* For sacrifice patterns, the survival of the stone to be played is
-   * not checked. Otherwise we discard moves which can be captured. 
-   * Illegal ko captures are accepted for ko analysis.
-   */
-  if (! (pattern->class & CLASS_s)) {
-    if (!owl_safe_move(move, color)) {
-      if (0)
-	TRACE("  move at %1m wasn't safe, discarded\n", move);
-      return;
-    }
-    if (!is_legal(move, color)) {
-      if (0)
-	TRACE("  move at %1m wasn't legal, discarded\n", move);
-      return;
-    }
-  }
-  
-  /* For class n patterns, the pattern is contingent on an opponent
-   * move at * not being captured.
-   *
-   * We can't use owl_safe_move() here because we would try the wrong color.
-   */
-  if (pattern->class & CLASS_n) {
-    if (safe_move(move, OTHER_COLOR(color)) == 0) {
-      if (0)
-	TRACE("  opponent can't play safely at %1m, move discarded\n", move);
-      return;
-    }
-  }
-
-  /* If the pattern has a constraint, call the autohelper to see
-   * if the pattern must be rejected.
-   */
-  if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, move, color, 0))
-      return;
-  }
+  if (!check_pattern_hard(move, color, pattern, ll))
+    return;
 
   /* and work out the value of this move */
   if (pattern->helper) {
     /* ask helper function to consider the move */
+    gg_assert(0);
     DEBUG(DEBUG_HELPER, "  asking helper to consider '%s'+%d at %1m\n",
 	  pattern->name, ll, move);
     tval = pattern->helper(pattern, ll, move, color);
@@ -2738,6 +3155,7 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
 		  || moves[k].pos != moves[l].pos);
   }
 }  
+
 
 /* Marks the dragons at (apos) and (bpos). If only one dragon
  * needs marking, (bpos) should be passed as (0). 
@@ -3666,8 +4084,13 @@ owl_safe_move(int move, int color)
 {
   int acode, safe = 0;
 
+#if PATTERN_CHECK_ON_DEMAND
+  if (current_owl_safe_move_cache[move])
+    return current_owl_safe_move_cache[move]-1;
+#else
   if (owl_safe_move_cache[move])
     return owl_safe_move_cache[move]-1;
+#endif
 
   if (trymove(move, color, "owl_safe_move", 0, EMPTY, 0)) {
     acode = attack(move, NULL);
@@ -3678,7 +4101,11 @@ owl_safe_move(int move, int color)
     current_owl_data->lunches_are_current = 0;
     popgo();
   }
+#if PATTERN_CHECK_ON_DEMAND
+  current_owl_safe_move_cache[move] = safe+1;
+#else
   owl_safe_move_cache[move] = safe+1;
+#endif
   return safe;
 }
   

@@ -1450,7 +1450,7 @@ OX.O
 .O*.
 xxxx
 
-:8,B,value(75)
+:8,-,value(75)
 
 ?X.o
 cXaO
@@ -3475,7 +3475,7 @@ Pattern A1124
 ?.*
 ???
 
-:8,b,value(70)
+:8,-,value(70)
 
 ?AX
 be*
@@ -3495,7 +3495,7 @@ Pattern A1124a
 ?*.
 ???
 
-:8,b,value(70)
+:8,-,value(70)
 
 ?AX
 b*e
@@ -3574,7 +3574,7 @@ XXO.
 XO..
 O..?
 
-:8,b,value(86)
+:8,-,value(86)
 
 xB*x
 XXOa
