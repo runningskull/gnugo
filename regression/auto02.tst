@@ -9,7 +9,7 @@ loadsgf games/auto_gen/auto007.sgf 42
 # C16 is probably best. /ab
 loadsgf games/auto_gen/auto008.sgf 58
 3 owl_defend D16
-#? [1 (C16|D17|E15)]*
+#? [1 (C16|D17|E15|D14)]*
 
 loadsgf games/auto_gen/auto008.sgf 150
 4 owl_attack C12

@@ -155,10 +155,11 @@ loadsgf games/trevor/trevor_16.sgf 53
 
 # Protecting lower left group better.
 loadsgf games/trevor/trevor_16.sgf 54
-161 gg_genmove white
+161 restricted_genmove white B1 F9
 #? [B1]*
 
 # W can live here unconditionally.
+# A2 is inferior as black gets seki with B1. /ab
 loadsgf games/trevor/trevor_16.sgf 58
 162 gg_genmove white
 #? [B1]*
@@ -577,7 +578,7 @@ loadsgf games/trevor/trevor_67.sgf
 
 loadsgf games/trevor/trevor_67.sgf
 671 defend G1
-#? [1 (D1|C3)]*
+#? [1 (D1|C3|C1)]*
 
 loadsgf games/trevor/trevor_68.sgf
 680 owl_attack H3

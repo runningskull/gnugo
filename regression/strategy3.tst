@@ -150,7 +150,7 @@ loadsgf games/strategy30.sgf 201
 
 loadsgf games/strategy31.sgf 34
 130 gg_genmove white
-#? [!D17]
+#? [!D17|C16]
 
 loadsgf games/strategy31.sgf 44
 131 gg_genmove white
@@ -162,13 +162,13 @@ loadsgf games/strategy31.sgf 48
 
 # Locally D4 is the only move, but there may be bigger moves elsewhere.
 loadsgf games/strategy31.sgf 50
-133 gg_genmove white
-#? [!(E5|E4)]
+133 restricted_genmove white D4 E4 E5
+#? [D4]
 
 # R10 is clearly superior to S10
 loadsgf games/strategy31.sgf 158
-134 gg_genmove white
-#? [!S10]
+134 restricted_genmove white S10 R10
+#? [R10]
 
 loadsgf games/strategy31.sgf 188
 135 gg_genmove white
@@ -224,7 +224,7 @@ loadsgf games/incident209.sgf 259
 # G3 is necessary here.
 loadsgf games/strategy35.sgf 112
 147 gg_genmove white
-#? [!G5]
+#? [G3|F3|G4]
 
 loadsgf games/strategy35.sgf 140
 148 gg_genmove white

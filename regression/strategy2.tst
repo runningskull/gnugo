@@ -121,15 +121,19 @@ loadsgf games/strategy19.sgf 94
 #? [A8]
 
 # I have added R17, as it seems to kill the huge black dragon --arend
+# added P15, because it also seems likely to kill the dragon,
+# and gnugo 3.3.18-pre3 finds it at level 12 --evand
 # Note: E7 doesn't work because of B:D9.
 loadsgf games/semeai2.sgf 116
 73 gg_genmove white
-#? [F7|R17]
+#? [F7|R17|P15]
 
 # I have added R17, as it seems to kill the huge black dragon --arend
+# added P15, because it also seems likely to kill the dragon,
+# and gnugo 3.3.18-pre3 finds it at level 12 --evand
 loadsgf games/semeai2.sgf 118
 74 gg_genmove white
-#? [F7|R17]
+#? [F7|R17|P15]
 
 loadsgf games/semeai2.sgf 150
 # If Q11 is not undervalued F7 is acceptable (though not correct)

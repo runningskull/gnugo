@@ -71,7 +71,7 @@ loadsgf games/trevor/auto/d02.sgf 58
 #Other moves possible.
 loadsgf games/trevor/auto/d02.sgf 64
 220 gg_genmove white
-#? [M10|L10|K10|K9|J10|J9]*
+#? [M10|L10|K10|K9|J10|J9|L9]
 
 
 #Other moves possible.  !F2
