@@ -17,5 +17,12 @@ vanilla.c : Not useful by itself, this program shows how to spawn a gtp
             and could be modified into any number of useful programs such
             as a gtp/gmp mediator.
 
+metamachine.c : This program sits between a gtp controller and an
+                engine intercepting gtp commands and processing
+            them. When the gtp engine is gnugo, it gives an
+            alternative move generation scheme (though a weaker
+            engine).
 
+
+                
 
