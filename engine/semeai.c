@@ -33,7 +33,7 @@ static void add_appropriate_semeai_moves(int move,
 					 int my_dragon, int your_dragon, 
 					 int my_status, int your_status,
 					 int margin_of_safety);
-static void small_semeai_analyzer(int str1, int str2);
+static void small_semeai_analyzer(int str1, int str2, int save_verbose);
 static void update_status(int dr, int new_status, int new_safety);
 
 
@@ -813,35 +813,45 @@ revise_semeai(int color)
  * which can be attacked. So they may overlook a defensive
  * move which consists of attacking an adjoining string.
  *
- * small_semeai(), called by make_worms() searches for a 
- * string A with 3 or 4 liberties such that worm[A], attack_code != 0.
- * If there is a string B next to A (of the opposite color)
- * such that worm[B].attack_code != 0, the following action is
- * taken: if worm[A].liberties == worm[B].liberties, then
- * worm[A].defend is set to worm[B].defend and vice versa;
- * and if worm[A].liberties > worm[B].liberties, then worm[A].defendi
- * is set to -1.
+ * small_semeai() generates all pairs of adjacent attackable
+ * worms, then calls owl_analyze_semeai in tactical (non-owl)
+ * mode to find out what really happens.
  */
 
 void
-small_semeai()
+small_semeai(int save_verbose)
 {
-  int pos;
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (IS_STONE(board[pos])
-	&& (worm[pos].liberties == 3 || worm[pos].liberties == 4)
-	&& worm[pos].attack_codes[0] != 0) {
-      int other = OTHER_COLOR(board[pos]);
-      
-      if (board[SOUTH(pos)] == other)
-	small_semeai_analyzer(pos, SOUTH(pos));
-      if (board[WEST(pos)] == other)
-	small_semeai_analyzer(pos, WEST(pos));
-      if (board[NORTH(pos)] == other)
-	small_semeai_analyzer(pos, NORTH(pos));
-      if (board[EAST(pos)] == other)
-	small_semeai_analyzer(pos, EAST(pos));
+  int apos, bpos;
+
+  /* Generate all adjacent pairs of attackable worms */
+
+  for (apos = BOARDMIN; apos < BOARDMAX; apos++) {
+
+    if (!ON_BOARD(apos) || board[apos] == EMPTY)
+      continue;
+    if (worm[apos].origin != apos)
+      continue;
+    if (worm[apos].attack_codes[0] == 0)
+      continue;
+
+    for (bpos = BOARDMIN; bpos < BOARDMAX; bpos++) {
+      if (!ON_BOARD(bpos) || board[bpos] == EMPTY)
+	continue;
+      if (worm[bpos].origin != bpos)
+	continue;
+      if (bpos == apos)
+	continue;
+      if (worm[bpos].attack_codes[0] == 0)
+	continue;
+      if (!adjacent_strings(apos, bpos))
+	continue;
+      if (worm[apos].liberties < 3 && worm[bpos].liberties < 3)
+	continue;
+      if (save_verbose && apos < bpos)
+	gprintf("small semeai found at %1m, %1m\n", apos, bpos);
+      small_semeai_analyzer(apos, bpos, save_verbose);
     }
+  }
 }
 
 /* Helper function for small_semeai. Tries to resolve the
@@ -851,33 +861,25 @@ small_semeai()
  */
 
 static void
-small_semeai_analyzer(int apos, int bpos)
+small_semeai_analyzer(int apos, int bpos, int save_verbose)
 {
   int move;
   int resulta, resultb;
-
-  if (worm[apos].attack_codes[0] == NO_MOVE)
-    return;
-  if (worm[bpos].attack_codes[0] == NO_MOVE)
-    return;
 
   /* FIXME: Not ko aware yet (since owl_analyze_semeai isn't).
    * Should be more careful if there is already a defense point.
    */
 
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0);
-  if (resulta != DEAD)
-    if (worm[apos].defend_codes[0] == NO_MOVE) {
-      worm[apos].defend_codes[0] = WIN;
-      worm[apos].defense_points[0] = move;
-    }
-  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 0);
-  if (resultb != DEAD)
-    if (worm[bpos].defend_codes[0] == NO_MOVE) {
-      worm[bpos].defend_codes[0] = WIN;
-      worm[bpos].defense_points[0] = move;
-    }
-} 
+  if (resulta != DEAD
+      && worm[apos].defend_codes[0] == 0 
+      && move != NO_MOVE) {
+    if (save_verbose)
+      gprintf("small semeai: changing defense of %1m to %1m\n",
+	      apos, move);
+    change_defense(apos, move, WIN);
+  }
+}
 
 
 

@@ -250,10 +250,11 @@ extern int last_moves[2];
 #define HASH_ATTACK3      0x0080
 #define HASH_OWL_ATTACK   0x0100
 #define HASH_OWL_DEFEND   0x0200
+#define HASH_SEMEAI       0x0400
 #define HASH_NOTHING      0
 #define HASH_ALL          0xffff
 #define HASH_DEFAULT      (HASH_ATTACK | HASH_FIND_DEFENSE\
-			   | HASH_OWL_ATTACK | HASH_OWL_DEFEND)
+			   | HASH_OWL_ATTACK | HASH_OWL_DEFEND | HASH_SEMEAI)
 
 extern int debug;		/* debug flags */
 extern int hashflags;		/* hash flags */
@@ -436,7 +437,7 @@ int aftermath_final_status(int color, int pos);
 /* Basic information gathering. */
 /* worm.c */
 void build_worms(void);
-void make_worms(void);
+void make_worms(int save_verbose);
 
 /* dragon.c */
 void make_dragons(int color, int stop_before_owl);

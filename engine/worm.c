@@ -80,7 +80,7 @@ static void defense_callback(int m, int n, int color,
  */
 
 void
-make_worms(void)
+make_worms(int save_verbose)
 {
   int m, n; /* iterate over board */
 
@@ -246,7 +246,7 @@ make_worms(void)
   gg_assert(stackp == 0);
 
   /* We try first to resolve small semeais. */
-  small_semeai();
+  small_semeai(save_verbose);
   gg_assert(stackp == 0);
 
   /* Now we try to improve the values of worm.attack and worm.defend.

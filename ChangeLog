@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- Zobrist hashing implemented in owl_analyze_semeai
+- do_owl_analyze_semeai no longer considers unsafe outside liberties
+- small_semeai reimplemented
+- make_worms takes the save_verbose parameter to allow a few traces
+- traces improved in decide_tactical_semeai
 - EXPERIMENTAL_READING code (pattern based) added.
 - added "tried" parameter to special_rescue
 - defend2-[CD] won't re-try moves (avoid cache check).

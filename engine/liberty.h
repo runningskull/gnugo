@@ -391,7 +391,7 @@ int placehand(int handicap);          /* place stones on board only */
 void fuseki(int color);
 void semeai(int color);
 void new_semeai(int color);
-void small_semeai(void);
+void small_semeai(int save_verbose);
 void shapes(int color);
 void endgame_shapes(int color);
 
