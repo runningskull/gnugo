@@ -754,12 +754,12 @@ territory for @code{color}.
 @item @code{int influence_get_moyo_size(int pos, int color)}
 @findex influence_get_moyo_size
 @quotation
-Return the size of the moyo around (pos).
+Return the size of the moyo around @code{pos}.
 @end quotation
 @item @code{void influence_get_moyo_segmentation(int opposite, struct moyo_data *moyos)}
 @findex influence_get_moyo_segmentation
 @quotation
-Export the moyo segmentation. If (opposite) is true, then
+Export the moyo segmentation. If @code{opposite} is true, then
 initial_opposite_influence is used, otherwise initial_influence.
 @end quotation
 @item @code{void compute_initial_influence(int color, int dragons_known)}
@@ -802,7 +802,7 @@ computed with the opposite color to move.
 @quotation
 Return the color who has area at @code{pos}, or EMPTY.
 @end quotation
-@item float @code{influence_delta_territory(int pos, int color, char saved_stones[BOARDMAX], float *followup_value)}
+@item @code{float influence_delta_territory(int pos, int color, char saved_stones[BOARDMAX], float *followup_value)}
 @findex influence_delta_territory
 @quotation
 Compute the difference in territory made by a move by color at @code{pos}.  
@@ -884,7 +884,7 @@ situations. You have to specify at least one of the options above and
 at least one of the options below to generate any output.
 
 @itemize @bullet
-@item @option{-m 0x010} or @option{-m 16}.
+@item @option{-m 0x010} or @option{-m 16}
 @quotation
 Show colored display of territory/moyo/area regions.
 @itemize @minus
@@ -895,32 +895,32 @@ Show colored display of territory/moyo/area regions.
 This feature is very useful to get an immediate impression of the influence
 regions as GNU Go sees them.
 @end quotation
-@item @option{-m 0x20} or @option{-m 32}.
+@item @option{-m 0x20} or @option{-m 32}
 @quotation
 Show numerical influence values for white and black. These come in
 two separate diagrams, the first one for white, the second one for
 black. Notice that the influence values are represented by floats and
 thus have been rounded in these diagrams.
 @end quotation
-@item @option{-m 0x40} or @option{-m 64}.
+@item @option{-m 0x40} or @option{-m 64}
 @quotation
 This generates two diagrams showing the permeability for black and white
 influence on the board.
 @end quotation
-@item @option{-m 0x80} or @option{-m 128}.
+@item @option{-m 0x80} or @option{-m 128}
 @quotation
 This shows the strength of the influence sources for black and white 
 across the board. You will see sources at each lively stone (with strength
 depending on the strength of this stone), and sources contributed by
 patterns.
 @end quotation
-@item @option{-m 0x100} or @option{-m 256}.
+@item @option{-m 0x100} or @option{-m 256}
 @quotation
 This shows the attenuation with which the influence sources spread
 influence across the board. Low attenuation indicates far-reaching
 influence sources.
 @end quotation
-@item @option{-m 0x200} or @option{-m 512}.
+@item @option{-m 0x200} or @option{-m 512}
 @quotation
 This shows the territory valuation of GNU Go. Each intersection is
 shown with a value between -1.0 and +1.0 (or -2 resp. +2 if there is

@@ -22,7 +22,7 @@ two routines @code{make_worm()} and @code{make_dragon()} in
 @file{dragon.c}.
 
 @cindex dragon
-@cindex worm	
+@cindex worm
 @cindex string
 @cindex worm closure
 A @dfn{worm} is a maximal set of vertices on the board which are connected
@@ -208,7 +208,7 @@ of in the separate fields @code{worm.cutstone} and @code{worm.cutstone2}.
 We use currently use both concepts in parallel.
 
 @itemize
-@item @code{cutstone}: 
+@item @code{cutstone} 
 @quotation
 @cindex cutting stone
 This field is equal to 2 for cutting stones, 1 for potential cutting
@@ -238,7 +238,7 @@ share a liberty. For example, X in:
 For cutting strings we set @code{worm[].cutstone=2}. For
 potential cutting strings we set @code{worm[].cutstone=1}.
 @end quotation
-@item @code{cutstone2}: 
+@item @code{cutstone2} 
 @quotation
 Cutting points are identified by the patterns in the connections
 database. Proper cuts are handled by the fact that attacking and
@@ -248,7 +248,7 @@ surrounding dragons.  The @code{cutstone2} field is set during
 @end quotation
 @findex find_cuts
 @findex make_domains
-@item @code{genus}: 
+@item @code{genus} 
 @quotation
 @cindex genus (worm)
 There are two separate notions of @dfn{genus} for worms and
@@ -259,7 +259,7 @@ to the number of eyes. The @dfn{genus} of a string is the number
 of connected components of its complement, minus one. It is
 an approximation to the number of eyes of the string.
 @end quotation
-@item @code{inessential}: 
+@item @code{inessential} 
 @quotation
 @cindex inessential string
 An @dfn{inessential} string is one which meets a
@@ -283,7 +283,7 @@ The inessential strings are used in the amalgamation of
 cavities in @code{make_dragons()}.
 @end quotation
 @findex unconditional_life
-@item @code{invincible}: 
+@item @code{invincible} 
 @quotation
 @cindex invincible worm
 An @dfn{invincible} worm is one which GNU Go thinks
@@ -583,12 +583,12 @@ to defend the half eye.
 struct half_eye_data half_eye[MAX_BOARD];
 
 struct half_eye_data @{
-  float value;      /* Topological eye value. */
-  int type;         /* HALF_EYE or FALSE_EYE; */
-  int num_attacks;  /* number of attacking points */
-  int attack_point[4];  /* the move to attack a topological halfeye */
-  int num_defends;      /* number of defending points */
-  int defense_point[4]; /* the move to defend a topological halfeye */
+  float value;          /* Topological eye value */
+  int type;             /* HALF_EYE or FALSE_EYE */
+  int num_attacks;      /* Number of attacking points */
+  int attack_point[4];  /* The moves to attack a topological halfeye */
+  int num_defends;      /* Number of defending points */
+  int defense_point[4]; /* The moves to defend a topological halfeye */
 @};
 
 @end group
@@ -663,7 +663,7 @@ extern struct dragon_data2 *dragon2;
 
 The difference between the two arrays is that the @code{dragon} array 
 is indexed by the board, and there is a copy of the dragon data 
-at every stone in the dragon, while there is only one copy of of
+at every stone in the dragon, while there is only one copy of
 the dragon2 data. The dragons are numbered, and the @code{id} field
 of the dragon is a key into the dragon2 array. Two macros DRAGON
 and DRAGON2 are provided for gaining access to the two arrays.
@@ -680,11 +680,11 @@ from the dragon2 array, you can access it using the DRAGON2 macro,
 for example you can access its neighor dragons by
 
 @example
-   for (k = 0; k < DRAGON2(pos).neighbors; k++) @{
-      int d = DRAGON2(pos).adjacent[k];
-      int apos = dragon2[d].origin;
-      do_something(apos);	
-   @}
+for (k = 0; k < DRAGON2(pos).neighbors; k++) @{
+  int d = DRAGON2(pos).adjacent[k];
+  int apos = dragon2[d].origin;
+  do_something(apos);
+@}
 @end example
 
 Similarly if you know the dragon number (which is @code{dragon[pos].id})
@@ -694,14 +694,14 @@ access the @code{dragon} array using the DRAGON macro.
 Here are the definitions of each field in the @code{dragon} arrray.
 
 @itemize @bullet 
-@item @code{color}: 
+@item @code{color} 
 @quotation
 @cindex color (dragon)
 For strings, this is @code{BLACK} or @code{WHITE}. 
 For caves, it is @code{BLACK_BORDER}, @code{WHITE_BORDER} or 
 @code{GRAY_BORDER}. The meaning of these concepts is the same as for worms.
 @end quotation
-@item @code{id}:
+@item @code{id}
 @quotation
 The dragon number. This is a key into the @code{dragon2} array.
 @end quotation
@@ -714,12 +714,12 @@ to the same dragon. Before amalgamation the worm origins are
 copied to the dragon origins. Amalgamation of two dragons
 amounts to changing the origin of one.
 @end quotation        
-@item @code{size}: 
+@item @code{size} 
 @quotation
 @cindex size (dragon)
 This is the cardinality of the dragon.
 @end quotation
-@item @code{effective_size}:
+@item @code{effective_size}
 @quotation
 @cindex effective size (dragon)
 The sum of the effective sizes of the constituent worms.
@@ -728,7 +728,7 @@ counted fractionally in @code{worm.effective_size}, this equals the
 cardinality of the dragon plus the number of empty vertices which are
 nearer this dragon than any other.
 @end quotation
-@item @code{genus}: 
+@item @code{genus} 
 @quotation
 @cindex genus (dragon)
 The @dfn{genus} of a nonempty dragon consists of the number
@@ -737,7 +737,7 @@ the dragon, minus the number of false eyes found. The genus
 is a computable approximation to the number of eyes a dragon
 has.
 @end quotation
-@item @code{escape_route}:
+@item @code{escape_route}
 @quotation
 @cindex escape_route (dragon)
 This is a measure of the escape potential of the dragon. If
@@ -746,6 +746,7 @@ dragon can escape, so finding two eyes locally becomes less
 urgent. Further documentation may be found else where
 (@pxref{Escape}).
 @end quotation
+@item @code{status}
 @cindex status (dragon)
 @findex compute_dragon_status
 @quotation
@@ -959,15 +960,15 @@ Before this function can be called, build_worms must have been run.
 @item @code{int is_worm_origin(int w, int pos)}
 @findex is_worm_origin
 @quotation
-Test whether the origin of the worm at (w) is (pos).
+Test whether the origin of the worm at @code{w} is @code{pos}.
 @end quotation
 @item @code{void change_defense(int str, int move, int dcode)}
 @findex change_defense
 @quotation
 @code{change_defense(str, move, dcode)} is used to add and remove defense
 points. It can also be used to change the defense code. The meaning
-of the call is that the string (str) can be defended by (move) with
-defense code (dcode). If (dcode) is zero, the move is removed from
+of the call is that the string @code{str} can be defended by @code{move} with
+defense code @code{dcode}. If @code{dcode} is zero, the move is removed from
 the list of defense moves if it was previously listed.
 @end quotation
 @item @code{void change_attack(int str, int move, int acode)}
@@ -975,8 +976,8 @@ the list of defense moves if it was previously listed.
 @quotation
 @code{change_attack(str, move, acode)} is used to add and remove attack
 points. It can also be used to change the attack code. The meaning
-of the call is that the string (str) can be attacked by (move) with
-attack code (acode). If (acode) is zero, the move is removed from
+of the call is that the string @code{str} can be attacked by @code{move} with
+attack code @code{acode}. If @code{acode} is zero, the move is removed from
 the list of attack moves if it was previously listed.
 @end quotation
 @item @code{void change_defense_threat(int str, int move, int dcode)}
@@ -984,8 +985,8 @@ the list of attack moves if it was previously listed.
 @quotation
 Used to add and remove defense threat points. It can also be used to
 change the defense threat code. The meaning of the call is that the
-string (str) can threaten to be defended by (move) with defense threat
-code (dcode). If (dcode) is zero, the move is removed from the list
+string @code{str} can threaten to be defended by @code{move} with defense threat
+code @code{dcode}. If @code{dcode} is zero, the move is removed from the list
 of defense threat moves if it was previously listed.
 @end quotation  
 @item @code{void change_attack_threat(int str, int move, int acode)}
@@ -993,33 +994,33 @@ of defense threat moves if it was previously listed.
 @quotation
 Used to add and remove attack threat points. It can also be used to
 change the attack threat code. The meaning of the call is that the
-string (str) can threaten to be attacked by (move) with attack threat
-code (acode). If (acode) is zero, the move is removed from the list
+string @code{str} can threaten to be attacked by @code{move} with attack threat
+code @code{acode}. If @code{acode} is zero, the move is removed from the list
 of attack threat moves if it was previously listed.
 @end quotation
 @item @code{int attack_move_known(int move, int str)}
 @findex attack_move_known
 @quotation
-Check whether (move) is listed as an attack point for (str) and
-return the attack code. If (move) is not listed, return 0.
+Check whether @code{move} is listed as an attack point for @code{str} and
+return the attack code. If @code{move} is not listed, return 0.
 @end quotation
 @item @code{int defense_move_known(int move, int str)}
 @findex defense_move_known
 @quotation
-Check whether (move) is listed as a defense point for (str) and
-return the defense code. If (move) is not listed, return 0.
+Check whether @code{move} is listed as a defense point for @code{str} and
+return the defense code. If @code{move} is not listed, return 0.
 @end quotation
 @item @code{int attack_threat_move_known(int move, int str)}
 @findex attack_threat_move_known
 @quotation
-Check whether (move) is listed as an attack threat point for (str)
-and return the attack threat code. If (move) is not listed, return  * 0.
+Check whether @code{move} is listed as an attack threat point for @code{str}
+and return the attack threat code. If @code{move} is not listed, return 0.
 @end quotation
 @item @code{int defense_threat_move_known(int move, int str)}
 @findex defense_threat_move_known
 @quotation
-Check whether (move) is listed as a defense threat point for (str)
-and return the defense threat code. If (move) is not listed, return 0.
+Check whether @code{move} is listed as a defense threat point for @code{str}
+and return the defense threat code. If @code{move} is not listed, return 0.
 @end quotation
 @item @code{void propagate_worm(int pos)}
 @findex propagate_worm

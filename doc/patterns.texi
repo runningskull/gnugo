@@ -113,10 +113,11 @@ The above pattern could equally well be written on the left edge:
 
 @example
 
-  |?X?.?
-  |O.*oo
-  |O....
-  |o....
+  |oOO?
+  |...X
+  |..*?
+  |..o.
+  |..o?
 
   :8,ed,NULL
 @end example
@@ -290,38 +291,38 @@ are optional and of the form @code{value1(x),value2(y),...}. The available set
 of values are as follows.
 
 @itemize @bullet
-@item @code{terri(x)} :
+@item @code{terri(x)}
 @findex terri
 @quotation
 Forces the territorial value of the move to be at least x.
 @end quotation
-@item @code{minterri(x)} :   
+@item @code{minterri(x)}
 @findex minterri
 @quotation
 Forces the territorial value of the move to be at least x.
 @end quotation
-@item @code{maxterri(x)}  : 
+@item @code{maxterri(x)}
 @findex maxterri
 @quotation
 Forces the territorial value of the move to be at most x.
 @end quotation
-@item @code{value(x)}     : 
+@item @code{value(x)}
 @findex value
 @quotation
 Forces the final value of the move to be at least x.
 @end quotation
-@item @code{minvalue(x)}
+@item @code{minvalue(x)}, @code{maxvalue(x)}
 @findex minvalue
-@code{maxvalue(x)}  : 
+@findex maxvalue
 @quotation
 Forces the final value of the move to be at least/most x.
 @end quotation
-@item @code{shape(x)}     : 
+@item @code{shape(x)}
 @findex shape
 @quotation
 Adds x to the move's shape value.
 @end quotation
-@item @code{followup(x)}  : 
+@item @code{followup(x)}
 @findex followup
 @quotation
 Adds x to the move's followup value.
@@ -624,8 +625,7 @@ that already are believed to be secure territory.
 @code{weak(x)}
 @end example
 
-True for a dragon that is perceived as weak. The definition of weak is
-given in @xref{Moyo}.
+True for a dragon that is perceived as weak.
 
 @example
 
