@@ -59,13 +59,15 @@ static int quiescence_connect(int str1, int str2, int *move);
 static int quiescence_capture(int str, int *move);
 /* static int capture_one_move(int str); */
 static int prevent_capture_one_move(int *moves, int str1);
-static int recursive_transitivity (int str1, int str2, int str3, int *move);
-static int recursive_non_transitivity (int str1, int str2, int str3, int *move);
+static int recursive_transitivity(int str1, int str2, int str3, int *move);
+static int recursive_non_transitivity(int str1, int str2, int str3, int *move);
+static void order_connection_moves(int *moves, int str1, int str2,
+				   int color_to_move);
 
 int nodes_connect=0,max_nodes_connect=2000,max_connect_depth=64;
 
-/* adds an integer to an array of integers if it is not already there
- * the number of elements of the array is in array[0]
+/* Adds an integer to an array of integers if it is not already there.
+ * The number of elements of the array is in array[0].
  */
 
 static int add_array (int *array, int elt) {
@@ -120,8 +122,7 @@ static int snapback (int str) {
     return 0;
 
   /* if only one liberty after capture */
-  if (trymove(lib, OTHER_COLOR(board[str]),
-	      "snapback", str, EMPTY, 0)) {
+  if (trymove(lib, OTHER_COLOR(board[str]), "snapback", str, EMPTY, 0)) {
     liberties=0;
     if (IS_STONE(board[lib]))
       liberties = countlib(lib);
@@ -215,6 +216,7 @@ static int connected_one_move (int str1, int str2) {
   
   moves[0] = 0;
   if (prevent_connection_one_move(moves, str1, str2)) {
+    order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]));
     res = WIN;
     for (r = 1; ((r < moves[0] + 1) && res); r++) {
       if (trymove(moves[r], OTHER_COLOR(board[str1]),
@@ -358,25 +360,6 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
     }
   }
 
-
-  /* Move in on a three liberty opponent string which is adjacent to
-   * str1 and has a liberty in common with str2.
-   */
-  adj = chainlinks2(str1, adjs, 3);
-  for (r = 0; r < adj; r++) {
-    liberties = find_common_libs(adjs[r], str2, MAXLIBS, libs);
-    for (s = 0; s < liberties; s++)
-      add_array(moves, libs[s]);
-  }
-
-  /* And vice versa. */
-  adj = chainlinks2(str2, adjs, 3);
-  for (r = 0; r < adj; r++) {
-    liberties = find_common_libs(adjs[r], str1, MAXLIBS, libs);
-    for (s = 0; s < liberties; s++)
-      add_array(moves, libs[s]);
-  }
-  
   return 0;
 }
   
@@ -386,7 +369,8 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
  * first working move.  The strings are connected in two moves
  * if the function connected_one_move is verified after a move.
  *
- * This is the gi2 game function. */
+ * This is the gi2 game function.
+ */
 
 static int connection_two_moves (int str1, int str2) {
   int r, res = 0, moves[MAX_MOVES];
@@ -398,6 +382,7 @@ static int connection_two_moves (int str1, int str2) {
   moves[0]=0;
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return WIN;
+  order_connection_moves(moves, str1, str2, board[str1]);
   for (r = 1; ((r < moves[0] + 1) && !res); r++) {
     if (trymove(moves[r], board[str1],
 		"connection_two_moves", str1, EMPTY, 0)) {
@@ -441,6 +426,8 @@ static int prevent_connection_two_moves (int *moves, int str1, int str2) {
     res = WIN;
     possible_moves[0]=0;
     moves_to_prevent_connection_in_two_moves(possible_moves, str1, str2);
+    order_connection_moves(possible_moves, str1, str2,
+			   OTHER_COLOR(board[str1]));
     for (r = 1; r < possible_moves[0] + 1; r++) {
       if (trymove(possible_moves[r], OTHER_COLOR(board[str1]), 
 		  "prevent_connection_two_moves", str1, EMPTY, 0)) {
@@ -529,6 +516,48 @@ static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
       }
     }
   }
+
+  /* Liberties of neighbor of str1 with at most two liberties, which
+   * are second order liberties of str2.
+   */
+  adj = chainlinks3(str1, adjs, 2);
+  for (r = 0; r < adj; r++) {
+    liberties = findlib(adjs[r], 2, libs);
+    for (s = 0; s < 2; s++)
+      if (second_order_liberty_of_string(libs[s], str2))
+	add_array(moves, libs[s]);
+  }
+
+  /* And vice versa. */
+  adj = chainlinks3(str2, adjs, 2);
+  for (r = 0; r < adj; r++) {
+    liberties = findlib(adjs[r], 2, libs);
+    for (s = 0; s < 2; s++)
+      if (second_order_liberty_of_string(libs[s], str1))
+	add_array(moves, libs[s]);
+  }
+  
+  /* Move in on a three liberty opponent string which is adjacent to
+   * str1 and has a liberty in common with str2.
+   */
+  adj = chainlinks2(str1, adjs, 3);
+  for (r = 0; r < adj; r++) {
+    if (have_common_lib(adjs[r], str2, NULL)) {
+      liberties = findlib(adjs[r], 3, libs);
+      for (s = 0; s < liberties; s++)
+	add_array(moves, libs[s]);
+    }
+  }
+
+  /* And vice versa. */
+  adj = chainlinks2(str2, adjs, 3);
+  for (r = 0; r < adj; r++) {
+    if (have_common_lib(adjs[r], str1, NULL)) {
+      liberties = findlib(adjs[r], 3, libs);
+      for (s = 0; s < liberties; s++)
+	add_array(moves, libs[s]);
+    }
+  }
   
   return 0;
 }
@@ -568,9 +597,10 @@ static int simply_connected_two_moves (int str1, int str2) {
   moves[0] = 0;
   if (prevent_connection_one_move(moves, str1, str2)) {
     res = WIN;
+    order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]));
     for (r = 1; ((r < moves[0] + 1) && res); r++) {
       if (trymove(moves[r], OTHER_COLOR(board[str1]),
-		  "connected_one_move", str1, EMPTY, 0)) {
+		  "simply_connected_two_moves", str1, EMPTY, 0)) {
 	if (!connection_one_move(str1, str2))
 	  if (!connection_two_moves(str1, str2))
 	    res = 0;
@@ -592,9 +622,10 @@ static int simple_connection_three_moves (int str1, int str2) {
   moves[0]=0;
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return WIN;
+  order_connection_moves(moves, str1, str2, board[str1]);
   for (r = 1; ((r < moves[0] + 1) && !res); r++) {
     if (trymove(moves[r], board[str1],
-		"connection_two_moves", str1, EMPTY, 0)) {
+		"simple_connection_three_moves", str1, EMPTY, 0)) {
       if (simply_connected_two_moves(str1, str2))
 	res = WIN;
       popgo();
@@ -629,9 +660,10 @@ static int prevent_simple_connection_three_moves (int *moves, int str1, int str2
     res = WIN;
     possible_moves[0]=0;
     moves_to_prevent_connection_in_three_moves(possible_moves, str1, str2);
+    order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]));
     for (r = 1; r < possible_moves[0] + 1; r++) {
       if (trymove(possible_moves[r], OTHER_COLOR(board[str1]), 
-		  "prevent_connection_two_moves", str1, EMPTY, 0)) {
+		  "prevent_simple_connection_three_moves", str1, EMPTY, 0)) {
 	if (!connection_one_move(str1, str2))
 	  if (!connection_two_moves(str1, str2))
 	    if (!simple_connection_three_moves(str1, str2))
@@ -755,6 +787,7 @@ static int recursive_connect (int str1, int str2, int *move) {
   if ( (ForcedMoves[0] != 0) && (Moves[0] != 0) )
     intersection_array(Moves, ForcedMoves);
 
+  order_connection_moves(Moves, str1, str2, board[str1]);
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++) {
     if (trymove(Moves[i], board[str1], "recursive_connect", str1, EMPTY, 0)) {
       if (!recursive_disconnect(str1, str2, move)) {
@@ -787,6 +820,7 @@ int disconnect(int str1, int str2, int *move) {
   moves_to_prevent_connection_in_three_moves (Moves, str1, str2);
   if (Moves[0] > 0)
     res = 0;
+  order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]));
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
     if (trymove(Moves[i], OTHER_COLOR(board[str1]),
 		"disconnect", str1, EMPTY, 0)) {
@@ -852,6 +886,7 @@ static int recursive_disconnect (int str1, int str2, int *move) {
     res = 0;
   
   if (res == 0)
+    order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]));
     for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
       if (trymove(Moves[i], OTHER_COLOR(board[str1]),
 		  "recursive_disconnect", str1, EMPTY, 0)) {
@@ -1003,6 +1038,7 @@ static int recursive_transitivity (int str1, int str2, int str3, int *move) {
   if ( (ForcedMoves[0] != 0) && (Moves[0] != 0) )
     intersection_array(Moves, ForcedMoves);
 
+  order_connection_moves(Moves, str1, str2, board[str1]);
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++) {
     if (trymove(Moves[i], board[str1], "recursive_transitivity", 
 		str1, EMPTY, 0)) {
@@ -1034,6 +1070,7 @@ int non_transitivity(int str1, int str2, int str3, int *move) {
   moves_to_prevent_connection_in_three_moves (Moves, str1, str3);
   if (Moves[0] > 0)
     res = 0;
+  order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]));
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
     if (trymove(Moves[i], OTHER_COLOR(board[str1]),
 		"non_transitivity", str1, EMPTY, 0)) {
@@ -1100,6 +1137,7 @@ static int recursive_non_transitivity (int str1, int str2, int str3,
     res = 0;
   
   if (res == 0)
+    order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]));
     for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
       if (trymove(Moves[i], OTHER_COLOR(board[str1]),
 		  "recursive_non_transitivity", str1, EMPTY, 0)) {
@@ -1118,6 +1156,15 @@ static int recursive_non_transitivity (int str1, int str2, int str3,
   }
   
   return res;
+}
+
+static void
+order_connection_moves(int *moves, int str1, int str2, int color_to_move)
+{
+  UNUSED(moves);
+  UNUSED(str1);
+  UNUSED(str2);
+  UNUSED(color_to_move);
 }
 
 /*

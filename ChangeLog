@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function second_order_liberty_of_string() in board.c
 - readconnect.c revised
 - take into account followup values if reverse_followup >= 1
 - try a little harder in attack_either

@@ -255,6 +255,7 @@ int disconnect(int str1, int str2, int *move);
 int non_transitivity(int str1, int str2, int str3, int *move);
 
 int liberty_of_string(int pos, int str);
+int second_order_liberty_of_string(int pos, int str);
 int neighbor_of_string(int pos, int str);
 int same_string(int str1, int str2);
 int adjacent_strings(int str1, int str2);

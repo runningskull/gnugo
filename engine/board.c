@@ -1722,6 +1722,25 @@ liberty_of_string(int pos, int str)
 
 
 /*
+ * Returns true if pos is a second order liberty of the string at str.
+ */
+int
+second_order_liberty_of_string(int pos, int str)
+{
+  int k;
+  ASSERT_ON_BOARD1(pos);
+  ASSERT_ON_BOARD1(str);
+
+  for (k = 0; k < 4; k++)
+    if (board[pos + delta[k]] == EMPTY
+	&& neighbor_of_string(pos + delta[k], str))
+      return 1;
+
+  return 0;
+}
+
+
+/*
  * Returns true if pos is adjacent to the string at str.
  */
 
