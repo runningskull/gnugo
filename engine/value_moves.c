@@ -90,10 +90,9 @@ find_more_attack_and_defense_moves(int color)
 	    || move_reasons[r].type == DEFEND_MOVE_BAD_KO
 	    || move_reasons[r].type == CONNECT_MOVE
 	    || move_reasons[r].type == CUT_MOVE
-	    || move_reasons[r].type == ATTACK_EITHER_MOVE
 	    || move_reasons[r].type == DEFEND_BOTH_MOVE)
 	  break;
-	/* FIXME: Add code for EITHER_MOVE here. */
+	/* FIXME: Add code for EITHER_MOVE and ALL_MOVE here. */
       }
       
       if (k == MAX_REASONS || move[ii].reason[k] == -1)
@@ -572,13 +571,13 @@ examine_move_safety(int color)
 	   */
 	  break;
 	case SEMEAI_MOVE:
-	case ATTACK_EITHER_MOVE:
 	case DEFEND_BOTH_MOVE:    /* Maybe need better check for this case. */
 	case OWL_DEFEND_MOVE:
 	case OWL_DEFEND_MOVE_GOOD_KO:
 	case OWL_DEFEND_MOVE_BAD_KO:
 	case MY_ATARI_ATARI_MOVE:
 	case EITHER_MOVE:         /* FIXME: More advanced handling? */
+	case ALL_MOVE:            /* FIXME: More advanced handling? */
 	  tactical_safety = 1;
 	  safety = 1;
 	  break;
@@ -1720,7 +1719,34 @@ estimate_strategical_value(int pos, int color, float score)
 	tot_value += this_value;
 	break;
 	
-      case ATTACK_EITHER_MOVE:
+      case ALL_MOVE:
+	/* FIXME: Generalize this to more types of threats. */
+	worm1 = all_data[move_reasons[r].what].what1;
+	worm2 = all_data[move_reasons[r].what].what2;
+	aa = worms[worm1];
+	bb = worms[worm2];
+
+	/* If both worms are dead, this move reason has no value. */
+	if (dragon[aa].matcher_status == DEAD 
+	    && dragon[bb].matcher_status == DEAD)
+	  break;
+
+	/* Also if there is a combination attack, we assume it covers
+	 * the same thing.
+	 */
+	if (move_reason_known(pos, YOUR_ATARI_ATARI_MOVE, -1))
+	  break;
+
+	aa_value = 2 * worm[aa].effective_size;
+	bb_value = 2 * worm[bb].effective_size;
+	this_value = 2 * gg_min(aa_value, bb_value);
+
+	TRACE("  %1m: %f - both defends %1m (%f) and defends %1m (%f)\n",
+	      pos, this_value, aa, aa_value, bb, bb_value);
+
+	tot_value += this_value;
+	break;
+	
       case DEFEND_BOTH_MOVE:
 	/* This is complete nonsense, but still better than nothing.
 	 * FIXME: Do this in a reasonable way.
@@ -1738,28 +1764,14 @@ estimate_strategical_value(int pos, int color, float score)
 	/* Also if there is a combination attack, we assume it covers
          * the same thing.
 	 */
-	if (move_reasons[r].type == ATTACK_EITHER_MOVE
-	    && move_reason_known(pos, MY_ATARI_ATARI_MOVE, -1))
-	  break;
-	if (move_reasons[r].type == DEFEND_BOTH_MOVE
-	    && move_reason_known(pos, YOUR_ATARI_ATARI_MOVE, -1))
+	if (move_reason_known(pos, YOUR_ATARI_ATARI_MOVE, -1))
 	  break;
 
-	if (move_reasons[r].type == ATTACK_EITHER_MOVE) {
-	  aa_value = adjusted_worm_attack_value(pos, aa);
-	  bb_value = adjusted_worm_attack_value(pos, bb);
-	  this_value = gg_min(aa_value, bb_value);
+	this_value = 2 * gg_min(worm[aa].effective_size, 
+				worm[bb].effective_size);
 
-	  TRACE("  %1m: %f - attacks either %1m (%f) or %1m (%f)\n",
-		pos, this_value, aa, aa_value, bb, bb_value);
-	}
-	else {
-	  this_value = 2 * gg_min(worm[aa].effective_size,
-				  worm[bb].effective_size);
-
-	  TRACE("  %1m: %f - defends both %1m and %1m\n",
-		pos, this_value, aa, bb);
-	}
+	TRACE("  %1m: %f - defends both %1m and %1m\n",
+	      pos, this_value, aa, bb);
 
 	tot_value += this_value;
 	break;

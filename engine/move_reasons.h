@@ -61,13 +61,13 @@
 #define YOUR_ATARI_ATARI_MOVE   52
 #define VITAL_EYE_MOVE          54
 
-#define ATTACK_EITHER_MOVE      60
 #define DEFEND_BOTH_MOVE        62
 
 #define ANTISUJI_MOVE           70
 
-
 #define EITHER_MOVE             100
+#define ALL_MOVE                101
+
 
 /* Bitmap values for move_reason.status */
 #define ACTIVE                  0
@@ -136,6 +136,7 @@ struct move_data {
 #define MAX_EYES          MAX_BOARD*MAX_BOARD/2
 #define MAX_LUNCHES       MAX_WORMS
 #define MAX_EITHER        100
+#define MAX_ALL           100
 
 
 float compute_shape_factor(int pos);
@@ -162,15 +163,17 @@ extern int worm_pair1[MAX_WORM_PAIRS];
 extern int worm_pair2[MAX_WORM_PAIRS];
 extern int next_worm_pair;
 
-/* Unordered pairs of threats */
+/* Unordered sets (currently pairs) of move reasons / targets */
 typedef struct {
   int reason1;
   int what1;
   int reason2;
   int what2;
-} Either_data;
-extern Either_data either_data[MAX_EITHER];
-extern int         next_either;
+} Reason_set;
+extern Reason_set either_data[MAX_EITHER];
+extern int        next_either;
+extern Reason_set all_data[MAX_ALL];
+extern int        next_all;
 
 /* Eye shapes */
 extern int eyes[MAX_EYES];

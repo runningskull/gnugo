@@ -56,9 +56,11 @@ int worm_pair1[MAX_WORM_PAIRS];
 int worm_pair2[MAX_WORM_PAIRS];
 int next_worm_pair;
 
-/* Unordered pairs of threats */
-Either_data either_data[MAX_EITHER];
-int         next_either;
+/* Unordered sets (currently pairs) of move reasons / targets */
+Reason_set either_data[MAX_EITHER];
+int        next_either;
+Reason_set all_data[MAX_ALL];
+int        next_all;
 
 /* Eye shapes */
 int eyes[MAX_EYES];
@@ -98,6 +100,7 @@ clear_move_reasons(void)
   next_connection = 0;
   next_worm_pair = 0;
   next_either = 0;
+  next_all = 0;
   next_eye = 0;
   next_lunch = 0;
   
@@ -266,6 +269,35 @@ find_either_data(int reason1, int what1, int reason2, int what2)
   return next_either - 1;
 }
 
+static int
+find_all_data(int reason1, int what1, int reason2, int what2)
+{
+  int k;
+  
+  /* Make sure the worms are ordered canonically. */
+  if (what1 > what2) {
+    int tmp = what1;
+    what1 = what2;
+    what2 = tmp;
+  }
+
+  for (k = 0; k < next_all; k++)
+    if (all_data[k].reason1    == reason1
+	&& all_data[k].what1   == what1
+	&& all_data[k].reason2 == reason2
+	&& all_data[k].what2   == what2)
+      return k;
+  
+  /* Add a new entry. */
+  gg_assert(next_all < MAX_ALL);
+  all_data[next_all].reason1 = reason1;
+  all_data[next_all].what1   = what1;
+  all_data[next_all].reason2 = reason2;
+  all_data[next_all].what2   = what2;
+  next_all++;
+  return next_all - 1;
+}
+
 /*
  * Find the index of an eye space in the list of eye spaces.
  * If necessary, add a new entry.
@@ -325,12 +357,14 @@ get_pos(int reason, int what)
   case OWL_DEFEND_MOVE_GOOD_KO:
   case OWL_DEFEND_MOVE_BAD_KO:
     return dragons[what];
-  case ATTACK_EITHER_MOVE:
   case DEFEND_BOTH_MOVE:
     return worms[worm_pair1[what]];
   case EITHER_MOVE:
     /* FIXME: What should we return here? */
     return worms[either_data[what].what1];
+  case ALL_MOVE:
+    /* FIXME: What should we return here? */
+    return worms[all_data[what].what1];
   case CONNECT_MOVE:
   case CUT_MOVE:
     return dragons[conn_dragon1[what]];
@@ -520,19 +554,6 @@ defense_move_reason_known(int pos, int what)
 	  || move_reason_known(pos, DEFEND_MOVE_BAD_KO, what));
 }
 
-/*
- * Check whether a tactical attack/defense is already known for
- * at least one of two worms in a worm pair.
- */
-static int
-tactical_move_vs_either_worm_known(int pos, int what)
-{
-  return attack_move_reason_known(pos, worm_pair1[what])
-      || attack_move_reason_known(pos, worm_pair2[what])
-      || defense_move_reason_known(pos, worm_pair1[what])
-      || defense_move_reason_known(pos, worm_pair2[what]);
-}
-
 /* Check whether a dragon consists of only one worm. If so, check
  * whether we know of a tactical attack or defense move.
  */
@@ -621,6 +642,15 @@ either_move_redundant(int pos, int what)
 	   && attack_move_reason_known(pos, either_data[what].what1))
 	  || (either_data[what].reason2 == ATTACK_STRING
 	      && attack_move_reason_known(pos, either_data[what].what2)));
+}
+
+static int
+all_move_redundant(int pos, int what)
+{
+  return ((all_data[what].reason1 == DEFEND_STRING
+	   && defense_move_reason_known(pos, all_data[what].what1))
+	  || (all_data[what].reason2 == DEFEND_STRING
+	      && defense_move_reason_known(pos, all_data[what].what2)));
 }
 
 
@@ -864,43 +894,11 @@ add_vital_eye_move(int pos, int eyespace, int color)
 }
 
 /*
- * Add to the reasons for the move at (pos) that it attacks
- * either (str1) or (str2) (e.g. a double atari). This move
- * reason is only used for double attacks on opponent stones.
- *
- * Before accepting the move reason, check that the worms are
- * distinct and that neither is undefendable.
- */
-void
-add_attack_either_move(int pos, int str1, int str2)
-{
-  int worm1 = find_worm(worm[str1].origin);
-  int worm2 = find_worm(worm[str2].origin);
-  int worm_pair;
-
-  ASSERT_ON_BOARD1(str1);
-  ASSERT_ON_BOARD1(str2);
-  if (worm1 == worm2)
-    return;
-  
-  if (worm[str1].attack_codes[0] != 0 && worm[str1].defend_codes[0] == 0)
-    return;
-  
-  if (worm[str2].attack_codes[0] != 0 && worm[str2].defend_codes[0] == 0)
-    return;
-  
-  worm_pair = find_worm_pair(worm1, worm2);
-  add_move_reason(pos, ATTACK_EITHER_MOVE, worm_pair);
-}
-
-
-/*
  * Add to the reasons for the move at (pos) that it will accomplish
  * one of two things: either (reason1) on (target1) or (reason2) on 
  * (target2).  
  *
- * At this time, (reason) can only be ATTACK_STRING, so this is, for the
- * time being, only a complicated version of ATTACK_EITHER_MOVE.
+ * At this time, (reason) can only be ATTACK_STRING.
  * However, more reasons will be implemented in the future.
  *
  * FIXME: Implement at least ATTACK_MOVE_GOOD_KO, ATTACK_MOVE_BAD_KO,
@@ -909,7 +907,8 @@ add_attack_either_move(int pos, int str1, int str2)
  *
  * FIXME: Generalize to more than 2 parameters.
  *        When that is done, this will be a good way to add 
- *        atari_atari moves.  */
+ *        atari_atari moves.
+ */
 void
 add_either_move(int pos, int reason1, int target1, int reason2, int target2)
 {
@@ -962,6 +961,61 @@ add_either_move(int pos, int reason1, int target1, int reason2, int target2)
 
   index = find_either_data(reason1, what1, reason2, what2);
   add_move_reason(pos, EITHER_MOVE, index);
+}
+
+
+/*
+ * Add to the reasons for the move at (pos) that it will accomplish
+ * both of two things: (reason1) on (target1) and (reason2) on 
+ * (target2).  
+ *
+ * At this time, (reason) can only be DEFEND_STRING.
+ * However, more reasons will be implemented in the future.
+ *
+ * FIXME: Implement at least ATTACK_MOVE_GOOD_KO, ATTACK_MOVE_BAD_KO,
+ *         DEFEND_MOVE and associates, CONNECT_MOVE, OWL_ATTACK_MOVE,
+ *         OWL_DEFEND_MOVE, and possibly more.
+ *
+ * FIXME: Generalize to more than 2 parameters.
+ *        When that is done, this will be a good way to add 
+ *        atari_atari moves.
+ */
+void
+add_all_move(int pos, int reason1, int target1, int reason2, int target2)
+{
+  int  what1 = 0;
+  int  what2 = 0;
+  int  index;
+
+  ASSERT_ON_BOARD1(target1);
+  ASSERT_ON_BOARD1(target2);
+  if (reason1 == reason2 && target1 == target2)
+    return;
+  
+  /* For now. */
+  gg_assert(reason1 == DEFEND_STRING);
+  gg_assert(reason2 == DEFEND_STRING);
+
+  switch (reason1) {
+  case DEFEND_STRING:
+    what1 = find_worm(worm[target1].origin);
+    break;
+
+  default:
+    break;
+  }
+
+  switch (reason2) {
+  case DEFEND_STRING:
+    what2 = find_worm(worm[target2].origin);
+    break;
+
+  default:
+    break;
+  }
+
+  index = find_all_data(reason1, what1, reason2, what2);
+  add_move_reason(pos, ALL_MOVE, index);
 }
 
 
@@ -1423,6 +1477,8 @@ list_move_reasons(int color)
   int n;
   int pos;
   int k;
+  int reason1;
+  int reason2;
   int aa = NO_MOVE;
   int bb = NO_MOVE;
   int dragon1 = -1;
@@ -1530,27 +1586,27 @@ list_move_reasons(int color)
 		    pos, black_eye[aa].dragon, aa);
 	  break;
 	  
-	case ATTACK_EITHER_MOVE:
 	case DEFEND_BOTH_MOVE:
 	  worm1 = worm_pair1[move_reasons[r].what];
 	  worm2 = worm_pair2[move_reasons[r].what];
 	  aa = worms[worm1];
 	  bb = worms[worm2];
-	  
-	  if (move_reasons[r].type == ATTACK_EITHER_MOVE)
-	    gprintf("Move at %1m attacks either %1m or %1m\n", pos, aa, bb);
-	  else
-	    gprintf("Move at %1m defends both %1m and %1m\n", pos, aa, bb);
+	  gprintf("Move at %1m defends both %1m and %1m\n", pos, aa, bb);
 	  break;
 	  	
 	case EITHER_MOVE:
+	case ALL_MOVE:
 	  /* FIXME: Generalize this. */
-	  worm1 = either_data[move_reasons[r].what].what1;
-	  worm2 = either_data[move_reasons[r].what].what2;
+	  reason1 = all_data[move_reasons[r].what].reason1;
+	  reason2 = all_data[move_reasons[r].what].reason2;
+	  worm1 = all_data[move_reasons[r].what].what1;
+	  worm2 = all_data[move_reasons[r].what].what2;
 	  aa = worms[worm1];
 	  bb = worms[worm2];
-	  gprintf("Move at %1m either attacks %1m or attacks %1m\n", 
-		  pos, aa, bb);
+	  gprintf("Move at %1m %s %s %1m or %s %1m\n", 
+		  pos, move_reasons[r].type == EITHER_MOVE ? "either" : "both",
+		  reason1 == ATTACK_STRING ? "attacks" : "defends", aa, 
+		  reason2 == ATTACK_STRING ? "attacks" : "defends", bb);
 	  break;
 
 	case OWL_ATTACK_MOVE:
@@ -1655,13 +1711,13 @@ static struct discard_rule discard_rules[] =
   { { SEMEAI_MOVE, SEMEAI_THREAT, -1 },
     tactical_move_vs_whole_dragon_known, REDUNDANT,
     "  %1m: 0.0 - (threat to) win semai involving %1m (tactical move as well)\n"},
-  { { ATTACK_EITHER_MOVE, DEFEND_BOTH_MOVE, -1 },
-    tactical_move_vs_either_worm_known, REDUNDANT,
-    "  %1m: 0.0 - att. either/def. both involving %1m (direct att./def. as well)\n"},
   { { EITHER_MOVE, -1 },
     either_move_redundant, REDUNDANT,
     "  %1m: 0.0 - either move is redundant at %1m (direct att./def. as well)\n"},
-  /* FIXME: Add handling of EITHER_MOVE */
+  /* FIXME: Add handling of ALL_MOVE: All single attacks/defenses should
+   *        be removed when there is also a corresponding ALL_MOVE.
+   */
+  /* FIXME: Add handling of ALL and EITHER moves for inessential worms. */
   { { ATTACK_MOVE, ATTACK_MOVE_GOOD_KO,
       ATTACK_MOVE_BAD_KO, ATTACK_THREAT,
       DEFEND_MOVE, DEFEND_MOVE_GOOD_KO,

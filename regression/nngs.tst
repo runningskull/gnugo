@@ -912,4 +912,23 @@ loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 51
 2020 gg_genmove white
 #? [L2|H6|H7|J6|J7]*
 
+# This is tough. If Black plays J5, then he can win the semeai after
+# E3 - E4 - D3 - D2 - D4 - D5 - E5. /ab
+loadsgf games/nngs/LordOfPi-gnugo-3.1.20-200201202014.sgf 16
+2030 gg_genmove black
+#? [J5]*
 
+# I think B can still get a seki (or life) at the bottom if he plays E5. /ab
+loadsgf games/nngs/LordOfPi-gnugo-3.1.20-200201202014.sgf 22
+2040 gg_genmove black
+#? [E5]*
+
+#CATEGORY=OWL_TUNING + KO
+loadsgf games/nngs/LordOfPi-gnugo-3.1.20-200201202014.sgf 30
+2050 gg_genmove black
+#? [A2|B2]*
+
+#CATEGORY=OWL_TUNING
+loadsgf games/nngs/LordOfPi-gnugo-3.1.20-200201202014.sgf 36
+2060 gg_genmove black
+#? [C4|C1|F1]

@@ -642,6 +642,15 @@ loadsgf games/trevor/auto/b75.sgf 62
 163 attack E12
 #? [0]*
 
+loadsgf games/reading35.sgf
+164 defend B6
+#? [1 C7]*
+
+# See also 13x13:78
+loadsgf games/reading36.sgf
+165 attack L4
+#? [1 K3]*
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

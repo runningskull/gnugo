@@ -3,7 +3,10 @@
 -------------------------------------------------------------------------
 
 - ATTACK_EITHER_MOVE taken down
-- new ALL_MOVE reasons
+- new ALL_MOVE reason
+- new static find_all_data(), all_move_redundant() in move_reasons.c
+- new function add_all_move()
+- add_defend_both autohelper macro revised
 - new tests 
 
 3.1.22 released January 20, 2002
