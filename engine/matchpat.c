@@ -664,16 +664,16 @@ static int  compare_int (const void *a, const void *b);
 static void do_dfa_matchpat(dfa_t *pdfa,
 		int m, int n, matchpat_callback_fn_ptr callback,
 		int color, struct pattern *database,
-		void *callback_data, char goal[MAX_BOARD][MAX_BOARD]);
+		void *callback_data, char goal[BOARDMAX]);
 static void check_pattern_light (int m, int n, 
 		matchpat_callback_fn_ptr callback,
 		int color, struct pattern *pattern, int ll,
 		void *callback_data,
-		char goal[MAX_BOARD][MAX_BOARD]);
+		char goal[BOARDMAX]);
 static void dfa_matchpat_loop(matchpat_callback_fn_ptr callback, 
 			      int color, int anchor,
 			      struct pattern_db *pdb, void *callback_data,
-			      char goal[MAX_BOARD][MAX_BOARD]);
+			      char goal[BOARDMAX]);
 
 
 /***********************************************************************/
@@ -845,7 +845,7 @@ static void
 do_dfa_matchpat(dfa_t *pdfa,
 		int m, int n, matchpat_callback_fn_ptr callback,
 		int color, struct pattern *database,
-		void *callback_data, char goal[MAX_BOARD][MAX_BOARD])
+		void *callback_data, char goal[BOARDMAX])
 {
   int ll;      /* Iterate over transformations (rotations or reflections)  */
   int matched; /* index in database[] of the matched pattern */
@@ -902,7 +902,7 @@ do_dfa_matchpat(dfa_t *pdfa,
 static void
 check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	      struct pattern *pattern, int ll, void *callback_data,
-	      char goal[MAX_BOARD][MAX_BOARD])
+	      char goal[BOARDMAX])
 {
   int k;			/* Iterate over elements of pattern */
   int found_goal, found_nongoal;
@@ -931,7 +931,7 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 
     /* goal check */
     if (goal != NULL) {
-      if (goal[x][y])
+      if (goal[POS(x,y)])
 	found_goal = 1;
       else if (p[x][y] == color)
 	found_nongoal = 1;
@@ -983,7 +983,7 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 static void
 dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 	 struct pattern_db *pdb, void *callback_data,
-	 char goal[MAX_BOARD][MAX_BOARD]) 
+	 char goal[BOARDMAX]) 
 {
   int i,j;
 

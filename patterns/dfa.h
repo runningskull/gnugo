@@ -40,8 +40,8 @@
 #define MAX_ORDER DFA_MAX_BOARD*DFA_MAX_BOARD*4
 /* maximum pattern matched at one positions */
 #define DFA_MAX_MATCHED 8*400
-#define DFA_RESIZE_STEP 0x20000
-#define DFA_INIT_SIZE 0X100
+#define DFA_RESIZE_STEP 20000
+#define DFA_INIT_SIZE 50000
 #ifndef EMPTY
 #define EMPTY     0		/* . */
 #define WHITE     1		/* O */
