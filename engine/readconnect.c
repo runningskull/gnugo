@@ -2135,6 +2135,12 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
   int savemove = NO_MOVE;
   int savecode = 0;
   int tried_moves = 0;
+  int attack_code1;
+  int attack_pos1;
+  int attack_code2;
+  int attack_pos2;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
 #if USE_HASHTABLE_NG
   int  value;
 #else
@@ -2169,7 +2175,37 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
     SGFTRACE2(PASS_MOVE, WIN, "connection depth limit reached");
     return WIN;
   }
-  
+
+  sgf_dumptree = NULL;
+  count_variations = 0;
+
+  attack_code1 = attack(str1, &attack_pos1);
+  if (attack_code1 == WIN) {
+    sgf_dumptree = save_sgf_dumptree;
+    count_variations = save_count_variations;
+
+    SGFTRACE2(attack_pos1, WIN, "one string is capturable");
+    if (move)
+      *move = attack_pos1;
+
+    return WIN;
+  }
+
+  attack_code2 = attack(str2, &attack_pos2);
+  if (attack_code2 == WIN) {
+    sgf_dumptree = save_sgf_dumptree;
+    count_variations = save_count_variations;
+
+    SGFTRACE2(attack_pos2, WIN, "one string is capturable");
+    if (move)
+      *move = attack_pos2;
+
+    return WIN;
+  }
+
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+
 #if USE_HASHTABLE_NG
   if ((stackp <= depth) && (hashflags & HASH_DISCONNECT)
       && tt_get(&ttable, komaster, kom_pos, DISCONNECT, str1, str2,
@@ -2227,7 +2263,27 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
 
   num_moves = find_string_connection_moves(str1, str2, other,
       					   moves, &distance);
-  
+
+  if (attack_code1 != 0 && num_moves < MAX_MOVES) {
+    for (k = 0; k < num_moves; k++) {
+      if (moves[k] == attack_pos1)
+	break;
+    }
+
+    if (k == num_moves)
+      moves[num_moves++] = attack_pos1;
+  }
+
+  if (attack_code2 != 0 && num_moves < MAX_MOVES) {
+    for (k = 0; k < num_moves; k++) {
+      if (moves[k] == attack_pos2)
+	break;
+    }
+
+    if (k == num_moves)
+      moves[num_moves++] = attack_pos2;
+  }
+
   for (k = 0; k < num_moves; k++) {
     int new_komaster;
     int new_kom_pos;
