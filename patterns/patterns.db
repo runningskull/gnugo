@@ -6861,6 +6861,7 @@ O*.
 
 
 Pattern EB1808
+# evand added shape value -0.5 (3.5.4)
 
 ??.??              defend!
 O.*.O
@@ -6868,7 +6869,7 @@ O.*.O
 .....
 -----
 
-:8,OXec
+:8,OXec,shape(-0.5)
 
 ??.??
 O.*.O
@@ -8341,6 +8342,18 @@ Pattern CB242
 ?OX?
 
 :8,OXe
+
+
+Pattern CB243
+#evand new (3.5.4)
+
+?oo?		extend in center
+...?
+.*.?
+?OX?
+?ox?
+
+:8,OXead
 
 
 Pattern CB246
@@ -10985,6 +10998,28 @@ d.......
 ;weak(a) && weak(B) && x_somewhere(c,d)
 
 
+Pattern ED97
+# evand new Pattern (3.5.4)
+
+.....
+O.*.x
+O...x
+.....
+.....
+-----
+
+:8,OXed
+
+.....
+A.*.b
+A...c
+.....
+.....
+-----
+
+;x_alive_somewhere(b,c) && weak(A)
+
+
 #####################################################################
 #
 # Center defend/attack patterns
@@ -11709,13 +11744,16 @@ xxxx
 Pattern CD107
 # db added (3.1.8)
 # gf Added O classification. (3.1.12)
+# evand modified (3.5.4)
 
+?x.??
 xX..?        good shape keima
 ..*.?
 O...?
 
 :8,OXead
 
+?x.??
 xX..?
 .a*.?
 Abc.?

@@ -9,8 +9,10 @@
 - avoid ko captures when filling outer liberties in semeai reading
 - adjust breakin_depth in modify_depth_values()
 - atari_atari tuning
+- fuseki tuning
 - influence tuning
 - owl tuning
+- tuning
 - new game records and test cases
 
 3.5.3 released January 7, 2004
