@@ -470,8 +470,12 @@ class GTP_match:
 		print "White:", self.white
 	    game1.play("")
 	    result1 = game1.result()[0]
-	    plain_result1 = re.search(r"([BW]\+)([0-9]*\.[0-9]*)", result1)
-	    result1_float = float(plain_result1.group(2))
+	    if result1 != "0":
+		plain_result1 = re.search(r"([BW]\+)([0-9]*\.[0-9]*)", result1)
+		result1_float = float(plain_result1.group(2))
+	    else:
+		plain_result1 = re.search(r"(0)", "0")
+		result1_float = 0.0
 	    if result1[0] == "B":
 		result1_float *= -1
 	    if verbose:
@@ -483,8 +487,13 @@ class GTP_match:
 	    result2 = game2.result()[1]
 	    if verbose:
 		print "Result:", result2
-	    plain_result2 = re.search(r"([BW]\+)([0-9]*\.[0-9]*)", result2)
-	    result2_float = float(plain_result2.group(2))
+	    if result2 != "0":
+		plain_result2 = re.search(r"([BW]\+)([0-9]*\.[0-9]*)", result2)
+		result2_float = float(plain_result2.group(2))
+	    else:
+		plain_result2 = re.search(r"(0)", "0")
+		result2_float = 0.0
+
 	    if result2[0] == "B":
 		result2_float *= -1
 	    results.append(result1_float - result2_float)

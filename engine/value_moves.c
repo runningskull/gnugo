@@ -2872,7 +2872,7 @@ remove_top_move(int move)
  * ko capture.
  */
 static void
-reevaluate_ko_threats(int ko_move, int color)
+reevaluate_ko_threats(int ko_move, int color, float ko_value)
 {
   int ko_stone = NO_MOVE;
   int opp_ko_move;
@@ -2881,6 +2881,9 @@ reevaluate_ko_threats(int ko_move, int color)
   int type, what;
   int threat_does_work = 0;
   int ko_move_target;
+  int num_good_threats = 0;
+  int good_threats[BOARDMAX];
+  int best_threat_quality = -1;
   float threat_size;
 
   ko_move_target = get_biggest_owl_target(ko_move);
@@ -2895,6 +2898,8 @@ reevaluate_ko_threats(int ko_move, int color)
   
   TRACE("Reevaluating ko threats.\n");
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int threat_quality = 0;
+
     if (!ON_BOARD(pos) || pos == ko_move)
       continue;
     if (move[pos].additional_ko_value <= 0.0) 
@@ -2903,6 +2908,14 @@ reevaluate_ko_threats(int ko_move, int color)
     /* Otherwise we look for the biggest threat, and then check whether
      * it still works after ko has been resolved.
      */
+
+    /* `additional_ko_value' includes reverse followup. While it is good to
+     * play ko threats which eliminate other threats in turn, we should
+     * always prefer threats that are larger than the value of the ko.
+     */
+    if (move[pos].followup_value < ko_value)
+      threat_quality = -1;
+
     threat_size = 0.0;
     type = -1;
     what = -1;
@@ -2912,33 +2925,34 @@ reevaluate_ko_threats(int ko_move, int color)
 	break;
       if (!(move_reasons[r].type & THREAT_BIT))
 	continue;
+
       switch (move_reasons[r].type) {
-        case ATTACK_THREAT:
-        case DEFEND_THREAT:
-          if (worm[move_reasons[r].what].effective_size
-              > threat_size) {
-            threat_size = worm[move_reasons[r].what].effective_size;
-            type = move_reasons[r].type;
-            what = move_reasons[r].what;
-          }
-          break;
-        case OWL_ATTACK_THREAT:
-        case OWL_DEFEND_THREAT:   
-        case SEMEAI_THREAT:
-          if (dragon[move_reasons[r].what].effective_size
-              > threat_size) {
-            threat_size = dragon[move_reasons[r].what]\
-	      .effective_size;
-            type = move_reasons[r].type;
-            what = move_reasons[r].what;
-          }
-          break;
-        default:
-          /* This means probably someone has introduced a new threat type
-           * without adding the corresponding case above.
-           */
-          gg_assert(0);
-          break;
+      case ATTACK_THREAT:
+      case DEFEND_THREAT:
+	if (worm[move_reasons[r].what].effective_size
+	    > threat_size) {
+	  threat_size = worm[move_reasons[r].what].effective_size;
+	  type = move_reasons[r].type;
+	  what = move_reasons[r].what;
+	}
+	break;
+      case OWL_ATTACK_THREAT:
+      case OWL_DEFEND_THREAT:   
+      case SEMEAI_THREAT:
+	if (dragon[move_reasons[r].what].effective_size
+	    > threat_size) {
+	  threat_size = dragon[move_reasons[r].what]\
+	    .effective_size;
+	  type = move_reasons[r].type;
+	  what = move_reasons[r].what;
+	}
+	break;
+      default:
+	/* This means probably someone has introduced a new threat type
+	 * without adding the corresponding case above.
+	 */
+	gg_assert(0);
+	break;
       }
     } 
     /* If there is no threat recorded, the followup value is probably
@@ -2954,24 +2968,28 @@ reevaluate_ko_threats(int ko_move, int color)
 	if (!find_defense(ko_stone, &opp_ko_move))
 	  threat_does_work = 1;
 	else {
+	  int threat_wastes_point = 0;
+	  if (whose_area(OPPOSITE_INFLUENCE(color), pos) != EMPTY)
+	    threat_wastes_point = 1;
+
 	  if (trymove(opp_ko_move, OTHER_COLOR(color),
 		      "reevaluate_ko_threats", ko_move, EMPTY, NO_MOVE)) {
 	    switch (type) {
-              case ATTACK_THREAT:
-                threat_does_work = attack(what, NULL);
-                break;
-              case DEFEND_THREAT:
-                threat_does_work = (board[what] != EMPTY
-                                    && find_defense(what, NULL));
-                break;
-              case OWL_ATTACK_THREAT:
-              case OWL_DEFEND_THREAT:
-                /* Should we call do_owl_attack/defense here?
-                 * Maybe too expensive? For the moment we just assume
-                 * that the attack does not work if it concerns the
-                 * same dragon as ko_move. (Can this really happen?)
-                 */
-                threat_does_work = (ko_move_target != what);
+	    case ATTACK_THREAT:
+	      threat_does_work = attack(what, NULL);
+	      break;
+	    case DEFEND_THREAT:
+	      threat_does_work = (board[what] != EMPTY
+				  && find_defense(what, NULL));
+	      break;
+	    case OWL_ATTACK_THREAT:
+	    case OWL_DEFEND_THREAT:
+	      /* Should we call do_owl_attack/defense here?
+	       * Maybe too expensive? For the moment we just assume
+	       * that the attack does not work if it concerns the
+	       * same dragon as ko_move. (Can this really happen?)
+	       */
+	      threat_does_work = (ko_move_target != what);
 	    }
 	    popgo();
 	    
@@ -2984,6 +3002,37 @@ reevaluate_ko_threats(int ko_move, int color)
 		threat_does_work = 0;
 	      }
 	    }
+
+	    /* If we are fighting a tiny ko (1 - 2 points only), we pay
+	     * extra attention to select threats that don't waste points.
+	     * In particular, we don't play threats inside of opponent
+	     * territory if they can be averted on a dame intersection.
+	     */
+	    if (ko_value < 1.0
+		&& threat_does_work
+		&& threat_quality >= 0
+		&& (type == ATTACK_THREAT || type == DEFEND_THREAT)) {
+	      int averting_pos;
+
+	      if (type == ATTACK_THREAT)
+		find_defense(what, &averting_pos);
+	      else
+		attack(what, &averting_pos);
+
+	      /* `averting_pos' can be NO_MOVE sometimes, at least when
+	       * when the the threat is a threat to attack. It is not
+	       * clear what to do in such cases.
+	       */
+	      if (averting_pos != NO_MOVE) {
+		int averting_wastes_point = 0;
+		if (whose_territory(OPPOSITE_INFLUENCE(color), averting_pos)
+		    != EMPTY)
+		  averting_wastes_point = 1;
+		threat_quality = averting_wastes_point - threat_wastes_point;
+		if (threat_quality < 0)
+ 		  threat_does_work = 0;
+	      }
+	    }
 	  }
 	}
 	popgo();
@@ -2991,14 +3040,25 @@ reevaluate_ko_threats(int ko_move, int color)
     }
     
     if (threat_does_work) {
-      TRACE("%1m: %f + %f = %f\n", pos, move[pos].value,
-	    move[pos].additional_ko_value,
-	    move[pos].value + move[pos].additional_ko_value);
-      move[pos].value += move[pos].additional_ko_value;
+      if (threat_quality == best_threat_quality)
+	good_threats[num_good_threats++] = pos;
+      else if (threat_quality > best_threat_quality) {
+	best_threat_quality = threat_quality;
+	num_good_threats = 0;
+	good_threats[num_good_threats++] = pos;
+      }
+      else
+	DEBUG(DEBUG_MOVE_REASONS,
+	      "%1m: no additional ko value (threat does not work as ko threat)\n", pos);
     }
-    else
-      DEBUG(DEBUG_MOVE_REASONS,
-	    "%1m: no additional ko value (threat does not work as ko threat)\n", pos);
+  }
+
+  for (k = 0; k < num_good_threats; k++) {
+    pos = good_threats[k];
+    TRACE("%1m: %f + %f = %f\n", pos, move[pos].value,
+	  move[pos].additional_ko_value,
+	  move[pos].value + move[pos].additional_ko_value);
+    move[pos].value += move[pos].additional_ko_value;
   }
 }
 
@@ -3083,7 +3143,7 @@ find_best_move(int *the_move, float *val, int color,
      */
     if (bestval > 0.0 && is_illegal_ko_capture(best_move, color)) {
       TRACE("Move at %1m would be an illegal ko capture.\n", best_move);
-      reevaluate_ko_threats(best_move, color);
+      reevaluate_ko_threats(best_move, color, bestval);
       redistribute_points();
       time_report(2, "  reevaluate_ko_threats", NO_MOVE, 1.0);
       ko_values_have_been_added = 1;
