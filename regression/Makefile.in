@@ -97,7 +97,7 @@ TST = 13x13b.tst 13x13.tst arb.tst arend2.tst arend.tst \
       strategy_rot.tst strategy.tst tactics1.tst tactics.tst \
       thrash.tst trevora.tst trevorb.tst trevorc.tst \
       trevord.tst trevor.tst vie.tst viking.tst gifu03.tst seki.tst \
-      9x9.tst
+      9x9.tst unconditional.tst
 
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
@@ -508,6 +508,7 @@ first_batch:
 	$(srcdir)/regress.sh $(srcdir) connection.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) break_in.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) blunder.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) unconditional.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) trevora.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) nngs1.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) strategy.tst $(GG_OPTIONS)

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new semeai_propose_eyespace_filling_move() tries to play inside eyeshapes
 - number_of_dragons initialized in initialize_dragon_data()
 - new option --gtp-dump-commands to dump all incoming GTP commands to file
 - new function and autohelper owl_lunch()
