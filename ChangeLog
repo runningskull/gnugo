@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new static function capture_non_invincible_strings() broken out of
+  unconditional_life()
+- unconditional_life() revised
 - new semeai_propose_eyespace_filling_move() tries to play inside eyeshapes
 - number_of_dragons initialized in initialize_dragon_data()
 - new option --gtp-dump-commands to dump all incoming GTP commands to file
