@@ -1,3 +1,115 @@
+Results after the patches:
+
+trevor_1_20.5. Tuning patch. 
+trevor_1_20.3. Debug and trace enhancements. 
+trevor_1_20.4. New tests. 
+teun_1_20.1. Test gray border. 
+gunnar_1_20.3. Avoid giving followup values for non-sente threats. 
+gunnar_1_20.2. Bad 13x13 fuseki pattern removed. 
+gunnar_1_20.1. Revised checking of GM and FF properties in sgf files. 
+doc_1_20.1. Doc revision. 
+trevor_1_20.2HTML view revision. 
+
+./regress.sh . owl_rot.tst
+150 unexpected FAIL: Correct '0', got '1 G13'
+./regress.sh . blunder.tst
+15 unexpected FAIL: Correct 'H3', got 'J1'
+./regress.sh . strategy.tst
+8 unexpected FAIL: Correct 'N2|N1', got 'T17'
+18 unexpected FAIL: Correct 'E4|F3', got 'G6'
+20 unexpected PASS!
+26 unexpected FAIL: Correct 'D3', got 'G3'
+./regress.sh . endgame.tst
+102 unexpected FAIL: Correct 'E9', got 'E8'
+401 unexpected PASS!
+./regress.sh . golife.tst
+2 unexpected FAIL: Correct 'H5', got 'F4'
+./regress.sh . viking.tst
+7 unexpected PASS!
+./regress.sh . ego.tst
+6 unexpected PASS!
+8 unexpected PASS!
+./regress.sh . strategy2.tst
+54 unexpected PASS!
+./regress.sh . nicklas4.tst
+809 unexpected FAIL: Correct 'B10', got 'J15'
+./regress.sh . manyfaces.tst
+7 unexpected FAIL: Correct 'R2|S7', got 'E14'
+./regress.sh . trevor.tst
+200 unexpected FAIL: Correct 'D7|D4', got 'H7'
+461 unexpected FAIL: Correct 'E14', got 'S8'
+1050 unexpected PASS!
+./regress.sh . strategy3.tst
+147 unexpected FAIL: Correct '!G5', got 'G5'
+./regress.sh . global.tst
+7 unexpected FAIL: Correct 'A5', got 'T11'
+./regress.sh . vie.tst
+37 unexpected FAIL: Correct '1 B6', got '1 A6'
+./regress.sh . arend.tst
+1 unexpected FAIL: Correct 'C4', got 'S17'
+8 unexpected PASS!
+./regress.sh . 13x13.tst
+6 unexpected PASS!
+31 unexpected PASS!
+36 unexpected FAIL: Correct 'C5', got 'B2'
+37 unexpected PASS!
+39 unexpected FAIL: Correct 'H4|J4', got 'E2'
+59 unexpected FAIL: Correct '!J12', got 'J12'
+61 unexpected PASS!
+72 unexpected PASS!
+./regress.sh . trevora.tst
+430 unexpected PASS!
+./regress.sh . trevorb.tst
+130 unexpected PASS!
+150 unexpected FAIL: Correct '!N12', got 'N12'
+240 unexpected PASS!
+280 unexpected PASS!
+420 unexpected PASS!
+490 unexpected PASS!
+590 unexpected FAIL: Correct 'H12|M9', got 'J11'
+660 unexpected PASS!
+730 unexpected PASS!
+./regress.sh . trevorc.tst
+190 unexpected PASS!
+340 unexpected FAIL: Correct 'M3|M4', got 'L2'
+480 unexpected PASS!
+540 unexpected PASS!
+590 unexpected PASS!
+630 unexpected PASS!
+640 unexpected PASS!
+680 unexpected PASS!
+760 unexpected PASS!
+790 unexpected PASS!
+830 unexpected PASS!
+960 unexpected PASS!
+1090 unexpected PASS!
+1100 unexpected PASS!
+1150 unexpected PASS!
+1300 unexpected PASS!
+1380 unexpected PASS!
+1430 unexpected FAIL: Correct '!G1', got 'G1'
+1490 unexpected PASS!
+1640 unexpected PASS!
+./regress.sh . trevord.tst
+140 unexpected PASS!
+180 unexpected PASS!
+360 unexpected FAIL: Correct 'K3|K4', got 'K9'
+370 unexpected PASS!
+380 unexpected PASS!
+390 unexpected PASS!
+410 unexpected PASS!
+590 unexpected PASS!
+600 unexpected PASS!
+740 unexpected PASS!
+790 unexpected PASS!
+950 unexpected PASS!
+1040 unexpected PASS!
+1120 unexpected PASS!
+./regress.sh . strategy4.tst
+156 unexpected FAIL: Correct 'B14|B16', got 'G9'
+212 unexpected PASS!
+
+
 ========================== 3.1.19 =========================
 
 ./regress.sh . owl.tst
