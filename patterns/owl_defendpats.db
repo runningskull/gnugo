@@ -5187,6 +5187,24 @@ OXO
 ; oplay_attack(*,A)
 
 
+Pattern D1207
+# gf New pattern. (3.7.3)
+
+o..x       sacrifice a stone to gain tempo
+.X*.
+....
+----
+
+:8,s,value(40)
+
+ob.x
+aX*.
+....
+----
+
+;oplay_attack(*,a,a) && oplay_attack(*,b,b)
+
+
 #########################################################
 #                                                       #
 #                       Escape                          #
