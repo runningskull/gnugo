@@ -2053,7 +2053,7 @@ fastlib(int pos, int color, int ignore_capture)
           || (neighbor_size == 1
               && ally1 
               && !ally2
-              && countstones(ally1) == 1)) {
+              && COUNTSTONES(ally1) == 1)) {
         /* Here, we can gain only the adjacent new liberty. */
         fast_liberties++;
       }
@@ -2061,8 +2061,8 @@ fastlib(int pos, int color, int ignore_capture)
         return -1;
     }
     if (neighbor_color == EMPTY) {
-      if ((!ally1 || !liberty_of_string(neighbor, ally1))
-          && (!ally2 || !liberty_of_string(neighbor, ally2))) {
+      if ((!ally1 || !neighbor_of_string(neighbor, ally1))
+          && (!ally2 || !neighbor_of_string(neighbor, ally2))) {
 	fast_liberties++;
       }
     }
@@ -2231,10 +2231,10 @@ approxlib(int pos, int color, int maxlib, int *libs)
 int
 count_common_libs(int str1, int str2)
 {
-  int libs1[MAXLIBS];
-  int liberties1;
-  int commonlibs;
-  int k;
+  int all_libs1[MAXLIBS], *libs1;
+  int liberties1, liberties2;
+  int commonlibs = 0;
+  int k, n;
   
   ASSERT_ON_BOARD1(str1);
   ASSERT_ON_BOARD1(str2);
@@ -2250,8 +2250,35 @@ count_common_libs(int str1, int str2)
     str2 = tmp;
   }
 
-  liberties1 = findlib(str1, MAXLIBS, libs1);
-  commonlibs = 0;
+  n = string_number[str1];
+  liberties1 = string[n].liberties;
+  
+  if (liberties1 <= MAX_LIBERTIES) {
+    /* Speed optimization: don't copy liberties with findlib */
+    libs1 = string[n].libs;
+    n = string_number[str2];
+    liberties2 = string[n].liberties;
+    
+    if (liberties2 <= MAX_LIBERTIES) {
+      /* Speed optimization: neighbor_of_string is quite expensive */
+      liberty_mark++;
+      
+      for (k = 0; k < liberties1; k++)
+	MARK_LIBERTY(libs1[k]);
+
+      libs1 = string[n].libs;
+      for (k = 0; k < liberties2; k++)
+	if (!UNMARKED_LIBERTY(libs1[k]))
+	  commonlibs++;
+
+      return commonlibs;
+    }
+  }
+  else {
+    findlib(str1, MAXLIBS, all_libs1);
+    libs1 = all_libs1;
+  }
+  
   for (k = 0; k < liberties1; k++)
     if (neighbor_of_string(libs1[k], str2))
       commonlibs++;
@@ -2272,10 +2299,10 @@ count_common_libs(int str1, int str2)
 int
 find_common_libs(int str1, int str2, int maxlib, int *libs)
 {
-  int libs1[MAXLIBS];
-  int liberties1;
-  int commonlibs;
-  int k;
+  int all_libs1[MAXLIBS], *libs1;
+  int liberties1, liberties2;
+  int commonlibs = 0;
+  int k, n;
   
   ASSERT_ON_BOARD1(str1);
   ASSERT_ON_BOARD1(str2);
@@ -2292,15 +2319,44 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
     str2 = tmp;
   }
 
-  liberties1 = findlib(str1, MAXLIBS, libs1);
-  commonlibs = 0;
-  for (k = 0; k < liberties1; k++) {
+  n = string_number[str1];
+  liberties1 = string[n].liberties;
+  
+  if (liberties1 <= MAX_LIBERTIES) {
+    /* Speed optimization: don't copy liberties with findlib */
+    libs1 = string[n].libs;
+    n = string_number[str2];
+    liberties2 = string[n].liberties;
+
+    if (liberties2 <= MAX_LIBERTIES) {
+      /* Speed optimization: neighbor_of_string is quite expensive */
+      liberty_mark++;
+
+      for (k = 0; k < liberties1; k++)
+	MARK_LIBERTY(libs1[k]);
+      
+      libs1 = string[n].libs;
+      for (k = 0; k < liberties2; k++)
+	if (!UNMARKED_LIBERTY(libs1[k])){
+          if (commonlibs < maxlib)
+	    libs[commonlibs] = libs1[k];
+	  commonlibs++;
+	}
+      
+      return commonlibs;
+    }
+  }
+  else {
+    findlib(str1, MAXLIBS, all_libs1);
+    libs1 = all_libs1;
+  }
+  
+  for (k = 0; k < liberties1; k++)
     if (neighbor_of_string(libs1[k], str2)) {
       if (commonlibs < maxlib)
 	libs[commonlibs] = libs1[k];
       commonlibs++;
     }
-  }
   
   return commonlibs;
 }
