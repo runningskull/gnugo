@@ -145,5 +145,5 @@ loadsgf games/blunder22.sgf 5
 
 loadsgf games/blunder23.sgf
 30 gg_genmove black
-#? [!O7]
+#? [!O7]*
 

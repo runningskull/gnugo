@@ -207,7 +207,7 @@ loadsgf games/nicklas/nicklas8.sgf 72
 
 loadsgf games/nicklas/nicklas8.sgf 80
 35 gg_genmove black
-#? [!B17]
+#? [!B17]*
 
 loadsgf games/nicklas/nicklas8.sgf 82
 36 gg_genmove black

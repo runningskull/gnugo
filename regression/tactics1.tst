@@ -17,7 +17,7 @@ loadsgf games/tactics06.sgf
 # J1 is worth 6 points
 loadsgf games/seki03.sgf
 30 gg_genmove white
-#? [J1]
+#? [J1]*
 
 
 # attack_either and defend_both tests could go in a separate test suite,

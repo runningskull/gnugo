@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.12 released November 20, 2002
+
 - optimization in do_play_move: don't check ko unnecessarily
 - revision of critical worms to inessential in make_dragons() revised
 - owl vital attack patterns now also used for owl defense

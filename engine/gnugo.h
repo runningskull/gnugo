@@ -511,6 +511,10 @@ void decide_combination(int color);
 void decide_surrounded(int pos);
 void decide_oracle(Gameinfo *gameinfo, char *infilename, char *untilstring);
 
+/*oracle.c*/
+void dismiss_oracle(void);
+void oracle_clear_board(int boardsize);
+
 #endif  /* _GNUGO_H_ */
 
 

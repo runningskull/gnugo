@@ -1,3 +1,16 @@
+==============-=========== 3.3.12 ==============================
+
+./regress.sh . blunder.tst 
+30 unexpected FAIL: Correct '!O7', got 'O7'
+./regress.sh . strategy.tst 
+35 unexpected FAIL: Correct '!B17', got 'B17'
+./regress.sh . trevorc.tst 
+940 unexpected PASS!
+./regress.sh . tactics1.tst 
+30 unexpected FAIL: Correct 'J1', got 'H4'
+./regress.sh . manyfaces1.tst 
+10 unexpected PASS!
+
 ======================= 3.3.12 pre 5  =========================
 
 ./regress.sh . reading.tst 

@@ -126,9 +126,9 @@ summon_oracle(void)
   }
   oracle_exists = 1;
   /* Attach pipe a to to_gnugo_stream  */
-  to_gnugo_stream = (int) fdopen(pfd_a[1], "w");
+  to_gnugo_stream = (FILE *) fdopen(pfd_a[1], "w");
   /* Attach pipe b to from_gnugo_stream */
-  from_gnugo_stream = (int) fdopen(pfd_b[0], "r");
+  from_gnugo_stream = (FILE *) fdopen(pfd_b[0], "r");
 }
 
 /* load an sgf file */

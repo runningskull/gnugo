@@ -6,7 +6,7 @@ reset_trymove_counter
 
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 9
 10 gg_genmove black
-#? [C17|H15|D9]*
+#? [C17|H15|D9]
 
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 15
 20 gg_genmove black
