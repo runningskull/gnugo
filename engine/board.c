@@ -3728,34 +3728,45 @@ do_play_move(int pos, int color)
   int neighbor_allies = 0;
   int have_liberties = 0;
   int s = -1;
+  int south = SOUTH(pos);
+  int west = WEST(pos);
+  int north = NORTH(pos);
+  int east = EAST(pos);
   
   if (!strings_initialized)
     init_board();
     
   /* Remove captured stones and check for suicide.*/
-  if (board[SOUTH(pos)] == other && LIBERTIES(SOUTH(pos)) == 1)
-    captured_stones += do_remove_string(string_number[SOUTH(pos)]);
-  else if (LIBERTY(SOUTH(pos)) || (board[SOUTH(pos)] == color
-				   && LIBERTIES(SOUTH(pos)) > 1))
-    have_liberties = 1;
+  if (board[south] == other && LIBERTIES(south) == 1)
+    captured_stones += do_remove_string(string_number[south]);
 
-  if (board[WEST(pos)] == other && LIBERTIES(WEST(pos)) == 1)
-    captured_stones += do_remove_string(string_number[WEST(pos)]);
-  else if (LIBERTY(WEST(pos)) || (board[WEST(pos)] == color
-				  && LIBERTIES(WEST(pos)) > 1))
-    have_liberties = 1;
+  if (board[west] == other && LIBERTIES(west) == 1)
+    captured_stones += do_remove_string(string_number[west]);
 
-  if (board[NORTH(pos)] == other && LIBERTIES(NORTH(pos)) == 1)
-    captured_stones += do_remove_string(string_number[NORTH(pos)]);
-  else if (LIBERTY(NORTH(pos)) || (board[NORTH(pos)] == color
-				   && LIBERTIES(NORTH(pos)) > 1))
-    have_liberties = 1;
+  if (board[north] == other && LIBERTIES(north) == 1)
+    captured_stones += do_remove_string(string_number[north]);
 
-  if (board[EAST(pos)] == other && LIBERTIES(EAST(pos)) == 1)
-    captured_stones += do_remove_string(string_number[EAST(pos)]);
-  else if (LIBERTY(EAST(pos)) || (board[EAST(pos)] == color
-				  && LIBERTIES(EAST(pos)) > 1))
-    have_liberties = 1;
+  if (board[east] == other && LIBERTIES(east) == 1)
+    captured_stones += do_remove_string(string_number[east]);
+
+
+  if (captured_stones == 0) {
+    if (LIBERTY(south)
+	|| (board[south] == color && LIBERTIES(south) > 1))
+      have_liberties = 1;
+    else if (LIBERTY(west)
+	     || (board[west] == color && LIBERTIES(west) > 1))
+      have_liberties = 1;
+    else if (LIBERTY(north)
+	     ||	(board[north] == color && LIBERTIES(north) > 1))
+      have_liberties = 1;
+    else if (LIBERTY(east)
+	     ||(board[east] == color && LIBERTIES(east) > 1))
+      have_liberties = 1;
+  }
+  else
+      have_liberties = 1;
+
 
   /* No captures and no liberties -> suicide. */
   if (have_liberties == 0 && captured_stones == 0) {
@@ -3771,47 +3782,47 @@ do_play_move(int pos, int color)
    */
   string_mark++;
 
-  if (board[SOUTH(pos)] == color && UNMARKED_STRING(SOUTH(pos))) {
+  if (board[south] == color && UNMARKED_STRING(south)) {
     neighbor_allies++;
-    s = string_number[SOUTH(pos)];
-    MARK_STRING(SOUTH(pos));
+    s = string_number[south];
+    MARK_STRING(south);
   }
-  else if (board[SOUTH(pos)] == other && UNMARKED_STRING(SOUTH(pos))) {
-    remove_liberty(string_number[SOUTH(pos)], pos);
-    MARK_STRING(SOUTH(pos));
+  else if (board[south] == other && UNMARKED_STRING(south)) {
+    remove_liberty(string_number[south], pos);
+    MARK_STRING(south);
   }    
   
-  if (board[WEST(pos)] == color && UNMARKED_STRING(WEST(pos))) {
+  if (board[west] == color && UNMARKED_STRING(west)) {
     neighbor_allies++;
-    s = string_number[WEST(pos)];
-    MARK_STRING(WEST(pos));
+    s = string_number[west];
+    MARK_STRING(west);
   }
-  else if (board[WEST(pos)] == other && UNMARKED_STRING(WEST(pos))) {
-    remove_liberty(string_number[WEST(pos)], pos);
-    MARK_STRING(WEST(pos));
+  else if (board[west] == other && UNMARKED_STRING(west)) {
+    remove_liberty(string_number[west], pos);
+    MARK_STRING(west);
   }    
   
-  if (board[NORTH(pos)] == color && UNMARKED_STRING(NORTH(pos))) {
+  if (board[north] == color && UNMARKED_STRING(north)) {
     neighbor_allies++;
-    s = string_number[NORTH(pos)];
-    MARK_STRING(NORTH(pos));
+    s = string_number[north];
+    MARK_STRING(north);
   }
-  else if (board[NORTH(pos)] == other && UNMARKED_STRING(NORTH(pos))) {
-    remove_liberty(string_number[NORTH(pos)], pos);
-    MARK_STRING(NORTH(pos));
+  else if (board[north] == other && UNMARKED_STRING(north)) {
+    remove_liberty(string_number[north], pos);
+    MARK_STRING(north);
   }    
   
-  if (board[EAST(pos)] == color && UNMARKED_STRING(EAST(pos))) {
+  if (board[east] == color && UNMARKED_STRING(east)) {
     neighbor_allies++;
-    s = string_number[EAST(pos)];
+    s = string_number[east];
 #if 0
-    MARK_STRING(EAST(pos));
+    MARK_STRING(east);
 #endif
   }
-  else if (board[EAST(pos)] == other && UNMARKED_STRING(EAST(pos))) {
-    remove_liberty(string_number[EAST(pos)], pos);
+  else if (board[east] == other && UNMARKED_STRING(east)) {
+    remove_liberty(string_number[east], pos);
 #if 0
-    MARK_STRING(EAST(pos));
+    MARK_STRING(east);
 #endif
   }    
   
