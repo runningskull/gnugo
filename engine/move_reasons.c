@@ -604,7 +604,7 @@ owl_defense_move_reason_known(int pos, int what)
  * Check whether an owl attack/defense move reason is recorded for a move.
  * A negative value for 'what' means only match 'type'.
  */
-static int
+int
 owl_move_reason_known(int pos, int what)
 {
   return (owl_attack_move_reason_known(pos, what)

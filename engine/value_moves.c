@@ -963,6 +963,9 @@ connection_value(int dragona, int dragonb, int tt, float margin)
   float terr_val = move[tt].territorial_value;
   float return_value;
 
+  if (margin > 20.0)
+    margin = 20.0;
+
   /* When scoring, we want to be restrictive with reinforcement moves
    * inside own territory. Thus if both dragons are weakly_alive,
    * alive, strongly alive, or invincible, no bonus is awarded.
@@ -985,7 +988,6 @@ connection_value(int dragona, int dragonb, int tt, float margin)
   }
 
   if (crude_weakness_a == 0.0
-      || dragon[dragona].status == CRITICAL
       || dragon[dragona].status == DEAD)
     return 0.0;
   if (terr_val < 0.0)
@@ -1007,7 +1009,20 @@ connection_value(int dragona, int dragonb, int tt, float margin)
 			    + terr_val,
 			    (float) da->escape_route);
 
-  {
+  /* Kludge: For a CRITICAL dragon, we use the usual effective
+   * size and give a strategic effect bigger than 2.0 * effective size.
+   * This is to match the "strategic bonus computation" in
+   * estimate_strategical_value(). This prefers connection moves that
+   * owl defend a dragon to other owl defense move.
+   */
+  if (dragon[dragona].status == CRITICAL) {
+    float bonus = (0.2 - 0.3 * crude_weakness_sum) * sizea;
+    /* If ahead, give extra bonus to connections. */
+    if (margin > 0.0 && bonus > 0.0)
+      bonus *= 1.0 + 0.05 * margin;
+    return_value = 2.0 * sizea + bonus;
+  }
+  else {
     float old_burden = 2.0 * crude_weakness_a * soft_cap(sizea, 15.0);
 
     /* The new burden is the burden of defending new joint dragon; but
@@ -1017,16 +1032,14 @@ connection_value(int dragona, int dragonb, int tt, float margin)
 		       * sizea / (sizea + sizeb);
 
     return_value = 1.05 * (old_burden - new_burden);
+    /* If ahead, give extra bonus to connections. */
+    if (margin > 0.0)
+      return_value *= 1.0 + 0.02 * margin;
   }
 
   if (return_value < 0.0)
     return_value = 0.0;
 
-  /* If ahead, give extra bonus to connections. */
-  if (margin > 20.0)
-    margin = 20.0;
-  if (margin > 0.0)
-    return_value *= 1.0 + 0.02 * margin;
 
   return return_value;
 }
@@ -2313,6 +2326,16 @@ estimate_strategical_value(int pos, int color, float score)
       continue;
 
     aa = dragons[k];
+
+    /* If this dragon is critical but not attacked/defended by this
+     * move, we ignore the strategic effect.
+     */
+    if (dragon[aa].status == CRITICAL
+	&& !owl_move_reason_known(pos, k)) {
+      DEBUG(DEBUG_MOVE_REASONS, "  %1m: 0.0 - disregarding strategic effect on %1m (critical dragon)\n",
+	    pos, aa);
+      continue;
+    }
     
     /* If this dragon consists of only one worm and that worm can
      * be tactically captured or defended by this move, we have
