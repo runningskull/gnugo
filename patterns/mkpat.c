@@ -1979,10 +1979,10 @@ write_patterns(FILE *outfile, char *name)
   if (tree_output)
     tree_write_patterns(outfile, name);
   else
-#endif
     fprintf(outfile, "\nvoid\ninit_tree_%s(void)\n{\n"
 	    "  /* nothing to do - tree option not compiled */\n"
 	    "}\n\n", name);
+#endif
 
   /* Write out the patterns. */
   if (fullboard)

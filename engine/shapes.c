@@ -29,6 +29,7 @@
 
 /* Maximum number of dragons considered by a, B, C, and d class patterns. */
 #define MAX_DRAGONS_PER_PATTERN 5
+#define MAX_STRINGS_PER_PATTERN 5
 
 /* Values of joseki patterns. */
 #define U_VALUE 40.0
@@ -45,16 +46,26 @@ static void
 shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 		void *data)
 {
+  int other = OTHER_COLOR(color);
+  
   int k, l;
   int move;
   
   /* Dragons of our color. */
   int my_dragons[MAX_DRAGONS_PER_PATTERN];
   int my_ndragons = 0;
-
+  
   /* Dragons of other color. */
   int your_dragons[MAX_DRAGONS_PER_PATTERN];
   int your_ndragons = 0;
+
+  /* Strings of our color. */
+  int my_strings[MAX_STRINGS_PER_PATTERN];
+  int my_nstrings = 0;
+  
+  /* Strings of other color. */
+  int your_strings[MAX_STRINGS_PER_PATTERN];
+  int your_nstrings = 0;
 
   /* Make a local copy of the classification that we may modify. */
   unsigned int class = pattern->class;
@@ -75,8 +86,6 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   if ((class & (CLASS_B | CLASS_C | CLASS_c | CLASS_a | CLASS_d | CLASS_O |
 		CLASS_J | CLASS_j | CLASS_U | CLASS_T | CLASS_t)) != 0)
   {
-    int other = OTHER_COLOR(color);
-
     /* Match each point. */
     for (k = 0; k < pattern->patlen; ++k) { 
       int pos; /* absolute (board) co-ord of (transformed) pattern element */
@@ -133,16 +142,54 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	  your_dragons[l] = origin;
 	  your_ndragons++;
 	}
-      }      
+      }
+      
+      if (pattern->patn[k].att == ATT_O || pattern->patn[k].att == ATT_X) {
+	origin = find_origin(pos);
+	if (board[pos] == color && my_nstrings < MAX_STRINGS_PER_PATTERN) {
+	  for (l = 0; l < my_nstrings; l++) {
+	    if (my_strings[l] == origin)
+	      break;
+	  }
+	  if (l == my_nstrings) {
+	    /* We found another string of our color. Check that it
+	     * cannot be tactically captured before adding it to the
+	     * list of my_strings.
+	     */
+	    if (worm[pos].attack_codes[0] == 0
+		|| does_defend(move, pos)) {
+	      /* Ok, add the string to the list. */
+	      my_strings[l] = origin;
+	      my_nstrings++;
+	    }
+	  }
+	}
+	
+	if (board[pos] == other && your_nstrings < MAX_STRINGS_PER_PATTERN) {
+	  for (l = 0; l < your_nstrings; l++) {
+	    if (your_strings[l] == origin)
+	      break;
+	  }
+	  if (l == your_nstrings) {
+	    /* We found another opponent string, add it to the list. */
+	    your_strings[l] = origin;
+	    your_nstrings++;
+	  }
+	}
+      }
     } /* loop over elements */
   } /* if we need to loop over the elements */
 
   /* Nothing to connect. Remove C class bit. */
-  if (my_ndragons < 2)
+  if (my_ndragons < 2 && !experimental_connections)
+    class &= ~CLASS_C;
+  if (my_nstrings < 2 && experimental_connections)
     class &= ~CLASS_C;
 
   /* Nothing to cut. Remove B class bit. */
-  if (your_ndragons < 2)
+  if (your_ndragons < 2 && !experimental_connections)
+    class &= ~CLASS_B;
+  if (your_nstrings < 2 && experimental_connections)
     class &= ~CLASS_B;
   
   /*
@@ -183,7 +230,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
    */
   if (class & CLASS_n) {
     /* Allow ko unsafety. */
-    if (safe_move(move, OTHER_COLOR(color)) == 0) {
+    if (safe_move(move, other) == 0) {
       if (0)
 	TRACE("  opponent can't play safely at %1m, move discarded\n", move);
       return;
@@ -228,7 +275,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   }
 
   /* Pattern class B, cut all combinations of opponent dragons. */
-  if (class & CLASS_B) {
+  if ((class & CLASS_B) && !experimental_connections) {
     for (k = 0; k < your_ndragons; k++)
       for (l = k+1; l < your_ndragons; l++) {
 	add_cut_move(move, your_dragons[k], your_dragons[l]);
@@ -237,11 +284,39 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   }
 
   /* Pattern class C, connect all combinations of our dragons. */
-  if (class & CLASS_C) {
+  if ((class & CLASS_C) && !experimental_connections) {
     for (k = 0; k < my_ndragons; k++)
       for (l = k+1; l < my_ndragons; l++) {
 	add_connection_move(move, my_dragons[k], my_dragons[l]);
 	TRACE("...connects dragons %1m, %1m\n", my_dragons[k], my_dragons[l]);
+      }
+  }
+
+  /* Pattern class B, try to cut all combinations of opponent strings. */
+  if ((class & CLASS_B) && experimental_connections) {
+    for (k = 0; k < your_nstrings; k++)
+      for (l = k+1; l < your_nstrings; l++) {
+	if (string_connect(your_strings[k], your_strings[l], NULL)
+	    && !play_connect_n(color, 1, 1, move,
+			       your_strings[k], your_strings[l])) {
+	  add_cut_move(move, your_strings[k], your_strings[l]);
+	  TRACE("...cuts strings %1m, %1m\n",
+		your_strings[k], your_strings[l]);
+	}
+      }
+  }
+
+  /* Pattern class C, try to connect all combinations of our strings. */
+  if ((class & CLASS_C) && experimental_connections) {
+    for (k = 0; k < my_nstrings; k++)
+      for (l = k+1; l < my_nstrings; l++) {
+	if (disconnect(my_strings[k], my_strings[l], NULL)
+	    && !play_connect_n(color, 0, 1, move,
+			       my_strings[k], my_strings[l])) {
+	  add_connection_move(move, my_strings[k], my_strings[l]);
+	  TRACE("...connects strings %1m, %1m\n",
+		my_strings[k], my_strings[l]);
+	}
       }
   }
 

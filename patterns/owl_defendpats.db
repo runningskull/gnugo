@@ -599,11 +599,12 @@ oO*?x
 
 Pattern D207
 # tm reduced value (3.1.22) (see nngs:710)
+# gf Modified. (3.3.6)
 
-O.X          second line kosumi
-.*x
-...
----
+?O.X          second line kosumi
+o.*x
+o...
+----
 
 :8,-,value(66)
 
@@ -2219,6 +2220,7 @@ ox*?
 
 Pattern D625
 # gf New pattern. (3.1.14)
+# gf Revised constraint. (3.3.6)
 
 O*o      prevent eye stealing capture
 XO.
@@ -2227,10 +2229,10 @@ XO.
 :8,n,value(45)
 
 a*o
-XO.
+XOb
 ---
 
-;lib(a)==1
+;lib(a)==1 && !obvious_false_oeye(b)
 
 
 Pattern D626
@@ -3769,6 +3771,7 @@ Pattern D1005
 
 Pattern D1006
 # gf Added n classification. (3.1.11)
+# gf Revised constraint. (3.3.6)
 
 OXO            connect underneath
 .*.
@@ -3776,11 +3779,11 @@ OXO            connect underneath
 
 :|,n,value(60)
 
-aXb
+aCb
 .*.
 ---
 
-;lib(a)>1 && lib(b)>1
+;lib(a)>1 && lib(b)>1 && !attack(C)
 
 
 Pattern D1006b
@@ -4215,6 +4218,7 @@ oooo
 
 
 Pattern D1122
+# gf Repaired constraint. (3.3.6)
 
 ?O?        Cut and maybe capture to make eye
 X*X
@@ -4226,7 +4230,7 @@ X*X
 A*B
 ---
 
-;oplay_attack(*,A,A) || oplay_attack(*,B,B)
+;oplay_attack(*,A) || oplay_attack(*,B)
 
 
 Pattern D1123
@@ -6538,6 +6542,18 @@ Pattern D1422
 +----
 
 ;lib(A)==1
+
+
+Pattern D1423
+# gf New pattern. (3.3.6)
+
+|OO?      throw in to make ko or better
+|.O?
+|XOO         
+|*.O
++---
+
+:8,s,value(45)
 
 
 # END OF FILE

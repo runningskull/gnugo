@@ -475,34 +475,60 @@ induce_secondary_move_reasons(int color)
 	if (!attack_move && !strategically_sound_defense(aa, pos))
 	  continue;
 	
-	num_adj = extended_chainlinks(aa, adjs);
+	num_adj = extended_chainlinks(aa, adjs, 1);
 	
 	for (i = 0; i < num_adj; i++) {
 	  for (j = i+1; j < num_adj; j++) {
 	    int adj1 = adjs[i];
 	    int adj2 = adjs[j];
-
-	    if (attack_move && !disconnect(adj1, adj2, NULL))
+	    
+	    if (board[adj1] != board[adj2])
 	      continue;
-	    if (!attack_move && !string_connect(adj1, adj2, NULL))
+	    if (attack_move
+		&& board[adj1] != board[aa]
+		&& !disconnect(adj1, adj2, NULL))
+	      continue;
+	    if (!attack_move
+		&& board[adj1] != board[aa]
+		&& !string_connect(adj1, adj2, NULL))
+	      continue;
+	    if (attack_move
+		&& board[adj1] == board[aa])
+	      continue;
+	    if (!attack_move
+		&& board[adj1] == board[aa]
+		&& !disconnect(adj1, adj2, NULL))
 	      continue;
 
 	    if (trymove(pos, color_to_move, "induce_secondary_move_reasons",
 			aa, EMPTY, NO_MOVE)) {
-	      if (attack_move && !disconnect(adj1, adj2, NULL)) {
+	      if (attack_move
+		  && board[adj1] != board[aa]
+		  && !disconnect(adj1, adj2, NULL)) {
 		DEBUG(DEBUG_MOVE_REASONS,
 		      "Connection move at %1m induced for %1m/%1m due to attack of %1m\n",
 		      pos, adj1, adj2, aa);
 		add_connection_move(pos, adj1, adj2);
 	      }
 		  
-	      if (!attack_move && !string_connect(adj1, adj2, NULL)) {
+	      if (!attack_move
+		  && board[adj1] != board[aa]
+		  && !string_connect(adj1, adj2, NULL)) {
 		DEBUG(DEBUG_MOVE_REASONS,
 		      "Cut move at %1m induced for %1m/%1m due to defense of %1m\n",
 		      pos, adj1, adj2, aa);
 		add_cut_move(pos, adj1, adj2);
 	      }
 
+	      if (!attack_move
+		  && board[adj1] == board[aa]
+		  && !disconnect(adj1, adj2, NULL)) {
+		DEBUG(DEBUG_MOVE_REASONS,
+		      "Connection move at %1m induced for %1m/%1m due to defense of %1m\n",
+		      pos, adj1, adj2, aa);
+		add_connection_move(pos, adj1, adj2);
+	      }
+		  
 	      popgo();
 	    }
 	  }
@@ -1501,10 +1527,12 @@ estimate_territorial_value(int pos, int color, float score)
 
       /* If the dragon is a single ko stone, the owl code currently
        * won't detect that the owl attack is conditional. As a
-       * workaround we deduct 0.5 points for the move here.
+       * workaround we deduct 0.5 points for the move here, but only
+       * if the move is a liberty of the string.
        */
       if (dragon[aa].size == 1
-	  && is_ko_point(aa)) {
+	  && is_ko_point(aa)
+	  && liberty_of_string(pos, aa)) {
 	TRACE("  %1m: -0.5 - penalty for ko stone %1m (workaround)\n",
 	      pos, aa);
 	tot_value -= 0.5;

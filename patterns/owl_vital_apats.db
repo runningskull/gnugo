@@ -741,11 +741,12 @@ XXXb
 
 Pattern VA44
 # tm New Pattern (3.1.17)
+# gf Fixed symmetry. (3.3.6)
 
 XoX
 o*o
 
-:8,s,value(57)
+:|,s,value(57)
 
 XbX
 a*c

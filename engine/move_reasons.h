@@ -73,7 +73,7 @@
 #define REDUNDANT               (TERRITORY_REDUNDANT | STRATEGICALLY_REDUNDANT)
 #define SECONDARY               4
 
-#define MAX_REASONS 80
+#define MAX_REASONS 100
 
 #define MAX_TRACE_LENGTH  160
 

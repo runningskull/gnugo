@@ -2,6 +2,17 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- extended_chainlinks() revised
+- MAX_REASONS increased from 80 to 100
+- modify_stupid_eye_vital_point() revised
+- new functions improve_lunch_attack() and improve_lunch_defense()
+- backfilling in do_owl_attack() when trying the defender's best move
+- sniff_lunch() revised
+- new experimental_connections contingent code in shapes_callback()
+- induce_secondary_move_reasons() revised
+- tuning
+- endgame tuning
+- owl tuning
 - request id no longer passed to callbacks in play_gtp.c
 - gtp_printid() renamed to gtp_start_response()
 - new preprocessing of command lines in gtp_main_loop()

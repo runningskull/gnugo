@@ -460,7 +460,8 @@ computer_move(Gameinfo *gameinfo, int *passes)
   last_move_i = i;
   last_move_j = j;
   
-  mprintf("%s(%d): %m\n", color_to_string(gameinfo->to_move), movenum+1, i, j);
+  mprintf("%s(%d): %m\n", color_to_string(gameinfo->to_move),
+	  movenum+1, i, j);
   if (is_pass(POS(i, j)))
     (*passes)++;
   else
@@ -910,11 +911,10 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  if (tmpstring) {
 	    /* discard newline */
 	    tmpstring[strlen(tmpstring)-1] = 0;
-	    if (!sgftree_readfile(&sgftree, tmpstring))
-	      {
-		fprintf(stderr, "Cannot open or parse '%s'\n", tmpstring);
-		break;
-	      }
+	    if (!sgftree_readfile(&sgftree, tmpstring)) {
+	      fprintf(stderr, "Cannot open or parse '%s'\n", tmpstring);
+	      break;
+	    }
 	    sgf_initialized = 0;
 	    gameinfo_play_sgftree(gameinfo, sgftree.root, NULL);
 	    sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);

@@ -2486,10 +2486,13 @@ chainlinks3(int str, int adj[MAXCHAIN], int lib)
 /* extended_chainlinks() returns (in the (adj) array) the opponent
  * strings being directly adjacent to (str) or having a common liberty
  * with (str). The number of such strings is returned.
+ *
+ * If the both_colors parameter is true, also own strings sharing a
+ * liberty are returned.
  */
 
 int 
-extended_chainlinks(int str, int adj[MAXCHAIN])
+extended_chainlinks(int str, int adj[MAXCHAIN], int both_colors)
 {
   struct string_data *s;
   int n;
@@ -2521,7 +2524,8 @@ extended_chainlinks(int str, int adj[MAXCHAIN])
    */
   for (r = 0; r < liberties; r++) {
     for (k = 0; k < 4; k++) {
-      if (board[libs[r] + delta[k]] == OTHER_COLOR(board[str])
+      if ((board[libs[r] + delta[k]] == OTHER_COLOR(board[str])
+	   || (both_colors && board[libs[r] + delta[k]] == board[str]))
 	  && UNMARKED_STRING(libs[r] + delta[k])) {
 	adj[n] = string[string_number[libs[r] + delta[k]]].origin;
 	MARK_STRING(adj[n]);

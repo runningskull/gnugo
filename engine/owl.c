@@ -208,7 +208,9 @@ static int owl_determine_life(struct local_owl_data *owl,
 			      int color, int komaster, int does_attack,
 			      struct owl_move_data *moves, int *probable_min,
 			      int *probable_max);
-static int modify_stupid_eye_vital_point(int *vital_point);
+static int modify_stupid_eye_vital_point(struct local_owl_data *owl,
+					 int *vital_point,
+					 int is_attack_point);
 static void owl_mark_dragon(int apos, int bpos,
 			    struct local_owl_data *owl);
 static void owl_mark_worm(int apos, int bpos,
@@ -218,6 +220,8 @@ static void owl_update_goal(int pos, int same_dragon,
 			    struct local_owl_data *owl, int semeai_call);
 static void owl_update_boundary_marks(int pos, struct local_owl_data *owl);
 static void owl_find_lunches(struct local_owl_data *owl);
+static int improve_lunch_attack(int lunch, int attack_point);
+static int improve_lunch_defense(int lunch, int defense_point);
 static void owl_make_domains(struct local_owl_data *owla,
 			     struct local_owl_data *owlb);
 static int owl_safe_move(int move, int color);
@@ -1374,16 +1378,34 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	READ_RETURN(read_result, move, 0, WIN);
       }
       else if (dpos != NO_MOVE) {
-	/* The dragon could be defended by another move. Try to attack
-         * with this move.
+	/* The dragon could be defended by one more move. Try to
+         * attack with this move.
+	 *
+	 * If the move is suicide for us, try to find a backfilling
+	 * move to play instead.
 	 */
-	shape_moves[0].pos         = dpos;
-	shape_moves[0].value       = 25;
-	shape_moves[0].name        = "defense move";
-	shape_moves[0].same_dragon = 1;
-	shape_moves[0].escape = 0;
-	shape_moves[1].value       = 0;
-	moves = shape_moves;
+	shape_moves[0].name = "defense move";
+	
+	if (is_suicide(dpos, other)) {
+	  int dpos2;
+	  for (k = 0; k < 4; k++) {
+	    if (board[dpos + delta[k]] == other
+		&& find_defense(dpos + delta[k], &dpos2)) {
+	      dpos = dpos2;
+	      shape_moves[0].name = "defense move (backfill)";
+	      break;
+	    }
+	  }
+	}
+
+	if (dpos != NO_MOVE) {
+	  shape_moves[0].pos         = dpos;
+	  shape_moves[0].value       = 25;
+	  shape_moves[0].same_dragon = 1;
+	  shape_moves[0].escape      = 0;
+	  shape_moves[1].value       = 0;
+	  moves = shape_moves;
+	}
       }
     }
       
@@ -1465,7 +1487,8 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 			    &ko_move, savecode == 0))
 	continue;
 
-      TRACE("Trying %C %1m.  Current stack: ", other, mpos);
+      TRACE("Trying %C %1m. Escape = %d. Current stack: ",
+	    other, mpos, escape);
       if (verbose)
 	dump_stack();
 
@@ -2047,7 +2070,8 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       if (moves[k].escape)
 	new_escape++;
 
-      TRACE("Trying %C %1m.  Current stack: ", color, mpos);
+      TRACE("Trying %C %1m. Escape = %d. Current stack: ",
+	    color, mpos, escape);
       if (verbose)
 	dump_stack();
 
@@ -2483,7 +2507,7 @@ owl_determine_life(struct local_owl_data *owl,
 		  pos, eyevalue.maxeye, eyevalue.mineye, pessimistic_min);
 	    
 	    if (eye[attack_point].marginal
-		&& modify_stupid_eye_vital_point(&attack_point))
+		&& modify_stupid_eye_vital_point(owl, &attack_point, 1))
 	      TRACE("vital point looked stupid, moved it to %1m\n",
 		    attack_point);
 	    
@@ -2531,8 +2555,9 @@ owl_determine_life(struct local_owl_data *owl,
 		  reason, defense_point, value, pos,
 		  eyevalue.maxeye, eyevalue.mineye, pessimistic_min);
 
-	    if (eye[defense_point].marginal
-		&& modify_stupid_eye_vital_point(&defense_point))
+	    if ((eye[defense_point].marginal
+		 || eye[defense_point].origin != pos)
+		&& modify_stupid_eye_vital_point(owl, &defense_point, 0))
 	      TRACE("vital point looked stupid, moved it to %1m\n",
 		    defense_point);
 	    
@@ -2577,16 +2602,18 @@ owl_determine_life(struct local_owl_data *owl,
 	  continue;
 
 	if (does_attack) {
+	  defense_point = improve_lunch_defense(owl->lunch[lunch],
+						owl->lunch_defense_point[lunch]);
 	  TRACE("save lunch at %1m with %1m, score %d\n",
-		owl->lunch[lunch], owl->lunch_defense_point[lunch], value);
-	  owl_add_move(moves, owl->lunch_defense_point[lunch], value,
-		       "save lunch", 1, 0);
+		owl->lunch[lunch], defense_point, value);
+	  owl_add_move(moves, defense_point, value, "save lunch", 1, 0);
 	}
 	else {
+	  attack_point = improve_lunch_attack(owl->lunch[lunch],
+					      owl->lunch_attack_point[lunch]);
 	  TRACE("eat lunch at %1m with %1m, score %d\n",
-		owl->lunch[lunch], owl->lunch_attack_point[lunch], value);
-	  owl_add_move(moves, owl->lunch_attack_point[lunch], value,
-		       "eat lunch", 1, 0);
+		owl->lunch[lunch], attack_point, value);
+	  owl_add_move(moves, attack_point, value, "eat lunch", 1, 0);
 	}
       }
   }
@@ -2596,7 +2623,9 @@ owl_determine_life(struct local_owl_data *owl,
 }
 
 
-/* The optics code occasionally comes up with stupid vital moves, like
+/* Case 1.
+ *
+ * The optics code occasionally comes up with stupid vital moves, like
  * a in this position:
  *
  * ----+
@@ -2609,14 +2638,29 @@ owl_determine_life(struct local_owl_data *owl,
  *
  * This function moves such moves to the second line.
  *
+ * Case 2.
+ *
+ * In this position the optics code can suggest the empty 1-2 point as
+ * vital move for the eyespace on the right edge. That is okay for attack
+ * but obviously not for defense.
+ *
+ * ----+
+ * XO.O|
+ * XOOX|
+ * XXO.|
+ * .XOO|
+ * .XXX|
+ *
  */
 static int
-modify_stupid_eye_vital_point(int *vital_point)
+modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
+			      int is_attack_point)
 {
   int up;
   int right;
   int k;
-  
+
+  /* Case 1. */
   for (k = 0; k < 4; k++) {
     up = delta[k];
     if (ON_BOARD(*vital_point - up))
@@ -2636,6 +2680,20 @@ modify_stupid_eye_vital_point(int *vital_point)
 	|| board[*vital_point + up - right] != EMPTY) {
       *vital_point += up;
       return 1;
+    }
+  }
+
+  /* Case 2. */
+  if (!is_attack_point) {
+    if (approxlib(*vital_point, OTHER_COLOR(owl->color), 1, NULL) == 0) {
+      for (k = 4; k < 8; k++) {
+	int pos = *vital_point + delta[k];
+	if (board[pos] == OTHER_COLOR(owl->color)
+	    && countlib(pos) == 1) {
+	  findlib(pos, 1, vital_point);
+	  return 1;
+	}
+      }
     }
   }
   
@@ -3343,6 +3401,11 @@ owl_update_boundary_marks(int pos, struct local_owl_data *owl)
     int pos2 = pos + delta[k];
     if (ON_BOARD(pos2) && owl->boundary[pos2] > boundary_mark)
       boundary_mark = owl->boundary[pos2];
+    if (board[pos2] == owl->color
+	&& dragon[pos2].color == owl->color
+	&& dragon[pos2].status == ALIVE
+	&& !owl->goal[pos2])
+      boundary_mark = 2;
   }
   owl->boundary[pos] = boundary_mark;
 
@@ -4000,6 +4063,81 @@ owl_find_lunches(struct local_owl_data *owl)
 }
 
 
+/* Try to improve the move to attack a lunch. Essentially we try to
+ * avoid unsafe moves when there are less risky ways to attack.
+ */
+static int
+improve_lunch_attack(int lunch, int attack_point)
+{
+  int color = OTHER_COLOR(board[lunch]);
+  int defense_point;
+  int k;
+
+  if (safe_move(attack_point, color))
+    return attack_point;
+
+  for (k = 0; k < 4; k++) {
+    int pos = attack_point + delta[k];
+    if (board[pos] == color
+	&& attack(pos, NULL)
+	&& find_defense(pos, &defense_point)
+	&& defense_point != NO_MOVE
+	&& does_attack(defense_point, lunch)) {
+      TRACE("Moved attack of lunch %1m from %1m to %1m.\n",
+	    lunch, attack_point, defense_point);
+      return defense_point;
+    }
+  }
+  
+  return attack_point;
+}
+
+/* Try to improve the move to defend a lunch.
+ *
+ * An example where this is useful is the position below, where the
+ * defense of A is moved from b to c. This is a possible variation in
+ * ld_owl:182.
+ *
+ * ...X..|      ...X..|
+ * ...X..|	...Xc.|
+ * ..XXO.|	..XXOb|
+ * XXXOOX|	XXXOOA|
+ * XOOOX.|	XOOOX.|
+ * .XOX.X|	.XOX.X|
+ * ------+	------+
+ */
+static int improve_lunch_defense(int lunch, int defense_point)
+{
+  int color = board[lunch];
+  int k;
+  
+  for (k = 0; k < 4; k++) {
+    int pos = defense_point + delta[k];
+    if (board[pos] == OTHER_COLOR(color)
+	&& countlib(pos) == 2) {
+      int libs[2];
+      int pos2;
+      
+      findlib(pos, 2, libs);
+      if (libs[0] == defense_point)
+	pos2 = libs[1];
+      else
+	pos2 = libs[0];
+
+      if (accurate_approxlib(pos2, color, MAXLIBS, NULL)
+	  > accurate_approxlib(defense_point, color, MAXLIBS, NULL)
+	  && does_defend(pos2, lunch)) {
+	TRACE("Moved defense of lunch %1m from %1m to %1m.\n",
+	      lunch, defense_point, pos2);
+	return pos2;
+      }
+    }
+  }
+  
+  return defense_point;
+}
+
+
 /* Wrapper for make domains. The second set of owl data is optional.
  * Use a null pointer if it is not needed. Otherwise, make_domains
  * is run separately for the two owl data, but information about
@@ -4261,22 +4399,43 @@ one_two_point(int pos)
  */
 
 static void
-sniff_lunch(int pos, int *min, int *probable, int *max,
+sniff_lunch(int lunch, int *min, int *probable, int *max,
 	    struct local_owl_data *owl)
 {
-  int other = OTHER_COLOR(board[pos]);
+  int other = OTHER_COLOR(board[lunch]);
   int size;
+  int libs[MAXLIBS];
+  int liberties;
+  int r;
 
-  ASSERT1(IS_STONE(board[pos]), pos);
+  ASSERT1(IS_STONE(board[lunch]), lunch);
 
-  if (owl->boundary[pos] == 2) {
+  if (owl->boundary[lunch] == 2) {
     *min = 2;
     *probable = 2;
     *max = 2;
     return;
   }
 
-  size = countstones(pos);
+  /* Do we believe this capture would help escaping? */
+  liberties = findlib(lunch, MAXLIBS, libs);
+  for (r = 0; r < liberties; r++) {
+    if (owl->escape_values[libs[r]] > 0
+	&& !is_self_atari(libs[r], other)) {
+      int k;
+      for (k = 0; k < 8; k++)
+	if (owl->goal[libs[r] + delta[k]])
+	  break;
+      if (k == 8) {
+	*min = 2;
+	*probable = 2;
+	*max = 2;
+	return;
+      }
+    }
+  }
+  
+  size = countstones(lunch);
   if (size > 6) {
     *min = 2;
     *probable = 2;
@@ -4294,7 +4453,7 @@ sniff_lunch(int pos, int *min, int *probable, int *max,
   }
   else if (size == 2) {
     int stones[2];
-    findstones(pos, 2, stones);
+    findstones(lunch, 2, stones);
     /* A lunch on a 1-2 point tends always to be worth contesting. */
     if ((obvious_false_eye(stones[0], other)
 	|| obvious_false_eye(stones[1], other))
@@ -4306,11 +4465,11 @@ sniff_lunch(int pos, int *min, int *probable, int *max,
     else {
       *min = 0;
       *probable = 1;
-      *max = 1;
+      *max = 2;
     }
   }
   else if (size == 1) {
-    if (!obvious_false_eye(pos, other)) {
+    if (!obvious_false_eye(lunch, other)) {
       *min = 0;
       *probable = 1;
       *max = 1;

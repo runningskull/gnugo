@@ -1393,6 +1393,16 @@ d*A
 ; && proper_eye(b) && oplay_attack(*,A)
 
 
+Pattern CE31
+# gf New pattern. (3.3.6)
+
+X.X
+?*?
+?O?
+
+:|,OXe
+
+
 ######################################################################
 #
 # Center followup patterns
