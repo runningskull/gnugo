@@ -36,4 +36,11 @@ loadsgf games/nngs/gnugo-3.3.16-ccwills-200302151826.sgf 74
 80 gg_genmove white
 #? [L2]*
 
+loadsgf games/paul.sgf 89
+90 restricted_genmove white P9 O10
+#? [O10]
+
+loadsgf games/paul.sgf 91
+100 restricted_genmove white O16 O15
+#? [O16]
 

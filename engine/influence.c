@@ -1007,7 +1007,7 @@ compute_influence(int color, const char safe_stones[BOARDMAX],
    */
   if ((move == NO_MOVE
        && !(printmoyo & PRINTMOYO_INITIAL_INFLUENCE))
-      || (move != debug_influence))
+      || (move != NO_MOVE && move != debug_influence))
     debug = debug &~ DEBUG_INFLUENCE;
 
   do_compute_influence(color, safe_stones, strength, q, move, trace_message);

@@ -1199,7 +1199,7 @@ ba
 >return (!xplay_attack(b,c));
 
 
-Pattern Intrusion8
+Pattern Intrusion8a
 # ab 3.1.22 revised constraint (see territory valuation in 13x13:2)
 
 X.X
@@ -1211,6 +1211,23 @@ Q!!
 B.X
 ca!
 ?X.
+
+;oplay_attack(a,B) && !attack(B)
+>return (!xplay_attack(a,c));
+
+
+Pattern Intrusion8b
+# ab New (3.3.18)
+
+?X
+Q!
+X!
+
+:8,B,value(30)
+
+?B
+ca
+X!
 
 ;oplay_attack(a,B) && !attack(B)
 >return (!xplay_attack(a,c));

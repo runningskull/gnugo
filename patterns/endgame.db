@@ -236,14 +236,17 @@ Pattern EE6
 Pattern EE7
 # tm New Pattern (3.1.19)
 #   s classification, in case of ko (see trevorc:180)
+# pp Revised (3.3.18) the pattern to match on edge only.
 
 ?.X?
 O.*.
+----
 
 :8,sOXe,terri(0.75)
 
 ?.X?
 O.*a
+----
 
 ;proper_eye(a) && safe_omove(*)
 

@@ -1287,6 +1287,31 @@ Pattern AS6
 >replace(a,*);
 
 
+Pattern AS7
+# pp New pattern (3.3.18)
+# (Work-around problem with NonTerritory11, see valuation of M19 in
+# endgame:830)
+
+?XX?	    don't play stupid zero point gote
+o*.o
+----
+
+# It is shape-penaltized since it can probably be a semeai attack/defense
+# in exceptionally rare cases. But actually it is really an antisuji.
+
+:8,X,shape(-10)
+
+aXXc
+b*ed
+----
+
+; o_alive_somewhere(a,b) && o_alive_somewhere(c,d)
+; && !oplay_attack(*,e,e) 
+; && (oplay_attack(*,e,*) || (o_somewhere(c) ? oplay_attack(*,e,c)
+;					     : oplay_attack(*,e,d)))
+
+
+
 ###########################
 #
 # Shape moves. 

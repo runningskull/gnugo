@@ -167,6 +167,9 @@ loadsgf games/nngs/gnugo-3.3.17-Wiedemann-200303251932.sgf 203
 820 gg_genmove white
 #? [H4|M10|K19]*
 
+loadsgf games/paul.sgf 205
+830 restricted_genmove white M19 B13
+#? [B13]
 
 
 ############ End of Tests #################

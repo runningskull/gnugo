@@ -193,4 +193,20 @@ X*
 :8,A
 
 
+Pattern Attack19
+# pp New pattern (3.3.18)
+
+*.O	    May be better to capture indirectly
+O.X
+..O
+
+:8,A
+
+*.O
+O.A
+..O
+
+; lib(A) == 1
+
+
 # END OF FILE
