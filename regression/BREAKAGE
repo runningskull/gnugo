@@ -1,3 +1,64 @@
+After the patches compute_eyes_1_16.2 semeai_1_16.3, semeai_1_16.2,
+gunnar_1_16.2, semeai_1_16.1:
+
+With standard semeai:
+
+./regress.sh . owl_rot.tst
+228 unexpected PASS!
+./regress.sh . strategy3.tst
+137 unexpected PASS!
+
+With experimental semeai:
+
+./regress.sh . owl_rot.tst
+228 unexpected PASS!
+./regress.sh . strategy.tst
+1 unexpected PASS!
+34 unexpected PASS!
+37 unexpected FAIL: Correct '!A17|A18|C19', got 'A17'
+44 unexpected PASS!
+./regress.sh . endgame.tst
+./regress.sh . heikki.tst
+./regress.sh . neurogo.tst
+11 unexpected FAIL: Correct 'N5', got 'L2'
+./regress.sh . arb.tst
+104 unexpected FAIL: Correct 'A7|B7', got 'B10'
+./regress.sh . golife.tst
+1 unexpected PASS!
+2 unexpected PASS!
+./regress.sh . dniwog.tst
+5 unexpected PASS!
+./regress.sh . strategy2.tst
+66 unexpected FAIL: Correct 'N11', got 'L7'
+72 unexpected PASS!
+93 unexpected PASS!
+./regress.sh . nicklas1.tst
+501 unexpected FAIL: Correct 'G7', got 'F6'
+1213 unexpected PASS!
+1405 unexpected FAIL: Correct 'B7', got 'B6'
+1406 unexpected FAIL: Correct 'B6', got 'C7'
+./regress.sh . nicklas2.tst
+1407 unexpected PASS!
+./regress.sh . manyfaces.tst
+7 unexpected FAIL: Correct 'R2|S7', got 'E14'
+./regress.sh . buzco.tst
+6 unexpected FAIL: Correct 'E8|E9|A12', got 'F10'
+./regress.sh . strategy3.tst
+110 unexpected PASS!
+113 unexpected FAIL: Correct 'P1', got 'T6'
+124 unexpected PASS!
+126 unexpected FAIL: Correct 'B19', got 'S3'
+137 unexpected PASS!
+./regress.sh . arend.tst
+30 unexpected FAIL: Correct 'C13', got 'J13'
+./regress.sh . trevora.tst
+480 unexpected PASS!
+530 unexpected PASS!
+./regress.sh . strategy4.tst
+179 unexpected FAIL: Correct 'P3|O2|P2|O4|E2', got 'Q5'
+199 unexpected FAIL: Correct 'N5|S18', got 'S19'
+200 unexpected FAIL: Correct 'P6|P7|Q7|S18', got 'S19'
+
 ========================== 3.1.15 =========================
 
 ./regress.sh . reading.tst

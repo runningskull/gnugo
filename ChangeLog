@@ -2,16 +2,17 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- pessimistic_compute_eyes() tries harder to find a vital point
 - new atari_atari_find_attack_moves() and atari_atari_find_defense_moves()
 - do_atari_atari() restructured
 - experimental-semeai configure option
 - experimental_semeai command line option
 - owl_analyze_semeai improvements
 
-3.1.14 released November 30, 2001
+3.1.15 released November 30, 2001
 
 - new field value in struct half_eye_data
-- topological_eye() and evaluate_diagonal_intersection() take ko into account
+- topological_eye(), evaluate_diagonal_intersection() take ko into account
 - improved debug output in compute_eyes() and compute_eyes_pessimistic()
 - add_half_eye() renamed add_false_eye
 - make_proper_eye_space() and remove_eyepoint() removed
