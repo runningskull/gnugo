@@ -12173,25 +12173,25 @@ oO.X..
 
 Pattern EJ45
 
-....       hane making shape in the center
-.*..
-.XOO
-..XX
-....
-....
-----
+?....?       hane making shape in the center
+?.*..?
+?.XOOo
+?..XX?
+?....?
+?....?
+------
 
 :8,J
 
-....
-.*..
-.XOO
-.aXX
-....
-....
-----
+?....?
+?.*..?
+?.XBBo
+?.aXX?
+?....?
+?....?
+------
 
-; !safe_omove(a)
+; !safe_omove(a) && !oplay_attack(*,B)
 
 
 Pattern EJ46
