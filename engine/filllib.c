@@ -28,7 +28,8 @@
 #include <string.h>
 #include "liberty.h"
 
-static int find_backfilling_move(int move, int color, int *backfill_move);
+static int find_backfilling_move(int move, int color, int *backfill_move,
+				 int forbidden_moves[BOARDMAX]);
 static int filllib_confirm_safety(int move, int color, int *defense_point);
 
 /* Determine whether a point is adjacent to at least one own string which
@@ -226,12 +227,17 @@ fill_liberty(int *move, int color)
     
     /* Try to play the move. */
     if (trymove(pos, color, "fill_liberty", NO_MOVE)) {
+      int forbidden_moves[BOARDMAX];
       popgo();
       /* Legal, but not safe. Look for backfilling move. */
       DEBUG(DEBUG_FILLLIB,
 	    "Filllib: Legal but not safe, looking for backfilling move.\n");
-      
-      if (find_backfilling_move(pos, color, move)) {
+
+      memset(forbidden_moves, 0, sizeof(forbidden_moves));
+      while (find_backfilling_move(pos, color, move, forbidden_moves)) {
+	/* Mark as forbidden in case we need another turn in the loop. */
+	forbidden_moves[*move] = 1;
+	
 	DEBUG(DEBUG_FILLLIB, "Filllib: Backfilling move at %1m.\n", *move);
 	/* In certain positions it may happen that an illegal move
 	 * is found. This probably only can happen if we try to play
@@ -250,25 +256,27 @@ fill_liberty(int *move, int color)
 	if (!filllib_confirm_safety(*move, color, &defense_point)) {
 	  DEBUG(DEBUG_FILLLIB,
 		"Filllib: Safety not confirmed, discarded.\n");
+	  *move = NO_MOVE;
 	  continue;
 	}
 	
 	/* Seems to be ok. */
 	return 1;
       }
-      else {
-	/* If we captured some stones, this move should be ok anyway. */
-	if (does_capture_something(pos, color)) {
+
+      /* No acceptable backfilling move found.
+       * If we captured some stones, this move should be ok anyway.
+       */
+      if (does_capture_something(pos, color)) {
+	DEBUG(DEBUG_FILLLIB,
+	      "Filllib: Not tactically safe, but captures stones.\n");
+	if (!filllib_confirm_safety(pos, color, &defense_point)) {
 	  DEBUG(DEBUG_FILLLIB,
-		"Filllib: Not tactically safe, but captures stones.\n");
-	  if (!filllib_confirm_safety(pos, color, &defense_point)) {
-	    DEBUG(DEBUG_FILLLIB,
-		  "Filllib: Safety not confirmed, discarded.\n");
-	    continue;
-	  }
-	  *move = pos;
-	  return 1;
+		"Filllib: Safety not confirmed, discarded.\n");
+	  continue;
 	}
+	*move = pos;
+	return 1;
       }
     }
     else {
@@ -348,12 +356,18 @@ fill_liberty(int *move, int color)
  * of his own. Maybe this could also be arranged by recursing this
  * function. Currently we only do a half-hearted attempt to find
  * opponent moves.
+ *
+ * The purpose of the forbidden_moves[] array is to get a new
+ * backfilling move if the first one later was found to be unsafe,
+ * like backfilling for J5 at F9 in filllib:45. With F9 marked as
+ * forbidden the correct move at G9 is found.
  */
 static int adjs[MAXCHAIN];
 static int libs[MAXLIBS];
 
 static int
-find_backfilling_move(int move, int color, int *backfill_move)
+find_backfilling_move(int move, int color, int *backfill_move,
+		      int forbidden_moves[BOARDMAX])
 {
   int k;
   int liberties;
@@ -415,6 +429,8 @@ find_backfilling_move(int move, int color, int *backfill_move)
       if (opponent_libs < 5 && countlib(adjs[k]) != opponent_libs)
 	continue;
       if (attack(adjs[k], &bpos) == WIN) {
+	if (forbidden_moves[bpos])
+	  continue;
 	if (liberty_of_string(bpos, adjs[k])) {
 	  *backfill_move = bpos;
 	  return 1;
@@ -428,7 +444,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
   /* Otherwise look for a safe move at a liberty. */
   if (!found_one) {
     for (k = 0; k < liberties; k++) {
-      if (safe_move(libs[k], color) == WIN) {
+      if (!forbidden_moves[libs[k]] && safe_move(libs[k], color) == WIN) {
 	*backfill_move = libs[k];
 	found_one = 1;
 	break;
@@ -442,6 +458,8 @@ find_backfilling_move(int move, int color, int *backfill_move)
 	if (opponent_libs < 5 && countlib(adjs[k]) != opponent_libs)
 	  continue;
 	if (attack(adjs[k], &bpos) == WIN) {
+	  if (forbidden_moves[bpos])
+	    continue;
 	  if (liberty_of_string(bpos, adjs[k])) {
 	    *backfill_move = bpos;
 	    return 1;
@@ -459,7 +477,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
     find_proper_superstring_liberties(move, &liberties, libs, 0);
     popgo();
     for (k = 0; k < liberties; k++) {
-      if (safe_move(libs[k], color) == WIN) {
+      if (!forbidden_moves[libs[k]] && safe_move(libs[k], color) == WIN) {
 	*backfill_move = libs[k];
 	found_one = 1;
 	break;
@@ -474,7 +492,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
     popgo();
     for (k = 0; k < neighbors; k++) {
       if (attack(adjs[k], &bpos) == WIN) {
-	if (liberty_of_string(bpos, adjs[k])) {
+	if (!forbidden_moves[bpos] && liberty_of_string(bpos, adjs[k])) {
 	  *backfill_move = bpos;
 	  return 1;
 	}
@@ -483,6 +501,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
   }
 
   if (found_one) {
+    ASSERT1(!forbidden_moves[*backfill_move], *backfill_move);
   
     if (!trymove(*backfill_move, color, "find_backfilling_move", move))
       return 0; /* This really shouldn't happen. */
@@ -495,7 +514,8 @@ find_backfilling_move(int move, int color, int *backfill_move)
     if (safe_move(move, color) == WIN)
       success = 1;
     else
-      success = find_backfilling_move(move, color, backfill_move);
+      success = find_backfilling_move(move, color, backfill_move,
+				      forbidden_moves);
 
     /* Pop move(s) and return. */
     if (extra_pop)
@@ -504,6 +524,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
   }
 
   if (!success && saved_move != NO_MOVE) {
+    ASSERT1(!forbidden_moves[saved_move], saved_move);
     *backfill_move = saved_move;
     success = 1;
   }
