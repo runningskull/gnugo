@@ -928,7 +928,7 @@ value_territory(struct influence_data *q)
 	  else if (owner == WHITE)
 	    q->territory_value[i][j] = 0.35;
 	  else {
-	    owner = whose_moyo(q, i, j);
+           owner = whose_area(q, i, j);
 	    if (owner == BLACK)
 	      q->territory_value[i][j] = -0.13;
 	    else if (owner == WHITE)
