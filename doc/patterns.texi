@@ -38,7 +38,7 @@ and the pattern files @file{hoshi.db} etc.  which are compiled from the SGF
 files @file{hoshi.sgf} (@pxref{Joseki Compiler}). There is no essential
 difference between these files, except that the ones in @file{patterns.db} and
 @file{patterns2.db} are hand written. They are concatenated before being
-compiled by @code{mkpat} into @code{patterns.c}. The purpose of the separate
+compiled by @code{mkpat} into @file{patterns.c}. The purpose of the separate
 file @file{patterns2.db} is that it is handy to move patterns into a new
 directory in the course of organizing them. The patterns in @file{patterns.db}
 are more disorganized, and are slowly being moved to @file{patterns2.db}.
@@ -83,7 +83,7 @@ The line of -'s along the bottom in this example is the edge of the
 board itself---this is an edge pattern. Corners can also be indicated.
 Elements are not generated for '?' markers, but they are not
 completely ignored - see below.
-	
+        
 The line beginning @samp{:} describes various attributes of the pattern, such
 as its symmetry and its class. Optionally, a function called a
 ``helper'' can be provided to assist the matcher in deciding whether
@@ -388,11 +388,11 @@ wedge_helper (ARGS)
   if (TRYMOVE(ti, tj, color)) @{
     if (TRYMOVE(ai, aj, other)) @{
       if (!p[ai][aj] || attack(ai, aj, NULL, NULL))
-	success = 1;
+        success = 1;
       else if (TRYMOVE(bi, bj, color)) @{
-	if (!safe_move(ci, cj, other))
-	  success = 1;
-	popgo();
+        if (!safe_move(ci, cj, other))
+          success = 1;
+        popgo();
       @}
       popgo();
     @}
@@ -1107,7 +1107,7 @@ Here are the public functions in @file{connections.c}.
 
 @itemize @bullet
 @item @code{static void cut_connect_callback(int m, int n, int color, 
-	struct pattern *pattern, int ll, void *data)}
+        struct pattern *pattern, int ll, void *data)}
 @findex cut_connect_callback
 @quotation
 Try to match all (permutations of) connection patterns at (m,n).

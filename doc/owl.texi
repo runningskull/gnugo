@@ -56,7 +56,7 @@ cutting points in the surrounding chains, the static analysis of
 eyespace is sometimes wrong. The problem is when the optics code says
 that a dragon definitely has 2 eyes, but it isn't true due to 
 shortage of liberties, so the ordinary owl patterns never get into play.
-In such situations @code{owl_vital_apats.db} is the only available measure
+In such situations @file{owl_vital_apats.db} is the only available measure
 to correct mistakes by the optics. Currently the patterns in
 @file{owl_vital_apats.db} are only matched when the level is 9 or
 greater.
@@ -237,7 +237,7 @@ results in a living dragon. Should be called only when @code{stackp==0}.
 @findex owl_lively
 @quotation
 True unless @code{(i, j)} is @code{EMPTY} or occupied by a lunch for the goal
-dragon. Used during @code{make_domains()} (see @code{optics.c}: lively macro).
+dragon. Used during @code{make_domains()} (see @file{optics.c}: lively macro).
 @end quotation
 @end itemize
 

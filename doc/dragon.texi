@@ -549,7 +549,7 @@ A database of connection patterns may be found in @file{patterns/conn.db}.
 
 The fields @code{black_eye.cut} and @code{white_eye.cut} are set where the
 opponent can cut, and this is done by the B (break) class patterns in
-@code{conn.db}.  There are two important uses for this field, which can be
+@file{conn.db}.  There are two important uses for this field, which can be
 accessed by the autohelper functions @code{xcut()} and @code{ocut()}. The
 first use is to stop amalgamation in positions like
 

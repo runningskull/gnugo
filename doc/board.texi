@@ -481,7 +481,7 @@ It's the caller's responsibility to initialize the result parameters.
 
 Hashing of go positions in a hash table (sometimes also called a
 transposition table) is implemented in @code{libboard}, in @file{hash.c}
-and @code{cache.c} to be exact.  
+and @file{cache.c} to be exact.  
 
 To use the hash function, you must include @file{hash.h} and to use the
 entire hash table, you must include @file{cache.h} in your program.  The

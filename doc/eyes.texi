@@ -1,12 +1,9 @@
 The purpose of this Chapter is to describe the algorithm used in
 GNU Go 3.0 to determine eyes. There are actually two alternative
-algorithms: the graph-based algorithm in @code{optics.c}, and
-the algorithm based on reading in @code{life.c}. The life
-code is slower than the graph based algorithm, but more 
-accurate. You can make it the default by using the option
-@code{--life}. Otherwise, GNU Go will only call the life
-code if the graph based algorithm decides that it needs
-an expert opinion.
+algorithms: the graph-based algorithm in @file{optics.c}, and
+the algorithm based on reading in @file{life.c}. The life
+code is slower than the graph based algorithm, but sometimes more 
+accurate. You can enable it by using the option @option{--life}.
 
 @menu
 * Local Games::                 Local games
@@ -16,6 +13,7 @@ an expert opinion.
 * Graphs::                      Underlying graphs
 * Eye Shape::                   Pattern matching
 * Eye Topology::                False eyes and half eyes
+* Eye Topology with Ko::        False eyes and half eyes with ko
 * False Margins::               False margins
 * Eye Functions::               Functions in @file{optics.c}
 @end menu
@@ -130,7 +128,7 @@ The captured @samp{X} stones inside the eyespace are naturally marked @samp{X}.
 The precise algorithm by which the eye spaces are determined is
 somewhat complex. Documentation of this algorithm is in the
 comments in the source to the function @code{make_domains()} in
-@file{src/optics.c}.
+@file{optics.c}.
 
 The eyespaces can be conveniently displayed using a colored 
 ascii diagram by running @command{gnugo -E}.
@@ -148,25 +146,25 @@ labelled:
 
 @end example
 
-Tables of many eyespaces are found in the database @file{patterns/eyes.db}.
-Each of these may be thought of as a local game. The result of this
-game is listed after the eyespace in the form :max,min, where max is
-the number of eyes the pattern yields if @samp{O} moves first, while
-min is the number of eyes the pattern yields if @samp{X} moves
-first. The player who owns the eye space is denoted @samp{O}
-throughout this discussion.  Since three eyes are no better than two,
-there is no attempt to decide whether the space yields two eyes or
-three, so max never exceeds 2. Patterns with min>1 are omitted from
-the table.
+Tables of many eyespaces are found in the database
+@file{patterns/eyes.db}. Each of these may be thought of as a local
+game. The result of this game is listed after the eyespace in the form
+@code{:max,min}, where @code{max} is the number of eyes the pattern
+yields if @samp{O} moves first, while @code{min} is the number of eyes
+the pattern yields if @samp{X} moves first. The player who owns the eye
+space is denoted @samp{O} throughout this discussion. Since three eyes
+are no better than two, there is no attempt to decide whether the space
+yields two eyes or three, so max never exceeds 2. Patterns with min>1
+are omitted from the table.
 
 For example, we have:
 
 @example
 @group
-Pattern 1
+Pattern 548
 
-  x
-!x*x
+ x
+x*x!
 
 :2,1
 
@@ -181,15 +179,15 @@ We may abstract the local game as follows. The two players @samp{O}
 and @samp{X} take turns moving, or either may pass.
 
 RULE 1: @samp{O} for his move may remove any vertex marked @samp{!}
-or marked @samp{.} .
+or marked @samp{.}.
 
 RULE 2: @samp{X} for his move may replace a @samp{.} by an @samp{X}. 
 
 RULE 3: @samp{X} may remove a @samp{!}. In this case, each @samp{.}
-adjacent to the "!" which is removed becomes a "!" . If an
-"@samp{X}" adjoins the "!" which is removed, then that "@samp{X}" and any
-which are connected to it are also removed. Any @samp{.} which
-are adjacent to the removed @samp{X}'s then become @samp{.}
+adjacent to the @samp{!} which is removed becomes a @samp{!} . If an
+@samp{X} adjoins the @samp{!} which is removed, then that @samp{X}
+and any which are connected to it are also removed. Any @samp{.} which
+are adjacent to the removed @samp{X}'s then become @samp{.}.
 
 Thus if @samp{O} moves first he can transform the eyeshape in
 the above example to:
@@ -217,7 +215,7 @@ exchange below, @samp{O} is threatening to capture three X stones,
 hence has a half eye to the left of 2.  This is subtle, and there are
 other such subtleties which our abstraction will not capture. Some of
 these at least can be dealt with by a refinements of the scheme, but
-we will content ourselves for the time being with a simplified
+we will content ourselves for the time being with a simplified model.
 
 @example
 @group
@@ -356,14 +354,11 @@ they are isomorphic as local games. This reduces the number of
 eyeshapes in the database @file{patterns/eyes.db}.
 
 A further simplification is obtained through our treatment of
-half eyes and false eyes. Such patterns are tabulated in the
-database hey.h. During make_worms, which runs before the
-eye space analysis, the half eye and false eye patterns are
-tabulated in the array @code{half_eye}.
+half eyes and false eyes. Such patterns are identified by the
+topological analysis (@pxref{Eye Topology}).
 
 A half eye is isomorphic to the pattern @code{(!.)} . To see this,
 consider the following two eye shapes:
-
 
 @example
 @group 
@@ -378,7 +373,7 @@ and:
 XXOOOOO
 XOa...O
 XbOOOOO
-XXXXXX
+XXXXXXX
 
 @end group
 @end example
@@ -392,33 +387,42 @@ The first has shape:
 
 @end example
 
-The second eyeshape has a half eye at a which is taken when @samp{O} 
+The second eyeshape has a half eye at @samp{a} which is taken when @samp{O} 
 or @samp{X} plays at @samp{b}. This is found by the topological
 criterion (@pxref{Eye Topology}).
 
+The graph of the eye_shape, ostensibly @samp{....} is modified by replacing
+the left @samp{.} by @samp{!.} during graph matching.
+
+
+A false eye is isomorphic to the pattern @code{(!)} . To see this,
+consider the following eye shape:
+
 @example
-@group
-ooo      half eye
-OhO
-*OX
-@end group
+
+XXXOOOOOO
+X.Oa....O
+XXXOOOOOO
+
 @end example
 
-@noindent
-and it is recorded in the half_eye array as follows. If @code{(i,j)}
-are the coordinates of the point @samp{a}, @code{half_eye[i][j].type==HALF_EYE}
-and @code{(half_eye[i][j].ki, half_eye[i][j].kj)} are the coordinates
-of @samp{b}.
+This is equivalent to the two previous eyeshapes, with an isomorphic
+local game @{2|1@}.
 
-The graph of the eye_shape, ostensibly @samp{....} is modified by replacing
-the left @samp{.} by @samp{!}.
+This eyeshape has a false eye at @samp{a}. This is also found by the
+topological criterion.
+
+The graph of the eye_shape, ostensibly @samp{.....} is modified by replacing
+the left @samp{.} by @samp{!}. This is made directly in the eye data,
+not only during graph matching.
+
 
 @node Eye Shape, Eye Topology, Graphs, Eyes
 @comment  node-name,  next,  previous,  up
 @section Eye shape analysis
 
 The patterns in @file{patterns/eyes.db} are compiled into graphs
-represented essentially by linked lists in @file{patterns/eyes.c}.
+represented essentially by arrays in @file{patterns/eyes.c}.
 
 Each actual eye space as it occurs on the board is also
 compiled into a graph. Half eyes are handled as follows.
@@ -440,12 +444,12 @@ condition in the graph is a macro (in @file{optics.c}): two
 vertices are adjacent if they are physically adjacent, 
 or if one is a half eye and the other is its key point.
 
-In recognize_eyes, each such graph arising from an actual eyespace is
+In @code{recognize_eyes()}, each such graph arising from an actual eyespace is
 matched against the graphs in @file{eyes.c}.  If a match is found, the
 result of the local game is known. If a graph cannot be matched, its
 local game is assumed to be @{2|2@}.
 
-@node Eye Topology, False Margins, Eye Shape, Eyes
+@node Eye Topology, Eye Topology with Ko, Eye Shape, Eyes
 @comment  node-name,  next,  previous,  up
 @section Topology of Half Eyes and False Eyes
 
@@ -455,14 +459,14 @@ depending on who moves first. Here is a half eye for @code{O}:
 @example
 @group
 
-   OOOX
-   O..X
-   OOOX
+   OOXX
+   O.O.
+   OO.X
 
 @end group
 @end example
 
-A FALSE EYE is a cave which cannot become an eye. Here is are
+A FALSE EYE is a cave which cannot become an eye. Here are
 two examples of false eyes for @code{O}:
 
 @example
@@ -476,7 +480,7 @@ two examples of false eyes for @code{O}:
 @end example
 
 We describe now the topological algorithm used to find half eyes
-and false eyes.
+and false eyes. In this section we ignore the possibility of ko.
 
 False eyes and half eyes can locally be characterized by the status of
 the diagonal intersections from an eye space. For each diagonal
@@ -513,12 +517,253 @@ For all eye space points with at most one neighbor in the eye space,
 evaluate the status of the diagonal intersections according to the
 criteria above and classify the point from the sum of the values.
 
-@node False Margins, Eye Functions, Eye Topology, Eyes
+@node  Eye Topology with Ko, False Margins, Eye Topology, Eyes
+@comment  node-name,  next,  previous,  up
+
+@section Eye Topology with Ko
+
+This section extends the topological eye analysis to handle ko. We
+distinguish between a ko in favor of @samp{O}' and one in favor of @samp{X}:
+
+@example
+@group
+.?O?   good for O
+OO.O
+O.O?
+XOX.
+.X..
+
+@end group
+@group
+.?O?   good for X
+OO.O
+OXO?
+X.X.
+.X..
+@end group
+@end example
+
+Preliminarily we give the former the symbolic diagonal value @code{a}
+and the latter the diagonal value @code{b}. We should clearly have
+@code{0 < a < 1 < b < 2}. Letting @code{e} be the topological eye value
+(still the sum of the four diagonal values), we want to have the
+following properties:
+
+@example
+e <= 2     - proper eye
+2 < e < 3  - worse than proper eye, better than half eye
+e = 3      - half eye
+3 < e < 4  - worse than half eye, better than false eye
+e >= 4     - false eye
+@end example
+
+In order to determine the appropriate values of @code{a} and @code{b} we
+analyze the typical cases of ko contingent topological eyes:
+
+@example
+@group
+      .X..      (slightly) better than proper eye
+(a)   ..OO          e < 2
+      OO.O
+      O.OO      e = 1 + a
+      XOX.
+      .X..
+
+@end group
+
+@group      
+      .X..      better than half eye, worse than proper eye
+(a')  ..OO      2 < e < 3
+      OO.O
+      OXOO      e = 1 + b
+      X.X.
+      .X..
+
+@end group
+      
+@group
+      .X..      better than half eye, worse than proper eye
+(b)   .XOO      2 < e < 3
+      OO.O
+      O.OO      e = 2 + a
+      XOX.
+      .X..
+
+@end group
+      
+@group
+      .X..      better than false eye, worse than half eye
+(b')  .XOO      3 < e < 4
+      OO.O
+      OXOO      e = 2 + b
+      X.X.
+      .X..
+
+@end group
+      
+@group
+      .X..
+      XOX.      (slightly) better than proper eye
+(c)   O.OO          e < 2
+      OO.O
+      O.OO      e = 2a
+      XOX.
+      .X..
+
+@end group
+      
+@group
+      .X..
+      XOX.      proper eye, some aji
+(c')  O.OO      e ~ 2
+      OO.O
+      OXOO      e = a + b
+      X.X.
+      .X..
+
+@end group
+      
+@group
+      .X..
+      X.X.      better than half eye, worse than proper eye
+(c'') OXOO      2 < e < 3
+      OO.O
+      OXOO      e = 2b
+      X.X.
+      .X..
+
+@end group
+      
+@group
+      .X...
+      XOX..     better than half eye, worse than proper eye
+(d)   O.O.X     2 < e < 3
+      OO.O.
+      O.OO.     e = 1 + 2a
+      XOX..
+      .X...
+
+@end group
+      
+@group
+      .X...
+      XOX..     half eye, some aji
+(d')  O.O.X     e ~ 3
+      OO.O.
+      OXOO.     e = 1 + a + b
+      X.X..
+      .X...
+
+@end group
+      
+@group
+      .X...
+      X.X..     better than false eye, worse than half eye
+(d'') OXO.X     3 < e < 4
+      OO.O.
+      OXOO.     e = 1 + 2b
+      X.X..
+      .X...
+
+@end group
+      
+@group
+      .X...
+      XOX..     better than false eye, worse than half eye
+(e)   O.OXX     3 < e < 4
+      OO.O.
+      O.OO.     e =  2 + 2a
+      XOX..
+      .X...
+
+@end group
+      
+@group
+      .X...
+      XOX..     false eye, some aji
+(e')  O.OXX     e ~ 4
+      OO.O.
+      OXOO.     e = 2 + a + b
+      X.X..
+      .X...
+
+@end group
+      
+@group
+      .X...
+      X.X..     (slightly) worse than false eye
+(e'') OXOXX     4 < e
+      OO.O.
+      OXOO.     e = 2 + 2b
+      X.X..
+      .X...
+
+@end group
+@end example      
+
+It may seem obvious that we should use
+@example
+(i)   a=1/2, b=3/2
+@end example
+but this turns out to have some drawbacks. These can be solved by
+using either of
+@example
+(ii)  a=2/3, b=4/3
+(iii) a=3/4, b=5/4
+(iv)  a=4/5, b=6/5
+
+@end example
+
+Summarizing the analysis above we have the following table for the
+four different choices of @code{a} and @code{b}.
+
+@example
+case    symbolic        a=1/2   a=2/3   a=3/4   a=4/5   desired
+        value           b=3/2   b=4/3   b=5/4   b=6/5   interval
+(a)     1+a             1.5     1.67    1.75    1.8         e < 2
+(a')    1+b             2.5     2.33    2.25    2.2     2 < e < 3
+(b)     2+a             2.5     2.67    2.75    2.8     2 < e < 3
+(b')    2+b             3.5     3.33    3.25    3.2     3 < e < 4
+(c)     2a              1       1.33    1.5     1.6         e < 2
+(c')    a+b             2       2       2       2           e ~ 2
+(c'')   2b              3       2.67    2.5     2.4     2 < e < 3
+(d)     1+2a            2       2.33    2.5     2.6     2 < e < 3
+(d')    1+a+b           3       3       3       3           e ~ 3
+(d'')   1+2b            4       3.67    3.5     3.4     3 < e < 4
+(e)     2+2a            3       3.33    3.5     3.6     3 < e < 4
+(e')    2+a+b           4       4       4       4           e ~ 4
+(e'')   2+2b            5       4.67    4.5     4.4     4 < e
+
+@end example
+
+We can notice that (i) fails for the cases (c''), (d), (d''), and (e).
+The other three choices get all values in the correct intervals. The
+main distinction between them is the relative ordering of (c'') and (d)
+(or analogously (d'') and (e)). If we do a more detailed analysis of
+these we can see that in both cases @samp{O} can secure the eye
+unconditionally if he moves first while @samp{X} can falsify it with ko
+if he moves first. The difference is that in (c''), @samp{X} has to make
+the first ko threat, while in (d), O has to make the first ko threat.
+Thus (c'') is better for O and ought to have a smaller topological eye
+value than (d). This gives an indication that (iv) is the better choice.
+
+We can notice that any value of @code{a}, @code{b} satisfying
+@code{a+b=2} and @code{3/4<a<1} would have the same qualities as choice
+(iv) according to the analysis above. One interesting choice is
+@code{a=7/8, b=9/8} since these allow exact computations with floating
+point values having a binary mantissa. The latter property is shared by
+@code{a=3/4} and @code{a=1/2}.
+
+When there are three kos around the same eyespace, things become
+more complex. This case is, however, rare enough that we ignore it.
+
+
+@node False Margins, Eye Functions, Eye Topology with Ko, Eyes
 @comment  node-name,  next,  previous,  up
 @section False Margins
 
-The following situation is rare but special enough to warrant
-separate attention:
+The following situation is rare but special enough to warrant separate
+attention:
 
 @example
    OOOOXX
@@ -538,134 +783,68 @@ as @code{(X)}, not @code{(X!)}.
 @comment  node-name,  next,  previous,  up
 @section Functions in @file{optics.c}
 
-Here are the public functions in @file{optics.c}. The statically
-declared functions are documented in the source code.
+Here are the public functions in @file{optics.c}, except some simple
+access functions used by autohelpers. The statically declared functions
+are documented in the source code.
 
 @itemize @bullet 
-@item @code{void make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD], struct eye_data w_eye[MAX_BOARD][MAX_BOARD])}
+@item @code{void make_domains(struct eye_data b_eye[BOARDMAX], struct eye_data w_eye[BOARDMAX], int owl_call)}
 @findex make_domains
 @quotation
-This function is called from make_dragons(). It marks the black
-and white domains (eyeshape regions) and collects some statistics
-about each one.
+This function is called from @code{make_dragons()} and from
+@code{owl_determine_life()}. It marks the black and white domains
+(eyeshape regions) and collects some statistics about each one.
 @end quotation
-@item @code{void originate_eye(int i, int j, int m, int n, int *esize, int *msize, struct eye_data eye[MAX_BOARD][MAX_BOARD])}
-@findex originate_eye
-@quotation
-originate_eye(i, j, i, j, *size) creates an eyeshape with origin (i, j).
-the last variable returns the size. The repeated variables (i, j) are due
-to the recursive definition of the function.
-@end quotation
-@item @code{static void print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD], int i, int j)}
-@findex print_eye
-@quotation
-Print debugging data for the eyeshape at (i,j). Useful with GDB.
-@end quotation
-@item @code{void compute_eyes(int i, int  j, int *max, int *min, 
-	int *attacki, int *attackj, struct eye_data eye[MAX_BOARD][MAX_BOARD],
-	int add_moves, int color)}
+@item @code{void compute_eyes(int pos, int *max, int *min, int *attack_point, int *defense_point, struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX], int add_moves, int color)}
 @findex compute_eyes
 @quotation
-Given an eyespace with origin (i,j), this function computes the
-minimum and maximum numbers of eyes the space can yield.
-If @code{add_moves==1}, this function may add a move_reason for @code{color} at
-a vital point which is found by the function. If @code{add_moves==0},
-set @code{color==EMPTY}.
+Given an eyespace with origin @code{pos}, this function computes the
+minimum and maximum numbers of eyes the space can yield. If max and
+min are different, then vital points of attack and defense are also
+generated.
 @end quotation
-@item @code{void compute_eyes_pessimistic(int i, int  j, int *max, int *min, int *pessimistic_min, int *attacki, int *attackj, int *defendi, int *defendj, struct eye_data eye[MAX_BOARD][MAX_BOARD], struct half_eye_data heye[MAX_BOARD][MAX_BOARD])}
+@item @code{void compute_eyes_pessimistic(int pos, int *max, int *min, int *pessimistic_min, int *attack_point, int *defense_point, struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX])}
 @findex compute_eyes_pessimistic
 @quotation
-This function works like compute_eyes(), except that it also gives
-a pessimistic view of the chances to make eyes. Since it is intended
-to be used from the owl code, the option to add move reasons has
-been removed.
+This function works like @code{compute_eyes()}, except that it also gives
+a pessimistic view of the chances to make eyes.
 @end quotation
-@item @code{void propagate_eye (int i, int j, struct eye_data eye[MAX_BOARD][MAX_BOARD])}
-@findex propogate_eye
+@item @code{void propagate_eye(int origin, struct eye_data eye[BOARDMAX])}
+@findex propagate_eye
 @quotation
-Copies the data at the origin (i, j) to the rest of the eye (certain fields only).
+Copies the data at @code{origin} to the rest of the eye (invariant
+fields only).
 @end quotation
-@item @code{static int recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj, int *max, int *min, struct eye_data eye[MAX_BOARD][MAX_BOARD], struct half_eye_data heye[MAX_BOARD][MAX_BOARD], int add_moves, int color)}
+@item @code{static int recognize_eye(int pos, int *attack_point, int *defense_point, int *max, int *min, struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX], int add_moves, int color)}
 @quotation
 Declared static but documented here because of its importance. The life
 code supplies an alternative version of this function called
-@code{recognize_eye2()}.  Here @code{(i,j)} is the origin of an
-eyespace. Returns 1 if there is a pattern in @file{eyes.c} matching the
+@code{recognize_eye2()}.  Here @code{pos} is the origin of an
+eyespace. Returns 1 if there is a pattern in @file{eyes.db} matching the
 eyespace, or 0 if no match is found. If there is a key point for attack,
-@code{(*ai, *aj)} are set to its location, or @code{(-1, -1)} if there is
-none.  Similarly @code{(*di, *dj)} is the location of a vital defense
+@code{*attack_point} is set to its location, or @code{NO_MOVE} if there is
+none.  Similarly @code{*defense_point} is the location of a vital defense
 point. @code{*min} and @code{*max} are the minimum and maximum number of eyes
 that can be made in this eyespace respectively. Vital attack/defense points
 exist if and only if @code{*min != *max}. If @code{add_moves==1}, this
-function may add a move_reason for (color) at a vital point which is found by
-the function. If @code{add_moves==0}, set @code{color==EMPTY}.
+function may add a move_reason for @code{color} at a vital point which
+is found by the function. If @code{add_moves==0}, set @code{color==EMPTY}.
 @end quotation
-@item @code{ void add_half_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD], struct half_eye_data hey[MAX_BOARD][MAX_BOARD])}
-@findex add_half_eye
+@item @code{void add_false_eye(int pos, struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX])}
+@findex add_false_eye
 @quotation
-This function adds a half eye or false eye to an eye shape.
+This function turns a proper eyespace into a margin.
 @end quotation
-@item @code{int eye_space(int i, int j)}
-@findex eye_space
-@quotation
-Used from constraints to identify eye spaces, primarily for late endgame moves.
-This returns true if the location is an eye space of either color.
-@end quotation
-@item @code{int proper_eye_space(int i, int j)}
-@findex proper_eye_space
-@quotation
-Used from constraints to identify proper eye spaces, primarily for late
-endgame moves. Returns true if the location is an eye space of either
-color and is not marginal.
-@end quotation
-@item @code{int marginal_eye_space(int i, int j)}
-@findex marginal_eye_space
-@quotation
-Used from constraints to identify marginal eye spaces, primarily for late
-endgame moves. Returns true if the location is a marginal eye space of either
-color.
-@end quotation
-@item @code{void make_proper_eye_space(int i, int j, int color)}
-@quotation
-Turn a marginal eye space into a proper eye space.
-@end quotation
-@item @code{void remove_half_eye(int m, int n, int color)}
-@findex remove_half_eye
-@quotation
-Remove a halfeye from an eye shape.
-@end quotation
-@item @code{void remove_eyepoint(int m, int n, int color)}
-@findex remove_eyepoint
-@quotation
-Remove an eye point. This function can only be used before the
-segmentation into eyespaces.
-@end quotation
-@item @code{int topological_eye(int m, int n, int color, int *ai, int *aj, int *di, int *dj, struct eye_data b_eye[MAX_BOARD][MAX_BOARD], struct eye_data w_eye[MAX_BOARD][MAX_BOARD], struct half_eye_data heye[MAX_BOARD][MAX_BOARD])}
+@item @code{float topological_eye(int pos, int color, struct eye_data b_eye[BOARDMAX], struct eye_data w_eye[BOARDMAX], struct half_eye_data heye[BOARDMAX])}
 @findex topological_eye
 @quotation 
-See @xref{Eye Topology}. Evaluate the eye space at @code{(m, n)} topologically
-(@pxref{Eye Topology}). Returns 2 or less if @code{(m, n)} is a proper eye for
-(color); 3 if @code{(m, n)} is a half eye; 4 if @code{(m, n)} is a false eye.
-@code{(*ai, *aj)} and @code{(*di, *dj)} return the coordinates of an unsettled
-diagonal intersection, or an attack or defense point of defense of an opponent
-stone occupying a diagonal intersection.
-@end quotation
-@item @code{int evaluate_diagonal_intersection(int m, int n, int color, int *vitali, int *vitalj)}
-@findex evaluate_diagonal_intersection
-@quotation
-Evaluate an intersection which is diagonal to an eye space
-(@pxref{Eye Topology}).  Returns 0 if the opponent cannot safely
-play at the vertex; Returns 1 if empty and the opponent can
-safely play on it, or if the vertex is occupied by an opponent
-stone which can be either attacked or defended. Returns 2 if
-safely occupied by the opponent.  Exception: if one coordinate is
-off the board, returns 1; if both are off the board, returns
-0. This guarantees correct behavior for diagonal intersections of
-points on the edge or in the corner. If the return value is 1,
-@code{(*vitali, *vitalj)} returns @code{(m, n)} if the vertex is
-empty, or the vital point of defense if it is occupied by an
-opponent stone.
+See @xref{Eye Topology}. Evaluate the eye space at @code{pos}
+topologically (@pxref{Eye Topology}). Returns 2 or less if @code{pos}
+is a proper eye for @code{color}; between 2 and 3 if the eye can be made
+false only by ko; 3 if @code{pos} is a half eye; between 3 and 4 if the
+eye can be made real only by ko; 4 if @code{pos} is a false eye. Attack
+and defense points for control of the diagonals are stored in the
+@code{heye[]} array.
 
 @end quotation
 @end itemize
-

@@ -9,7 +9,7 @@ definition of the file format, see @url{http://www.red-bean.com/sgf/}.
 GNU Go contains a library to handle go game records in the SGF format in
 memory and to read and write SGF files. This library - @code{libsgf.a} -
 is in the @code{sgf} subdirectory. To use the SGF routines, include the
-file @code{sgftree.h}.
+file @file{sgftree.h}.
 
 Each game record is stored as a tree of @dfn{nodes}, where each node
 represents a state of the game, often after some move is made. Each node

@@ -1,4 +1,4 @@
-The algorithms in @code{board.c} implement a method of incremental board
+The algorithms in @file{board.c} implement a method of incremental board
 updates that keeps track of the following information for each string:
 
 @itemize @bullet

@@ -241,7 +241,7 @@ the start state is 1.
 To each state we associate an often empty
 list of attributes which is the  
 list of pattern indexes recognized when this state is reached.
-In '@code{dfa.h}' this is basically represented by two stuctures:
+In '@file{dfa.h}' this is basically represented by two stuctures:
 
 @example
 @group
@@ -273,7 +273,7 @@ dfa_t;}
 
 Recognizing with a DFA is very simple
 and thus very fast 
-(See '@code{scan_for_pattern()}' in the '@code{engine/matchpat.c}' file).
+(See '@code{scan_for_pattern()}' in the '@file{engine/matchpat.c}' file).
 
 
 Starting from the start state, we only need to read the board
