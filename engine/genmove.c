@@ -742,7 +742,7 @@ test_symmetry_after_move(int move, int color)
     return 0;
   
   for (pos = BOARDMIN; pos <= MIRROR_MOVE(pos); pos++) {
-    if (!(board[pos] == EMPTY ^ board[MIRROR_MOVE(pos)])) {
+    if ((board[pos] == EMPTY) ^ (board[MIRROR_MOVE(pos)] == EMPTY)) {
       result = 0;
       break;
     }
