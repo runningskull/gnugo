@@ -508,7 +508,6 @@ class RegressionViewer
     GTK.Widget data_widget;
 
     GTK.ScrolledWindow scrolled_data_window;
-    array(GTK.Window) all_windows = ({});
     GTK.Image gtk_image;
     GDK.Image gdk_image;
     GTK.Clist clist;
@@ -517,6 +516,8 @@ class RegressionViewer
 
     mapping(string:array(string)) worms = ([]);
     mapping(string:array(string)) dragons = ([]);
+    int worms_initialized = 0;
+    int dragons_initialized = 0;
 
     string name;
     string result;
@@ -541,13 +542,24 @@ class RegressionViewer
 	int boardsize = (int) send_command("query_boardsize");
 	on_board_click_callback = callback;
 
-	foreach (send_command("worm_stones") / "\n", string worm)
-	    worms[(worm / " ")[0]] = worm / " " - ({""});
-	
+	setup_board(boardsize);
+
+	scrolled_data_window = GTK.ScrolledWindow();
+	scrolled_data_window->set_policy(GTK.POLICY_AUTOMATIC,
+					 GTK.POLICY_AUTOMATIC);
+
+	clist = GTK.Clist(3);
+	scrolled_data_window->add(clist);
+	handle_testcase();
+    }
+
+    static void setup_board(int boardsize)
+    {
 	goban = Goban(boardsize, 600);
 	goban->add_stones("WHITE", send_command("list_stones white") / " ");
 	goban->add_stones("BLACK", send_command("list_stones black") / " ");
 	Image.Image im = goban->draw_board();
+
 	gdk_image = GDK.Image(0)->set(im);
 	gtk_image = GTK.Image(gdk_image);
 	goban_widget = GTK.EventBox()->add(gtk_image);
@@ -557,19 +569,32 @@ class RegressionViewer
 					 button_pressed_on_board);
 	goban_widget->signal_connect_new("key_press_event",
 					 key_pressed_on_board);
-
-	scrolled_data_window = GTK.ScrolledWindow();
-	scrolled_data_window->set_policy(GTK.POLICY_AUTOMATIC,
-					 GTK.POLICY_AUTOMATIC);
-
-	all_windows = ({});
-	
-	clist = GTK.Clist(3);
-	scrolled_data_window->add(clist);
-	
-//	thread_create(handle_testcase);
-	handle_testcase();
     }
+
+
+    void new_testcase(array(string) fulltest_, string testcase_command_)
+    {
+	werror("Loading new testcase.\n");
+        worms_initialized = 0;
+        dragons_initialized = 0;
+        result = "";
+        worms = ([]);
+        dragons = ([]);
+
+        fulltest = fulltest_;
+	testcase_command = testcase_command_;
+
+	load_testcase();
+	werror("%s\n", send_command("showboard"));
+	int boardsize = (int) send_command("query_boardsize");
+
+	werror("Loaded new testcase.\n");
+	goban = Goban(boardsize, 600);
+	goban->add_stones("WHITE", send_command("list_stones white") / " ");
+	goban->add_stones("BLACK", send_command("list_stones black") / " ");
+	redraw_board();
+    }
+
 
     static void load_testcase()
     {
@@ -580,18 +605,12 @@ class RegressionViewer
         }
     }
 
-    static void handle_testcase()
+    void handle_testcase()
     {
 	traces = ({});
 	engine->trace_callback = collect_traces;
         result = send_command(testcase_command);
 	engine->trace_callback = 0;
-
-	// Due to a bug in the examine_position caching, we can't do
-	// this before a genmove call.
-	foreach (send_command("dragon_stones") / "\n", string dragon)
-	    dragons[(dragon / " ")[0]] = dragon / " " - ({""});
-
 	redraw_board();
     }
 
@@ -599,6 +618,21 @@ class RegressionViewer
     {
 	traces += ({s});
     }
+    
+    void get_dragons()
+    {
+        foreach (send_command("dragon_stones") / "\n", string dragon)
+            dragons[(dragon / " ")[0]] = dragon / " " - ({""});
+        dragons_initialized = 1;
+    }
+
+    static void get_worms()
+    {
+	foreach (send_command("worm_stones") / "\n", string worm)
+	    worms[(worm / " ")[0]] = worm / " " - ({""});
+	worms_initialized = 1;
+    }
+	
     
     void add_markup(int mode)
     {
@@ -631,6 +665,8 @@ class RegressionViewer
 	
 	if (parent->dragon_status_button->get_active())
 	{
+            if (!dragons_initialized)
+                get_dragons();
 	    foreach (dragons; string dragon; array(string) stones)
 	    {
 		string status = get_worm_or_dragon_data("dragon", "status",
@@ -642,6 +678,8 @@ class RegressionViewer
 	}
 	else if (parent->dragon_safety_button->get_active())
 	{
+            if (!dragons_initialized)
+                get_dragons();
 	    foreach (dragons; string dragon; array(string) stones)
 	    {
 		string safety = get_worm_or_dragon_data("dragon", "safety",
@@ -653,6 +691,8 @@ class RegressionViewer
 	}
 	else if (parent->worm_status_button->get_active())
 	{
+            if (!worms_initialized)
+                get_worms();
 	    foreach (worms; string worm; array(string) stones)
 	    {
 		string attack = get_worm_or_dragon_data("worm", "attack_code",
@@ -1097,9 +1137,7 @@ class RegressionViewer
     string send_command(string command)
     {
 	string result;
-	//all_windows->set_cursor(GDK.Watch);
 	result = engine->send_command(command)->text;
-	//all_windows->set_cursor(GDK.TopLeftArrow);
 	return result;
     }
 
@@ -1175,6 +1213,8 @@ class Controller
     GTK.Notebook data_notebook;
     GTK.Notebook selector_notebook;
 
+    GTK.Widget testcase_label;
+
     GTK.RadioButton worm_data_button;
     GTK.RadioButton dragon_data1_button;
     GTK.RadioButton dragon_data2_button;
@@ -1216,9 +1256,8 @@ class Controller
     GTK.CheckButton sgf_traces_button, sgf_viewer_button;
     GTK.Entry sgf_filename_entry, sgf_viewer_entry;
     GTK.Table sgf_stuff;
-    GTK.Button new_engine_button;
-    GTK.Entry engine_path_entry;
-    GTK.Entry engine_name_entry;
+    GTK.Button new_testcase_button, new_engine_button;
+    GTK.Entry new_testcase_entry, engine_path_entry, engine_name_entry;
     
     string delta_territory_move = "PASS";
     string move_influence_move = "PASS";
@@ -1245,8 +1284,8 @@ class Controller
 	}
 	testcase_name = testcase;
 
-	GTK.Widget testcase_label = (GTK.Label(full_testcase * "\n")
-				     ->set_justify(GTK.JUSTIFY_LEFT));
+	testcase_label = (GTK.Label(full_testcase * "\n")
+		          ->set_justify(GTK.JUSTIFY_LEFT));
 
 	main_window = GTK.Window(GTK.WindowToplevel);
 	controller_notebook = GTK.Notebook();
@@ -1423,7 +1462,11 @@ class Controller
                     ->attach_defaults(sgf_viewer_button, 0, 1, 1, 2)
                     ->attach_defaults(sgf_viewer_entry, 1, 2, 1, 2);
 
-
+	new_testcase_entry = GTK.Entry();
+        new_testcase_entry->set_text("owl:1");
+        new_testcase_entry->set_editable(1);
+        new_testcase_button = GTK.Button("Load new testcase");
+        new_testcase_button->signal_connect_new("clicked", new_testcase);
 	engine_path_entry = GTK.Entry();
 	engine_path_entry->set_text("../interface/gnugo");
 	engine_path_entry->set_editable(1);
@@ -1508,7 +1551,9 @@ class Controller
 	if (single_window_mode)
 	    engines_page->pack_start(engine_name_entry, 0, 0, 0);
 	engines_page->pack_start(GTK.Alignment(1.0, 0.0, 0.0, 0.0)
-				 ->add(new_engine_button), 0, 0, 0);
+				 ->add(new_engine_button), 0, 0, 0)
+		     ->pack_start(new_testcase_entry, 0, 0, 0)
+		     ->pack_start(new_testcase_button, 0, 0, 0);
 	controller_notebook->append_page(engines_page->set_border_width(12),
 					 GTK.Label("engines"));
 
@@ -1758,8 +1803,7 @@ class Controller
 		    else
 		    {
 			c1 = sprintf("analyze_semeai %s %s",
-				     first_vertex,
-				     vertex);
+				     first_vertex, vertex);
 			c2 = sprintf("analyze_semeai %s %s", vertex,
 				     first_vertex);
 			// FIXME: We should use a semeai node counter rather
@@ -1776,6 +1820,24 @@ class Controller
 	    break;
 	}
     }
+
+
+    static void new_testcase()
+    {
+        string new_testcase = new_testcase_entry->get_text();
+        werror("Trying to load new testcase %s.", new_testcase);
+        if (!excerpt_testcase(new_testcase, viewers[0]->engine))
+        {
+            werror("Failed to load testcase.\n");
+            return;
+        }
+        testcase_name = new_testcase;
+	main_window->set_title(testcase_name);
+	testcase_label->set_text(full_testcase * "\n");
+        viewers->new_testcase(full_testcase, testcase_command);
+        viewers->handle_testcase();
+    }
+
 
     // The engine parameter is only needed to find out the color to
     // move when an sgf file is given. Since there can be multiple

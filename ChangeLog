@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- view.pike enhancement: switch to new test case
 - debugging enhancement: owl goal marked in sgf trees
 - new move reasons POTENTIAL_SEMEAI_ATTACK/DEFENSE to defer analysis of
   possible semeai winning moves until move valuation
