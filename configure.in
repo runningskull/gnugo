@@ -37,10 +37,6 @@ AC_ARG_WITH(readline,
  [  --with-readline     try to use GNU readline for command reading
   --without-readline  do not use GNU readline (default)])
 
-AC_ARG_WITH(readline,
- [  --with-readline     try to use GNU readline for command reading
-  --without-readline  do not use GNU readline (default)])
-
 AC_ARG_WITH(curses,
  [  --with-curses       try to use curses for colored debugging output (default)
   --without-curses    do not use curses for colored debugging output])
