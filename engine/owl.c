@@ -1124,7 +1124,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 			    &ko_move, savecode == 0))
 	continue;
       TRACE("Trying %C %1m\n", other, mpos);
-      
+
       /* We have now made a move. Analyze the new position. */
       push_owl(owl);
       mw[mpos] = 1;
@@ -1869,9 +1869,10 @@ owl_determine_life(struct local_owl_data *owl,
    * are the eyespaces of the dragon. Now we find their
    * origins.
    *
-   * It is required that at least one non-marginal eye space is
-   * directly adjacent to the goal dragon, otherwise there is a risk
-   * that we include irrelevant eye spaces.
+   * It is required that there are at least two distinct connections,
+   * adjacent or diagonal, between non-marginal eyespace vertices and
+   * stones of the goal dragon. Otherwise there is a risk that we
+   * include irrelevant eye spaces.
    */
 
   if (color == WHITE)
@@ -1882,26 +1883,15 @@ owl_determine_life(struct local_owl_data *owl,
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
       if (BOARD(m, n) && owl->goal[m][n]) {
-	if (m > 0
-	    && eye[POS(m-1, n)].color == eye_color
-	    && eye[POS(m-1, n)].origin != NO_MOVE
-	    && !eye[POS(m-1, n)].marginal)
-	  mw[I(eye[POS(m-1, n)].origin)][J(eye[POS(m-1, n)].origin)] = 1;
-	if (m < board_size-1
-	    && eye[POS(m+1, n)].color == eye_color
-	    && eye[POS(m+1, n)].origin != NO_MOVE
-	    && !eye[POS(m+1, n)].marginal)
-	  mw[I(eye[POS(m+1, n)].origin)][J(eye[POS(m+1, n)].origin)] = 1;
-	if (n > 0
-	    && eye[POS(m, n-1)].color == eye_color
-	    && eye[POS(m, n-1)].origin != NO_MOVE
-	    && !eye[POS(m, n-1)].marginal)
-	  mw[I(eye[POS(m, n-1)].origin)][J(eye[POS(m, n-1)].origin)] = 1;
-	if (n < board_size-1
-	    && eye[POS(m, n+1)].color == eye_color
-	    && eye[POS(m, n+1)].origin != NO_MOVE
-	    && !eye[POS(m, n+1)].marginal)
-	  mw[I(eye[POS(m, n+1)].origin)][J(eye[POS(m, n+1)].origin)] = 1;
+	for (k = 0; k < 8; k++) {
+	  int dm = deltai[k];
+	  int dn = deltaj[k];
+	  if (ON_BOARD2(m+dm, n+dn)
+	      && eye[POS(m+dm, n+dn)].color == eye_color
+	      && eye[POS(m+dm, n+dn)].origin != NO_MOVE
+	      && !eye[POS(m+dm, n+dn)].marginal)
+	    mw[I(eye[POS(m+dm, n+dn)].origin)][J(eye[POS(m+dm, n+dn)].origin)]++;
+	}
       }
 
   for (m = 0; m < board_size; m++)
@@ -1919,7 +1909,7 @@ owl_determine_life(struct local_owl_data *owl,
     for (n = 0; n<board_size; n++) {
       if ((eye[POS(m, n)].color == eye_color)
 	  && (eye[POS(m, n)].origin != NO_MOVE)
-	  && (mw[I(eye[POS(m, n)].origin)][J(eye[POS(m, n)].origin)])
+	  && (mw[I(eye[POS(m, n)].origin)][J(eye[POS(m, n)].origin)] > 1)
 	  && (!eye[POS(m, n)].marginal || life)
 	  && (eye[POS(m, n)].neighbors <= 1)) {
 	mx[m][n] = 1;
@@ -1994,7 +1984,7 @@ owl_determine_life(struct local_owl_data *owl,
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
-      if (mw[m][n]
+      if (mw[m][n] > 1
 	  && (eye[POS(m, n)].origin == POS(m, n)))
       {
 	int value = 0;
@@ -2008,7 +1998,7 @@ owl_determine_life(struct local_owl_data *owl,
 	 */
 	for (i = 0; i < board_size; i++)
 	  for (j = 0; j < board_size; j++)
-	    if (mw[i][j]
+	    if (mw[i][j] > 1
 		&& eye[POS(i, j)].origin == POS(m, n)
 		&& owl->inessential[i][j])
 	      pessimistic_min = 0;

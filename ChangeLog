@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- owl_determine_life() revised
 - new gtp functions connect and disconnect
 - naive_ladder() made global
 - warnings eliminated from readconnect.c
