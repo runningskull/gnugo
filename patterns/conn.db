@@ -1260,7 +1260,7 @@ OX
 OB
 aO
 
-; xplay_attack_either(a,a,B)
+; xplay_attack_either(a,a,B) == WIN
 
 
 #############################################
