@@ -189,20 +189,18 @@ gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move)
   int i,j;
   SGFProperty *prop;
 
-  position_to_globals(pos);
-
   for (prop=node->props; prop; prop=prop->next) {
     switch(prop->name) {
     case SGFAB:
       /* A black stone. */
-      get_moveXY(prop, &i, &j, board_size);
-      add_stone(i, j, BLACK);
+      get_moveXY(prop, &i, &j, pos->boardsize);
+      gnugo_add_stone(pos, i, j, BLACK);
       break;
 
     case SGFAW:
       /* A white stone. */
-      get_moveXY(prop, &i, &j, board_size);
-      add_stone(i, j, WHITE);
+      get_moveXY(prop, &i, &j, pos->boardsize);
+      gnugo_add_stone(pos, i, j, WHITE);
       break;
 
     case SGFPL:
@@ -217,14 +215,12 @@ gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move)
     case SGFB:
       /* An ordinary move. */
       to_move = (prop->name == SGFW) ? WHITE : BLACK;
-      get_moveXY(prop, &i, &j, board_size);
-      play_move(i, j, to_move);
+      get_moveXY(prop, &i, &j, pos->boardsize);
+      gnugo_play_move(pos, i, j, to_move);
       to_move=OTHER_COLOR(to_move);
       break;
     }
   }
-
-  globals_to_position(pos);
 
   return to_move;
 }
@@ -235,7 +231,7 @@ gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move)
  * Return whose turn it is to move (WHITE or BLACK).
  */
 int
-gnugo_play_sgftree(Position *pos, SGFNode *root, int *until, 
+gnugo_play_sgftree(Position *position, SGFNode *root, int *until, 
 		   SGFNode **curnode)
 {
   SGFNode *node;
@@ -245,21 +241,19 @@ gnugo_play_sgftree(Position *pos, SGFNode *root, int *until,
   int movenumber=0;
 
   /* Start from the empty board. */
-  gnugo_clear_position(pos, pos->boardsize, komi);
-
-  position_to_globals(pos);
+  gnugo_clear_position(position, position->boardsize, komi);
 
   for (node=root; node; node=node->child) {
     for (prop=node->props; prop; prop=prop->next) {
       switch(prop->name) {
       case SGFAB:
-	get_moveXY(prop, &i, &j, board_size);
-	add_stone(i, j, BLACK);
+	get_moveXY(prop, &i, &j, position->boardsize);
+	gnugo_add_stone(position, i, j, BLACK);
 	break;
 
       case SGFAW:
-	get_moveXY(prop, &i, &j, board_size);
-	add_stone(i, j, WHITE);
+	get_moveXY(prop, &i, &j, position->boardsize);
+	gnugo_add_stone(position, i, j, WHITE);
 	break;
 
       case SGFPL:
@@ -272,22 +266,19 @@ gnugo_play_sgftree(Position *pos, SGFNode *root, int *until,
       case SGFW:
       case SGFB:
 	next = prop->name == SGFW ? WHITE : BLACK;
-	get_moveXY(prop, &i, &j, board_size);
+	get_moveXY(prop, &i, &j, position->boardsize);
 	movenumber++;
 	if (movenumber == *until) {
 	  *curnode=node->parent;
-	  globals_to_position(pos);
 	  return next;
 	}
-	play_move(i, j, next);
+	gnugo_play_move(position, i, j, next);
 	next=OTHER_COLOR(next);
 	break;
       }
     }
   }
   *until=movenumber;
-
-  globals_to_position(pos);
 
   return next;
 }
@@ -553,7 +544,6 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
   }
   if (!sgfGetIntProperty(head, "SZ", &bs))
     bs = 19;
-
   gnugo_clear_position(&gameinfo->position, bs, komi);
 
   /* Now we can safely parse the until string (which depends on board size). */
@@ -583,9 +573,7 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
    * as we have no interest in variations.
    *
    * The sgf routines map AB[aa][bb][cc] into AB[aa]AB[bb]AB[cc]
-   * FIXME: Why not call gnugo_play_sgftree()?
    */
-  position_to_globals(&gameinfo->position);
   for (node = head; node; node = node->child) {
     SGFProperty *prop;
     int i, j;
@@ -595,7 +583,7 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 	    prop->name & 0xff, (prop->name >> 8), prop->value);
       switch(prop->name) {
       case SGFAB:
-	get_moveXY(prop, &i, &j, board_size);
+	get_moveXY(prop, &i, &j, gameinfo->position.boardsize);
 	/* Generally the last move is unknown when the AB or AW
 	 * properties are encountered. These are used to set up
 	 * a board position (diagram) or to place handicap stones
@@ -606,18 +594,18 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 	last_moves_j[0] = -1;
 	last_moves_i[1] = -1;
 	last_moves_j[1] = -1;
-	add_stone(i, j, BLACK);
+	gnugo_add_stone(&gameinfo->position, i, j, BLACK);
 	sgffile_put_stone(i, j, BLACK);
 	addstone = 1;
 	break;
 	      
       case SGFAW:
-	get_moveXY(prop, &i, &j, board_size);
+	get_moveXY(prop, &i, &j, gameinfo->position.boardsize);
 	last_moves_i[0] = -1;
 	last_moves_j[0] = -1;
 	last_moves_i[1] = -1;
 	last_moves_j[1] = -1;
-	add_stone(i, j, WHITE);
+	gnugo_add_stone(&gameinfo->position, i, j, WHITE);
 	sgffile_put_stone(i, j, WHITE);
 	addstone = 1;
 	break;
@@ -625,7 +613,7 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
       case SGFPL:
 	/* following really should not be needed for proper sgf file */
 	if (!gameinfo->move_number && !addstone) {
-	  placehand(gameinfo->handicap);
+	  gnugo_sethand(&gameinfo->position, gameinfo->handicap, 0);
 	  sgfOverwritePropertyInt(head, "HA", handicap);
 	}
 
@@ -647,25 +635,19 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 	next = prop->name == SGFW ? WHITE : BLACK;
 	/* following really should not be needed for proper sgf file */
 	if (!gameinfo->move_number && !addstone) {
-	  placehand(gameinfo->handicap);
+	  gnugo_sethand(&gameinfo->position, gameinfo->handicap, 0);
 	  sgfOverwritePropertyInt(head, "HA", handicap);
 	}
 
 	gameinfo->move_number++;
-	if (gameinfo->move_number == until) {
-	  gameinfo->to_move = next;
-	  globals_to_position(&gameinfo->position);
+	if (gameinfo->move_number == until)
 	  return next;
-	}
 	      
-	if (get_moveXY(prop, &i, &j, board_size))
-	  if (i == untilm && j == untiln) {
-	    gameinfo->to_move = next;
-	    globals_to_position(&gameinfo->position);
+	if (get_moveXY(prop, &i, &j, gameinfo->position.boardsize))
+	  if (i == untilm && j == untiln)
 	    return next;
-	  }
 
-	play_move(i, j, next);
+	gnugo_play_move(&gameinfo->position, i, j, next);
 	sgffile_move_made(i, j, next, 0);
 	next = OTHER_COLOR(next);
 	      
@@ -679,7 +661,7 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 	 * (board_ko_i, board_ko_j) is set to the location of
 	 * the ko.
 	 */
-	get_moveXY(prop, &i, &j, board_size);
+	get_moveXY(prop, &i, &j, gameinfo->position.boardsize);
 	{
 	  int move_color;
 
@@ -700,9 +682,6 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
   }
 
   gameinfo->to_move = next;
-
-  globals_to_position(&gameinfo->position);
-
   return next;
 }
 

@@ -694,11 +694,7 @@ add_stone(int i, int j, int color)
   ASSERT(p[i][j] == EMPTY, i, j);
 
   do_add_stone(i, j, color);
-#if 0
   new_position();
-#else
-  CLEAR_STACKS();
-#endif
 }
 
 
@@ -712,11 +708,7 @@ remove_stone(int i, int j)
   ASSERT(p[i][j] != EMPTY, i, j);
 
   do_remove_stone(i, j);
-#if 0
   new_position();
-#else
-  CLEAR_STACKS();
-#endif
 }
 
 
@@ -769,11 +761,7 @@ play_move(int i, int j, int color)
   }
   
   movenum++;
-#if 0
   new_position();
-#else
-  CLEAR_STACKS();
-#endif
 }
 
 
