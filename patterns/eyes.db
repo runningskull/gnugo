@@ -2586,6 +2586,15 @@ x*x.!
 :0122
 
 
+Pattern 6152
+# Attacking at the other marginal vertices is sometimes incorrect.
+
+ !
+!..x@
+
+:0011
+
+
 #             .
 # Topology: .....
 #
