@@ -667,14 +667,14 @@ loadsgf games/trevor/trevor_20.sgf  14
 #? [0]
 
 
-loadsgf games/nngs/theDoor-gnugo-3.3.11-2002-11130142.sgf 72
+loadsgf games/nngs/theDoor-gnugo-3.3.11-200211130142.sgf 72
 1100 gg_genmove black
 #? [D15]*
 
 #Bad pattern Shape55
 #Fixed with revised constraint:
 #   ;weak(a) && oplay_defend(*,B)
-loadsgf games/nngs/theDoor-gnugo-3.3.11-2002-11130142.sgf 208
+loadsgf games/nngs/theDoor-gnugo-3.3.11-200211130142.sgf 208
 1110 gg_genmove black
 #? [O12]*
 
