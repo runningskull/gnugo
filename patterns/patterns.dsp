@@ -639,7 +639,7 @@ IntDir=.\Release
 InputPath=.\hoshi_keima.db
 
 "josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -C joseki -i hoshi.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
+	$(IntDir)\mkpat -C joseki -i hoshi_keima.db -i hoshi_other.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
 
 # End Custom Build
 
@@ -651,7 +651,7 @@ IntDir=.\Debug
 InputPath=.\hoshi_keima.db
 
 "josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -C joseki -i hoshi.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
+	$(IntDir)\mkpat -C joseki -i hoshi_keima.db -i hoshi_other.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
 
 # End Custom Build
 
@@ -938,7 +938,7 @@ IntDir=.\Debug
 InputPath=.\hoshi_other.sgf
 
 "hoshi_other.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\joseki JH hoshi_keima.sgf >hoshi_other.db
+	$(IntDir)\joseki JH hoshi_other.sgf >hoshi_other.db
 
 # End Custom Build
 
