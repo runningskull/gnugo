@@ -39,9 +39,10 @@ loadsgf golois/Connecter990428-1.sgf
 10 disconnect B5 B8
 #? [1 (A6|A7|A5|B7|C6)]
 
+# A6 also works. /gf
 loadsgf golois/Connecter990428-1.sgf
 11 connect B5 B8
-#? [1 B7]
+#? [1 (B7|A6)]
 
 loadsgf golois/Connecter990430-1.sgf
 12 disconnect H7 F7
@@ -251,7 +252,7 @@ loadsgf golois/Indigo20000718-3.sgf
 
 loadsgf golois/Indigo20000718-3.sgf
 60 connect G17 F15
-#? [1 G16]
+#? [1 (G16|F16|G15|H15|H16)]
 
 loadsgf golois/Indigo991107-1.sgf
 61 disconnect P4 P8
@@ -285,7 +286,7 @@ loadsgf golois/Indigo-Golois-991106-1.sgf
 # The ladder works, so F11 is also okay.
 loadsgf golois/Indigo-Golois-991106-2.sgf
 68 connect F8 F12
-#? [1 (E11|F11)]
+#? [1 (E11|F11|E9)]
 
 # The ladder works, so F11 is also okay.
 loadsgf golois/Indigo-Golois-991106-2.sgf

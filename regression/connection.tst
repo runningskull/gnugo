@@ -129,7 +129,7 @@ loadsgf games/connection3.sgf
 36 connect M3 N7
 #? [1 (N4|M4|N5|N6)]*
 37 disconnect M3 N7
-#? [1 (N4|M4|N5|M5|M6)]*
+#? [1 (N4|M4|N5|M5|M6|N6)]*
 38 connect B2 G1
 #? [1 E1]*
 39 disconnect B2 G1
@@ -146,7 +146,7 @@ loadsgf games/connection4.sgf
 43 disconnect L12 H13
 #? [1 (K12|J12|J13|H12|G13)]
 44 connect M3 N7
-#? [3 M6]*
+#? [0]*
 45 disconnect M3 N7
 #? [1 (N4|M4|N5|M5|M6|M7|N8|M8)]*
 46 connect B2 G1
@@ -235,6 +235,14 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52
 74 disconnect D3 J2
 #? [1 F3]*
 75 same_dragon D3 G3
+#? [0]*
+
+loadsgf games/trevor/auto/b20.sgf 38
+76 connect D2 G2
+#? [1 (E3|F1|F2)]
+77 disconnect D2 G2
+#? [1 (F2|F1)]
+78 same_dragon D2 G2
 #? [0]*
 
 # Report number of nodes visited by the tactical reading
