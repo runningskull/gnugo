@@ -43,7 +43,7 @@
  */
 #define MAXLIBS   (2*(MAX_BOARD*MAX_BOARD + 1)/3)
 /* This is a smaller, practical number of liberties that we care to keep track of. */
-#define MAX_LIBERTIES 20
+#define MAX_LIBERTIES 8
 
 
 /* This is an upper bound of the number of strings that can exist on
