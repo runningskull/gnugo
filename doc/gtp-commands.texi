@@ -1211,42 +1211,39 @@
 
 @end example
 
-@cindex influence
-@item influence
+@cindex initial_influence
+@item initial_influence
 
 @example
 
- Function:  Return information about the influence function.
- Arguments: color to move
+ Function:  Return information about the initial influence function.
+ Arguments: color to move, what information
  Fails:     never
  Returns:   Influence data formatted like:
 
- white:
    0.51   1.34   3.20   6.60   9.09   8.06   1.96   0.00   0.00 
    0.45   1.65   4.92  12.19  17.47  15.92   4.03   0.00   0.00 
                    .
                    .
                    .
    0.00   0.00   0.00   0.00   0.00 100.00  75.53  41.47  23.41
- black:
-   1.57   2.51   4.10   3.10   3.60   4.54   8.32   4.15   2.71 
-   2.96   4.62   9.18   5.47   5.89  10.88  20.54  10.19   4.08 
-                   .
-                   .
-                   .
- 100.00 139.39 100.00 139.39 100.00   0.00   0.00   0.00   0.00
- territory value:
-		.
-		.
-		.
- regions:
- -1  0  0  1  1  0 -1 -3 -3
-              .
-              .
-              .
- -3 -3 -3 -3 -3  3  3  3  3
 
- The encoding of the regions is as follows:
+ The available choices of information are:
+ 
+ white_influence (float)
+ black_influence (float)
+ white_strength (float)
+ black_strength (float)
+ white_attenuation (float)
+ black_attenuation (float)
+ white_permeability (float)
+ black_permeability (float)
+ territory_value (float)
+ influence_regions (int)
+ non_territory (int)
+
+ The encoding of influence_regions is as follows:
+  4 white stone
   3 white territory
   2 white moyo
   1 white area
@@ -1254,6 +1251,31 @@
  -1 black area
  -2 black moyo
  -3 black territory
+ -4 black stone
+
+@end example
+
+@cindex move_influence
+@item move_influence
+
+@example
+
+ Function:  Return information about the influence function after a move.
+ Arguments: move, what information
+ Fails:     never
+ Returns:   Influence data formatted like for initial_influence.
+
+@end example
+
+@cindex followup_influence
+@item followup_influence
+
+@example
+
+ Function:  Return information about the followup influence after a move.
+ Arguments: move, what information
+ Fails:     never
+ Returns:   Influence data formatted like for initial_influence.
 
 @end example
 
@@ -1343,6 +1365,30 @@
  Arguments: the location
  Fails:     if called on an empty or off-board location
  Returns:   list of stones
+
+@end example
+
+@cindex eye_data
+@item eye_data
+
+@example
+
+ Function:  Return the information in the eye data structure.
+ Arguments: color, vertex
+ Fails:     never
+ Returns:   eye data fields and values, one pair per row
+
+@end example
+
+@cindex half_eye_data
+@item half_eye_data
+
+@example
+
+ Function:  Return the information in the half eye data structure.
+ Arguments: vertex
+ Fails:     never
+ Returns:   half eye data fields and values, one pair per row
 
 @end example
 

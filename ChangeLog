@@ -2,6 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- get_influence() revised
+- list_move_reasons() revised and made global
+- new functions print_all_move_values() and prepare_move_influence_debugging()
+- delta_territory cache can be disabled in estimate_territorial_value()
+- new GTP commands all_move_values, eye_data, half_eye_data, move_reasons
+- GTP command influence replaced by initial_influence, move_influence, and
+  followup_influence
+- GTP command clear_cache now also clears the non-persistent cache
 - bugfix in corner_add_pattern() (mkpat.c): labels must be rotated too
 - spread_connection_distances() now delays expensive constraint evaluation,
   storing pending evaluation on a heap

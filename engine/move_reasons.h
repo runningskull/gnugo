@@ -193,7 +193,6 @@ int get_biggest_owl_target(int pos);
 int is_antisuji_move(int pos);
 
 void discard_redundant_move_reasons(int pos);
-void list_move_reasons(int color);
 
 void mark_changed_dragon(int pos, int color, int affected, int affected2,
 			 int move_reason_type, char safe_stones[BOARDMAX],

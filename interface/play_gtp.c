@@ -56,10 +56,6 @@ static void analyze_time_data(int time_left_data[2], int stones_left_data[2],
 			      int *time_for_last_move,
 			      int *time_left, int *stones_left);
 static void adjust_level_offset(int color);
-static void print_influence(float white_influence[BOARDMAX],
-			    float black_influence[BOARDMAX],
-			    float territory_value[BOARDMAX],
-			    int influence_regions[BOARDMAX]);
 static void gtp_print_code(int c);
 static void gtp_print_vertices2(int n, int *moves);
 static void rotate_on_input(int ai, int aj, int *bi, int *bj);
@@ -72,6 +68,7 @@ DECLARE(gtp_aa_confirm_safety);
 DECLARE(gtp_accurate_approxlib);
 DECLARE(gtp_accuratelib);
 DECLARE(gtp_all_legal);
+DECLARE(gtp_all_move_values);
 DECLARE(gtp_analyze_eyegraph);
 DECLARE(gtp_analyze_semeai);
 DECLARE(gtp_analyze_semeai_after_move);
@@ -102,12 +99,14 @@ DECLARE(gtp_echo_err);
 DECLARE(gtp_estimate_score);
 DECLARE(gtp_eval_eye);
 DECLARE(gtp_experimental_score);
+DECLARE(gtp_eye_data);
 DECLARE(gtp_final_score);
 DECLARE(gtp_final_status);
 DECLARE(gtp_final_status_list);
 DECLARE(gtp_findlib);
 DECLARE(gtp_finish_sgftrace);
 DECLARE(gtp_fixed_handicap);
+DECLARE(gtp_followup_influence);
 DECLARE(gtp_genmove);
 DECLARE(gtp_genmove_black);
 DECLARE(gtp_genmove_white);
@@ -121,8 +120,9 @@ DECLARE(gtp_get_reading_node_counter);
 DECLARE(gtp_get_trymove_counter);
 DECLARE(gtp_gg_genmove);
 DECLARE(gtp_gg_undo);
+DECLARE(gtp_half_eye_data);
 DECLARE(gtp_increase_depths);
-DECLARE(gtp_influence);
+DECLARE(gtp_initial_influence);
 DECLARE(gtp_is_legal);
 DECLARE(gtp_is_surrounded);
 DECLARE(gtp_known_command);
@@ -132,6 +132,8 @@ DECLARE(gtp_limit_search);
 DECLARE(gtp_list_commands);
 DECLARE(gtp_list_stones);
 DECLARE(gtp_loadsgf);
+DECLARE(gtp_move_influence);
+DECLARE(gtp_move_reasons);
 DECLARE(gtp_name);
 DECLARE(gtp_owl_attack);
 DECLARE(gtp_owl_connection_defends);
@@ -195,6 +197,7 @@ static struct gtp_command commands[] = {
   {"accurate_approxlib",      gtp_accurate_approxlib},
   {"accuratelib",             gtp_accuratelib},
   {"all_legal",        	      gtp_all_legal},
+  {"all_move_values",         gtp_all_move_values},
   {"analyze_eyegraph", 	      gtp_analyze_eyegraph},
   {"analyze_semeai",          gtp_analyze_semeai},
   {"analyze_semeai_after_move", gtp_analyze_semeai_after_move},
@@ -228,12 +231,14 @@ static struct gtp_command commands[] = {
   {"estimate_score",          gtp_estimate_score},
   {"eval_eye",         	      gtp_eval_eye},
   {"experimental_score",      gtp_experimental_score},
+  {"eye_data",                gtp_eye_data},
   {"final_score",             gtp_final_score},
   {"final_status",            gtp_final_status},
   {"final_status_list",       gtp_final_status_list},
   {"findlib",          	      gtp_findlib},
   {"finish_sgftrace",  	      gtp_finish_sgftrace},
   {"fixed_handicap",   	      gtp_fixed_handicap},
+  {"followup_influence",      gtp_followup_influence},
   {"genmove",                 gtp_genmove},
   {"genmove_black",           gtp_genmove_black},
   {"genmove_white",           gtp_genmove_white},
@@ -247,9 +252,10 @@ static struct gtp_command commands[] = {
   {"get_trymove_counter",     gtp_get_trymove_counter},
   {"gg-undo",                 gtp_gg_undo},
   {"gg_genmove",              gtp_gg_genmove},
+  {"half_eye_data",           gtp_half_eye_data},
   {"help",                    gtp_list_commands},
   {"increase_depths",  	      gtp_increase_depths},
-  {"influence",               gtp_influence},
+  {"initial_influence",       gtp_initial_influence},
   {"is_legal",         	      gtp_is_legal},
   {"is_surrounded",           gtp_is_surrounded},
   {"known_command",    	      gtp_known_command},
@@ -262,6 +268,8 @@ static struct gtp_command commands[] = {
   {"list_commands",    	      gtp_list_commands},
   {"list_stones",    	      gtp_list_stones},
   {"loadsgf",          	      gtp_loadsgf},
+  {"move_influence",          gtp_move_influence},
+  {"move_reasons",            gtp_move_reasons},
   {"name",                    gtp_name},
   {"new_score",               gtp_estimate_score},
   {"orientation",     	      gtp_set_orientation},
@@ -1174,6 +1182,7 @@ gtp_clear_cache(char *s)
   clear_persistent_owl_cache();
   clear_persistent_connection_cache();
   clear_persistent_breakin_cache();
+  reading_cache_clear();
   return gtp_success("");
 }
 
@@ -2519,8 +2528,50 @@ gtp_restricted_genmove(char *s)
 }
 
 
-/* Function : Generate a list of the best moves in the previous genmove
- *            command (either of genmove_black, genmove_white, gg_genmove).
+/* Function : List the move reasons for a move.
+ * Arguments: vertex
+ * Fails:   : invalid vertex, occupied vertex
+ * Returns  : list of move reasons (may be empty)
+ */
+
+static int
+gtp_move_reasons(char *s)
+{
+  int i, j;
+  if (!gtp_decode_coord(s, &i, &j))
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(i, j) != EMPTY)
+    return gtp_failure("vertex must not be occupied");
+
+  gtp_start_response(GTP_SUCCESS);
+  if (list_move_reasons(stdout, POS(i, j)) == 0)
+    gtp_printf("\n");
+  gtp_printf("\n");
+  return GTP_OK;
+}
+
+/* Function : Generate a list of all moves with values larger than zero in
+ *            the previous genmove command.
+ *            If no previous genmove command has been issued, the result
+ *            of this command will be meaningless.
+ * Arguments: none
+ * Fails:   : never
+ * Returns  : list of moves with values
+ */
+
+static int
+gtp_all_move_values(char *s)
+{
+  UNUSED(s);
+  gtp_start_response(GTP_SUCCESS);
+  print_all_move_values();
+  gtp_printf("\n");
+  return GTP_OK;
+}
+
+/* Function : Generate a sorted list of the best moves in the previous genmove
+ *            command.
  *            If no previous genmove command has been issued, the result
  *            of this command will be meaningless.
  * Arguments: none
@@ -3441,38 +3492,110 @@ gtp_dump_stack(char *s)
   return gtp_success("");
 }
 
+/* Determine whether a string starts with a specific substring. */
+static int
+has_prefix(const char *s, const char *prefix)
+{
+  return strncmp(s, prefix, strlen(prefix)) == 0;
+}
 
-/* Function:  Return information about the influence function.
- * Arguments: color to move
+static int
+print_influence_data(struct influence_data *q, char *what_data)
+{
+  float white_influence[BOARDMAX];
+  float black_influence[BOARDMAX];
+  float white_strength[BOARDMAX];
+  float black_strength[BOARDMAX];
+  float white_attenuation[BOARDMAX]; 
+  float black_attenuation[BOARDMAX];
+  float white_permeability[BOARDMAX];
+  float black_permeability[BOARDMAX];
+  float territory_value[BOARDMAX];
+  int influence_regions[BOARDMAX];
+  int non_territory[BOARDMAX];
+  int m, n;
+  
+  float *float_pointer = NULL;
+  int *int_pointer = NULL;
+  
+  while (*what_data == ' ')
+    what_data++;
+
+  get_influence(q, white_influence, black_influence,
+		white_strength, black_strength,
+		white_attenuation, black_attenuation,
+		white_permeability, black_permeability,
+		territory_value, influence_regions, non_territory);
+
+  if (has_prefix(what_data, "white_influence"))
+    float_pointer = white_influence;
+  else if (has_prefix(what_data, "black_influence"))
+    float_pointer = black_influence;
+  else if (has_prefix(what_data, "white_strength"))
+    float_pointer = white_strength;
+  else if (has_prefix(what_data, "black_strength"))
+    float_pointer = black_strength;
+  else if (has_prefix(what_data, "white_attenuation"))
+    float_pointer = white_attenuation;
+  else if (has_prefix(what_data, "black_attenuation"))
+    float_pointer = black_attenuation;
+  else if (has_prefix(what_data, "white_permeability"))
+    float_pointer = white_permeability;
+  else if (has_prefix(what_data, "black_permeability"))
+    float_pointer = black_permeability;
+  else if (has_prefix(what_data, "territory_value"))
+    float_pointer = territory_value;
+  else if (has_prefix(what_data, "influence_regions"))
+    int_pointer = influence_regions;
+  else if (has_prefix(what_data, "non_territory"))
+    int_pointer = non_territory;
+  else
+    return gtp_failure("unknown influence data");
+  
+  gtp_start_response(GTP_SUCCESS);
+  for (m = 0; m < board_size; m++) {
+    for (n = 0; n < board_size; n++) {
+      if (float_pointer)
+	gtp_printf("%6.2f ", float_pointer[POS(m, n)]);
+      else
+	gtp_printf("%2d ", int_pointer[POS(m, n)]);
+    }
+    gtp_printf("\n");
+  }
+  
+  /* We already have one newline and thus can't use gtp_finish_response(). */
+  gtp_printf("\n");
+  return GTP_OK;
+}
+
+/* Function:  Return information about the initial influence function.
+ * Arguments: color to move, what information
  * Fails:     never
  * Returns:   Influence data formatted like:
  *
- * white:
  *   0.51   1.34   3.20   6.60   9.09   8.06   1.96   0.00   0.00 
  *   0.45   1.65   4.92  12.19  17.47  15.92   4.03   0.00   0.00 
  *                   .
  *                   .
  *                   .
  *   0.00   0.00   0.00   0.00   0.00 100.00  75.53  41.47  23.41
- * black:
- *   1.57   2.51   4.10   3.10   3.60   4.54   8.32   4.15   2.71 
- *   2.96   4.62   9.18   5.47   5.89  10.88  20.54  10.19   4.08 
- *                   .
- *                   .
- *                   .
- * 100.00 139.39 100.00 139.39 100.00   0.00   0.00   0.00   0.00
- * territory value:
- *		.
- *		.
- *		.
- * regions:
- * -1  0  0  1  1  0 -1 -3 -3
- *              .
- *              .
- *              .
- * -3 -3 -3 -3 -3  3  3  3  3
  *
- * The encoding of the regions is as follows:
+ * The available choices of information are:
+ * 
+ * white_influence (float)
+ * black_influence (float)
+ * white_strength (float)
+ * black_strength (float)
+ * white_attenuation (float)
+ * black_attenuation (float)
+ * white_permeability (float)
+ * black_permeability (float)
+ * territory_value (float)
+ * influence_regions (int)
+ * non_territory (int)
+ *
+ * The encoding of influence_regions is as follows:
+ *  4 white stone
  *  3 white territory
  *  2 white moyo
  *  1 white area
@@ -3480,76 +3603,68 @@ gtp_dump_stack(char *s)
  * -1 black area
  * -2 black moyo
  * -3 black territory
+ * -4 black stone
  */
 static int
-gtp_influence(char *s)
+gtp_initial_influence(char *s)
 {
   int color;
-  float white_influence[BOARDMAX];
-  float black_influence[BOARDMAX];
-  float territory_value[BOARDMAX];
-  int influence_regions[BOARDMAX];
-  
-  if (!gtp_decode_color(s, &color))
+  struct influence_data *q;
+  int n;
+
+  n = gtp_decode_color(s, &color);
+  if (n == 0)
     return gtp_failure("invalid color");
 
+  q = INITIAL_INFLUENCE(color);
+  
   silent_examine_position(color, EXAMINE_ALL);
 
-  gtp_start_response(GTP_SUCCESS);
-  get_influence(OPPOSITE_INFLUENCE(color), white_influence,
-		black_influence, territory_value, influence_regions);
-  print_influence(white_influence, black_influence, territory_value,
-		  influence_regions);
-
-  /* We already have one newline and thus can't use gtp_finish_response(). */
-  gtp_printf("\n");
-  return GTP_OK;
+  return print_influence_data(q, s + n);
 }
 
 
-static void
-print_influence(float white_influence[BOARDMAX],
-		float black_influence[BOARDMAX],
-		float territory_value[BOARDMAX],
-		int influence_regions[BOARDMAX])
+/* Function:  Return information about the influence function after a move.
+ * Arguments: move, what information
+ * Fails:     never
+ * Returns:   Influence data formatted like for initial_influence.
+ */
+static int
+gtp_move_influence(char *s)
 {
-  int m, n;
-  gtp_printf("white:\n");
-  for (m = 0; m < board_size; m++) {
-    for (n = 0; n < board_size; n++) {
-      gtp_printf("%6.2f ", white_influence[POS(m, n)]);
-    }
-    gtp_printf("\n");
-  }
+  int color;
+  int i, j;
+  int n;
 
-  gtp_printf("black:\n");
-  for (m = 0; m < board_size; m++) {
-    for (n = 0; n < board_size; n++) {
-      gtp_printf("%6.2f ", black_influence[POS(m, n)]);
-    }
-    gtp_printf("\n");
-  }
+  n = gtp_decode_move(s, &color, &i, &j);
+  if (n == 0)
+    return gtp_failure("invalid move");
 
-  gtp_printf("territory value:\n");
-  for (m = 0; m < board_size; m++) {
-    for (n = 0; n < board_size; n++)
-      gtp_printf("%+6.2f ", territory_value[POS(m, n)]);
+  prepare_move_influence_debugging(POS(i, j), color);
+  
+  return print_influence_data(&move_influence, s + n);
+}
 
-    gtp_printf("\n");
-  }
 
-  gtp_printf("regions:\n");
-  for (m = 0; m < board_size; m++) {
-    for (n = 0; n < board_size; n++) {
-      if (influence_regions[POS(m, n)] == 4)
-	gtp_printf(" @ ");	/* 'O' looks too much like '0'. */
-      else if (influence_regions[POS(m, n)] == -4)
-	gtp_printf(" X ");
-      else
-	gtp_printf("%2d ", influence_regions[POS(m, n)]);
-    }
-    gtp_printf("\n");
-  }
+/* Function:  Return information about the followup influence after a move.
+ * Arguments: move, what information
+ * Fails:     never
+ * Returns:   Influence data formatted like for initial_influence.
+ */
+static int
+gtp_followup_influence(char *s)
+{
+  int color;
+  int i, j;
+  int n;
+
+  n = gtp_decode_move(s, &color, &i, &j);
+  if (n == 0)
+    return gtp_failure("invalid move");
+
+  prepare_move_influence_debugging(POS(i, j), color);
+  
+  return print_influence_data(&followup_influence, s + n);
 }
 
 
@@ -3607,8 +3722,7 @@ gtp_worm_data(char *s)
 	struct worm_data *w = &worm[POS(m, n)];
 	gtp_print_vertex(m, n);
 	gtp_printf(":\n");
-	gtp_mprintf("origin               %m\n", 
-		    I(w->origin), J(w->origin));
+	gtp_mprintf("origin               %m\n",  I(w->origin), J(w->origin));
 	gtp_mprintf("color                %C\n",  w->color);
 	gtp_printf("size                 %d\n",   w->size);
 	gtp_printf("effective_size       %.2f\n", w->effective_size);
@@ -3794,6 +3908,99 @@ gtp_dragon_stones(char *s)
 	    gtp_mprintf("%m ", m, n);
       gtp_printf("\n");
     }
+  
+  gtp_printf("\n");
+  return GTP_OK;
+}
+
+/* Function:  Return the information in the eye data structure.
+ * Arguments: color, vertex
+ * Fails:     never
+ * Returns:   eye data fields and values, one pair per row
+ */
+static int
+gtp_eye_data(char *s)
+{
+  int color = EMPTY;
+  int i = -1;
+  int j = -1;
+  struct eye_data *e;
+
+  if (!gtp_decode_move(s, &color, &i, &j))
+    return gtp_failure("invalid color or coordinate");
+
+  if (stackp > 0)
+    return gtp_failure("eye data unavailable when stackp > 0");
+
+  examine_position(EMPTY, EXAMINE_DRAGONS_WITHOUT_OWL);
+
+  gtp_start_response(GTP_SUCCESS);
+
+  if (color == BLACK)
+    e = &black_eye[POS(i, j)];
+  else
+    e = &white_eye[POS(i, j)];
+  
+  gtp_mprintf("origin               %m\n", I(e->origin), J(e->origin));
+  gtp_mprintf("color                %C\n", e->color);
+  gtp_printf("esize                %d\n", e->esize);
+  gtp_printf("msize                %d\n", e->msize);
+  gtp_printf("value                %s\n", eyevalue_to_string(&e->value));
+  gtp_mprintf("attack_point         %m\n",  
+	      I(e->attack_point), J(e->attack_point));
+  gtp_mprintf("defense_point        %m\n",  
+	      I(e->defense_point), J(e->defense_point));
+  gtp_printf("marginal             %d\n", e->marginal);
+  gtp_printf("type                 %d\n", e->type);
+  gtp_printf("neighbors            %d\n", e->neighbors);
+  gtp_printf("marginal_neighbors   %d\n", e->marginal_neighbors);
+  gtp_printf("cut                  %d\n", e->cut);
+  
+  gtp_printf("\n");
+  return GTP_OK;
+}
+
+
+/* Function:  Return the information in the half eye data structure.
+ * Arguments: vertex
+ * Fails:     never
+ * Returns:   half eye data fields and values, one pair per row
+ */
+static int
+gtp_half_eye_data(char *s)
+{
+  int i = -1;
+  int j = -1;
+  struct half_eye_data *h;
+  int k;
+
+  if (!gtp_decode_coord(s, &i, &j))
+    return gtp_failure("invalid coordinate");
+
+  if (stackp > 0)
+    return gtp_failure("half eye data unavailable when stackp > 0");
+
+  examine_position(EMPTY, EXAMINE_DRAGONS_WITHOUT_OWL);
+
+  gtp_start_response(GTP_SUCCESS);
+
+  h = &half_eye[POS(i, j)];
+  
+  gtp_printf("value                %.2f\n", h->value);
+  if (h->type == HALF_EYE)
+    gtp_printf("type                 HALF_EYE\n");
+  else if (h->type == FALSE_EYE)
+    gtp_printf("type                 FALSE_EYE\n");
+  else
+    gtp_printf("type                 %d\n", h->type);
+  gtp_printf("num_attacks          %d\n", h->num_attacks);
+  for (k = 0; k < h->num_attacks; k++)
+    gtp_mprintf("attack_point[%d]      %m\n", k, I(h->attack_point[k]),
+		J(h->attack_point[k]));
+  gtp_printf("num_defenses         %d\n", h->num_defenses);
+  for (k = 0; k < h->num_defenses; k++)
+    gtp_mprintf("defense_point[%d]     %m\n", k, I(h->defense_point[k]),
+		J(h->defense_point[k]));
   
   gtp_printf("\n");
   return GTP_OK;

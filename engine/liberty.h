@@ -366,6 +366,8 @@ void set_maximum_territorial_value(int pos, float value);
 void add_shape_value(int pos, float value);
 void add_followup_value(int pos, float value);
 void add_reverse_followup_value(int pos, float value);
+int list_move_reasons(FILE *out, int pos);
+void print_all_move_values(void);
 void record_top_move(int move, float val);
 void remove_top_move(int move);
 void scale_randomness(int pos, float scaling);
@@ -449,6 +451,7 @@ int atari_atari_blunder_size(int color, int tpos, int *move,
 int review_move_reasons(int *move, float *val, int color,
 			float pure_threat_value, float our_score,
 			int allowed_moves[BOARDMAX]);
+void prepare_move_influence_debugging(int pos, int color);
 int fill_liberty(int *move, int color);
 int aftermath_genmove(int *aftermath_move, int color,
 		      int under_control[BOARDMAX],
@@ -603,8 +606,15 @@ void influence_get_moyo_data(const struct influence_data *q,
 void get_influence(const struct influence_data *q,
 		   float white_influence[BOARDMAX],
 		   float black_influence[BOARDMAX],
+		   float white_strength[BOARDMAX],
+		   float black_strength[BOARDMAX],
+		   float white_attenuation[BOARDMAX], 
+		   float black_attenuation[BOARDMAX],
+		   float white_permeability[BOARDMAX],
+		   float black_permeability[BOARDMAX],
 		   float territory_value[BOARDMAX],
-		   int regions[BOARDMAX]);
+		   int influence_regions[BOARDMAX],
+		   int non_territory[BOARDMAX]);
 float influence_score(const struct influence_data *q);
 float game_status(int color);
 void resegment_initial_influence(void);

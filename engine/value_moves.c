@@ -1346,7 +1346,8 @@ adjacent_to_nondead_stone(int pos, int color)
  * Estimate the direct territorial value of a move at (pos).
  */
 static void
-estimate_territorial_value(int pos, int color, float our_score)
+estimate_territorial_value(int pos, int color, float our_score,
+			   int disable_delta_territory_cache)
 {
   int other = OTHER_COLOR(color);
   int k;
@@ -1944,10 +1945,11 @@ estimate_territorial_value(int pos, int color, float our_score)
   if (does_block
       && tryko(pos, color, "estimate_territorial_value", EMPTY, NO_MOVE)) {
     Hash_data safety_hash = goal_to_hashvalue(safe_stones);
-    if (!retrieve_delta_territory_cache(pos, color, &this_value, 
-	  				&move[pos].influence_followup_value,
-					OPPOSITE_INFLUENCE(color),
-					safety_hash)) {
+    if (disable_delta_territory_cache
+	|| !retrieve_delta_territory_cache(pos, color, &this_value, 
+					   &move[pos].influence_followup_value,
+					   OPPOSITE_INFLUENCE(color),
+					   safety_hash)) {
 
       int saved_optimistic_territory;    
       saved_optimistic_territory = use_optimistic_territory;
@@ -2579,7 +2581,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
      * is significant. Territorial value must be computed before
      * strategical value. See connection_value().
      */
-    estimate_territorial_value(pos, color, our_score);
+    estimate_territorial_value(pos, color, our_score, 0);
     estimate_strategical_value(pos, color, our_score);
   }
 
@@ -2828,6 +2830,21 @@ value_moves(int color, float pure_threat_value, float our_score)
 }
 
 
+/* Print the values of all moves with values bigger than zero. */
+
+void
+print_all_move_values()
+{
+  int pos;
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos) || move[pos].final_value <= 0.0)
+      continue;
+      
+    mprintf("%1M %f\n", pos, move[pos].final_value);
+  }
+}
+
 /* Search through all board positions for the 10 highest valued
  * moves and print them.
  */
@@ -2861,7 +2878,7 @@ print_top_moves(void)
 /* Add a move to the list of top moves (if it is among the top ten) */
 
 void
-record_top_move(int move, float val)
+record_top_move(int pos, float val)
 {
   int k;
   for (k = 9; k >= 0; k--)
@@ -2871,8 +2888,10 @@ record_top_move(int move, float val)
 	best_moves[k+1] = best_moves[k];
       }
       best_move_values[k] = val;
-      best_moves[k] = move;
+      best_moves[k] = pos;
     }
+
+  move[pos].final_value = val;
 }
 
 /* remove a rejected move from the list of top moves */
@@ -3265,7 +3284,7 @@ review_move_reasons(int *the_move, float *val, int color,
   time_report(2, "  induce_secondary_move_reasons", NO_MOVE, 1.0);
     
   if (printworms || verbose)
-    list_move_reasons(color);
+    list_move_reasons(stderr, NO_MOVE);
 
   /* Evaluate all moves with move reasons. */
   value_moves(color, pure_threat_value, our_score);
@@ -3341,6 +3360,26 @@ choose_strategy(int color, float our_score, float game_status)
   }
 }
 
+/* In order to get valid influence data after a move, we need to rerun
+ * estimate_territorial_value() for that move. A prerequisite for
+ * using this function is that move reasons have already been collected.
+ *
+ * This function should only be used for debugging purposes.
+ */
+void
+prepare_move_influence_debugging(int pos, int color)
+{
+  float lower_bound, upper_bound;
+  float our_score;
+  
+  estimate_score(&upper_bound, &lower_bound);
+  if (color == WHITE)
+    our_score = lower_bound;
+  else
+    our_score = -upper_bound;
+
+  estimate_territorial_value(pos, color, our_score, 1);
+}
 
 /*
  * Local Variables:

@@ -1633,9 +1633,11 @@ mark_safe_stones(int color, int move_pos, const char saved_dragons[BOARDMAX],
 }
 
 
-/* List the move reasons for (color). */
-void
-list_move_reasons(int color)
+/* List the move reasons for (color)'s move at (pos). Return the
+ * number of move reasons.
+ */
+int
+list_move_reasons(FILE *out, int move_pos)
 {
   int m;
   int n;
@@ -1648,47 +1650,50 @@ list_move_reasons(int color)
   int worm1 = -1;
   int worm2 = -1;
   int ecolor = 0;
-  
+
   gprintf("\nMove reasons:\n");
   
   for (n = 0; n < board_size; n++)
     for (m = board_size-1; m >= 0; m--) {
       pos = POS(m, n);
 
+      if (move_pos != NO_MOVE && move_pos != pos)
+	continue;
+      
       for (k = 0; k < MAX_REASONS; k++) {
 	int r = move[pos].reason[k];
 
 	if (r < 0)
 	  break;
-	
+
 	switch (move_reasons[r].type) {
 	case ATTACK_MOVE:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m attacks %1m%s\n", pos, aa,
-		  (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
+	  gfprintf(out, "Move at %1m attacks %1m%s\n", pos, aa,
+		   (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
 	  break;
 	case ATTACK_MOVE_GOOD_KO:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m attacks %1m%s with good ko\n", pos, aa,
-		  (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
+	  gfprintf(out, "Move at %1m attacks %1m%s with good ko\n", pos, aa,
+		   (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
 	  break;
 	case ATTACK_MOVE_BAD_KO:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m attacks %1m%s with bad ko\n", pos, aa,
-		  (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
+	  gfprintf(out, "Move at %1m attacks %1m%s with bad ko\n", pos, aa,
+		   (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
 	  break;
 	  
 	case DEFEND_MOVE:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m defends %1m\n", pos, aa);
+	  gfprintf(out, "Move at %1m defends %1m\n", pos, aa);
 	  break;
 	case DEFEND_MOVE_GOOD_KO:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m defends %1m with good ko\n", pos, aa);
+	  gfprintf(out, "Move at %1m defends %1m with good ko\n", pos, aa);
 	  break;
 	case DEFEND_MOVE_BAD_KO:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m defends %1m with bad ko\n", pos, aa);
+	  gfprintf(out, "Move at %1m defends %1m with bad ko\n", pos, aa);
 	  break;
 	  
 	case ATTACK_THREAT:
@@ -1696,19 +1701,19 @@ list_move_reasons(int color)
 	  aa = move_reasons[r].what;
 	  
 	  if (move_reasons[r].type == ATTACK_THREAT)
-	    gprintf("Move at %1m threatens to attack %1m\n", pos, aa);
+	    gfprintf(out, "Move at %1m threatens to attack %1m\n", pos, aa);
 	  else if (move_reasons[r].type == DEFEND_THREAT)
-	    gprintf("Move at %1m threatens to defend %1m\n", pos, aa);
+	    gfprintf(out, "Move at %1m threatens to defend %1m\n", pos, aa);
 	  break;
 
 	case UNCERTAIN_OWL_DEFENSE:
 	  aa = move_reasons[r].what;
-	  if (board[aa] == color)
-	    gprintf("%1m found alive but not certainly, %1m defends it again\n",
-		    aa, pos);
+	  if (board[aa] == current_color)
+	    gfprintf(out, "%1m found alive but not certainly, %1m defends it again\n",
+		     aa, pos);
 	  else
-	    gprintf("%1m found dead but not certainly, %1m attacks it again\n",
-		    aa, pos);
+	    gfprintf(out, "%1m found dead but not certainly, %1m attacks it again\n",
+		     aa, pos);
 	  break;	  
 
 	case CONNECT_MOVE:
@@ -1716,32 +1721,36 @@ list_move_reasons(int color)
 	  worm1 = conn_worm1[move_reasons[r].what];
 	  worm2 = conn_worm2[move_reasons[r].what];
 	  if (move_reasons[r].type == CONNECT_MOVE)
-	    gprintf("Move at %1m connects %1m and %1m\n", pos, worm1, worm2);
+	    gfprintf(out, "Move at %1m connects %1m and %1m\n",
+		     pos, worm1, worm2);
 	  else
-	    gprintf("Move at %1m cuts %1m and %1m\n", pos, worm1, worm2);
+	    gfprintf(out, "Move at %1m cuts %1m and %1m\n", pos, worm1, worm2);
 	  break;
 	  
 	case ANTISUJI_MOVE:
-	  gprintf("Move at %1m is an antisuji\n", pos);
+	  gfprintf(out, "Move at %1m is an antisuji\n", pos);
 	  break;
 	  
 	case SEMEAI_MOVE:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m wins semeai for %1m\n", pos, aa);
+	  gfprintf(out, "Move at %1m wins semeai for %1m\n", pos, aa);
 	  break;
 	  
 	case SEMEAI_THREAT:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m threatens to win semeai for %1m\n", pos, aa);
+	  gfprintf(out, "Move at %1m threatens to win semeai for %1m\n",
+		   pos, aa);
 	  break;
 	  
 	case VITAL_EYE_MOVE:
 	  aa = eyes[move_reasons[r].what];
 	  ecolor = eyecolor[move_reasons[r].what];
 	  if (ecolor == WHITE)
-	    gprintf("Move at %1m vital eye point for eye %1m\n", pos, aa);
+	    gfprintf(out, "Move at %1m vital eye point for eye %1m\n",
+		     pos, aa);
 	  else
-	    gprintf("Move at %1m vital eye point for eye %1m\n", pos, aa);
+	    gfprintf(out, "Move at %1m vital eye point for eye %1m\n",
+		     pos, aa);
 	  break;
 	  
 	case EITHER_MOVE:
@@ -1749,9 +1758,9 @@ list_move_reasons(int color)
 	  reason2 = either_data[move_reasons[r].what].reason2;
 	  worm1 = either_data[move_reasons[r].what].what1;
 	  worm2 = either_data[move_reasons[r].what].what2;
-	  gprintf("Move at %1m either %s %1m or %s %1m\n", pos, 
-		  reason1 == ATTACK_STRING ? "attacks" : "defends", worm1, 
-		  reason2 == ATTACK_STRING ? "attacks" : "defends", worm2);
+	  gfprintf(out, "Move at %1m either %s %1m or %s %1m\n", pos, 
+		   reason1 == ATTACK_STRING ? "attacks" : "defends", worm1, 
+		   reason2 == ATTACK_STRING ? "attacks" : "defends", worm2);
 	  break;
 
 	case ALL_MOVE:
@@ -1759,73 +1768,75 @@ list_move_reasons(int color)
 	  reason2 = all_data[move_reasons[r].what].reason2;
 	  worm1 = all_data[move_reasons[r].what].what1;
 	  worm2 = all_data[move_reasons[r].what].what2;
-	  gprintf("Move at %1m both %s %1m and %s %1m\n", pos, 
-		  reason1 == ATTACK_STRING ? "attacks" : "defends", worm1, 
-		  reason2 == ATTACK_STRING ? "attacks" : "defends", worm2);
+	  gfprintf(out, "Move at %1m both %s %1m and %s %1m\n", pos, 
+		   reason1 == ATTACK_STRING ? "attacks" : "defends", worm1, 
+		   reason2 == ATTACK_STRING ? "attacks" : "defends", worm2);
 	  break;
 
 	case OWL_ATTACK_MOVE:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m owl-attacks %1m\n", pos, aa);
+	  gfprintf(out, "Move at %1m owl-attacks %1m\n", pos, aa);
 	  break;
 	case OWL_ATTACK_MOVE_GOOD_KO:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m owl-attacks %1m with good ko\n", pos, aa);
+	  gfprintf(out, "Move at %1m owl-attacks %1m with good ko\n", pos, aa);
 	  break;
 	case OWL_ATTACK_MOVE_BAD_KO:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m owl-attacks %1m with bad ko\n", pos, aa);
+	  gfprintf(out, "Move at %1m owl-attacks %1m with bad ko\n", pos, aa);
 	  break;
 	case OWL_ATTACK_MOVE_GAIN:
 	  aa = either_data[move_reasons[r].what].what1;
 	  bb = either_data[move_reasons[r].what].what2;
-	  gprintf("Move at %1m owl-attacks %1m (captures %1m)\n", pos, aa, bb);
+	  gfprintf(out, "Move at %1m owl-attacks %1m (captures %1m)\n",
+		   pos, aa, bb);
 	  break;
 	  
 	case OWL_DEFEND_MOVE:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m owl-defends %1m\n", pos, aa);
+	  gfprintf(out, "Move at %1m owl-defends %1m\n", pos, aa);
 	  break;
 	case OWL_DEFEND_MOVE_GOOD_KO:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m owl-defends %1m with good ko\n", pos, aa);
+	  gfprintf(out, "Move at %1m owl-defends %1m with good ko\n", pos, aa);
 	  break;
 	case OWL_DEFEND_MOVE_BAD_KO:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m owl-defends %1m with bad ko\n", pos, aa);
+	  gfprintf(out, "Move at %1m owl-defends %1m with bad ko\n", pos, aa);
 	  break;
 	case OWL_DEFEND_MOVE_LOSS:
 	  aa = either_data[move_reasons[r].what].what1;
 	  bb = either_data[move_reasons[r].what].what2;
-	  gprintf("Move at %1m owl-defends %1m (loses %1m)\n", pos, aa, bb);
+	  gfprintf(out, "Move at %1m owl-defends %1m (loses %1m)\n",
+		   pos, aa, bb);
 	  break;
 	  
 	case OWL_ATTACK_THREAT:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m owl-threatens to attack %1m\n", pos, aa);
+	  gfprintf(out, "Move at %1m owl-threatens to attack %1m\n", pos, aa);
 	  break;
 	  
 	case OWL_DEFEND_THREAT:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m owl-threatens to defend %1m\n", pos, aa);
+	  gfprintf(out, "Move at %1m owl-threatens to defend %1m\n", pos, aa);
 	  break;
 	  
 	case OWL_PREVENT_THREAT:
 	  aa = move_reasons[r].what;
-	  gprintf("Move at %1m owl-prevents a threat to attack or defend %1m\n", 
-		  pos, aa);
+	  gfprintf(out, "Move at %1m owl-prevents a threat to attack or defend %1m\n", 
+		   pos, aa);
 	  break;
 
 	case EXPAND_TERRITORY_MOVE:
-	  gprintf("Move at %1m expands territory\n", pos);
+	  gfprintf(out, "Move at %1m expands territory\n", pos);
 	  break;
 	  
 	case EXPAND_MOYO_MOVE:
-	  gprintf("Move at %1m expands moyo\n", pos);
+	  gfprintf(out, "Move at %1m expands moyo\n", pos);
 	  break;
 	  
 	case INVASION_MOVE:
-	  gprintf("Move at %1m is an invasion\n", pos);
+	  gfprintf(out, "Move at %1m is an invasion\n", pos);
 	  break;
 	  
 	case STRATEGIC_ATTACK_MOVE:
@@ -1833,21 +1844,24 @@ list_move_reasons(int color)
 	  aa = move_reasons[r].what;
 	  
 	  if (move_reasons[r].type == STRATEGIC_ATTACK_MOVE)
-	    gprintf("Move at %1m strategically attacks %1m\n", pos, aa);
+	    gfprintf(out, "Move at %1m strategically attacks %1m\n", pos, aa);
 	  else
-	    gprintf("Move at %1m strategically defends %1m\n", pos, aa);
+	    gfprintf(out, "Move at %1m strategically defends %1m\n", pos, aa);
 	  break;
 	  
 	case MY_ATARI_ATARI_MOVE:
-	  gprintf("Move at %1m captures something\n", pos);
+	  gfprintf(out, "Move at %1m captures something\n", pos);
 
 	case YOUR_ATARI_ATARI_MOVE:
-	  gprintf("Move at %1m defends against combination attack\n", pos);
+	  gfprintf(out, "Move at %1m defends against combination attack\n",
+		   pos);
 	}
       }
       if (k > 0 && move[pos].move_safety == 0)
-	gprintf("Move at %1m strategically or tactically unsafe\n", pos);
+	gfprintf(out, "Move at %1m strategically or tactically unsafe\n", pos);
     }
+  
+  return k;
 }
 
 

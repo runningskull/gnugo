@@ -2121,14 +2121,29 @@ void
 get_influence(const struct influence_data *q,
 	      float white_influence[BOARDMAX],
 	      float black_influence[BOARDMAX],
+	      float white_strength[BOARDMAX],
+	      float black_strength[BOARDMAX],
+	      float white_attenuation[BOARDMAX], 
+	      float black_attenuation[BOARDMAX],
+	      float white_permeability[BOARDMAX],
+	      float black_permeability[BOARDMAX],
 	      float territory_value[BOARDMAX],
-	      int influence_regions[BOARDMAX])
+	      int influence_regions[BOARDMAX],
+	      int non_territory[BOARDMAX])
 {
   int ii;
+  
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
     white_influence[ii] = q->white_influence[ii];
     black_influence[ii] = q->black_influence[ii];
+    white_strength[ii] = q->white_strength[ii];
+    black_strength[ii] = q->black_strength[ii];
+    white_attenuation[ii] = q->white_attenuation[ii];
+    black_attenuation[ii] = q->black_attenuation[ii];
+    white_permeability[ii] = q->white_permeability[ii];
+    black_permeability[ii] = q->black_permeability[ii];
     territory_value[ii] = q->territory_value[ii];
+    non_territory[ii] = q->non_territory[ii];
 
     if (board[ii] == EMPTY) {
       if (whose_territory(q, ii) == WHITE)
