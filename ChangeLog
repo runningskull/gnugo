@@ -2,30 +2,27 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- remove unused configure option --experimental-semeai
+- add missing output to --options
 - new static function special_rescue4() called from defend2() in reading.c
 - fast_defense() now heuristically looks for neighbors to capture
 - don't restore random state in hash_init() and keyhash_init()
 - major `view.pike' revision, added new "single window" mode
 - break_chain2_moves() revised to generate more backfilling moves
-- atari_atari_blunder_size() revised to return multiple defense moves
-  and also verifies them more carefully
+- atari_atari_blunder_size() now returns multiple defenses, better verified
 - remove %r support from gprintf, use result_to_string() instead
 - double_atari_chain2() revised to generate more moves
 - new argument recompute_dragons to owl_analyze_semeai_after_move()
 - owl_mark_dragon() and init_owl() revised
 - detect_tactical_blunder() revised
-- value of tactical blunders doubled to twice the effective size of
-  the string
-- not a blunder if a string which already is alive in seki becomes
-  tactically safe when outer liberties are filled
+- value of tactical blunders doubled to twice the effective size of the string
+- not a blunder if a string alive in seki is saved when outer liberties filled
 - normalize apos, bpos in do_owl_analyze_semeai
 - find_cuts() called from make_dragons() instead of make_domains()
-- new function compute_new_dragons() and new static function
-  join_new_dragons() in dragon.c
+- new compute_new_dragons() and new static join_new_dragons() in dragon.c
 - new global array cutting_points[]
 - cut field removed from struct eye_data
-- INHIBIT_CONNECTION bit no longer used in the type field of struct
-  eye_data
+- INHIBIT_CONNECTION bit no longer used in the type field of struct eye_data
 - find_cuts() no longer allowed to modify eyespaces
 - bugfix in do_owl_analyze_semeai()
 - tuning
