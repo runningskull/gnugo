@@ -107,8 +107,18 @@ find_double_threats(int color)
 	       *       that we already know of a common threat point for
 	       *       the two strings.
 	       * Besides, attack_either is currently (3.1.11) not very good.
+	       *
+	       * The call to attack() is intended to detect the case
+	       * where the move at ii is a snapback capture.
 	       */
-	      if (!defend_both(a_threatened_groups[k], a_threatened_groups[l]))
+	      if (board[a_threatened_groups[k]] == EMPTY
+		  || board[a_threatened_groups[l]] == EMPTY) {
+		if (!attack(ii, NULL))
+		  add_attack_either_move(ii, a_threatened_groups[k], 
+					 a_threatened_groups[l]);
+	      }
+	      else if (!defend_both(a_threatened_groups[k],
+				    a_threatened_groups[l]))
 		add_attack_either_move(ii, a_threatened_groups[k], 
 				       a_threatened_groups[l]);
 	    }
