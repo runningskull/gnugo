@@ -75,6 +75,7 @@ DECLARE(gtp_finish_sgftrace);
 DECLARE(gtp_fixed_handicap);
 DECLARE(gtp_get_handicap);
 DECLARE(gtp_get_random_seed);
+DECLARE(gtp_set_random_seed);
 DECLARE(gtp_genmove);
 DECLARE(gtp_genmove_black);
 DECLARE(gtp_genmove_white);
@@ -171,6 +172,7 @@ static struct gtp_command commands[] = {
   {"fixed_handicap",   	      gtp_fixed_handicap},
   {"get_handicap",   	      gtp_get_handicap},
   {"get_random_seed",  	      gtp_get_random_seed},
+  {"set_random_seed",  	      gtp_set_random_seed},
   {"genmove_black",           gtp_genmove_black},
   {"genmove_white",           gtp_genmove_white},
   {"get_connection_node_counter", gtp_get_connection_node_counter},

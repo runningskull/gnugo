@@ -15,6 +15,9 @@
 - infl_followup_value renamed influence_followup_value and initialized
 - initialize_dragon_data broken out of make_dragons
 - dragon_data initialized even on empty board
+- owl reasons ignores empty board positions
+- twogtp does not report duplicate scores unless they differ
+- new gtp get_random_seed, set_random_seed
 - tuning
 
 3.1.31 released April 4, 2002

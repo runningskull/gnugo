@@ -3416,7 +3416,7 @@ owl_reasons(int color)
   int pos;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(pos) || board[pos] == EMPTY)
       continue;
     if (dragon[pos].origin == pos
 	&& dragon[pos].matcher_status == CRITICAL
