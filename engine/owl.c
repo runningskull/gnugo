@@ -2284,7 +2284,6 @@ owl_determine_life(struct local_owl_data *owl,
   struct eye_data *eye = owl->my_eye;
   char mw[BOARDMAX];  /* mark relevant eye origins */
   char mz[BOARDMAX];  /* mark potentially irrelevant eye origins */
-  signed char mx[BOARDMAX]; /* mark potential half or false eyes */
   int vital_values[BOARDMAX];
   int dummy_eyemin = 0;
   int dummy_eyemax = 0;
@@ -2296,10 +2295,8 @@ owl_determine_life(struct local_owl_data *owl,
   int k;
   int lunch;
   int eye_color;
-  int topological_intersections;
   int save_debug = debug;
   memset(mw, 0, sizeof(mw));
-  memset(mx, 0, sizeof(mx));
   memset(mz, 0, sizeof(mz));
   memset(vital_values, 0, sizeof(vital_values));
   UNUSED(komaster);
@@ -2381,76 +2378,8 @@ owl_determine_life(struct local_owl_data *owl,
       owl->half_eye[POS(m, n)].value = 10.0;
     }
   
-  /* Find topological half eyes and false eyes by analyzing the
-   * diagonal intersections, as described in the Texinfo
-   * documentation (Eyes/Eye Topology).
-   */
-
-  /* First mark the potential halfeyes or false eyes. */
-  topological_intersections = 0;
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (eye[pos].color == eye_color
-	  && eye[pos].origin != NO_MOVE
-	  && mw[eye[pos].origin] > 1
-	  && !eye[pos].marginal
-	  && eye[pos].neighbors <= 1) {
-	mx[pos] = 1;
-	topological_intersections++;
-      }
-    }
-
-  /* Then examine them. */
-  while (topological_intersections > 0) {
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	int pos = POS(m, n);
-	float sum;
-
-	if (mx[pos] <= 0)
-	  continue;
-
-	mx[pos] = -1;
-	topological_intersections--;
-	
-	sum = topological_eye(pos, color, owl->my_eye, owl->half_eye);
-	
-	if (sum >= 4.0) {
-	  /* False eye. */
-	  int previously_marginal = eye[pos].marginal;
-	  owl->half_eye[pos].type = FALSE_EYE;
-	  if (eye[pos].esize == 1
-	      || is_legal(pos, OTHER_COLOR(color))
-	      || board[pos] == OTHER_COLOR(color)) {
-	    add_false_eye(pos, eye, owl->half_eye);
-	    
-	    /* Marginal status may have changed. This can change the
-             * topological eye evaluation for diagonal neighbors, so
-             * we mark these for another pass if they have already
-             * been examined.
-	     */
-	    if (!previously_marginal) {
-	      for (k = 4; k < 8; k++) {
-		int i = m + deltai[k];
-		int j = n + deltaj[k];
-		if (ON_BOARD(POS(i, j)) && mx[POS(i, j)] == -1) {
-		  mx[POS(i, j)] = 1;
-		  topological_intersections++;
-		}
-	      }
-	    }
-	  }
-	}
-	else if (sum > 2.0) {
-	  owl->half_eye[pos].type = HALF_EYE;
-	  ASSERT1(owl->half_eye[pos].num_attacks > 0, pos);
-	  ASSERT_ON_BOARD1(owl->half_eye[pos].attack_point[0]);
-	  ASSERT1(owl->half_eye[pos].num_defends > 0, pos);
-	  ASSERT_ON_BOARD1(owl->half_eye[pos].defense_point[0]);
-	}
-      }
-  }
+  /* Find topological half eyes and false eyes. */
+  find_half_and_false_eyes(color, eye, owl->half_eye, mw);
 
   set_eyevalue(probable_eyes, 0, 0, 0, 0);
   /* This test must be conditioned on (m, n) being its own origin,

@@ -898,6 +898,9 @@ void add_false_eye(int pos, struct eye_data eye[BOARDMAX],
 void make_domains(struct eye_data b_eye[BOARDMAX],
                   struct eye_data w_eye[BOARDMAX],
 		  int owl_call);
+void find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
+			      struct half_eye_data heye[BOARDMAX],
+			      char find_mask[BOARDMAX]);
 
 void set_eyevalue(struct eyevalue *e, int a, int b, int c, int d);
 int min_eyes(struct eyevalue *e);

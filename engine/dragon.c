@@ -185,49 +185,9 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
     }
   time_report(2, "  time to find lunches", NO_MOVE, 1.0);
 
-  
-  /* Find topological half eyes and false eyes by analyzing the
-   * diagonal intersections, as described in the Texinfo
-   * documentation (Eyes/Eye Topology).
-   *
-   * FIXME: Consolidate this piece of code with the very similar one
-   * in owl_determine_life().
-   */
-
-  for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
-      float sum;
-
-      if (black_eye[str].color == BLACK_BORDER
-	  && !black_eye[str].marginal
-	  && black_eye[str].neighbors <= 1) {
-	sum = topological_eye(str, BLACK, black_eye, half_eye);
-	if (sum >= 4.0) {
-	  half_eye[str].type = FALSE_EYE;
-	  if (black_eye[str].esize == 1
-	      || is_legal(str, WHITE)
-	      || board[str] == WHITE)
-	    add_false_eye(str, black_eye, half_eye);
-	}
-	else if (sum > 2.0)
-	  half_eye[str].type = HALF_EYE;
-      }
-      
-      if (white_eye[str].color == WHITE_BORDER
-	  && !white_eye[str].marginal
-	  && white_eye[str].neighbors <= 1) {
-	sum = topological_eye(str, WHITE, white_eye, half_eye);
-	if (sum >= 4.0) {
-	  half_eye[str].type = FALSE_EYE;
-	  if (white_eye[str].esize == 1
-	      || is_legal(str, BLACK)
-	      || board[str] == BLACK)
-	    add_false_eye(str, white_eye, half_eye);
-	}
-	else if (sum > 2.0)
-	  half_eye[str].type = HALF_EYE;
-      }
-    }
+  /* Find topological half eyes and false eyes. */
+  find_half_and_false_eyes(BLACK, black_eye, half_eye, NULL);
+  find_half_and_false_eyes(WHITE, white_eye, half_eye, NULL);
 
   /* Pattern based modification of the eye shapes computed by
    * make_domains and halfeye analysis.

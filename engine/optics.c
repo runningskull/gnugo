@@ -1971,6 +1971,51 @@ test_eyeshape(int eyesize, int *eye_vertices)
 }
 
 
+/* Find topological half eyes and false eyes by analyzing the
+ * diagonal intersections, as described in the Texinfo
+ * documentation (Eyes/Eye Topology).
+ */
+void
+find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
+			 struct half_eye_data heye[BOARDMAX],
+			 char find_mask[BOARDMAX])
+{
+  int eye_color = (color == WHITE ? WHITE_BORDER : BLACK_BORDER);
+  int pos;
+  float sum;
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    /* skip eyespaces which owl doesn't want to be searched */
+    if (!ON_BOARD(pos) || (find_mask && find_mask[eye[pos].origin] <= 1))
+      continue;
+    
+    /* skip every vertex which can't be a false or half eye */
+    if (eye[pos].color != eye_color
+        || eye[pos].marginal
+        || eye[pos].neighbors > 1)
+      continue;
+    
+    sum = topological_eye(pos, color, eye, heye);
+    if (sum >= 4.0) {
+      /* false eye */
+      heye[pos].type = FALSE_EYE;
+      if (eye[pos].esize == 1
+          || is_legal(pos, OTHER_COLOR(color))
+          || board[pos] == OTHER_COLOR(color))
+        add_false_eye(pos, eye, heye);
+    }
+    else if (sum > 2.0) {
+      /* half eye */
+      heye[pos].type = HALF_EYE;
+      ASSERT1(heye[pos].num_attacks > 0, pos);
+      ASSERT_ON_BOARD1(heye[pos].attack_point[0]);
+      ASSERT1(heye[pos].num_defends > 0, pos);
+      ASSERT_ON_BOARD1(heye[pos].defense_point[0]);
+    }
+  }
+}
+
+
 /*
  * Local Variables:
  * tab-width: 8

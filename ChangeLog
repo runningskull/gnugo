@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function find_half_and_false_eyes() in optics.c
 - blunder_size() code reorganized
 - new static functions detect_owl_blunder() and
   detect_tactical_blunder() in utils.c
