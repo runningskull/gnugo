@@ -843,7 +843,7 @@ confirm_safety(int move, int color, int size, int *defense_point,
   int liberties = accurate_approxlib(move, color, 5, libs);
   int other = OTHER_COLOR(color);
   int issafe = 1;
-  int m, n;
+  int pos;
   int apos;
   int trouble = 0;
   int k;
@@ -902,46 +902,51 @@ confirm_safety(int move, int color, int size, int *defense_point,
   increase_depth_values();
   
   if (trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
-    for (m = 0; issafe && m < board_size; m++)
-      for (n = 0; issafe && n < board_size; n++)
-	if (issafe
-	    && IS_STONE(BOARD(m, n))
-	    && worm[POS(m, n)].origin == POS(m, n)
-	    && POS(m, n) != move) {
-	  if (BOARD(m, n) == color
-	      && worm[POS(m, n)].attack_codes[0] == 0
-	      && worm[POS(m, n)].size >= size
-	      && attack(POS(m, n), NULL)) {
-	    if (defense_point)
-	      find_defense(POS(m, n), defense_point);
+    for (pos = BOARDMIN; issafe && pos < BOARDMAX; pos++)
+      if (issafe
+	  && IS_STONE(board[pos])
+	  && worm[pos].origin == pos
+	  && pos != move) {
+	if (board[pos] == color
+	    && worm[pos].attack_codes[0] == 0
+	    && worm[pos].size >= size
+	    && attack(pos, NULL)) {
+	  if (defense_point)
+	    find_defense(pos, defense_point);
+	  issafe = 0;
+	  TRACE("After %1m Worm at %1m becomes attackable.\n", move, pos);
+	}
+	else if (board[pos] == other
+		 && worm[pos].attack_codes[0] != 0
+		 && worm[pos].defend_codes[0] == 0
+		 && worm[pos].size >= size
+		 && find_defense(pos, NULL)) {
+	  /* Also ask the owl code whether the string can live
+	   * strategically. To do this we need to temporarily undo
+	   * the trymove().
+	   */
+	  popgo();
+	  decrease_depth_values();
+	  if (owl_does_attack(move, pos) != WIN)
 	    issafe = 0;
-	    TRACE("After %1m Worm at %1m becomes attackable.\n", move, POS(m, n));
-	  }
-	  else if (BOARD(m, n) == other
-		   && worm[POS(m, n)].attack_codes[0] != 0
-		   && worm[POS(m, n)].defend_codes[0] == 0
-		   && worm[POS(m, n)].size >= size
-		   && find_defense(POS(m, n), NULL)) {
-	    /* Also ask the owl code whether the string can live
-	     * strategically. To do this we need to temporarily undo
-	     * the trymove().
-	     */
-	    popgo();
-	    decrease_depth_values();
-	    if (owl_does_attack(move, POS(m, n)) != WIN)
-	      issafe = 0;
-	    trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE);
-	    increase_depth_values();
-	    
-	    if (!issafe) {
-	      if (defense_point)
-		attack(POS(m, n), defense_point);
-	      
-	      TRACE("After %1m worm at %1m becomes defendable.\n",
-		    move, POS(m, n));
+	  trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE);
+	  increase_depth_values();
+	  
+	  if (!issafe) {
+	    if (defense_point) {
+	      int dpos;
+	      if (attack(pos, &dpos))
+		*defense_point = dpos;
+	      else
+		TRACE("No attack found (unexpectedly) on %1m after move at %1m.\n",
+		      pos, move);
 	    }
+	    
+	    TRACE("After %1m worm at %1m becomes defendable.\n",
+		  move, pos);
 	  }
 	}
+      }
     
     if (liberties == 2) {
       if (double_atari(libs[0], other)) {

@@ -2,7 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- komaster scheme 5 implemented
+- bugfix in confirm_safety() plus 1D conversion
+- komaster scheme 5 implemented and made default
 - update_aa_goal() in combination.c revised
 - heuristics to estimate cost of pattern constraint introduced
 - constraint cost used in owl callback for speedup
