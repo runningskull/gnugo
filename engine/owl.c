@@ -263,7 +263,9 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
 {
   int semeai_focus;
   char ms[BOARDMAX];
-  int pos;
+  int w1, w2;
+  int str;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
 
   struct local_owl_data *owla;
   struct local_owl_data *owlb;
@@ -273,44 +275,31 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
    * These are the semeai_worms. This code must come before
    * the owl_init() calls because the owl_substantial
    *
+   * FIXME: The sentence above is unfinished.
    */
   s_worms = 0;
   memset(ms, 0, sizeof(ms));
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) 
-    if (ON_BOARD(pos) && board[pos] != EMPTY) {
-      if (is_same_dragon(pos, apos))
-	if (ON_BOARD(NORTH(pos)) && is_same_dragon(NORTH(pos), bpos)) {
-	  mark_string(pos, ms, 1);
-	  mark_string(NORTH(pos), ms, 1);
-	}
-      if (is_same_dragon(pos, apos))
-	if (ON_BOARD(SOUTH(pos)) && is_same_dragon(SOUTH(pos), bpos)) {
-	  mark_string(pos, ms, 1);
-	  mark_string(SOUTH(pos), ms, 1);
-	}
-      if (is_same_dragon(pos, apos))
-	if (ON_BOARD(EAST(pos)) && is_same_dragon(EAST(pos), bpos)) {
-	  mark_string(pos, ms, 1);
-	  mark_string(EAST(pos), ms, 1);
-	}
-      if (is_same_dragon(pos, apos))
-	if (ON_BOARD(WEST(pos)) && is_same_dragon(WEST(pos), bpos)) {
-	  mark_string(pos, ms, 1);
-	  mark_string(WEST(pos), ms, 1);
-	}    
+  for (w1 = first_worm_in_dragon(apos);
+       w1 != NO_MOVE;
+       w1 = next_worm_in_dragon(w1)) {
+    for (w2 = first_worm_in_dragon(bpos);
+	 w2 != NO_MOVE;
+	 w2 = next_worm_in_dragon(w2)) {
+      if (adjacent_strings(w1, w2) || have_common_lib(w1, w2, NULL)) {
+	mark_string(w1, ms, 1);
+	mark_string(w2, ms, 1);
+      }
     }
-  {
-    SGFTree *save_sgf_dumptree = sgf_dumptree;
-    
-    sgf_dumptree = NULL;
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++) 
-      if (ON_BOARD(pos) && ms[pos] && worm[pos].origin == pos)
-	if (owl_substantial(pos)) {
-	  semeai_worms[s_worms++] = pos;
-	  DEBUG(DEBUG_SEMEAI, "semeai worm: %1m\n", pos);
-	}
-    sgf_dumptree = save_sgf_dumptree;
   }
+  
+  sgf_dumptree = NULL;
+  for (str = BOARDMIN; str < BOARDMAX; str++) 
+    if (ON_BOARD(str) && ms[str] && worm[str].origin == str)
+      if (owl_substantial(str)) {
+	semeai_worms[s_worms++] = str;
+	DEBUG(DEBUG_SEMEAI, "semeai worm: %1m\n", str);
+      }
+  sgf_dumptree = save_sgf_dumptree;
 
   ASSERT1(board[apos] == OTHER_COLOR(board[bpos]), apos);
   count_variations = 1;
@@ -385,7 +374,6 @@ do_owl_analyze_semeai(int apos, int bpos,
   int backfilling_move_found = 0;
   char mw[BOARDMAX];  
   int k;
-  int m, n;
   int same_dragon;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
@@ -482,7 +470,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     for (sworm = 0; sworm <= s_worms; sworm++)
       if (board[semeai_worms[sworm]] == other
 	  && countlib(semeai_worms[sworm]) < 3
-	  && attack(semeai_worms[sworm], &upos)) {
+	  && attack(semeai_worms[sworm], &upos) == WIN) {
 	*resulta = ALIVE;
 	*resultb = DEAD;
 	if (move) *move = upos;
@@ -502,7 +490,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  && countlib(semeai_worms[sworm]) < 3
 	  && attack(semeai_worms[sworm], NULL)
 	  && find_defense(semeai_worms[sworm], &upos))
-	owl_add_move(moves, upos, 160, "defend semeai worm", 0, 0, NO_MOVE,
+	owl_add_move(moves, upos, 160, "defend semeai worm", 2, 0, NO_MOVE,
 		     MAX_SEMEAI_MOVES);
   }
   /* 
@@ -826,40 +814,46 @@ do_owl_analyze_semeai(int apos, int bpos,
   /* now we look for a move to fill a liberty.
    */
 
+  if (0) {
+    showboard(0);
+    goaldump(owla->goal);
+    goaldump(owlb->goal);
+  }
   if (!safe_outside_liberty_found && moves[0].value < 100) {
-    for (m = 0; !safe_outside_liberty_found && m < board_size; m++)
-      for (n = 0; !safe_outside_liberty_found && n < board_size; n++) {
-	int pos = POS(m, n);
-	if (board[pos] == EMPTY && !mw[pos]) {
-	  if (liberty_of_goal(pos, owlb)) {
-	    if (!liberty_of_goal(pos, owla)) {
-	      /* outside liberty */
-	      if (safe_move(pos, color)) {
-		safe_outside_liberty_found = 1;
-		outside_liberty.pos = pos;
-	      }
-	      else if (!safe_outside_liberty_found) {
-		if (!backfilling_move_found) {
-		  backfilling_move.pos =
-		    find_semeai_backfilling_move(bpos, pos);
-		  if (backfilling_move.pos)
-		    backfilling_move_found = 1;
-		}
-	      }
+    int pos;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos))
+	continue;
+      
+      if (board[pos] == EMPTY && !mw[pos]) {
+	if (liberty_of_goal(pos, owlb)) {
+	  if (!liberty_of_goal(pos, owla)) {
+	    /* outside liberty */
+	    if (safe_move(pos, color)) {
+	      safe_outside_liberty_found = 1;
+	      outside_liberty.pos = pos;
+	      break;
 	    }
-	    else {
-	      /* common liberty */
-	      if (safe_move(pos, color)) {
-		safe_common_liberty_found = 1;
-		common_liberty.pos = pos;
-	      }
-	      else
-		unsafe_common_liberty_found = 1;
+	    else if (!backfilling_move_found) {
+	      backfilling_move.pos = find_semeai_backfilling_move(bpos, pos);
+	      if (backfilling_move.pos != NO_MOVE)
+		backfilling_move_found = 1;
 	    }
+	  }
+	  else {
+	    /* common liberty */
+	    if (safe_move(pos, color)) {
+	      safe_common_liberty_found = 1;
+	      common_liberty.pos = pos;
+	    }
+	    else
+	      unsafe_common_liberty_found = 1;
 	  }
 	}
       }
+    }
   }
+  
   if (safe_outside_liberty_found
       && outside_liberty.pos != NO_MOVE) {
     move_value = semeai_move_value(outside_liberty.pos,
@@ -1058,11 +1052,10 @@ semeai_move_value(int move, struct local_owl_data *owla,
 static int
 liberty_of_goal(int pos, struct local_owl_data *owl)
 {
-  if ((ON_BOARD(SOUTH(pos)) && owl->goal[SOUTH(pos)])
-      || (ON_BOARD(WEST(pos)) && owl->goal[WEST(pos)])
-      || (ON_BOARD(NORTH(pos)) && owl->goal[NORTH(pos)])
-      || (ON_BOARD(EAST(pos)) && owl->goal[EAST(pos)]))
-    return 1;
+  int k;
+  for (k = 0; k < 4; k++)
+    if (IS_STONE(board[pos + delta[k]]) && owl->goal[pos + delta[k]])
+      return 1;
   
   return 0;
 }
