@@ -2,7 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.1.23 released February 3, 2002
+3.1.24 released February 3, 2002
 
 - cleanup of clock.c, filllib.c, fuseki.c, genmove.c, globals.c,
   gnugo.h, hash.h, printutils.c, reading.c, showbord.c, utils.c,

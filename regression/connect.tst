@@ -153,7 +153,7 @@ loadsgf golois/Goemate990908-2.sgf
 
 loadsgf golois/Goemate990908-2.sgf
 37 disconnect F3 C3
-#? [0]*
+#? [0]
 
 loadsgf golois/Goemate990911-1.sgf
 38 connect J11 F9
