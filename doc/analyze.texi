@@ -208,60 +208,10 @@ out the contents of the worm, dragon and eye arrays.
 @section Scoring the game
 @cindex scoring
 
-GNU Go can score the game. If done at the last move, this is usually
-accurate unless there is a seki. Normally GNU Go will report its
-opinion about the score at the end of the game, but if you want this
-information about a game stored in a file, use the @option{--score}
-option.
-
-@example
-gnugo --score last -l filename
-@end example
-
-@noindent
-loads the sgf file to the end of the file and estimates the winner after the
-last stored move by estimating the territory.
-
-@example
-gnugo --score end -l filename
-@end example
-
-@noindent
-loads the sgf file and GNU Go continues to play after the last stored
-move by itself up to the very end.  Then the winner is determined by
-estimating the territory.
-
-@example
-gnugo --score aftermath -l filename
-@end example
-
-@noindent
-loads the sgf file and GNU Go continues to play after the last stored
-move by itself up to the very end. Then the winner is determined by
-the most accurate algorithm available. Slower but more accurate than
-@option{--score end}.
-
-@example
-gnugo --score L10 -l filename
-@end example
-
-@noindent
-loads the sgf file until a stone is placed on L10. Now the winner will
-be estimated as with @command{gnugo --score last}.
-
-Any of these commands may be combined with @option{--chinese-rules}
-if you want to use Chinese (area) counting.
-
-@example
-gnugo --score 100 -l filename
-@end example
-
-@noindent
-loads the sgf file until move number 100. Now the winner will be estimated
-as with @command{gnugo --score last}.
-
-If the option @option{-o @var{outputfilename}} is provided, the results
-will also be written as comment at the end of the output file.
+GNU Go can score the game. Normally GNU Go will report its opinion about
+the score at the end of the game, but if you want this information about
+a game stored in a file, use the @option{--score} option (@pxref{Invoking
+GNU Go}).
 
 @node  Colored Display,  , Scoring, Analyzing
 @comment  node-name,  next,  previous,  up
@@ -269,7 +219,7 @@ will also be written as comment at the end of the output file.
 @cindex colored display
 
 Various colored displays of the board may be obtained in a color
-@command{xterm} or @command{rxvt} window. Xterm will only work if xterm is not
+@command{xterm} or @command{rxvt} window. Xterm will only work if xterm is
 compiled with color support. If the colors are not displayed on your xterm,
 try @command{rxvt}.  You may also use the Linux console. The colored display
 will work best if the background color is black; if this is not the case you

@@ -274,7 +274,7 @@ are not supressed.
 Load the named SGF file. GNU Go will generate a move for
 the player who is about to move. If you want to override this
 and generate a move for the other player you may add the
-option @option{color @var{<color>}} where @var{<color>} is
+option @option{--color @var{<color>}} where @var{<color>} is
 @code{black} or @code{white}.
 @end quotation
 @item @option{--orientation @var{n}}
@@ -309,7 +309,7 @@ need this option.
 @end quotation
 @end itemize
 
-@subsection Other general options:
+@subsection Other general options
 @itemize
 @item @option{-M}, @option{--cache-size @var{megs}} 
 @quotation
@@ -333,7 +333,8 @@ this option.
 Use Chinese rules. This means that the Chinese or Area Counting is
 followed. It may affect the score of the game by one point in even
 games, more if there is a handicap (since in Chinese Counting the
-handicap stones count for Black).
+handicap stones count for Black) or if either player passes during the
+game.
 @end quotation
 @item @option{--japanese-rules} 
 @quotation
@@ -421,7 +422,7 @@ is inhibited, so fewer variations are considered.  Below this
 depth (default 13), GNU Go still tries to attack strings with only
 3 liberties, but only tries one move at each node.
 @end quotation
-@item @option{--aa_depth @var{depth}}
+@item @option{--aa-depth @var{depth}}
 @quotation
 The reading function @code{atari_atari} looks for combinations beginning
 with a series of ataris, and culminating with some string having an
@@ -456,7 +457,7 @@ program.
 @end quotation
 @end itemize
 
-@subsection Ascii Mode Options
+@subsection Ascii mode options
 @cindex ascii mode
 @itemize
 @item @option{--color @var{color}}
@@ -469,7 +470,7 @@ Choose the number of handicap stones (0--9)
 @end quotation
 @end itemize
 
-@subsection Development options:
+@subsection Development options
 
 @itemize
 @item @option{--replay @var{color}} 
@@ -510,7 +511,7 @@ be more informative.
 @quotation
 Use rxvt, xterm or Linux Console. (@pxref{Colored Display})
 @end quotation
-@item @option{-E}, @option{printeyes}: colored display of eye spaces
+@item @option{-E}, @option{--printeyes}: colored display of eye spaces
 @quotation
 Use rxvt, xterm or Linux Console. (@pxref{Colored Display})
 @end quotation
@@ -652,37 +653,43 @@ exist combinations on the board.
 @end quotation
 @item @option{--score @var{method}}
 @quotation
-Requires @option{-l}. @var{method} can be "end", "last", "aftermath" or a move.
-"end" and "aftermath" are appropriate when the game is complete, or nearly
-so, and both try to supply an accurate final score. The other options may
-be used to get an estimate during the middle of the game. Any of these
-options may be combined with @option{--chinese-rule} if you want to
-use Chinese (Area) counting.
+Requires @option{-l} to specify which game to score and @option{-L} if
+you want to score anywhere else than at the end of the game record.
+@var{method} can be "estimate", "finish", or "aftermath". "finish" and
+"aftermath" are appropriate when the game is complete, or nearly so, and
+both try to supply an accurate final score. Notice that if the game is
+not already finished it will be played out, which may take quite a long
+time if the game is far from complete. The "estimate" method may be used
+to get a quick estimate during the middle of the game. Any of these
+options may be combined with @option{--chinese-rules} if you want to use
+Chinese (Area) counting.
+
+If the option @option{-o @var{outputfilename}} is provided, the result
+will also be written as a comment in the output file. For the "finish"
+and "aftermath" scoring algorithms, the selfplayed moves completing the
+game are also stored.
+
 @itemize
-@item last
+@item estimate
 @quotation
-load the sgf file up to the last move, then estimate territory
-using the Bouzy 5/21 algorithm (@pxref{Moyo}).
+Examine the status of all groups on the board, then give a quick
+estimate of the score using the Bouzy 5/21 algorithm (@pxref{Moyo}).
 @end quotation
-@item end
+@item finish
 @quotation
-finish the game by selfplaying from the end of the file until two passes,
-then estimate territory using the Bouzy 5/21 algorithm (@pxref{Moyo}).
+Finish the game by selfplaying until two passes, then determine the
+status of all stones and estimate territory using the Bouzy 5/21
+algorithm (@pxref{Moyo}).
 @end quotation
 @item aftermath
 @quotation
-finish the game by selfplaying from the end of the file until two passes,
-then estimate territory using the most accurate scoring algorithm available.
-Slower than @option{--score last}, and while these algorithms usually agree,
-if they differ, @option{--score aftermath} is most likely to be correct.
-@end quotation
-@item move, e.g. @option{--score J17}
-@quotation
-load file until move is reached and estimate territorial balance using
-the Bouzy 5/21 algorithm. The @option{--score end} and 
-@option{--score aftermath} options are only useful at or near the
-end of the game, so if you want an estimate of the score in the
-middle, use this method.
+Finish the game by selfplaying until two passes, then accurately
+determine status of all stones by playing out the "aftermath", i.e.
+playing on until all stones except ones involved in seki have become
+either unconditionally (in the strongest sense) alive or unconditionally
+dead (or captured). Slower than @option{--score finish}, and while these
+algorithms usually agree, if they differ, @option{--score aftermath} is
+most likely to be correct.
 @end quotation
 @end itemize
 @end quotation

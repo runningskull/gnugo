@@ -604,14 +604,6 @@ influence of either player.
 Header file for the engine. The name ``liberty'' connotes
 freedom (@pxref{Copying}).
 @end quotation
-@item @file{life.c}
-@quotation
-The code in this file contains an alternative approach to
-life and death based on reading instead of the static approach
-in @file{optics.c}. This code is experimental. It is reasonably
-accurate but too slow. It is activated when gnugo is invoked
-with the @option{--life} option.
-@end quotation
 @item @file{matchpat.c}
 @quotation
 This file contains the pattern matcher @code{matchpat()}, which looks for
@@ -634,7 +626,7 @@ documented in @xref{Eyes}.
 This file does life and death reading. The paradigm is that moves
 are played by both players trying to expand and shrink the eyespace
 until a static configuration is reached where it can be analyzed
-by the code in @file{optics.c} or @file{life.c}.
+by the code in @file{optics.c}.
 @end quotation
 @item @file{printutils.c}
 @quotation

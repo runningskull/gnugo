@@ -958,7 +958,7 @@ We recommend studying this example by
 examining the variation file produced by the command:
 
 @example
-gnugo -l ko5.sgf --quiet --decidestring L1 -o vars.sgf
+gnugo -l ko5.sgf --quiet --decide-string L1 -o vars.sgf
 @end example
 
 The correct resolution is that H1 attacks L1 unconditionally while K2

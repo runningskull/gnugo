@@ -1,9 +1,5 @@
 The purpose of this Chapter is to describe the algorithm used in
-GNU Go 3.0 to determine eyes. There are actually two alternative
-algorithms: the graph-based algorithm in @file{optics.c}, and
-the algorithm based on reading in @file{life.c}. The life
-code is slower than the graph based algorithm, but sometimes more 
-accurate. You can enable it by using the option @option{--life}.
+GNU Go to determine eyes.
 
 @menu
 * Local Games::                 Local games

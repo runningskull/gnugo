@@ -985,7 +985,7 @@ after. The difference is that dead dragons are taken into account the
 second time. Tactically captured worms are taken into account both
 times. 
 @end quotation
-@item @option{--debuginfluence @var{location}}
+@item @option{--debug-influence @var{location}}
 @quotation
 Show influence diagrams after the move at the given location. An
 important limitation of this option is that it's only effective for

@@ -186,38 +186,59 @@ load_and_analyze_sgf_file(Gameinfo *gameinfo)
  *             get an accurate score
  */
 
+#define ESTIMATE  0
+#define FINISH    1
+#define AFTERMATH 2
+
 void 
 load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo, 
 			const char *scoringmode)
 {
   int i, j, move_val;
-  float result;
   char *tempc = NULL;
-  char dummy;
   char text[250];
   char winner;
   int next;
   int pass = 0;
-  SGFTree score_tree;
+  int method;
+  SGFTree local_tree;
+  SGFTree *score_tree = tree;
   
-  sgftree_clear(&score_tree);
-  /* Modify komi to compensate for captured stones. We start at a
-   * setup position and since there is no standard sgf property to
-   * tell the number of captured stones, a modified komi is the best
-   * available solution.
+  /* Default scoring method is ESTIMATE since it's fastest. */
+  method = ESTIMATE;
+  if (strcmp(scoringmode, "finish") == 0)
+    method = FINISH;
+  else if (strcmp(scoringmode, "aftermath") == 0)
+    method = AFTERMATH;
+
+  /* For aftermath scoring we compress the previous moves to a static
+   * board position in the output sgf. This helps a lot when debugging
+   * scoring mistakes. We don't do this for the finish method,
+   * however, since users may be better served by having GNU Go's
+   * selfplay added to the original game record.
    */
-  sgftreeCreateHeaderNode(&score_tree, board_size,
-			  komi + black_captured - white_captured);
-  sgffile_printboard(&score_tree);
-  sgfAddProperty(score_tree.lastnode, "PL",
-		 gameinfo->to_move == WHITE ? "W" : "B");  
+  if (method == AFTERMATH) {
+    sgftree_clear(&local_tree);
+    /* Modify komi to compensate for captured stones. We start at a
+     * setup position and since there is no standard sgf property to
+     * tell the number of captured stones, a modified komi is the best
+     * available solution.
+     */
+    sgftreeCreateHeaderNode(&local_tree, board_size,
+			    komi + black_captured - white_captured);
+    sgffile_printboard(&local_tree);
+    sgfAddProperty(local_tree.lastnode, "PL",
+		   gameinfo->to_move == WHITE ? "W" : "B");
+    score_tree = &local_tree;
+  }
   
   next = gameinfo->to_move;
-  doing_scoring = 1;
   reset_engine();
   
-  if (!strcmp(scoringmode, "finish") || !strcmp(scoringmode, "aftermath")) {
-    do {
+  /* Complete the game by selfplay for the finish and aftermath methods. */
+  if (method != ESTIMATE) {
+    doing_scoring = 1;
+    while (pass < 2) {
       move_val = genmove_conservative(&i, &j, next);
       if (move_val >= 0) {
 	pass = 0;
@@ -225,76 +246,83 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
 		next == WHITE ? "white (O)" : "black (X)", i, j);
       }
       else {
-	++pass;
+	pass++;
 	gprintf("%d %s move : PASS!\n", movenum, 
 		next == WHITE ? "white (O)" : "black (X)");
       }
       play_move(POS(i, j), next);
-      sgffile_add_debuginfo(score_tree.lastnode, move_val);
-      sgftreeAddPlay(&score_tree, next, i, j);
-      sgffile_output(&score_tree);
+      sgffile_add_debuginfo(score_tree->lastnode, move_val);
+      sgftreeAddPlay(score_tree, next, i, j);
+      sgffile_output(score_tree);
       next = OTHER_COLOR(next);
-    } while (movenum <= 10000 && pass < 2);
-
-    if (pass >= 2) {
-      /* Calculate the score */
-      if (!strcmp(scoringmode, "aftermath"))
-	score = aftermath_compute_score(next, komi, &score_tree);
-      else
-	score = gnugo_estimate_score(&upper_bound, &lower_bound);
-
-      if (score < 0.0) {
-	sprintf(text, "Black wins by %1.1f points\n", -score);
-	winner = 'B';
-      }
-      else if (score > 0.0) {
-	sprintf(text, "White wins by %1.1f points\n", score);
-	winner = 'W';
-      }
-      else {
-	sprintf(text, "Jigo\n");
-	winner = '0';
-      }
-      fputs(text, stdout);
-      sgftreeAddComment(&score_tree, text);
-      if (sgfGetCharProperty(tree->root, "RE", &tempc)) {
-	if (sscanf(tempc, "%1c%f", &dummy, &result) == 2) {
-	  fprintf(stdout, "Result from file: %1.1f\n", result);
-	  fputs("GNU Go result and result from file are ", stdout);
-	  if (result == fabs(score) && winner == dummy)
-	    fputs("identical\n", stdout);
-	  else
-	    fputs("different\n", stdout);
-	      
-	}
-	else {
-	  if (tempc[2] == 'R') {
-	    fprintf(stdout, "Result from file: Resign\n");
-	    fputs("GNU Go result and result from file are ", stdout);
-	    if (tempc[0] == winner)
-	      fputs("identical\n", stdout);
-	    else
-	      fputs("different\n", stdout);
-	  }
-	}
-      }
-      sgfWriteResult(score_tree.root, score, 1);
-      sgffile_output(&score_tree);
     }
+    doing_scoring = 0;
   }
-  doing_scoring = 0;
-
-  if (strcmp(scoringmode, "aftermath")) {
-    /* Before we call estimate_score() we must make sure that the dragon
-     * status is computed. Therefore the call to examine_position().
+  
+  /* Calculate the score. */
+  if (method == AFTERMATH)
+    score = aftermath_compute_score(next, komi, score_tree);
+  else {
+    /* Before we call estimate_score() we must make sure that the
+     * dragon status is computed. Therefore the call to
+     * examine_position().
      */
     examine_position(next, EXAMINE_ALL);
-    score = estimate_score(NULL, NULL);
-
-    fprintf(stdout, "\n%s seems to win by %1.1f points\n",
-      score < 0 ? "B" : "W",
-      score < 0 ? -score : score);
+    score = gnugo_estimate_score(NULL, NULL);
   }
+  
+  if (score < 0.0) {
+    sprintf(text, "Black wins by %1.1f points\n", -score);
+    winner = 'B';
+  }
+  else if (score > 0.0) {
+    sprintf(text, "White wins by %1.1f points\n", score);
+    winner = 'W';
+  }
+  else {
+    sprintf(text, "Jigo\n");
+    winner = '0';
+  }
+  fputs(text, stdout);
+  sgftreeAddComment(score_tree, text);
+
+  /* For the finish and aftermath methods we compare the score with
+   * what's stored in the game record.
+   *
+   * FIXME: No comparison is made if the stored result was 0. Wins by
+   *        time or forfeit or not handled either.
+   *
+   * FIXME: Does anybody actually care about this information? Just
+   *        removing this piece of code is a tempting alternative.
+   */
+  if (method != ESTIMATE && sgfGetCharProperty(tree->root, "RE", &tempc)) {
+    char dummy;
+    float result;
+    if (sscanf(tempc, "%1c%f", &dummy, &result) == 2) {
+      fprintf(stdout, "Result from file: %c+%1.1f\n", dummy, result);
+      fputs("GNU Go result and result from file are ", stdout);
+      if (result == fabs(score) && winner == dummy)
+	fputs("identical\n", stdout);
+      else
+	fputs("different\n", stdout);
+      
+    }
+    else {
+      if (tempc[2] == 'R') {
+	fprintf(stdout, "Result from file: Resign\n");
+	fputs("GNU Go result and result from file are ", stdout);
+	if (tempc[0] == winner)
+	  fputs("identical\n", stdout);
+	else
+	  fputs("different\n", stdout);
+      }
+    }
+  }
+
+  if (method != ESTIMATE)
+    sgfWriteResult(score_tree->root, score, 1);
+  
+  sgffile_output(score_tree);
 }
 
 
