@@ -4297,12 +4297,13 @@ X*.
 
 Pattern D1137
 # gf New pattern. (3.1.14)
+# gf Bugfix. (3.1.18)
 # See buzco:6
 
-?oo
-?..
-X*.
-O.?
+?oo?
+?..o
+X*.o
+O.??
 
 :8,B,value(65)
 
