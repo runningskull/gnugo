@@ -604,7 +604,8 @@ sub summarizeTestFile {
   <TH>gtp</TH>
   <TH><A href="?tstfile=$tstfile&sortby=cputime">cputime</A></TH>
   <TH><A href="?tstfile=$tstfile&sortby=owl_node">owl_node</A></TH>
-  <TH>100*time/node</TH>
+  <TH><A href="?tstfile=$tstfile&sortby=reading_node">reading_node</A></TH>
+  <TH><A href="?tstfile=$tstfile&sortby=msperowl">1000*time/owl_node</A></TH>
 </TR>\n@;
 
   my @files = glob("html/$tstfile.tst/*.xml");
@@ -633,6 +634,8 @@ sub summarizeTestFile {
       if $content =~ m@<TIME.*?CPU=((\d|\.)*)@s;
     my $owl_node = $1
       if $content =~ m@<COUNTER[^>]*owl_node="?(\d+)@s;
+    my $reading_node = $1
+      if $content =~ m@<COUNTER[^>]*reading_node="?(\d+)@s;
     $cputime =~ s/0*$//;
     $files{$curfile} = {
       gtp_all => $gtp_all,
@@ -644,6 +647,8 @@ sub summarizeTestFile {
       result => $result,
       cputime => $cputime,
       owl_node => $owl_node,
+      reading_node => $reading_node,
+      msperowl => ($owl_node ? 1000*$cputime/ $owl_node : 0),
     }
   }
  
@@ -661,6 +666,15 @@ sub summarizeTestFile {
     $files{$b}{owl_node} <=> $files{$a}{owl_node}
     or byfilepos();
   }
+
+  sub byreading_node {
+    $files{$b}{reading_node} <=> $files{$a}{reading_node}
+    or byfilepos();
+  }
+  sub bymsperowl  {
+    $files{$b}{msperowl} <=> $files{$a}{msperowl}
+    or byfilepos();
+  }
   
   sub filesby {
     $_ = shift;
@@ -669,6 +683,8 @@ sub summarizeTestFile {
     return byresult if /result/i;
     return bycputime if /cputime/i;
     return byowl_node if /owl_node/i || /owlnode/i;
+    return bymsperowl if /msperowl/i;
+    return byreading_node if /reading_node/i || /readingnode/i;
     $files{$a}{$_} <=> $files{$b}{$_};   
   }
   
@@ -681,13 +697,16 @@ sub summarizeTestFile {
     $r =~ s@^([A-Z]*)$@<B>$1</B>@;
     print TF "<TR><TD>$h{filepos}</TD><TD>$numURL</TD><TD>$r</TD><TD>$h{expected}</TD>"
         . "<TD>$h{got}</TD><TD>$h{gtp}</TD><TD>$h{cputime}</TD><TD>$h{owl_node}</TD>"
-        . "<TD>".sprintf("%.2f",100*$h{cputime}/$h{owl_node})."</TD></TR>\n";
+        . "<TD>$h{reading_node}</TD>"
+        . "<TD>".sprintf("%.2f",$h{msperowl})."</TD></TR>\n";
     $totals{cputime} += $h{cputime};
     $totals{owl_node} += $h{owl_node};
+    $totals{reading_node} += $h{reading_node};
   }
   print TF "<TR><TD>Total</TD><TD>&nbsp;</TD><TD>&nbsp;</TD><TD>&nbsp;</TD>"
     . "<TD>&nbsp;</TD><TD>&nbsp;</TD><TD>$totals{cputime}</TD><TD>$totals{owl_node}</TD>"
-    ." <TD>".sprintf("%.2f",100*$totals{cputime}/$totals{owl_node})."</TD></TR>\n";
+    . "<TD>$totals{reading_node}</TD>"
+    ." <TD>".sprintf("%.2f",1000*$totals{cputime}/($totals{owl_node}+.0001))."</TD></TR>\n";
   print TF "</TABLE>";
   #close TF;
 }
@@ -856,6 +875,7 @@ sub printslow {
     print qq@</TD></TR>@ if $first < 1;
     close F;
   }
+  print "</TABLE></BODY></HTML>\n";
 }
 
 sub printspecial {

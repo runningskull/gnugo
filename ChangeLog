@@ -7,6 +7,7 @@
 - bugfix in estimate_strategical_value(): ALL_MOVE worms were overvalued
 - VC build now DFA compliant
 - semeai module sets matcher status to ALIVE instead of ALIVE_IN_SEKI
+- regression html view enhancements
 - fix arraybound violation in compute_aa_values
 - constraint diagram checking moved to new check_constraint_diagram()
 - Invoke check_constraint_diagram *before* incrementing patno
