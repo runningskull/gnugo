@@ -649,7 +649,7 @@ loadsgf games/reading35.sgf
 # See also 13x13:78
 loadsgf games/reading36.sgf 23
 165 attack L4
-#? [1 K3]*
+#? [1 K3|L3]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

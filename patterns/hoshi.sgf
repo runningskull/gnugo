@@ -470,9 +470,18 @@ W[pg]MA[lk]C[S])
 (;W[ob]MA[nf]C[S];B[nc]MA[mf]C[S];W[nb]MA[mf]C[S];B[mc]MA[lf]C[S];
 W[rd]MA[nf]C[S];B[re]MA[ng]C[S];W[rc]MA[nf]C[S];B[qf]MA[mg]C[S])
 
-(;W[rd]MA[nf]C[S]
-(;B[re]MA[nf]C[S];W[rc]MA[nf]C[S];B[qf]MA[ng]C[S];W[ob]MA[nf]C[S];
-B[nc]MA[mf]C[S];W[nb]MA[mf]C[S];B[mc]MA[lf]C[S])
+(;W[rd]C[#Not joseki
+]
+(;B[re]MA[nf]C[S];W[rc]MA[nf]C[S]
+(;B[qf]C[j
+]MA[ng];W[ob]MA[nf]C[S];B[nc]MA[mf]C[S];W[nb]MA[mf]C[S];
+B[mc]MA[lf]C[S])
+
+(;B[od]C[#depending on circumstances, P18 might be possible ?
+S
+]
+MA[mg])
+)
 
 (;B[od]MA[nf]C[0
 ])
