@@ -2915,8 +2915,8 @@ estimate_territorial_value(int pos, int color, float score)
 				  || (color == WHITE && score > 0.0))) {
 	this_value = gg_min(1.5 * dragon[aa].effective_size,
 			    gg_abs(score/2));
-	TRACE("  %1m: %f - attack last move played, although it seems dead\n",
-	      pos, this_value);
+	TRACE("  %1m: %f - attack %1m, although it seems dead, as we are ahead\n",
+	      pos, this_value, aa);
 	tot_value += this_value;
       }
       else {
