@@ -1348,7 +1348,7 @@ gtp_same_dragon(char *s, int id)
   if (BOARD(ai, aj) == EMPTY || BOARD(bi, bj) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  silent_examine_position(BLACK, EXAMINE_DRAGONS);
+  silent_examine_position(BLACK, EXAMINE_DRAGONS_WITHOUT_OWL);
   
   return gtp_success(id, "%d", dragon[POS(ai, aj)].id == dragon[POS(bi, bj)].id);
 }
