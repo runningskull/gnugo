@@ -1,0 +1,162 @@
+# White: GoeMate
+# Black: GNU Go 3.3.23
+# Handicap: 0
+# Result: W+26.5
+# 2003-08-02
+# CGF 2003 Round 4
+
+boardsize 19
+clear_board
+komi 6.5
+
+reset_connection_node_counter
+reset_owl_node_counter
+reset_reading_node_counter
+reset_trymove_counter
+
+play black Q16
+play white D3
+play black C16
+play white R4
+play black D5
+play white E16
+play black C3
+play white C2
+play black H16
+play white E14
+play black C13
+play white C4
+play black P3
+play white R14
+play black Q5
+play white R5
+play black Q6
+play white R6
+play black Q7
+play white R8
+play black K3
+play white C17
+play black B17
+play white D17
+play black P9
+play white M16
+play black K5
+play white J15
+play black R12
+play white J16
+play black Q14
+play white R17
+play black R16
+play white Q17
+play black H17
+play white J17
+play black S14
+play white P16
+play black C10
+play white G3
+play black R10
+play white B6
+play black R7
+play white S7
+play black R2
+play white S9
+play black D15
+play white B18
+play black H15
+play white H13
+play black B16
+play white E15
+play black N13
+play white K7
+play black M7
+play white H6
+play black L9
+play white D7
+play black K13
+play white K9
+play black K10
+play white J9
+play black J11
+play white H14
+play black G11
+play white L6
+play black N5
+play white G9
+play black H5
+play white G6
+play black H2
+play white G5
+play black H4
+play white T12
+play black G4
+play white F4
+play black G2
+play white R15
+play black S16
+play white Q15
+81 reg_genmove black
+play black P15
+play white O15
+83 reg_genmove black
+play black P14
+play white O16
+85 reg_genmove black
+play black S17
+play white O14
+87 reg_genmove black
+play black R18
+play white O13
+89 reg_genmove black
+play black P12
+play white O12
+91 reg_genmove black
+play black P17
+play white R13
+93 reg_genmove black
+play black Q13
+play white S13
+95 reg_genmove black
+play black O17
+play white L8
+97 reg_genmove black
+play black S15
+play white M8
+99 reg_genmove black
+play black M12
+play white E11
+101 reg_genmove black
+play black E10
+play white F10
+103 reg_genmove black
+play black N17
+play white N11
+105 reg_genmove black
+play black L10
+play white O8
+107 reg_genmove black
+play black N10
+play white M11
+109 reg_genmove black
+play black O9
+play white L11
+111 reg_genmove black
+play black N16
+play white N15
+113 reg_genmove black
+play black M15
+play white M14
+115 reg_genmove black
+play black M13
+play white L15
+117 reg_genmove black
+play black K11
+play white N9
+119 reg_genmove black
+play black L18
+play white J18
+
+
+10000 get_reading_node_counter
+10001 get_owl_node_counter
+10002 get_connection_node_counter
+10003 get_trymove_counter

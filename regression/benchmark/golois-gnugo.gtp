@@ -1,0 +1,160 @@
+# White: Golois
+# Black: GNU Go
+# Handicap: 0
+# 2002-07-27
+
+boardsize 19
+clear_board
+komi 5.5
+
+reset_connection_node_counter
+reset_owl_node_counter
+reset_reading_node_counter
+reset_trymove_counter
+
+play black Q16
+play white C17
+play black Q3
+play white C4
+play black E3
+play white R10
+play black D5
+play white K17
+play black C5
+play white C10
+play black B4
+play white K3
+play black R5
+play white R17
+play black R16
+play white Q17
+play black P17
+play white E4
+play black D4
+play white F4
+play black P18
+play white N3
+play black D16
+play white D17
+play black E16
+play white E17
+play black R8
+play white R13
+play black M17
+play white G17
+play black E14
+play white S16
+play black S15
+play white T16
+play black T15
+play white P16
+play black Q15
+play white P15
+play black P14
+play white Q14
+play black R15
+play white O14
+play black P13
+play white S18
+play black O15
+play white D12
+play black Q18
+play white C7
+play black H15
+play white E13
+play black F3
+play white M14
+play black G4
+play white E6
+play black N15
+play white G5
+play black H4
+play white R18
+play black T18
+play white H5
+play black Q12
+play white J4
+play black R12
+play white P2
+play black F16
+play white C3
+play black B3
+play white C2
+play black A6
+play white H16
+play black F14
+play white J15
+play black G13
+play white K14
+play black N14
+play white M13
+play black H14
+play white D14
+play black G11
+play white F11
+81 reg_genmove black
+play black F12
+play white J13
+83 reg_genmove black
+play black E11
+play white Q11
+85 reg_genmove black
+play black F10
+play white P11
+87 reg_genmove black
+play black J11
+play white E9
+89 reg_genmove black
+play black C16
+play white F9
+91 reg_genmove black
+play black B2
+play white C1
+93 reg_genmove black
+play black H8
+play white H7
+95 reg_genmove black
+play black J5
+play white K5
+97 reg_genmove black
+play black J6
+play white J8
+99 reg_genmove black
+play black J7
+play white S13
+101 reg_genmove black
+play black G7
+play white H3
+103 reg_genmove black
+play black G3
+play white F6
+105 reg_genmove black
+play black H9
+play white K8
+107 reg_genmove black
+play black L7
+play white L8
+109 reg_genmove black
+play black M7
+play white B16
+111 reg_genmove black
+play black B15
+play white A16
+113 reg_genmove black
+play black M8
+play white J12
+115 reg_genmove black
+play black L9
+play white H6
+117 reg_genmove black
+play black G6
+play white F5
+119 reg_genmove black
+play black K6
+play white G8
+
+
+10000 get_reading_node_counter
+10001 get_owl_node_counter
+10002 get_connection_node_counter
+10003 get_trymove_counter

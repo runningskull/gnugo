@@ -1,0 +1,202 @@
+# White: Go Intellect
+# Black: GNU Go 3.3.23
+# Handicap: 0
+# Result: B+14.5
+# 2003-08-02
+# CGF 2003 Round 1
+
+boardsize 19
+clear_board
+komi 6.5
+
+reset_connection_node_counter
+reset_owl_node_counter
+reset_reading_node_counter
+reset_trymove_counter
+
+play black R16
+play white C16
+play black E16
+play white C4
+play black C17
+play white D17
+play black D16
+play white E17
+play black C15
+play white H17
+play black C18
+play white F16
+play black E3
+play white P17
+play black Q14
+play white C10
+play black D5
+play white D4
+play black E4
+play white C5
+play black D6
+play white C7
+play black R4
+play white K3
+play black P3
+play white G3
+play black E8
+play white F15
+play black R10
+play white C6
+play black O14
+play white F5
+play black E5
+play white F6
+play black C2
+play white F2
+play black B3
+play white D18
+play black B16
+play white D7
+play black G8
+play white E7
+play black B4
+play white D3
+play black E2
+play white D2
+play black D1
+play white Q9
+play black B5
+play white Q10
+play black R7
+play white R8
+play black S8
+play white S9
+play black R9
+play white Q8
+play black S10
+play white B1
+play black N17
+play white O16
+play black N16
+play white R17
+play black S17
+play white Q16
+play black R18
+play white R15
+play black Q17
+play white Q15
+play black Q18
+play white P18
+play black N15
+play white S16
+play black S15
+play white T16
+play black T17
+play white R17
+play black S14
+play white R16
+play black M3
+play white R14
+play black P15
+play white S18
+play black R13
+play white Q13
+play black C12
+play white P14
+play black K17
+play white R11
+play black S11
+play white R12
+play black K15
+play white S7
+play black T9
+play white R6
+play black Q7
+play white Q6
+play black P7
+play white P6
+play black O7
+play white N5
+play black O6
+play white L4
+play black O5
+play white O13
+play black S12
+play white S13
+play black N13
+play white E10
+play black F7
+play white H10
+play black G6
+play white F9
+play black F8
+play white G5
+play black J8
+play white H6
+play black K13
+play white K10
+play black G7
+play white L8
+121 reg_genmove black
+play black O12
+play white P13
+123 reg_genmove black
+play black N4
+play white M4
+125 reg_genmove black
+play black M2
+play white S6
+127 reg_genmove black
+play black O4
+play white T12
+129 reg_genmove black
+play black T11
+play white Q4
+131 reg_genmove black
+play black Q3
+play white N12
+133 reg_genmove black
+play black S4
+play white T13
+135 reg_genmove black
+play black N11
+play white M12
+137 reg_genmove black
+play black O11
+play white C1
+139 reg_genmove black
+play black E1
+play white M13
+141 reg_genmove black
+play black N14
+play white M11
+143 reg_genmove black
+play black O9
+play white M5
+145 reg_genmove black
+play black G14
+play white L2
+147 reg_genmove black
+play black B10
+play white B11
+149 reg_genmove black
+play black C11
+play white B9
+151 reg_genmove black
+play black D10
+play white A10
+153 reg_genmove black
+play black D9
+play white D11
+155 reg_genmove black
+play black E11
+play white G9
+157 reg_genmove black
+play black D12
+play white F11
+159 reg_genmove black
+play black J18
+play white B12
+
+
+10000 get_reading_node_counter
+10001 get_owl_node_counter
+10002 get_connection_node_counter
+10003 get_trymove_counter

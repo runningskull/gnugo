@@ -1,0 +1,122 @@
+# White: Go++
+# Black: GNU Go 3.3.23
+# Handicap: 0
+# Result: W+10.5
+# 2003-08-03
+# CGF 2003 Round 9
+
+boardsize 19
+clear_board
+komi 6.5
+
+reset_connection_node_counter
+reset_owl_node_counter
+reset_reading_node_counter
+reset_trymove_counter
+
+play black Q16
+play white C17
+play black Q3
+play white C4
+play black E3
+play white C7
+play black H3
+play white R6
+play black Q5
+play white S4
+play black F16
+play white C14
+play black N3
+play white L17
+play black J17
+play white O17
+play black Q14
+play white Q18
+play black R17
+play white D3
+play black E4
+play white R18
+play black E7
+play white D9
+play black H5
+play white F9
+play black J15
+play white E17
+play black N5
+play white R9
+play black R11
+play white G13
+play black L6
+play white J13
+play black L15
+play white P9
+play black E13
+play white L13
+play black E15
+play white C12
+41 reg_genmove black
+play black E11
+play white D10
+43 reg_genmove black
+play black G14
+play white M10
+45 reg_genmove black
+play black F10
+play white J10
+47 reg_genmove black
+play black D6
+play white C6
+49 reg_genmove black
+play black D2
+play white C2
+51 reg_genmove black
+play black E2
+play white F17
+53 reg_genmove black
+play black S18
+play white Q17
+55 reg_genmove black
+play black S17
+play white H14
+57 reg_genmove black
+play black H15
+play white K16
+59 reg_genmove black
+play black K15
+play white K18
+61 reg_genmove black
+play black N15
+play white M16
+63 reg_genmove black
+play black M15
+play white N13
+65 reg_genmove black
+play black H18
+play white N16
+67 reg_genmove black
+play black E19
+play white D18
+69 reg_genmove black
+play black S2
+play white G10
+71 reg_genmove black
+play black G11
+play white H11
+73 reg_genmove black
+play black O14
+play white G17
+75 reg_genmove black
+play black J16
+play white P12
+77 reg_genmove black
+play black Q12
+play white P11
+79 reg_genmove black
+play black F13
+play white S10
+
+
+10000 get_reading_node_counter
+10001 get_owl_node_counter
+10002 get_connection_node_counter
+10003 get_trymove_counter

@@ -1,0 +1,82 @@
+# White: GNU Go 3.3.23
+# Black: Aya
+# Handicap: 0
+# Result: W+67.5
+# 2003-08-03
+# Gifu 2003 Round 6
+
+boardsize 19
+clear_board
+komi 6.5
+
+reset_connection_node_counter
+reset_owl_node_counter
+reset_reading_node_counter
+reset_trymove_counter
+
+play black C16
+2 reg_genmove white
+play white Q16
+play black R4
+4 reg_genmove white
+play white D3
+play black C5
+6 reg_genmove white
+play white E4
+play black P3
+8 reg_genmove white
+play white D6
+play black E17
+10 reg_genmove white
+play white C6
+play black R17
+12 reg_genmove white
+play white R16
+play black Q17
+14 reg_genmove white
+play white P17
+play black P18
+16 reg_genmove white
+play white O17
+play black O18
+18 reg_genmove white
+play white N17
+play black S16
+20 reg_genmove white
+play white S15
+play black S17
+22 reg_genmove white
+play white R14
+play black R7
+24 reg_genmove white
+play white C10
+play black C13
+26 reg_genmove white
+play white K3
+play black R11
+28 reg_genmove white
+play white N18
+play black J17
+30 reg_genmove white
+play white M4
+play black L16
+32 reg_genmove white
+play white L18
+play black N15
+34 reg_genmove white
+play white O15
+play black N3
+36 reg_genmove white
+play white E11
+play black K17
+38 reg_genmove white
+play white G11
+play black Q13
+40 reg_genmove white
+play white M6
+
+
+10000 get_reading_node_counter
+10001 get_owl_node_counter
+10002 get_connection_node_counter
+10003 get_trymove_counter

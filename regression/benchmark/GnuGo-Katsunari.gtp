@@ -1,0 +1,82 @@
+# White: Katsunari
+# Black: GNU Go 3.3.23
+# Handicap: 0
+# Result: B+47.5
+# 2003-08-03
+# CGF 2003 Round 8
+
+boardsize 19
+clear_board
+komi 6.5
+
+reset_connection_node_counter
+reset_owl_node_counter
+reset_reading_node_counter
+reset_trymove_counter
+
+1 reg_genmove black
+play black Q16
+play white D16
+3 reg_genmove black
+play black D4
+play white R4
+5 reg_genmove black
+play black C14
+play white F17
+7 reg_genmove black
+play black B16
+play white C17
+9 reg_genmove black
+play black C11
+play white R14
+11 reg_genmove black
+play black P4
+play white P3
+13 reg_genmove black
+play black O3
+play white Q3
+15 reg_genmove black
+play black O4
+play white R6
+17 reg_genmove black
+play black K3
+play white C6
+19 reg_genmove black
+play black D6
+play white D7
+21 reg_genmove black
+play black E6
+play white C4
+23 reg_genmove black
+play black C5
+play white B5
+25 reg_genmove black
+play black D5
+play white B7
+27 reg_genmove black
+play black C3
+play white B4
+29 reg_genmove black
+play black E7
+play white D8
+31 reg_genmove black
+play black B3
+play white R11
+33 reg_genmove black
+play black O16
+play white S16
+35 reg_genmove black
+play black R17
+play white E2
+37 reg_genmove black
+play black K17
+play white N16
+39 reg_genmove black
+play black N15
+play white M16
+
+
+10000 get_reading_node_counter
+10001 get_owl_node_counter
+10002 get_connection_node_counter
+10003 get_trymove_counter
