@@ -197,8 +197,8 @@ loadsgf games/owl29.sgf 134
 # B can play at C4 if we remember the tesuji B:C4 W:E4 B:B2.
 
 loadsgf games/pooo.sgf 16
-187 gg_genmove black
-#? [!C1]
+187 restricted_genmove black E4 C4 B3 B4 C1
+#? [C4|E4]
 
 loadsgf games/pooo.sgf 24
 188 gg_genmove black

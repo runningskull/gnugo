@@ -215,7 +215,7 @@ loadsgf games/arend/constructed3.sgf
 # This is an example for part 1 of my comment of the previous problem.
 # This slightly adapted from a game (to make the problem more specific).
 loadsgf games/arend/constructed4.sgf
-39 gg_genmove black 3
+39 gg_genmove black
 #? [G10|H10|F13]
 
 #CATEGORY=ENDGAME_TUNING

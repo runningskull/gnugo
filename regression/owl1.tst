@@ -212,22 +212,26 @@ loadsgf games/owl45.sgf
 313 owl_attack B18
 #? [1 (A18|C19)]
 
-
 # See also ld_owl:12
 loadsgf games/life_and_death/ld3.sgf
 white E1
 black B1
 white D1
-313 owl_defend A2
+314 owl_defend A2
 #? [1 F1]*
 
 loadsgf games/splee2.sgf 128
-314 owl_does_attack Q9 M10
+315 owl_does_attack Q9 M10
 #? [0]*
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 136
 316 owl_defend L7
 #? [0]*
+
+# J5 and J3 fail spectacularly due to shortage of liberties.
+loadsgf games/owl46.sgf
+317 owl_attack J4
+#? [1 (J7|J6|J8)]
 
 ########### end of tests #####################
 

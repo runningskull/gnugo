@@ -187,6 +187,12 @@ loadsgf games/nngs/gnugo-3.3.18-overziel7-200304281000.sgf 234
 34 gg_genmove white
 #? [M4|M5]*
 
+# D5 is a ko threat which loses two points. Better let black connect
+# the ko.
+loadsgf games/gunnar/gunnar10.sgf
+35 gg_genmove white
+#? [C7|D7|E7]
+
 
 ############ End of Tests #################
 

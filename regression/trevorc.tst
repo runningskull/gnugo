@@ -293,7 +293,7 @@ loadsgf games/trevor/auto/c30.sgf 80
 
 
 loadsgf games/trevor/auto/c30.sgf 92
-570 gg_genmove white 2
+570 gg_genmove white
 #? [!N9]
 
 
@@ -833,7 +833,7 @@ loadsgf games/trevor/auto/c78.sgf 100
 
 
 loadsgf games/trevor/auto/c78.sgf 102
-1420 gg_genmove white 6
+1420 gg_genmove white
 #? [J4]*
 
 

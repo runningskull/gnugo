@@ -250,7 +250,7 @@ loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 85
 
 #CATEGORY=FUSEKI_STRATEGY
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 7
-47 gg_genmove black 8
+47 gg_genmove black
 #? [!G11]
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 11
@@ -463,7 +463,7 @@ loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 65
 #CATEGORY=BLUNDER
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 69
-88 gg_genmove black 3
+88 gg_genmove black
 #? [!A9]
 
 #CATEGORY=OWL_TUNING

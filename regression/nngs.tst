@@ -476,7 +476,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 26
 
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 28
-1040 gg_genmove white 2
+1040 gg_genmove white
 #? [!O17]
 
 
@@ -876,7 +876,7 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 205
 #CATEGORY=TERRITORIAL_VALUATION
 # Not E9 as played by GNU Go! -ab
 loadsgf games/nngs/gnugo-3.1.20-setenza-200201162038.sgf 15
-1930 gg_genmove white 4
+1930 gg_genmove white
 #? [K15|L3|K3|F17|O17]*
 
 #CATEGORY=TERRITORIAL_VALUATION

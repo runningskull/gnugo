@@ -224,10 +224,9 @@ loadsgf games/trevor/trevor_23.sgf 27
 
 
 # Connect the dragons!  One eye is not enough, anyway.
-# Thanks to Gunnar, for the random seed to force failure!
 # See also owl.tst 221
 loadsgf games/trevor/trevor_24.sgf 33
-240 gg_genmove black 1
+240 gg_genmove black
 #? [E8|D8]
 
 
