@@ -1,8 +1,6 @@
 (;GM[1]FF[4]RU[Japanese]SZ[13]
 PW[GNU Go]PB[GNU Go 2.7.226 ascii]HA[9]KM[0.5]GN[GNU Go 2.7.226 ascii Random Seed 984842282] 
 AB[dd]AB[gd]AB[jd]AB[dg]AB[gg]AB[jg]AB[dj]AB[gj]AB[jj]
-LB[cc:37][kc:37][ck:37][kk:37]
-C[Value of move: 37]
 ;W[ck];B[cj];W[kc];B[jc];W[cc];B[cd];W[dc];B[fc];W[kd];B[mf]
 ;W[eb];B[bc];W[bb];B[db];W[bd];B[ec];W[ac];B[fb];W[dk];B[fk]
 ;W[kk];B[jk];W[ek];B[fl];W[el];B[em];W[dm];B[ej];W[fm];B[bk]
