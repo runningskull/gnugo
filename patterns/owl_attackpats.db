@@ -462,13 +462,39 @@ O.Xx         second line kosumi
 
 
 Pattern A207c
+# nn Modified (3.3.11) see A207d
 
-O.Xxx         second line kosumi
-.*.xx
-...??
------
+?O.Xxx         second line kosumi
+?.*.xx
+?...??
+------
 
 :8,-,value(78)
+
+?O.Xxx
+a.*.xx
+?...??
+------
+
+;!x_somewhere(a) || attack(a)
+
+
+Pattern A207d
+# nn New pattern (3.3.11) penalty for being gote
+
+?O.Xxx         second line kosumi
+X.*.xx
+?...??
+------
+
+:8,-,value(60)
+
+?O.Xxx
+a.*.xx
+?...??
+------
+
+;!attack(a)
 
 
 # Pattern A208
@@ -504,6 +530,17 @@ O.X
 ---
 
 :8,-,value(55)
+
+
+Pattern A208b
+# nn New Pattern (3.3.11) 
+
+O..
+*.X
+.oo
+---
+
+:8,-,value(35)
 
 
 Pattern A209
@@ -1311,6 +1348,7 @@ OXO
 Pattern A411
 # gf Revised pattern. Necessary to constrain it harder. (3.1.14)
 # gf Revised and devalued pattern. (3.1.15)
+# nn Modified constraint (3.3.11)
 
 ??...???      try to stop escape into center
 ??...oo?
@@ -1326,7 +1364,32 @@ Pattern A411
 ??j.X???
 ??bc????
 
-;owl_escape_value(a)>0 && o_somewhere(b,c,j) && o_somewhere(d,e,f,g,h,i)
+;owl_escape_value(a)>0 
+;&& ((o_somewhere(b,c,j) && o_somewhere(d,e,f,g,h,i))
+;   || (o_somewhere(j) && owl_escape_value(d)==0 && owl_escape_value(e)==0))
+
+
+Pattern A411a
+# nn New pattern (3.3.11)
+#   FIXME: there must be a way to prevent duplicate matches with A411
+
+???..??      try to stop escape into center
+??...oo
+??.*.oo
+??o.X??
+??oo???
+??oo???
+
+:8,-,value(79)
+
+???a.??
+??...de
+??.*.bc
+??f.X??
+??gh???
+??ij???
+
+;owl_escape_value(a)>0 && o_somewhere(f,g,h,i,j) && o_somewhere(b,c,d,e)
 
 
 Pattern A412
@@ -1358,6 +1421,25 @@ ba??
 # :8,-,value(45)
 
 
+Pattern A413a
+# nn New pattern (3.3.11)
+
+o.....       prevent escape
+o.....
+o..*..
+O.X...
+
+:8,-,value(50)
+
+idf...
+jcbe..
+k.a*..
+O.X...
+
+;(o_somewhere(j) || (o_somewhere(i) && o_somewhere(k)))
+;&& !oplay_attack(*,a,b,c,d,e,f,*) && !oplay_attack(*,a,b,e,f,*)
+
+
 Pattern A414
 # gf Revised constraint. (3.1.14)
 
@@ -1376,6 +1458,28 @@ cd...hi
 ??.X.jk
 
 ; o_somewhere(a,b,c,d) && owl_escape_value(e)>0 && o_somewhere(f,g,h,i,j,k)
+
+
+Pattern A414a
+# nn New pattern (3.3.11)
+
+......o
+......o
+..*...o
+oo.X.oo
+
+:8,-,value(65)
+
+a.....b
+......c
+..*...d
+ef.X.oo
+
+;owl_escape_value(a)>0 
+;&& owl_escape_value(b)==0
+;&& owl_escape_value(c)==0
+;&& owl_escape_value(d)==0
+;&& o_somewhere(e,f)
 
 
 Pattern A415
@@ -3037,6 +3141,73 @@ oc*A
 ;     || (!x_somewhere(d) && !xplay_defend_both(*,c,d,c,e)))
 
 
+Pattern A1017
+# nn New pattern (3.3.11)
+
+X.*o     threaten to cut and mess up opponent's shape
+xX.X
+
+:8,-,value(65)
+
+X.*b
+xXaX
+
+;!oplay_attack(*,a,*)
+;&& (o_somewhere(b) || !oplay_attack(*,b,*))
+
+
+Pattern A1018
+# nn New pattern (3.3.11)
+
+O.X      separate
+.*.
+X.o
+
+:\,-,value(35)
+
+
+Pattern A1019
+# nn New pattern (3.3.11)
+
+.o.O     cut / prevent escape
+X...
+.*.X
+
+:8,-,value(65)
+
+.fgO
+Xbde
+.*cA
+
+;!owl_goal_dragon(A) && !oplay_attack_either(*,b,c,d,e,c,e)
+;&& (o_somewhere(f) || !oplay_attack_either(*,d,b,f,g,b,g))
+
+
+Pattern A1020
+# nn New pattern (3.3.11)
+#   FIXME: constraint is ugly
+
+ooooo      try to cut off and kill the moyo reducing stone
+....o
+....o
+.X..o
+*...o
+
+:/,-,value(45)
+
+abcde
+....f
+....g
+.X..h
+*...i
+
+;(owl_escape_value(a)>0) + (owl_escape_value(b)>0)
+;+(owl_escape_value(c)>0) + (owl_escape_value(d)>0)
+;+(owl_escape_value(e)>0) + (owl_escape_value(f)>0)
+;+(owl_escape_value(g)>0) + (owl_escape_value(h)>0)
+;+(owl_escape_value(i)>0) < 2
+
+
 #########################################################
 #                                                       #
 #              Reinforce the perimeter                  #
@@ -3439,29 +3610,32 @@ Dcb
 ;&& !oplay_attack_either(*,c,D,*,D)
 
 
-Pattern A1120
-# tm New Pattern (3.1.20)
-# tm Modified (3.1.20)
-#   see global:40 (owl_does_defend F4 H2)
-# tm Modified (3.1.23) (see D1343b, D1380)
-
-????
-?..?	block escape
-.*.?
-X.??
-
-:8,-,value(65)
-
-?ge?
-?abf
-.*ch
-X.??
-
-; (owl_escape_value(a) > 0)
-; + (owl_escape_value(b) > 0)
-; + (owl_escape_value(c) > 0) > 1
-; || (!o_somewhere(g) && !o_somewhere(h)
-;     && owl_escape_value(e) + owl_escape_value(f) > 0)
+# nn Removed (3.3.11)
+#   Too general and (way) too expensive
+#
+# Pattern A1120
+# # tm New Pattern (3.1.20)
+# # tm Modified (3.1.20)
+# #   see global:40 (owl_does_defend F4 H2)
+# # tm Modified (3.1.23) (see D1343b, D1380)
+# 
+# ????
+# ?..?	block escape
+# .*.?
+# X.??
+# 
+# :8,-,value(65)
+# 
+# ?ge?
+# ?abf
+# .*ch
+# X.??
+# 
+# ; (owl_escape_value(a) > 0)
+# ; + (owl_escape_value(b) > 0)
+# ; + (owl_escape_value(c) > 0) > 1
+# ; || (!o_somewhere(g) && !o_somewhere(h)
+# ;     && owl_escape_value(e) + owl_escape_value(f) > 0)
 
 
 Pattern A1121
@@ -3633,6 +3807,19 @@ XO..
 O..?
 
 ;xplay_attack(*,a,B)
+
+
+Pattern A1130
+# nn New pattern (3.3.11)
+#   FIXME: should be constrained
+
+...o?     to be considered in crosscut cases like this
+...Ox
+.*.OX
+..XXO
+...o?
+
+:8,-,value(65)
 
 
 #########################################################
