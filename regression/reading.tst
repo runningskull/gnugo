@@ -668,9 +668,10 @@ loadsgf games/reading37.sgf
 #? [2 B2]
 
 # See also trevorb:430
+# After B:F13, W:D13, B:H13, W:G13, B:G12, white G11 would be self-atari.
 loadsgf games/trevor/auto/b28.sgf 80
 169 defend F12
-#? [0]*
+#? [1 F13]
 
 # See also owl:237
 loadsgf games/owl33.sgf 212

@@ -221,10 +221,10 @@ loadsgf games/trevor/auto/b28.sgf 64
 420 gg_genmove white
 #? [!E3]
 
-
+# See also reading:169.
 loadsgf games/trevor/auto/b28.sgf 80
 430 gg_genmove white
-#? [!F13]*
+#? [F13]
 
 
 

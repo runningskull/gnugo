@@ -867,7 +867,7 @@ loadsgf games/owl33.sgf 134
 236 owl_defend O4
 #? [1 (R4|S3|R3|S2|Q5|P5)]
 
-#SEE_ALSO=trevor:1080, reading:170
+#SEE_ALSO=reading:170
 loadsgf games/owl33.sgf 212
 237 owl_defend S12
 #? [0]*
