@@ -50,6 +50,7 @@ Usage : mkpat [-cvh] <prefix>\n\
 	   -i = one or more input files (typically *.db).\n\
 	   -o = output file (typically *.c).\n\
            -p = pre-rotate patterns before storing in database.\n\
+           -a = require anchor in all patterns.  Sets fixed_anchor flag in db.\n\
 \n\
  If compiled with --enable-dfa the following options also work:\n\n\
            -D = generate a dfa and save it as a C file.\n\
@@ -362,8 +363,8 @@ int anchor = ANCHOR_O; /* Whether both O and/or X may be anchors.
 			*/
 
 int choose_best_anchor = 0;  /* -m */
-
-int pre_rotate = 0; 
+int fixed_anchor = 0;        /* -a */
+int pre_rotate = 0;          /* -p */
 
 int fullboard = 0;   /* Whether this is a database of fullboard patterns. */
 int dfa_generate = 0; /* if 1 a dfa is created. */
@@ -2117,7 +2118,8 @@ write_pattern_db(FILE *outfile, char *name)
   /* Write out the pattern database. */
   fprintf(outfile, "\n");
   fprintf(outfile, "struct pattern_db %s_db = {\n", name);
-  fprintf(outfile, "  -1,\n");
+  fprintf(outfile, "  -1,\n");  /* fixed_for_size */
+  fprintf(outfile, "  %d,\n", fixed_anchor);
   fprintf(outfile, "  %s\n", name);
   if (dfa_c_output)
     fprintf(outfile, " ,& dfa_%s\n", name); /* pointer to the wired dfa */
@@ -2151,15 +2153,24 @@ main(int argc, char *argv[])
 
   {
     /* parse command-line args */
-    while ((i = gg_getopt(argc, argv, "i:o:V:vcbpXfmtDT")) != EOF) {
+    while ((i = gg_getopt(argc, argv, "i:o:V:abcfmptvDTX")) != EOF) {
       switch (i) {
       case 'v': verbose = 1; break;
       case 'c': pattern_type = CONNECTIONS; break;
       case 'b': anchor = ANCHOR_BOTH; break;
       case 'X': anchor = ANCHOR_X; break;
       case 'f': fullboard = 1; break;
-      case 'm': choose_best_anchor = 1; break;
+      case 'm': 
+        choose_best_anchor = 1;
+        if (fixed_anchor)
+          fprintf(stderr, "Warning : -m and -a are mutually exclusive.\n");
+         break;
       case 'p': pre_rotate = 1; break;
+      case 'a': 
+        fixed_anchor = 1; 
+        if (choose_best_anchor)
+          fprintf(stderr, "Warning : -m and -a are mutually exclusive.\n");
+        break;
       case 'i': 
 	if (ifc == MAX_INPUT_FILE_NAMES) {
 	  fprintf(stderr, "Error : Too many input files; %s", gg_optarg);

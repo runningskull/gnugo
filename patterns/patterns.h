@@ -265,6 +265,7 @@ struct tree_node_list;
 
 struct pattern_db {
   int fixed_for_size;
+  int fixed_anchor;
   struct pattern *patterns;
   struct dfa *pdfa;
 #if EXPERIMENTAL_READING

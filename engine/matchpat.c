@@ -837,12 +837,14 @@ static int compare_int(const void *a, const void *b);
 static void do_dfa_matchpat(dfa_t *pdfa,
 			    int m, int n, matchpat_callback_fn_ptr callback,
 			    int color, struct pattern *database,
-			    void *callback_data, char goal[BOARDMAX]);
+			    void *callback_data, char goal[BOARDMAX],
+                            int anchor_in_goal);
 static void check_pattern_light(int m, int n, 
 				matchpat_callback_fn_ptr callback,
 				int color, struct pattern *pattern, int ll,
 				void *callback_data,
-				char goal[BOARDMAX]);
+				char goal[BOARDMAX],
+                                int anchor_in_goal);
 static void dfa_matchpat_loop(matchpat_callback_fn_ptr callback,
 			      int color, int anchor,
 			      struct pattern_db *pdb, void *callback_data,
@@ -994,7 +996,8 @@ static void
 do_dfa_matchpat(dfa_t *pdfa,
 		int m, int n, matchpat_callback_fn_ptr callback,
 		int color, struct pattern *database,
-		void *callback_data, char goal[BOARDMAX])
+		void *callback_data, char goal[BOARDMAX],
+                int anchor_in_goal)
 {
   int ll;      /* Iterate over transformations (rotations or reflections)  */
   int matched; /* index in database[] of the matched pattern */
@@ -1037,7 +1040,7 @@ do_dfa_matchpat(dfa_t *pdfa,
 #endif
     
     check_pattern_light(m, n, callback, color, database+matched, 
-			ll, callback_data, goal);
+			ll, callback_data, goal, anchor_in_goal);
   }
 }
 
@@ -1051,7 +1054,7 @@ do_dfa_matchpat(dfa_t *pdfa,
 static void
 check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	      struct pattern *pattern, int ll, void *callback_data,
-	      char goal[BOARDMAX])
+	      char goal[BOARDMAX], int anchor_in_goal)
 {
   int k;			/* Iterate over elements of pattern */
   int found_goal = 0;
@@ -1074,10 +1077,12 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
     if (ll < 2 || ll >= 6)
       return;
   }
-  else
+  else {
     if (ll >= pattern->trfno)
       return;
+  }
 
+ 
   /* Now iterate over the elements of the pattern. */
   for (k = 0; k < pattern->patlen; k++) {
   				/* match each point */
@@ -1090,15 +1095,17 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
     y += n;
     ASSERT_ON_BOARD2(x, y);
 
-    /* goal check */
-    if (goal != NULL) {
-      if (goal[POS(x, y)])
-	found_goal = 1;
-      else if (p[x][y] == color)
-	found_nongoal = 1;
+    if (!anchor_in_goal) { 
+      /* goal check */
+      if (goal != NULL) {
+        if (goal[POS(x, y)])
+	  found_goal = 1;
+        else if (p[x][y] == color)
+	  found_nongoal = 1;
+      }
     }
 
-   /* class check */
+    /* class check */
     ASSERT2(dragon[POS(x,y)].status < 4, x, y);
     if ((pattern->class
 	 & class_mask[dragon[POS(x, y)].status][p[x][y]]) != 0)
@@ -1107,10 +1114,12 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
   } /* loop over elements */
   
   /* Make it here ==> We have matched all the elements to the board. */
-  if (goal != NULL && !found_goal)
-    goto match_failed;
-  if (goal != NULL && (pattern->class & CLASS_C) && !found_nongoal)
-    goto match_failed;
+  if (!anchor_in_goal) { 
+    if (goal != NULL && !found_goal)
+      goto match_failed;
+    if (goal != NULL && (pattern->class & CLASS_C) && !found_nongoal)
+      goto match_failed;
+  }
 
 #ifdef PROFILE_MATCHER
   ++totals[4];
@@ -1153,7 +1162,7 @@ dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
       if (p[i][j] == anchor
           && (!anchor_in_goal || goal[POS(i,j)] != 0))
 	do_dfa_matchpat(pdb->pdfa, i, j, callback, color, pdb->patterns, 
-			callback_data, goal);
+			callback_data, goal, anchor_in_goal);
 }
 
 
@@ -1185,7 +1194,8 @@ matchpat(matchpat_callback_fn_ptr callback, int color,
 	 struct pattern_db *pdb, void *callback_data,
 	 char goal[BOARDMAX]) 
 {
-  matchpat_goal_anchor(callback, color, pdb, callback_data, goal, 0);
+  matchpat_goal_anchor(callback, color, pdb, callback_data, goal, 
+                       pdb->fixed_anchor);
 }
 
 void 
