@@ -3936,6 +3936,7 @@ owl_escape_value(int pos)
    * escaping inwards. Returning a negative value is just a kludge.
    */
   int k;
+  ASSERT_ON_BOARD1(pos);
   if (current_owl_data->goal[pos])
     return -10;
 

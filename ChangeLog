@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in owl_attackpats.db pattern D1137
+- assertion added in owl_escape_value()
+- bugfix in moves_to_connect_in_three_moves() in readconnect.c
 - support for all tactical worm points in debugboard
 
 3.1.17 released December 16, 2001
