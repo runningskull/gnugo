@@ -849,7 +849,7 @@ store_persistent_connection_cache(enum routine_id routine,
 				  int result, int move, int tactical_nodes,
 				  char connection_shadow[BOARDMAX])
 {
-  char active[BOARDMAX];
+  signed char active[BOARDMAX];
   int k;
   int r;
   int score = tactical_nodes;
@@ -913,15 +913,16 @@ store_persistent_connection_cache(enum routine_id routine,
    * the connection shadow +
    * distance two expansion through empty intersections and own stones +
    * adjacent opponent strings +
-   * liberties of adjacent opponent strings with less than five liberties +
-   * liberties of low liberty neighbors of adjacent opponent strings
-   * with less than five liberties.
+   * liberties and neighbors of adjacent opponent strings with less than
+   * five liberties +
+   * liberties and neighbors of low liberty neighbors of adjacent opponent
+   * strings with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     active[pos] = connection_shadow[pos];
 
-  mark_string(str1, active, 1);
-  mark_string(str2, active, 1);
+  signed_mark_string(str1, active, 1);
+  signed_mark_string(str2, active, 1);
 
   /* To be safe, also add the successful move. */
   if (result != 0 && move != 0)
@@ -939,7 +940,7 @@ store_persistent_connection_cache(enum routine_id routine,
 	if (board[pos] == EMPTY)
 	  active[pos] = k + 1;
 	else
-	  mark_string(pos, active, (char) (k + 1));
+	  signed_mark_string(pos, active, (signed char) (k + 1));
       }
     }
   }
@@ -951,7 +952,7 @@ store_persistent_connection_cache(enum routine_id routine,
     for (r = 0; r < 4; r++) {
       int pos2 = pos + delta[r];
       if (ON_BOARD(pos2) && board[pos2] != other && active[pos2] != 0) {
-	mark_string(pos, active, (char) 1);
+	signed_mark_string(pos, active, 1);
 	break;
       }
     }
@@ -962,7 +963,7 @@ store_persistent_connection_cache(enum routine_id routine,
    * with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == other && active[pos] != 0 && countlib(pos) < 5) {
+    if (board[pos] == other && active[pos] > 0 && countlib(pos) < 5) {
       int libs[4];
       int liberties = findlib(pos, 4, libs);
       int adjs[MAXCHAIN];
@@ -975,11 +976,17 @@ store_persistent_connection_cache(enum routine_id routine,
        */
       adj = chainlinks(pos, adjs);
       for (r = 0; r < adj; r++) {
+	signed_mark_string(adjs[r], active, -1);
 	if (countlib(adjs[r]) <= 3) {
 	  int s;
+	  int adjs2[MAXCHAIN];
+	  int adj2;
 	  liberties = findlib(adjs[r], 3, libs);
 	  for (s = 0; s < liberties; s++)
 	    active[libs[s]] = 1;
+	  adj2 = chainlinks(pos, adjs2);
+	  for (s = 0; s < adj2; s++)
+	    signed_mark_string(adjs2[s], active, -1);
 	}
       }
     }
@@ -995,7 +1002,7 @@ store_persistent_connection_cache(enum routine_id routine,
       continue;
     if (!active[pos])
       value = GRAY;
-    else if (IS_STONE(board[pos]) && countlib(pos) > 4)
+    else if (IS_STONE(board[pos]) && countlib(pos) > 4 && active[pos] > 0)
       value |= HIGH_LIBERTY_BIT;
     
     persistent_connection_cache[persistent_connection_cache_size].board[pos] =
@@ -1185,7 +1192,7 @@ store_persistent_breakin_cache(enum routine_id routine,
 			       int result, int move, int tactical_nodes,
 			       char breakin_shadow[BOARDMAX])
 {
-  char active[BOARDMAX];
+  signed char active[BOARDMAX];
   int k;
   int r;
   struct breakin_cache *entry;
@@ -1245,14 +1252,15 @@ store_persistent_breakin_cache(enum routine_id routine,
    * the breakin shadow (which contains the goal) +
    * distance two expansion through empty intersections and own stones +
    * adjacent opponent strings +
-   * liberties of adjacent opponent strings with less than five liberties +
-   * liberties of low liberty neighbors of adjacent opponent strings
-   * with less than five liberties.
+   * liberties and neighbors of adjacent opponent strings with less than
+   * five liberties +
+   * liberties and neighbors of low liberty neighbors of adjacent opponent
+   * strings with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     active[pos] = breakin_shadow[pos];
 
-  mark_string(str, active, 1);
+  signed_mark_string(str, active, 1);
 
   /* To be safe, also add the successful move. */
   if (result != 0 && move != 0)
@@ -1270,7 +1278,7 @@ store_persistent_breakin_cache(enum routine_id routine,
 	if (board[pos] == EMPTY)
 	  active[pos] = k + 1;
 	else
-	  mark_string(pos, active, (char) (k + 1));
+	  signed_mark_string(pos, active, (signed char) (k + 1));
       }
     }
   }
@@ -1284,7 +1292,7 @@ store_persistent_breakin_cache(enum routine_id routine,
       if (ON_BOARD(pos2)
 	  && board[pos2] != other
 	  && active[pos2] && active[pos2] <= 2) {
-	mark_string(pos, active, (char) 1);
+	signed_mark_string(pos, active, 1);
 	break;
       }
     }
@@ -1295,7 +1303,7 @@ store_persistent_breakin_cache(enum routine_id routine,
    * with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == other && active[pos] != 0 && countlib(pos) < 4) {
+    if (board[pos] == other && active[pos] > 0 && countlib(pos) < 4) {
       int libs[4];
       int liberties = findlib(pos, 3, libs);
       int adjs[MAXCHAIN];
@@ -1308,11 +1316,17 @@ store_persistent_breakin_cache(enum routine_id routine,
        */
       adj = chainlinks(pos, adjs);
       for (r = 0; r < adj; r++) {
+	signed_mark_string(adjs[r], active, -1);
 	if (countlib(adjs[r]) <= 3) {
 	  int s;
+	  int adjs2[MAXCHAIN];
+	  int adj2;
 	  liberties = findlib(adjs[r], 3, libs);
 	  for (s = 0; s < liberties; s++)
 	    active[libs[s]] = 1;
+	  adj2 = chainlinks(pos, adjs2);
+	  for (s = 0; s < adj2; s++)
+	    signed_mark_string(adjs2[s], active, -1);
 	}
       }
     }
@@ -1324,7 +1338,7 @@ store_persistent_breakin_cache(enum routine_id routine,
       continue;
     if (!active[pos])
       value = GRAY;
-    else if (IS_STONE(board[pos]) && countlib(pos) > 3)
+    else if (IS_STONE(board[pos]) && countlib(pos) > 3 && active[pos] > 0)
       value |= HIGH_LIBERTY_BIT2;
     
     persistent_breakin_cache[persistent_breakin_cache_size].board[pos] =
@@ -1458,7 +1472,7 @@ store_persistent_owl_cache(enum routine_id routine,
 			   int tactical_nodes,
 			   char goal[BOARDMAX], int goal_color)
 {
-  char active[BOARDMAX];
+  signed char active[BOARDMAX];
   int pos;
   int k;
   int r;
@@ -1492,9 +1506,10 @@ store_persistent_owl_cache(enum routine_id routine,
    * the goal +
    * distance four expansion through empty intersections and own stones +
    * adjacent opponent strings +
-   * liberties of adjacent opponent strings with less than five liberties +
-   * liberties of low liberty neighbors of adjacent opponent strings
-   * with less than five liberties.
+   * liberties and neighbors of adjacent opponent strings with less than
+   * five liberties +
+   * liberties and neighbors of low liberty neighbors of adjacent opponent
+   * strings with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos))
@@ -1510,7 +1525,7 @@ store_persistent_owl_cache(enum routine_id routine,
   /* Distance four expansion through empty intersections and own stones. */
   for (k = 1; k < 5; k++) {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++){
-      if (!ON_BOARD(pos) || board[pos] == other || active[pos] != 0) 
+      if (!ON_BOARD(pos) || board[pos] == other || active[pos] > 0) 
 	continue;
       if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] == k)
 	  || (ON_BOARD(WEST(pos)) && active[WEST(pos)] == k)
@@ -1519,7 +1534,7 @@ store_persistent_owl_cache(enum routine_id routine,
 	if (board[pos] == EMPTY)
 	  active[pos] = k + 1;
 	else
-	  mark_string(pos, active, (char) (k + 1));
+	  signed_mark_string(pos, active, (signed char) (k + 1));
       }
     }
   }
@@ -1531,7 +1546,7 @@ store_persistent_owl_cache(enum routine_id routine,
     for (r = 0; r < 4; r++) {
       int pos2 = pos + delta[r];
       if (ON_BOARD(pos2) && board[pos2] != other && active[pos2] != 0) {
-	mark_string(pos, active, (char) 1);
+	signed_mark_string(pos, active, 1);
 	break;
       }
     }
@@ -1542,7 +1557,7 @@ store_persistent_owl_cache(enum routine_id routine,
    * with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == other && active[pos] != 0 && countlib(pos) < 5) {
+    if (board[pos] == other && active[pos] > 0 && countlib(pos) < 5) {
       int libs[4];
       int liberties = findlib(pos, 4, libs);
       int adjs[MAXCHAIN];
@@ -1555,11 +1570,17 @@ store_persistent_owl_cache(enum routine_id routine,
        */
       adj = chainlinks(pos, adjs);
       for (r = 0; r < adj; r++) {
+	signed_mark_string(adjs[r], active, -1);
 	if (countlib(adjs[r]) <= 3) {
 	  int s;
+	  int adjs2[MAXCHAIN];
+	  int adj2;
 	  liberties = findlib(adjs[r], 3, libs);
 	  for (s = 0; s < liberties; s++)
 	    active[libs[s]] = 1;
+	  adj2 = chainlinks(pos, adjs2);
+	  for (s = 0; s < adj2; s++)
+	    signed_mark_string(adjs2[s], active, -1);
 	}
       }
     }
@@ -1571,7 +1592,7 @@ store_persistent_owl_cache(enum routine_id routine,
       continue;
     if (!active[pos])
       value = GRAY;
-    else if (IS_STONE(board[pos]) && countlib(pos) > 4)
+    else if (IS_STONE(board[pos]) && countlib(pos) > 4 && active[pos] > 0)
       value |= HIGH_LIBERTY_BIT;
     
     persistent_owl_cache[persistent_owl_cache_size].board[pos] = value;

@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function signed_mark_string()
+- computation of active area revised in store_persistent_connection_cache(), 
+  store_persistent_breakin_cache(), and store_persistent_owl_cache()
 - move_is_marked_unsafe() in move_reasons.h revised
 - modify_stupid_eye_vital_point() revised
 - eye tuning
