@@ -30,12 +30,12 @@
 /* Experimental pattern based reading. Disabled by default. */
 #define EXPERIMENTAL_READING 0
 
-/* Semeai module. Default standard. */
-#define EXPERIMENTAL_SEMEAI 1
-
 /* Define as 1 to use the grid optimisation, or 2 to run it in self-test mode
    */
 #define GRID_OPT 1
+
+/* Large Scale Captures. Disabled by default. */
+#define LARGE_SCALE 0
 
 /* Oracle. Default not enabled. */
 #define ORACLE 0
@@ -46,8 +46,8 @@
 /* Owl Threats. 0 standard. */
 #define OWL_THREATS 0
 
-/* Allow resignation. Default disabled */
-#define RESIGNATION_ALLOWED 0
+/* Allow resignation. Default enabled */
+#define RESIGNATION_ALLOWED 1
 
 /* Semeai Variations. 500 default */
 #define SEMEAI_NODE_LIMIT 500
@@ -58,8 +58,6 @@
 /* Define special valgrind macros. */
 #define USE_VALGRIND 0
 
-/* Large scale captures. Disabled by default. */
-#define LARGE_SCALE 0
 
 /* Version number of package */
 #define PACKAGE "gnugo"

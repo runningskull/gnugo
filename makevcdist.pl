@@ -6,7 +6,7 @@ use warnings;
 
 my %defaults =
  ( CHINESE_RULES => 0,
-   RESIGNATION_ALLOWED => 0,
+   RESIGNATION_ALLOWED => 1,
    HASHING_SCHEME => 2,
    DEFAULT_LEVEL => 10,
    DEFAULT_MEMORY => 8,
@@ -18,6 +18,7 @@ my %defaults =
    EXPERIMENTAL_CONNECTIONS => 1,
    EXPERIMENTAL_INFLUENCE => 1,
    EXPERIMENTAL_READING => 0,
+   LARGE_SCALE => 0,
    GRID_OPT => 1,
    OWL_THREATS => 0,
    USE_BREAK_IN => 1,
