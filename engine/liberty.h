@@ -534,6 +534,7 @@ void semeai(int color);
 void new_semeai(int color);
 void small_semeai(int save_verbose);
 void shapes(int color);
+void endgame(int color);
 void endgame_shapes(int color);
 
 void combinations(int color);

@@ -55,7 +55,7 @@ static int last_move_j;      /* -""-                          */
 /* Keep track of the score estimated before the last computer move. */
 static int current_score_estimate = NO_SCORE;
 
-static void endgame(Gameinfo *gameinfo);
+static void ascii_endgame(Gameinfo *gameinfo);
 static void showcapture(char *line);
 static void showdefense(char *line);
 static void ascii_goto(Gameinfo *gameinfo, char *line);
@@ -959,7 +959,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	break;
 	
       case COUNT:
-	endgame(gameinfo);
+	ascii_endgame(gameinfo);
 	break;
 
       case QUIT:
@@ -997,11 +997,11 @@ play_ascii_emacs(SGFTree *tree, Gameinfo *gameinfo,
 
 
 /*
- * endgame() scores the game.
+ * ascii_endgame() scores the game.
  */
 
 static void
-endgame(Gameinfo *gameinfo)
+ascii_endgame(Gameinfo *gameinfo)
 {
   char line[12];
   int done = 0;

@@ -2,10 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revision of new_semeai()
+- endgame move generator beginnings implemented in endgame.c
+- endgame() in ascii.c renamed ascii_endgame()
 - dragon_weak() moved to dragon.c
 - bugfix in owl_substantial()
-- merge various code to generate superstring related tactical moves into
-  new function superstring_moves()
+- merge superstring related tactical move generators into superstring_moves()
 - resigning of hopeless games implemented (over GTP and in replay mode)
 - new command-line option --resign-allowed
 - twogtp script updated to understand resignation

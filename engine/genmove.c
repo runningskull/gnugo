@@ -455,6 +455,7 @@ do_genmove(int *move, int color, float pure_threat_value,
   /* If the move value is 6 or lower, we look for endgame patterns too. */
   if (val <= 6.0 && !disable_endgame_patterns && !limit_search) {
     endgame_shapes(color);
+    endgame(color);
     gg_assert(stackp == 0);
     if (review_move_reasons(move, &val, color, pure_threat_value, score,
 			    allowed_moves))

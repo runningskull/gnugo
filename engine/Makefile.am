@@ -22,6 +22,7 @@ libengine_a_SOURCES = \
       clock.c \
       combination.c \
       dragon.c \
+      endgame.c \
       filllib.c \
       fuseki.c \
       genmove.c \
