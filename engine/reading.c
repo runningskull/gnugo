@@ -5666,8 +5666,12 @@ safe_move(int move, int color)
     initialized = 1;
   }
 
-  /* If we have this position cached, use the previous value. */
+  /* If we have this position cached, use the previous value.
+   * Only use cached values when stackp is 0 and reading is not being done
+   * at a modified depth.
+   */
   if (stackp == 0
+      && depth_offset == 0
       && safe_move_cache_when[move][color == BLACK] == position_number)
     return safe_move_cache[move][color == BLACK];
 
@@ -5686,7 +5690,7 @@ safe_move(int move, int color)
    * Comment: This is currently not a problem since no reduced depth
    * reading is performed.
    */
-  if (stackp == 0) {
+  if (stackp == 0 && depth_offset == 0) {
     if (0)
       gprintf("Safe move at %1m for %s cached when depth=%d, position number=%d\n",
 	      move, color_to_string(color), depth, position_number);
