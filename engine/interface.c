@@ -585,7 +585,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 	/* following really should not be needed for proper sgf file */
 	if (movenum != 0 && !addstone) {
 	  gnugo_sethand(gameinfo->handicap, 0);
-         sgfOverwritePropertyInt(tree->root, "HA", gameinfo->handicap);
+	  sgfOverwritePropertyInt(tree->root, "HA", gameinfo->handicap);
 	}
 
 	/* Due to a bad comment in the SGF FF3 definition (in the
@@ -607,13 +607,13 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 	/* following really should not be needed for proper sgf file */
 	if (movenum != 0 && !addstone) {
 	  gnugo_sethand(gameinfo->handicap, 0);
-         sgfOverwritePropertyInt(tree->root, "HA", gameinfo->handicap);
+	  sgfOverwritePropertyInt(tree->root, "HA", gameinfo->handicap);
 	}
 
 	if (movenum == until - 1) {
 	  gameinfo->to_move = next;
-         /* go back so that variant will be added to the proper node */
-         sgftreeBack(tree);
+	  /* go back so that variant will be added to the proper node */
+	  sgftreeBack(tree);
 	  return next;
 	}
 	      
@@ -621,7 +621,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 	  if (i == untilm && j == untiln) {
 	    gameinfo->to_move = next;
             /* go back so that variant will be added to the proper node */
-           sgftreeBack(tree);
+	    sgftreeBack(tree);
 	    return next;
 	  }
 
