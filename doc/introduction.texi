@@ -102,14 +102,14 @@ Teun Burgers, Tanguy Urvoy, Thien-Thi Nguyen, Heikki Levanto,
 Mark Vytlacil, Adriaan van Kessel, Wolfgang Manner, Jens
 Yllman, Don Dailey, M@aa{}ns Ullerstam, Arend Bayer, Trevor
 Morris, Evan Berggren Daniel, Fernando Portela, Paul
-Pogonyshev, S.P. Lee and Stephane Nicolet.
+Pogonyshev, S.P. Lee and Stephane Nicolet and Martin Holters.
 
 @node Thanks
 @section Thanks
 
-We would like to thank Arthur Britto, David Doshay, Martin Holters, Tim Hunt,
-Matthias Krings, Piotr Lakomy, Paul Leonard, Jean-Louis Martineau, Andreas
-Roever and Pierce Wetter for helpful correspondence. 
+We would like to thank Arthur Britto, David Doshay, Tim Hunt, Matthias Krings,
+Piotr Lakomy, Paul Leonard, Jean-Louis Martineau, Andreas Roever and Pierce
+Wetter for helpful correspondence.
 
 Thanks to everyone who stepped on a bug (and sent us a report)!
 
