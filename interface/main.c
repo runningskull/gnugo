@@ -87,7 +87,6 @@ enum {OPT_BOARDSIZE=2,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_POSITION,
       OPT_DECIDE_EYE,
-      OPT_GENMOVE,
       OPT_BRANCH_DEPTH,
       OPT_BACKFILL2_DEPTH,
       OPT_SUPERSTRING_DEPTH,
@@ -205,7 +204,6 @@ static struct gg_option const long_options[] =
   {"decide-semeai",  required_argument, 0, OPT_DECIDE_SEMEAI},
   {"decide-position", no_argument,       0, OPT_DECIDE_POSITION},
   {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
-  {"genmove",        required_argument, 0, OPT_GENMOVE},
   {"life",           no_argument,       0, OPT_LIFE},
   {"life-eyesize",   required_argument, 0, OPT_LIFE_EYESIZE},
   {"nofusekidb",     no_argument,       0, OPT_NOFUSEKIDB},
@@ -233,6 +231,7 @@ main(int argc, char *argv[])
   int       boardsize = 19;
 
   int i, umove;
+  int mandated_color = EMPTY;
   enum mode playmode = MODE_UNKNOWN;
   int replay_color = EMPTY;
   
@@ -505,20 +504,6 @@ main(int argc, char *argv[])
 	playmode = MODE_DECIDE_EYE;
 	break;
 	
-      case OPT_GENMOVE:
-	if (strcmp(gg_optarg, "white") == 0) 
-	  to_move = WHITE;
-	else if (strcmp(gg_optarg, "black") == 0)
-	  to_move = BLACK;
-	else {
-	  fprintf(stderr, "Invalid color for genmove: %s\n", gg_optarg);
-	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
-	  
-	  exit(EXIT_FAILURE);
-	}
-	playmode = MODE_LOAD_AND_ANALYZE;
-	break;
-	
       case OPT_BRANCH_DEPTH:
 	mandated_branch_depth = atoi(gg_optarg);
 	break;
@@ -638,9 +623,9 @@ main(int argc, char *argv[])
 	
       case OPT_COLOR: 
 	if (strcmp(gg_optarg, "white") == 0)
-	  umove = WHITE;
-	else if (strcmp(gg_optarg, "black") == 0) 
-	  umove = BLACK;
+	  mandated_color = WHITE;
+	else if (strcmp(gg_optarg, "black") == 0)
+	  mandated_color = BLACK;
 	else {
 	  fprintf(stderr, "Invalid color selection: %s\n", gg_optarg);
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
@@ -706,7 +691,7 @@ main(int argc, char *argv[])
     string_to_location(boardsize, debuginfluence_move, &m, &n);
     debug_influence_move(m, n);
   }
-
+  
   /* Figure out a default mode if there was no explicit one. */
   if (playmode == MODE_UNKNOWN) {
     if (infilename)
@@ -766,6 +751,9 @@ main(int argc, char *argv[])
     break;
     
   case MODE_LOAD_AND_ANALYZE:
+    if (mandated_color != EMPTY)
+      to_move = mandated_color;
+    
     if (!sgftree.root) {
       fprintf(stderr, "You must use -l infile with load and analyze mode.\n");
       exit(EXIT_FAILURE);
@@ -890,12 +878,14 @@ main(int argc, char *argv[])
       boardsize = gameinfo.position.boardsize;
       
       if (!string_to_location(boardsize, decide_this, &ai, &aj)) {
-	fprintf(stderr, "usage: --decide-semeai [first dragon]/[second dragon]\n");
+	fprintf(stderr, 
+		"usage: --decide-semeai [first dragon]/[second dragon]\n");
 	return (EXIT_FAILURE);
       }
       
       if (!string_to_location(boardsize, decide_that, &bi, &bj)) {
-	fprintf(stderr, "usage: --decide-semeai [first dragon]/[second dragon]\n");
+	fprintf(stderr, 
+		"usage: --decide-semeai [first dragon]/[second dragon]\n");
 	return (EXIT_FAILURE);
       }
 
@@ -960,6 +950,8 @@ main(int argc, char *argv[])
     break;
 
   case MODE_ASCII_EMACS:  
+    if (mandated_color != EMPTY)
+      umove = mandated_color;
     gameinfo.computer_player = OTHER_COLOR(umove);
     if (!sgftree.root)
       sgftreeCreateHeaderNode(&sgftree, boardsize, komi);
@@ -968,6 +960,8 @@ main(int argc, char *argv[])
 
   case MODE_ASCII:  
   default:     
+    if (mandated_color != EMPTY)
+      umove = mandated_color;
     gameinfo.computer_player = OTHER_COLOR(umove);
     if (!sgftree.root)
       sgftreeCreateHeaderNode(&sgftree, boardsize, komi);
