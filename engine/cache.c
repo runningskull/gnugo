@@ -117,11 +117,13 @@ tt_get(Transposition_table *table,
        int remaining_depth,
        int *result, int *move)
 {
-  Hashvalue_ng  hashval;
-  Hashentry_ng *entry;
-  Hashnode_ng  *node;
+  Hash_data      hashval;
+  Hashentry_ng  *entry;
+  Hashnode_ng   *node;
  
-  hashval = calculate_hashval_ng(komaster, kom_pos, routine, target);
+  /* Get the combined hash value. */
+  calculate_hashval_for_tt(komaster, kom_pos, routine, target,
+			   &hashval);
 
   /* Sanity check. */
   if (remaining_depth < 0)
@@ -163,14 +165,16 @@ tt_update(Transposition_table *table,
 	  int remaining_depth,
 	  int result, int move)
 {
-  Hashvalue_ng hashval;
-  Hashentry_ng *entry;
-  Hashnode_ng *deepest;
-  Hashnode_ng *newest;
+  Hash_data      hashval;
+  Hashentry_ng  *entry;
+  Hashnode_ng   *deepest;
+  Hashnode_ng   *newest;
   int data;
 
   /* Calculate the hash value. */
-  hashval = calculate_hashval_ng(komaster, kom_pos, routine, target);
+  /* Get the combined hash value. */
+  calculate_hashval_for_tt(komaster, kom_pos, routine, target,
+			   &hashval);
   data = hn_create_data(remaining_depth, result, 0, move, 0);
 
   /* Get the entry and nodes. */ 

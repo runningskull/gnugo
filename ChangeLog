@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function: hashdata_to_string()
 - small_semeai() and small_semeai_analyzer() removed
 - support for !experimental_semeai removed
 - old semeai() removed and new_semeai() renamed to semeai()
@@ -15,7 +16,6 @@
 - komaster_to_string() revised
 - KOMASTER_TRACE functionality removed
 - new GTP command combination_defend
-- don't use stdint.h
 - revised hash table scheme
 - new COSMIC_GNUGO function choose_best_strategy() sets tuning parameters
 - new global tuning parameters: minimum_value_weight, maximum_value_weight,

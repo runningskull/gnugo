@@ -39,24 +39,23 @@
 
 
 /* Random values for the hash function. */
-static Hashvalue_ng  white_hash_ng[BOARDMAX];
-static Hashvalue_ng  black_hash_ng[BOARDMAX];
-static Hashvalue_ng  ko_hash_ng[BOARDMAX];
-
-static Hashvalue_ng  komaster_hash[4]; /* EMPTY, BLACK, WHITE, GRAY */
-static Hashvalue_ng  kom_pos_hash[BOARDMAX];
-static Hashvalue_ng  target1_hash[BOARDMAX];
-static Hashvalue_ng  target2_hash[BOARDMAX];
-static Hashvalue_ng  routine_hash[NUM_ROUTINES];
+static Hash_data  white_hash_ng[BOARDMAX];
+static Hash_data  black_hash_ng[BOARDMAX];
+static Hash_data  ko_hash_ng[BOARDMAX];
+static Hash_data  komaster_hash[7]; /* FIXME: Make it impossible to set wrong value here. */
+static Hash_data  kom_pos_hash[BOARDMAX];
+static Hash_data  target1_hash[BOARDMAX];
+static Hash_data  target2_hash[BOARDMAX];
+static Hash_data  routine_hash[NUM_ROUTINES];
 
 static struct init_struct {
-  Hashvalue_ng  *array;
-  int            array_size;
+  Hash_data  *array;
+  int         array_size;
 } hash_init_values[] = {
   {white_hash_ng, BOARDMAX},
   {black_hash_ng, BOARDMAX},
   {ko_hash_ng,    BOARDMAX},
-  {komaster_hash, 4},
+  {komaster_hash, 7},
   {kom_pos_hash,  BOARDMAX},
   {target1_hash,  BOARDMAX},
   {target2_hash,  BOARDMAX},
@@ -75,7 +74,7 @@ void
 hash_ng_init(void)
 {
   static int  is_initialized = 0;
-  Hashvalue_ng  *array;
+  Hash_data  *array;
   int         size;
   unsigned    i;
   int         j;
@@ -103,84 +102,17 @@ hash_ng_init(void)
 }
 
 
-/* Calculate the hashvalue for a position.
- */
-
-Hashvalue_ng
-hashvalue_ng_recalc(Intersection *p, int ko_pos)
+void
+calculate_hashval_for_tt(int komaster, int kom_pos, int routine, int target,
+			 Hash_data *hashdata2)
 {
-  Hashvalue_ng  hashval;
-  int           pos;
-
-  hashdata_clear(hashval);
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
-      continue;
-
-    switch (p[pos]) {
-      default:
-      case EMPTY: 
-	break;
-
-      case WHITE:
-	hashdata_xor(hashval, white_hash_ng[pos]);
-	break;
-
-      case BLACK:
-	hashdata_xor(hashval, black_hash_ng[pos]);
-	break;
-    }
-  }
-
-  if (ko_pos != NO_MOVE)
-    hashdata_xor(hashval, ko_hash_ng[ko_pos]);
-
-  return hashval;
+  *hashdata2 = hashdata;		/* from globals.c */
+  hashdata_xor(*hashdata2, komaster_hash[komaster]);
+  hashdata_xor(*hashdata2, kom_pos_hash[kom_pos]);
+  hashdata_xor(*hashdata2, routine_hash[routine]);
+  hashdata_xor(*hashdata2, target1_hash[target]);
 }
 
-
-Hashvalue_ng
-calculate_hashval_ng(int komaster, int kom_pos, int routine, int target)
-{
-  Hashvalue_ng  hashval;
-
-  hashval = hashval_ng;		/* from globals.c */
-  hashdata_xor(hashval, komaster_hash[komaster]);
-  hashdata_xor(hashval, kom_pos_hash[kom_pos]);
-  hashdata_xor(hashval, routine_hash[routine]);
-  hashdata_xor(hashval, target1_hash[target]);
-
-  return hashval;
-}
-
-
-/*
- * Set or remove ko in the hash value.
- */
-
-Hashvalue_ng
-hashvalue_ng_invert_ko(Hashvalue_ng hashval, int ko_pos)
-{
-  hashdata_xor(hashval, ko_hash_ng[ko_pos]);
-  return hashval;
-}
-
-
-
-/*
- * Set or remove a stone of COLOR at pos in a Hash_data.
- */
-
-Hashvalue_ng
-hashvalue_ng_invert_stone(Hashvalue_ng hashval, int pos, int color)
-{
-  if (color == BLACK)
-    hashdata_xor(hashval, black_hash_ng[pos]);
-  else if (color == WHITE)
-    hashdata_xor(hashval, white_hash_ng[pos]);
-
-  return hashval;
-}
 
 
 /* ================================================================ */
@@ -572,6 +504,20 @@ xor_hashvalues(Hash_data *hash1, Hash_data *hash2)
   return_value.hashpos = hash1->hashpos;
 #endif
   return return_value;
+}
+
+
+char *
+hashdata_to_string(Hash_data *hashdata)
+{
+  static char  buffer[17];
+
+  sprintf(buffer, "%lx", hashdata->hashval[0]);
+#if NUM_HASHVALUES == 2
+  sprintf(buffer + 8, "%lx", hashdata->hashval[1]);
+#endif
+
+  return buffer;
 }
 
 

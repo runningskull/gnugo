@@ -136,22 +136,26 @@ typedef struct {
 #endif
 } Hash_data;
 
+
 Hash_data xor_hashvalues(Hash_data *key1, Hash_data *key2);
 Hash_data goal_to_hashvalue(const char *goal);
 
 void hash_init(void);
 #if FULL_POSITION_IN_HASH
-int hashposition_compare(Hashposition *pos1, Hashposition *pos2);
+int  hashposition_compare(Hashposition *pos1, Hashposition *pos2);
 void hashposition_dump(Hashposition *pos, FILE *outfile);
 #endif
 
 void hashdata_recalc(Hash_data *hd, Intersection *board, int ko_pos);
-int hashdata_compare(Hash_data *hd1, Hash_data *hd2);
+int  hashdata_compare(Hash_data *hd1, Hash_data *hd2);
 void hashdata_invert_ko(Hash_data *hd, int pos);
 void hashdata_invert_stone(Hash_data *hd, int pos, int color);
 void hashdata_set_tomove(Hash_data *hd, int to_move);
 
 int hashdata_diff_dump(Hash_data *key1, Hash_data *key2);
+
+char *hashdata_to_string(Hash_data *hashdata);
+
 
 
 /* ---------------------------------------------------------------- */
@@ -162,15 +166,38 @@ int hashdata_diff_dump(Hash_data *key1, Hash_data *key2);
  * FIXME: Once this is the standard, remove all the _ng suffixes
  *        and clean it up.
  */
-#if 0
-typedef uint64_t      Hashvalue_ng;
 
+#if NUM_HASHVALUES == 1
+
+#define hashdata_NULL  {{0}}
+#define hashdata_clear(hd) \
+   do { \
+    (hd).hashval[0] = 0; \
+   } while (0)
 #define hashdata_init(hd, uint1, uint2) \
-   (hd) = ((uint64_t) (uint1) << 32) | ((uint64_t) (uint2))
+   do { \
+    (hd).hashval[0] = ((uint1) << 32 | (uint2)); \
+   } while (0)
 
-#else
+#define hashdata_is_equal(hd1, hd2) \
+   ((hd1).hashval[0] == (hd2).hashval[0])
 
-#define Hashvalue_ng  Hash_data
+#define hashdata_xor(hd1, hd2) \
+   do { \
+    (hd1).hashval[0] ^= (hd2).hashval[0]; \
+   } while (0)
+
+/* FIXME: This is only an approximation. 
+ *        The real remainder can be calculated by 
+ *            (ax+y)%z = (a%z)(x%z)+(y%z)
+ *        but this probably is good enough for the cache.
+ */
+#define hashdata_remainder(hd, num) \
+  ((hd).hashval[0] % (num))
+
+#endif
+
+#if NUM_HASHVALUES == 2
 
 #define hashdata_NULL  {{0, 0}}
 #define hashdata_clear(hd) \
@@ -204,13 +231,11 @@ typedef uint64_t      Hashvalue_ng;
 #endif
 
 
+
 extern void          hash_ng_init(void);
-extern Hashvalue_ng  calculate_hashval_ng(int komaster, int kom_pos, 
-					  int routine, int target);
-extern Hashvalue_ng  hashvalue_ng_recalc(Intersection *p, int ko_pos);
-extern Hashvalue_ng  hashvalue_ng_invert_ko(Hashvalue_ng hashval, int ko_pos);
-extern Hashvalue_ng  hashvalue_ng_invert_stone(Hashvalue_ng hashval, 
-					       int pos, int color);
+extern void          calculate_hashval_for_tt(int komaster, int kom_pos,
+					      int routine, int target,
+					      Hash_data *hashdata);
 
 
 #endif

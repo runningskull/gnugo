@@ -265,14 +265,12 @@ static int next_stone[BOARDMAX];
     PUSH_VERTEX(board[pos]);\
     board[pos] = color;\
     hashdata_invert_stone(&hashdata, pos, color);\
-    hashval_ng = hashvalue_ng_invert_stone(hashval_ng, pos, color);\
   } while (0)
 
 #define DO_REMOVE_STONE(pos)\
   do {\
     PUSH_VERTEX(board[pos]);\
     hashdata_invert_stone(&hashdata, pos, board[pos]);\
-    hashval_ng = hashvalue_ng_invert_stone(hashval_ng, pos, board[pos]);\
     board[pos] = EMPTY;\
   } while (0)
 
@@ -391,7 +389,6 @@ restore_board(struct board_state *state)
   movenum = state->move_number;
   
   hashdata_recalc(&hashdata, board, board_ko_pos);
-  hashval_ng = hashvalue_ng_recalc(board, board_ko_pos);
   new_position();
 }
 
@@ -428,7 +425,6 @@ clear_board(void)
   movenum = 0;
   
   hashdata_recalc(&hashdata, board, board_ko_pos);
-  hashval_ng = hashvalue_ng_recalc(board, board_ko_pos);
   new_position();
 }
 
@@ -462,7 +458,6 @@ static int stack[MAXSTACK];
 static int move_color[MAXSTACK];
 
 static Hash_data hashdata_stack[MAXSTACK];
-static Hashvalue_ng hashval_ng_stack[MAXSTACK];
 
 static const char *komaster_to_string(int komaster);
 
@@ -500,24 +495,25 @@ trymove(int pos, int color, const char *message, int str,
 
     if (str == NO_MOVE) {
       if (komaster != EMPTY)
-	gg_snprintf(buf, 100, "%s (variation %d, hash %lx, komaster %s:%s)", 
-		    message, count_variations, hashval_ng,
+	gg_snprintf(buf, 100, "%s (variation %d, hash %s, komaster %s:%s)", 
+		    message, count_variations, hashdata_to_string(&hashdata),
 		    komaster_to_string(komaster), location_to_string(kom_pos));
       else
-	gg_snprintf(buf, 100, "%s (variation %d, hash %lx)", 
-		    message, count_variations, hashval_ng);
+	gg_snprintf(buf, 100, "%s (variation %d, hash %s)", 
+		    message, count_variations, hashdata_to_string(&hashdata));
     }
     else {
       if (komaster != EMPTY)
 	gg_snprintf(buf, 100, 
-		    "%s at %s (variation %d, hash %lx, komaster %s:%s)", 
+		    "%s at %s (variation %d, hash %s, komaster %s:%s)", 
 		    message, location_to_string(str), count_variations,
-		    hashval_ng, komaster_to_string(komaster),
+		    hashdata_to_string(&hashdata),
+		    komaster_to_string(komaster),
 		    location_to_string(kom_pos));
       else
-	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %lx)", 
+	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %s)", 
 		    message, location_to_string(str), count_variations,
-		    hashval_ng);
+		    hashdata_to_string(&hashdata));
     }
     sgftreeAddPlayLast(sgf_dumptree, color, I(pos), J(pos));
     sgftreeAddComment(sgf_dumptree, buf);
@@ -554,12 +550,12 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
     if (message == NULL)
       message = "UNKNOWN";
     if (komaster != EMPTY)
-      gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx, komaster %s:%s)", 
-		  message, count_variations, hashval_ng,
+      gg_snprintf(buf, 100, "tryko: %s (variation %d, %s, komaster %s:%s)", 
+		  message, count_variations, hashdata_to_string(&hashdata),
 		  komaster_to_string(komaster), location_to_string(kom_pos));
     else
-      gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx)", 
-		  message, count_variations, hashval_ng);
+      gg_snprintf(buf, 100, "tryko: %s (variation %d, %s)", 
+		  message, count_variations, hashdata_to_string(&hashdata));
 
     /* Add two pass moves to the SGF output to simulate the ko threat
      * and the answer.
@@ -662,11 +658,9 @@ do_trymove(int pos, int color, int ignore_ko)
   BEGIN_CHANGE_RECORD();
   PUSH_VALUE(board_ko_pos);
   memcpy(&hashdata_stack[stackp], &hashdata, sizeof(hashdata));
-  hashval_ng_stack[stackp] = hashval_ng;
 
   if (board_ko_pos != NO_MOVE) {
     hashdata_invert_ko(&hashdata, board_ko_pos);
-    hashval_ng = hashvalue_ng_invert_ko(hashval_ng, board_ko_pos);
   }
   board_ko_pos = NO_MOVE;
   
@@ -696,7 +690,6 @@ popgo()
   undo_trymove();
   
   memcpy(&hashdata, &(hashdata_stack[stackp]), sizeof(hashdata));
-  hashval_ng = hashval_ng_stack[stackp];
 
   if (sgf_dumptree) {
     char buf[100];
@@ -724,7 +717,6 @@ silent_popgo(void)
   stackp--;
   undo_trymove();
   memcpy(&hashdata, &(hashdata_stack[stackp]), sizeof(hashdata));
-  hashval_ng = hashval_ng_stack[stackp];
 }
 
 #endif
@@ -767,7 +759,7 @@ dump_stack(void)
   if (count_variations)
     gprintf("%o (variation %d)", count_variations-1);
 #else
-  gprintf("%o (%d)", hashval_ng);
+  gprintf("%o (%d)", hashdata_to_string(&hashdata));
 #endif
 
   gprintf("%o\n");
@@ -803,7 +795,6 @@ add_stone(int pos, int color)
 
   board[pos] = color;
   hashdata_invert_stone(&hashdata, pos, color);
-  hashval_ng = hashvalue_ng_invert_stone(hashval_ng, pos, color);
   reset_move_history();
   new_position();
 }
@@ -821,7 +812,6 @@ remove_stone(int pos)
   ASSERT1(IS_STONE(board[pos]), pos);
 
   hashdata_invert_stone(&hashdata, pos, board[pos]);
-  hashval_ng = hashvalue_ng_invert_stone(hashval_ng, pos, board[pos]);
   board[pos] = EMPTY;
   reset_move_history();
   new_position();
@@ -840,11 +830,9 @@ play_move_no_history(int pos, int color, int update_internals)
 {
 #if CHECK_HASHING
   Hash_data oldkey;
-  Hashvalue_ng  oldhashval_ng;
 
   /* Check the hash table to see if it corresponds to the cumulative one. */
   hashdata_recalc(&oldkey, board, board_ko_pos);
-  old_hashval_ng = hashvalue_ng_recalc(board, board_ko_pos);
 #if FULL_POSITION_IN_HASH
   gg_assert(hashdata_diff_dump(&oldkey, &hashdata) == 0);
 #else
@@ -852,10 +840,8 @@ play_move_no_history(int pos, int color, int update_internals)
 #endif
 #endif
 
-  if (board_ko_pos != NO_MOVE) {
+  if (board_ko_pos != NO_MOVE)
     hashdata_invert_ko(&hashdata, board_ko_pos);
-    hashval_ng = hashvalue_ng_invert_ko(hashval_ng, board_ko_pos);
-  }
   board_ko_pos = NO_MOVE;
 
   /* If the move is a pass, we can skip some steps. */
@@ -872,7 +858,6 @@ play_move_no_history(int pos, int color, int update_internals)
 #if CHECK_HASHING
     /* Check the hash table to see if it equals the previous one. */
     hashdata_recalc(&oldkey, board, board_ko_pos);
-    oldhashval_ng = hashvalue_ng_recalc(board, board_ko_pos);
 #if FULL_POSITION_IN_HASH
     gg_assert(hashdata_diff_dump(&oldkey, &hashdata) == 0);
 #else
@@ -1632,7 +1617,6 @@ struct board_cache_entry {
   int threshold;
   int liberties;
   Hash_data position_hash;
-  Hashvalue_ng  position_hash_ng;
 };
 
 
@@ -1680,7 +1664,7 @@ approxlib(int pos, int color, int maxlib, int *libs)
 
   if (!libs) {
     /* First see if this result is cached. */
-    if (hashdata_is_equal(hashval_ng, entry->position_hash_ng)
+    if (hashdata_is_equal(hashdata, entry->position_hash)
 	&& maxlib <= entry->threshold) {
       return entry->liberties;
     }
@@ -1694,7 +1678,6 @@ approxlib(int pos, int color, int maxlib, int *libs)
       entry->threshold = MAXLIBS;
       entry->liberties = liberties;
       entry->position_hash = hashdata;
-      entry->position_hash_ng = hashval_ng;
 
       return liberties;
     }
@@ -1714,7 +1697,6 @@ approxlib(int pos, int color, int maxlib, int *libs)
 
   entry->liberties = liberties;
   entry->position_hash = hashdata;
-  entry->position_hash_ng = hashval_ng;
 
 #else /* not USE_BOARD_CACHES */
 
@@ -1980,7 +1962,7 @@ accuratelib(int pos, int color, int maxlib, int *libs)
 
   if (!libs) {
     /* First see if this result is cached. */
-    if (hashdata_is_equal(hashval_ng, entry->position_hash_ng)
+    if (hashdata_is_equal(hashdata, entry->position_hash)
 	&& maxlib <= entry->threshold) {
       return entry->liberties;
     }
@@ -1994,7 +1976,6 @@ accuratelib(int pos, int color, int maxlib, int *libs)
       entry->threshold = MAXLIBS;
       entry->liberties = liberties;
       entry->position_hash = hashdata;
-      entry->position_hash_ng = hashval_ng;
 
       return liberties;
     }
@@ -2009,7 +1990,6 @@ accuratelib(int pos, int color, int maxlib, int *libs)
   entry->threshold = liberties < maxlib ? MAXLIBS : maxlib;
   entry->liberties = liberties;
   entry->position_hash = hashdata;
-  entry->position_hash_ng = hashval_ng;
 
 #else /* not USE_BOARD_CACHES */
 
@@ -3907,13 +3887,10 @@ do_play_move(int pos, int color)
       && string[s].size == 1
       && captured_stones == 1) {
     /* In case of a double ko: clear old ko position first. */
-    if (board_ko_pos != NO_MOVE) {
+    if (board_ko_pos != NO_MOVE)
       hashdata_invert_ko(&hashdata, board_ko_pos);
-      hashval_ng = hashvalue_ng_invert_ko(hashval_ng, board_ko_pos);
-    }
     board_ko_pos = string[s].libs[0];
     hashdata_invert_ko(&hashdata, board_ko_pos);
-    hashval_ng = hashvalue_ng_invert_ko(hashval_ng, board_ko_pos);
   }
 }
 

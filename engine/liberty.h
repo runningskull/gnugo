@@ -45,8 +45,7 @@
 #include "cache.h"
 
 /* Other modules get read-only access to this variable. */
-extern Hash_data     hashdata;
-extern Hashvalue_ng  hashval_ng;
+extern Hash_data            hashdata;
 extern Transposition_table  ttable;
 
 /* Define if you want the new transposition table. */
