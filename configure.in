@@ -33,13 +33,15 @@ AC_ARG_WITH(curses,
   --without-curses    do not use curses for colored debugging output])
 
 AC_ARG_ENABLE(color,
- [  --enable-color        use curses or ansi escape sequences for colored debug output
-  --disable-color       do not try to generated colored debug output])
+ [  --enable-color              use curses or ansi escape sequences for colored
+                                   debug output
+  --disable-color             do not try to generated colored debug output])
 
 dnl and look to see if they want to disable the grid optimisation
 
 AC_ARG_ENABLE(grid-opt,
- [  --enable-grid-opt           enable the grid optimsation within the pattern matcher (default)
+ [  --enable-grid-opt           enable the grid optimsation within the pattern
+                                matcher (default)
   --enable-grid-opt=distrust  enable the grid optimsation in non-trusting mode
   --disable-grid-opt          disable the grid optimisation])
 
@@ -49,16 +51,19 @@ default_semeai_variations=250
 default_owl_node_limit=1000
 
 AC_ARG_ENABLE(cache-size,
-  [  --enable-cache-size=n     reserve n Mb RAM for caching (16 default)])
+  [  --enable-cache-size=n       reserve n Mb RAM for caching (16 default)])
 
 AC_ARG_ENABLE(level,
-  [  --enable-level=n          n = default level (8 standard, up to 10 supported)])
+  [  --enable-level=n            n = default level (up to 10 supported)])
 
 AC_ARG_ENABLE(semeai-variations,
-  [  --enable-semeai-variations=n          n = semeai variations (250 standard)])
+  [  --enable-semeai-variations=n        n = semeai variations (250 standard)])
+
+AC_ARG_ENABLE(level,
+  [  --enable-owl-node-limit=n           n = owl node limit (1000 standard)])
 
 AC_ARG_ENABLE(dfa,
- [  --disable-dfa             use old non-dfa pattern matcher],
+ [  --disable-dfa               use old non-dfa pattern matcher],
  [ if test ${enableval} = no; then	
      dfa_c=
    else	
@@ -67,39 +72,41 @@ AC_ARG_ENABLE(dfa,
  [ dfa_c=dfa ])
 
 AC_ARG_ENABLE(chinese-rules,
- [  --enable-chinese-rules       tell the Go Modem Protocol to use Chinese Rules
-  --disable-chinese-rules       use Japanese rules (default)])
+ [  --enable-chinese-rules      use Chinese (area) counting
+  --disable-chinese-rules     use Japanese counting (default)])
 
 AC_ARG_ENABLE(owl-threats,
  [  --enable-owl-threats        compute owl threats
-  --disable-owl-threats        don't compute owl threats (default)])
+  --disable-owl-threats       don't compute owl threats (default)])
 
 AC_ARG_ENABLE(experimental-semeai,
- [  --enable-experimental-semeai    use the experimental semeai module
-  --disable-experimental-semeai    use standard semeai module (default)])
+ [  --enable-experimental-semeai       use the experimental semeai module
+  --disable-experimental-semeai      use standard semeai module (default)])
 
 AC_ARG_ENABLE(experimental-owl-ext,
- [  --enable-experimental-owl-ext    use the experimental GAIN/LOSS codes
-  --disable-experimental-owl-ext    use standard owl module (default)])
+ [  --enable-experimental-owl-ext      use the experimental GAIN/LOSS codes
+  --disable-experimental-owl-ext     use standard owl module (default)])
 
 AC_ARG_ENABLE(experimental-reading,
- [  --enable-experimental-reading    use experimental pattern-based reading
-  --disable-experimental-reading    use standard reading (default)])
+ [  --enable-experimental-reading      use experimental pattern-based reading
+  --disable-experimental-reading     use standard reading (default)])
 
 AC_ARG_ENABLE(experimental-connections,
- [  --enable-experimental-connections    use experimental connection analysis
-  --disable-experimental-connections    use standard connection analysis (default)])
+ [  --enable-experimental-connections  use experimental connection analysis
+  --disable-experimental-connections use standard connection analysis (default)])
 
 AC_ARG_ENABLE(alternate-connections,
- [  --enable-alternate-connections    use alternate experimental connection analysis
-  --disable-alternate-connections    use primary experimental connection analysis (default)])
+ [  --enable-alternate-connections     use alternate experimental connection
+                                       analysis
+  --disable-alternate-connections    use primary experimental connection 
+                                     analysis (default)])
 
 AC_ARG_ENABLE(experimental-hashing,
- [  --enable-experimental-hashing    use experimental hashing scheme (default)
-  --disable-experimental-hashing    use old hashing scheme])
+ [  --enable-experimental-hashing      use experimental hashing scheme (default)
+  --disable-experimental-hashing     use old hashing scheme])
 
 AC_ARG_ENABLE(profile,
- [  --enable-profile       compile gnugo with gprof option ])
+ [  --enable-profile                   compile gnugo with gprof option ])
 
 dnl expand any instances of @matcher@ in Makefile
 AC_SUBST(dfa_c)
