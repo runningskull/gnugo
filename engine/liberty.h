@@ -482,6 +482,7 @@ float influence_delta_territory(int pos, int color,
 				char saved_stones[BOARDMAX]);
 int influence_territory_color(int pos);
 int influence_moyo_color(int pos);
+int influence_moyo_color_opposite(int pos);
 int influence_area_color(int pos);
 int influence_get_moyo_size(int pos, int color);
 void influence_get_moyo_segmentation(int opposite, struct moyo_data *moyo);

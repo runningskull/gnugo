@@ -102,3 +102,9 @@ loadsgf games/filllib9.sgf 235
 30 gg_genmove black
 #? [A3|A1|B1]
 
+# Q19 for white is non-orthodox but doesn't lose points.
+loadsgf games/trevor/auto/d29.sgf 188
+31 gg_genmove white
+#? [S16|T17|O18|Q19]*
+32 gg_genmove black
+#? [O18|O19|N18|P19|N19]

@@ -731,6 +731,9 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
  * For use when called from fill_liberty, this function may optionally
  * return a point of defense, which, if taken, will presumably make
  * the move at (i, j) safe on a subsequent turn.
+ *
+ * FIXME: Most TRACE calls below are ineffective because we have
+ * decreased the verbose value to avoid traces in the owl code. Oops.
  */
 
 int
@@ -760,8 +763,8 @@ confirm_safety(int move, int color, int size, int *defense_point,
     ASSERT_ON_BOARD1(apos);
     if (defense_point)
       *defense_point = apos;
-    TRACE("Combination attack appears at %1m.\n", apos);
     verbose = save_verbose;
+    TRACE("Combination attack appears at %1m.\n", apos);
     return 0;
   }
 

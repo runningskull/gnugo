@@ -36,7 +36,8 @@ static void add_influence_source(int pos, int color, float strength,
                                  float attenuation,
                                  struct influence_data *q);
 static void segment_influence(struct influence_data *q);
-static void print_influence(struct influence_data *q, int dragons_known);
+static void print_influence(struct influence_data *q,
+			    const char *info_string);
 static void print_numeric_influence(struct influence_data *q,
 				    float values[MAX_BOARD][MAX_BOARD],
 				    const char *format, int draw_stones,
@@ -805,11 +806,16 @@ compute_influence(struct influence_data *q, int color, int m, int n,
   /* FIXME: The "board_size - 19" stuff below is an ugly workaround for a bug
    *        in main.c
    */
-  if ((q == &initial_influence
+  if (((q == &initial_influence || q == &initial_opposite_influence)
        && (printmoyo & PRINTMOYO_INITIAL_INFLUENCE))
       || (m == (board_size - 19) + debug_influence_i
-	  && n == debug_influence_j && m >= 0))
-    print_influence(q, dragons_known);
+	  && n == debug_influence_j && m >= 0)) {
+    if (q == &initial_opposite_influence)
+      print_influence(q, (dragons_known ? "dragons_known, opposite, color"
+			  : "dragons_unknown, opposite, color"));
+    else
+      print_influence(q, dragons_known ? "dragons_known" : "dragons_unknown");
+  }
 }
 
 /* Return the color of the territory at (m, n). If it's territory for
@@ -1118,8 +1124,7 @@ influence_get_moyo_size(int pos, int color)
  * initial_opposite_influence is used, otherwise initial_influence.
  */
 void
-influence_get_moyo_segmentation(int opposite, 
-                                struct moyo_data *moyos)
+influence_get_moyo_segmentation(int opposite, struct moyo_data *moyos)
 {
   int m, n;
   int min_moyo_id;
@@ -1282,6 +1287,15 @@ int
 influence_moyo_color(int pos)
 {
   return whose_moyo(&initial_influence, I(pos), J(pos));
+}
+
+/* Return the color who has moyo at pos, or EMPTY, using influence
+ * computed with the opposite color to move.
+ */
+int
+influence_moyo_color_opposite(int pos)
+{
+  return whose_moyo(&initial_opposite_influence, I(pos), J(pos));
 }
 
 /* Return the color who has area at pos, or EMPTY. */
@@ -1484,7 +1498,11 @@ void
 print_initial_influence(int color, int dragons_known)
 {
   compute_initial_influence(color, dragons_known);
-  print_influence(&initial_influence, dragons_known);
+  print_influence(&initial_influence, (dragons_known ? "dragons_known"
+				       : "dragons_unknown"));
+  print_influence(&initial_opposite_influence,
+		  dragons_known ? "dragons_known, opposite color"
+		  : "dragons_unknown, opposite color");
 }
 
 /* Compute influence after doing a move and print it. Notice that it's
@@ -1495,20 +1513,18 @@ print_move_influence(int pos, int color,
 		     char saved_stones[BOARDMAX])
 {
   compute_move_influence(I(pos), J(pos), color, saved_stones);
-  print_influence(&move_influence, 1);
+  print_influence(&move_influence, "after move, dragons known");
 }
 
 /* Print influence for debugging purposes. */
 static void
-print_influence(struct influence_data *q, int dragons_known)
+print_influence(struct influence_data *q, const char *info_string)
 {
   if (printmoyo & PRINTMOYO_ATTENUATION) {
     /* Print the attenuation values. */
-    fprintf(stderr, "white attenuation (%s):\n",
-	    dragons_known ? "dragons known" : "dragons unknown");
+    fprintf(stderr, "white attenuation (%s):\n", info_string);
     print_numeric_influence(q, q->white_attenuation, "%3.2f", 0, 0);
-    fprintf(stderr, "black attenuation (%s):\n",
-	    dragons_known ? "dragons known" : "dragons unknown");
+    fprintf(stderr, "black attenuation (%s):\n", info_string);
     print_numeric_influence(q, q->black_attenuation, "%3.2f", 0, 0);
   }
 
@@ -1532,19 +1548,16 @@ print_influence(struct influence_data *q, int dragons_known)
 
   if (printmoyo & PRINTMOYO_NUMERIC_INFLUENCE) {
     /* Print the white influence values. */
-    fprintf(stderr, "white influence (%s):\n",
-	    dragons_known ? "dragons known" : "dragons unknown");
+    fprintf(stderr, "white influence (%s):\n", info_string);
     print_numeric_influence(q, q->white_influence, "%3.0f", 1, 1);
     
     /* Print the black influence values. */
-    fprintf(stderr, "black influence (%s):\n",
-	    dragons_known ? "dragons known" : "dragons unknown");
+    fprintf(stderr, "black influence (%s):\n", info_string);
     print_numeric_influence(q, q->black_influence, "%3.0f", 1, 1);
   }
 
   if (printmoyo & PRINTMOYO_PRINT_INFLUENCE) {
-    fprintf(stderr, "influence regions (%s):\n",
-	    dragons_known ? "dragons known" : "dragons unknown");
+    fprintf(stderr, "influence regions (%s):\n", info_string);
     print_influence_areas(q);
   }
 }

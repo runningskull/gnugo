@@ -117,7 +117,7 @@ loadsgf games/incident240.sgf 69
 
 loadsgf games/trevor/auto/a035.sgf 28
 33 disconnect B4 C6
-#? [B5]*
+#? [1 B5]*
 
 # Monkey jumps and relatives.
 loadsgf games/connection3.sgf
@@ -164,6 +164,47 @@ loadsgf games/trevor/trevor_15.sgf
 loadsgf games/trevor/auto/a014.sgf 16
 50 disconnect B5 C2
 #? [1 B4]
+
+loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 108
+51 connect R14 Q16
+#? [1 Q15]*
+52 connect R14 O15
+#? [1 Q15]*
+53 connect S7 S4
+#? [1 T5]*
+
+# D8 might also disconnect.
+loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 164
+54 disconnect B6 D10
+#? [1 C8]*
+55 connect B6 D10
+#? [1 D8|C8]*
+56 connect B6 F9
+#? [1 D8]*
+
+loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 192
+57 connect K14 K16
+#? [1 L16]
+
+loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 204
+58 disconnect D18 F17
+#? [0]
+
+loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 216
+59 disconnect D18 E15
+#? [1 D15|F15|B15|D19|E19]
+60 connect D14 B18
+#? [1 D15|F15|B15|D19|E19]*
+61 connect O9 Q9
+#? [1 D15|F15|B15|D19|E19]*
+
+loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 238
+62 connect S18 S14
+#? [1 T15|T17]*
+
+loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 258
+63 connect N13 N17
+#? [1 N16|O17|P16]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
