@@ -189,66 +189,72 @@ loadsgf games/pooo.sgf 24
 188 gg_genmove black
 #? [B6|C4]
 
+# The dragon at A2 is misclassified as inessential.
+
 loadsgf games/pooo.sgf 52
-188 gg_genmove black
+189 gg_genmove black
 #? [D13]
 
+loadsgf games/pooo.sgf 56
+190 gg_genmove black
+#? [C12]
+
 loadsgf games/pooo.sgf 74
-189 gg_genmove black
+191 gg_genmove black
 #? [A15]
 
 # (3.1.9) owl status of A11 is unchecked.
 
 loadsgf games/bretz.sgf 26
-190 gg_genmove black
+192 gg_genmove black
 #? [F16]
 
 loadsgf games/bretz.sgf 58
-191 gg_genmove black
+193 gg_genmove black
 #? [A13]
 
 loadsgf games/bretz.sgf 88
-192 gg_genmove black
+194 gg_genmove black
 #? [!S14]
 
 loadsgf games/bretz.sgf 100
-192 gg_genmove black
+195 gg_genmove black
 #? [M17]
 
 loadsgf games/bretz.sgf 130
-193 gg_genmove black
+196 gg_genmove black
 #? [K3]
 
 loadsgf games/bretz.sgf 148
-194 gg_genmove black
+197 gg_genmove black
 #? [C10]
 
 loadsgf games/bretz 164
-195 gg_genmove black
+198 gg_genmove black
 #? [N5]
 
 loadsgf games/bretz.sgf 149
-196 gg_genmove black
+199 gg_genmove black
 #? [P6|P7|Q7]
 
 loadsgf games/juka1.sgf 8
-197 gg_genmove black
+200 gg_genmove black
 #? [D5]
 
 loadsgf games/juka1.sgf 14
-198 gg_genmove black
+201 gg_genmove black
 #? [B6]
 
 loadsgf games/juka1.sgf 18
-199 gg_genmove black
+202 gg_genmove black
 #? [D5]
 
 loadsgf games/juka1.sgf 28
-200 gg_genmove black
+203 gg_genmove black
 #? [B2]
 
 loadsgf games/juka1.sgf 48
-201 gg_genmove black
+204 gg_genmove black
 #? [!O11]
 
 
