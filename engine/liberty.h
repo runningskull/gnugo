@@ -33,7 +33,7 @@
 #define gg_max(a, b) ((a)<(b) ? (b) : (a))
 
 /* not sure if this is the best way of doing this, but... */
-#define UNUSED(x)  x=x
+#define UNUSED(x)  (void)x
 
 
 /* ================================================================ */
