@@ -90,7 +90,7 @@ contains the emulation layer for Unix.
 
    Cygwin Home page:
 
-   <http://sources.redhat.com/cygwin/>
+   <http://cygwin.com/>
 
    Optionally you can use glib to get a working version of snprintf.
 Glib builds out of the box on cygwin.
@@ -136,30 +136,12 @@ c) A custom build step in the first dependent subproject (utils)
    INSTALL, you must edit this file.
 
 d) This project was built and tested using VC version 6.0.
-   It has not been tested, and will most likely not work with
-   earlier versions of VC.
-
-e) If for any reason some or all of the automatically built
-   files in the patterns directory do not build you can run 
-   mkpat on the command line to make these files. For reference 
-   here are the recommended mkpat options:
-
-  FILE             MKPAT OPTIONS      INPUT FILES
-
-  conn.c           mkpat -c conn            conn.db
-  patterns.c       mkpat -b pat             patterns.db, patterns2.db
-  apatterns.c      mkpat -X attpat          attack.db
-  dpatterns.c      mkpat defpat             defense.db
-  influence.c      mkpat -c influencepat    influence.db
-  endgame.c        mkpat -b endpat          endgame.db
-  owl_attackpat.c  mkpat -b owl_attackpat   owl_attackpats.db
-  owl_vital_apat.c mkpat -b owl_vital_apat  owl_vital_apats.db
-  owl_defendpat.c  mkpat -b owl_defendpat   owl_defendpats.db
-  fuseki9.c        mkpat -b -f fuseki9      fuseki9.db
-  fuseki19.c       mkpat -b -f fuseki19     fuseki19.db
-  josekidb.c       mkpat -b joseki          hoshi.db, komoku.db, sansan.db,
-                                            mokuhazushi.db, takamoku.db
-
+   It can be successfully converted to Visual Studio.NET.  However, 
+   you may not rebuild all in .NET.  .NET cleans each project as it
+   builds on a rebuild, whereas in 6.0, all projects were cleaned at
+   the beginning.  This caused some intermediate output to be 
+   deleted by later build steps.  To achieve the same, simply build 
+   clean, then build all.
 
 
          Running GNU Go on Windows NT and Windows 95/98

@@ -892,7 +892,7 @@ IntDir=.\Release
 InputPath=.\hoshi_keima.sgf
 
 "hoshi_keima.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\joseki JH hoshi_keima.sgf >hoshi_keima.db
+	$(IntDir)\joseki JHK hoshi_keima.sgf >hoshi_keima.db
 
 # End Custom Build
 
@@ -905,7 +905,7 @@ IntDir=.\Debug
 InputPath=.\hoshi_keima.sgf
 
 "hoshi_keima.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\joseki JH hoshi_keima.sgf >hoshi_keima.db
+	$(IntDir)\joseki JHK hoshi_keima.sgf >hoshi_keima.db
 
 # End Custom Build
 
@@ -925,7 +925,7 @@ IntDir=.\Release
 InputPath=.\hoshi_other.sgf
 
 "hoshi_other.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\joseki JH hoshi_other.sgf >hoshi_other.db
+	$(IntDir)\joseki JHO hoshi_other.sgf >hoshi_other.db
 
 # End Custom Build
 
@@ -938,7 +938,7 @@ IntDir=.\Debug
 InputPath=.\hoshi_other.sgf
 
 "hoshi_other.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\joseki JH hoshi_other.sgf >hoshi_other.db
+	$(IntDir)\joseki JHO hoshi_other.sgf >hoshi_other.db
 
 # End Custom Build
 
