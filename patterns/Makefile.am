@@ -87,10 +87,10 @@ noinst_LIBRARIES = libpatterns.a libdfa.a
 libpatterns_a_SOURCES = connections.c helpers.c $(GGBUILTSOURCES)
 libdfa_a_SOURCES = dfa.c transform.c
 
-hoshi_keima.db : $(srcdir)/hoshi.sgf joseki$(EXEEXT)
+hoshi_keima.db : $(srcdir)/hoshi_keima.sgf joseki$(EXEEXT)
 	./joseki JH $(srcdir)/hoshi_keima.sgf >hoshi_keima.db
 
-hoshi_other.db : $(srcdir)/hoshi.sgf joseki$(EXEEXT)
+hoshi_other.db : $(srcdir)/hoshi_other.sgf joseki$(EXEEXT)
 	./joseki JH $(srcdir)/hoshi_other.sgf >hoshi_other.db
 
 komoku.db : $(srcdir)/komoku.sgf joseki$(EXEEXT)
