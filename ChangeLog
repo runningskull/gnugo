@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- regress.sh revised
 - regress.pike revised
 - attack2() revised
 - defend4() revised
