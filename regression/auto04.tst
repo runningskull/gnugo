@@ -11,7 +11,7 @@ loadsgf games/auto_gen/auto020.sgf 67
 #? [M5|L4|N5|L5]*
 
 loadsgf games/auto_gen/auto021.sgf 72
-7 owl_defend j14
+7 owl_defend j15
 #? [0]*
 
 loadsgf games/auto_gen/auto021.sgf 71
