@@ -81,6 +81,8 @@ sgftreeAddStone(SGFTree *tree, SGFNode *node, int color, int movex, int movey)
 
   return node;
 }
+
+
 /*
  * Add a move to the gametree.
  */
