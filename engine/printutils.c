@@ -263,13 +263,14 @@ abortgo(const char *file, int line, const char *msg, int x, int y)
 
 #if 0
   if (sgf_root) {
-    sgf_write_header(sgf_root, 1, random_seed, komi, level, chinese_rules);
+    sgf_write_header(sgf_root, 1, get_random_seed()
+		     komi, level, chinese_rules);
     writesgf(sgf_root, "abortgo.sgf");
   }
 #endif
 
   fprintf(stderr, "\ngnugo %s (seed %d): You stepped on a bug.\n",
-          gg_version(), random_seed);
+          gg_version(), get_random_seed());
   if (board_size >= 9 && board_size <= 19) {
     fprintf(stderr, "\
 Please save this game as an sgf file and mail it to gnugo@gnu.org\n\

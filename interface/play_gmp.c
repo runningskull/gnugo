@@ -121,7 +121,7 @@ play_gmp(Gameinfo *gameinfo)
   }
 
   gameinfo->computer_player = mycolor;
-  sgf_write_header(sgftree.root, 1, random_seed, gnugo_get_komi(),
+  sgf_write_header(sgftree.root, 1, get_random_seed(), gnugo_get_komi(),
 		   level, chinese_rules);
   gameinfo->handicap = gnugo_sethand(gameinfo->handicap, sgftree.root);
   sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);

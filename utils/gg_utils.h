@@ -86,6 +86,12 @@ const char *gg_version(void);
 void rotate(int i, int j, int *ri, int *rj, int bs, int rot);
 void inv_rotate(int i, int j, int *ri, int *rj, int bs, int rot);
 
+void update_random_seed(void);
+void set_random_seed(unsigned int seed);
+unsigned int get_random_seed(void);
+void reuse_random_seed(void);
+
+
 #endif /* _GG_UTILS_H_ */
 
 

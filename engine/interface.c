@@ -37,8 +37,9 @@
  */
 
 void
-init_gnugo(float memory)
+init_gnugo(float memory, unsigned int seed)
 {
+  set_random_seed(seed);
   reading_cache_init(memory * 1024 * 1024);
   clear_board();
 

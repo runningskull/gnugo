@@ -25,6 +25,7 @@
 #include <assert.h>
 
 #include "gg_utils.h"
+#include "random.h"
 
 #ifdef HAVE_GLIB_H
 #include <glib.h>
@@ -504,6 +505,53 @@ inv_rotate(int i, int j, int *ri, int *rj, int bs, int rot)
     rotate(i, j, ri, rj, bs, 1);
   else
     rotate(i, j, ri, rj, bs, rot);
+}
+
+
+/* Intermediate layer to random.c. gg_srand() should only be called via the
+ * functions below.
+ */
+ 
+/* Private variable remembering the random seed. */
+static unsigned int random_seed;
+
+unsigned int
+get_random_seed()
+{
+  return random_seed;
+}
+
+void
+set_random_seed(unsigned int seed)
+{
+  random_seed = seed;
+  gg_srand(seed);
+}
+
+/* Update the random seed with the current value in the random sequence.
+ * This should be called at the start of each new game.
+ */
+void
+update_random_seed(void)
+{
+  random_seed = gg_rand();
+  /* Since random seed 0 has a special interpretation when given as
+   * command line argument with the -r option, we make sure to avoid
+   * it.
+   */
+  if (random_seed == 0)
+    random_seed = 1;
+  gg_srand(random_seed);
+}
+
+
+/* Restart the pseudo-random sequence with the initialization given
+ * by the random seed. Should be called at each move.
+ */
+void
+reuse_random_seed()
+{
+  gg_srand(random_seed);
 }
 
 

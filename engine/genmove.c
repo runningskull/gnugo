@@ -73,7 +73,7 @@ reset_engine()
    * actually play through them, in order to get the right random
    * numbers.
    */
-  gg_srand(random_seed);
+  reuse_random_seed();
 
   /* Initialize things for hashing of positions. */
   reading_cache_clear();

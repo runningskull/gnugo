@@ -45,7 +45,7 @@
 
 /* interface.c */
 /* Initialize the whole thing. Should be called once. */
-void init_gnugo(float memory);
+void init_gnugo(float memory, unsigned int random_seed);
 
 
 /* ================================================================ */
@@ -193,8 +193,6 @@ int  gameinfo_play_sgftree(Gameinfo *gameinfo, SGFTree *tree,
 /*                           global variables                       */
 /* ================================================================ */
 
-/* Random seed */
-extern int random_seed;
 
 /* Miscellaneous debug options. */
 extern int quiet;		/* Minimal output. */

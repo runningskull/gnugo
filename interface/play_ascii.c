@@ -427,7 +427,8 @@ init_sgf(Gameinfo *ginfo)
     return;
   sgf_initialized = 1;
 
-  sgf_write_header(sgftree.root, 1, random_seed, komi, level, chinese_rules);
+  sgf_write_header(sgftree.root, 1, get_random_seed(), komi,
+      		   level, chinese_rules);
   sgfOverwritePropertyInt(sgftree.root, "HA", ginfo->handicap);
   if (ginfo->handicap > 0)
     gnugo_recordboard(sgftree.root);

@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new functions set_/get_/update_/reuse_random_seed()
+- save and restore random_seed where it is set to zero in deterministic
+  GTP commands
 - adjust conection and semeai depth parameters according to levels
 - don't forget to switch exchange sgf_messages in order_moves()
 

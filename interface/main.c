@@ -905,14 +905,10 @@ main(int argc, char *argv[])
   /* Start random number seed. */
   if (!seed)
     seed = time(0);
-  gg_srand(seed);
-  random_seed = seed;
-
   
   /* Initialize the GNU Go engine. */
-  init_gnugo(memory);
+  init_gnugo(memory, seed);
 
-  
   /* Read the infile if there is one. Also play up the position. */
   if (infilename) {
     if (!sgftree_readfile(&sgftree, infilename)) {

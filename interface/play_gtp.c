@@ -2144,6 +2144,7 @@ gtp_reg_genmove(char *s)
   int i, j;
   int color;
   int n;
+  unsigned int saved_random_seed = get_random_seed();
 
   n = gtp_decode_color(s, &color);
   if (!n)
@@ -2157,9 +2158,11 @@ gtp_reg_genmove(char *s)
    * number generator before calling genmove(). It is always seeded by
    * 0.
    */
-  random_seed = 0;
+  set_random_seed(0);
   
   genmove_conservative(&i, &j, color);
+
+  set_random_seed(saved_random_seed);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(i, j);
   return gtp_finish_response();
@@ -2178,6 +2181,7 @@ gtp_gg_genmove(char *s)
   int i, j;
   int color;
   int n;
+  unsigned int saved_random_seed = get_random_seed();
   unsigned int seed;
 
   n = gtp_decode_color(s, &color);
@@ -2195,9 +2199,10 @@ gtp_gg_genmove(char *s)
    */
   seed = 0;
   sscanf(s+n, "%u", &seed);
-  random_seed = seed;
+  set_random_seed(seed);
   
   genmove_conservative(&i, &j, color);
+  set_random_seed(saved_random_seed);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(i, j);
   return gtp_finish_response();
@@ -2216,6 +2221,7 @@ gtp_restricted_genmove(char *s)
   int i, j;
   int color;
   int n;
+  unsigned int saved_random_seed = get_random_seed();
   int allowed_moves[BOARDMAX];
   int number_allowed_moves = 0;
   memset(allowed_moves, 0, sizeof(allowed_moves));
@@ -2249,9 +2255,10 @@ gtp_restricted_genmove(char *s)
    * number generator before calling genmove(). It is always seeded by
    * 0.
    */
-  random_seed = 0;
+  set_random_seed(0);
   
   genmove_restricted(&i, &j, color, allowed_moves);
+  set_random_seed(saved_random_seed);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(i, j);
   return gtp_finish_response();
@@ -2581,6 +2588,7 @@ finish_and_score_game(int seed)
 static int
 gtp_final_score(char *s)
 {
+  unsigned int saved_random_seed = get_random_seed();
   int seed;
   /* This is intended for regression purposes and should therefore be
    * deterministic. The best way to ensure this is to reset the random
@@ -2590,9 +2598,11 @@ gtp_final_score(char *s)
    */
   seed = 0;
   sscanf(s, "%d", &seed);
-  random_seed = seed;
+  set_random_seed(seed);
 
   finish_and_score_game(seed);
+
+  set_random_seed(saved_random_seed);
 
   gtp_start_response(GTP_SUCCESS);
   if (final_score > 0.0)
@@ -2618,6 +2628,7 @@ gtp_final_status(char *s)
   int n;
   int ai, aj;
   int k;
+  unsigned int saved_random_seed = get_random_seed();
   const char *result = NULL;
 
   n = gtp_decode_coord(s, &ai, &aj);
@@ -2632,10 +2643,11 @@ gtp_final_status(char *s)
    */
   seed = 0;
   sscanf(s + n, "%d", &seed);
-  random_seed = seed;
+  set_random_seed(seed);
 
   finish_and_score_game(seed);
 
+  set_random_seed(saved_random_seed);
   for (k = 0; k < 6; k++)
     if (final_status[ai][aj] == status_numbers[k]) {
       result = status_names[k];
@@ -2670,6 +2682,7 @@ gtp_final_status_list(char *s)
   int k;
   char status_string[GTP_BUFSIZE];
   int first;
+  unsigned int saved_random_seed = get_random_seed();
 
   if (sscanf(s, "%s %n", status_string, &n) != 1)
     return gtp_failure("missing status");
@@ -2690,9 +2703,11 @@ gtp_final_status_list(char *s)
    */
   seed = 0;
   sscanf(s + n, "%d", &seed);
-  random_seed = seed;
+  set_random_seed(seed);
 
   finish_and_score_game(seed);
+
+  set_random_seed(saved_random_seed);
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -3575,7 +3590,7 @@ static int
 gtp_get_random_seed(char *s)
 {
   UNUSED(s);
-  return gtp_success("%d", random_seed);
+  return gtp_success("%d", get_random_seed());
 }
 
 /* Function:  Set the random seed
@@ -3590,7 +3605,7 @@ gtp_set_random_seed(char *s)
   if (sscanf(s, "%d", &seed) < 1)
     return gtp_failure("invalid seed");
   
-  random_seed = seed;
+  set_random_seed(seed);
   return gtp_success("");
 }
 
