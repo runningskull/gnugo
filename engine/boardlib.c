@@ -58,9 +58,5 @@ int position_number;    /* position number */
 struct stats_data stats;
 
 /* Variation tracking in SGF trees: */
-int count_variations  = 0;  /* used by decide_string */
-int sgf_dump          = 0;  /* used by decide_string */
+int count_variations  = 0;
 SGFTree *sgf_dumptree = NULL;
-
-
-

@@ -85,7 +85,6 @@ int allpats           = 0;  /* generate all patterns, even small ones */
 int printworms        = 0;  /* print full data on each string */
 int printmoyo         = 0;  /* print moyo board each move */
 int printboard        = 0;  /* print board each move */
-int loading           = 0;  /* TRUE if last loaded move comes from file */
 int fusekidb          = 1;  /* use fuseki database */
 int disable_fuseki    = 0;  /* do not generate fuseki moves */
 int josekidb          = 1;  /* use fuseki database */

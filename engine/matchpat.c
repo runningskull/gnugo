@@ -152,7 +152,6 @@ static void matchpat_loop(matchpat_callback_fn_ptr callback,
 			  int color, int anchor,
 			  struct pattern_db *pdb, void *callback_data,
 			  char goal[BOARDMAX], int anchor_in_goal);
-void transform2(int i, int j, int *ti, int *tj, int trans);
 
 /* Precomputed tables to allow rapid checks on the piece at
  * the board. This table relies on the fact that color is

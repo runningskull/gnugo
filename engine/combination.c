@@ -390,7 +390,7 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
 			 const char safe_stones[BOARDMAX])
 {
   int apos;
-  int defense_point = NO_MOVE, after_defense_point = NO_MOVE;
+  int defense_point = NO_MOVE;
   int aa_val, after_aa_val;
   int other = OTHER_COLOR(color);
   char defense_points[BOARDMAX];
@@ -439,7 +439,6 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
      * works. What we really want is to get the proper defense move
      * into (*defense).
      */
-    after_defense_point = defense_point;
     forbidden[apos] = 1;
     last_forbidden = apos;
     aa_val = do_atari_atari(other, &apos, &defense_point, NULL,

@@ -222,7 +222,7 @@ static const char *attribute_name[NUM_ATTRIBUTES + 1] = {
 /* Owl-style value stored in pattern itself. */
 #define IN_PATTERN_VALUE	NUM_ATTRIBUTES
 
-struct attribute_description general_attribute_map[] = {
+static struct attribute_description general_attribute_map[] = {
   { "value",		MIN_VALUE },
   { "minvalue",		MIN_VALUE },
   { "maxvalue",		MAX_VALUE },
@@ -236,12 +236,12 @@ struct attribute_description general_attribute_map[] = {
   { NULL,		LAST_ATTRIBUTE }
 };
 
-struct attribute_description value_only_attribute_map[] = {
+static struct attribute_description value_only_attribute_map[] = {
   { "value",		IN_PATTERN_VALUE },
   { NULL,		LAST_ATTRIBUTE }
 };
 
-struct attribute_description owl_attack_attribute_map[] = {
+static struct attribute_description owl_attack_attribute_map[] = {
   { "value",			IN_PATTERN_VALUE },
   { "threatens_to_capture",	THREATENS_TO_CAPTURE },
   { "threatens_eye",		THREATENS_EYE },
@@ -249,7 +249,7 @@ struct attribute_description owl_attack_attribute_map[] = {
   { NULL,			LAST_ATTRIBUTE }
 };
 
-struct attribute_description owl_defense_attribute_map[] = {
+static struct attribute_description owl_defense_attribute_map[] = {
   { "value",			IN_PATTERN_VALUE },
   { "threatens_to_capture",	THREATENS_TO_CAPTURE },
   { "threatens_eye",		THREATENS_EYE },
@@ -257,7 +257,7 @@ struct attribute_description owl_defense_attribute_map[] = {
   { NULL,			LAST_ATTRIBUTE }
 };
 
-struct attribute_description *attribute_map = NULL;
+static struct attribute_description *attribute_map = NULL;
 static int attributes_needed = 0;
 
 
@@ -558,7 +558,7 @@ find_transformation_hint(const char *pattern_name)
 static void
 check_constraint_diagram(void)
 {
-  int i, j, ino = 0, iso = 0, jwo = 0, jeo = 0;
+  int i, j, ino = 0, iso = 0, jwo = 0;
 
   int have_constraint = (pattern[patno].autohelper_flag & HAVE_CONSTRAINT);
   if (0)
@@ -570,8 +570,6 @@ check_constraint_diagram(void)
     iso = 1;
   if (where & WEST_EDGE)
     jwo = 1;
-  if (where & EAST_EDGE)
-    jeo = 1;
     
   if (verbose) {
     for (i = ino; i <= maxi+ino+iso; i++)

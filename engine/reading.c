@@ -1751,7 +1751,7 @@ defend3(int str, int *move)
 static int 
 defend4(int str, int *move)
 {
-  int color, other;
+  int color;
   int xpos = NO_MOVE;
   int liberties;
   int libs[4];
@@ -1765,7 +1765,6 @@ defend4(int str, int *move)
   reading_node_counter++;
 
   color = board[str];
-  other = OTHER_COLOR(color);
 
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 4, str);

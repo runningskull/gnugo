@@ -35,8 +35,8 @@ static void add_influence_source(int pos, int color, float strength,
                                  float attenuation,
                                  struct influence_data *q);
 static void segment_influence(struct influence_data *q);
-void print_influence(const struct influence_data *q,
-		     const char *info_string);
+static void print_influence(const struct influence_data *q,
+			    const char *info_string);
 static void print_numeric_influence(const struct influence_data *q,
 				    const float values[BOARDMAX],
 				    const char *format, int width,
@@ -68,11 +68,11 @@ static struct influence_data *current_influence = NULL;
 
 
 /* Thresholds values used in the whose_moyo() functions */
-struct moyo_determination_data moyo_data;
-struct moyo_determination_data moyo_restricted_data;
+static struct moyo_determination_data moyo_data;
+static struct moyo_determination_data moyo_restricted_data;
  
 /* Thresholds value used in the whose_territory() function */
-float territory_determination_value; 
+static float territory_determination_value; 
  
 
 
@@ -1885,7 +1885,7 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
 /* Cache of delta_territory_values. */
 static float delta_territory_cache[BOARDMAX];
 static float followup_territory_cache[BOARDMAX];
-Hash_data delta_territory_cache_hash[BOARDMAX];
+static Hash_data delta_territory_cache_hash[BOARDMAX];
 static int territory_cache_position_number = -1;
 static int territory_cache_influence_id = -1;
 static int territory_cache_color = -1;

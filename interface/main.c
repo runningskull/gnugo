@@ -1284,14 +1284,10 @@ main(int argc, char *argv[])
 
   case MODE_DECIDE_POSITION:
     {
-      int color;
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-position must be used with -l\n");
 	return EXIT_FAILURE;
       }
-      color = gameinfo.to_move;
-      if (mandated_color != EMPTY)
-	color = mandated_color;
       decide_position();
     }
     break;

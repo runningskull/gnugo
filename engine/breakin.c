@@ -58,8 +58,8 @@ struct break_in_data {
 };
 
 #define MAX_BREAK_INS 50
-struct break_in_data break_in_list[MAX_BREAK_INS];
-int num_break_ins;
+static struct break_in_data break_in_list[MAX_BREAK_INS];
+static int num_break_ins;
 
 
 /* Adds all empty intersections that have two goal neighbors to the goal. */

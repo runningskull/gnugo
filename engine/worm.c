@@ -697,10 +697,8 @@ compute_unconditional_status()
   int unconditional_territory[BOARDMAX];
   int pos;
   int color;
-  int other;
   
   for (color = WHITE; color <= BLACK; color++) {
-    other = OTHER_COLOR(color);
     unconditional_life(unconditional_territory, color);
 
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -877,14 +875,11 @@ find_worm_threats()
   int k;
   int l;
   int color;
-  int other;
   
   for (str = BOARDMIN; str < BOARDMAX; str++) {
     color = board[str];
     if (!IS_STONE(color) || !is_worm_origin(str, str))
       continue;
-
-    other = OTHER_COLOR(color);
 
     /* 1. Start with finding attack threats. */
     /* Only try those worms that have no attack. */

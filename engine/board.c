@@ -1651,7 +1651,7 @@ struct board_cache_entry {
 
 
 /* approxlib() cache. */
-struct board_cache_entry approxlib_cache[BOARDMAX][2];
+static struct board_cache_entry approxlib_cache[BOARDMAX][2];
 
 
 /* Clears approxlib() cache. This function should be called only once
@@ -1943,7 +1943,7 @@ slow_approxlib(int pos, int color, int maxlib, int *libs)
 
 
 /* accuratelib() cache. */
-struct board_cache_entry accuratelib_cache[BOARDMAX][2];
+static struct board_cache_entry accuratelib_cache[BOARDMAX][2];
 
 
 /* Clears accuratelib() cache. This function should be called only once

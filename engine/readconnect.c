@@ -384,7 +384,7 @@ static int
 prevent_connection_one_move(int *moves, int str1, int str2)
 {
   int r, s;
-  int liberties, libs[MAXLIBS];
+  int libs[MAXLIBS];
   int adj, adjs[MAXCHAIN];
   int adjadj, adjadjs[MAXCHAIN];
   
@@ -400,7 +400,7 @@ prevent_connection_one_move(int *moves, int str1, int str2)
   for (r = 0; r < adj; r++)
     if (adjacent_strings(adjs[r], str2)
         && !snapback(adjs[r])) {
-      liberties = findlib(adjs[r], MAXLIBS, libs);
+      findlib(adjs[r], MAXLIBS, libs);
       add_array(moves, libs[0]);
       adjadj = chainlinks2(adjs[r], adjadjs, 1);
       for (s = 0; s < adjadj; s++) {

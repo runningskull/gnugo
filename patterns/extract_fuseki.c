@@ -150,13 +150,13 @@ int handicap_value;
 int player_strength;
 
 
-/* min # of times a position must be seen before moves from it become
-   patterns 
-   might want this larger to ensure reasonable statistics, 6 or more, say
-   or smaller to hit every move down to unique games, 2 say;
-   or even keep churning out moves with 1
-
-   given as argument
+/* Min # of times a position must be seen before moves from it become
+ * patterns.
+ * Might want this larger to ensure reasonable statistics, 6 or more, say
+ * or smaller to hit every move down to unique games, 2 say;
+ * or even keep churning out moves with 1.
+ *
+ * Given as argument.
 */
 
 int min_position_freq;
@@ -170,11 +170,13 @@ int min_move_freq;
 /* Number of games to analyze. */
 int number_of_games;
 
-/* The number of games that could not be used for some reason. */
+/* Dynamically allocated array marking the games that could not be
+ * used for some reason.
+ */
 int *unused_games;
 
-/* WARN 1 warns about unused games */
-/* WARN 2 also notes assumptions about metainfo */
+/* WARN 1 warns about unused games. */
+/* WARN 2 also notes assumptions about metainfo. */
 #define WARN 1
 
 
@@ -243,7 +245,7 @@ int number_of_distinct_positions;
  */
 struct winner {
   int index;
-  int pre;
+  unsigned int pre;
   int position_frequency;
   int move_frequency;
   int n_player;
@@ -257,15 +259,56 @@ struct winner *winning_moves;
 int number_of_winning_moves;
 
 /* critical values of chisquare distribution with n degrees of freedom */
-/* p < 0.05 */
-double chisquarecrit05[] = {3.8415, 5.9915, 7.8147, 9.4877, 11.0705, 12.5916, 14.0671, 15.5073, 16.9190, 18.3070, 19.6751, 21.0261, 22.3620, 23.6848, 24.9958, 26.2962, 27.5871, 28.8693, 30.1435, 31.4104, 32.67057, 33.92444, 35.17246, 36.41503, 37.65248, 38.88514, 40.11327, 41.33714, 42.55697, 43.77297, 44.98534, 46.19426, 47.39988, 48.60237, 49.80185, 50.99846, 52.19232, 53.38354, 54.57223, 55.75848, 56.94239, 58.12404, 59.30351, 60.48089,  61.65623, 62.82962, 64.00111, 65.17077, 66.33865, 67.50481 };
+/* p < 0.05
+ */
+double chisquarecrit05[] = {
+  3.8415, 5.9915, 7.8147, 9.4877, 11.0705, 12.5916, 14.0671, 15.5073,
+  16.9190, 18.3070, 19.6751, 21.0261, 22.3620, 23.6848, 24.9958, 26.2962,
+  27.5871, 28.8693, 30.1435, 31.4104, 32.67057, 33.92444, 35.17246,
+  36.41503, 37.65248, 38.88514, 40.11327, 41.33714, 42.55697, 43.77297,
+  44.98534, 46.19426, 47.39988, 48.60237, 49.80185, 50.99846, 52.19232,
+  53.38354, 54.57223, 55.75848, 56.94239, 58.12404, 59.30351, 60.48089,
+  61.65623, 62.82962, 64.00111, 65.17077, 66.33865, 67.50481};
 
 /* p < 0.10, should be same size as 05 */
-double chisquarecrit10[] = {2.7055, 4.6052, 6.2514, 7.7794, 9.2364, 10.6446, 12.0170, 13.3616, 14.6837, 15.9872, 17.2750, 18.5493, 19.8119, 21.0641, 22.3071, 23.5418, 24.7690, 25.9894, 27.2036, 28.4120,29.61509, 30.81328, 32.00690, 33.19624, 34.38159, 35.56317, 36.74122, 37.91592, 39.08747, 40.25602, 41.42174, 42.58475, 43.74518, 44.90316, 46.05879, 47.21217, 48.36341, 49.51258, 50.65977, 51.80506, 52.94851, 54.09020, 55.23019, 56.36854, 57.50530, 58.64054, 59.77429, 60.90661, 62.03754, 63.16712 };
+double chisquarecrit10[] = {
+  2.7055, 4.6052, 6.2514, 7.7794, 9.2364, 10.6446, 12.0170, 13.3616,
+  14.6837, 15.9872, 17.2750, 18.5493, 19.8119, 21.0641, 22.3071, 23.5418,
+  24.7690, 25.9894, 27.2036, 28.4120, 29.61509, 30.81328, 32.00690,
+  33.19624, 34.38159, 35.56317, 36.74122, 37.91592, 39.08747, 40.25602,
+  41.42174, 42.58475, 43.74518, 44.90316, 46.05879, 47.21217, 48.36341,
+  49.51258, 50.65977, 51.80506, 52.94851, 54.09020, 55.23019, 56.36854,
+  57.50530, 58.64054, 59.77429, 60.90661, 62.03754, 63.16712};
 
-double chisquarecrit01[] = {6.63489660102121,9.21034037197618,11.3448667301444,13.2767041359876,15.086272469389,16.8118938297709,18.4753069065824,20.0902350296632,21.6659943334619,23.2092511589544,24.7249703113183,26.2169673055359,27.6882496104570,29.1412377406728,30.5779141668925,31.9999269088152,33.4086636050046,34.8053057347051,36.1908691292701,37.5662347866250,38.9321726835161,40.2893604375938,41.6383981188585,42.9798201393516,44.3141048962192,45.6416826662832,46.9629421247514,48.2782357703155,49.5878844728988,50.8921813115171,52.1913948331919,53.4857718362354,54.7755397601104,56.0609087477891,57.3420734338592,58.619214501687,59.8925000450869,61.1620867636897,62.4281210161849,63.6907397515645,64.9500713352112,66.2062362839932,67.4593479223258,68.7095129693454,69.9568320658382,71.2014002483115,72.4433073765482,73.6826385201058,74.9194743084782,76.1538912490127};
+double chisquarecrit01[] = {
+  6.63489660102121, 9.21034037197618, 11.3448667301444, 13.2767041359876,
+  15.086272469389, 16.8118938297709, 18.4753069065824, 20.0902350296632,
+  21.6659943334619, 23.2092511589544, 24.7249703113183, 26.2169673055359,
+  27.6882496104570, 29.1412377406728, 30.5779141668925, 31.9999269088152,
+  33.4086636050046, 34.8053057347051, 36.1908691292701, 37.5662347866250,
+  38.9321726835161, 40.2893604375938, 41.6383981188585, 42.9798201393516,
+  44.3141048962192, 45.6416826662832, 46.9629421247514, 48.2782357703155,
+  49.5878844728988, 50.8921813115171, 52.1913948331919, 53.4857718362354,
+  54.7755397601104, 56.0609087477891, 57.3420734338592, 58.619214501687,
+  59.8925000450869, 61.1620867636897, 62.4281210161849, 63.6907397515645,
+  64.9500713352112, 66.2062362839932, 67.4593479223258, 68.7095129693454,
+  69.9568320658382, 71.2014002483115, 72.4433073765482, 73.6826385201058,
+  74.9194743084782, 76.1538912490127};
 
-double chisquarecrit001[] = {10.8275661706627,13.8155105579643,16.2662361962381,18.4668269529032,20.5150056524329,22.4577444848253,24.3218863478569,26.1244815583761,27.8771648712566,29.5882984450744,31.26413362024,32.9094904073602,34.5281789748709,36.1232736803981,37.6972982183538,39.2523547907685,40.7902167069025,42.31239633168,43.8201959645175,45.3147466181259,46.7970380415613,48.2679422908352,49.7282324664315,51.1785977773774,52.6196557761728,54.0519623885766,55.4760202057452,56.8922853933536,58.3011734897949,59.7030643044299,61.0983060810581,62.4872190570885,63.870098522345,65.2472174609424,66.618828843701,67.9851676260242,69.3464524962412,70.702887411505,72.0546629519878,73.401957518991,74.7449383984238,76.0837627077,77.418578241314,78.749524228043,80.076732010819,81.40032565871,82.720422519124,84.0371337172235,85.350564608593,86.6608151904032};
+double chisquarecrit001[] = {
+  10.8275661706627, 13.8155105579643, 16.2662361962381, 18.4668269529032,
+  20.5150056524329, 22.4577444848253, 24.3218863478569, 26.1244815583761,
+  27.8771648712566, 29.5882984450744, 31.26413362024, 32.9094904073602,
+  34.5281789748709, 36.1232736803981, 37.6972982183538, 39.2523547907685,
+  40.7902167069025, 42.31239633168, 43.8201959645175, 45.3147466181259,
+  46.7970380415613, 48.2679422908352, 49.7282324664315, 51.1785977773774,
+  52.6196557761728, 54.0519623885766, 55.4760202057452, 56.8922853933536,
+  58.3011734897949, 59.7030643044299, 61.0983060810581, 62.4872190570885,
+  63.870098522345, 65.2472174609424, 66.618828843701, 67.9851676260242,
+  69.3464524962412, 70.702887411505, 72.0546629519878, 73.401957518991,
+  74.7449383984238, 76.0837627077, 77.418578241314, 78.749524228043,
+  80.076732010819, 81.40032565871, 82.720422519124, 84.0371337172235,
+  85.350564608593, 86.6608151904032};
 
 /*
  * Append the files that are sorted to a specific file
@@ -313,7 +356,7 @@ read_sgf_filenames(const char *name, char *filenames[])
     if (filenames != NULL) {
       if (buf[strlen(buf) - 2] == '\r') {
 	buf[strlen(buf) - 2] = '\0'; 
-	/* Delete newline character. PC only */
+	/* Delete carriage return character, if any. */
       }
       else {
 	buf[strlen(buf) - 1] = '\0'; 
@@ -463,18 +506,16 @@ hash_board_and_move(struct invariant_hash *hash, int color_to_play,
 
 
 /* the so called X31 hash from gtk, for hashing strings */
-static unsigned int hash_string (char *v)
+static unsigned int
+hash_string(const char *v)
 {
-  unsigned int h=0;
+  unsigned int h = 0;
   while (*v != '\0') {
-    h = ( h << 5 ) - h + *v;
+    h = (h << 5) - h + *v;
     v++;
   }
   return h;
 }
-
-
-
 
 /* Adapted from play_sgf_tree() in engine/sgfutils.c. Returns the
  * next move from the game record in (*m, *n) and color in *color. If
@@ -486,7 +527,6 @@ static int
 get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
 {
   SGFProperty *prop;
-  int i, j;
   
   for (prop = node->props; prop; prop = prop->next) {
     if (!prop || !prop->name || !node) {
@@ -497,18 +537,19 @@ get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
     }
     switch (prop->name) {
     case SGFAB:
-      get_moveXY(prop, &i, &j, board_size);
       /* Put handicap stones on the board at once. */
-      add_stone(POS(i, j), BLACK);
+      add_stone(get_sgfmove(prop), BLACK);
       break;
       
     case SGFAW:
-      /* fprintf(stderr, "Warning: white stone added.\n"); */
+      if (0)
+	fprintf(stderr, "Warning: white stone added.\n");
       return 0;
       break;
       
     case SGFPL:
-      /* fprintf(stderr, "Warning: PL property encountered.\n"); */
+      if (0)
+	fprintf(stderr, "Warning: PL property encountered.\n");
       return 0;
       break;
       
@@ -531,7 +572,8 @@ get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
 
 /* Add a situation to the situation_table array. */
 static void
-add_situation(struct invariant_hash *pre, struct invariant_hash *post, int outcome, unsigned int player)
+add_situation(struct invariant_hash *pre, struct invariant_hash *post,
+	      int outcome, unsigned int player)
 {
   situation_table[number_of_situations].pre = *pre;
   situation_table[number_of_situations].post = *post;
@@ -575,10 +617,12 @@ compare_situations2(const void *a, const void *b)
   const struct situation *aa = a;
   const struct situation *bb = b;
   int r = compare_situations(a, b);
-  if (r !=0) 
+  if (r != 0) 
     return r;
-  if (aa->player > bb->player) return 1;
-  if (aa->player < bb->player) return -1;
+  if (aa->player > bb->player)
+    return 1;
+  if (aa->player < bb->player)
+    return -1;
 
   return 0;
 }
@@ -641,8 +685,8 @@ compare_frequencies2(const void *a, const void *b)
 }
 
 /*
- * find_region answers in what region the move is
- * there are 9 regions, corners, sides and center
+ * find_region answers in what region the move is.
+ * There are 9 regions, corners, sides and center.
  */
 
 static int
@@ -691,7 +735,9 @@ store_pattern_if_winner(struct invariant_hash *pre,
   s.post = *post;
 
   for (k = 0; k < number_of_winning_moves; k++) {
-    if (winning_moves[k].index != -1 && compare_situations(&situation_table[winning_moves[k].index], &s) == 0) {
+    if (winning_moves[k].index != -1
+	&& compare_situations(&situation_table[winning_moves[k].index],
+			      &s) == 0) {
       /* This is a winner. Record the pattern. */
       for (i = 0; i < board_size; i++)
 	for (j = 0; j < board_size; j++) {
@@ -712,7 +758,7 @@ store_pattern_if_winner(struct invariant_hash *pre,
 	  }
 	}
       winning_moves[k].pattern[m][n] = '*';
-      /* add ? in areas far away from the move */
+      /* Add ? in areas far away from the move. */
       if (half_board_patterns == 1 && move_number > 3 && board_size == 19)
         region = find_region(m, n);
       if (region != 8) {
@@ -723,11 +769,11 @@ store_pattern_if_winner(struct invariant_hash *pre,
      	        winning_moves[k].pattern[i][j] = '?';
      	    }
             else if (region == 1) {
-              if ((i - j) > 5)
+              if (i - j > 5)
  	        winning_moves[k].pattern[i][j] = '?';
  	    }
             else if (region == 2) {
-              if ((i + board_size - j) < 14)
+              if (i + board_size - j < 14)
  	        winning_moves[k].pattern[i][j] = '?';
  	    }
  	    else if (region == 3) {
@@ -763,7 +809,8 @@ store_pattern_if_winner(struct invariant_hash *pre,
  * game.  Otherwise, see if there are any winners among the situations
  * and store the corresponding pattern so that it can subsequently be
  * printed. Return 0 if there was some problem with the game record,
- * e.g. fewer moves than expected.  */
+ * e.g. fewer moves than expected.
+ */
 static int
 examine_game(SGFNode *sgf, int collect_statistics)
 {
@@ -776,17 +823,15 @@ examine_game(SGFNode *sgf, int collect_statistics)
   char *PW, *PB;
   unsigned int white_player, black_player;
 
-  if (!sgfGetCharProperty(sgf, "PW", &PW)) {
+  if (!sgfGetCharProperty(sgf, "PW", &PW))
     white_player = hash_string("");
-  } else {
+  else
     white_player = hash_string(PW);
-  }
 
-  if (!sgfGetCharProperty(sgf, "PB", &PB)) {
+  if (!sgfGetCharProperty(sgf, "PB", &PB))
     black_player = hash_string("");
-  } else {
+  else
     black_player = hash_string(PB);
-  }
   
   /* Call the engine to clear the board. */
   clear_board();
@@ -865,7 +910,6 @@ enough_strength(char *strength)
       else
 	return 0;
     }
-
   }
   
   if (kyu <= player_strength)
@@ -882,104 +926,113 @@ enough_strength(char *strength)
  * 0 means failure for any reason
  * 1 means probably okay, without going through moves
  */
-static int check_game(SGFNode *sgf, char *sgfname) {
+static int
+check_game(SGFNode *sgf, char *sgfname)
+{
   int handicap, size;
   char *WR, *BR; /* white rank */
-  char thirtyk[] = "30k";
+  char thirty_kyu[] = "30k";
   char *RE;
   
-    size = 19;
-    if (!sgfGetIntProperty(sgf, "SZ", &size)) {
-      if (WARN>1)
-	fprintf(stderr, "Warning: no SZ in sgf file %s , assuming size %d\n", sgfname, size);
-    }
-    if (size != board_size) {
+  size = 19;
+  if (!sgfGetIntProperty(sgf, "SZ", &size)) {
+    if (WARN > 1)
+      fprintf(stderr, "Warning: no SZ in sgf file %s , assuming size %d\n",
+	      sgfname, size);
+  }
+  if (size != board_size) {
+    if (WARN)
+      fprintf(stderr, "Warning: wrong size of board %d in sgf file %s .\n",
+	      size, sgfname);
+    return 0;
+  }
+    
+  /* No handicap games */
+  if (handicap_value == 0) {
+    if (sgfGetIntProperty(sgf, "HA", &handicap) && handicap > 1) {
       if (WARN)
-	fprintf(stderr, "Warning: wrong size of board %d in sgf file %s .\n", size, sgfname);
+	fprintf(stderr,
+		"No handicap games allowed, sgf file %s has handicap %d\n",
+		sgfname, handicap);
       return 0;
     }
+  }
     
-    /* No handicap games */
-    if (handicap_value == 0) {
-      if (sgfGetIntProperty(sgf, "HA", &handicap) && handicap > 1) {
-	if (WARN)
-	  fprintf(stderr, "No handicap games allowed, sgf file %s has handicap %d\n", sgfname, handicap);
+  /* Only handicap games */
+  if (handicap_value > 1) {
+    if (!sgfGetIntProperty(sgf, "HA", &handicap)) {
+      if (WARN)
+	fprintf(stderr, "Sgf file %s is not a handicap game\n", sgfname);
       return 0;
-      }
     }
-    
-    /* Only handicap games */
-    if (handicap_value > 1) {
-      if (!sgfGetIntProperty(sgf, "HA", &handicap)) {
-	if (WARN)
-	  fprintf(stderr, "Sgf file %s is not a handicap game\n", sgfname);
-	return 0;
-      }
       
-      /* only specific handicap games */
-      if (handicap_value != 10 && handicap != handicap_value) {
-	if (WARN)
-	  fprintf(stderr, "Sgf file %s has wrong number of handicap stones %d\n", sgfname, handicap);
-	return 0;
-      }
-
-      /* any reasonable handicap games */
-      if (handicap_value == 10 && (handicap < 2 || handicap > 9)) {
-	if (WARN)
-	  fprintf(stderr, "Sgf file %s has wrong/weird number of handicap stones %d\n", sgfname, handicap);
-	return 0;
+    /* only specific handicap games */
+    if (handicap_value != 10 && handicap != handicap_value) {
+      if (WARN)
+	fprintf(stderr,
+		"Sgf file %s has wrong number of handicap stones %d\n",
+		sgfname, handicap);
+      return 0;
     }
-    
+
+    /* any reasonable handicap games */
+    if (handicap_value == 10 && (handicap < 2 || handicap > 9)) {
+      if (WARN)
+	fprintf(stderr,
+		"Sgf file %s has wrong/weird number of handicap stones %d\n",
+		sgfname, handicap);
+      return 0;
     }
-    
+  }
 
-      /* examine strength of players in the game and compare it 
-       * with minimum player strength 
-       */
-
-
-    BR = thirtyk;
-      if (!sgfGetCharProperty(sgf, "BR", &BR)) {
-	if (WARN>1)
-	  fprintf(stderr, "No black strength in sgf file %s assuming %s\n", sgfname, BR);
-      }
-      if (!enough_strength(BR)) {
-	if (WARN)
-	  fprintf(stderr, "Wrong black strength %s in sgf file %s\n", BR, sgfname);
-	return 0;
-      }
+  /* Examine strength of players in the game and compare it 
+   * with minimum player strength.
+   */
+  
+  BR = thirty_kyu;
+  if (!sgfGetCharProperty(sgf, "BR", &BR)) {
+    if (WARN > 1)
+      fprintf(stderr, "No black strength in sgf file %s assuming %s\n",
+	      sgfname, BR);
+  }
+  if (!enough_strength(BR)) {
+    if (WARN)
+      fprintf(stderr, "Wrong black strength %s in sgf file %s\n", BR, sgfname);
+    return 0;
+  }
       
-    WR = thirtyk;
-      if (!sgfGetCharProperty(sgf, "WR", &WR)) {
-	if (WARN>1)
-	  fprintf(stderr, "No white strength in sgf file %s assuming %s\n", sgfname, WR);
-      }
-      if (!enough_strength(WR)) {
-	if (WARN)
-	  fprintf(stderr, "Wrong white strength %s in sgf file %s\n", WR, sgfname);
-	return 0;
-      }
+  WR = thirty_kyu;
+  if (!sgfGetCharProperty(sgf, "WR", &WR)) {
+    if (WARN > 1)
+      fprintf(stderr, "No white strength in sgf file %s assuming %s\n",
+	      sgfname, WR);
+  }
+  if (!enough_strength(WR)) {
+    if (WARN)
+      fprintf(stderr, "Wrong white strength %s in sgf file %s\n", WR, sgfname);
+    return 0;
+  }
 
-    /* must have result */
-    if (!sgfGetCharProperty(sgf, "RE", &RE)) {
-      if (WARN)
-	fprintf(stderr, "No result in game %s\n", sgfname);
-      return 0;
-    }
-    if (strncmp(RE, "B+", 2)!=0  && strncmp(RE, "W+", 2)!=0) {
-
-      if (WARN)
-	fprintf(stderr, "Couldn't parse winner in result %s from game %s\n", RE, sgfname);
-      return 0;
-    }
-
-
-      /* looks okay */
-      return 1;
+  /* Must have result. */
+  if (!sgfGetCharProperty(sgf, "RE", &RE)) {
+    if (WARN)
+      fprintf(stderr, "No result in game %s\n", sgfname);
+    return 0;
+  }
+  
+  if (strncmp(RE, "B+", 2) != 0 && strncmp(RE, "W+", 2) != 0) {
+    if (WARN)
+      fprintf(stderr, "Couldn't parse winner in result %s from game %s\n",
+	      RE, sgfname);
+    return 0;
+  }
+  
+  /* Looks okay. */
+  return 1;
 }
 
 /*
- * Sort out the games that can be used
+ * Sort out the games that can be used.
  */
 
 static void
@@ -999,14 +1052,14 @@ sort_games(void)
     
     if (!sgf) {
       if (WARN)
-	fprintf(stderr, "Warning: Couldn't open sgf file %s number %d.\n", sgf_names[k], k);
-	unused_games[k] = 1; /* the game could not be used */
-	continue;
-      }
-
-    if (!check_game(sgf, sgf_names[k])) {
-      unused_games[k] = 1;
+	fprintf(stderr, "Warning: Couldn't open sgf file %s number %d.\n",
+		sgf_names[k], k);
+      unused_games[k] = 1; /* the game could not be used */
+      continue;
     }
+
+    if (!check_game(sgf, sgf_names[k]))
+      unused_games[k] = 1;
     
     /* Free memory of SGF file */
     sgfFreeNode(sgf);
@@ -1025,7 +1078,6 @@ collect_situations(void)
   
   init_situations();
   for (k = 0; k < number_of_games; k++) {
-    int size;
     SGFNode *sgf;
     char *RE;
     
@@ -1041,20 +1093,22 @@ collect_situations(void)
       unused_games[k] = 1; /* the game could not be used */
       continue;
     }
+    
     if (!check_game(sgf, sgf_names[k])) {
       unused_games[k] = 1; 
       sgfFreeNode(sgf);
-	continue;
-      }
+      continue;
+    }
     
     if (!sgfGetCharProperty(sgf, "RE", &RE)) {
       gg_assert(0);
     }
-    if (strncmp(RE, "B+", 2)==0 ) {
+
+    if (strncmp(RE, "B+", 2) == 0)
       winner = BLACK;
-    } else if (strncmp(RE, "W+", 2)==0 ) {
+    else if (strncmp(RE, "W+", 2) == 0)
       winner = WHITE;
-    } else {
+    else {
       gg_assert(0);
     }
     
@@ -1114,7 +1168,7 @@ analyze_statistics(void)
     }
     frequency_table[number_of_distinct_positions-1].n++;
     frequency_table[number_of_distinct_positions-1].n_win += situation_table[k].outcome;
-    if (frequency_table[number_of_distinct_positions-1].n==1 
+    if (frequency_table[number_of_distinct_positions-1].n == 1 
 	|| situation_table[k].player != situation_table[k-1].player) 
       frequency_table[number_of_distinct_positions-1].n_player++; 
   }
@@ -1152,17 +1206,19 @@ analyze_statistics(void)
     struct frequency move_frequencies[MAX_BOARD * MAX_BOARD];
     int number_of_moves = 0;
 
-    /* a position must occur a minimum before we analyze and 
-       record the moves from it */
-    if (frequency_table[k].n < min_position_freq) {
+    /* A position must occur a minimum before we analyze and record
+     * the moves from it.
+     */
+    if (frequency_table[k].n < min_position_freq)
       break;
-    }
+
     for (i = index; ;i++) {
       if (i == number_of_situations
 	  || (i > index
 	      && compare_positions(&situation_table[i],
 				   &situation_table[i-1]) != 0))
 	break;
+      
       if (i == index || compare_situations(&situation_table[i],
 					   &situation_table[i-1]) != 0) {
 	move_frequencies[number_of_moves].index = i;
@@ -1173,9 +1229,10 @@ analyze_statistics(void)
       }
       move_frequencies[number_of_moves-1].n++;
       move_frequencies[number_of_moves-1].n_win += situation_table[i].outcome;
-    if (move_frequencies[number_of_moves-1].n==1 
-	|| situation_table[i].player != situation_table[i-1].player) 
-      move_frequencies[number_of_moves-1].n_player++;
+      
+      if (move_frequencies[number_of_moves-1].n == 1 
+	  || situation_table[i].player != situation_table[i-1].player) 
+	move_frequencies[number_of_moves-1].n_player++;
     }
     
     /* Sort the moves, in falling order. */
@@ -1193,25 +1250,31 @@ analyze_statistics(void)
     /* Add the moves to the list of winners. */
     for (i = 0; i < number_of_moves; i++) {
       /* This is where the cut-off of moves is decided 
-       *  based on popularity from command line arguments
+       * based on popularity from command line arguments.
        */
 	
-      if (0.01*min_move_percent*move_frequencies[0].n_player > move_frequencies[i].n_player 
+      if (0.01 * min_move_percent*move_frequencies[0].n_player
+	  > move_frequencies[i].n_player 
 	  || move_frequencies[i].n_player < min_move_freq) {
 	winning_moves[number_of_winning_moves].index = -1;
-	winning_moves[number_of_winning_moves].pre = situation_table[frequency_table[k].index].pre.values[0];
+	winning_moves[number_of_winning_moves].pre =
+	  situation_table[frequency_table[k].index].pre.values[0];
 	winning_moves[number_of_winning_moves].position_frequency =
 	  frequency_table[k].n;
 	winning_moves[number_of_winning_moves].n_player = 0;	
 	winning_moves[number_of_winning_moves].move_frequency = 0;
-	winning_moves[number_of_winning_moves].position_success = frequency_table[k].n_win;
+	winning_moves[number_of_winning_moves].position_success =
+	  frequency_table[k].n_win;
 	winning_moves[number_of_winning_moves].move_success = 0;
-	while (i<number_of_moves) {
-	  gg_assert (0.01*min_move_percent*move_frequencies[0].n_player 
-		     > move_frequencies[i].n_player ||
-		     move_frequencies[i].n_player < min_move_freq);
-	  gg_assert( situation_table[move_frequencies[i].index].pre.values[0] == winning_moves[number_of_winning_moves].pre);
-	  winning_moves[number_of_winning_moves].n_player += move_frequencies[i].n_player;	
+	
+	while (i < number_of_moves) {
+	  gg_assert(0.01 * min_move_percent*move_frequencies[0].n_player 
+		     > move_frequencies[i].n_player
+		     || move_frequencies[i].n_player < min_move_freq);
+	  gg_assert(situation_table[move_frequencies[i].index].pre.values[0]
+		    == winning_moves[number_of_winning_moves].pre);
+	  winning_moves[number_of_winning_moves].n_player +=
+	    move_frequencies[i].n_player;	
 	  winning_moves[number_of_winning_moves].move_frequency += 	
 	    move_frequencies[i].n;
 	  winning_moves[number_of_winning_moves].move_success +=
@@ -1223,15 +1286,19 @@ analyze_statistics(void)
       }
       
       winning_moves[number_of_winning_moves].index = move_frequencies[i].index;
-      winning_moves[number_of_winning_moves].pre = situation_table[frequency_table[k].index].pre.values[0];
+      winning_moves[number_of_winning_moves].pre =
+	situation_table[frequency_table[k].index].pre.values[0];
       winning_moves[number_of_winning_moves].position_frequency =
 	frequency_table[k].n;
       winning_moves[number_of_winning_moves].move_frequency =
 	move_frequencies[i].n;
-      winning_moves[number_of_winning_moves].n_player = move_frequencies[i].n_player;	
+      winning_moves[number_of_winning_moves].n_player =
+	move_frequencies[i].n_player;	
 
-      winning_moves[number_of_winning_moves].position_success = frequency_table[k].n_win;
-      winning_moves[number_of_winning_moves].move_success = move_frequencies[i].n_win;
+      winning_moves[number_of_winning_moves].position_success =
+	frequency_table[k].n_win;
+      winning_moves[number_of_winning_moves].move_success =
+	move_frequencies[i].n_win;
       number_of_winning_moves++;
       
       if (number_of_winning_moves == MAX_PATTERNS_TO_EXTRACT)
@@ -1268,7 +1335,7 @@ generate_patterns(void)
     if (k % 500 == 0)
       fprintf(stderr, "Generating number %d, %s\n", k, sgf_names[k]);
     
-    /* Check if this game is a valid game */
+    /* Check if this game is a valid game. */
     if (unused_games[k]) {
       if (0)
 	fprintf(stderr, "Not used\n");
@@ -1281,9 +1348,9 @@ generate_patterns(void)
       continue;
     }
     
-    (void) examine_game(sgf, 0);
+    examine_game(sgf, 0);
     
-    /* Free memory of SGF file */
+    /* Free memory of SGF file. */
     sgfFreeNode(sgf);
   }
 }
@@ -1301,69 +1368,82 @@ print_patterns(void)
   gg_assert(winning_moves[0].index != -1);
   l = 1;
   for (k = 0; k < number_of_winning_moves; k++) {
-    
-    /* do not print erroneous patterns */
-    if (winning_moves[k].pattern[0][0] != '\0' || winning_moves[k].index == -1) {
+    /* Do not print erroneous patterns. */
+    if (winning_moves[k].pattern[0][0] != '\0'
+	|| winning_moves[k].index == -1) {
       double grand_sum = winning_moves[k].position_frequency;
       double grand_wins = winning_moves[k].position_success;
+#if 0
       double grand_losses = grand_sum - grand_wins;
+#endif
       double row_sum = winning_moves[k].move_frequency;
       double wins =  winning_moves[k].move_success;
       double losses = row_sum - wins;
       double expect_wins = row_sum*grand_wins/grand_sum;
       double expect_losses = row_sum - expect_wins;
-      /* we're _not_ using a Yates corrected chisquare */
-      /* two reasons: 1. It's never correct for > 2x2 table */
-      /*              2. Our marginals are sampled, not fixed, so
-       *	         Yates and usual Fisher exact are wrong distribution
+      /* We're _not_ using a Yates corrected chisquare.
+       * Two reasons: 1. It's never correct for > 2x2 table
+       *              2. Our marginals are sampled, not fixed, so
+       *	         Yates and usual Fisher exact are wrong distribution.
        *  Straight chi squared is best.
        */
       double dchisq = 0.0;
-      /* this was Yates line. it's wrong 
-      if (expect_wins > 0.0) dchisq += pow(gg_abs(wins - expect_wins)-0.5,2)/expect_wins;
-      */
-      if (expect_wins > 0.0) dchisq += pow(wins - expect_wins,2)/expect_wins;
-      if (expect_losses > 0.0) dchisq  += pow(losses-expect_losses, 2)/expect_losses;
+      /* This was Yates line. It's wrong. */
+#if 0
+      if (expect_wins > 0.0)
+	dchisq += pow(gg_abs(wins - expect_wins) - 0.5, 2) / expect_wins;
+#endif
       
-      gg_assert(winning_moves[k].index == -1 || situation_table[winning_moves[k].index].pre.values[0] == winning_moves[k].pre);
-
-      /* did we just finish a set? If so, print totals and reset */
-
-      /*
-      if (winning_moves[k].index != -1 && situation_table[winning_moves[k].index].pre.values[0] != pre) { 
-      */
+      if (expect_wins > 0.0)
+	dchisq += pow(wins - expect_wins, 2) / expect_wins;
+      if (expect_losses > 0.0)
+	dchisq  += pow(losses - expect_losses, 2) / expect_losses;
+      
+      gg_assert(winning_moves[k].index == -1
+		|| (situation_table[winning_moves[k].index].pre.values[0]
+		    == winning_moves[k].pre));
+      
+      /* Did we just finish a set? If so, print totals and reset. */
       if (winning_moves[k].pre != pre) { 
-	/* p-value is 1 - incomplete gamma function(d.o.f/2, chisq/2) */
-	/* variable df is number of moves, actual d.o.f is df-1 */
-	/* k is referring to the pattern _after_ the set we just completed */
-	printf("\n### Summary of pattern pre 0x%08x\n### N Chi_squared df: %d %g %d ", pre, winning_moves[k-1].position_frequency, chisq, df-1);
+	/* p-value is 1 - incomplete gamma function(d.o.f/2, chisq/2)
+	 * variable df is number of moves, actual d.o.f is df-1
+	 * k is referring to the pattern _after_ the set we just completed.
+	 */
+	printf("\n### Summary of pattern pre 0x%08x\n### N Chi_squared df: %d %g %d ",
+	       pre, winning_moves[k-1].position_frequency, chisq, df - 1);
 	/* and array is indexed at zero for d.o.f = 1... */
-	if (df-1 < 1) {
+	if (df-1 < 1)
 	  printf("NS\n\n");
-	} else if (df-1 < sizeof(chisquarecrit05)/sizeof(double)  && chisq > chisquarecrit05[df-2]) { 
+	else if (df - 1 < (int) (sizeof(chisquarecrit05) / sizeof(double))
+		 && chisq > chisquarecrit05[df-2]) { 
 	  /* The overall result is significant at 5%. In this case, at
-	     least some authorities will allow us to examine several
-	     individual contrasts w/o futher correction. We compare
-	     every pair of moves, which is perhaps too many, but the
-	     purpose is to give the human expert (who would in any
-	     case be required to examine the output) some sense of
-	     where the differences are. Something like a Bonferroni
-	     correction could result in a significant test overall,
-	     but no significant contrasts, which is obviously
-	     nonsense. The significance of the overall result must
-	     come from somewhere. */
-	  int m,n;
+	   * least some authorities will allow us to examine several
+	   * individual contrasts w/o futher correction. We compare
+	   * every pair of moves, which is perhaps too many, but the
+	   * purpose is to give the human expert (who would in any
+	   * case be required to examine the output) some sense of
+	   * where the differences are. Something like a Bonferroni
+	   * correction could result in a significant test overall,
+	   * but no significant contrasts, which is obviously
+	   * nonsense. The significance of the overall result must
+	   * come from somewhere.
+	   */
+	  int m, n;
 	  if (chisq > chisquarecrit001[df-2]) 
 	    printf("!!! p < 0.001\n");
 	  else if (chisq > chisquarecrit01[df-2]) 
 	    printf("!!! p < 0.01\n");
 	  else
 	    printf("!!! p < 0.05\n");
-	  for (m=first_in_set; m<k; m++) {
-	    for (n=m+1; n<k; n++) {
-	      double grand_sum = winning_moves[m].move_frequency + winning_moves[n].move_frequency;
-	      double grand_wins = winning_moves[m].move_success + winning_moves[n].move_success; 
+	  for (m = first_in_set; m < k; m++) {
+	    for (n = m + 1; n < k; n++) {
+	      double grand_sum = (winning_moves[m].move_frequency
+				  + winning_moves[n].move_frequency);
+	      double grand_wins = (winning_moves[m].move_success
+				   + winning_moves[n].move_success);
+#if 0
 	      double grand_losses = grand_sum - grand_wins;
+#endif
 	      double row_sum_m = winning_moves[m].move_frequency;
 	      double row_sum_n = winning_moves[n].move_frequency;
 
@@ -1372,37 +1452,45 @@ print_patterns(void)
 	      double wins_n =  winning_moves[n].move_success;
 	      double losses_n = row_sum_n - wins_n;
 
-	      double expect_wins_m = row_sum_m*grand_wins/grand_sum;
+	      double expect_wins_m = row_sum_m * grand_wins/grand_sum;
 	      double expect_losses_m = row_sum_m - expect_wins_m;
-	      double expect_wins_n = row_sum_n*grand_wins/grand_sum;
+	      double expect_wins_n = row_sum_n * grand_wins/grand_sum;
 	      double expect_losses_n = row_sum_n - expect_wins_n;
 	      double dchisq_m = 0.0;
 	      double dchisq_n = 0.0;
-	      if (expect_wins_m > 0.0) dchisq_m += pow(wins_m - expect_wins_m,2)/expect_wins_m;
-	      if (expect_losses_m > 0.0) dchisq_m  += pow(losses_m-expect_losses_m, 2)/expect_losses_m;
-	      if (expect_wins_n > 0.0) dchisq_n += pow(wins_n - expect_wins_n,2)/expect_wins_n;
-	      if (expect_losses_n > 0.0) dchisq_n  += pow(losses_n-expect_losses_n, 2)/expect_losses_n;
-	      /* we demand at least N=6. nonsense with smaller N */
+	      if (expect_wins_m > 0.0)
+		dchisq_m += pow(wins_m - expect_wins_m, 2) / expect_wins_m;
+	      if (expect_losses_m > 0.0)
+		dchisq_m  += pow(losses_m - expect_losses_m, 2) / expect_losses_m;
+	      if (expect_wins_n > 0.0)
+		dchisq_n += pow(wins_n - expect_wins_n, 2) / expect_wins_n;
+	      if (expect_losses_n > 0.0)
+		dchisq_n  += pow(losses_n - expect_losses_n, 2) / expect_losses_n;
+	      /* We demand at least N=6. Nonsense with smaller N. */
 	      if (dchisq_m + dchisq_n > chisquarecrit05[0] && grand_sum > 5) {
 		printf("#### 0x%08x %c 0x%08x (p < 0.05) chisq = %g N = %g\n", 
 		       situation_table[winning_moves[m].index].post.values[0],
-		       (1.0*wins_m/row_sum_m > 1.0*wins_n/row_sum_n)? '>' : '<',
+		       (1.0 * wins_m / row_sum_m
+			> 1.0 * wins_n / row_sum_n) ? '>' : '<',
 		       situation_table[winning_moves[n].index].post.values[0],
-		       dchisq_m+dchisq_n, grand_sum);
+		       dchisq_m + dchisq_n, grand_sum);
 	      }
 	    }
 	  }
 	  printf("\n\n");
-
-	} else 	if (df-1 < sizeof(chisquarecrit10)/sizeof(double)  && chisq > chisquarecrit10[df-2]) { 
-	  printf("??? p < 0.10\n\n");
-	} else if (!(df-1 < sizeof(chisquarecrit05)/sizeof(double))) {
-	  printf("df out of range...\n\n");
-	} else {
-	  printf("NS\n\n");
 	}
-	pre = winning_moves[k].pre; 
-	/* pre = situation_table[winning_moves[k].index].pre.values[0];  */
+	else if (df-1 < (int) (sizeof(chisquarecrit10) / sizeof(double))
+		 && chisq > chisquarecrit10[df - 2])
+	  printf("??? p < 0.10\n\n");
+	else if (!(df - 1 < (int) (sizeof(chisquarecrit05) / sizeof(double))))
+	  printf("df out of range...\n\n");
+	else
+	  printf("NS\n\n");
+	
+	pre = winning_moves[k].pre;
+#if 0
+	pre = situation_table[winning_moves[k].index].pre.values[0];
+#endif
 	first_in_set = k;
 	chisq = 0.0;
 	df = 0;
@@ -1410,7 +1498,7 @@ print_patterns(void)
       /* increment totals */
       chisq += dchisq;
       df++;
-
+      
       if (winning_moves[k].index == -1) {
 	printf("# Unpopular moves\n");
 	printf("# pre: 0x%08x\n", winning_moves[k].pre);
@@ -1423,51 +1511,56 @@ print_patterns(void)
 	       winning_moves[k].move_success,
 	       winning_moves[k].position_success);
 	printf("# success: %.1f%% vs %.1f%% for this position overall, dchisq = %g\n\n", 
-	       100.0*winning_moves[k].move_success / winning_moves[k].move_frequency,
-	       100.0*winning_moves[k].position_success / winning_moves[k].position_frequency, dchisq);
-      } else {
+	       100.0 * winning_moves[k].move_success / winning_moves[k].move_frequency,
+	       100.0 * winning_moves[k].position_success / winning_moves[k].position_frequency,
+	       dchisq);
+      }
+      else {
 	printf("Pattern F-H%d-%d\n", handicap_value, l);
-	printf("# pre : 0x%08x\n", situation_table[winning_moves[k].index].pre.values[0]);
-	printf("# post: 0x%08x\n", situation_table[winning_moves[k].index].post.values[0]);
-	printf("# frequency: %d/%d\n", 
-	     winning_moves[k].move_frequency,
-	     winning_moves[k].position_frequency);
+	printf("# pre : 0x%08x\n",
+	       situation_table[winning_moves[k].index].pre.values[0]);
+	printf("# post: 0x%08x\n",
+	       situation_table[winning_moves[k].index].post.values[0]);
+	printf("# frequency: %d/%d\n", winning_moves[k].move_frequency,
+	       winning_moves[k].position_frequency);
 	printf("# unique players: %d\n", winning_moves[k].n_player);
-	printf("# wins: %d/%d\n\n", 
-	       winning_moves[k].move_success,
+	printf("# wins: %d/%d\n\n", winning_moves[k].move_success,
 	       winning_moves[k].position_success);
 	printf("# success: %.1f%% vs %.1f%% for this position overall, dchisq = %g\n\n", 
-	       100.0*winning_moves[k].move_success / winning_moves[k].move_frequency,
-	       100.0*winning_moves[k].position_success / winning_moves[k].position_frequency, dchisq);
+	       100.0 * winning_moves[k].move_success / winning_moves[k].move_frequency,
+	       100.0 * winning_moves[k].position_success / winning_moves[k].position_frequency,
+	       dchisq);
 	
+	printf("+");
+	for (n = 0; n < board_size; n++)
+	  printf("-");
 
-      printf("+");
-      for (n = 0; n < board_size; n++) {
-	printf("-");
-      }
-      printf("+\n");
-      for (m = 0; m < board_size; m++) {
-	printf("|");
-	for (n = 0; n < board_size; n++) {
-	  if (winning_moves[k].pattern[m][n] == '\0') {
-	    fprintf(stderr, "Something wrong in print pattern\n");
-	    printf(".");
+	printf("+\n");
+	for (m = 0; m < board_size; m++) {
+	  printf("|");
+	  for (n = 0; n < board_size; n++) {
+	    if (winning_moves[k].pattern[m][n] == '\0') {
+	      fprintf(stderr, "Something wrong in print pattern\n");
+	      printf(".");
+	    }
+	    else
+	      printf("%c", winning_moves[k].pattern[m][n]);
 	  }
-	  else
-	    printf("%c", winning_moves[k].pattern[m][n]);
+	  printf("|\n");
 	}
-	printf("|\n");
-      }
-      printf("+");
-      for (n = 0; n < board_size; n++) {
-	printf("-");
-      }
-      printf("+");
+	
+	printf("+");
+	for (n = 0; n < board_size; n++)
+	  printf("-");
+	printf("+");
+	
 	printf("\n\n:8,-,value(%d)\n\n\n", winning_moves[k].n_player);
-      l++;
+	l++;
+      }
     }
-    } else {
-      fprintf(stderr, "Skipping pattern pre 0x%08x post 0x%08x, stats may be wrong...\n", 
+    else {
+      fprintf(stderr,
+	      "Skipping pattern pre 0x%08x post 0x%08x, stats may be wrong...\n", 
 	      situation_table[winning_moves[k].index].pre.values[0], 
 	      situation_table[winning_moves[k].index].post.values[0]);
     }
@@ -1513,7 +1606,8 @@ main(int argc, char *argv[])
   
   half_board_patterns = atoi(argv[6]);
   if (half_board_patterns != 0 && half_board_patterns != 1) {
-    fprintf(stderr, "Warning: incorrect half_board_flag (0 or 1). Setting the value to 0.\n");
+    fprintf(stderr,
+	    "Warning: incorrect half_board_flag (0 or 1). Setting the value to 0.\n");
     half_board_patterns = 0;
   }
 
@@ -1531,10 +1625,8 @@ main(int argc, char *argv[])
   }
 
   min_move_freq = atoi(argv[9]);
-  if (min_move_freq < 0) {
+  if (min_move_freq < 0)
     fprintf(stderr, "Warning: strange min_move_freq %d\n", min_move_freq);
-  }
-
 
   /* Count the number of sgf files. */
   number_of_games = read_sgf_filenames(argv[1], NULL);
@@ -1554,7 +1646,7 @@ main(int argc, char *argv[])
   }
   
   /* Read the list of sgf files and store in memory. */
-  (void) read_sgf_filenames(argv[1], sgf_names);
+  read_sgf_filenames(argv[1], sgf_names);
   
   /* Save memory by sorting out the games that can be used first */
   if (argv[10] != NULL) {
@@ -1562,7 +1654,8 @@ main(int argc, char *argv[])
     sort_games();
     fprintf(stderr, "Starting game writes\n");
     write_sgf_filenames(argv[10], sgf_names);
-  }  else {
+  }
+  else {
     /* Build tables of random numbers for Zobrist hashing. */
     init_zobrist_numbers();
     
@@ -1585,7 +1678,8 @@ main(int argc, char *argv[])
 
     printf("attribute_map value_only\n\n\n");
     printf("# ");
-    for (i=0; i<argc; i++) printf("%s ", argv[i]);
+    for (i = 0; i < argc; i++)
+      printf("%s ", argv[i]);
     printf("\n\n\n");
 
     /* Write the patterns to stdout in patterns.db format.

@@ -60,8 +60,6 @@
 /* Datas and other stuff */
 /*************************/
 
-extern int board_size;
-
 typedef struct {
 
   /* clock parameters */
@@ -577,7 +575,6 @@ keep_ahead(int color)
 void
 clock_adapt_level(int *p_level, int color)
 {
-  int old_level;
   double hurry_limit, safe_limit;
 
   /* 
@@ -589,8 +586,6 @@ clock_adapt_level(int *p_level, int color)
     clk.levels[clk.moveno + 1] = clk.level;
     return;
   }
-
-  old_level = *p_level;
   
   /* 
    * Hurry strategy:

@@ -156,11 +156,10 @@ find_more_attack_and_defense_moves(int color)
     
     for (k = 0; k < MAX_REASONS; k++) {
       int r = move[ii].reason[k];
-      int what;
       
       if (r < 0)
 	break;
-      what = move_reasons[r].what;
+      
       if (move_reasons[r].type == ATTACK_MOVE
 	  || move_reasons[r].type == ATTACK_MOVE_GOOD_KO
 	  || move_reasons[r].type == ATTACK_MOVE_BAD_KO
@@ -3544,7 +3543,6 @@ find_best_move(int *the_move, float *value, int color,
 	       int allowed_moves[BOARDMAX])
 {
   int good_move_found = 0;
-  int ko_values_have_been_added = 0;
   char blunder_tested[BOARDMAX];
   float best_value = 0.0;
   int best_move = NO_MOVE;
@@ -3586,7 +3584,6 @@ find_best_move(int *the_move, float *value, int color,
       reevaluate_ko_threats(best_move, color, best_value);
       redistribute_points();
       time_report(2, "  reevaluate_ko_threats", NO_MOVE, 1.0);
-      ko_values_have_been_added = 1;
       remove_top_move(best_move);
       move[best_move].value = 0.0;
       move[best_move].final_value = 0.0;

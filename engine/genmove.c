@@ -56,8 +56,6 @@ static void break_mirror_go(int color);
 static int find_mirror_move(int *move, int color);
 static int should_resign(int color, float our_score, int move);
 
-void sgfShowConsideredMoves(void);
-
 
 /* Reset some things in the engine. 
  *

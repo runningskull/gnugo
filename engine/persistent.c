@@ -142,27 +142,27 @@ static void compute_active_breakin_area(struct persistent_cache_entry *entry,
 				        const char breakin_shadow[BOARDMAX],
 				        int dummy);
 
-struct persistent_cache reading_cache =
+static struct persistent_cache reading_cache =
   { MAX_READING_CACHE_SIZE, MAX_READING_CACHE_DEPTH, 1.0,
     "reading cache", compute_active_reading_area,
     NULL, 0, -1 };
 
-struct persistent_cache connection_cache =
+static struct persistent_cache connection_cache =
   { MAX_CONNECTION_CACHE_SIZE, MAX_CONNECTION_CACHE_DEPTH, 1.0,
     "connection cache", compute_active_connection_area,
     NULL, 0, -1 };
 
-struct persistent_cache breakin_cache =
+static struct persistent_cache breakin_cache =
   { MAX_BREAKIN_CACHE_SIZE, MAX_BREAKIN_CACHE_DEPTH, 0.75,
     "breakin cache", compute_active_breakin_area,
     NULL, 0, -1 };
 
-struct persistent_cache owl_cache =
+static struct persistent_cache owl_cache =
   { MAX_OWL_CACHE_SIZE, MAX_OWL_CACHE_DEPTH, 1.0,
     "owl cache", compute_active_owl_area,
     NULL, 0, -1 };
 
-struct persistent_cache semeai_cache =
+static struct persistent_cache semeai_cache =
   { MAX_SEMEAI_CACHE_SIZE, MAX_SEMEAI_CACHE_DEPTH, 0.75,
     "semeai cache", compute_active_semeai_area,
     NULL, 0, -1 };
@@ -284,6 +284,8 @@ print_persistent_cache_entry(struct persistent_cache_entry *entry)
  */
 void print_persistent_cache(struct persistent_cache *cache);
 
+
+/* Can be used from gdb. */
 void
 print_persistent_cache(struct persistent_cache *cache)
 {
