@@ -4807,7 +4807,7 @@ break_chain3(int str, int *move, int komaster, int kom_pos)
       continue;
     lib3 = approxlib(libs[2], other, 4, NULL);
 
-    if ((lib1 >= 4 || lib2 >= 4) && lib3 >= 3)
+    if ((lib1 >= 4 || lib2 >= 4) && lib3 >= 4)
       continue;
 
     if (lib1 >= 4 && !mw[libs[0]]) {

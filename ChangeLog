@@ -20,6 +20,9 @@
 - cleanup of sgf code
 - revision of extract_fuseki
 - revision of fuseki.c
+- bugfix in break_chain3
+- warning fixed in mkpat
+- formatting error fixed in decidestring
 - twogtp-a writes html
 - tuning
 - owl tuning
