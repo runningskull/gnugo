@@ -62,7 +62,7 @@ regress.pl --goprog \'<path to program> --mode gtp [program options]\' \\
 
 Possible options:
 
-  --verbose 1 (to list moves) or --verbose 2 (to draw board)
+  --verbose 0 (very quiet) --verbose 1 (to list moves) or --verbose 2 (to draw board)
       [FIXME: verbose levels not well defined.]
   --html 0 (to not generate html) or --html 1 (default - generate html file w/ results)
 
@@ -103,7 +103,7 @@ my $pidt;
 my $pidg;
 my $testdir;
 my $goprog;
-my $verbose = 0;
+my $verbose = 1;
 my $old_whole_gtp = "";
 my $html_whole_gtp = "";
 my $testfile;
@@ -213,7 +213,6 @@ if ($one_gg_process) {
 }
 
 
-  
 if ($problem_set) {
   open(F, $problem_set) or confess "can't open problem set: $problem_set";
   my %filehash;
@@ -261,10 +260,14 @@ if ($problem_set) {
   };
 }
 
-go_command("quit");
-print "waiting\n" if $verbose > 1;
-waitpid $pidg, 0;
-print "done waiting\n" if $verbose > 1;
+if (!$one_gg_process) {
+  go_command("quit");
+  print "waiting\n" if $verbose > 1;
+  waitpid $pidg, 0;
+  print "done waiting\n" if $verbose > 1;
+}
+
+readline(*STDIN);
 
 exit;
 
@@ -301,6 +304,7 @@ sub regress_file {
       chdir "html/$testfile" ;
       open (TRACER, ">tracer.ttt");
       while (defined(my $t = <$goprog_err>)) {
+        last if $t =~ /^ALL DONE/;
         print TRACER $t;
         print "ERR: $t" if $verbose > 2;
         if ($t =~ /^\s*FINISHED PROBLEM:\s*$/) {
@@ -308,7 +312,7 @@ sub regress_file {
           print TRACER $num;
           $num += 0;
           close TRACER or die "Couldn't close temp trace file";
-          print "closed trace file" if $verbose > 2; 
+          print "closed trace file\n" if $verbose > 2; 
           rename "tracer.ttt", "$num.trace"
               or die "Couldn't rename tracer: $testfile, $num";
           open (TRACER, ">tracer.ttt");
@@ -469,13 +473,14 @@ sub regress_file {
        . "$unexpected_fail unexpected $fail_string\n";
 
   unless ($one_gg_process) {
+    go_command("echo_err ALL DONE");
+    print "waiting on child\n" if $verbose > 1;
+    waitpid $childpid, 0;
+    print "done waiting on child\n" if $verbose > 1;
     go_command("quit");
     print "waiting\n" if $verbose > 1;
     waitpid $pidg, 0;
     print "done waiting\n" if $verbose > 1;
-    print "waiting on child\n" if $verbose > 1;
-    waitpid $childpid, 0;
-    print "done waiting on child\n" if $verbose > 1;
   }
 }
 
@@ -488,7 +493,7 @@ sub tally_result {
   $unexpected_fail++ if $status eq "FAILED";
   
   if ($status ne "skipped") {
-    print "$g_curtestfile:$number: $status: correct: $correct  incorrect: $incorrect\n";
+    print "$g_curtestfile:$number: $status: correct: $correct  answer: $incorrect\n";
   }
   
   $cur_passed = ($status =~ /pass/i);

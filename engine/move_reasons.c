@@ -3209,10 +3209,10 @@ estimate_strategical_value(int pos, int color, float score)
 	}
 
 #if 0
-	if (dragon[POS(bi, bj)].status == CRITICAL) {
+       if (dragon[bb].matcher_status == CRITICAL) {
 	  this_value = ???
-	  TRACE("  %m: %f - vital for %m\n",
-		m, n, this_value, bi, bj);
+         TRACE("  %1m: %f - vital for %1m\n",
+               pos, this_value, bb);
 	  tot_value += this_value;
 	}
 #endif
@@ -3356,7 +3356,7 @@ estimate_strategical_value(int pos, int color, float score)
       
       continue;
     }
-    
+
     TRACE("  %1m: %f - strategic effect on %1m\n",
 	  pos, dragon_value[k], dragons[k]);
     tot_value += dragon_value[k];

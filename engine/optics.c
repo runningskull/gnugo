@@ -1498,6 +1498,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
       if (ok && marginal[map[q]]
 	  && graphs[graph].vertex[q].type != '!'
 	  && graphs[graph].vertex[q].type != '@'
+	  && graphs[graph].vertex[q].type != '$'
 	  && graphs[graph].vertex[q].type != ')'
 	  && graphs[graph].vertex[q].type != '(')
 	ok = 0;
@@ -1506,16 +1507,19 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	  && (graphs[graph].vertex[q].type == '!'
 	      || graphs[graph].vertex[q].type == '('
 	      || graphs[graph].vertex[q].type == ')'
-	      || graphs[graph].vertex[q].type == '@'))
+	      || graphs[graph].vertex[q].type == '@'
+	      || graphs[graph].vertex[q].type == '$'))
 	ok = 0;
       
       if (ok && IS_STONE(board[vpos[map[q]]])
 	  && graphs[graph].vertex[q].type != 'X'
-	  && graphs[graph].vertex[q].type != 'x')
+	  && graphs[graph].vertex[q].type != 'x'
+	  && graphs[graph].vertex[q].type != '$')
 	ok = 0;
       
       if (ok && board[vpos[map[q]]] == EMPTY
-	  && graphs[graph].vertex[q].type == 'X')
+	  && (graphs[graph].vertex[q].type == 'X'
+	      || graphs[graph].vertex[q].type == '$'))
 	ok = 0;
 
       if (ok && edge[map[q]] < graphs[graph].vertex[q].edge)
@@ -1620,7 +1624,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	*defense_point = defense_points[0];
 	DEBUG(DEBUG_EYES, "  vital points: %1m (attack) %1m (defense)\n",
 	      *attack_point, *defense_point);
-	DEBUG(DEBUG_EYES, "  pattern matched:  %d\n", graphs[graph].id);
+	DEBUG(DEBUG_EYES, "  pattern matched:  %s\n", graphs[graph].patname);
 
 	if (add_moves) {
 	  if (eye_color != color) {
@@ -1633,7 +1637,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	  }
 	}
       }
-      TRACE("eye space at %1m of type %d\n", pos, graphs[graph].id);
+      TRACE("eye space at %1m of type %s\n", pos, graphs[graph].patname);
 
       return 1;
     }

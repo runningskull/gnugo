@@ -50,7 +50,7 @@ struct eye_vertex {
 
 struct eye_graph {
   struct eye_vertex *vertex;
-  int id;                         /* serial number of pattern              */
+  const char *patname;            /* Name of pattern                       */
   int esize;                      /* number of vertices                    */
   int msize;                      /* number of marginal vertices           */
   int ends;                       /* number of vertices with one neighbor  */

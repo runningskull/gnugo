@@ -465,6 +465,7 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
 #define KO_DEPTH              8
 
 #define AA_DEPTH              6
+#define AA_THREAT_DEPTH       1
 
 /* Pattern based reading */
 #define OWL_DISTRUST_DEPTH    6
@@ -493,6 +494,7 @@ set_depth_values(int level)
     branch_depth        = gg_max(3, BRANCH_DEPTH - 10 + level);
     fourlib_depth       = gg_max(1, FOURLIB_DEPTH - 10 + level);
     aa_depth            = gg_max(0, AA_DEPTH - 10 + level);
+    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH - 10 + level);
     owl_distrust_depth  = gg_max(1, OWL_DISTRUST_DEPTH - 5 + level/2);
     owl_branch_depth    = gg_max(2, OWL_BRANCH_DEPTH - 5 + level/2);
     owl_reading_depth   = gg_max(5, OWL_READING_DEPTH - 5 + level/2);
@@ -514,6 +516,7 @@ set_depth_values(int level)
     else
       fourlib_depth     = gg_max(1, FOURLIB_DEPTH - 9 + level);
     aa_depth            = gg_max(0, AA_DEPTH - 10 + level);
+    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH - 10 + level);
     owl_distrust_depth  = gg_max(1, OWL_DISTRUST_DEPTH - 5 
 			      + (level+1)/2);
     owl_branch_depth    = gg_max(2, OWL_BRANCH_DEPTH - 5 + (level+1)/2);
@@ -535,6 +538,7 @@ set_depth_values(int level)
     else
       fourlib_depth     = gg_max(1, FOURLIB_DEPTH - 1);
     aa_depth            = gg_max(0, AA_DEPTH - 2);
+    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH - 2);
     owl_distrust_depth  = gg_max(1, OWL_DISTRUST_DEPTH - 1);
     owl_branch_depth    = gg_max(2, OWL_BRANCH_DEPTH - 5 + (level+1)/2);
     owl_reading_depth   = gg_max(5, OWL_READING_DEPTH - 5 + (level+1)/2);
@@ -555,6 +559,7 @@ set_depth_values(int level)
     else
       fourlib_depth     = gg_max(1, FOURLIB_DEPTH - 8 + level);
     aa_depth            = gg_max(0, AA_DEPTH - 9 + level);
+    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH - 9 + level);
     owl_distrust_depth  = gg_max(1, OWL_DISTRUST_DEPTH - 5
 			      + (level+1)/2);
     owl_branch_depth    = gg_max(2, OWL_BRANCH_DEPTH - 4 + level/2);
@@ -582,6 +587,8 @@ set_depth_values(int level)
     branch_depth = mandated_branch_depth;
   if (mandated_aa_depth != -1)
     aa_depth = mandated_aa_depth;
+  if (mandated_aa_threat_depth != -1)
+    aa_threat_depth = mandated_aa_threat_depth;
   if (mandated_owl_distrust_depth != -1)
     owl_distrust_depth = mandated_owl_distrust_depth;
   if (mandated_owl_branch_depth != -1)

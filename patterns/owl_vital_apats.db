@@ -532,4 +532,59 @@ xa*X
 ;lib(C)==2 && owl_eyespace(a,C) && oplay_attack(*,a,b,b)!=WIN
 
 
+Pattern VA25
+# tm New pattern (3.1.15)  (see maeda0:60)
+
+?O.|
+OX.|
+X.X|
+X.*|
+??.|
+
+:8,s,value(76)
+
+
+Pattern VA26
+# tm New pattern (3.1.15)  (see maeda0:60)
+
+?O*|
+OX.|
+X.X|
+XXO|
+
+:8,s,value(76)
+
+
+Pattern VA27
+# tm New pattern (3.1.15)
+
+?X|
+XO|
+.O|
+*X|
+
+:8,-,value(76)
+
+
+Pattern VA28
+# tm New pattern (3.1.15)
+#   See also VA27
+
+?X?
+XOX
+.OX
+*XO
+
+:8,-,value(76)
+
+?X?
+XOX
+.OX
+*XA
+
+; oplay_defend_both(*,A,*)
+
+
 # END OF FILE
+
+

@@ -31,9 +31,10 @@ loadsgf games/arb/dumonteil-1.sgf 184
 #? [J5]
 
 # Why is this move so urgent? /gf
-loadsgf games/arb/dumonteil-2.sgf 229
-200 gg_genmove black
-#? [F14]
+# tm - F14 is not necessary - removing this bad problem.
+#loadsgf games/arb/dumonteil-2.sgf 229
+#200 gg_genmove black
+##? [F14]
 
 loadsgf games/arb/dumonteil-2.sgf 247
 201 gg_genmove black

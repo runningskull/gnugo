@@ -28,6 +28,7 @@
 #     > - ordinary eye space and defense key point (expands)    #
 #     ! - marginal eye space                                    #
 #     @ - marginal eye space and key point, attack/defense      #
+#     $ - marginal eye space containing an opponent stone       #
 #     ( - marginal eye space and attack key point               #
 #     ) - marginal eye space and defense key point              #
 #     X - dead opponent stone                                   #
@@ -71,6 +72,13 @@ x
 
 Pattern 102
 
+$
+
+:0,0
+
+
+Pattern 103
+
 !
 
 :0,0
@@ -95,6 +103,13 @@ Pattern 202
 
 
 Pattern 203
+
+$.
+
+:0,0
+
+
+Pattern 204
 
 !!
 
@@ -1800,16 +1815,30 @@ xXx
 Pattern 7000
 # There is some ko potential here.
 
- .
+|.
 |X
 |X
 |...@
-+--
++----
 
 :2,1
 
 
 Pattern 7001
+# tm added (3.1.15)
+# Though pattern 7002 matches with a defense point at
+# the proper place, the code doesn't seem to provide
+# more than one defense point.
+|(
+|.
+|.
+|>..(
++----
+
+:2,1
+
+
+Pattern 7002
 
 @..>..@
 

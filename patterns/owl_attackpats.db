@@ -1011,6 +1011,17 @@ X*..
 # :8,-,value(20)
 
 
+Pattern A305
+# tm New Pattern (3.1.15)
+
+XXXxxO	    Monkey Jump to reduce eye space
+.....O
+..*..o
+------
+
+:8,s,value(45)
+
+
 #########################################################
 #                                                       #
 #          Limiting moves in the center                 #
@@ -1519,6 +1530,16 @@ Pattern A512
 :8,-,value(70)
 
 
+Pattern A513
+# tm New pattern. (3.1.15) (see trevora:620)
+#   This may be just too generic, though often useful.
+
+X..|
+O*.|
+
+:8,-,value(45)
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves on the first line         #
@@ -1570,8 +1591,9 @@ XX.a
 
 
 Pattern A603b
+# tm - modified (3.1.15) (see trevora:170)
 
-xX..       reduce eye space
+xX.x       reduce eye space
 .*.O
 ----
 
@@ -3090,9 +3112,10 @@ Pattern A1302
 
 
 Pattern A1303
+#tm - modified (3.1.15) (see ld_owl:152)
 
 |..X?         obligatory corner attack
-|X.XO
+|X.Xo
 |.*.?
 +----
 

@@ -219,6 +219,8 @@ void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 
 void reading_cache_init(int bytes);
 void reading_cache_clear(void);
+/* FIXME: Remove it from here and put it back near worm.c */
+#define MAX_TACTICAL_POINTS 10
 
 /* reading.c */
 int attack(int str, int *move);
@@ -229,6 +231,8 @@ int attack_and_defend(int str,
 int attack_either(int astr, int bstr);
 int defend_both(int astr, int bstr);
 int break_through(int apos, int bpos, int cpos);
+int attack_threats(int pos, int moves[MAX_TACTICAL_POINTS], 
+		   int codes[MAX_TACTICAL_POINTS]);
 
 int restricted_defend1(int str, int *move, int komaster, int kom_pos,
 		       int num_forbidden_moves, int *forbidden_moves);
@@ -288,6 +292,16 @@ int offset(int i, int j, int basepos, int trans);
 void find_cuts(void);
 void find_connections(void);
 void modify_eye_spaces(void);
+
+/* FIXME: Move these from worm.c */
+int  tactical_move_known(int move, int points[MAX_TACTICAL_POINTS],
+			 int codes[MAX_TACTICAL_POINTS]);
+void change_tactical_point(int str, int move, int code,
+			   int points[MAX_TACTICAL_POINTS],
+			   int codes[MAX_TACTICAL_POINTS]);
+void sort_tactical_points(int points[MAX_TACTICAL_POINTS],
+			  int codes[MAX_TACTICAL_POINTS]);
+
 
 /* functions to add (or remove) move reasons */
 void clear_move_reasons(void);
@@ -516,6 +530,7 @@ extern int branch_depth;        /* deep reading cutoff */
 extern int fourlib_depth;       /* deep reading cutoff */
 extern int ko_depth;            /* deep ko reading cutoff */
 extern int aa_depth;            /* deep global reading cutoff */
+extern int aa_threat_depth;
 extern int owl_distrust_depth;  /* below this owl trusts the optics code */
 extern int owl_branch_depth;    /* below this owl tries only one variation */
 extern int owl_reading_depth;   /* owl does not read below this depth */
@@ -558,7 +573,11 @@ extern struct half_eye_data half_eye[BOARDMAX];
  * data concerning a worm. A copy is kept at each vertex of the worm.
  */
 
+#if 0
+FIXME: Reinstate it here once the functions handling these arrays
+       are moved to their own file.
 #define MAX_TACTICAL_POINTS 10
+#endif
 
 struct worm_data {
   int color;         /* its color */
@@ -586,8 +605,8 @@ struct worm_data {
    * respect to the codes so that the first element contains the best
    * result.
    */
-  int attack_codes[MAX_TACTICAL_POINTS];
   int attack_points[MAX_TACTICAL_POINTS];
+  int attack_codes[MAX_TACTICAL_POINTS];
   int defend_codes[MAX_TACTICAL_POINTS];
   int defense_points[MAX_TACTICAL_POINTS];
   int attack_threat_codes[MAX_TACTICAL_POINTS];
@@ -615,7 +634,12 @@ struct dragon_data {
   int owl_status;          /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
   int owl_attack_point;    /* vital point for attack                         */
   int owl_attack_code;     /* ko result code                                 */
+#if 0
+  int owl_attack_points[MAX_TACTICAL_POINTS];
+  int owl_attack_codes[MAX_TACTICAL_POINTS];
+#endif
   int owl_attack_certain;  /* 0 if owl reading node limit is reached         */
+
   int owl_second_attack_point;/* if attacker gets both attack points, wins   */
   int owl_defense_point;   /* vital point for defense                        */
   int owl_defense_code;    /* ko result code                                 */

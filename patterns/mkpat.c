@@ -1535,8 +1535,9 @@ main(int argc, char *argv[])
 	  break;
 	case 2:
 	case 3:
-	  fprintf(stderr, "%s(%d) : warning : No entry line for pattern %s\n",
+	  fprintf(stderr, "%s(%d) : Error : No entry line for pattern %s\n",
 		  current_file, current_line_number, pattern_names[patno]);
+	  fatal_errors++;
 	  break;
 	case 5:
 	case 6:
@@ -1643,8 +1644,9 @@ main(int argc, char *argv[])
       break;
     case 2:
     case 3:
-      fprintf(stderr, "Warning: no entry line for pattern %s\n",
-	      pattern_names[patno]);
+      fprintf(stderr, "%s(%d) : Error : no entry line for pattern %s\n",
+	      current_file, current_line_number, pattern_names[patno]);
+      fatal_errors++;
       break;
     case 5:
     case 6:

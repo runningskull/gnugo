@@ -284,6 +284,7 @@ extern int mandated_fourlib_depth;
 extern int mandated_ko_depth;
 extern int mandated_branch_depth;
 extern int mandated_aa_depth;
+extern int mandated_aa_threat_depth;
 extern int mandated_owl_distrust_depth;
 extern int mandated_owl_branch_depth;
 extern int mandated_owl_reading_depth;

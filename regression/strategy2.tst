@@ -41,7 +41,7 @@ loadsgf games/strategy16.sgf 2
 #? [!PASS]
 
 # incident 285
-# Semeai mistake
+# Seki mistake
 loadsgf games/incident278.sgf 322
 59 gg_genmove black
 #? [B1]

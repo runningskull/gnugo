@@ -12870,18 +12870,20 @@ A...
 
 Pattern LE6
 # At move 96 of ego.tst, this is matched at J8.
+# tm - revised (3.1.15) (see trevora:330)
+#   added left-hand ?s
 
-?????
-..*.x
-....X
-..O??
+??????
+?..*.x
+?....X
+?..O??
 
 :8,OX,value(8)
 
-?cbd?
-..*.x
-a...X
-..O??
+??cbd?
+?..*.x
+?a...X
+?..O??
 
 ; omoyo(a) && !(o_somewhere(b) && o_somewhere(c,d))
 

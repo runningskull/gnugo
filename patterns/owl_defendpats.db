@@ -1632,6 +1632,17 @@ o*..
 :8,-,value(80)
 
 
+Pattern D600a
+# tm New Pattern (3.1.15)
+
+?OX??         eye with reverse sente, avoid ko
+OxOX?
+o.*.X
+-----
+
+:8,-,value(81)
+
+
 # Pattern D601
 # gf Strange and ineffective pattern, removed. (3.1.14)
 # 
@@ -1695,6 +1706,23 @@ b*.
 ---
 
 ;owl_eyespace(b,c) && !obvious_false_oeye(b) && !xplay_attack(*,A)
+
+
+Pattern D604a
+#tm New Pattern (3.1.15) (see maeda:70)
+
+OOOOOX	    make eye by threatening large capture
+XX..*.
+------
+
+:8,-,value(35)
+
+OOOOOX
+XCAb*.
+------
+
+; !oplay_defend(*,A,b,C)
+
 
 
 Pattern D605
@@ -2058,6 +2086,39 @@ OOX.|
 ----+
 
 :8,-,value(45)
+
+Pattern D627
+# tm New pattern (3.1.15) (see maeda:100)
+
+|.OX
+|O.O
+|..O
+|X*.
+
+:8,-,value(45)
+
+|.OX
+|O.O
+|B.O
+|A*.
+
+; oplay_defend(*,A)  && oplay_attack(*,B,A)
+
+
+Pattern D628
+# tm New pattern (3.1.15)
+
+|OO
+|.*
+|O.
+
+:8,-,value(80)
+
+|OO
+|.*
+|OA
+
+; !xplay_attack(*,*) && oplay_attack(*,A,A)
 
 
 #########################################################
@@ -2926,6 +2987,32 @@ O*X|
 
 :8,-,value(40)
 
+
+Pattern D835
+# tm New Pattern (3.1.15)  (see trevora:400)
+
+|.*.	Special corner pattern
+|.XO
+|...
+|...
++---
+
+:8,-,value(65)
+
+Pattern D836
+# tm New Pattern (3.1.15)
+
+|O.
+|.*
++--
+
+:8,-,value(65)
+
+|OA
+|.*
++--
+
+; xplay_attack(A,A)
 
 #########################################################
 #                                                       #
@@ -4187,20 +4274,23 @@ O...a
 
 
 Pattern D1310
+#tm modified (3.1.15) (see trevora:400)
 
-oooo
-oooo    try to escape
+?ooo
+?ooo    try to escape
 X*oo
 ?OX?
 
 :8,-,value(80)
 
-oabo
-oooc
+dabo
+eooc
 X*oo
 ?OX?
 
-;owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
+;(!x_somewhere(e) && !x_somewhere(d) && (owl_escape_value(a) > 0))
+;||  owl_escape_value(b) > 0
+;||  owl_escape_value(c) > 0
 
 
 Pattern D1311

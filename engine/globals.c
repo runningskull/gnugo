@@ -61,6 +61,7 @@ int fourlib_depth;      /* deep reading cut off */
 int ko_depth;           /* deep reading cut off */
 int branch_depth;       /* deep reading cut off */
 int aa_depth;
+int aa_threat_depth;
 int owl_distrust_depth;   /* below this owl trusts the optics code */
 int owl_branch_depth;     /* below this owl tries only one variation */
 int owl_reading_depth;    /* owl does not read below this depth */
@@ -73,6 +74,7 @@ int mandated_fourlib_depth;   /* deep reading cut off, mandated value */
 int mandated_ko_depth;        /* deep reading cut off, mandated value */
 int mandated_branch_depth;    /* deep reading cut off, mandated value */
 int mandated_aa_depth;
+int mandated_aa_threat_depth = -1;
 int mandated_owl_distrust_depth;  
 int mandated_owl_branch_depth;  
 int mandated_owl_reading_depth; 

@@ -520,9 +520,8 @@ loadsgf games/trevor/trevor_48.sgf
 #DESCRIPTION=See problem this causes w/ owl in Pattern D805
 #SEVERITY=7
 loadsgf games/trevor/trevor_59.sgf
-590 attack A18*
-#? [0]
-
+590 attack A18
+#? [0]*
 
 
 #CATEGORY=OWL_EYES

@@ -168,6 +168,11 @@ main(void)
 	    num_defenses++;
 	    break;
 	    
+	  case '$':
+	    msize[patno]++;
+	    marginal[m][n] = 1;
+	    break;
+	    
 	  case '(':
 	    msize[patno]++;
 	    marginal[m][n] = 1;
@@ -332,7 +337,7 @@ main(void)
   printf("\nstruct eye_graph graphs[] = {\n");
   for (l = 0; l < patno; l++) {
 
-    printf("   {eye%d, %d, %d, %d, %d, %d, %d, %d, %d}",
+    printf("   {eye%d, \"%d\", %d, %d, %d, %d, %d, %d, %d}",
 	   eye_number[l], eye_number[l], esize[l], msize[l], ends[l],
 	   two_neighbors[l], three_neighbors[l], max[l], min[l]);
     if (l < patno-1)

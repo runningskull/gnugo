@@ -58,6 +58,8 @@ use strict;
 use warnings;
 use Carp;
 
+STDOUT->autoflush(1);
+
 #following added globally to allow "use strict" :
 my $vertex;
 my $first;

@@ -1171,18 +1171,22 @@ compute_escape_influence(char goal[BOARDMAX], int color,
 			 int dragons_known)
 {
   int i, j;
+  int ii;
+
   compute_influence(&escape_influence, OTHER_COLOR(color), -1, -1,
 		    dragons_known, goal, NULL);
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
+      ii = POS(i, j);
+
       if (whose_moyo(&escape_influence, i, j) == color)
-	escape_value[POS(i, j)] = 4;
+       escape_value[ii] = 4;
       else if (whose_area(&escape_influence, i, j) == color)
-	escape_value[POS(i, j)] = 2;
+       escape_value[ii] = 2;
       else if (whose_area(&escape_influence, i, j) == EMPTY)
-	escape_value[POS(i, j)] = 1;
+       escape_value[ii] = 1;
       else
-	escape_value[POS(i, j)] = 0;
+       escape_value[ii] = 0;
     }
 
   if (0 && (debug & DEBUG_ESCAPE) && verbose > 0) {

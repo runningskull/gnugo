@@ -78,12 +78,19 @@ make_dragons(int color, int stop_before_owl)
       dragon[ii].effective_size     = worm[ii].effective_size;
       dragon[ii].color              = worm[ii].color;
       dragon[ii].origin             = worm[ii].origin;
+#if 0
+      for (i = 0; i < MAX_TACTICAL_POINTS; ++i) {
+       dragon[ii].owl_attack_points[i]   = NO_MOVE;
+       dragon[ii].owl_attack_codes[i]    = 0;
+      }
+#else
       dragon[ii].owl_attack_point   = NO_MOVE;
       dragon[ii].owl_attack_code    = 0;
-      dragon[ii].owl_attack_certain =  1;
+#endif
+      dragon[ii].owl_attack_certain = 1;
       dragon[ii].owl_defense_point  = NO_MOVE;
       dragon[ii].owl_defense_code   = 0;
-      dragon[ii].owl_defend_certain =  1;
+      dragon[ii].owl_defend_certain = 1;
       dragon[ii].owl_status         = UNCHECKED;
       dragon[ii].status             = UNKNOWN;
       dragon[ii].matcher_status     = UNKNOWN;
@@ -395,8 +402,9 @@ make_dragons(int color, int stop_before_owl)
   if (stop_before_owl)
     return;
   
-  /* Determine owl status of each dragon. */
-
+  /* Determine life and death status of each dragon using the owl code
+   * if necessary.
+   */
   purge_persistent_owl_cache();
 
   for (m = 0; m < board_size; m++)
@@ -1452,7 +1460,7 @@ dragon_escape(char goal[BOARDMAX], int color,
 }
 
 /* Wrapper to call the function above and compute the escape potential
- * for the dragon at (m, n).
+ * for the dragon at (pos).
  */
 static int
 compute_escape(int pos, int dragon_status_known)
@@ -1471,9 +1479,13 @@ compute_escape(int pos, int dragon_status_known)
       goal[ii] = is_same_dragon(ii, pos);
     }
 
+  /* Compute escape_value array.  Points are awarded for moyo (4),
+   * area (2) or EMPTY (1).  Values may change without notice.
+   */
   compute_escape_influence(goal, board[pos], escape_value,
 			   dragon_status_known);
 
+  /* If we can reach a live group, award 6 points. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       ii = POS(i, j);

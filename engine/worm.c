@@ -33,6 +33,7 @@ static void compute_unconditional_status(void);
 static void find_worm_attacks_and_defenses(void);
 static void find_worm_threats(void);
 static int find_lunch(int str, int *lunch);
+#if 0
 static int tactical_move_known(int move, int points[MAX_TACTICAL_POINTS],
 			       int codes[MAX_TACTICAL_POINTS]);
 static void change_tactical_point(int str, int move, int code,
@@ -40,6 +41,7 @@ static void change_tactical_point(int str, int move, int code,
 				  int codes[MAX_TACTICAL_POINTS]);
 static void sort_tactical_points(int points[MAX_TACTICAL_POINTS],
 				 int codes[MAX_TACTICAL_POINTS]);
+#endif
 static void swap_points_and_codes(int points[MAX_TACTICAL_POINTS],
 				  int codes[MAX_TACTICAL_POINTS],
 				  int m, int n);
@@ -585,6 +587,7 @@ make_worms(void)
 	  && worm[pos].origin == pos
 	  && worm[pos].genus == 0
 	  && worm[pos].liberties2 == 0
+	  && !worm[pos].cutstone
 	  && worm[pos].lunch == NO_MOVE)
       {
 	int edge;
@@ -1265,7 +1268,8 @@ int defense_move_known(int move, int str)
  * and return the attack threat code. If (move) is not listed, return
  * 0.
  */
-int attack_threat_move_known(int move, int str)
+int
+attack_threat_move_known(int move, int str)
 {
   return tactical_move_known(move, worm[str].attack_threat_points,
 			     worm[str].attack_threat_codes);
@@ -1275,14 +1279,15 @@ int attack_threat_move_known(int move, int str)
  * and return the defense threat code. If (move) is not listed, return
  * 0.
  */
-int defense_threat_move_known(int move, int str)
+int
+defense_threat_move_known(int move, int str)
 {
   return tactical_move_known(move, worm[str].defense_threat_points,
 			     worm[str].defense_threat_codes);
 }
 
 /* Do the real work for the functions above. */
-static int
+int
 tactical_move_known(int move, int points[MAX_TACTICAL_POINTS],
 		    int codes[MAX_TACTICAL_POINTS])
 {
@@ -1303,7 +1308,7 @@ tactical_move_known(int move, int points[MAX_TACTICAL_POINTS],
  * change_defense_threat().
  */
 
-static void
+void
 change_tactical_point(int str, int move, int code,
 		      int points[MAX_TACTICAL_POINTS],
 		      int codes[MAX_TACTICAL_POINTS])
@@ -1347,7 +1352,7 @@ change_tactical_point(int str, int move, int code,
  * loop.
  */
 
-static void
+void
 sort_tactical_points(int points[MAX_TACTICAL_POINTS],
 		     int codes[MAX_TACTICAL_POINTS])
 {

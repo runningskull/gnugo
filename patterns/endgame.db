@@ -1293,6 +1293,22 @@ X*.A
 ; omoyo(b) && lib(A)==2
 
 
+
+Pattern CE25
+# tm  New pattenrn (3.1.15)  (see trevora:320)
+
+O*X
+XX.
+
+:8,-,terri(1)
+
+O*X
+Xa.
+
+;lib(a)==2
+
+
+
 ######################################################################
 #
 # Center followup patterns

@@ -134,6 +134,8 @@ static int in_list(int move, int num_moves, int *moves);
 
 
 /* ================================================================ */
+/*                     Persistent reading cache                     */
+/* ================================================================ */
 
 
 /* Persistent reading cache to reuse read results between moves and
@@ -758,6 +760,95 @@ break_through_helper(int apos, int bpos, int cpos,
 }
 
 
+/* ---------------------------------------------------------------- */
+/*                              Threats                             */
+/* ---------------------------------------------------------------- */
+
+
+/* Return up to max_threats threats to capture the string at pos.
+ * If the string is directly attackable the number of threats
+ * is reported to be 0.
+ *
+ * FIXME: Shall we report upgrades, like we can capture in ko but
+ *        have a threat to capture unconditionally.
+ */
+
+int
+attack_threats(int pos, int moves[MAX_TACTICAL_POINTS],
+	       int codes[MAX_TACTICAL_POINTS])
+{
+  int  other;
+  int  num_threats;
+  int  liberties;
+  int  libs[MAXLIBS];
+  int  k;
+  int  l;
+
+  ASSERT1(IS_STONE(board[pos]), pos);
+  other = OTHER_COLOR(board[pos]);
+
+  /* Only handle strings with no way to capture immediately.
+   * For now, we treat ko the same as unconditionally. */
+  if (attack(pos, NULL) != 0)
+    return 0;
+
+  num_threats = 0;
+
+  /* This test would seem to be unnecessary since we only attack
+   * strings with attack_code == 0, but it turns out that single
+   * stones with one liberty that can be captured, but come to
+   * live again in a snap-back get attack_code == 0.
+   *
+   * The test against 6 liberties is just an optimization.
+   */
+  liberties = findlib(pos, MAXLIBS, libs);
+  if (liberties > 1 && liberties < 6) {
+    for (k = 0; k < liberties && num_threats < MAX_TACTICAL_POINTS; k++) {
+      int aa = libs[k];
+
+      /* Try to threaten on the liberty. */
+      if (trymove(aa, other, "threaten attack", pos, EMPTY, NO_MOVE)) {
+       int acode = attack(pos, NULL);
+       if (acode != 0 && !tactical_move_known(aa, moves, codes)) {
+         moves[num_threats] = aa;
+         codes[num_threats] = acode;
+         num_threats++;
+       }
+       popgo();
+      }
+      if (num_threats == MAX_TACTICAL_POINTS)
+       break;
+
+      /* Try to threaten on second order liberties. */
+      for (l = 0; l < 4; l++) {
+       int bb = libs[k] + delta[l];
+
+       if (!ON_BOARD(bb)
+           || IS_STONE(board[bb])
+           || liberty_of_string(bb, pos))
+         continue;
+
+       if (trymove(bb, other, "threaten attack", pos, EMPTY, NO_MOVE)) {
+         int acode = attack(pos, NULL);
+         if (acode != 0 && !tactical_move_known(bb, moves, codes)) {
+           moves[num_threats] = bb;
+           codes[num_threats] = acode;
+           num_threats++;
+         }
+         popgo();
+       }
+      }
+    }
+  }
+
+
+  /* FIXME: Threaten to attack by saving weak neighbors.
+   *        Get it from worm.c. */
+
+  return num_threats;
+}
+
+
 /* ================================================================ */  
 /*                       Defensive functions                        */
 /* ================================================================ */
@@ -917,7 +1008,6 @@ defend1(int str, int *move, int komaster, int kom_pos)
   num_moves = 1;
   
   break_chain_moves(str, moves, scores, &num_moves);
-
   order_moves(str, num_moves, moves, scores, color, read_function_name);
 
   for (k = 0; k < num_moves; k++) {
@@ -4498,6 +4588,7 @@ restricted_defend1(int str, int *move, int komaster, int kom_pos,
   
   break_chain_moves(str, moves, scores, &num_moves);
   order_moves(str, num_moves, moves, scores, color, read_function_name);
+
   for (k = 0; k < num_moves; k++) {
     int ko_capture;
 
