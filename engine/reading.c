@@ -962,7 +962,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
   int dcode = 0;
   int liberties;
   int found_read_result;
-  Read_result *read_result;
+  Read_result *read_result = NULL;
   
   SETUP_TRACE_INFO("find_defense", str);
   
@@ -998,15 +998,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
-
-    /* This data should always be recorded. */
-    if (read_result) {
-      rr_set_compressed_data(*read_result, FIND_DEFENSE, 
-			     komaster, kom_pos, str, stackp);
-    }
   }
-  else
-    read_result = NULL;
 
   if (liberties == 1)
     dcode = defend1(str, &xpos, komaster, kom_pos);
@@ -1059,7 +1051,7 @@ defend1(int str, int *move, int komaster, int kom_pos)
   int liberties;
   int k;
   int found_read_result;
-  Read_result *read_result;
+  Read_result *read_result = NULL;
 
   SETUP_TRACE_INFO("defend1", str);
   reading_node_counter++;
@@ -1081,15 +1073,7 @@ defend1(int str, int *move, int komaster, int kom_pos)
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
-
-    /* This data should always be recorded. */
-    if (read_result) {
-      rr_set_compressed_data(*read_result, DEFEND1, komaster, kom_pos,
-			     str, stackp);
-    }
   }
-  else
-    read_result = NULL;
 
   /* lib will be the liberty of the string. */
   liberties = findlib(str, 1, &lib);
@@ -1207,7 +1191,7 @@ defend2(int str, int *move, int komaster, int kom_pos)
   int r;
   int s;
   int found_read_result;
-  Read_result *read_result;
+  Read_result *read_result = NULL;
 
   SETUP_TRACE_INFO("defend2", str);
   reading_node_counter++;
@@ -1232,15 +1216,7 @@ defend2(int str, int *move, int komaster, int kom_pos)
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
-
-    /* This data should always be recorded. */
-    if (read_result) {
-      rr_set_compressed_data(*read_result, DEFEND2, komaster, kom_pos,
-			     str, stackp);
-    }
   }
-  else
-    read_result = NULL;
 
   liberties = findlib(str, 2, libs);
   ASSERT1(liberties == 2, str);
@@ -1525,7 +1501,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
   int bc;
   int k;
   int found_read_result;
-  Read_result *read_result;
+  Read_result *read_result = NULL;
 
   SETUP_TRACE_INFO("defend3", str);
   reading_node_counter++;
@@ -1549,15 +1525,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
-
-    /* This data should always be recorded. */
-    if (read_result) {
-      rr_set_compressed_data(*read_result, DEFEND3, komaster, kom_pos, 
-			     str, stackp);
-    }
   }
-  else
-    read_result = NULL;
 
   liberties = findlib(str, 3, libs);
   ASSERT1(liberties == 3, str);
@@ -1869,7 +1837,7 @@ defend4(int str, int *move, int komaster, int kom_pos)
   int savecode = 0;
   int k;
   int found_read_result;
-  Read_result *read_result;
+  Read_result *read_result = NULL;
   
   SETUP_TRACE_INFO("defend4", str);
   reading_node_counter++;
@@ -1893,15 +1861,7 @@ defend4(int str, int *move, int komaster, int kom_pos)
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
-
-    /* This data should always be recorded. */
-    if (read_result) {
-      rr_set_compressed_data(*read_result, DEFEND4, komaster, kom_pos, 
-			     str, stackp);
-    }
   }
-  else
-    read_result = NULL;
 
   liberties = findlib(str, 4, libs);
   ASSERT1(liberties == 4, str);
@@ -2671,7 +2631,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   int libs;
   int result = 0;
   int found_read_result;
-  Read_result *read_result;
+  Read_result *read_result = NULL;
 
   SETUP_TRACE_INFO("attack", str);
 
@@ -2702,15 +2662,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
-
-    /* This data should always be recorded. */
-    if (read_result) {
-      rr_set_compressed_data(*read_result, ATTACK, komaster, kom_pos, 
-			     str, stackp);
-    }
   }
-  else
-    read_result = NULL;
 
   /* Treat the attack differently depending on how many liberties the 
      string at (str) has. */
@@ -2925,7 +2877,7 @@ attack2(int str, int *move, int komaster, int kom_pos)
   int num_moves = 0;
   int adjacent_liberties = 0;
   int found_read_result;
-  Read_result *read_result;
+  Read_result *read_result = NULL;
 
   SETUP_TRACE_INFO("attack2", str);
   reading_node_counter++;
@@ -2949,15 +2901,7 @@ attack2(int str, int *move, int komaster, int kom_pos)
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
-
-    /* This data should always be recorded. */
-    if (read_result) {
-      rr_set_compressed_data(*read_result, ATTACK2, komaster, kom_pos, 
-			     str, stackp);
-    }
   }
-  else
-    read_result = NULL;
 
   /* The attack may fail if a boundary string is in atari and cannot 
    * be defended.  First we must try defending such a string. 
@@ -3222,7 +3166,7 @@ attack3(int str, int *move, int komaster, int kom_pos)
   int savemove = 0;
   int savecode = 0;
   int found_read_result;
-  Read_result *read_result;
+  Read_result *read_result = NULL;
   
   SETUP_TRACE_INFO("attack3", str);
   reading_node_counter++;
@@ -3241,15 +3185,7 @@ attack3(int str, int *move, int komaster, int kom_pos)
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
-    
-    /* This data should always be recorded. */
-    if (read_result) {
-      rr_set_compressed_data(*read_result, ATTACK3, komaster, kom_pos, 
-			     str, stackp);
-    }
   }
-  else
-    read_result = NULL;
   
   if (stackp > depth) {
     SGFTRACE(0, 0, "stackp > depth");

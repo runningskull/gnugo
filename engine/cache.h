@@ -51,55 +51,83 @@
  * identify repeated positions in the reading, in particular local
  * double or triple kos.
  *
- * The compressed_data field packs into 32 bits the following
+ * The data1 field packs into 32 bits the following
  * fields:
  *
- * komaster: 2 bits (EMPTY, BLACK, WHITE, or GRAY)
+ * komaster:  2 bits (EMPTY, BLACK, WHITE, or GRAY)
  * kom_pos : 10 bits (allows MAX_BOARD up to 31)
- * routine : 4 bits (currently 10 different choices)
- * str     : 10 bits
- * stackp  : 5 bits
+ * routine :  4 bits (currently 10 different choices)
+ * str1    : 10 bits
+ * stackp  :  5 bits
+ *
+ * The data2 field packs into 32 bits the following
+ * fields:
+ *
+ * status :   2 bits (0 free, 1 open, 2 closed)
+ * result1:   4 bits
+ * result2:   4 bits
+ * move   :  10 bits
+ * str2   :  10 bits
  */
 
 typedef struct read_result_t {
-  unsigned int compressed_data;	
-
-  int result_ri_rj;		/* ...then this was the result. */
-  /*
-  status:  8 bits        // 0 free, 1 open, 2 closed
-  result:  8 bits
-  move  : 16 bits
-  */
+  unsigned int data1;	
+  unsigned int data2;
 
   struct read_result_t *next;
 } Read_result;
 
+/* Bit mask for the input bits in the data2 field. */
+#define RR_INPUT_DATA2 0x3ff
 
-/* Get parts of a Read_result identifying the routine and position. */
-#define rr_get_komaster(rr)   (((rr).compressed_data  >> 29) & 0x03)
-#define rr_get_kom_pos(rr)    (((rr).compressed_data  >> 19) & 0x2ff)
-#define rr_get_routine(rr)    (((rr).compressed_data  >> 15) & 0x0f)
-#define rr_get_str(rr)        (((rr).compressed_data  >>  5) & 0x2ff)
-#define rr_get_stackp(rr)     (((rr).compressed_data  >>  0) & 0x1f)
+/* Get parts of a Read_result identifying the input data. */
+#define rr_get_komaster(rr)   (((rr).data1  >> 29) & 0x03)
+#define rr_get_kom_pos(rr)    (((rr).data1  >> 19) & 0x3ff)
+#define rr_get_routine(rr)    (((rr).data1  >> 15) & 0x0f)
+#define rr_get_str1(rr)       (((rr).data1  >>  5) & 0x3ff)
+#define rr_get_stackp(rr)     (((rr).data1  >>  0) & 0x1f)
+#define rr_get_str2(rr)       (((rr).data2  >>  0) & 0x3ff)
+#define rr_get_str(rr)        rr_get_str1(rr)
 
 /* Set corresponding parts. */
-#define rr_compress_data(rr, routine, komaster, kom_pos, str, stackp) \
+#define rr_input_data1(routine, komaster, kom_pos, str1, stackp) \
 	(((((((((komaster) << 10) | (kom_pos)) << 4) \
-	  | (routine)) << 10) | (str)) << 5) | stackp);
+	  | (routine)) << 10) | (str1)) << 5) | stackp);
+#define rr_input_data2(str2) (str2) \
 
-#define rr_set_compressed_data(rr, routine, komaster, kom_pos, str, stackp) \
-       (rr).compressed_data \
-	= rr_compress_data(rr, routine, komaster, kom_pos, str, stackp)
+/* Set input data fields and at the same time set status to open. */
+#define rr_set_input_data(rr, routine, komaster, kom_pos, str, stackp) \
+       do { \
+         (rr).data1 = rr_input_data1(routine, komaster, kom_pos, str, stackp);\
+         (rr).data2 = (((rr).data2 & ~0x300003ff) | (1 << 28));\
+       } while (0)
+
+/* Variation for two distinct strings. */
+#define rr_set_input_data2(rr, routine, komaster, kom_pos, str1, str2, stackp)\
+       do { \
+         (rr).data1 = rr_input_data1(routine, komaster, kom_pos, \
+                                     str1, stackp); \
+         (rr).data2 = (((rr).data2 & ~0x3ff) | (1 << 28) \
+                       | rr_input_data2(str2)); \
+       } while (0)
 
 /* Get parts of a Read_result constituting the result of a search. */
-#define rr_get_status(rr)      (((rr).result_ri_rj >> 24) & 0xff)
-#define rr_get_result(rr)      (((rr).result_ri_rj >> 16) & 0xff)
-#define rr_get_move(rr)        (((rr).result_ri_rj >>  0) & 0xffff)
+#define rr_get_status(rr)      (((rr).data2 >> 28) & 0x03)
+#define rr_get_result1(rr)     (((rr).data2 >> 24) & 0x0f)
+#define rr_get_result2(rr)     (((rr).data2 >> 20) & 0x0f)
+#define rr_get_move(rr)        (((rr).data2 >> 10) & 0x3ff)
+#define rr_get_result(rr)      rr_get_result1(rr)
 
 /* Set corresponding parts. */
-#define rr_set_result_ri_rj(rr, result, move) \
-	(rr).result_ri_rj \
-	    = (2 << 24 | (((result) & 0xff) << 16) | ((move) & 0xffff))
+#define rr_set_result_move(rr, result, move) \
+	(rr).data2 = (((rr).data2 & 0x3ff) \
+          | (2 << 28) | (((result) & 0x0f) << 24) | (((move) & 0x3ff) << 10))
+
+/* Variation with two results. */
+#define rr_set_result_move2(rr, result1, result2, move) \
+	(rr).data2 = (((rr).data2 & 0x3ff) \
+          | (2 << 28) | (((result) & 0x0f) << 24) | (((move) & 0x3ff) << 10))
+
 
 /*
  * The hash table consists of hash nodes.  Each hash node consists of
@@ -229,7 +257,7 @@ int get_read_result(int routine, int komaster, int kom_pos,
 #define READ_RETURN0(read_result) \
   do { \
     if (read_result) { \
-      rr_set_result_ri_rj(*(read_result), 0, 0); \
+      rr_set_result_move(*(read_result), 0, 0); \
     } \
     return 0; \
   } while (0)
@@ -238,7 +266,7 @@ int get_read_result(int routine, int komaster, int kom_pos,
   do { \
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     if (read_result) { \
-      rr_set_result_ri_rj(*(read_result), (value), (move)); \
+      rr_set_result_move(*(read_result), (value), (move)); \
     } \
     return (value); \
   } while (0)
@@ -248,7 +276,7 @@ int get_read_result(int routine, int komaster, int kom_pos,
 #define READ_RETURN0(read_result) \
   do { \
     if (read_result) { \
-      rr_set_result_ri_rj(*(read_result), 0, 0); \
+      rr_set_result_move(*(read_result), 0, 0); \
     } \
     gprintf("%o%s %1m %d 0 0 0 ", read_function_name, q, stackp); \
     dump_stack(); \
@@ -259,7 +287,7 @@ int get_read_result(int routine, int komaster, int kom_pos,
   do { \
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     if (read_result) { \
-      rr_set_result_ri_rj(*(read_result), (value), (move)); \
+      rr_set_result_move(*(read_result), (value), (move)); \
     } \
     gprintf("%o%s %1m %d %d %d ", read_function_name, q, stackp, \
 	    (value), (move)); \

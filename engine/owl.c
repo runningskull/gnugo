@@ -1051,7 +1051,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
   int move_cutoff;
   int dcode;
   int found_read_result;
-  Read_result *read_result;
+  Read_result *read_result = NULL;
   int this_variation_number = count_variations - 1;
   
   SETUP_TRACE_INFO("owl_attack", str);
@@ -1075,15 +1075,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	       "cached");
       return rr_get_result(*read_result);
     }
-
-    /* This data should always be recorded. */
-    if (read_result) {
-      rr_set_compressed_data(*read_result, OWL_ATTACK, komaster, kom_pos,
-			     str, stackp);
-    }
   }
-  else
-    read_result = NULL;
 
   /* If we're deeper than owl_reading_depth, assume the dragon has
    * managed to escape.
@@ -1641,7 +1633,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
   int move_cutoff;
   int acode;
   int found_read_result;
-  Read_result *read_result;
+  Read_result *read_result = NULL;
   int this_variation_number = count_variations - 1;
   
   SETUP_TRACE_INFO("owl_defend", str);
@@ -1665,14 +1657,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	       "cached");
       return rr_get_result(*read_result);
     }
-    /* This data should always be recorded. */
-    if (read_result) {
-      rr_set_compressed_data(*read_result, OWL_DEFEND, 
-			     komaster, kom_pos, str, stackp);
-    }
   }
-  else
-    read_result = NULL;
 
   /* In order to get a defense move even if we seem to already have
    * escaped and to reduce the impact of overestimated escape

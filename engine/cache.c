@@ -41,10 +41,10 @@ static Hashnode *hashtable_enter_position(Hashtable *table, Hash_data *hd);
 static Hashnode *hashtable_search(Hashtable *table, Hash_data *hd);
 
 static Read_result *hashnode_search(Hashnode *node, int routine, int komaster,
-				    int kom_pos, int str);
+				    int kom_pos, int str1, int str2);
 static Read_result *hashnode_new_result(Hashtable *table, Hashnode *node, 
 					int routine, int komaster,
-					int kom_pos, int move);
+					int kom_pos, int str1, int str2);
 
 static void hashtable_unlink_closed_results(Hashnode *node, 
 					    int exclusions, 
@@ -52,7 +52,7 @@ static void hashtable_unlink_closed_results(Hashnode *node,
 					    int statistics[][20]);
 static void hashtable_partially_clear(Hashtable *table);
 static int do_get_read_result(int routine, int komaster, int kom_pos,
-			      int *str, Read_result **read_result);
+			      int str1, int str2, Read_result **read_result);
 
 /*
  * Dump an ASCII representation of the contents of a Read_result onto
@@ -281,7 +281,7 @@ hashtable_clear(Hashtable *table)
 
   /* Mark all read_results as free. */
   for (i = 0; i < table->num_results; i++)
-    table->all_results[i].result_ri_rj = 0;
+    table->all_results[i].data2 = 0;
   
   /* Mark all nodes as free. */
   for (i = 0; i < table->num_nodes; i++)
@@ -306,11 +306,15 @@ hashtable_unlink_closed_results(Hashnode *node,
   
   while (current_result != NULL) {
     int stackp;
+    int routine;
 
     stackp = rr_get_stackp(*current_result);
     if (stackp > 19)
       stackp = 19;
-    statistics[rr_get_routine(*current_result)][stackp]++;
+
+    routine = rr_get_routine(*current_result);
+    gg_assert(routine >= 0 && routine < NUM_ROUTINES);
+    statistics[routine][stackp]++;
 
     if (rr_get_status(*current_result) == 2
 	&& ((1 << rr_get_routine(*current_result)) & exclusions) == 0
@@ -319,7 +323,7 @@ hashtable_unlink_closed_results(Hashnode *node,
 	node->results = current_result->next;
       else
 	previous_result->next = current_result->next;
-      current_result->result_ri_rj = 0;
+      current_result->data2 = 0;
     }
     else
       previous_result = current_result;
@@ -509,15 +513,18 @@ hashtable_search(Hashtable *table, Hash_data *hd)
 
 static Read_result *
 hashnode_search(Hashnode *node, int routine, int komaster, int kom_pos,
-		int str)
+		int str1, int str2)
 {
   Read_result *result;
-  unsigned int search_for;
+  unsigned int search_for1;
+  unsigned int search_for2;
 
-  search_for = rr_compress_data(rr, routine, komaster, kom_pos, str, stackp);
+  search_for1 = rr_input_data1(routine, komaster, kom_pos, str1, stackp);
+  search_for2 = rr_input_data2(str2);
 
   for (result = node->results; result != NULL; result = result->next) {
-    if (result->compressed_data == search_for)
+    if (result->data1 == search_for1
+	&& (result->data2 & RR_INPUT_DATA2) == search_for2)
       break;
     }
 
@@ -534,7 +541,7 @@ hashnode_search(Hashnode *node, int routine, int komaster, int kom_pos,
 
 static Read_result *
 hashnode_new_result(Hashtable *table, Hashnode *node, int routine, 
-		    int komaster, int kom_pos, int str)
+		    int komaster, int kom_pos, int str1, int str2)
 {
   Read_result *result;
 
@@ -554,13 +561,9 @@ hashnode_new_result(Hashtable *table, Hashnode *node, int routine,
   result->next = node->results;
   node->results = result;
 
-  /* Now, put the routine number into it. */
-  result->compressed_data = rr_compress_data(rr, routine, komaster,
-					     kom_pos, str, stackp);
+  /* Now, put the input data into it. This also sets status to open. */
+  rr_set_input_data2(*result, routine, komaster, kom_pos, str1, str2, stackp);
 
-  /* And set the status to open. */
-  result->result_ri_rj = 1 << 24;
-  
   stats.read_result_entered++;
   return result;
 
@@ -628,18 +631,20 @@ get_read_result(int routine, int komaster, int kom_pos, int *str,
    */
   *str = find_origin(*str);
   
-  result = do_get_read_result(routine, komaster, kom_pos, str, read_result);
+  result = do_get_read_result(routine, komaster, kom_pos, *str, NO_MOVE,
+			      read_result);
   if (*read_result == NULL) {
     /* Clean up the hashtable and try once more. */
     hashtable_partially_clear(movehash);
-    result = do_get_read_result(routine, komaster, kom_pos, str, read_result);
+    result = do_get_read_result(routine, komaster, kom_pos, *str, NO_MOVE,
+				read_result);
   }
   return result;
 }
 
 static int
 do_get_read_result(int routine, int komaster, int kom_pos,
-		   int *str, Read_result **read_result)
+		   int str1, int str2, Read_result **read_result)
 {
   Hashnode *hashnode;
   int retval;
@@ -690,7 +695,7 @@ do_get_read_result(int routine, int komaster, int kom_pos,
 
     /* We found it!  Now see if we can find a previous result. */
     *read_result = hashnode_search(hashnode, routine, komaster, kom_pos,
-				   *str);
+				   str1, str2);
 
     if (*read_result != NULL) {
       stats.read_result_hits++;
@@ -698,11 +703,11 @@ do_get_read_result(int routine, int komaster, int kom_pos,
     }
     else {
       DEBUG(DEBUG_READING_CACHE,
-	    "...but no previous result for routine %d and (%1m)...",
-	    routine, *str);
+	    "...but no previous result for routine %d and (%1m, %1m)...",
+	    routine, str1, str2);
 
       *read_result = hashnode_new_result(movehash, hashnode, routine,
-					 komaster, kom_pos, *str);
+					 komaster, kom_pos, str1, str2);
       
       if (*read_result == NULL)
 	DEBUG(DEBUG_READING_CACHE,
