@@ -87,8 +87,8 @@ typedef struct read_result_t {
 
 /* Set corresponding parts. */
 #define rr_input_data1(routine, komaster, kom_pos, str1, stackp) \
-	(((((((((komaster) << 10) | (kom_pos)) << 4) \
-	  | (routine)) << 10) | (str1)) << 5) | (stackp));
+	((( (unsigned) (((((((komaster) << 10) | (kom_pos)) << 4) \
+	  | (routine)) << 10) | (str1))) << 5) | ((unsigned) stackp));
 #define rr_input_data2(str2) (str2) \
 
 /* Set input data fields and at the same time set status to open. */

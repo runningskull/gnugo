@@ -4,6 +4,7 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- be paranoid about sign bit in bit shifting in rr_input_data1()
 - floating point rounding problem solved in compute_surrounding_moyo_sizes()
 - floating point rounding problem solved in value_move_reasons()
 - add abort() if SIZEOF_LONG was set incorrectly
