@@ -2485,6 +2485,10 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	      board_size - I(moves[i]), distances[i], &chars);
       pos += chars;
     }
+    if (cutoff < HUGE_CONNECTION_DISTANCE) {
+      sprintf(pos, "(cutoff %f)%n", cutoff, &chars);
+      pos += chars;
+    }
     sgftreeAddComment(sgf_dumptree, buf);
   }
 
@@ -2669,7 +2673,7 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
   {
     float cutoff = HUGE_CONNECTION_DISTANCE;
     if (breakin_depth - stackp <= 5)
-      cutoff = 1.1 + (breakin_depth - stackp) * 0.15;
+      cutoff = 1.101 + (breakin_depth - stackp) * 0.15;
     num_moves = find_connection_moves(str, str2, color_to_move,
 				      &conn1, &conn2, max_dist1, max_dist2,
 				      moves, *total_distance, cutoff);

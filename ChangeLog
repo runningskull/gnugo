@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- adjust breakin_depth in modify_depth_values()
+
+3.5.3 released January 7, 2004
+
 - new GTP command kgs-genmove_cleanup
 - compute_crude_status() revised to consider dragons with big
   territorial moyo value as alive

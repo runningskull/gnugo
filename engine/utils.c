@@ -828,6 +828,7 @@ modify_depth_values(int n)
   branch_depth       += n;
   fourlib_depth      += n;
   ko_depth           += n;
+  breakin_depth	     += n;
 }
 
 void
