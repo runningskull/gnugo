@@ -46,7 +46,6 @@ showterri        display territory\n\
 /* some options for the ascii interface */
 static int opt_showboard = 1;
 static int showdead = 0;
-static int emacs = 0;
 static SGFTree sgftree;
 static int last_move_i;      /* The position of the last move */
 static int last_move_j;      /* -""-                          */
@@ -213,7 +212,7 @@ ascii_showboard(void)
   printf("\n");
 
   fflush(stdout);
-  printf("%s%s\n", (emacs ? "EMACS1\n" : ""), letterbar);
+  printf("%s\n", letterbar);
   fflush(stdout);
   
   for (i = 0; i < board_size; i++) {
@@ -520,7 +519,7 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
   last_move_i = i;
   last_move_j = j;
   
-  if (opt_showboard && !emacs) {
+  if (opt_showboard) {
     ascii_showboard();
     printf("GNU Go is thinking...\n");
   }
@@ -993,14 +992,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
   }
 
   printf("\nThanks! for playing GNU Go.\n\n");
-}
-
-void
-play_ascii_emacs(SGFTree *tree, Gameinfo *gameinfo,
-		 char *filename, char *until)
-{
-  emacs = 1;
-  play_ascii(tree, gameinfo, filename, until);
 }
 
 

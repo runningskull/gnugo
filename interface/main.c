@@ -161,7 +161,6 @@ enum {OPT_BOARDSIZE = 127,
 enum mode {
   MODE_UNKNOWN = 0,
   MODE_ASCII,
-  MODE_ASCII_EMACS,
   MODE_GTP,
   MODE_GMP,
   MODE_SGMP,
@@ -659,8 +658,6 @@ main(int argc, char *argv[])
       case OPT_MODE: 
 	if (strcmp(gg_optarg, "ascii") == 0)
 	  playmode = MODE_ASCII;
-	else if (strcmp(gg_optarg, "emacs") == 0)
-	  playmode = MODE_ASCII_EMACS;
 	else if (strcmp(gg_optarg, "gtp") == 0)
 	  playmode = MODE_GTP;
 	else if (strcmp(gg_optarg, "gmp") == 0)
@@ -1426,13 +1423,6 @@ main(int argc, char *argv[])
 	socket_stop_listening(gtp_input_FILE, gtp_output_FILE);
     }
 
-    break;
-
-  case MODE_ASCII_EMACS:  
-    if (mandated_color != EMPTY)
-      gameinfo.computer_player = OTHER_COLOR(mandated_color);
-
-    play_ascii_emacs(&sgftree, &gameinfo, infilename, untilstring);
     break;
 
   case MODE_ASCII:  

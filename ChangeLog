@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- emacs variant of ascii interface removed
 - give less bonus to connection moves when scoring
 	
 3.7.1 released November 23, 2004
