@@ -181,7 +181,6 @@ static struct gg_option const long_options[] =
   {"owl-reading",    required_argument, 0, OPT_OWL_READING},
   {"owl-node-limit", required_argument, 0, OPT_OWL_NODE_LIMIT},
   {"level",          required_argument, 0, OPT_LEVEL},
-  {"clock",          required_argument, 0, OPT_CLOCK_TIME},
   {"byo-time",       required_argument, 0, OPT_CLOCK_BYO_TIME},
   {"byo-period",     required_argument, 0, OPT_CLOCK_BYO_PERIOD},
   {"autolevel",      no_argument,       0, OPT_AUTOLEVEL},
@@ -302,10 +301,6 @@ main(int argc, char *argv[])
   allow_suicide = 0;
   capture_all_dead = 0;
   play_out_aftermath = 0;
-
-  /* Default parameters for clock and auto level systems. */
-  clock_init(3600, 0, 0);      /* One hour sudden death. */
-  clock_init_autolevel(2, 10); /* 2 < level < 10 */
 
   sgftree_clear(&sgftree);
   gameinfo_clear(&gameinfo, board_size, komi);
@@ -667,28 +662,6 @@ main(int argc, char *argv[])
 	level = atoi(gg_optarg);
 	break;
 
-      case OPT_CLOCK_TIME:
-
-	clock_init(atoi(gg_optarg), -1, -1);
-	clock_enable();
-	break;
-
-      case OPT_CLOCK_BYO_TIME: 
-	clock_init(-1, atoi(gg_optarg), -1);
-	clock_enable();
-	break;
-
-      case OPT_CLOCK_BYO_PERIOD:
-	clock_init(-1, -1, atoi(gg_optarg));
-	clock_enable();
-	break;
-
-      case OPT_AUTOLEVEL:
-	clock_init(-1, -1, -1);
-	clock_enable();
-	clock_enable_autolevel();
-	break;
-	
       case OPT_DEBUG_INFLUENCE:
 	if (strlen(gg_optarg) > 3) {
 	  fprintf(stderr, "Invalid board coordinate: %s\n", gg_optarg);
@@ -1130,8 +1103,6 @@ main(int argc, char *argv[])
     break;
   }
   
-  clock_report_autolevel(NULL, gameinfo.computer_player);
- 
   return 0;
 }  /* end main */
 
@@ -1185,8 +1156,6 @@ Options that affect strength (higher = stronger, slower):\n\
    --owl-reading <depth>        owl reading depth (default %d)\n\
    --owl-node-limit <limit>     max nodes for owl reading (default %d)\n\
    --level <amount>             strength (default %d, up to 10 supported)\n\
-   --autolevel                  adapt gnugo level during game to respect\n\
-                                the time specified by --clock <sec>.\n\
 "
 
 #define USAGE1 "\n\
@@ -1207,9 +1176,6 @@ Game Options: (--mode ascii)\n\
        --color <color>   Choose your color ('black' or 'white')\n\
        --handicap <num>  Set the number of handicap stones (0--%d)\n\
        --komi <num>      Set the komi\n\
-       --clock <sec>     Initialize the timer.\n\
-       --byo-time <sec>  Initialize the byo-yomi timer.\n\
-       --byo-period <stones>  Initialize the byo-yomi period.\n\n\
 \n\
 Informative Output:\n\
    -v, --version         Display the version of GNU Go\n\

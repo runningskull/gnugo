@@ -41,7 +41,6 @@
 #endif
 
 #include "sgftree.h"
-#include "clock.h"
 
 /* interface.c */
 /* Initialize the whole thing. Should be called once. */

@@ -7,7 +7,7 @@ INCLUDES = \
 	-I$(top_srcdir)/sgf \
 	-I$(top_srcdir)/utils
 
-noinst_HEADERS = cache.h gnugo.h hash.h clock.h \
+noinst_HEADERS = cache.h gnugo.h hash.h \
                  influence.h liberty.h move_reasons.h
 
 # preconfigured settings for various configurations
@@ -17,7 +17,6 @@ libengine_a_SOURCES = \
       aftermath.c \
       board.c \
       cache.c \
-      clock.c \
       combination.c \
       dragon.c \
       filllib.c \

@@ -27,7 +27,6 @@
 
 #include "sgftree.h"
 #include "liberty.h"
-#include "clock.h"
 
 #include "gg_utils.h"
 
@@ -98,7 +97,6 @@ void
 gnugo_play_move(int i, int j, int color)
 {
   play_move(POS(i, j), color);
-  clock_push_button(color);
 }
 
 /* Undo n permanent moves. Returns 1 if successful and 0 if it fails.

@@ -312,9 +312,6 @@ do_genmove(int *move, int color, float pure_threat_value,
   if (get_level(&level))
     fprintf(stderr, "level = %d\n", level);
   
-  /* experimental level adapter */
-  clock_adapt_level(&level, color);
-
   /* Prepare pattern matcher and reading code. */
   reset_engine();
 

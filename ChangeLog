@@ -4,6 +4,7 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- remove autolevel code (engine/clock.c)
 - remove time.h and sys/time.h includes, check for HAVE_SYS_TIME_H
 - remove GMP playing mode
 - remove unistd.h include in main.c and dfa.c
