@@ -3,6 +3,9 @@
 -------------------------------------------------------------------------
 
 - new gtp command owl_analyze_semeai
+- revision of owl_analyze_semeai()
+- new static catalog_goal in owl.c
+- sgfdecide functions made 1D
 - empty_corner_value adjusted to board size in fuseki()
 - removed tactical reading move pass from owl.c
 - contribution of (reverse) followup values revised in value_move_reasons
@@ -13,6 +16,8 @@
 - tuning
 - test revisions
 - new trevora tests
+- new semeai tests
+- doc revision
 
 3.1.14 released November 17, 2001
 
