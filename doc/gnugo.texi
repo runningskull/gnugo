@@ -15,7 +15,7 @@
 @titlepage
 @subtitle Documentation for the GNU Go Project
 @subtitle Edition @value{EDITION}
-@subtitle April, 2002
+@subtitle July, 2003
 @vskip 0pt plus 1filll
 @image{logo-32}
 @vskip 0pt plus 1filll

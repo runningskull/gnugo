@@ -206,8 +206,8 @@ of the move history.
 
 All the functions in the engine that manipulate Positions have names
 prefixed by @code{gnugo_}. These functions still use the two-dimensional
-representation of the board (@pxref{The Board}). Here is a complete list, as
-prototyped in @file{gnugo.h}:
+representation of the board (@pxref{The Board Array}). Here is a complete
+list, as prototyped in @file{gnugo.h}:
 
 @itemize
 @item @code{void init_gnugo(float memory)}

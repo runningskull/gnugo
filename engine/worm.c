@@ -60,14 +60,11 @@ static void defense_callback(int anchor, int color,
 			     struct pattern *pattern, int ll, void *data);
 static void build_worms(void);
 
-/* A STRING is a maximal connected set of stones of the same color, 
- * black or white. A WORM is the same thing as a string, except that
- * its color can be empty. An empty worm is called a CAVITY.
+/* A worm or string is a maximal connected set of stones of the same color, 
+ * black or white.
  *
- * Worms are eventually amalgamated into dragons. An empty dragon
- * is called a CAVE.
+ * Cavities are sets of connected empty vertices.
  */
-
 
 
 /* make_worms() finds all worms and assembles some data about them.

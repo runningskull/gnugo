@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- doc: complete rewrite of first sections of overview.texi
+- doc: subsection on 1D board array moved to board.texi
+- doc: references to cavities in dragon amalgamation removed
+
 3.3.23 released June 28, 2003
 
 - break-in code turned off below level 9

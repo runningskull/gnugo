@@ -24,15 +24,9 @@ two routines @code{make_worm()} and @code{make_dragon()} in
 @cindex dragon
 @cindex worm
 @cindex string
-@cindex worm closure
-A @dfn{worm} is a maximal set of vertices on the board which are connected
-along the horizontal and vertical lines, and are of the same color,
-which can be @code{BLACK}, @code{WHITE} or @code{EMPTY}. The term 
-@code{EMPTY} applied to a worm means that the worm consists of empty
-(unoccupied) vertices. It does @strong{not} mean that that the worm is the
-empty set. A @dfn{string} is a nonempty worm. An empty worm is called a
-@dfn{cavity}.  If a subset of vertices is contained in a worm, there is a
-unique worm containing it; this is its @dfn{worm closure}.
+A @dfn{worm} is a maximal set of stones on the board which are connected
+along the horizontal and vertical lines, and are of the same color.
+We often say @dfn{string} instead of worm.
 
 A @dfn{dragon} is a union of strings of the same color which will be
 treated as a unit. The dragons are generated anew at each move. If two strings
@@ -271,16 +265,9 @@ not adjacent to any opponent string which can be easily
 captured, and which has no edge liberties or second
 order liberties, and which satisfies the following
 further property: If the string is removed from the
-board, then the empty worm E which is the worm closure
-of the set of vertices which it occupied has
-bordercolor the opposite of the removed string. The
-empty worm E (empty, that is, as a worm of the board
-modified by removal of S) consists of the union of
-support of S together with certain other empty worms
-which we call the @dfn{boundary components} of S.
+board, then the remaining cavity only borders worms of the
+opposite color.
 
-The inessential strings are used in the amalgamation of
-cavities in @code{make_dragons()}.
 @end quotation
 @findex unconditional_life
 @item @code{invincible} 
@@ -357,85 +344,7 @@ similar data. Each dragon is a union of worms. Just as the data maintained in
 @code{worm[]} is constant on each worm, the data in
 @code{dragon[]} is constant on each dragon.
 
-@dfn{Amalgamation} of two worms means means in practice replacing the origin
-of one worm by the origin of the other.  Amalgamation takes place in
-two stages: first, the amalgamation of empty worms (cavities) into
-empty dragons (caves); then, the amalgamation of colored worms into
-dragons.
-
-@section Amalgamation of cavities
-@cindex amalgamation of cavities
-
-As we have already defined it, a cavity is an empty
-worm. A cave is an empty dragon.
-
-Under certain circumstances we want to amalgamate two or
-more cavities into a single cave. This is done before we
-amalgamate strings. An example where we wish to amalgamate
-two empty strings is the following:
-
-@example
-
-      OOOOO
-     OOXXXOO
-     OXaObXO
-     OOXXXOO
-      OOOOO
-
-@end example
-
-The two empty worms at a and b are to be amalgamated.
-@cindex inessential string
-
-We have already defined a string to be @dfn{inessential} if it meets a
-criterion designed to guarantee that it has no life potential unless a
-particular surrounding string of the opposite color can be killed. An
-@dfn{inessential string} is a string S of genus zero which is not a cutting
-string or potential cutting string, and which has no edge liberties or
-second order liberties (the last condition should be relaxed), and
-which satisfies the following further property: If the string is
-removed from the board, then the empty worm E which is the worm
-closure of the set of vertices which it occupied has bordercolor the
-opposite of the removed string.
-
-Thus in the previous example, after removing the inessential string at
-the center the worm closure of the center vertex consists of an empty
-worm of size 3 including a and b. The latter are the boundary
-components.
-
-The last condition in the definition of inessential worms excludes
-examples such as this:
-
-@example
-
-        OOOO
-       OXXOO
-      OXX.XO 
-      OX.XXO
-      OOXXO
-       OOO
-
-@end example
-
-Neither of the two X strings should be considered inessential
-(together they form a live group!) and indeed after removing one of
-them the resulting space has gray bordercolor, so by this definition
-these worms are not inessential.
-
-Some strings which should by rights be considered inessential will be
-missed by this criterion.
-
-The algorithm for amalgamation of empty worms consists of amalgamating
-the boundary components of any inessential worm. The resulting dragon
-has bordercolor the opposite of the removed string.
-
-Any dragon consisting of a single cavity has bordercolor equal to that
-of the cavity.
-
-@section Amalgamation of strings
-@cindex amalgamation of worms into dragons
-
-Amalgamation of nonempty worms in GNU Go 3.0 proceeds as follows.
+Amalgamation of worms in GNU Go 3.0 proceeds as follows.
 First we amalgamate all boundary components of an eyeshape. Thus in
 the following example:
 

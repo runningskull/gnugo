@@ -3,262 +3,101 @@ This chapter is an overview of the GNU Go internals. Further
 documentation of how any one module or routine works may be found in
 later chapters or comments in the source files.
 
+GNU Go starts by trying to understand the current board position as
+good as possible. Using the information found in this first phase, and
+using additional move generators, a list of candidate moves is generated.
+Finally, each of the candidate moves is valued according to its territorial
+value (including captures or life-and-death effects), and possible
+strategical effects (such as strengthening a weak group).
+
+Note that while GNU Go does, of course, do a lot of reading to analyze
+possible captures, life and death of groups etc., it does not (yet?) have
+a fullboard lookahead.
+
 @menu
-* Definitions::                Some words used in this documentation.
-* The Board::                  The Board
-* Move Generation Basics::     How GNU Go generates a move.
-* Examining the Position::     What @code{examine_position()} does.
-* Sequence of Events::         Outline of @code{genmove()}.
-* Roadmap::                    Description of the different files.
-* Coding Styles::              Coding conventions.
-* Navigating the Source::      Navigating the Source.
+* Examining the Position::		Gathering Information
+* Move Generators::			Selecting Candidate Moves
+* Move Valuation::			Selecting the best Move
+* Detailed Sequence of Events::		Outline of @code{genmove()}.
+* Roadmap::				Description of the different files.
+* Coding Styles::			Coding conventions.
+* Navigating the Source::		Navigating the Source.
 @end menu
 
-@node    Definitions, The Board, Overview,  Overview
-@section Definitions
-@cindex worm
-@cindex dragon
-@cindex cavity
-@cindex string
-@cindex superstring
 
-A @dfn{worm} is a maximal set of vertices on the board which are connected
-along the horizontal and vertical lines, and are of the same color,
-which can be @code{BLACK}, @code{WHITE} or @code{EMPTY}. The term 
-@code{EMPTY} applied to a worm means that the worm consists of empty
-(unoccupied) vertices. It does @strong{not} mean that that the worm is the
-empty set. A @dfn{string} is a nonempty worm. An empty worm is called a
-@dfn{cavity}.  If a subset of vertices is contained in a worm, there is a unique
-worm containing it; this is its @dfn{worm closure}. (@pxref{Worms}.)
-
-A @dfn{dragon} is a union of strings of the same color which will be treated
-as a unit. If two strings are in the same dragon, it is the computer's
-working hypothesis that they will live or die together and are
-effectively connected. (@pxref{Dragons}.)
-
-A @dfn{superstring} is a less commonly used unit which is the union
-of several strings but generally smaller than a dragon. The superstring
-code is in @file{engine/utils.c}. The definition of a superstring is
-slightly different if the code is called from @file{owl.c} or from
-@file{reading.c}.
-
-@node The Board, Move Generation Basics, Definitions, Overview
-@section The Board
-
-GNU Go represents the board in a one-dimensional array called
-@code{board}. For some purposes a two dimensional indexing of the
-board by parameters @code{(i,j)} might be used.
-
-The @code{board} array includes out-of-board markers around the
-board. To make the relation to the old two-dimensional board
-representation clear, this figure shows how the 1D indices correspond
-to the 2D indices when MAX_BOARD is 7.
-
-@example
-@group
-  j  -1   0   1   2   3   4   5   6
-i +----------------------------------
--1|   0   1   2   3   4   5   6   7
- 0|   8   9  10  11  12  13  14  15
- 1|  16  17  18  19  20  21  22  23
- 2|  24  25  26  27  28  29  30  31
- 3|  32  33  34  35  36  37  38  39
- 4|  40  41  42  43  44  45  46  47
- 5|  48  49  50  51  52  53  54  55
- 6|  56  57  58  59  60  61  62  63
- 7|  64  65  66  67  68  69  70  71  72
-@end group
-@end example
-
-To convert between a 1D index @code{pos} and a 2D index @code{(i,j)},
-the macros @code{POS}, @code{I}, and @code{J} are provided, defined as
-below:
-
-@example
-#define POS(i, j)    ((MAX_BOARD + 2) + (i) * (MAX_BOARD + 1) + (j))
-#define I(pos)       ((pos) / (MAX_BOARD + 1) - 1)
-#define J(pos)       ((pos) % (MAX_BOARD + 1) - 1)
-@end example
-
-All 1D indices not corresponding to points on the board have the out
-of board marker value @code{GRAY}. Thus if @code{board_size} and
-@code{MAX_BOARD} both are 7, this looks like
-
-@example
-@group
-  j  -1   0   1   2   3   4   5   6
-i +----------------------------------
--1|   #   #   #   #   #   #   #   #
- 0|   #   .   .   .   .   .   .   .
- 1|   #   .   .   .   .   .   .   .
- 2|   #   .   .   .   .   .   .   .
- 3|   #   .   .   .   .   .   .   .
- 4|   #   .   .   .   .   .   .   .
- 5|   #   .   .   .   .   .   .   .
- 6|   #   .   .   .   .   .   .   .
- 7|   #   #   #   #   #   #   #   #   #
-@end group
-@end example
-
-The indices marked @samp{#} have value @code{GRAY}.
-If @code{MAX_BOARD} is 7 and @code{board_size} is only 5:
-
-@example
-@group
-  j  -1   0   1   2   3   4   5   6
-i +----------------------------------
--1|   #   #   #   #   #   #   #   #
- 0|   #   .   .   .   .   .   #   #
- 1|   #   .   .   .   .   .   #   #
- 2|   #   .   .   .   .   .   #   #
- 3|   #   .   .   .   .   .   #   #
- 4|   #   .   .   .   .   .   #   #
- 5|   #   #   #   #   #   #   #   #
- 6|   #   #   #   #   #   #   #   #
- 7|   #   #   #   #   #   #   #   #   #
-@end group
-@end example
-
-Navigation on the board is done by the @code{SOUTH}, @code{WEST},
-@code{NORTH}, and @code{EAST} macros,
-
-@example
-#define NS           (MAX_BOARD + 1)
-#define WE           1
-#define SOUTH(pos)   ((pos) + NS)
-#define WEST(pos)    ((pos) - 1)
-#define NORTH(pos)   ((pos) - NS)
-#define EAST(pos)    ((pos) + 1)
-@end example
-
-There are also shorthand macros @code{SW}, @code{NW}, @code{NE},
-@code{SE}, @code{SS}, @code{WW}, @code{NN}, @code{EE} for two step
-movements.
-
-Any movement from a point on the board to an adjacent or diagonal
-vertex is guaranteed to produce a valid index into the board array, and
-the color found is GRAY if it is not on the board. To do explicit tests
-for out of board there are two macros
-
-@example
-#define ON_BOARD(pos) (board[pos] != GRAY)
-#define ON_BOARD1(pos) (((unsigned) (pos) < BOARDSIZE) && board[pos] != GRAY)
-@end example
-
-where the first one should be used in the algorithms and the second
-one is useful for assertion tests.
-
-@strong{Important}: The 2D coordinate @code{(-1,-1)}, which is used for
-pass and sometimes to indicate no point, maps to the 1D coordinate
-@code{0}, not to @code{-1}. Instead of a plain @code{0}, use one of the
-macros @code{NO_MOVE} or @code{PASS_MOVE}.
-
-A loop over multiple directions is straightforwardly written:
-
-@example
-  for (k = 0; k < 4; k++) @{
-    int d = delta[k];
-    do_something(pos + d);
-  @}
-@end example
-
-The following constants are useful for loops over the entire board and
-allocation of arrays with a 1-1 mapping to the board.
-
-@example
-#define BOARDSIZE    ((MAX_BOARD + 2) * (MAX_BOARD + 1) + 1)
-#define BOARDMIN     (MAX_BOARD + 2)
-#define BOARDMAX     (MAX_BOARD + 1) * (MAX_BOARD + 1)
-@end example
-
-@code{BOARDSIZE} is the actual size of the 1D board array,
-@code{BOARDMIN} is the first index corresponding to a point on the
-board, and @code{BOARDMAX} is one larger than the last index corresponding to
-a point on the board. 
-
-Often one wants to traverse the board, carrying out some function
-at every vertex. Here are two possible ways of doing this:
-
-@example
-  int m, n;
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) @{
-      do_something(POS(m, n));
-    @}
-@end example
-
-Or:
-
-@example
-  int pos;
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) @{
-    if (ON_BOARD(pos))
-      do_something(pos);
-  @}
-@end example
-
-@node Move Generation Basics, Examining the Position, The Board, Overview
+@node Examining the Position, Move Generators,, Overview
 @comment node-name,       next,          previous,     up
-@section Move Generation Basics
-@cindex move generation
+@section Gathering Information
 
-The engine of GNU Go takes a position and a color to move and
-generates the (supposedly) optimal move.  This is done by the function
-@code{genmove()} in @file{engine/genmove.c}.
-@findex genmove
+This is by far the most important phase in the move generation. 
+Misunderstanding life-and-death situations can cause gross mistakes.
+Wrong territory estimates will lead to inaccurate move valuations. 
+Bad judgement of weaknesses of groups make strategic mistakes likely.
 
-The move generation is done in three passes:
+This information gathering is done by the function @code{examine_position()}.
+It first calls @code{make_worms()}.
 
-@enumerate
-@item Information gathering.
-@item Different modules propose moves.
-@item The values of the moves are weighted together and the best move is selected.
-@end enumerate
+Its first steps are very simple: It identifies sets of directly connected
+stones--we call them @dfn{worms}--, and notes their sizes and their number of
+liberties.
 
-@subsection Information gathering
-@findex examine_position
-@cindex information gathering
+Soon after comes the most important step of the worm analysis:
+The tactical reading code (@pxref{Tactical Reading}) is called for every
+worm. It tries to read
+out which worms can be captured directly, giving up as soon as a worm
+can reach 5 liberties. If a worm can be captured, the engine of course
+looks for moves defending against this capture. Also, a lot of effort
+is made to find virtually all moves that achieve the capture or defense
+of a worm.
 
-The information gathering is done by a function @code{examine_position()},
-which will be discussed in greater detail in the next section.
-Such information could be life and death of the groups, information
-about moyos, connection of groups and so on. Information gathering is
-performed by @code{examine_position()}, which in turn calls:
+After knowing which worms are tactically stable, we can make a first
+picture of the balance of power across the board: The @ref{Influence}
+code is called for the first time.
 
+This is to aid the next step, the analysis of dragons. By a @dfn{dragon}
+we mean a group of stones that cannot be disconnected.
+
+Naturally the first step in the responsible function @code{make_dragons()}
+is to identify these dragons, i.e. determine which worms cannot be
+disconnected from each other. This is partly done by patterns, but
+in most cases the specialized readconnect code (@pxref{Connections})
+is called. This module does a minimax search to determine whether two
+given worms can be connected with, resp. disconnected from each other.
+
+Then we compute various measures to determine how strong or weak any given
+dragon is: 
 @itemize @bullet
-@item @code{make_worms()}
-@findex make_worms
-@quotation
-Collect information about all connected sets of stones
-(strings) and cavities.  This information is stored in
-the @code{worm[]} array. (@pxref{Worms})
-@end quotation
-@item @code{compute_initial_influence()}
-@findex compute_initial_influence
-@quotation
-Decides which areas of the board are influenced by which
-player. This function is run a second time later at
-the end of @code{make_dragons()}, since GNU Go's opinion
-about the safety of groups may change, and it is
-important to have the influence function as accurate as
-possible. @pxref{Influence}
-@end quotation
-@item @code{make_dragons()}	
-@findex make_dragons
-@quotation
-Collect information about connected strings, which are
-called dragons.  Important information here is number
-of eyes, life status, and connectedness between
-string. (@pxref{Dragons}.)
-@end quotation
+@item A crude estimate of the number of eyes is made.
+@item The results of the influence computations is used to see which dragons
+are adjacent to own territory or a moyo.
+@item A guess is made for the potential to escape if the dragon got
+under attack.
 @end itemize
 
-A more detailed
+For those dragons that are considered weak, a life and death analysis
+is made (@pxref{The Owl Code}). If two dragons next to each other are found
+that are both not alive, we try to resolve this situation with the semeai
+module.
 
-@subsection Move generation in GNU Go 3.2
+For a more detailed reference of the worm and dragon analysis (and
+explanations of the data structures used to store the information),
+see @xref{Worms and Dragons}.
+
+The influence code is then called second time to make a detailed analysis
+of likely territory. Of course, the life-and-death status' of dragons are
+now taken into account.
+
+The territorial results of the influence module get corrected by the break-in
+module. This specifically tries to analyze where an opponent could break
+into an alleged territory, with sequences that would be too difficult to
+see for the influence code.
+
+
+@node Move Generators, Move Valuation, Examining the Position, Overview
 @cindex move generation
 @cindex move generators
 @cindex move reasons
+@section Move Generators
 
 Once we have found out all about the position it is time to generate
 the best move. Moves are proposed by a number of different modules
@@ -267,30 +106,61 @@ do not set the values of the moves, but enumerate justifications for
 them, called @dfn{move reasons}. The valuation of the moves comes
 last, after all moves and their reasons have been generated.
 
-The move generators in version 3.2 are:
+For a list and explanation of move reasons used in GNU Go, and how they
+are evaluated, see @xref{Move Generation}.
+
+There are a couple of move generators that only extract data found in
+the previous phase, examining the position:
+
+@itemize @bullet
+@item @code{worm_reasons()}
+@findex worm_reasons
+@quotation
+Moves that have been found to capture or defend a worm are propsed as
+candidates.
+@end quotation
+
+@item @code{owl_reasons()}
+@findex owl_reasons
+@quotation
+The status of every dragon, as it has been determined by the owl code
+(@pxref{The Owl Code}) in the previous phase, is reviewed. If the status
+is critical, the killing or defending move gets a corresponding move
+reason.
+@end quotation
+
+@item @code{semeai_move_reasons()}
+@findex semeai
+@quotation
+Similarly as @code{owl_reasons}, this function proposes moves relevant
+for semeais.
+@end quotation
+
+@item @code{break_in_move_reasons()}
+@quotation
+This suggests moves that have been found to break into opponent's territory
+by the break-in module.
+@end quotation
+@end itemize
+
+The following move generators do additional work:
 
 @itemize @bullet
 
 @item @code{fuseki()}
 @findex fuseki
 @quotation
-Generate a move in the early fuseki.
-@end quotation
-
-@item @code{semeai()}
-@findex semeai
-@quotation
-Find out if two dead groups of opposite colors are
-next to each other and, if so, try to kill the other
-group. This module will eventually be rewritten along
-the lines of the owl code.
+Generate a move in the early fuseki, either in an empty corner of from
+the fuseki database.
 @end quotation
 
 @item @code{shapes()}
 @findex shapes
 @quotation
-Find patterns from @file{patterns/patterns.db} in
-the current position.  Each pattern is matched in each
+This is probably the most important move generator.
+It finds patterns from @file{patterns/patterns.db},
+@file{patterns/patterns2.db}, @file{patterns/fuseki.db}, and the joseki
+files in the current position.  Each pattern is matched in each
 of the 8 possible orientations obtainable by rotation and
 reflection. If the pattern matches, a so called "constraint"
 may be tested which makes use of reading to determine if the
@@ -305,29 +175,28 @@ The patterns can be of a number of different classes
 with different goals.  There are e.g. patterns which
 try to attack or defend groups, patterns which try to
 connect or cut groups, and patterns which simply try
-to make good shape. In addition to the large pattern
+to make good shape. (In addition to the large pattern
 database called by @code{shapes()}, pattern matching
 is used by other modules for different tasks throughout
 the program. @xref{Patterns}, for a complete documentation 
-of patterns.
+of patterns.)
 @end quotation
 
-@item @code{atari_atari()}
+@item @code{combinations()}
 @findex atari_atari
 @quotation
-See if there are any combination threats and either propose them or
-defend against them.
+See if there are any combination threats or atari sequences and either
+propose them or defend against them.
 @end quotation
 
-@item @code{owl_reasons()}
-@findex owl_reasons
+@item @code{revise_thrashing_dragon()}
+@findex revise_thrashing_dragon
 @quotation
-The Owl Code (@pxref{The Owl Code}) which has been run during
-@code{examine_position}), before @code{owl_reasons()} executes, has decided
-whether different groups can be attacked. The module @code{review_owl_reasons}
-reviews the statuses of every dragon and assigns move reasons for attack and
-defense. Unlike the other move generation modules, this one is called from
-@code{examine_position()}.  
+This module does not directly propose move: If we are clearly ahead,
+and the last move played by the opponent is part of a dead dragon, we
+want to attack that dragon again to be on the safe side. This is done
+be setting the status of this @dfn{thrashing dragon} to unkown and
+repeating the shape move generation and move valution.
 @end quotation
 
 @item @code{endgame_shapes()}
@@ -356,22 +225,32 @@ move is generated.
 @end quotation
 @end itemize
 
-@subsection Selecting the Move
+@node Move Valuation, Detailed Sequence of Events, Move Generators, Overview
+@section Move Valuation
 
-After the move generation modules have run, the best ten moves
-are selected by the function @code{review_move_reasons}. This
-function also does some analysis to try to turn up other moves
-which may have been missed. The modules @code{revise_semeai()} and
-@code{fill_liberty()} are only run if no good move has been
-discovered by the other modules.
+After the move generation modules have run, each proposed candidate
+move goes through a detailed valuation by the function
+@code{review_move_reasons}. This invokes some analysis to try to turn
+up other move reasons that may have been missed.
 
-@node  Examining the Position, Sequence of Events, Move Generation Basics, Overview
+The most important value of a move is its territorial effect.
+@xref{Influence and Territory} explains in detail how this is determined.
+
+This value is modified for all move reasons that cannot be expressed
+directly in terms of territory, such as combination attacks (where it
+is not clear which of several strings will get captured), strategical
+effects, connection moves, etc.  A large set heuristics is necessary
+here, e.g. to avoid duplication of such values. This is explained in
+more detail in @ref{Valuations}.
+
+
+@node Detailed Sequence of Events, Roadmap, Move Valuation, Overview
 @comment node-name,     next,            previous,        up
-@section Examining the Position
+@section Detailed Sequence of Events
 
-In this section we summarize the sequence of events when
+First comes the sequence of events when
 @code{examine_position()} is run from @code{genmove()}. This
-is for reference only. Don't try to memorize it.
+is for reference only.
 
 @format
 purge persistent reading cache (@pxref{Persistent Cache})
@@ -397,7 +276,6 @@ purge persistent reading cache (@pxref{Persistent Cache})
     find higher order liberties
   find cutting points (worm.cutstone)
   for each worm compute the genus (@pxref{Worms})
-  @code{small_semeai()}
   try to improve values of worm.attack and worm.defend
   try to repair situations where adjacent worms can be
     both attacked and defended
@@ -453,13 +331,9 @@ purge persistent reading cache (@pxref{Persistent Cache})
 @code{compute_initial_influence()} again (@pxref{Influence})
 @end format
 
-@node  Sequence of Events, Roadmap, Examining the Position, Overview
-@comment node-name,     next,            previous,        up
-@section Sequence of Events
-
-In this section we summarize the sequence of events during the
+Now a summary of the sequence of events during the
 move generation and selection phases of @code{genmove()}, which 
-take place after the information gathering phase has been completed.
+take place after the information gathering phase has been completed:
 
 @format
 @code{fuseki()}
@@ -485,7 +359,7 @@ if still no move found
     pass
 @end format
 
-@node Roadmap, Coding Styles, Sequence of Events, Overview
+@node Roadmap, Coding Styles, Detailed Sequence of Events, Overview
 @comment node-name,     next,            previous,        up
 @section Roadmap
 
@@ -869,8 +743,7 @@ format string suppresses the indentation.
 @end quotation
 @end itemize
 
-A variant @code{mprintf} sends output to stderr. Normally
-@code{gprintf()} is wrapped in one of the following:
+Normally @code{gprintf()} is wrapped in one of the following:
 
 @code{TRACE(fmt, ...)}: 
 @quotation
