@@ -396,20 +396,20 @@ atari_atari_blunder_size(int color, int move, int *defense,
 
   if (aa_val == 0 || defense_point == NO_MOVE) {
 
-  /* No sufficiently large combination attack, so the move is safe from
-   * this danger.
-   *
-   * On rare occasions do_atari_atari might find a combination
-   * but no defense. In this case we assume that the combination
-   * is illusory.
-   */
+    /* No sufficiently large combination attack, so the move is safe from
+     * this danger.
+     *
+     * On rare occasions do_atari_atari might find a combination
+     * but no defense. In this case we assume that the combination
+     * is illusory.
+     */
 
     popgo();
     decrease_depth_values();
     return 0;
   }
 
-  while (aa_val >= after_aa_val) {
+  while (aa_val >= after_aa_val && defense_point != NO_MOVE) {
     /* Try dropping moves from the combination and see if it still
      * works. What we really want is to get the proper defense move
      * into (*defense).
