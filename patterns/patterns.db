@@ -11465,25 +11465,26 @@ xxxx
 ; dead(A) && effective_size(A)>8 && lib(b)<=4
 
 
-Pattern CD106
-# db added (3.1.7)
-
-?x?          make an eye (or die trying!)
-O*O
-O.O
-oOX
-
-:8,d
-
-?x?
-O*A
-OaA
-bOX
-
-; does_defend(*,A)
-
-> replace(a,*);
-> if (!o_alive_somewhere(b)) replace(b,*)
+# Pattern CD106
+# # db added (3.1.7)
+# Removed (3.3.20), see 13x13b:27.
+# 
+# ?x?          make an eye (or die trying!)
+# O*O
+# O.O
+# oOX
+#
+# :8,d
+#
+# ?x?
+# O*A
+# OaA
+# bOX
+#
+# ; does_defend(*,A)
+#
+# > replace(a,*);
+# > if (!o_alive_somewhere(b)) replace(b,*)
 
 
 Pattern CD107
