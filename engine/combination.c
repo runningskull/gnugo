@@ -973,7 +973,7 @@ atari_atari_attack_callback(int m, int n, int color,
       x += m;
       y += n;
 
-      str = worm[POS(x, y)].origin;
+      str = find_origin(POS(x, y));
 
       if (current_minsize > 0
 	  && countstones(str) < current_minsize
@@ -1059,6 +1059,10 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
   for (r = 0; r < AA_MAX_TARGETS_PER_MOVE && targets[r] != NO_MOVE; r++) {
     int str = targets[r];
 
+    /* If the attack move happened to remove (str), there's no defense. */
+    if (board[str] == EMPTY)
+      continue;
+    
     /* Because we know (str) is threatened there is an
      * attack and we can be sure find_defense() will give a
      * useful defense point if it returns non-zero. Usually we
