@@ -2296,37 +2296,50 @@ report_dragon(FILE *outfile, int pos)
   gfprintf(outfile, "heye                    %1m\n", d2->heye);
   gfprintf(outfile, "escape_route            %d\n", d2->escape_route);
   gfprintf(outfile, "lunch                   %1m\n", d2->lunch);
-  gfprintf(outfile, "crude status            %s\n",
+  gfprintf(outfile, "crude_status            %s\n",
 	   status_to_string(d->crude_status));
   gfprintf(outfile, "owl_status              %s\n",
 	   status_to_string(d2->owl_status));
   gfprintf(outfile, "status                  %s\n",
 	   status_to_string(d->status));
-  gfprintf(outfile, "owl_threat_status       %s\n",
-	   status_to_string(d2->owl_threat_status));
-  gfprintf(outfile, "owl_attack              %1m\n", d2->owl_attack_point);
-  gfprintf(outfile, "owl_attack_certain      %s\n",
-	   (d2->owl_attack_certain) ? "YES" : "NO");
-  gfprintf(outfile, "owl_2nd_attack          %1m\n",
-	   d2->owl_second_attack_point);
-  gfprintf(outfile, "owl_defend              %1m\n", d2->owl_defense_point);
-  gfprintf(outfile, "owl_defense_certain     %s\n",
-	   (d2->owl_defense_certain) ? "YES" : "NO");
-  gfprintf(outfile, "owl_2nd_defend          %1m\n",
-           d2->owl_second_defense_point);
-  gfprintf(outfile, "semeai                  %d\n", d2->semeai);
-  gfprintf(outfile, "semeai_margin_of_safety %d\n",
-	   d2->semeai_margin_of_safety);
+  gfprintf(outfile, "safety                  %s\n",
+	   status_to_string(d2->safety));
+  gfprintf(outfile, "weakness                %f\n", d2->weakness);
+  gfprintf(outfile, "weakness_pre_owl        %f\n", d2->weakness_pre_owl);
+  gfprintf(outfile, "surround_status         %d\n", d2->surround_status);
+  gfprintf(outfile, "surround_size           %d\n", d2->surround_size);
+  gfprintf(outfile, "moyo_size               %d\n", d2->moyo_size);
+  gfprintf(outfile, "moyo_territorial_value  %f\n",
+	   d2->moyo_territorial_value);
   gfprintf(outfile, "neighbors               ");
   for (k = 0; k < d2->neighbors; k++)
     gfprintf(outfile, "%1m ", DRAGON(d2->adjacent[k]).origin);
-  gfprintf(outfile, "\nhostile neighbors       %d\n", d2->hostile_neighbors);
-  gfprintf(outfile, "moyo size               %d\n", d2->moyo_size);
-  gfprintf(outfile, "moyo territorial value  %f\n",
-	   d2->moyo_territorial_value);
-  gfprintf(outfile, "safety                  %s\n",
-	   status_to_string(d2->safety));
-  gfprintf(outfile, "weakness estimate       %f\n", d2->weakness);
+  gfprintf(outfile, "\nhostile_neighbors       %d\n", d2->hostile_neighbors);
+  gfprintf(outfile, "owl_attack_code         %d\n", d2->owl_attack_code);
+  gfprintf(outfile, "owl_attack_point        %1m\n", d2->owl_attack_point);
+  gfprintf(outfile, "owl_attack_certain      %s\n",
+	   (d2->owl_attack_certain) ? "YES" : "NO");
+  gfprintf(outfile, "owl_2nd_attack_point    %1m\n",
+	   d2->owl_second_attack_point);
+  gfprintf(outfile, "owl_threat_status       %s\n",
+	   status_to_string(d2->owl_threat_status));
+  gfprintf(outfile, "owl_defense_code        %d\n", d2->owl_defense_code);
+  gfprintf(outfile, "owl_defense_point       %1m\n", d2->owl_defense_point);
+  gfprintf(outfile, "owl_defense_certain     %s\n",
+	   (d2->owl_defense_certain) ? "YES" : "NO");
+  gfprintf(outfile, "owl_2nd_defense_point   %1m\n",
+           d2->owl_second_defense_point);
+  gfprintf(outfile, "owl_attack_kworm        %1m\n", d2->owl_attack_kworm);
+  gfprintf(outfile, "owl_defense_kworm       %1m\n", d2->owl_defense_kworm);
+  gfprintf(outfile, "semeai                  %d\n", d2->semeai);
+  gfprintf(outfile, "semeai_margin_of_safety %d\n",
+	   d2->semeai_margin_of_safety);
+  gfprintf(outfile, "semeai_defense_point    %1m\n", d2->semeai_defense_point);
+  gfprintf(outfile, "semeai_defense_certain  %d\n",
+	   d2->semeai_defense_certain);
+  gfprintf(outfile, "semeai_attack_point     %1m\n", d2->semeai_attack_point);
+  gfprintf(outfile, "semeai_attack_certain   %d\n", d2->semeai_attack_certain);
+  gfprintf(outfile, "semeai_target           %1m\n", d2->semeai_target);
   gfprintf(outfile, "strings                 ");
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)

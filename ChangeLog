@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- report_dragon() revised
+- gtp_worm_data() revised
 - pattern tagging
 - regress.sh revised
 - regress.pike revised

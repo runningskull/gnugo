@@ -3607,27 +3607,30 @@ gtp_worm_data(char *s)
 	struct worm_data *w = &worm[POS(m, n)];
 	gtp_print_vertex(m, n);
 	gtp_printf(":\n");
-	gtp_mprintf("color           %C\n",  w->color);
-	gtp_printf("size            %d\n",   w->size);
-	gtp_printf("effective_size  %.2f\n", w->effective_size);
-	gtp_mprintf("origin          %m\n", 
+	gtp_mprintf("origin               %m\n", 
 		    I(w->origin), J(w->origin));
-	gtp_printf("liberties       %d\n",   w->liberties);
-	gtp_printf("liberties2      %d\n",   w->liberties2);
-	gtp_printf("liberties3      %d\n",   w->liberties3);
-	gtp_printf("liberties4      %d\n",   w->liberties4);
-	gtp_mprintf("attack_point    %m\n",  
+	gtp_mprintf("color                %C\n",  w->color);
+	gtp_printf("size                 %d\n",   w->size);
+	gtp_printf("effective_size       %.2f\n", w->effective_size);
+	gtp_printf("liberties            %d\n",   w->liberties);
+	gtp_printf("liberties2           %d\n",   w->liberties2);
+	gtp_printf("liberties3           %d\n",   w->liberties3);
+	gtp_printf("liberties4           %d\n",   w->liberties4);
+	gtp_printf("attack_code          %d\n",   w->attack_codes[0]);
+	gtp_mprintf("attack_point         %m\n",  
 		    I(w->attack_points[0]), J(w->attack_points[0]));
-	gtp_printf("attack_code     %d\n",   w->attack_codes[0]);
-	gtp_mprintf("lunch           %m\n",  
-		    I(w->lunch), J(w->lunch));
-	gtp_mprintf("defense_point   %m\n",  
+	gtp_printf("defense_code         %d\n",   w->defense_codes[0]);
+	gtp_mprintf("defense_point        %m\n",  
 		    I(w->defense_points[0]), J(w->defense_points[0]));
-	gtp_printf("defense_code    %d\n",   w->defense_codes[0]);
-	gtp_printf("cutstone        %d\n",   w->cutstone);
-	gtp_printf("cutstone2       %d\n",   w->cutstone2);
-	gtp_printf("genus           %d\n",   w->genus);
-	gtp_printf("inessential     %d\n",   w->inessential);
+	gtp_mprintf("lunch                %m\n",  
+		    I(w->lunch), J(w->lunch));
+	gtp_printf("cutstone             %d\n",   w->cutstone);
+	gtp_printf("cutstone2            %d\n",   w->cutstone2);
+	gtp_printf("genus                %d\n",   w->genus);
+	gtp_printf("inessential          %d\n",   w->inessential);
+	gtp_printf("invincible           %d\n",   w->invincible);
+	gtp_printf("unconditional_status %s\n",
+		   status_to_string(w->unconditional_status));
       }
   
   gtp_printf("\n");
