@@ -134,7 +134,7 @@ typedef struct {
 } Hash_data;
 
 Hash_data xor_hashvalues(Hash_data *key1, Hash_data *key2);
-Hash_data goal_to_hashvalue(char *goal);
+Hash_data goal_to_hashvalue(const char *goal);
 
 void hash_init(void);
 #if FULL_POSITION_IN_HASH

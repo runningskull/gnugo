@@ -80,6 +80,62 @@ enlarge_goal(char goal[BOARDMAX])
   }
 }
 
+
+/* The "smaller goal" is the intersection of the goal with what is
+ * stored in the queue of the connection_data conn.
+ */
+static void
+compute_smaller_goal(int owner, int color_to_move,
+    		     const struct connection_data *conn,
+    		     const char goal[BOARDMAX], char smaller_goal[BOARDMAX])
+		     
+{
+  int k, j;
+  int own_stones_visited[BOARDMAX];
+  memset(smaller_goal, 0, BOARDMAX);
+  for (k = 0; k < conn->queue_end; k++) {
+    int pos = conn->queue[k];
+    int goal_neighbors = 0;
+    /* If we are trying to block-off, we need to be extra careful: We only
+     * can block intrusions coming directly from the string in question.
+     * Therefore, we discard the area if we have traversed more than two
+     * stones of the color breaking in on the way to the goal.
+     */
+    if (owner == color_to_move) {
+      int coming_from = conn->coming_from[pos];
+      if (coming_from == NO_MOVE)
+	own_stones_visited[pos] = 0;
+      else {
+	own_stones_visited[pos] = own_stones_visited[coming_from];
+	/* How many stones have we used to jump from coming_from to pos?
+	 * Use Manhattan metric as a guess.
+	 */
+	if (!goal[pos] && board[pos] == OTHER_COLOR(owner))
+	  own_stones_visited[pos] += gg_abs(I(pos) - I(coming_from))
+	    			     + gg_abs(J(pos) - J(coming_from));
+	if (own_stones_visited[pos] > 2)
+	  continue;
+      }
+    }
+
+    if (!goal[pos])
+      continue;
+
+    /* We don't want vertices that are at the border of the territory, and
+     * from which a break-in is unlikely; these often lead to false
+     * positives.
+     * So we throw out every vertex that has only one neighbor in the goal.
+     */
+    for (j = 0; j < 4; j++)
+      if (ON_BOARD(pos + delta[j])
+	  && goal[pos + delta[j]]
+	  && (board[pos] == EMPTY || goal[pos] == OTHER_COLOR(owner)))
+	goal_neighbors++;
+    if (goal_neighbors > 1)
+      smaller_goal[pos] = 1;
+  }
+}
+
 /* Try to intrude from str into goal. If successful, we shrink the goal,
  * store the non-territory fields in the non_territory array, and
  * try again.
@@ -90,48 +146,58 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
     		      int color_to_move)
 {
   int move = NO_MOVE;
+  char smaller_goal[BOARDMAX];
+  struct connection_data conn;
 
-  DEBUG(DEBUG_TERRITORY, "Trying to break in from %1m\n", str);
+  compute_connection_distances(str, NO_MOVE, 3.01, &conn);
+  compute_smaller_goal(OTHER_COLOR(board[str]), color_to_move,
+      		       &conn, goal, smaller_goal);
+  DEBUG(DEBUG_TERRITORY, "Trying to break in from %1m to:\n", str);
+  if (debug & DEBUG_TERRITORY)
+    goaldump(smaller_goal);
   while ((color_to_move == board[str]
-          && break_in(str, goal, &move))
+          && break_in(str, smaller_goal, &move))
          || (color_to_move == OTHER_COLOR(board[str])
-	     && !block_off(str, goal, NULL))) { 
+	     && !block_off(str, smaller_goal, NULL))) { 
     /* Successful break-in/unsuccessful block. Now where exactly can we
      * erase territory? This is difficult, and the method here is very
      * crude: Wherever we enter the territory when computing the closest
      * neighbors of (str). Plus at the locaction of the break-in move.
      * FIXME: This needs improvement.
      */
-    struct connection_data conn;
     int k;
     int save_num = *num_non_territory;
-    float min_distance = 5.0;
+    float cut_off_distance = 3.5;
     if (ON_BOARD(move) && goal[move]) {
       non_territory[(*num_non_territory)++] = move;
       DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -a.\n", move);
     }
 
-    compute_connection_distances(str, NO_MOVE, 3.01, &conn);
     for (k = 0; k < conn.queue_end; k++) {
       int pos = conn.queue[k];
-      if (conn.distances[pos] > min_distance + 0.31)
+      if (conn.distances[pos] > cut_off_distance + 0.31)
 	break;
       if (goal[pos]
 	  && (!ON_BOARD(conn.coming_from[pos])
 	      || !goal[conn.coming_from[pos]])) {
 	non_territory[(*num_non_territory)++] = pos;
 	DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -b.\n", pos);
-	if (conn.distances[pos] < min_distance)
-	  min_distance = conn.distances[pos];
+	if (conn.distances[pos] < cut_off_distance)
+	  cut_off_distance = conn.distances[pos];
       }
-      if (*num_non_territory >= save_num + 5)
+      if (*num_non_territory >= save_num + 4)
 	break;
     }
+
     /* Shouldn't happen, but it does. */
     if (*num_non_territory == save_num)
       break;
+
     for (k = save_num; k < *num_non_territory; k++)
       goal[non_territory[k]] = 0;
+
+    compute_smaller_goal(OTHER_COLOR(board[str]), color_to_move,
+			 &conn, goal, smaller_goal);
   }
   return move;
 }
@@ -170,7 +236,7 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
     if (conn.distances[pos] > min_distance + 1.001)
       break;
     if (board[pos] == intruder
-	&& influence_considered_safe(q, pos)
+	&& influence_considered_lively(q, pos)
 	&& !used[pos]) {
       /* Discard this string in case the shortest path goes via a string
        * that we have in the candidate list already.

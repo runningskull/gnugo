@@ -1926,6 +1926,8 @@ estimate_territorial_value(int pos, int color, float score)
    */
   this_value = 0.0;
 
+  mark_inessential_stones(OTHER_COLOR(color), safe_stones);
+
   if (move[pos].move_safety == 1 && safe_move(pos, color) == WIN) {
     safe_stones[pos] = INFLUENCE_SAVED_STONE;
     strength[pos] = DEFAULT_STRENGTH;

@@ -47,10 +47,10 @@ static int recursive_connect2(int str1, int str2, int *move,
 			      int komaster, int kom_pos, int has_passed);
 static int recursive_disconnect2(int str1, int str2, int *move,
 				 int komaster, int kom_pos, int has_passed);
-static int recursive_break(int str, char goal[BOARDMAX], int *move,
+static int recursive_break(int str, const char goal[BOARDMAX], int *move,
     			   int komaster, int kom_pos, int has_passed,
 			   Hash_data *goal_hash);
-static int recursive_block(int str, char goal[BOARDMAX], int *move,
+static int recursive_block(int str, const char goal[BOARDMAX], int *move,
     			   int komaster, int kom_pos, int has_passed,
 			   Hash_data *goal_hash);
 
@@ -2529,32 +2529,47 @@ find_string_connection_moves(int str1, int str2, int color_to_move,
   return num_moves;
 }
 
+
+static void
+add_to_start_queue(int pos, float dist, struct connection_data *conn)
+{
+  conn->queue[conn->queue_end++] = pos;
+  conn->distances[pos] = dist;
+  conn->deltas[pos] = dist;
+  conn->coming_from[pos] = NO_MOVE;
+  conn->vulnerable1[pos] = NO_MOVE;
+  conn->vulnerable2[pos] = NO_MOVE;
+}
+
+
 void
 init_connection_data(int color, const char goal[BOARDMAX],
     		     struct connection_data *conn)
 {
   int pos;
+  char mark[BOARDMAX];
+  memset(mark, 0, BOARDMAX);
   clear_connection_data(conn);
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if ((board[pos] == EMPTY || board[pos] == color)
+    if (!mark[pos]
+	&& (board[pos] == EMPTY || board[pos] == color)
 	&& goal[pos]) {
-      conn->queue[conn->queue_end++] = pos;
       if (board[pos] == color) {
-	conn->distances[pos] = 0.0;
-	conn->deltas[pos] = 0.0;
+	/* In this case, add the whole string to the start queue. */
+	int stones[MAX_BOARD * MAX_BOARD];
+	int num_stones = findstones(pos, MAX_BOARD * MAX_BOARD, stones);
+	int k;
+	for (k = 0; k < num_stones; k++)
+	  add_to_start_queue(stones[k], 0.0, conn);
+	mark_string(pos, mark, 1);
       }
-      else {
-	conn->distances[pos] = 1.0;
-	conn->deltas[pos] = 1.0;
-      }
-      conn->coming_from[pos] = NO_MOVE;
-      conn->vulnerable1[pos] = NO_MOVE;
-      conn->vulnerable2[pos] = NO_MOVE;
+      else
+        add_to_start_queue(pos, 1.0, conn);
     }
 }
 
 static int
-find_break_moves(int str, char goal[BOARDMAX], int color_to_move,
+find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
 		 int moves[MAX_MOVES], float *total_distance)
 {
   struct connection_data conn1;
@@ -2602,6 +2617,10 @@ find_break_moves(int str, char goal[BOARDMAX], int color_to_move,
   max_dist2 = conn2.distances[str];
   *total_distance = gg_min(max_dist1, max_dist2);
 
+  /* Turn the sgf traces back on. */
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+
   if (verbose > 0) {
     gprintf("%oVariation %d\n", save_count_variations);
     dump_stack();
@@ -2609,10 +2628,6 @@ find_break_moves(int str, char goal[BOARDMAX], int color_to_move,
     print_connection_distances(&conn1);
     print_connection_distances(&conn2);
   }
-
-  /* Turn the sgf traces back on. */
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
 
   num_moves = find_connection_moves(str, str2, color_to_move,
       				    &conn1, &conn2, max_dist1, max_dist2,
@@ -2639,7 +2654,7 @@ static int break_in_depth;
 
 /* Can (str) connect to goal[] if the other color moves first? */
 static int
-recursive_break(int str, char goal[BOARDMAX], int *move,
+recursive_break(int str, const char goal[BOARDMAX], int *move,
     		int komaster, int kom_pos, int has_passed,
 		Hash_data *goal_hash)
 {
@@ -2756,7 +2771,7 @@ recursive_break(int str, char goal[BOARDMAX], int *move,
 
 /* Can (str) connect to goal[] if the other color moves first? */
 static int
-recursive_block(int str, char goal[BOARDMAX], int *move,
+recursive_block(int str, const char goal[BOARDMAX], int *move,
     		int komaster, int kom_pos, int has_passed,
 		Hash_data *goal_hash)
 {
@@ -2884,7 +2899,7 @@ recursive_block(int str, char goal[BOARDMAX], int *move,
  * not contain stones), if he gets the first move.
  */
 int
-break_in(int str, char goal[BOARDMAX], int *move)
+break_in(int str, const char goal[BOARDMAX], int *move)
 {
   int dummy_move;
   int save_verbose;
@@ -2919,6 +2934,7 @@ break_in(int str, char goal[BOARDMAX], int *move)
     gprintf("%obreak_in    %1M, result %d %1M (%d, %d nodes, %f seconds)\n",
 	    str, result, *move,
 	    nodes_connect, tactical_nodes, gg_cputime() - start);
+    goaldump(goal);
     dump_stack();
   }
   if (0) {
@@ -2936,7 +2952,7 @@ break_in(int str, char goal[BOARDMAX], int *move)
  * not contain stones), if the other color moves first.
  */
 int
-block_off(int str, char goal[BOARDMAX], int *move)
+block_off(int str, const char goal[BOARDMAX], int *move)
 {
   int dummy_move;
   int result;
@@ -2967,18 +2983,18 @@ block_off(int str, char goal[BOARDMAX], int *move)
   verbose = save_verbose;
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
-#if 0
   if (0) {
-    gprintf("%odisconnect %1m %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
-	    str1, str2, result, *move,
+    gprintf("%oblock_off %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
+	    str, result, *move,
 	    nodes_connect, tactical_nodes, gg_cputime() - start);
+    goaldump(goal);
     dump_stack();
   }
   if (0) {
-    gprintf("%odisconnect %1m %1m %d %1m ", str1, str2, result, *move);
+    gprintf("%oblock_off %1m %d %1m ", str, result, *move);
+    goaldump(goal);
     dump_stack();
   }
-#endif
 
   return result;
 }

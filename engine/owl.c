@@ -3813,7 +3813,7 @@ owl_update_boundary_marks(int pos, struct local_owl_data *owl)
  */
 
 void
-goaldump(char goal[BOARDMAX])
+goaldump(const char goal[BOARDMAX])
 {
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)

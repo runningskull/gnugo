@@ -233,6 +233,12 @@ loadsgf games/owl46.sgf
 317 owl_attack J4
 #? [1 (J7|J6|J8)]*
 
+# See also lazarus:10
+loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 258
+318 owl_does_defend F10 D10
+#? [0]
+
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

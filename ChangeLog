@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- inessential dragons handled differently in estimate_territorial_value()
+- use smaller goal area when trying to break into territories
 - semeai_trymove_and_recurse() propagetes back changes to &owla, &owlb
 - copy over old eye_data in do_owl_defend() if escape > MAX_ESCAPE
 - new configure option --experimental-break-in

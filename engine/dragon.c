@@ -1185,10 +1185,10 @@ set_dragon_strengths(const char safe_stones[BOARDMAX],
     }
 }
 
-/* Marks all inessential stones with INFLUENCE_SAVE_STONE, leaves
+/* Marks all inessential stones with INFLUENCE_SAFE_STONE, leaves
  * everything else unchanged.
  */
-static void
+void
 mark_inessential_stones(int color, char safe_stones[BOARDMAX])
 {
   int ii;

@@ -907,8 +907,10 @@ influence_erase_territory(struct influence_data *q, int pos, int color)
   q->territory_value[pos] = 0.0;
   influence_mark_non_territory(pos, color);
   for (k = 0; k < 4; k++) {
-    q->territory_value[pos + delta[k]] = 0.0;
-    influence_mark_non_territory(pos + delta[k], color);
+    if (ON_BOARD(pos + delta[k])) {
+      q->territory_value[pos + delta[k]] = 0.0;
+      influence_mark_non_territory(pos + delta[k], color);
+    }
   }
 }
 
@@ -1506,9 +1508,13 @@ influence_territory(const struct influence_data *q, int pos, int color)
 }
 
 int
-influence_considered_safe(const struct influence_data *q, int pos)
+influence_considered_lively(const struct influence_data *q, int pos)
 {
-  return q->safe[pos];
+  int color = board[pos];
+  ASSERT1(IS_STONE(color), pos);
+  return (q->safe[pos]
+          && ((color == WHITE && q->white_strength[pos] > 0)
+	      || (color == BLACK && q->black_strength[pos] > 0)));
 }
 
 
@@ -1536,6 +1542,7 @@ compute_followup_influence(const struct influence_data *base,
   int save_debug = debug;
 
   memcpy(q, base, sizeof(*q));
+  ASSERT1(IS_STONE(q->color_to_move), move);
  
   /* We mark the saved stones and their neighbors in the goal array.
    */

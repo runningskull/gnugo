@@ -396,7 +396,7 @@ hashdata_compare(Hash_data *hd1, Hash_data *hd2)
 
 /* Compute hash value to identify the goal area. */
 Hash_data
-goal_to_hashvalue(char *goal)
+goal_to_hashvalue(const char *goal)
 {
   int i, pos;
   Hash_data return_value;

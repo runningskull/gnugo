@@ -328,10 +328,11 @@ loadsgf games/trevor/auto/a033.sgf 26
 
 # games/trevor/auto/a034.sgf problems:
 
-#Must connect groups.
-loadsgf games/trevor/auto/a034.sgf 12
-510 gg_genmove white
-#? [F4]*
+# Duplicate of trevora:150. /ab
+##Must connect groups.
+#loadsgf games/trevor/auto/a034.sgf 12
+#510 gg_genmove white
+##? [F4]*
 
 
 

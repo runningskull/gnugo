@@ -355,8 +355,8 @@ int string_connect(int str1, int str2, int *move);
 int disconnect(int str1, int str2, int *move);
 int non_transitivity(int str1, int str2, int str3, int *move);
 
-int break_in(int str, char goal[BOARDMAX], int *move);
-int block_off(int str1, char goal[BOARDMAX], int *move);
+int break_in(int str, const char goal[BOARDMAX], int *move);
+int block_off(int str1, const char goal[BOARDMAX], int *move);
 
 /* board.c */
 int liberty_of_string(int pos, int str);
@@ -414,6 +414,7 @@ int lively_dragon_exists(int color);
 void compute_dragon_influence(void);
 void set_strength_data(int color, char safe_stones[BOARDMAX],
 		       float strength[BOARDMAX]);
+void mark_inessential_stones(int color, char safe_stones[BOARDMAX]);
 
 void get_lively_stones(int color, char safe_stones[BOARDMAX]);
 int is_same_worm(int w1, int w2);
@@ -717,7 +718,7 @@ float influence_score(const struct influence_data *q);
 float game_status(int color);
 void resegment_initial_influence(void);
 void influence_mark_non_territory(int pos, int color);
-int influence_considered_safe(const struct influence_data *q, int pos);
+int influence_considered_lively(const struct influence_data *q, int pos);
 void influence_erase_territory(struct influence_data *q, int pos, int color);
 
 void break_territories(int color_to_move, struct influence_data *q,
@@ -738,7 +739,7 @@ int analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
 
 
 /* debugging support */
-void goaldump(char goal[BOARDMAX]);
+void goaldump(const char goal[BOARDMAX]);
 void move_considered(int move, float value);
 
 
