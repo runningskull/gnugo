@@ -166,10 +166,14 @@ while ($games > 0) {
 
     print $black_in  "boardsize $size\n";
     eat_no_response($black_out);
+    print $black_in  "clear_board\n";
+    eat_no_response($black_out);
     print $black_in  "komi $komi\n";
     eat_no_response($black_out);
 
     print $white_in  "boardsize $size\n";
+    eat_no_response($white_out);
+    print $white_in  "clear_board\n";
     eat_no_response($white_out);
     print $white_in  "komi $komi\n";
     eat_no_response($white_out);
@@ -195,7 +199,7 @@ while ($games > 0) {
     }
     while ($pass < 2) {
 	if ($toplay eq 'B') {
-	    print $black_in "genmove_black\n";
+	    print $black_in "genmove black\n";
 	    $move = eat_move($black_out);
 	    $sgfmove = standard_to_sgf($move);
 	    print SGFFILEHANDLE ";B[$sgfmove]\n" if defined $sgffilename;
@@ -205,7 +209,7 @@ while ($games > 0) {
 	    } else {
 		$pass = 0;
 	    }
-	    print $white_in "black $move\n";
+	    print $white_in "play black $move\n";
 	    eat_no_response($white_out);
 	    if ($verbose > 1) {
 		print $white_in "showboard\n";
@@ -213,7 +217,7 @@ while ($games > 0) {
 	    }
 	    $toplay = 'W';
 	} else {
-	    print $white_in "genmove_white\n";
+	    print $white_in "genmove white\n";
 	    $move = eat_move($white_out);
 	    $sgfmove = standard_to_sgf($move);
 	    print SGFFILEHANDLE ";W[$sgfmove]\n" if defined $sgffilename;
@@ -223,7 +227,7 @@ while ($games > 0) {
 	    } else {
 		$pass = 0;
 	    }
-	    print $black_in "white $move\n";
+	    print $black_in "play white $move\n";
 	    eat_no_response($black_out);
 	    if ($verbose > 1) {
 		print $black_in "showboard\n";
@@ -232,10 +236,10 @@ while ($games > 0) {
 	    $toplay = 'B';
 	}
     }
-    print $white_in "estimate_score\n";
+    print $white_in "final_score\n";
     $resultw = eat_score($white_out);
     print "Result according to W: $resultw\n";
-    print $black_in "new_score\n";
+    print $black_in "final_score\n";
     $resultb = eat_score($black_out);
     print "Result according to B: $resultb\n";
     print $white_in "quit\n";

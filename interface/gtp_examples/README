@@ -4,6 +4,10 @@ twogtp    : a very useful perl script for playing two gtp processes together.
 
 twogtp-a  : alternative implementation
 
+twogtp.py : Python version of twogtp with additional features.
+
+twogtp.pike : Pike version of twogtp with even more features.
+
 2ptkgo.pl : Requires perltk and the next program. Plays two gtp processes 
             together with graphical display
 
