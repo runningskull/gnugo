@@ -61,3 +61,7 @@ loadsgf games/trevor/auto/c24.sgf 62
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 104
 14 combination_attack black
 #? [PASS]*
+
+loadsgf games/atari_atari05.sgf 291
+15 combination_attack black
+#? [B13]*

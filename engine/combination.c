@@ -1241,10 +1241,12 @@ update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX], int apos,
 
     /* FIXME: We shouldn't let dead opponent stones stop the
      * propagation of distance.
+     *
+     * As a partial fix we include pos == apos in a test below.
      */
     for (k = 0; k < 4; k++) {
       int pos2 = pos + delta[k];
-      if (board[pos] == other && board[pos2] == EMPTY) {
+      if ((board[pos] == other || pos == apos) && board[pos2] == EMPTY) {
         ENQUEUE(pos2, dists[pos] + 1);
       }
       else if (board[pos] != other && board[pos2] == other) {
