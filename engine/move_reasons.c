@@ -1607,9 +1607,10 @@ examine_move_safety(int color)
 	what = move_reasons[r].what;
 	switch (type) {
 	case CUT_MOVE:
-	  if (doing_scoring)
-	    break;
-	  /* otherwise fall through */
+	  /* We don't trust cut moves, unless some other move reason
+           * indicates they are safe.
+	   */
+	  break;
 	case SEMEAI_MOVE:
 	case ATTACK_EITHER_MOVE:
 	case DEFEND_BOTH_MOVE:    /* Maybe need better check for this case. */
