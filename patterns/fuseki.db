@@ -848,7 +848,10 @@ O..*..O?
 
 
 Pattern F407
+#tm modified (3.1.20) 
+#     (see nngs:1150, nngs:1030, nngs:1230)
 
+.....???
 ......??   make 2 space extension on third row
 .O..*...
 ......??
@@ -1348,16 +1351,18 @@ o......
 :8,FsjE
 
 
-Pattern F707
-
-.....         attack to make local shape
-O.X.O
-..*..
-.....
-.....
------
-
-:8,FsjE
+# tm - removed (3.1.20)
+# This is almost an antisuji, much less a joseki move!
+#Pattern F707
+#
+#.....         attack to make local shape
+#O.X.O
+#..*..
+#.....
+#.....
+#-----
+#
+#:8,FsjE
 
 
 ################

@@ -25,7 +25,6 @@
 #define _DFA_H_
 
 #include <stdio.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>

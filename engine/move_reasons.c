@@ -2197,8 +2197,8 @@ list_move_reasons(int color)
       pos = POS(m, n);
 
       for (k = 0; k < MAX_REASONS; k++) {
-	
 	int r = move[pos].reason[k];
+
 	if (r < 0)
 	  break;
 	
@@ -2957,7 +2957,8 @@ estimate_territorial_value(int pos, int color, float score)
 	adjusted_value -= adjustment_down;
 	if (adjusted_value > 0.0) {
 	  add_followup_value(pos, adjusted_value);
-	  TRACE("  %1m: %f (followup) - threatens to capture %1m\n",
+	  /* Inside trymove, so don't re-indented.*/
+	  TRACE("%1m:   %f (followup) - threatens to capture %1m\n",
 		pos, adjusted_value, aa);
 	}
 	popgo();
@@ -3661,9 +3662,10 @@ estimate_strategical_value(int pos, int color, float score)
     if (dragon[aa].matcher_status != DEAD
 	&& dragon[aa].size == worm[aa].size
 	&& (attack_move_reason_known(pos, find_worm(aa))
-	    || defense_move_reason_known(pos, find_worm(aa))))
+	    || defense_move_reason_known(pos, find_worm(aa)))) {
+      TRACE("  %1m:   %f - %1m strategic value already counted.\n", pos, dragon_value[k], aa);
       continue;
-    
+    }
     /* If the dragon has been owl captured, owl defended, or involved
      * in a semeai, we have likewise already counted the points as
      * territorial value.
@@ -3681,6 +3683,8 @@ estimate_strategical_value(int pos, int color, float score)
 	TRACE("  %1m: %f - strategic bonus for %1m\n",
 	      pos, excess_value, dragons[k]);
 	tot_value += excess_value;
+      } else {
+	TRACE(" %1m:   %f - %1m strategic value already counted.\n", pos, dragon_value[k], aa);
       }
       
       continue;

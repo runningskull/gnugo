@@ -467,6 +467,7 @@ add_influence_source(int pos, int color, float strength, float attenuation,
  * A - Barrier pattern, where O plays first and X tries to block influence.
  * D - Barrier pattern, where O plays first and O tries to block influence.
  * B - Intrusion patterns, adding a low intensity influence source.
+ * E - Enhance patterns, FIXME: document this one!
  * t - Non-territory patterns, marking vertices as not territory.
  * I - Invasion patterns, adding a low intensity influence source.
  * e - Escape bonus. Used together with I to increase the value substantially

@@ -285,26 +285,25 @@ All classes can be combined arbitrarily.
 @comment  node-name,  next,  previous,  up
 @section Pattern Attributes
 
-The second third field in the @samp{:} line of a pattern
-is optional and of the form @code{value1(x),value2(y),...}. The available set
+The second and following fields in the @samp{:} line of a pattern
+are optional and of the form @code{value1(x),value2(y),...}. The available set
 of values are as follows.
 
 @itemize @bullet
-@item @code{terri(x)}
+@item @code{terri(x)} :
 @findex terri
 @quotation
-Forces the territorial value of the move to be at most x
+Forces the territorial value of the move to be at least x.
 @end quotation
 @item @code{minterri(x)} :   
 @findex minterri
 @quotation
-Forces the territorial value of the move to be at least x
+Forces the territorial value of the move to be at least x.
 @end quotation
 @item @code{maxterri(x)}  : 
 @findex maxterri
 @quotation
-Forces the territorial value of the move to be at
-most x.
+Forces the territorial value of the move to be at most x.
 @end quotation
 @item @code{value(x)}     : 
 @findex value
@@ -315,7 +314,7 @@ Forces the final value of the move to be at least x.
 @findex minvalue
 @code{maxvalue(x)}  : 
 @quotation
-Forces the final value of the move to be at last/most x.
+Forces the final value of the move to be at least/most x.
 @end quotation
 @item @code{shape(x)}     : 
 @findex shape

@@ -24,6 +24,19 @@
 #
 #  New patterns that are not from patterns.db
 #
+##############################
+#
+#  The patterns are classified into a number of different categories:
+#
+#  Conn	    Connection patterns
+#  Cut	    Cut patterns
+#  AS	    Antisuji patterns (i.e. prohibitted moves)
+#  Shape    Shape moves
+#  Sente    Followup moves (add followup or reverse_followup values)
+#  DD	    Double threat moves and defense against double threats
+#  Temp     Temporary patterns to correct certain misbehaviours.
+#
+##############################
 
 ##############################
 #
@@ -1381,6 +1394,7 @@ xXx
 
 Pattern Shape9a
 # tm modified (3.1.18)
+# tm modified (3.1.20)
 
 ooo     don't give opponent ponnuki
 o*o
@@ -1391,16 +1405,17 @@ XOX
 
 bdB     don't give opponent ponnuki
 c*C
-XOX
+eOf
 .X.
 
-
+; lib(e) > 1 && lib(f) > 1 &&
 ; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1) &&
 ; !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B)))
 
 
 Pattern Shape9b
 # tm modified (3.1.18)
+# tm modified (3.1.20)
 
 ooo     don't give opponent ponnuki
 o*o
@@ -1411,13 +1426,16 @@ XOX
 
 bdB     don't give opponent ponnuki
 c*C
-XOX
+eOf
 .XX
 
 ; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1) &&
-; !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B)))
+; !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B))) &&
+; !attack(e) && !attack(f)
+
 
 Pattern Shape9c
+# tm modified (3.1.20)
 
 ooo     don't give opponent ponnuki
 o*o
@@ -1428,12 +1446,12 @@ XOX
 
 bdB
 c*C
-XOA
-.XO
+eOA
+.fO
 
 ; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1) &&
 ; !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B))) &&
-; !attack(A)
+; !attack(A) && !attack(e) && !attack(f)
 
 
 Pattern Shape10
@@ -2797,6 +2815,9 @@ a*bX
 
 
 Pattern DD1
+# FIXME: This isn't really double atari - just plain old
+#   capture also matches here.  see nngs:1260
+#   Does this matter?
 
 *X        double atari on you
 XO
@@ -3059,6 +3080,7 @@ a..
 
 Pattern Temp1
 # This joseki is played far too frequently.
+# existed since at least 3.0.0
 
 |........
 |........
@@ -3074,6 +3096,7 @@ Pattern Temp1
 
 Pattern Temp2
 # Connection of half point kos are severely overvalued.
+# existed since at least 3.0.0
 
 OOXX
 O*OX
@@ -3084,6 +3107,7 @@ O*OX
 
 Pattern Temp3a
 # Connection of half point kos are severely overvalued.
+# existed since at least 3.0.0
 
 oOXx
 O*OX
@@ -3100,6 +3124,7 @@ a*OD
 
 Pattern Temp3b
 # Connection of half point kos are severely overvalued.
+# existed since at least 3.0.0
 
 OOXX
 O*OX
@@ -3110,6 +3135,7 @@ OOXX
 
 Pattern Temp4
 # Connection of half point kos are severely overvalued.
+# existed since at least 3.0.0
 
 oOXx
 O*OX
@@ -3127,6 +3153,9 @@ ocFx
 
 Pattern Temp5
 # Don't make a short jump along the edge before shimari.
+# existed since at least 3.0.0
+# tm Modified (3.1.20)
+
 
 ???xxxxx|
 ........|
@@ -3149,11 +3178,12 @@ Pattern Temp5
 --------+
 
 >antisuji(*);
->antisuji(a);
+# antisuji(a); - a is often a fine move.
 
 
 Pattern Temp6
 # Don't make a short extension from san-san in open surroundings.
+# existed since at least 3.0.0
 
 .........|
 .........|
@@ -3183,6 +3213,8 @@ Pattern Temp6
 Pattern Temp7a
 # Don't make a one space jump along the edge when there is room for a
 # two space jump.
+# existed since at least 3.0.0
+# FIXME: consider using replace instead of antisuji here?
 
 ......
 ......
@@ -3198,6 +3230,7 @@ Pattern Temp7a
 
 Pattern Temp7b
 # Usually stupid
+# existed since at least 3.1.20
 
 X...xxx
 XXO.xxx
@@ -3219,6 +3252,7 @@ OG*....
 
 
 Pattern Temp8
+# existed since at least 3.1.20
 
 .....o         Don't crosscut
 .*X.Oo

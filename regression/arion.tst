@@ -1,7 +1,7 @@
 # NNGS game of GNU Go 2.7.203 on December 28, 2000
 
 loadsgf games/arion.sgf 33
-1 gg_genmove black
+1 gg_genmove black 1
 #? [Q6]
 
 loadsgf games/arion.sgf 63

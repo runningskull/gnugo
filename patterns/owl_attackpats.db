@@ -700,11 +700,12 @@ xX*.
 
 
 Pattern A221
+# tm Modified (3.1.20) - added right hand ?s
 
-?xx.             back off to prevent jump
-xX.*
-....
-----
+?xx.?             back off to prevent jump
+xX.*?
+....?
+-----
 
 :8,-,value(50)
 
@@ -3097,12 +3098,13 @@ Xc
 
 Pattern A1107c
 # tm New pattern. (3.1.17)
+# tm Modified (3.1.20) - reduced value (see nngs:320)
    
 .*       defend the surrounding chain
 O.
 XO
 
-:8,-,value(96)
+:8,-,value(60)
 
 .*
 ba

@@ -8685,6 +8685,7 @@ xxX.a.b
 
 
 Pattern CB322
+#FIXME: Pattern needs revision see nngs:860
 
 ??.ooo?       block to attack
 ??....?
@@ -9742,6 +9743,7 @@ XOX*..
 
 
 Pattern ED56
+# tm modified (3.1.20) (nngs:1170)
 
 ...X.?      extend to defend if attached
 O..O*.
@@ -9749,7 +9751,7 @@ O..O*.
 ......
 ------
 
-:8,OXCda,value(24)
+:8,OXCda,shape(3)
 
 
 Pattern ED57
@@ -9962,6 +9964,7 @@ OaB
 
 
 Pattern ED68
+# tm Modified (3.1.20) (see nngs:1130)
 
 ?O*Xx         reinforce
 o..OO
@@ -9969,7 +9972,7 @@ o..OO
 .....
 -----
 
-:8,JOX
+:8,ebdOX
 
 ?O*Xx
 o.aOO
@@ -10699,6 +10702,7 @@ BBX.
 
 
 Pattern CD92
+# tm Modified (3.1.20) - added constraint
 
 .X.        ponnuki is worth thirty points
 XO*
@@ -10706,6 +10710,11 @@ XO*
 
 :8,da,shape(3)
 
+.X.        ponnuki is worth thirty points
+XO*
+.aO
+
+; !attack(a)
 
 Pattern CD92a
 
@@ -13218,6 +13227,7 @@ Pattern LE13
 
 
 Pattern LE15
+# tm decreased value (3.1.20) (see nngs:1150 move G4)
 
 xxx            jump towards moyo
 x.x
@@ -13227,7 +13237,7 @@ x.x
 OoO
 ?o?
 
-:|,OE,value(10)
+:|,OE,value(7)
 
 def
 abc

@@ -62,6 +62,9 @@ loadsgf golois/Goemate990903-12.sgf
 15 owl_attack B17
 #? [0]
 
+#CATEGORY=SEMEAI
+#DESCRIPTION=
+#SEVERITY=
 # This is more of a semeai. /gf
 loadsgf golois/Goemate990903-5.sgf
 16 owl_attack M4

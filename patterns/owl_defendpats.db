@@ -994,6 +994,30 @@ o....*
 :8,-,value(80)
 
 
+Pattern D231
+# tm New Pattern (3.1.20) (see nngs:1320 owl_does_attack L15 M17)
+
+----	attach under
+.ooo
+*..o
+X.Oo
+..??
+????
+
+:8,sb,value(70)
+
+----
+.ooo
+*a.o
+XbOo
+c.??
+ed??
+
+; safe_omove(*) ||
+; ((owl_escape_value(c) > 0 || owl_escape_value(d) >0 || owl_escape_value(e)>0)
+;  && oplay_attack(*,a,b,a))
+
+
 #########################################################
 #                                                       #
 #          Expanding moves in the center                #
@@ -1033,6 +1057,7 @@ O..?
 
 
 Pattern D302
+# FIXME: This pattern looks way to general (see owl:23)
 
 XX.?          push along
 O*..
@@ -4387,6 +4412,42 @@ AOCd
 ; && oplay_attack_either(*,d,B,A)
 
 
+Pattern D1139
+# tm New Pattern (3.1.20) (see nngs:110)
+
+?*
+XO
+OX
+
+:8,b,value(75)
+
+?*
+aO
+Ob
+
+; (owl_escape_value(*) > 0) && !oplay_defend_both(*,a,b)
+
+
+Pattern D1140
+# tm New Pattern (3.1.20) (see nngs:1320 owl_does_attack L15 M17)
+
+?XO
+?*.
+???
+
+:8,b,value(70)
+
+?aO
+b*.
+cd?
+
+;(owl_escape_value(d) > 0 ||
+; owl_escape_value(b) > 0 ||
+; owl_escape_value(c) > 0)
+;&& oplay_attack(*,a)
+
+
+
 ########################################################
 #                                                       #
 #                       Kikashi                         #
@@ -5744,13 +5805,14 @@ XO?
 
 Pattern D1371
 # gf New pattern. (3.1.13)
+# tm Added b class (3.1.20)
 
 oOo        move out
 ...        
 .*X
 .O?
 
-:8,-,value(85)
+:8,b,value(85)  
 
 oao        move out
 ...        
