@@ -989,6 +989,27 @@ OO*           not guaranteed to yield a single point
 :8,OXe,terri(0.1)
 
 
+Pattern EE806
+# evand new (3.7.1)
+# see kgs:70
+
+|.O??
+|.OX.
+|.*X.
+|....
++----
+
+:8,OXe,terri(3)
+
+|bO??
+|.OX.
+|.*Xa
+|....
++----
+
+;xmoyo(a) && omoyo(b)
+
+
 # second line extensions
 ########################
 

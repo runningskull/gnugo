@@ -56,6 +56,7 @@
 - remove special case of CLASS_C in matchpat.c
 - influence tuning
 - owl tuning
+- endgame tuning
 - tuning
 - implement persistent semeai caching
 - don't crash on some .sgf-files from kgs

@@ -9266,6 +9266,85 @@ oooOo
 :8,OXe
 
 
+Pattern CB343
+# evand New pattern. (3.7.1)
+# Is there a better way to do this than r_followup, followup, and terri?
+# See gifu03:202.
+
+xX..
+..*.
+....
+..Oo
+....
+
+:8,OXe,reverse_followup(2),followup(1),terri(3)
+
+xXde
+..*.
+....
+..Oo
+.abc
+
+;omoyo(a) && omoyo(b) && omoyo(c) && xmoyo(d) && xmoyo(e)
+
+
+Pattern CB344a
+# evand New pattern. (3.7.1)
+# see endgame:850
+
+?X??
+.*.o
+O..O
+?..?
+
+:8,OXe
+
+?X??
+.*.o
+O..O
+?ab?
+
+;omoyo(a) || omoyo(b)
+
+
+Pattern CB344b
+# evand New pattern. (3.7.1)
+# see endgame:850
+
+?X??
+*..o
+O..O
+?..?
+
+:8,OXe
+
+?X??
+*..o
+O..O
+?ab?
+
+;omoyo(a) || omoyo(b)
+
+
+Pattern CB344c
+# evand New pattern. (3.7.1)
+# see endgame:850
+
+?X??
+..*o
+O..O
+?..?
+
+:8,OXe
+
+?X??
+..*o
+O..O
+?ab?
+
+;omoyo(a) || omoyo(b)
+
+
 ######################################################################
 #
 # Edge defend/attack patterns
