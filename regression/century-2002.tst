@@ -84,32 +84,32 @@ loadsgf games/century21-2002/manyfaces-gnugo.sgf 253
 #? [T9]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 26
-gg_genmove white
+190 gg_genmove white
 #? [D3]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 36
-gg_genmove white
+200 gg_genmove white
 #? [F6]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 58
-gg_genmove white
+210 gg_genmove white
 #? [!A15]
 
 # a move in the center is bigger than this monkey jump
 loadsgf games/century21-2002/gnugo-katsunari.sgf 76
-gg_genmove white
+220 gg_genmove white
 #? [!T3]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 96
-gg_genmove white
+240 gg_genmove white
 #? [F18]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 156
-gg_genmove white
+260 gg_genmove white
 #? [S12|Q12]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 202
-gg_genmove white
+270 gg_genmove white
 #? [O7]
 
 ############ End of Tests #################
