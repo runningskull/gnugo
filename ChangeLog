@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- atari_atari moves considered blocking in estimate_territorial_value()
 - MAX_LIBERTIES reduced to 8
 - popgo() bugfix to repair sgf traces	
 - do_owl_analyze_semeai() revised

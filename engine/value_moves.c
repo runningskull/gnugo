@@ -2335,6 +2335,11 @@ estimate_territorial_value(int pos, int color, float our_score,
       break;
       
     case YOUR_ATARI_ATARI_MOVE:
+      /* Set does_block to force territorial valuation of the move.
+       * That way we can prefer defenses against combination attacks
+       * on dame points instead of inside territory.
+       */
+      does_block = 1;
       this_value = move_reasons[r].what;
       tot_value += this_value;
       TRACE("  %1m: %f - defends against combination attack on several worms\n",
