@@ -854,36 +854,36 @@ finish_pattern(char *line)
   case '+' :
     if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
       fprintf(stderr,
-	      "Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
-	      pattern_names[patno]);
+	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
+	      current_file, current_line_number, pattern_names[patno]);
     pattern[patno].trfno = 2;
     break;
 
   case 'X' : 
     if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
       fprintf(stderr,
-	      "Warning : X symmetry inconsistent with edge constraints (pattern %s)\n", 
-	      pattern_names[patno]);
+	      "%s(%d) : Warning : X symmetry inconsistent with edge constraints (pattern %s)\n", 
+	      current_file, current_line_number, pattern_names[patno]);
     if (maxi != maxj)
       fprintf(stderr,
-	      "Warning : X symmetry requires a square pattern (pattern %s)\n",
-	      pattern_names[patno]);
+	      "%s(%d) : Warning : X symmetry requires a square pattern (pattern %s)\n",
+	      current_file, current_line_number, pattern_names[patno]);
     pattern[patno].trfno = 2;
     break;
 
   case '-' :
     if (where & (NORTH_EDGE|SOUTH_EDGE))
       fprintf(stderr,
-	      "Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
-	      pattern_names[patno]);
+	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
+	      current_file, current_line_number, pattern_names[patno]);
     pattern[patno].trfno = 4;
     break;
     
   case '|' :
     if (where & (EAST_EDGE|WEST_EDGE))
       fprintf(stderr,
-	      "Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
-	      pattern_names[patno]);
+	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
+	      current_file, current_line_number, pattern_names[patno]);
     pattern[patno].trfno = 4;
     break;
 
@@ -894,8 +894,8 @@ finish_pattern(char *line)
     */
     if (maxi != maxj)
       fprintf(stderr,
-	      "Warning : \\ or / symmetry requires a square pattern (pattern %s)\n", 
-	      pattern_names[patno]);
+	      "%s(%d) : Warning : \\ or / symmetry requires a square pattern (pattern %s)\n", 
+	      current_file, current_line_number, pattern_names[patno]);
 
     pattern[patno].trfno = 4;
     break;
@@ -903,15 +903,15 @@ finish_pattern(char *line)
   case 'O' :
     if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
       fprintf(stderr,
-	      "Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
-	      pattern_names[patno]);
+	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
+	      current_file, current_line_number, pattern_names[patno]);
     pattern[patno].trfno = 5;  /* Ugly special convention. */
     break;
 
   default:
     fprintf(stderr,
-	    "Warning : symmetry character '%c' not implemented - using '8' (pattern %s)\n", 
-	    symmetry, pattern_names[patno]);
+	    "%s(%d) : Warning : symmetry character '%c' not implemented - using '8' (pattern %s)\n", 
+	    current_file, current_line_number, symmetry, pattern_names[patno]);
     /* FALLTHROUGH */
   case '8' :
     pattern[patno].trfno = 8;

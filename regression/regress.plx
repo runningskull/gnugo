@@ -47,9 +47,10 @@ use lib "$FindBin::Bin/../interface";
 
 use GoImage::Stone;
 
-#use CGI::Carp;
+use CGI::Carp;
 use CGI qw/:standard/;
 
+my $debug=2;
 
 my %colors = ("ALIVE", "green",
 	"DEAD", "cyan",
@@ -58,7 +59,7 @@ my %colors = ("ALIVE", "green",
 	"UNCHECKED", "magenta");
 
 my $query = new CGI;
-my ($tstfile, $num, $sortby, $sgf, $reset, $trace);
+my ($tstfile, $num, $sortby, $sgf, $reset, $trace, $bycat);
 
 ($tstfile, $num) = ($query->query_string() =~ /keywords=(.*)%3A(.*)/);
 
@@ -69,8 +70,10 @@ if (!$tstfile) {
   $sgf = $query->param("sgf");
   $reset = $query->param("reset");
   $trace = $query->param("trace");
+  $bycat = $query->param("bycat");
 }
 
+sub sgfFile(%);
 
 
 print "HTTP/1.0 200 OK\r\n";
@@ -91,8 +94,9 @@ if ($tstfile && !($tstfile =~ /^[a-zA-Z0-9_]+\.tst$/)) {
 }
 
 if ($reset) {
-  unlink glob("html/*.html");
-  unlink glob("html/*/*.html");
+  unlink glob("html/*.html");# or die "couldn't delete html files: $!";
+  unlink glob("html/*/*.html");# or die "couldn't delete html/* files: $!"; 
+  unlink "html/one.perldata";# or die "couldn't delete data file";
   print "Cleaned up!<HR>\n";
 }
 
@@ -110,9 +114,6 @@ if ($trace) {
 
 
 my %points;
-my %attribs;
-
-
 
 unless ($tstfile) {
 #CASE 1 - main index
@@ -121,7 +122,18 @@ unless ($tstfile) {
   } else {
     print STDERR "Cached!\n";
   }
-  open (TESTFILE, "html/index.html") or (print "$! ".__LINE__, die);
+  
+  if ($bycat) {
+    printbycategory();
+    exit;
+  }
+  
+  if (-z "html/index.html") {
+    print "Yikes - index missing - please reset!";
+    exit;
+  }
+  
+  open (TESTFILE, "html/index.html") or do {print "$! ".__LINE__; confess "$!"};
   while (<TESTFILE>) {
     print;
   }
@@ -129,25 +141,39 @@ unless ($tstfile) {
   exit;
 }
  
+
+my %fullHash;
+use Data::Dumper;
+
 sub createIndex {
-  open I, ">html/index.html";
-  my %hha;
+  my %h;
   foreach my $file (glob("html/*.tst/*.xml")) {
-    my ($tst, $prob) = $file =~ m@html.(.*.tst).(.*).xml@;
-    open F, $file or print "Couldn't open file: $file; $_", die;
-    while (<F>){
-      if (m@.*status="([passedfailed]+?)"@i) {
-        push @{$hha{$tst}{$1}}, $prob;
-        last;
-      }
-    }
-    close F;
+    my ($tst, $prob) = $file =~ m@html.(.*).tst.(.*).xml@;
+    open (FILE, "$file");
+    local $/; undef($/);
+    my $content = <FILE>;
+    close FILE;
+    $h{"$tst:$prob"} = game_parse($content);
+    delete $h{"$tst:$prob"}->{gtp_all};
   }
   
-  print I '<HTML><HEAD><TITLE>Regression test summary - _VERSION-TBD_</TITLE></HEAD>
+  open (FILE, ">html/one.perldata") or confess "can't open";
+  print FILE Dumper([\%h]) or confess "couldn't print";
+  close FILE or confess "can't close";
+  
+
+  #our $VAR1;
+  #do "html/one.perldata" or confess "can't do perldata";
+  #my %h = %{$VAR1->[0]};
+  
+
+  open I, ">html/index.html";
+
+  print I '<HTML><HEAD><TITLE>Regression test summary - </TITLE></HEAD>
  <BODY>
- <H3> Regression test summary - _VERSION-TBD_</H3>
+ <H3> Regression test summary - </H3>
  Program: _CMDLINE_TBD_ <BR>
+ <A href="?bycat=1">View by category</A><BR>
  <TABLE border=1>
  <TR><TD>file</TD><TD>passed</TD><TD>PASSED</TD><TD>failed</TD><TD>FAILED</TD>
  </TR>';
@@ -156,25 +182,60 @@ sub createIndex {
   my %totHash;
   @totHash{@pflist} = (0,0,0,0);
 
-  foreach my $k1 (sort keys %hha) { #$k1 = filename
-    print I qq@<TR>\n <TD><A href="?tstfile=$k1&sortby=result">$k1</A></TD>\n@;
+  sub byfilebynum {
+    my ($fileA,$numA) = $a =~ /(.*):(.*)/;
+    my ($fileB,$numB) = $b =~ /(.*):(.*)/;
+    $fileA cmp $fileB or $numA <=> $numB;
+  }    
+
+  my $curfile = "";
+  my %subTotHash;
+  foreach my $k1 (sort byfilebynum keys %h) { #$k1 = filename
+    if ($k1 !~ /^$curfile:/) {
+      if ($curfile ne "") {
+        #New file = print old totals
+        print I qq@<TR>\n <TD><A href="?tstfile=$curfile&sortby=result">$curfile</A></TD>\n@;
+        foreach my $k2 (@pflist) {
+          my $c = @{$subTotHash{$k2}};  #i.e. length of array.
+          if ($k2 !~ /passed/ and $c) {
+            print I " <TD>$c:<BR>\n";
+            foreach (sort {$a<=>$b} @{$subTotHash{$k2}}) {
+              print I qq@  <A HREF="?$curfile:$_">$_</A>\n@;
+            }
+            print I " </TD>\n";
+          } else {
+            print I " <TD>$c</TD>\n";
+          }
+        }
+        print I qq@</TR>@;
+      }
+      #prepare for next file.
+      ($curfile) = $k1 =~ /(.*):/;
+      @subTotHash{@pflist} = ([],[],[],[]);
+    }
+    push @{$subTotHash{$h{$k1}{status}}}, $h{$k1}{num};
+  }
+
+      #direct copy from above - don't miss last time through - HACK!  
+        if ($curfile ne "") {
+        #New file = print old totals
+        print I qq@<TR>\n <TD><A href="?tstfile=$curfile&sortby=result">$curfile</A></TD>\n@;
     foreach my $k2 (@pflist) {
-      my $c = 0;
-      $c = @{$hha{$k1}{$k2}} if $hha{$k1}{$k2};
-      $totHash{$k2} += $c;
-      if (!($k2 =~ /passed/) and $c) {
+          my $c = @{$subTotHash{$k2}};  #i.e. length of array.
+          if ($k2 !~ /passed/ and $c) {
         print I " <TD>$c:<BR>\n";
-        foreach (sort {$a<=>$b} @{$hha{$k1}{$k2}}) {
-          print I qq@  <A HREF="?tstfile=$k1&num=$_">$_</A>\n@;
+            foreach (sort {$a<=>$b} @{$subTotHash{$k2}}) {
+              print I qq@  <A HREF="?$curfile:$_">$_</A>\n@;
         }
         print I " </TD>\n";
       } else {
         print I " <TD>$c</TD>\n";
       }
-      #print I "$k1: $k2: ". (join ";", @{$hha{$k1}{$k2}}) . "\n";
     }
-    print I "</TR>";
+        print I qq@</TR>@;
   }
+
+  
   print I "<TR>\n <TD><B>Total</B></TD>\n";
   foreach (@pflist) {
     print I " <TD>$totHash{$_}</TD>\n";
@@ -208,10 +269,10 @@ if ($num) {
   local $/; undef($/);
   my $content = <FILE>;
   close FILE;
-  game_parse($content);
+  my %attribs = %{game_parse($content)};
   
   if ($sgf) {
-    &sgfFile;
+    sgfFile(%attribs);
     exit;
   }
   
@@ -440,6 +501,7 @@ sub pval {
 
 sub game_parse {
   my $content = shift;
+  my %attribs;
   $attribs{"num"} = $1
     if $content =~ m@<GOPROB.*?number=(\d*)@s;
   $attribs{"file"} = $1
@@ -479,6 +541,7 @@ sub game_parse {
       die;
     }
   }
+  return \%attribs;
 }
     
     
@@ -496,7 +559,8 @@ sub colorboard_letter_row {
 }
 
 
-sub sgfFile() {
+sub sgfFile(%) {
+  my %attribs = shift;
   my $boardsize = $attribs{"boardsize"};  #need to add to export.
 
   my $ret="";
@@ -538,3 +602,105 @@ sub GTPtoSGF {
   chr(ord("a") + $_ - 1) . chr(ord("a") + $boardsize - $2);
 }
 
+
+
+
+
+sub printbycategory {
+
+    our $VAR1;
+    do "html/one.perldata" or confess "can't do perldata";
+    my %hash = %{$VAR1->[0]};
+    
+    my %fails;
+    
+    foreach my $k (keys %hash) {
+      my $status = $hash{$k}{status};
+      $fails{$k} = $hash{$k} if $status =~ /failed/i;
+    }
+    
+    sub bycat {
+      defined $fails{$a}{file}
+        or do {
+          print '$a:'."$a\n";
+          confess "missing file";
+        };
+      
+      my $ca = $fails{$a}{category};
+      my $cb = $fails{$b}{category};
+      defined $ca or $ca = 0;
+      defined $cb or $cb = 0;
+        
+      if ($ca ne "" and $cb eq "") { return -1; }
+      if ($ca eq "" and $cb ne "") { return 1; }
+      
+      $ca ne "" or $ca = $fails{$a}{file};
+      $cb ne "" or $cb = $fails{$b}{file};
+      
+      uc ($ca) cmp uc($cb) 
+      or
+        do {
+          my $sa = $fails{$a}{severity};
+          my $sb = $fails{$b}{severity};
+          #print '$sa <=> $sb :' . "$sa <=> $sb  ($ca, $cb)" , "\n"
+          #  if defined $sa and defined $sb and ($sa ne "") and ($sb ne "");
+          defined $sa or $sa = 5;
+          defined $sb or $sb = 5;
+          if ($sa eq "") {$sa = 5};
+          if ($sb eq "") {$sb = 5};
+          -($sa <=> $sb); 
+        }
+      or
+        do {
+          my $fa = $fails{$a}{file};
+          my $fb = $fails{$b}{file};
+          $fa cmp $fb;
+        }
+      or
+        do {
+          my $na = $fails{$a}{num};
+          my $nb = $fails{$b}{num};
+          $na <=> $nb;
+        }
+    }
+    
+    sub getcat(%) {
+      my %h = %{shift()};
+      $h{category} or $h{file};
+    }
+    sub getsev(%) {
+      my %h = %{shift()};
+      my $s = $h{severity};
+      defined $s or do {return 5};
+      $s ne "" or do {return 5};
+      no warnings qw/numeric/;
+      $s+0;
+    }
+    
+    print "<HTML><HEAD><TITLE>Failures by category - GNU Go</TITLE></HEAD>\n";
+    print "<BODY><H4>Failures by category</H4>";
+    print qq@<A href="?">main index</A>@;
+    
+    
+    print "<TABLE border=1>";
+    print "<TR><TD><B>Category</B></TD><TD><B>Severity</B></TD><TD><B>Problem</B></TD>\n";
+    my $cat = "";
+    my $sev = "";
+    foreach my $k (sort bycat keys %fails) {
+      if (uc(getcat($fails{$k})) ne $cat) {
+        $cat = uc(getcat($fails{$k}));
+        print "</TD></TR>\n";
+        print "<TR><TD>$cat</TD>\n";
+        $sev = "";
+      }
+      if (($sev eq "") or $sev != getsev($fails{$k})) {
+        print "</TD></TR>\n<TR><TD>&nbsp;</TD>" if ($sev ne "");
+        $sev = getsev($fails{$k});
+        print "<TD>$sev</TD><TD>\n";
+      }
+      print qq@<A href="?$k">$k</A>&nbsp&nbsp</A>\n@;
+    }
+    print "</TABLE>\n";
+    print "</body></html>\n";
+    
+}

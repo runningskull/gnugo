@@ -322,7 +322,7 @@ find_defense(int str, int *move)
  * defended, WIN is returned, acode and dcode are both non-zero, and
  * (attack_point), (defense_point) both point to vertices on the board. 
  * If a string can be attacked but not defended, 0 is again returned, 
- * acode is non-zero, dcode is 0, and (ai, aj) point to a vertex 
+ * acode is non-zero, dcode is 0, and (attack_point) points to a vertex 
  * on the board.
  *
  * This function in particular guarantees that if there is an attack,
@@ -1809,7 +1809,7 @@ special_rescue2(int str, int libs[2], int *move, int komaster, int kom_pos)
   int k;
 
   for (k = 0; k < 2; k++) {
-    /* Let (ai, aj) and (bi, bj) be the two liberties. Reverse the
+    /* Let (alib) and (blib) be the two liberties. Reverse the
      * order during the second pass through the loop.
      */
     int alib = libs[k];
@@ -1869,7 +1869,7 @@ special_rescue3(int str, int libs[3], int *move, int komaster, int kom_pos)
   ASSERT1(countlib(str) == 3, str);
   
   for (r = 0; r < 3; r++) {
-    /* Let (ai, aj) be one of the three liberties. */
+    /* Let (apos) be one of the three liberties. */
     apos = libs[r];
     /* Try to find the configuration above. */
     for (k = 0; k < 4; k++) {
@@ -2858,7 +2858,7 @@ attack3(int str, int *move, int komaster, int kom_pos)
     int libs2[2];
 #endif
     int apos = libs[k];
-    /* we only want to consider the move at (ai,aj) if:
+    /* we only want to consider the move at (apos) if:
      * stackp <= backfill_depth
      * -or-  stackp <= depth and it is an isolated stone
      * -or-  it is not in immediate atari
@@ -3190,7 +3190,7 @@ attack4(int str, int *move, int komaster, int kom_pos)
 
 
 /* If (str) points to a string with 2 or 3 liberties,
- * find_cap2(str, ai, aj, bi, bj, &i, &j, komaster)
+ * find_cap2(str, alib, blib, &i, &j, komaster)
  * looks for a configuration of the following type:
  *
  *  X.

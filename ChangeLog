@@ -16,7 +16,12 @@
 - do_owl_defend() revised
 - move stupid vital marginal eye points from first line to second line
   in owl_determine_life()
+- patterns.dsp doesn't reference invalid file
+- regress.pl deals with threads better on Win32
+- regress.plx supports view by category
 - updated regress.pl
+- add file & line numbers to more warnings in mkpat.c
+- comments in reading.c made 1D
 - DFA_ENABLE ifdefs removed
 - bugfix in find_double_threats()
 - global_matchpat() renamed matchpat()

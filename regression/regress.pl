@@ -238,8 +238,11 @@ print "done waiting\n" if $verbose > 1;
 exit;
 
 
+my $g_curtestfile;
+
 sub regress_file {
   $testfile = shift;
+  ($g_curtestfile) = $testfile =~ /(.*)\.tst$/ or confess "Unparsable test file: $testfile";
   print "$testfile\n" if $verbose;
   
   -e "html" or mkdir "html" or die "Couldn't create html";
@@ -256,12 +259,15 @@ sub regress_file {
       #Child.
       chdir "html/$testfile" ;
       open (TRACER, ">tracer.ttt");
-      while (<$goprog_err>) {
-        print TRACER $_;
-        if (/^FINISHED PROBLEM: (.*)/) {
+      while (defined(my $t = <$goprog_err>)) {
+        print TRACER $t;
+        print "ERR: $t" if $verbose > 2;
+        if ($t =~ /^\s*FINISHED PROBLEM:\s*$/) {
+          my $num = <$goprog_err>;
+          print TRACER $num;
+          $num += 0;
           close TRACER or die "Couldn't close temp trace file";
-          my $thisgtp = $1;
-          my ($num) = $thisgtp =~ /^(\d+)/ or confess "Missing number: $thisgtp";
+          print "closed trace file" if $verbose > 2; 
           rename "tracer.ttt", "$num.trace"
               or die "Couldn't rename tracer: $testfile, $num";
           open (TRACER, ">tracer.ttt");
@@ -317,7 +323,9 @@ sub regress_file {
           if ($3) { $fail = 1} else { $fail = 0};
           if ($4) {$ignore = 1} else {$ignore = 0};
 
-          go_command("echo_err FINISHED PROBLEM: $prev_cmd\n");
+          go_command("echo_err FINISHED PROBLEM:\n");
+          eat();  #ignore output!
+          go_command("echo_err $num\n");
           eat();  #ignore output!
 
           my $old_skipping = $skipping;
@@ -424,7 +432,7 @@ sub tally_result {
   $unexpected_fail++ if $status eq "FAILED";
   
   if ($status ne "skipped") {
-    print "$number: $status: correct: $correct  incorrect: $incorrect\n";
+    print "$g_curtestfile:$number: $status: correct: $correct  incorrect: $incorrect\n";
   }
   
   $cur_passed = ($status =~ /pass/i);

@@ -1187,7 +1187,10 @@ gtp_genmove_black(char *s, int id)
 {
   int i, j;
   UNUSED(s);
-  
+
+  if (stackp > 0)
+    return gtp_failure(id, "genmove cannot be called when stackp > 0");
+
   if (genmove(&i, &j, BLACK) >= 0)
     play_move(POS(i, j), BLACK);
 
@@ -1212,6 +1215,10 @@ gtp_genmove_white(char *s, int id)
 {
   int i, j;
   UNUSED(s);
+
+  if (stackp > 0)
+    return gtp_failure(id, "genmove cannot be called when stackp > 0");
+
   if (genmove(&i, &j, WHITE) >= 0)
     play_move(POS(i, j), WHITE);
 
@@ -1242,6 +1249,9 @@ gtp_genmove(char *s, int id)
   n = gtp_decode_color(s, &color);
   if (!n)
     return gtp_failure(id, "invalid color");
+
+  if (stackp > 0)
+    return gtp_failure(id, "genmove cannot be called when stackp > 0");
 
   /* This is intended for regression purposes and should therefore be
    * deterministic. The best way to ensure this is to reset the random
