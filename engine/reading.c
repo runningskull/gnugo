@@ -1059,8 +1059,9 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
 #if !USE_HASHTABLE_NG
   int found_read_result;
   Read_result *read_result = NULL;
-#endif
+#else
   int retval;
+#endif
   
   SETUP_TRACE_INFO("find_defense", str);
   
@@ -1090,9 +1091,13 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
   if ((stackp <= depth) && (hashflags & HASH_FIND_DEFENSE)
       && tt_get(&ttable, komaster, kom_pos, FIND_DEFENSE, str, 
 		depth - stackp,
-		&retval, move) == 2)
+		&retval, &xpos) == 2) {
     /* FIXME: Use move for move ordering if tt_get() returned 1 */
+    SGFTRACE(xpos, retval, "cached");
+    if (move)
+      *move = xpos;
     return retval;
+  }
 
 #else
 
@@ -2972,8 +2977,9 @@ do_attack(int str, int *move, int komaster, int kom_pos)
 #if !USE_HASHTABLE_NG
   int found_read_result;
   Read_result *read_result = NULL;
-#endif
+#else
   int  retval;
+#endif
 
   SETUP_TRACE_INFO("attack", str);
 
@@ -3005,9 +3011,13 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   if ((stackp <= depth) && (hashflags & HASH_ATTACK)
       && tt_get(&ttable, komaster, kom_pos, ATTACK, str, 
 		depth - stackp,
-		&retval, move) == 2)
+		&retval, &xpos) == 2) {
     /* FIXME: Use move for move ordering if tt_get() returned 1 */
+    SGFTRACE(xpos, retval, "cached");
+    if (move)
+      *move = xpos;
     return retval;
+  }
 
 #else
 

@@ -22,6 +22,7 @@
 
 
 #include "config.h"
+#include "board.h"
 
 /*
  * This file, together with engine/hash.c implements hashing of go positions

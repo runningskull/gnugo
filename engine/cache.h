@@ -32,6 +32,9 @@
 #ifndef _CACHE_H_
 #define _CACHE_H_
 
+/* Define to 1 if you want the new transposition table. */
+#define USE_HASHTABLE_NG 1
+
 
 /* Hashnode: a node stored in the transposition table.
  *
@@ -90,46 +93,7 @@ typedef struct {
   int            is_clean;
 } Transposition_table;
 
-
-enum routine_id {
-  OWL_ATTACK,
-  OWL_DEFEND,
-  SEMEAI,
-  FIND_DEFENSE,
-  ATTACK,
-  CONNECT,
-  DISCONNECT,
-  BREAK_IN,
-  BLOCK_OFF,
-  OWL_THREATEN_ATTACK,
-  OWL_THREATEN_DEFENSE,
-  OWL_DOES_DEFEND,
-  OWL_DOES_ATTACK,
-  OWL_CONNECTION_DEFENDS,
-  OWL_SUBSTANTIAL,
-  OWL_CONFIRM_SAFETY,
-  NUM_CACHE_ROUTINES
-};
-
-#define ROUTINE_NAMES \
-  "owl_attack", \
-  "owl_defend", \
-  "semeai", \
-  "find_defense", \
-  "attack", \
-  "connect", \
-  "disconnect", \
-  "break_in", \
-  "block_off" \
-  "owl_threaten_attack" \
-  "owl_threatend_defense" \
-  "owl_does_defend" \
-  "owl_does_attack" \
-  "owl_connection_defends" \
-  "owl_substantial" \
-  "owl_confirm_safety"
-
-const char *routine_id_to_string(enum routine_id routine);
+extern Transposition_table  ttable;
 
 extern void  tt_init(Transposition_table *table, int memsize);
 extern void  tt_clear(Transposition_table *table);

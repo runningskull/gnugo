@@ -757,7 +757,7 @@ dump_stack(void)
   if (count_variations)
     gprintf("%o (variation %d)", count_variations-1);
 #else
-  gprintf("%o (%d)", hashdata_to_string(&hashdata));
+  gprintf("%o (%s)", hashdata_to_string(&hashdata));
 #endif
 
   gprintf("%o\n");

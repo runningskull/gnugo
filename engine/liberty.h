@@ -24,16 +24,13 @@
 #define _LIBERTY_H_
 
 #include "board.h"
+#include "hash.h"
 #include "gnugo.h"
 
 /* ================================================================ */
 /*                           public variables                       */
 /* ================================================================ */
 
-
-/* We need the defintion of type Hash_data here. */
-#include "cache.h"
-extern Transposition_table  ttable;
 
 /* ================================================================ */
 
@@ -63,6 +60,48 @@ void rotate2(int i, int j, int *ri, int *rj, int rot);
 void inv_rotate2(int i, int j, int *ri, int *rj, int rot);
 int rotate1(int pos, int rot);
 int inv_rotate1(int pos, int rot);
+
+/* Routine names used by persistent and non-persistent caching schemes. */
+enum routine_id {
+  OWL_ATTACK,
+  OWL_DEFEND,
+  SEMEAI,
+  FIND_DEFENSE,
+  ATTACK,
+  CONNECT,
+  DISCONNECT,
+  BREAK_IN,
+  BLOCK_OFF,
+  OWL_THREATEN_ATTACK,
+  OWL_THREATEN_DEFENSE,
+  OWL_DOES_DEFEND,
+  OWL_DOES_ATTACK,
+  OWL_CONNECTION_DEFENDS,
+  OWL_SUBSTANTIAL,
+  OWL_CONFIRM_SAFETY,
+  NUM_CACHE_ROUTINES
+};
+
+#define ROUTINE_NAMES \
+  "owl_attack", \
+  "owl_defend", \
+  "semeai", \
+  "find_defense", \
+  "attack", \
+  "connect", \
+  "disconnect", \
+  "break_in", \
+  "block_off" \
+  "owl_threaten_attack" \
+  "owl_threatend_defense" \
+  "owl_does_defend" \
+  "owl_does_attack" \
+  "owl_connection_defends" \
+  "owl_substantial" \
+  "owl_confirm_safety"
+
+const char *routine_id_to_string(enum routine_id routine);
+
 
 /* Forward struct declarations. */
 struct pattern;
@@ -755,18 +794,18 @@ enum dragon_status {
 };
 
 #define DRAGON_STATUS_NAMES \
-  "dead" \
-  "alive" \
-  "critical" \
-  "unknown" \
-  "unchecked" \
-  "can threaten attack" \
-  "can threaten defense" \
-  "inessential" \
-  "tactically dead" \
-  "alive in seki" \
-  "strongly alive" \
-  "invincible" \
+  "dead", \
+  "alive", \
+  "critical", \
+  "unknown", \
+  "unchecked", \
+  "can threaten attack", \
+  "can threaten defense", \
+  "inessential", \
+  "tactically dead", \
+  "alive in seki", \
+  "strongly alive", \
+  "invincible", \
   "insubstantial"
 
 const char *status_to_string(enum dragon_status status);
