@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- regress.pike revised
 - attack2() revised
 - defend4() revised
 - slow sorting in get_next_move_from_list() is replaced with heap sorting

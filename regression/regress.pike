@@ -13,7 +13,7 @@ static float last_time;
 static float total_time = 0.0;
 static int total_pass = 0;
 static int total_fail = 0;
-static int report_all_tests = 0;
+static int verbose = 0;
 
 class Testsuite
 {
@@ -46,7 +46,7 @@ class Testsuite
 array(Testsuite) testsuites = ({});
 Testsuite current_testsuite;
 
-void Send(string|void s)
+void send(string|void s)
 {
   if (!s) {
     if (debug)
@@ -60,7 +60,7 @@ void Send(string|void s)
   }
 }
 
-static void Finish()
+static void finish()
 {
   write("%-37s %7.2f %9d %7d %8d\n", current_testsuite->name,
 	current_testsuite->cputime,
@@ -69,7 +69,7 @@ static void Finish()
   cond->signal();
 }
 
-static void ProgramReader(object f)
+static void program_reader(object f)
 {
   int move;
   string stored = "";
@@ -114,7 +114,7 @@ static void ProgramReader(object f)
 	current_testsuite[result] += ({test_number});
 	current_testsuite->time += (current_time - last_time);
 	
-	if (result == "PASS" || result == "FAIL" || report_all_tests)
+	if (result == "PASS" || result == "FAIL" || verbose)
 	  write("%-15s %s %s [%s]\n",
 		current_testsuite->name + ":" + test_number, result, answer,
 		correct_results[test_number]);
@@ -131,16 +131,20 @@ static void ProgramReader(object f)
       else if (number == 10004)
 	break;
     }
-    else if (sscanf(s, "?%s", answer))
-      write("%-15s ?%s\n", current_testsuite->name + ":", answer);
+    else if (sscanf(s, "?%s", answer)) {
+      number = -1;
+      sscanf(answer, "%d", number);
+      if (verbose || (number != -1 && number < 10000))
+	write("%-15s ?%s\n", current_testsuite->name + ":", answer);
+    }
   }
   f->close();
   if (debug)
     werror("Reader closed down.\n");
-  Finish();
+  finish();
 }
 
-static void ProgramWriter(object f)
+static void program_writer(object f)
 {
   while (1) {
     string s = write_queue->read();
@@ -179,11 +183,11 @@ string modify_testsuite(string testsuite)
   return s;
 }
 
-void run_testsuite(string suite_name, array(string) program_args,
+void run_testsuite(string suite_name, string engine,
+		   array(string) engine_options, mapping(string:mixed) options,
 		   array(int)|void test_numbers)
 {
-  array(string) program_start_array = ({"../interface/gnugo", "--quiet",
-					"--mode", "gtp"});
+  array(string) program_start_array = ({engine}) + engine_options;
 
   string testsuite = Stdio.read_file(suite_name);
   if (!testsuite) {
@@ -191,25 +195,21 @@ void run_testsuite(string suite_name, array(string) program_args,
     exit(1);
   }
 
-  if (has_value(program_args, "valgrind")) {
+  if (options["valgrind"])
     program_start_array = ({"valgrind"}) + program_start_array;
-    program_args -= ({"valgrind"});
-  }
 
-  if (has_value(program_args, "check-unoccupied-answers")) {
-    program_args -= ({"check-unoccupied-answers"});
+  if (options["check-unoccupied-answers"])
     testsuite = modify_testsuite(testsuite);
-  }
 
   write_queue = Thread.Queue();
   object f1 = Stdio.File();
   object pipe1 = f1->pipe();
   object f2 = Stdio.FILE();
   object pipe2 = f2->pipe();
-  machine = Process.create_process(program_start_array + program_args,
+  machine = Process.create_process(program_start_array,
 				   (["stdin":pipe1, "stdout":pipe2]));
-  thread_create(ProgramReader, f2);
-  thread_create(ProgramWriter, f1);
+  thread_create(program_reader, f2);
+  thread_create(program_writer, f1);
 
   int number;
   string answer;
@@ -222,6 +222,9 @@ void run_testsuite(string suite_name, array(string) program_args,
   expected_failures = (<>);
   current_testsuite = Testsuite(suite_name - ".tst");
   testsuites += ({current_testsuite});
+
+  if (test_numbers && sizeof(test_numbers) == 0)
+    test_numbers = 0;
   
   foreach (testsuite/"\n", string s) {
     if (sscanf(s, "%d", number) == 1) {
@@ -231,14 +234,14 @@ void run_testsuite(string suite_name, array(string) program_args,
 	continue;
       if (correct_results[(int) number])
 	write("Repeated test number " + number + ".\n");
-      Send("reset_reading_node_counter");
-      Send("reset_owl_node_counter");
-      Send("reset_connection_node_counter");
-      Send(s);
-      Send("10000 get_reading_node_counter");
-      Send("10001 get_owl_node_counter");
-      Send("10002 get_connection_node_counter");
-      Send("10003 cputime");
+      send("reset_reading_node_counter");
+      send("reset_owl_node_counter");
+      send("reset_connection_node_counter");
+      send(s);
+      send("10000 get_reading_node_counter");
+      send("10001 get_owl_node_counter");
+      send("10002 get_connection_node_counter");
+      send("10003 cputime");
     }
     else if (sscanf(s, "#? [%[^]]]%s", answer, expected)) {
       correct_results[(int)number] = answer;
@@ -246,11 +249,11 @@ void run_testsuite(string suite_name, array(string) program_args,
 	expected_failures[(int)number] = 1;
     }
     else
-      Send(s);
+      send(s);
   }
   
-  Send("10004 quit");
-  Send();
+  send("10004 quit");
+  send();
   cond->wait(condmutexkey);
 }
 
@@ -282,9 +285,39 @@ void final_report()
     write("%d FAIL\n", number_unexpected_fail);
 }
 
-// There is support for various fancy options in the code but
-// those are not considered stable yet. The only official way
-// to run the script is without any options at all.
+string parse_tests(mapping(string:array(int)) partial_testsuites,
+		   string tests)
+{
+  string suite, numbers;
+  if (sscanf(tests, "%s:%s", suite, numbers) != 2) {
+    suite = tests;
+    numbers = "";
+  }
+  
+  if (!has_suffix(suite, ".tst"))
+    suite += ".tst";
+
+  if (numbers != "") {
+    if (!partial_testsuites[suite])
+      partial_testsuites[suite] = ({});
+    else if (sizeof(partial_testsuites[suite]) == 0)
+      return suite;
+    
+    foreach (numbers / ",", string interval) {
+      int start, stop;
+      if (sscanf(interval, "%d-%d", start, stop) == 2)
+	for (int k = start; k <= stop; k++)
+	  partial_testsuites[suite] |= ({k});
+      else
+	partial_testsuites[suite] |= ({(int) interval});
+    }
+  }
+  else
+    partial_testsuites[suite] = ({});
+  
+  return suite;
+}
+
 int main(int argc, array(string) argv)
 {
   cond = Thread.Condition();
@@ -292,29 +325,71 @@ int main(int argc, array(string) argv)
   condmutexkey = condmutex->lock();
   array(string) testsuites = ({});
   mapping(string:array(int)) partial_testsuites = ([]);
-  argv = argv[1..];
 
-  testsuites = glob("*.tst", argv);
-  argv -= testsuites;
+  array(array(mixed)) all_options;
 
-  foreach (glob("+f*", argv), string filename) {
-    argv -= ({filename});
-    filename = filename[2..];
-    string testlist = Stdio.read_file(filename);
-    if (!testlist) {
-      werror("Couldn't find %s\n", filename);
-      continue;
-    }
-    string name, numbers;
-    foreach (testlist / "\n", string tests) {
-      if (sscanf(tests, "%s:%s", name, numbers) == 2) {
-	name += ".tst";
-	testsuites |= ({name});
-	partial_testsuites[name] = (array(int)) (numbers / ",");
-      }
+  all_options = ({ ({"help", Getopt.NO_ARG, ({"-h", "--help"})}),
+		   ({"verbose", Getopt.NO_ARG, ({"-v", "--verbose"})}),
+		   ({"valgrind", Getopt.NO_ARG, "--valgrind"}),
+		   ({"check-unoccupied-answers", Getopt.NO_ARG,
+		     "--check-unoccupied"}),
+		   ({"engine", Getopt.HAS_ARG, ({"-e", "--engine"})}),
+		   ({"options", Getopt.HAS_ARG, ({"-o", "--options"})}),
+		   ({"file", Getopt.HAS_ARG, ({"-f", "--file"})})});
+
+  mapping(string:mixed) options = ([]);
+  string engine = "";
+  array(string) engine_options = ({});
+  
+  foreach (Getopt.find_all_options(argv, all_options), array(mixed) option) {
+    [string name, mixed value] = option;
+    switch (name) {
+      case "help":
+	werror(help_message, basename(argv[0]));
+	return 0;
+	break;
+      
+      case "valgrind":
+	options["valgrind"] = 1;
+	break;
+	
+      case "check-unoccupied-answers":
+	options["check-unoccupied-answers"] = 1;
+	break;
+	
+      case "verbose":
+	verbose = 1;
+	break;
+	
+      case "engine":
+	engine = value;
+	break;
+	
+      case "options":
+	engine_options += value / " ";
+	break;
+	
+      case "file":
+	string testlist = Stdio.read_file(value);
+	if (!testlist) {
+	  werror("Couldn't find %s\n", value);
+	  continue;
+	}
+	foreach ((testlist / "\n") - ({""}), string tests)
+	  testsuites |= ({parse_tests(partial_testsuites, tests)});
+	break;
     }
   }
-  
+
+  if (engine == "") {
+    engine = "../interface/gnugo";
+    engine_options |= "--quiet --mode gtp" / " ";
+  }
+
+  argv = Getopt.get_args(argv)[1..];
+  foreach (argv, string tests)
+    testsuites |= ({parse_tests(partial_testsuites, tests)});
+
   if (sizeof(testsuites) == 0) {
     string makefile = Stdio.read_file("Makefile.am");
     foreach (makefile / "\n", string s) {
@@ -325,7 +400,44 @@ int main(int argc, array(string) argv)
   }
 
   foreach(testsuites, string testsuite)
-    run_testsuite(testsuite, argv, partial_testsuites[testsuite]);
+    run_testsuite(testsuite, engine, engine_options, options,
+		  partial_testsuites[testsuite]);
 
   final_report();
 }
+
+string help_message =
+"Usage: %s [OPTIONS]... [TESTS]...\n"
+"\n"
+"Run all regressions or a selection of them.\n"
+"Options:\n"
+"  -h, --help                    Display this help and exit.\n"
+"  -v, --verbose                 Show also expected results.\n"
+"      --valgrind                Run regressions under valgrind (very slow).\n"
+"      --check-unoccupied        Do not run regressions. Instead check that\n"
+"                                the listed answers are not occupied.\n"
+"  -e, --engine=ENGINE           Engine to run regressions on. Default is\n"
+"                                ../interface/gnugo.\n"
+"  -o, --options=OPTIONS         Options passed to the engine.\n"
+"  -f, --file=FILE               File containing a list of tests to run.\n"
+"\n"
+"Tests are listed on the command line in one of the following forms:\n"
+"reading           Run all tests in the testsuite reading.tst.\n"
+"reading:4         Run test number 4 in reading.tst.\n"
+"reading:4,17,30   Run tests with numbers 4, 7, and 30 in reading.tst\n"
+"reading:4-17      Run tests with numbers between 4 and 17 in reading.tst\n"
+"\n"
+"It is also allowed to include the suffix \".tst\" above and more complex\n"
+"lists like \"reading.tst:1-3,15,17,30-50,52\" are also understood.\n"
+"The format of files used with --file is the same, with one testsuite on\n"
+"each line.\n"
+"\n"
+"If no test suite is listed on the command line or read from file, then all\n"
+"regressions listed in Makefile.am will be run.\n";
+
+/*
+ * Local Variables:
+ * tab-width: 8
+ * c-basic-offset: 2
+ * End:
+ */
