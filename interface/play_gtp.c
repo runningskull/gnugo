@@ -57,6 +57,8 @@ DECLARE(gtp_all_legal);
 DECLARE(gtp_analyze_eyegraph);
 DECLARE(gtp_attack);
 DECLARE(gtp_attack_either);
+DECLARE(gtp_block_off);
+DECLARE(gtp_break_in);
 DECLARE(gtp_clear_board);
 DECLARE(gtp_clear_cache);
 DECLARE(gtp_combination_attack);
@@ -176,6 +178,8 @@ static struct gtp_command commands[] = {
   {"attack",           	      gtp_attack},
   {"attack_either",           gtp_attack_either},
   {"black",            	      gtp_playblack},
+  {"block_off",		      gtp_block_off},
+  {"break_in",		      gtp_break_in},
   {"boardsize",        	      gtp_set_boardsize},
   {"captures",        	      gtp_captures},
   {"clear_board",      	      gtp_clear_board},
@@ -1809,6 +1813,102 @@ gtp_disconnect(char *s)
 
   return gtp_finish_response();
 }  
+
+
+/* Function:  Try to break from string into area.
+ * Arguments: vertex, vertices
+ * Fails:     invalid vertex, empty vertex.
+ * Returns:   result followed by break in point if successful.
+ */
+static int
+gtp_break_in(char *s)
+{
+  int ai, aj;
+  int i, j;
+  char goal[BOARDMAX];
+  int break_move = PASS_MOVE;
+  int result;
+  int n;
+  int k;
+  
+  n = gtp_decode_coord(s, &ai, &aj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  memset(goal, 0, BOARDMAX);
+  s += n;
+
+  for (k = 0; k < MAX_BOARD * MAX_BOARD; k++) {
+    n = gtp_decode_coord(s, &i, &j);
+    if (n > 0) {
+      goal[POS(i, j)] = 1;
+      s += n;
+    }
+    else if (sscanf(s, "%*s") != EOF)
+      return gtp_failure("invalid coordinate");
+    else
+      break;
+  }
+
+  if (BOARD(ai, aj) == EMPTY)
+    return gtp_failure("vertex must not be empty");
+
+  result = break_in(POS(ai, aj), goal, &break_move);
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_code(result);
+  if (result != 0)
+    gtp_mprintf(" %m", I(break_move), J(break_move));
+
+  return gtp_finish_response();
+}
+
+/* Function:  Try to block string from area.
+ * Arguments: vertex, vertices
+ * Fails:     invalid vertex, empty vertex.
+ * Returns:   result followed by block point if successful.
+ */
+static int
+gtp_block_off(char *s)
+{
+  int ai, aj;
+  int i, j;
+  char goal[BOARDMAX];
+  int block_move = PASS_MOVE;
+  int result;
+  int n;
+  int k;
+  
+  n = gtp_decode_coord(s, &ai, &aj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  memset(goal, 0, BOARDMAX);
+  s += n;
+
+  for (k = 0; k < MAX_BOARD * MAX_BOARD; k++) {
+    n = gtp_decode_coord(s, &i, &j);
+    if (n > 0) {
+      goal[POS(i, j)] = 1;
+      s += n;
+    }
+    else if (sscanf(s, "%*s") != EOF)
+      return gtp_failure("invalid coordinate");
+    else
+      break;
+  }
+
+  if (BOARD(ai, aj) == EMPTY)
+    return gtp_failure("vertex must not be empty");
+
+  result = block_off(POS(ai, aj), goal, &block_move);
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_code(result);
+  if (result != 0)
+    gtp_mprintf(" %m", I(block_move), J(block_move));
+
+  return gtp_finish_response();
+}
+
 
 
 /********

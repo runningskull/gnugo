@@ -88,6 +88,7 @@ reset_engine()
 
   /* Prepare our table of move reasons. */
   clear_move_reasons();
+  clear_break_in_list();
 
   /* Set up depth values (see comments there for details). */
   set_depth_values(level);
@@ -291,6 +292,7 @@ collect_move_reasons(int color)
   worm_reasons(color);
   owl_reasons(color);
   semeai_move_reasons(color);
+  break_in_move_reasons(color);
 }
 
 /* 

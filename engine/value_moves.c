@@ -1944,10 +1944,11 @@ estimate_territorial_value(int pos, int color, float score)
 					OPPOSITE_INFLUENCE(color))) {
       compute_influence(OTHER_COLOR(color), safe_stones, strength, 
 	  		&move_influence, pos, "after move");
-      compute_followup_influence(&move_influence, &followup_influence,
-	  			 pos, "followup");
+      break_territories(OTHER_COLOR(color), &move_influence, 0);
       this_value = influence_delta_territory(OPPOSITE_INFLUENCE(color),
 	   				     &move_influence, color, pos);
+      compute_followup_influence(&move_influence, &followup_influence,
+	  			 pos, "followup");
       if (this_value != 0.0)
 	TRACE("%1m: %f - change in territory\n", pos, this_value);
       else

@@ -652,6 +652,30 @@
 
 @end example
 
+@cindex break_in
+@item break_in
+
+@example
+
+ Function:  Try to break from string into area.
+ Arguments: vertex, vertices
+ Fails:     invalid vertex, empty vertex.
+ Returns:   result followed by break in point if successful.
+
+@end example
+
+@cindex block_off
+@item block_off
+
+@example
+
+ Function:  Try to block string from area.
+ Arguments: vertex, vertices
+ Fails:     invalid vertex, empty vertex.
+ Returns:   result followed by block point if successful.
+
+@end example
+
 
 @cindex eval_eye
 @item eval_eye

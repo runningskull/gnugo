@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new functions recursive_break(), recursive_block() in readconnect.c:
+  decide whether a string can be connected to an arbitrary goal area
+- new functions break_in(), block_off(), frontends to the functions above
+- corresponding GTP commands break_in, block_off
+- new file breakin.c evaluates whether territories can be broken in
+- new command line parameter --experimental-break-in to enable new
+  code evaluating territory break-ins
 - retire move_safety check in value_moves.c for territorial move valuation
 - read_eye() revised
 - `num_defends' field of half_eye_data strtucture renamed `num_defenses'

@@ -892,6 +892,27 @@ influence_mark_non_territory(int pos, int color)
   current_influence->non_territory[pos] |= color;
 }
 
+/* Erases all territory for color at (pos), and all directly neighboring
+ * fields.
+ */
+void
+influence_erase_territory(struct influence_data *q, int pos, int color)
+{
+  int k;
+  float factor;
+  ASSERT1((color == WHITE && q->territory_value[pos] >= 0.0)
+          || (color == BLACK && q->territory_value[pos] <= 0.0), pos);
+
+  current_influence = q;
+
+  q->territory_value[pos] = 0.0;
+  influence_mark_non_territory(pos, color);
+  for (k = 0; k < 4; k++) {
+    q->territory_value[pos + delta[k]] = 0.0;
+    influence_mark_non_territory(pos + delta[k], color);
+  }
+}
+
 /* Match the patterns in influence.db and barriers.db in order to add:
  * - influence barriers,
  * - extra influence sources at possible invasion and intrusion points, and
@@ -1411,6 +1432,53 @@ influence_get_moyo_segmentation(const struct influence_data *q,
   }
 }
 
+
+/* Export the territory segmentation. */
+void
+influence_get_territory_segmentation(const struct influence_data *q,
+    			             struct moyo_data *moyos)
+{
+  int ii;
+  int min_moyo_id;
+  int max_moyo_id;
+  int i;
+
+  min_moyo_id = MAX_REGIONS;
+  max_moyo_id = 0;
+
+  /* Find out range of region ids used by moyos. */
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+    if (ON_BOARD(ii)) {
+      if (q->territory_segmentation[ii] != 0) {
+        min_moyo_id = gg_min(min_moyo_id, q->territory_segmentation[ii]);
+        max_moyo_id = gg_max(max_moyo_id, q->territory_segmentation[ii]);
+      }
+    }
+  moyos->number = max_moyo_id - min_moyo_id + 1;
+
+  /* Export segmentation. */
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+    if (ON_BOARD(ii)) {
+      if (q->territory_segmentation[ii] != 0) {
+        moyos->segmentation[ii]
+	  = q->territory_segmentation[ii] - min_moyo_id + 1;
+      }
+      else
+        moyos->segmentation[ii] = 0;
+    }
+  
+  /* Export size and owner info. */
+  for (i = min_moyo_id; i <= max_moyo_id; i++) {
+    moyos->size[i - min_moyo_id + 1] = q->region_size[i];
+    moyos->territorial_value[i - min_moyo_id + 1]
+        = q->region_territorial_value[i];
+    if (q->region_type[i] & BLACK_REGION)
+      moyos->owner[i - min_moyo_id + 1] = BLACK;
+    else
+      moyos->owner[i - min_moyo_id + 1] = WHITE;
+  }
+}
+
 /* Another function to export a certain amount of moyo data. */
 void
 influence_get_moyo_data(const struct influence_data *q,
@@ -1436,6 +1504,12 @@ influence_territory(const struct influence_data *q, int pos, int color)
     return q->territory_value[pos];
   else
     return -q->territory_value[pos];
+}
+
+int
+influence_considered_safe(const struct influence_data *q, int pos)
+{
+  return q->safe[pos];
 }
 
 

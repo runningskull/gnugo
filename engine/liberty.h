@@ -355,6 +355,9 @@ int string_connect(int str1, int str2, int *move);
 int disconnect(int str1, int str2, int *move);
 int non_transitivity(int str1, int str2, int str3, int *move);
 
+int break_in(int str, char goal[BOARDMAX], int *move);
+int block_off(int str1, char goal[BOARDMAX], int *move);
+
 /* board.c */
 int liberty_of_string(int pos, int str);
 int second_order_liberty_of_string(int pos, int str);
@@ -697,6 +700,8 @@ int whose_area(const struct influence_data *q, int pos);
 float influence_territory(const struct influence_data *q, int pos, int color);
 void influence_get_moyo_segmentation(const struct influence_data *q,
 	       			     struct moyo_data *moyo);
+void influence_get_territory_segmentation(const struct influence_data *q,
+	       			          struct moyo_data *moyo);
 void influence_get_moyo_data(const struct influence_data *q,
 			     int moyo_color[BOARDMAX],
 			     float territory_value[BOARDMAX]);
@@ -708,6 +713,13 @@ float influence_score(const struct influence_data *q);
 float game_status(int color);
 void resegment_initial_influence(void);
 void influence_mark_non_territory(int pos, int color);
+int influence_considered_safe(const struct influence_data *q, int pos);
+void influence_erase_territory(struct influence_data *q, int pos, int color);
+
+void break_territories(int color_to_move, struct influence_data *q,
+			 int store);
+void clear_break_in_list(void);
+void break_in_move_reasons(int color);
 
 float estimate_score(float *upper, float *lower);
 
@@ -795,7 +807,7 @@ extern int experimental_semeai;      /* use experimental semeai module */
 extern int experimental_connections; /* use experimental connection module */
 extern int alternate_connections;    /* use alternate connection module */
 extern int owl_threats;              /* compute owl threats */
-extern int experimental_influence;   /* use experimental influence module */
+extern int experimental_break_in;    /* use experimental module breakin.c */
 
 extern int thrashing_dragon; /* Dead opponent's dragon trying to live */
 extern char thrashing_stone[BOARDMAX]; /* All thrashing stones. */

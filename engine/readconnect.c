@@ -30,6 +30,7 @@
 #include "liberty.h"
 #include "cache.h"
 #include "gg_utils.h"
+#include "readconnect.h"
 
 /* Size of array where candidate moves are stored. */
 #define MAX_MOVES 362
@@ -46,6 +47,10 @@ static int recursive_connect2(int str1, int str2, int *move,
 			      int komaster, int kom_pos, int has_passed);
 static int recursive_disconnect2(int str1, int str2, int *move,
 				 int komaster, int kom_pos, int has_passed);
+static int recursive_break(int str, char goal[BOARDMAX], int *move,
+    			   int komaster, int kom_pos, int has_passed);
+static int recursive_block(int str, char goal[BOARDMAX], int *move,
+    			   int komaster, int kom_pos, int has_passed);
 
 static int add_array(int *array, int elt);
 static int element_array(int *array,int elt);
@@ -1869,24 +1874,12 @@ get_connection_node_counter()
   } while (0)
 
 
-struct connection_data {
-  float distances[BOARDMAX];
-  float deltas[BOARDMAX];
-  int coming_from[BOARDMAX];
-  int vulnerable1[BOARDMAX];
-  int vulnerable2[BOARDMAX];
-  int queue[BOARDMAX];
-  int queue_start;
-  int queue_end;
-};
-
 #define HUGE_CONNECTION_DISTANCE 100.0
 
-static int find_connection_moves(int str1, int str2, int color_to_move,
-				 int moves[MAX_MOVES], float *total_distance);
-static void compute_connection_distances(int str, int target,
-					 struct connection_data *conn);
-static void print_connection_distances(struct connection_data *conn);
+static int find_string_connection_moves(int str1, int str2, int color_to_move,
+				        int moves[MAX_MOVES],
+					float *total_distance);
+static void clear_connection_data(struct connection_data *conn);
 static int trivial_connection(int str1, int str2, int *move);
 static int does_secure_through_ladder(int color, int move, int pos);
 static int ladder_capture(int str, int *move);
@@ -1977,7 +1970,8 @@ recursive_connect2(int str1, int str2, int *move, int komaster, int kom_pos,
     READ_RETURN_CONN(read_result, move, xpos, WIN);
   }
   
-  num_moves = find_connection_moves(str1, str2, color, moves, &distance);
+  num_moves = find_string_connection_moves(str1, str2, color,
+      					   moves, &distance);
   
   for (k = 0; k < num_moves; k++) {
     int new_komaster;
@@ -2116,7 +2110,8 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
     READ_RETURN_CONN(read_result, move, xpos, WIN);
   }
 
-  num_moves = find_connection_moves(str1, str2, other, moves, &distance);
+  num_moves = find_string_connection_moves(str1, str2, other,
+      					   moves, &distance);
   
   for (k = 0; k < num_moves; k++) {
     int new_komaster;
@@ -2192,27 +2187,25 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
  */
 static int
 find_connection_moves(int str1, int str2, int color_to_move,
-		      int moves[MAX_MOVES], float *total_distance)
+    		      struct connection_data *conn1,
+    		      struct connection_data *conn2,
+		      float max_dist1, float max_dist2,
+		      int moves[MAX_MOVES], float total_distance)
 {
   int color = board[str1];
   int other = OTHER_COLOR(color);
   int connect_move = (color_to_move == color);
   int r;
-  struct connection_data conn1;
-  struct connection_data conn2;
   float distances[MAX_MOVES];
   int num_moves = 0;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
   int acode = 0;
   int attack_move = NO_MOVE;
   int dcode = 0;
   int defense_move = NO_MOVE;
-  float max_dist1;
-  float max_dist2;
-  int lib;
   int k;
   int i, j;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
 
   /* We turn off the sgf traces here to avoid cluttering them up with
    * tactical reading moves.
@@ -2220,44 +2213,15 @@ find_connection_moves(int str1, int str2, int color_to_move,
   sgf_dumptree = NULL;
   count_variations = 0;
 
-  compute_connection_distances(str1, str2, &conn1);
-  compute_connection_distances(str2, str1, &conn2);
-
-  if (findlib(str1, 1, &lib) == 1) {
-    conn1.distances[lib] = 0;
-    conn1.coming_from[lib] = NO_MOVE;
-    conn2.distances[lib] = conn2.distances[str1];
-    conn2.coming_from[lib] = conn1.coming_from[str1];
-  }
-
-  if (findlib(str2, 1, &lib) == 1) {
-    conn2.distances[lib] = 0;
-    conn1.distances[lib] = conn1.distances[str2];
-  }
-
-
-  max_dist1 = conn1.distances[str2];
-  max_dist2 = conn2.distances[str1];
-
-  *total_distance = gg_min(max_dist1, max_dist2);
-
-  if (verbose > 0) {
-    gprintf("%oVariation %d\n", save_count_variations);
-    dump_stack();
-    showboard(0);
-    print_connection_distances(&conn1);
-    print_connection_distances(&conn2);
-  }
-
   /* Loop through the points with smallish distance from str1 and look
    * for ones also having a small distance to str2.
    */
-  for (r = 0; r < conn1.queue_end; r++) {
-    int pos = conn1.queue[r];
-    float dist1 = conn1.distances[pos];
-    float deltadist1 = conn1.deltas[pos];
-    float dist2 = conn2.distances[pos];
-    float deltadist2 = conn2.deltas[pos];
+  for (r = 0; r < conn1->queue_end; r++) {
+    int pos = conn1->queue[r];
+    float dist1 = conn1->distances[pos];
+    float deltadist1 = conn1->deltas[pos];
+    float dist2 = conn2->distances[pos];
+    float deltadist2 = conn2->deltas[pos];
     float d1;
     float d2;
     float distance;
@@ -2293,8 +2257,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
     }
 
     /* Check whether the move is "between" the two strings. */
-    if (conn1.coming_from[pos] != NO_MOVE
-	&& conn1.coming_from[pos] == conn2.coming_from[pos]) {
+    if (conn1->coming_from[pos] != NO_MOVE
+	&& conn1->coming_from[pos] == conn2->coming_from[pos]) {
       if (verbose > 0)
 	gprintf("%o  discarded, not between strings\n");
       continue;
@@ -2322,8 +2286,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	    gprintf("%o  +0.5, no defense\n");
 	}
 	else {
-	  if (conn1.distances[attack_move]
-	      + conn2.distances[attack_move] > dist1 + dist2) {
+	  if (conn1->distances[attack_move]
+	      + conn2->distances[attack_move] > dist1 + dist2) {
 	    distance += 0.5;
 	    if (verbose > 0)
 	      gprintf("%o  +0.5, attack point not on shortest path\n");
@@ -2346,14 +2310,14 @@ find_connection_moves(int str1, int str2, int color_to_move,
       for (k = 0; k < 4; k++) {
 	int apos, bpos;
 	if (k & 1)
-	  apos = conn1.vulnerable1[pos];
+	  apos = conn1->vulnerable1[pos];
 	else 
-	  apos = conn1.vulnerable2[pos];
+	  apos = conn1->vulnerable2[pos];
 
 	if (k & 2)
-	  bpos = conn2.vulnerable1[pos];
+	  bpos = conn2->vulnerable1[pos];
 	else 
-	  bpos = conn2.vulnerable2[pos];
+	  bpos = conn2->vulnerable2[pos];
 
 	if (common_vulnerability(apos, bpos, color)) {
 	  if (check_self_atari(apos, color_to_move)) {
@@ -2373,10 +2337,6 @@ find_connection_moves(int str1, int str2, int color_to_move,
     }
   }
 
-  /* Turn the sgf traces back on. */
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
-
   /* Modify the distance values for the moves with various bonuses. */
   for (r = 0; r < num_moves; r++) {
     int move = moves[r];
@@ -2393,12 +2353,12 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	  distances[r] -= 0.2;
 	  if (verbose > 0)
 	    gprintf("%o%1M -0.2, adjacent to attacker string with at most two liberties\n", move);
-	  if ((conn1.distances[move] - conn1.deltas[move] <= 0.5
-	       || conn1.distances[pos] - conn1.deltas[pos] <= 0.5)
-	      && (conn2.distances[move] - conn2.deltas[move] <= 0.5
-		  || conn2.distances[pos] - conn2.deltas[pos] <= 0.5)
-	      && conn1.distances[pos] < *total_distance
-	      && conn2.distances[pos] < *total_distance) {
+	  if ((conn1->distances[move] - conn1->deltas[move] <= 0.5
+	       || conn1->distances[pos] - conn1->deltas[pos] <= 0.5)
+	      && (conn2->distances[move] - conn2->deltas[move] <= 0.5
+		  || conn2->distances[pos] - conn2->deltas[pos] <= 0.5)
+	      && conn1->distances[pos] < total_distance
+	      && conn2->distances[pos] < total_distance) {
 	    distances[r] -= 0.7;
 	    if (verbose > 0)
 	      gprintf("%o%1M -0.7, capture or atari of immediately connecting string\n", move);
@@ -2427,13 +2387,17 @@ find_connection_moves(int str1, int str2, int color_to_move,
      */
     if ((liberty_of_string(move, str1)
 	 && countlib(str1) == 3)
-	|| (liberty_of_string(move, str2)
+	|| (ON_BOARD(str2) && liberty_of_string(move, str2)
 	    && countlib(str2) == 3)) {
       distances[r] -= 0.1;
       if (verbose > 0)
 	gprintf("%o%1M -0.1, liberty of endpoint string with 3 libs\n", move);
     }
   }
+
+  /* Turn the sgf traces back on. */
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
 
   /* Normalize distance values. See comment to gg_normalize_float() in
    * utils/gg_utils.c for an explanation of this operation. It is
@@ -2485,7 +2449,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
     char *pos;
     int chars;
     sprintf(buf, "Move order for %sconnect: %n",
-	    color_to_move == color ? "" : "dis", &chars);
+	    connect_move ? "" : "dis", &chars);
     pos = buf + chars;
     for (i = 0; i < num_moves; i++) {
       sprintf(pos, "%c%d (%4.2f) %n", J(moves[i]) + 'A' + (J(moves[i]) >= 8),
@@ -2506,6 +2470,513 @@ find_connection_moves(int str1, int str2, int color_to_move,
 
   return num_moves;
 }
+
+static int
+find_string_connection_moves(int str1, int str2, int color_to_move,
+		             int moves[MAX_MOVES], float *total_distance)
+{
+  struct connection_data conn1;
+  struct connection_data conn2;
+  float max_dist1;
+  float max_dist2;
+  int num_moves;
+  int lib;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
+
+  /* We turn off the sgf traces here to avoid cluttering them up with
+   * tactical reading moves.
+   */
+  sgf_dumptree = NULL;
+  count_variations = 0;
+
+  compute_connection_distances(str1, str2, 3.051, &conn1);
+  compute_connection_distances(str2, str1, 3.051, &conn2);
+
+  if (findlib(str1, 1, &lib) == 1) {
+    conn1.distances[lib] = 0;
+    conn1.coming_from[lib] = NO_MOVE;
+    conn2.distances[lib] = conn2.distances[str1];
+    conn2.coming_from[lib] = conn1.coming_from[str1];
+  }
+
+  if (findlib(str2, 1, &lib) == 1) {
+    conn2.distances[lib] = 0;
+    conn1.distances[lib] = conn1.distances[str2];
+  }
+
+  max_dist1 = conn1.distances[str2];
+  max_dist2 = conn2.distances[str1];
+
+  *total_distance = gg_min(max_dist1, max_dist2);
+
+  if (verbose > 0) {
+    gprintf("%oVariation %d\n", save_count_variations);
+    dump_stack();
+    showboard(0);
+    print_connection_distances(&conn1);
+    print_connection_distances(&conn2);
+  }
+
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+
+  num_moves = find_connection_moves(str1, str2, color_to_move,
+      				    &conn1, &conn2, max_dist1, max_dist2,
+      			   	    moves, *total_distance);
+  return num_moves;
+}
+
+void
+init_connection_data(int color, const char goal[BOARDMAX],
+    		     struct connection_data *conn)
+{
+  int pos;
+  clear_connection_data(conn);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if ((board[pos] == EMPTY || board[pos] == color)
+	&& goal[pos]) {
+      conn->queue[conn->queue_end++] = pos;
+      if (board[pos] == color) {
+	conn->distances[pos] = 0.0;
+	conn->deltas[pos] = 0.0;
+      }
+      else {
+	conn->distances[pos] = 1.0;
+	conn->deltas[pos] = 1.0;
+      }
+      conn->coming_from[pos] = NO_MOVE;
+      conn->vulnerable1[pos] = NO_MOVE;
+      conn->vulnerable2[pos] = NO_MOVE;
+    }
+}
+
+static int
+find_break_moves(int str, char goal[BOARDMAX], int color_to_move,
+		 int moves[MAX_MOVES], float *total_distance)
+{
+  struct connection_data conn1;
+  struct connection_data conn2;
+  float max_dist1 = HUGE_CONNECTION_DISTANCE;
+  float max_dist2;
+  int num_moves;
+  int str2 = NO_MOVE;
+  int color = board[str];
+  int lib;
+  int k;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
+
+  /* We turn off the sgf traces here to avoid cluttering them up with
+   * tactical reading moves.
+   */
+  sgf_dumptree = NULL;
+  count_variations = 0;
+
+  compute_connection_distances(str, NO_MOVE, 2.501, &conn1);
+  for (k = 0; k < conn1.queue_end; k++)
+    if (goal[conn1.queue[k]]
+	&& board[conn1.queue[k]] == color) {
+      str2 = conn1.queue[k];
+      TRACE("%oUsing %1m as secondary target.\n", str2);
+      break;
+    }
+
+  /* Add all stones in the goal to the queue. */
+  init_connection_data(color, goal, &conn2);
+  for (k = 0; k < conn2.queue_end; k++)
+    if (max_dist1 > conn1.distances[conn2.queue[k]])
+      max_dist1 = conn1.distances[conn2.queue[k]];
+
+  spread_connection_distances(color, str, &conn2, 2.501, 1);
+
+  if (findlib(str, 1, &lib) == 1) {
+    conn1.distances[lib] = 0;
+    conn1.coming_from[lib] = NO_MOVE;
+    conn2.distances[lib] = conn2.distances[str];
+    conn2.coming_from[lib] = conn1.coming_from[str];
+  }
+
+  max_dist2 = conn2.distances[str];
+  *total_distance = gg_min(max_dist1, max_dist2);
+
+  if (verbose > 0) {
+    gprintf("%oVariation %d\n", save_count_variations);
+    dump_stack();
+    showboard(0);
+    print_connection_distances(&conn1);
+    print_connection_distances(&conn2);
+  }
+
+  /* Turn the sgf traces back on. */
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+
+  num_moves = find_connection_moves(str, str2, color_to_move,
+      				    &conn1, &conn2, max_dist1, max_dist2,
+      			   	    moves, *total_distance);
+  
+  {
+    int move;
+    if (num_moves < MAX_MOVES
+	&& ON_BOARD(str2)
+	&& ladder_capture(str2, &move)) {
+      moves[num_moves++] = move;
+    }
+  }
+
+  return num_moves;
+}
+
+
+/* These depth values are set relative to the standard readconnnect depth
+ * limits at each call of break_in()/block_off().
+ * */
+int break_in_node_limit;
+int break_in_depth;
+
+/* Can (str) connect to goal[] if the other color moves first? */
+static int
+recursive_break(int str, char goal[BOARDMAX], int *move,
+    		int komaster, int kom_pos, int has_passed)
+{
+  int color = board[str];
+  int moves[MAX_MOVES];
+  int num_moves;
+  float distance = 0.0;
+  int k;
+  int xpos;
+  int savemove = NO_MOVE;
+  int savecode = 0;
+#if 0
+  int found_read_result;
+#endif
+  Read_result *read_result = NULL;
+  
+  SETUP_TRACE_INFO("recursive_break", str);
+
+  if (move)
+    *move = NO_MOVE;
+
+  nodes_connect++;
+  global_connection_node_counter++;
+  
+  if (board[str] == EMPTY) {
+    SGFTRACE(PASS_MOVE, 0, "one string already captured");
+    return 0;
+  }
+  
+  if (nodes_connect > break_in_node_limit) {
+    SGFTRACE(PASS_MOVE, 0, "connection node limit reached");
+    return 0;
+  }
+  
+  if (stackp > break_in_depth) {
+    SGFTRACE(PASS_MOVE, 0, "connection depth limit reached");
+    return 0;
+  }
+
+#if 0
+  if (stackp <= depth
+      && (hashflags & HASH_CONNECT)
+      && !has_passed) {
+    found_read_result = get_read_result2(CONNECT, komaster, kom_pos, 
+					 &str1, &str2, &read_result);
+    if (found_read_result) {
+      TRACE_CACHED_RESULT2(*read_result);
+      if (rr_get_result(*read_result) != 0)
+	if (move)
+	  *move = rr_get_move(*read_result);
+
+      SGFTRACE2(rr_get_move(*read_result),
+		rr_get_result(*read_result), "cached");
+      return rr_get_result(*read_result);
+    }
+  }
+#endif
+  
+#if 0
+  if (trivial_connection(str1, str2, &xpos) == WIN) {
+    SGFTRACE2(xpos, WIN, "trivial connection");
+    READ_RETURN_CONN(read_result, move, xpos, WIN);
+  }
+#endif
+  
+  num_moves = find_break_moves(str, goal, color, moves, &distance);
+  
+  for (k = 0; k < num_moves; k++) {
+    int new_komaster;
+    int new_kom_pos;
+    int ko_move;
+
+    xpos = moves[k];
+    
+    if (komaster_trymove(xpos, color, "recursive_break", str,
+			 komaster, kom_pos, &new_komaster, &new_kom_pos,
+			 &ko_move, stackp <= ko_depth && savecode == 0)) {
+      if (!ko_move) {
+	int acode = recursive_block(str, goal, NULL,
+				    new_komaster, new_kom_pos,
+				    has_passed);
+	popgo();
+	if (acode == 0) {
+	  SGFTRACE(xpos, WIN, "break effective");
+	  READ_RETURN(read_result, move, xpos, WIN);
+	}
+	/* if the move works with ko we save it, then look for something
+	 * better.
+	 */
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+      }
+      else {
+	if (recursive_block(str, goal, NULL, new_komaster, new_kom_pos,
+			    has_passed) != WIN) {
+	  savemove = xpos;
+	  savecode = KO_B;
+	}
+	popgo();
+      }
+    }
+  }
+
+  if (num_moves == 0 && distance < 1.0) {
+    SGFTRACE(NO_MOVE, WIN, "no move, probably connected");
+    READ_RETURN(read_result, move, NO_MOVE, WIN);
+  }
+  
+  if (savecode != 0) {
+    SGFTRACE(savemove, savecode, "saved move");
+    READ_RETURN(read_result, move, savemove, savecode);
+  }
+
+  SGFTRACE(0, 0, NULL);
+  READ_RETURN(read_result, move, NO_MOVE, 0);
+}
+
+
+/* Can (str) connect to goal[] if the other color moves first? */
+static int
+recursive_block(int str, char goal[BOARDMAX], int *move,
+    		int komaster, int kom_pos, int has_passed)
+{
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int moves[MAX_MOVES];
+  int num_moves;
+  float distance = 0.0;
+  int k;
+  int xpos;
+  int savemove = NO_MOVE;
+  int savecode = 0;
+#if 0
+  int found_read_result;
+#endif
+  Read_result *read_result = NULL;
+  SETUP_TRACE_INFO("recursive_block", str);
+  
+  nodes_connect++;
+  global_connection_node_counter++;
+
+  if (move)
+    *move = NO_MOVE;
+  
+  if (board[str] == EMPTY) {
+    SGFTRACE(PASS_MOVE, WIN, "string already captured");
+    return WIN;
+  }
+
+#if 0
+  if (same_string(str1, str2)) {
+    SGFTRACE(PASS_MOVE, 0, "already connected");
+    return 0;
+  }
+#endif
+  
+  if (nodes_connect > break_in_node_limit) {
+    SGFTRACE(PASS_MOVE, WIN, "connection node limit reached");
+    return WIN;
+  }
+  
+  if (stackp > break_in_depth) {
+    SGFTRACE(PASS_MOVE, WIN, "connection depth limit reached");
+    return WIN;
+  }
+  
+#if 0
+  if ((stackp <= depth) && (hashflags & HASH_DISCONNECT)) {
+    found_read_result = get_read_result2(DISCONNECT, komaster, kom_pos, 
+					 &str1, &str2, &read_result);
+    if (found_read_result) {
+      TRACE_CACHED_RESULT2(*read_result);
+      if (rr_get_result(*read_result) != 0)
+	if (move)
+	  *move = rr_get_move(*read_result);
+
+      SGFTRACE2(rr_get_move(*read_result),
+		rr_get_result(*read_result), "cached");
+      return rr_get_result(*read_result);
+    }
+  }
+#endif
+
+  if (ladder_capture(str, &xpos) == WIN) {
+    SGFTRACE(xpos, WIN, "string capturable");
+    READ_RETURN(read_result, move, xpos, WIN);
+  }
+  
+  num_moves = find_break_moves(str, goal, other, moves, &distance);
+  
+  for (k = 0; k < num_moves; k++) {
+    int new_komaster;
+    int new_kom_pos;
+    int ko_move;
+
+    xpos = moves[k];
+    
+    if (komaster_trymove(xpos, other, "recursive_block", str,
+			 komaster, kom_pos, &new_komaster, &new_kom_pos,
+			 &ko_move, stackp <= ko_depth && savecode == 0)) {
+      if (!ko_move) {
+	int dcode = recursive_break(str, goal, NULL,
+				    new_komaster, new_kom_pos, has_passed);
+	popgo();
+	if (dcode == 0) {
+	  SGFTRACE(xpos, WIN, "block effective");
+	  READ_RETURN(read_result, move, xpos, WIN);
+	}
+	/* if the move works with ko we save it, then look for something
+	 * better.
+	 */
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
+      }
+      else {
+	if (recursive_break(str, goal, NULL, new_komaster, new_kom_pos,
+			    has_passed) != WIN) {
+	  savemove = xpos;
+	  savecode = KO_B;
+	}
+	popgo();
+      }
+    }
+  }
+
+  if (num_moves == 0
+      && distance >= 1.0
+      && (has_passed
+	  || !recursive_break(str, goal, NULL, komaster, kom_pos, 1))) {
+    SGFTRACE(NO_MOVE, WIN, "no move, probably disconnected");
+    READ_RETURN(read_result, move, NO_MOVE, WIN);
+  }
+  
+  if (savecode != 0) {
+    SGFTRACE(savemove, savecode, "saved move");
+    READ_RETURN(read_result, move, savemove, savecode);
+  }
+
+  SGFTRACE(0, 0, NULL);
+  READ_RETURN(read_result, move, NO_MOVE, 0);
+}
+
+
+
+/* Externably callable frontend to recursive_break_in.
+ * Returns WIN if (str) can connect to the area goal[] (which may or may
+ * not contain stones), if he gets the first move.
+ */
+int
+break_in(int str, char goal [BOARDMAX], int *move)
+{
+  int dummy_move;
+  int save_verbose;
+  int result;
+  int reading_nodes_when_called = get_reading_node_counter();
+  double start = 0;
+  int tactical_nodes;
+
+  break_in_node_limit = connection_node_limit / 5;
+  break_in_depth = connect_depth2 - 5;
+
+  if (move == NULL)
+    move = &dummy_move;
+  
+  nodes_connect = 0;
+  *move = PASS_MOVE;
+  
+  if (board[str] == EMPTY)
+    return 0;
+  str = find_origin(str);
+
+  save_verbose = verbose;
+  if (verbose > 0)
+    verbose--;
+  start = gg_cputime();
+  memset(connection_shadow, 0, sizeof(connection_shadow));
+  result = recursive_break(str, goal, move, EMPTY, NO_MOVE, 0);
+  verbose = save_verbose;
+  tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
+  if (0) {
+    gprintf("%obreak_in    %1M, result %d %1M (%d, %d nodes, %f seconds)\n",
+	    str, result, *move,
+	    nodes_connect, tactical_nodes, gg_cputime() - start);
+    dump_stack();
+  }
+  if (0) {
+    gprintf("%obreak_in %1m %d %1m ", str, result, *move);
+    dump_stack();
+    goaldump(goal);
+  }
+
+  return result;
+}
+
+
+/* Externably callable frontend to recursive_block_off.
+ * Returns WIN if (str) cannot connect to the area goal[] (which may or may
+ * not contain stones), if the other color moves first.
+ */
+int
+block_off(int str, char goal[BOARDMAX], int *move)
+{
+  int dummy_move;
+  int result;
+  int save_verbose;
+  int reading_nodes_when_called = get_reading_node_counter();
+  double start = 0;
+  int tactical_nodes;
+  
+  if (move == NULL)
+    move = &dummy_move;
+  
+  nodes_connect = 0;
+  *move = PASS_MOVE;
+  
+  str = find_origin(str);
+
+  save_verbose = verbose;
+  if (verbose > 0)
+    verbose--;
+  start = gg_cputime();
+  memset(connection_shadow, 0, sizeof(connection_shadow));
+  result = recursive_block(str, goal, move, EMPTY, NO_MOVE, 0);
+  verbose = save_verbose;
+  tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
+
+#if 0
+  if (0) {
+    gprintf("%odisconnect %1m %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
+	    str1, str2, result, *move,
+	    nodes_connect, tactical_nodes, gg_cputime() - start);
+    dump_stack();
+  }
+  if (0) {
+    gprintf("%odisconnect %1m %1m %d %1m ", str1, str2, result, *move);
+    dump_stack();
+  }
+#endif
+
+  return result;
+}
+
 
 
 /* Helper macro for the function below. */
@@ -2607,7 +3078,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
  * below.
  */
 
-static void
+void
 spread_connection_distances(int color, int target,
     			    struct connection_data *conn,
     			    float cutoff_distance, int speculative)
@@ -3122,8 +3593,9 @@ clear_connection_data(struct connection_data *conn)
 /* Compute the connection distances from string (str) to nearby
  * vertices, until we reach target or the distance gets too high.
  */
-static void
-compute_connection_distances(int str, int target, struct connection_data *conn)
+void
+compute_connection_distances(int str, int target, float cutoff,
+    			     struct connection_data *conn)
 {
   int color = board[str];
   
@@ -3143,8 +3615,9 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
       conn->vulnerable2[stones[k]] = NO_MOVE;
     }
   }
-  spread_connection_distances(color, target, conn, 3.0501, 1);
+  spread_connection_distances(color, target, conn, cutoff, 1);
 }
+
 
 
 /* Print the connection distances in a struct connection_data. */
