@@ -527,6 +527,7 @@ static int
 get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
 {
   SGFProperty *prop;
+  int i, j;
   
   for (prop = node->props; prop; prop = prop->next) {
     if (!prop || !prop->name || !node) {
@@ -537,8 +538,9 @@ get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
     }
     switch (prop->name) {
     case SGFAB:
+      get_moveXY(prop, &i, &j, board_size);
       /* Put handicap stones on the board at once. */
-      add_stone(get_sgfmove(prop), BLACK);
+      add_stone(POS(i, j), BLACK);
       break;
       
     case SGFAW:
