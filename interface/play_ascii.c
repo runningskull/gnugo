@@ -579,11 +579,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
   char *tmpstring;
   int state = 1;
   
-#ifdef HAVE_SETLINEBUF
-  setlinebuf(stdout); /* Need at least line buffer gnugo-gnugo */
-#else
-  setbuf(stdout, NULL); /* else set it to completely UNBUFFERED */
-#endif
+  setvbuf(stdout, (char *)NULL, _IOLBF, 0); /* Set line buffering. */
   
   sgftree = *tree;
 

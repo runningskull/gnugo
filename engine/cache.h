@@ -32,9 +32,6 @@
 #ifndef _CACHE_H_
 #define _CACHE_H_
 
-/* Dump (almost) all read results. */
-#define TRACE_READ_RESULTS 0
-
 /*
  * This struct contains the attack / defense point and the result.
  * It is kept in a linked list, and each position has a list of 

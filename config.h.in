@@ -61,14 +61,8 @@
 /* Define if you have the `g_vsnprintf' function. */
 #undef HAVE_G_VSNPRINTF
 
-/* Define if you have the <inttypes.h> header file. */
-#undef HAVE_INTTYPES_H
-
 /* Define if you have the `keypad' function. */
 #undef HAVE_KEYPAD
-
-/* Define if you have the <memory.h> header file. */
-#undef HAVE_MEMORY_H
 
 /* Define if you have the <ncurses/curses.h> header file. */
 #undef HAVE_NCURSES_CURSES_H
@@ -76,32 +70,11 @@
 /* Define if you have the <ncurses/term.h> header file. */
 #undef HAVE_NCURSES_TERM_H
 
-/* Define if you have the `setlinebuf' function. */
-#undef HAVE_SETLINEBUF
-
-/* Define if you have the <stdint.h> header file. */
-#undef HAVE_STDINT_H
-
-/* Define if you have the <stdlib.h> header file. */
-#undef HAVE_STDLIB_H
-
-/* Define if you have the <strings.h> header file. */
-#undef HAVE_STRINGS_H
-
-/* Define if you have the <string.h> header file. */
-#undef HAVE_STRING_H
-
-/* Define if you have the <sys/stat.h> header file. */
-#undef HAVE_SYS_STAT_H
-
 /* Define if you have the <sys/times.h> header file. */
 #undef HAVE_SYS_TIMES_H
 
 /* Define if you have the <sys/time.h> header file. */
 #undef HAVE_SYS_TIME_H
-
-/* Define if you have the <sys/types.h> header file. */
-#undef HAVE_SYS_TYPES_H
 
 /* Define if you have the <term.h> header file. */
 #undef HAVE_TERM_H
@@ -123,9 +96,6 @@
 
 /* Define if you have the `vwprintw' function. */
 #undef HAVE_VWPRINTW
-
-/* Define if the preprocessor recognizes __FUNCTION__ */
-#undef HAVE___FUNCTION__
 
 /* Define if `major', `minor', and `makedev' are declared in <mkdev.h>. */
 #undef MAJOR_IN_MKDEV
@@ -151,14 +121,8 @@
 /* Semeai Variations. 500 default */
 #undef SEMEAI_NODE_LIMIT
 
-/* The size of a `int', as computed by sizeof. */
-#undef SIZEOF_INT
-
 /* The size of a `long', as computed by sizeof. */
 #undef SIZEOF_LONG
-
-/* Define if you have the ANSI C header files. */
-#undef STDC_HEADERS
 
 /* Define to 1 if termcap/terminfo is available. */
 #undef TERMINFO

@@ -29,6 +29,8 @@
  * (Reading/Hashing) for more information.  
  */
 
+/* Dump (almost) all read results. */
+#define TRACE_READ_RESULTS 0
 
 #ifndef _HASH_H_
 #define _HASH_H_
@@ -149,7 +151,6 @@ void hashdata_invert_stone(Hash_data *hd, int pos, int color);
 void hashdata_set_tomove(Hash_data *hd, int to_move);
 
 int hashdata_diff_dump(Hash_data *key1, Hash_data *key2);
-
 
 #endif
 

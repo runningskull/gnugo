@@ -73,16 +73,14 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 am__include = @am__include@
 am__quote = @am__quote@
-dfa_c = @dfa_c@
 glibconfig = @glibconfig@
 install_sh = @install_sh@
-perl = @perl@
 
 bin_PROGRAMS = gnugo
 
 SUBDIRS = debugboard
 
-EXTRA_DIST = html gtp_examples gnugo.dsp gnugo.el GoImage
+EXTRA_DIST = gtp_examples gnugo.dsp gnugo.el GoImage
 
 noinst_HEADERS = interface.h gmp.h gtp.h
 

@@ -73,10 +73,8 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 am__include = @am__include@
 am__quote = @am__quote@
-dfa_c = @dfa_c@
 glibconfig = @glibconfig@
 install_sh = @install_sh@
-perl = @perl@
 
 EXTRA_DIST = engine.dsp board.dsp
 

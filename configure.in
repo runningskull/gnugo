@@ -121,9 +121,6 @@ AC_ARG_ENABLE(experimental-hashing,
 AC_ARG_ENABLE(profile,
  [  --enable-profile                   compile gnugo with gprof option ])
 
-dnl expand any instances of @matcher@ in Makefile
-AC_SUBST(dfa_c)
-
 AC_PROG_CC
 
 dnl for automake 1.4.x
@@ -149,7 +146,6 @@ if test $ac_cv_mingw32 = yes;then
 fi
 
 AC_PROG_CPP
-AC_PROG_GCC_TRADITIONAL
 AC_PROG_RANLIB
 
 dnl required since we use SUBDIRS in Makefile.am
@@ -179,15 +175,11 @@ else
    term_header="no"
 fi
 
-AC_PATH_PROG(perl, perl)
+AC_CHECK_SIZEOF(long,,[#include <stdio.h>])
 
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(long)
-
-dnl results of setlinebuf test used in interface/play_ascii.c
 dnl vsnprintf not universally available
 dnl usleep not available in Unicos and mingw32
-AC_CHECK_FUNCS(setlinebuf vsnprintf gettimeofday usleep times)
+AC_CHECK_FUNCS(vsnprintf gettimeofday usleep times)
 
 dnl if snprintf not available try to use g_snprintf from glib
 if test $ac_cv_func_vsnprintf = no; then
@@ -210,22 +202,6 @@ if test $ac_cv_func_vsnprintf = no; then
     fi
 fi
  
-dnl AM_FUNC_ERROR_AT_LINE
-
-AH_TEMPLATE([HAVE___FUNCTION__],
-[Define if the preprocessor recognizes __FUNCTION__])
-
-AC_CACHE_CHECK(
-	[for __FUNCTION__],
-	gnugo_cv_c___function__,
-	AC_TRY_COMPILE(,
-		[char *s=__FUNCTION__],
-		gnugo_cv_c___function__="yes",
-		gnugo_cv_c___function__="no")
-)
-if test "$gnugo_cv_c___function__" = "yes";then
-      AC_DEFINE(HAVE___FUNCTION__)
-fi
 dnl ------ variadic #define -----------------------
 
 AH_TEMPLATE([HAVE_VARIADIC_DEFINE],
@@ -537,15 +513,11 @@ AC_SUBST(GNUGO_SOME_WARNINGS)
 AC_SUBST(GNUGO_ALL_WARNINGS)
 AC_SUBST(NO_WARNINGS)
 
-dnl Please add -Wp,-lang-c89 to SOME_WARNINGS soon
-
 NO_WARNINGS="CFLAGS=$CFLAGS"
 if test $ac_cv_c_compiler_gnu = yes; then
   GCC_ONLY=''
-  GGO_SOME_WARNINGS='-Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations'
-  GGO_ALL_WARNINGS='-Wall -W -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wp,-lang-c89'
+  GGO_SOME_WARNINGS='-Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wundef'
   GNUGO_SOME_WARNINGS="CFLAGS=$CFLAGS $GGO_SOME_WARNINGS"
-  GNUGO_ALL_WARNINGS="CFLAGS=$CFLAGS $GGO_ALL_WARNINGS"
   CFLAGS="$CFLAGS $GGO_SOME_WARNINGS"
   if test "$enable_profile" = "yes" ; then
      CFLAGS="-pg $CFLAGS"
@@ -553,11 +525,10 @@ if test $ac_cv_c_compiler_gnu = yes; then
 else
   GCC_ONLY='#'
   GNUGO_SOME_WARNINGS=''
-  GNUGO_ALL_WARNINGS=''
 fi
 
 dnl Now lines in Makefile.am can be prefixed @GCC_ONLY@, and
-dnl we can specify either @GNUGO_SOME_WARNINGS@ or @GNUGO_ALL_WARNINGS@
+dnl we can specify either @GNUGO_SOME_WARNINGS@
 
 dnl FIXME: please add warnings for other compilers !
 
