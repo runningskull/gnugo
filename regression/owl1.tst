@@ -279,7 +279,7 @@ loadsgf games/nngs/juka-gnugo-3.5.1-200309161948.sgf
 328 owl_attack R6
 #? [1 (P1|T4)]
 329 owl_defend R6
-#? [1 T4]*
+#? [1 T4]
 
 loadsgf games/nngs/tommmal-gnugo-3.5.1-200310071202.sgf 78
 330 owl_attack Q5

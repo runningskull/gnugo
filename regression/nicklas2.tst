@@ -147,7 +147,7 @@ loadsgf games/nicklas/nicklas21.sgf 72
 #See also nicklas2.tst?2102
 loadsgf games/nicklas/nicklas21.sgf 74
 2103 reg_genmove black
-#? [PASS]*
+#? [PASS]
 
 loadsgf games/nicklas/nicklas21.sgf 76
 2104 reg_genmove black

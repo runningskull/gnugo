@@ -172,7 +172,7 @@ loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 254
 # possible but the policy should be to play it out.
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 272
 560 reg_genmove black
-#? [A9|B10|D11|F11|J15|A16]*
+#? [A9|B10|D11|F11|J15|A16]
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 274
 570 reg_genmove black
@@ -219,7 +219,7 @@ loadsgf games/ninestones/emanuel-1.sgf 182
 
 loadsgf games/ninestones/emanuel-1.sgf 200
 660 reg_genmove black
-#? [P1]
+#? [P1]*
 
 #this is a persistent cache problem
 loadsgf games/ninestones/emanuel-2.sgf 112

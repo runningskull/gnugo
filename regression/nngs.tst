@@ -132,7 +132,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 12
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 14
 330 reg_genmove black
-#? [B15|B16]*
+#? [B15|B16]
 
 
 #Other moves possible.
@@ -204,7 +204,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 84
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 86
 490 reg_genmove black
-#? [J18]
+#? [J18]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 90
@@ -339,7 +339,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 241
 #J11 is terrible.
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 257
 820 reg_genmove white
-#? [J13|L9]
+#? [J13|L9]*
 
 
 
@@ -766,7 +766,7 @@ loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 50
 
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 56
 1680 reg_genmove black
-#? [K17]*
+#? [K17]
 
 
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 60

@@ -1,6 +1,6 @@
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 4
 10 reg_genmove black
-#? [E5|E6]*
+#? [E5|E6]
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 6
 20 reg_genmove black
@@ -8,7 +8,7 @@ loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 6
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 10
 30 reg_genmove black
-#? [D7]*
+#? [D7]
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 26
 40 reg_genmove black
@@ -35,7 +35,7 @@ loadsgf games/nngs/evand-gnugo-3.5.2-200312060932.sgf 32
 #something better than H6
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312041808.sgf 6
 90 reg_genmove black
-#? [E4|F5|E3]*
+#? [E4|F5|E3]
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312041808.sgf 10
 100 reg_genmove black
@@ -50,7 +50,7 @@ loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312041808.sgf 40
 #game move is B1, maybe a caching issue?
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312041808.sgf 58
 120 reg_genmove black
-#? [F1]
+#? [F1]*
 
 #large endgame, white will have to pick up.
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312041808.sgf 64
@@ -136,7 +136,7 @@ loadsgf games/nngs/sjfried-gnugo-3.5.2gf1-200312210441.sgf 24
 
 loadsgf games/nngs/sjfried-gnugo-3.5.2gf1-200312210441.sgf 32
 310 reg_genmove black
-#? [H7|H8]*
+#? [H7|H8]
 
 loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312241905.sgf 8
 320 reg_genmove black
@@ -152,13 +152,13 @@ loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312241905.sgf 28
 
 loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312241905.sgf 30
 350 owl_defend C3
-#? [0]*
+#? [0]
 
 loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312292348.sgf 8
 360 reg_genmove black
-#? [F4|E6|D5]
+#? [F4|E6|D5]*
 
 #E7 appears to be a losing move
 loadsgf games/nngs/gnugo-3.5.2gf1-Kiskol-200401021557.sgf 10
 370 reg_genmove white
-#? [G7]
+#? [G7]*

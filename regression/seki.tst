@@ -135,7 +135,7 @@ play white B1
 undo
 play white C1
 206 reg_genmove black
-#? [A1]
+#? [A1]*
 
 undo
 undo
@@ -396,7 +396,7 @@ play black B1
 # A1 secures seki, removing white's ko aji.
 play white A3
 811 reg_genmove black
-#? [A1]
+#? [A1]*
 
 
 loadsgf games/seki13.sgf

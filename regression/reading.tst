@@ -644,7 +644,7 @@ loadsgf games/trevor/auto/b75.sgf 62
 
 loadsgf games/reading35.sgf
 164 defend B6
-#? [1 C7]*
+#? [1 C7]
 
 # See also 13x13:78
 loadsgf games/reading36.sgf 23

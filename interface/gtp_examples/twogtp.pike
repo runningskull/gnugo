@@ -3,7 +3,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * This program is distributed with GNU Go, a Go program.            *
  *                                                                   *
- * Copyright 2003 by the Free Software Foundation.                   *
+ * Copyright 2003 and 2004 by the Free Software Foundation.          *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *
  * modify it under the terms of the GNU General Public License as    *

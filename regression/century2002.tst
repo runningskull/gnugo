@@ -81,7 +81,7 @@ loadsgf games/century21-2002/manyfaces-gnugo.sgf 45
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 57
 140 reg_genmove black
-#? [J3|R4|P5]*
+#? [J3|R4|P5]
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 157
 150 reg_genmove black
@@ -121,7 +121,7 @@ loadsgf games/century21-2002/gnugo-katsunari.sgf 76
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 96
 240 reg_genmove white
-#? [F18]*
+#? [F18]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 156
 260 reg_genmove white

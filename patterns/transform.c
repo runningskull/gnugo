@@ -2,7 +2,7 @@
  * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *
  * http://www.gnu.org/software/gnugo/ for more information.          *
  *                                                                   *
- * Copyright 1999, 2000, 2001, 2002 and 2003                         *
+ * Copyright 1999, 2000, 2001, 2002, 2003 and 2004                   *
  * by the Free Software Foundation.                                  *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *

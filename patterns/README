@@ -6,7 +6,7 @@ documentation for more information, or write to gnugo@gnu.org.
 The SGF format files in this directory, fuseki2.sgf, hoshi.sgf,
 komoku.sgf, sansan.sgf, mokuhazushi.sgf and takamoku.sgf comprise
 GNU Go's Joseki database. These files are Copyright 1999, 2000,
-2001, 2002 and 2003 by the Free Software Foundation.
+2001, 2002, 2003 and 2004 by the Free Software Foundation.
 
 You may redistribute or modify them under the terms of the GNU
 General Public License as published by the Free Software

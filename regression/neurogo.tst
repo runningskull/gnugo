@@ -57,7 +57,7 @@ loadsgf games/FSF-neurogo.sgf 148
 
 loadsgf games/FSF-neurogo.sgf 152
 12 reg_genmove white
-#? [B10]*
+#? [B10]
 
 loadsgf games/FSF-neurogo.sgf 176
 # This may be hard to fix at this point but since we

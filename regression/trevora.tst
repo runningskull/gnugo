@@ -215,7 +215,7 @@ loadsgf games/trevor/auto/a019.sgf 6
 #Break through important
 loadsgf games/trevor/auto/a021.sgf 16
 370 reg_genmove white
-#? [F6]*
+#? [F6]
 
 
 

@@ -85,7 +85,7 @@ loadsgf games/incident94.sgf 114
 # Tenuki instead of urgent edge joseki move.
 loadsgf games/strategy40.sgf 10
 167 reg_genmove black
-#? [D4]
+#? [D4]*
 
 # Safety must come first. This is almost a whole-board semeai.
 loadsgf games/strategy40.sgf 30
@@ -172,7 +172,7 @@ loadsgf games/xxlin.sgf 38
 
 loadsgf games/xxlin.sgf 48
 182 reg_genmove black
-#? [E7|F8]*
+#? [E7|F8]
 
 loadsgf games/xxlin.sgf 76
 183 reg_genmove black
@@ -201,7 +201,7 @@ loadsgf games/pooo.sgf 16
 
 loadsgf games/pooo.sgf 24
 188 reg_genmove black
-#? [B6|C4]
+#? [B6|C4]*
 
 loadsgf games/pooo.sgf 50
 189 restricted_genmove black A14 C14 D14 E14 D15 E15 C19

@@ -455,7 +455,7 @@ loadsgf games/trevor/auto/d39.sgf 26
 
 loadsgf games/trevor/auto/d39.sgf 30
 880 reg_genmove white
-#? [R7]*
+#? [R7]
 
 
 #locally, E18 is better.

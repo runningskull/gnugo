@@ -241,7 +241,7 @@ loadsgf games/semeai/semeai9.sgf
 
 loadsgf games/semeai/semeai12.sgf
 45 analyze_semeai C3 A9
-#? [0 0 PASS]*
+#? [0 0 PASS]
 
 loadsgf games/semeai/semeai9.sgf
 46 analyze_semeai Q12 S11
@@ -289,15 +289,15 @@ loadsgf games/test4win.sgf
 # See also reading:195.
 loadsgf games/test4lose.sgf
 58 analyze_semeai F5 H6
-#? [0 0 PASS]*
+#? [0 0 PASS]
 
 loadsgf games/test5win.sgf
 59 analyze_semeai B7 E6
-#? [1 1 H5]*
+#? [1 1 H5]
 
 loadsgf games/test5lose.sgf
 60 analyze_semeai C8 E6
-#? [0 0 PASS]
+#? [0 0 PASS]*
 
 # A15 is a certain seki. A17 gives a ko for life and death of both.
 # The ko is very indirect for white, but it's still a ko. B17
@@ -341,13 +341,13 @@ loadsgf games/semeai/semeai14.sgf
 74 analyze_semeai N12 M13
 #? [1 0 (PASS|L13)]
 75 analyze_semeai J3 L2
-#? [1 0 PASS]*
+#? [1 0 PASS]
 76 analyze_semeai L2 J3
-#? [1 0 (PASS|N3|K2)]*
+#? [1 0 (PASS|N3|K2)]
 77 analyze_semeai A5 A3
 #? [1 0 PASS]*
 78 analyze_semeai A3 A5
-#? [1 0 (PASS|A6|C6|C1)]*
+#? [1 0 (PASS|A6|C6|C1)]
 79 analyze_semeai F9 F7
 #? [1 0 PASS]*
 80 analyze_semeai F7 F9
@@ -393,27 +393,27 @@ loadsgf games/semeai/semeai17.sgf 52
 104 analyze_semeai E9 D9
 #? [1 1 (D6|C7)]
 105 analyze_semeai G8 E9
-#? [1 1 (D6|C7)]
+#? [1 1 (D6|C7)]*
 106 analyze_semeai E9 G8
-#? [1 0 (D6|C7)]
+#? [1 0 (D6|C7)]*
 
 loadsgf games/semeai/semeai17.sgf 60
 108 analyze_semeai G8 H2
-#? [1 1 J2]
+#? [1 1 J2]*
 109 analyze_semeai H2 G8
 #? [1 1 E1]
 
 loadsgf games/semeai/semeai17.sgf 62
 110 analyze_semeai G8 H2
-#? [1 0 (PASS|F3|E1)]
+#? [1 0 (PASS|F3|E1)]*
 111 analyze_semeai H2 G8
-#? [1 0 (PASS|F3|E1)]
+#? [1 0 (PASS|F3|E1)]*
 
 loadsgf games/semeai/semeai17.sgf 64
 112 analyze_semeai G8 H2
-#? [1 0 PASS]
+#? [1 0 PASS]*
 113 analyze_semeai H2 G8
-#? [1 0 PASS]
+#? [1 0 PASS]*
 
 ########### semeai gen_move tests #################
 
@@ -439,7 +439,7 @@ loadsgf games/semeai/semeai16.sgf 230
 # Doubtful whether C7 should be accepted even if it kills all white.
 loadsgf games/semeai/semeai17.sgf 52
 107 reg_genmove black
-#? [D6|C7]
+#? [D6|C7]*
 
 ########### semeai status tests #################
 
@@ -461,7 +461,7 @@ loadsgf games/semeai/semeai17.sgf 64
 114 dragon_status G8
 #? [alive]
 115 dragon_status H2
-#? [alive]
+#? [alive]*
 
 ########### end of semeai tests #################
 

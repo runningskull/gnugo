@@ -72,7 +72,7 @@ loadsgf games/trevor/auto/b09.sgf 86
 #CATEGORY=ATARI_ATARI
 loadsgf games/trevor/auto/b09.sgf 92
 210 reg_genmove white
-#? [K7]*
+#? [K7]
 
 
 

@@ -267,7 +267,7 @@ loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 114
 # Saving M13 is small compared to stopping a black incursion.
 loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 114
 48 restricted_genmove white M12 P11
-#? [P11]*
+#? [P11]
 
 # In 3.5.2 the breakin code hallucinates that white A10 would suddenly
 # let black break into the territory around F6.

@@ -372,7 +372,7 @@ loadsgf games/owl49.sgf 1
 #? [1 P18]*
 play black P17
 315 owl_attack P17
-#? [1 P18]*
+#? [1 P18]
 
 loadsgf games/owl49.sgf 7
 316 owl_defend Q17
@@ -388,31 +388,31 @@ loadsgf games/owl47.sgf 6
 #? [0]
 loadsgf games/owl47.sgf 7
 406 owl_attack Q4
-#? [1 R3]*
+#? [1 R3]
 loadsgf games/owl47.sgf 8
 407 owl_defend Q4
-#? [0]*
+#? [0]
 loadsgf games/owl47.sgf 9
 408 owl_attack Q4
-#? [1 T3]*
+#? [1 T3]
 loadsgf games/owl47.sgf 10
 409 owl_defend Q4
-#? [0]*
+#? [0]
 loadsgf games/owl47.sgf 11
 410 owl_attack Q4
-#? [1 (R3|T2)]*
+#? [1 (R3|T2)]
 loadsgf games/owl47.sgf 12
 411 owl_defend Q4
-#? [0]*
+#? [0]
 loadsgf games/owl47.sgf 13
 412 owl_attack Q4
-#? [1 T2]*
+#? [1 T2]
 loadsgf games/owl47.sgf 14
 413 owl_defend Q4
-#? [0]*
+#? [0]
 loadsgf games/owl47.sgf 15
 414 owl_attack Q4
-#? [1 S2]*
+#? [1 S2]
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

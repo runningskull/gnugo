@@ -2,7 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- new static function capture_non_invincible_strings() broken out of
+3.5.3 released January 23, 2004
+
+- copyright 2004 added to copyright notices
+- new static function capture_non_invincible_strings() broken out of 
   unconditional_life()
 - unconditional_life() revised
 - new semeai_propose_eyespace_filling_move() tries to play inside eyeshapes

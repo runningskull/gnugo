@@ -74,7 +74,7 @@ loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 130
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 138
 150 reg_genmove black
-#? [M3|L3]*
+#? [M3|L3]
 
 # same bug as century-2002:30
 loadsgf games/nngs/gnugo-3.3.2-Programmer-200206021522.sgf 52
