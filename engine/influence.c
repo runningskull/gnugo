@@ -657,6 +657,10 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
       && experimental_influence)
     return;
 
+  /* Don't use invasion (I) patterns when scoring. */
+  if (doing_scoring && (pattern->class & CLASS_I))
+    return;
+  
   /* Loop through pattern elements to see if an A or D pattern
    * can possibly have any effect. If not we can skip evaluating
    * constraint and/or helper. */

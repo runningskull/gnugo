@@ -77,6 +77,10 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	  ||(!experimental_influence && (class & CLASS_F))))
       return;
 
+  /* Don't accept fuseki marked patterns while scoring. */
+  if (doing_scoring && (class & CLASS_F))
+    return;
+  
   /* Don't need auxiliary data in this callback. */
   UNUSED(data);
   
@@ -484,7 +488,7 @@ shapes(int color)
   if (josekidb)
     matchpat(shapes_callback, color, &joseki_db, NULL, NULL);
 
-  if (!disable_fuseki)
+  if (!disable_fuseki && !doing_scoring)
     matchpat(shapes_callback, color, &fusekipat_db, NULL, NULL);
 }
 

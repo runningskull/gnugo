@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- major aftermath code revisions
+- doing_scoring contingent revisions in influence_callback(), shapes(),
+  shapes_callback(), connection_value(), estimate_strategical_value(),
+  high_handicap_helper(), and reinforce_helper()
 - analyze_neighbor() in filllib.c revised
 - size of persistent owl cache increased from 100 to 150 entires
 - bugfix in owl_confirm_safety()

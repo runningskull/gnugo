@@ -145,7 +145,7 @@ high_handicap_helper(ARGS)
 {
   UNUSED(transformation); UNUSED(pattern); UNUSED(move);
   
-  return stones_on_board(OTHER_COLOR(color)) == 0;
+  return !doing_scoring && stones_on_board(OTHER_COLOR(color)) == 0;
 }
 
 
@@ -160,7 +160,8 @@ reinforce_helper(ARGS)
 {
   UNUSED(transformation); UNUSED(pattern);
   
-  return (!lively_dragon_exists(OTHER_COLOR(color)) 
+  return (!doing_scoring
+	  && !lively_dragon_exists(OTHER_COLOR(color)) 
 	  && safe_move(move, color));
 }
 

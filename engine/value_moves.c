@@ -952,17 +952,19 @@ connection_value(int dragona, int dragonb, int tt, float margin)
   
 
   /* When scoring, we want to be restrictive with reinforcement moves
-   * inside own territory. Thus if both dragons are alive, strongly
-   * alive, or invincible, no bonus is awarded.
+   * inside own territory. Thus if both dragons are weakly_alive,
+   * alive, strongly alive, or invincible, no bonus is awarded.
    *
    * Notice that this requires that the territorial value is computed
    * before the strategical value.
    */
   if (doing_scoring && move[tt].territorial_value < 0.0) {
-    if ((safety1 == ALIVE
+    if ((safety1 == WEAKLY_ALIVE
+	 || safety1 == ALIVE
 	 || safety1 == STRONGLY_ALIVE
 	 || safety1 == INVINCIBLE)
-	&& (safety2 == ALIVE
+	&& (safety2 == WEAKLY_ALIVE
+	    || safety2 == ALIVE
 	    || safety2 == STRONGLY_ALIVE
 	    || safety2 == INVINCIBLE))
       return 0.0;
@@ -1788,6 +1790,17 @@ estimate_strategical_value(int pos, int color, float score)
              * does not defend, no points.
 	     */
 	    if (worm[bb].attack_codes[0] != 0 && !does_defend(pos, bb))
+	      this_value = 0.0;
+
+	    /* If we are doing scoring, are alive, and the move loses
+             * territory, no points.
+	     */
+	    if (doing_scoring
+		&& move[pos].territorial_value < 0.0
+		&& (DRAGON2(bb).safety == WEAKLY_ALIVE
+		    || DRAGON2(bb).safety == ALIVE
+		    || DRAGON2(bb).safety == STRONGLY_ALIVE
+		    || DRAGON2(bb).safety == INVINCIBLE))
 	      this_value = 0.0;
 	    
 	    if (this_value > dragon_value[d1]) {
