@@ -657,12 +657,14 @@ sub eat_board {
       }
       while ($iline) {
         $iline = <$goprog_out>;
-        $iline =~ s/^[=]\s*//;
-        $iline =~ s/\s*$//mg;
-        foreach (split (/\s+/,$iline)) {
+        my $splitline = $iline;
+        $splitline =~ s/^[=]\s*//;
+        $splitline =~ s/\s*$//mg;
+        foreach (split (/\s+/,$splitline)) {
           $stones{$_} =";color_letter=" . $cur_color_letter.
   	    	       ";";
         }
+        $iline =~ s/\s*$//mg;
       }
     }
   }

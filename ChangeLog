@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in experimental influence: floating point exception cure
+- bugfix in regress.plx: handling of gtp worm_stones
+
 3.1.23 released January 28, 2002
 
 - configure option: alternate-connections

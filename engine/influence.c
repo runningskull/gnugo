@@ -1158,8 +1158,10 @@ new_value_territory(struct influence_data *q)
 
       if (q->p[i][j] == EMPTY
 	  || (q->black_strength[i][j] == 0 && q->white_strength[i][j] == 0)) {
-        float diff = ( q->white_influence[i][j] - q->black_influence[i][j] )
-                    /( q->white_influence[i][j] + q->black_influence[i][j] );
+        float diff = 0.0;
+        if (q->white_influence[i][j] + q->black_influence[i][j] > 0)
+          diff = (q->white_influence[i][j] - q->black_influence[i][j])
+                /(q->white_influence[i][j] + q->black_influence[i][j]);
         first_guess[i][j] = diff * diff * diff;
         first_guess[i][j] *= interpolate(&territory_correction,
                                          gg_max(q->black_influence[i][j],
