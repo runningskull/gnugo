@@ -56,7 +56,7 @@
 #include "gg_utils.h"
 
 #define MAX_MOVES 3           /* maximum number of branches at each node */
-#define MAX_SEMEAI_MOVES 2    /* semeai branch factor--must be <= MAX_MOVES */
+#define MAX_SEMEAI_MOVES 6    /* semeai branch factor */
 #define SEMEAI_BRANCH_DEPTH 12 /* Only one move considered below this depths.*/
 #define MAX_SEMEAI_DEPTH 100  /* Don't read below this depth */
 #define MAX_LUNCHES 10
@@ -155,7 +155,7 @@ static void owl_shapes_callback(int anchor, int color,
 				int ll, void *data);
 static void owl_add_move(struct owl_move_data *moves, int move, int value,
 			 const char *reason, int same_dragon, int escape,
-			 int defense_pos);
+			 int defense_pos, int max_moves);
 static void owl_determine_life(struct local_owl_data *owl,
 			       struct local_owl_data *second_owl,
 			       int komaster, int does_attack,
@@ -373,7 +373,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   struct owl_move_data shape_offensive_moves[MAX_MOVES];
   struct matched_patterns_list_data shape_offensive_patterns;
   struct matched_patterns_list_data shape_defensive_patterns;
-  struct owl_move_data moves[2*MAX_SEMEAI_MOVES+2];
+  struct owl_move_data moves[MAX_SEMEAI_MOVES];
   struct owl_move_data outside_liberty;
   struct owl_move_data common_liberty;
   struct owl_move_data backfilling_move;
@@ -462,7 +462,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   /* turn off the sgf file and variation counting */
   sgf_dumptree = NULL;
   count_variations = 0;
-  for (k = 0; k < 2*MAX_SEMEAI_MOVES+2; k++) {
+  for (k = 0; k < MAX_SEMEAI_MOVES; k++) {
     moves[k].pos = 0;
     moves[k].value = -1;
     moves[k].name = NULL;
@@ -502,7 +502,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  && countlib(semeai_worms[sworm]) < 3
 	  && attack(semeai_worms[sworm], NULL)
 	  && find_defense(semeai_worms[sworm], &upos))
-	owl_add_move(moves, upos, 160, "defend semeai worm", 0, 0, NO_MOVE);
+	owl_add_move(moves, upos, 160, "defend semeai worm", 0, 0, NO_MOVE,
+		     MAX_SEMEAI_MOVES);
   }
   /* 
    * We generate the candidate moves. During the early stages of
@@ -676,13 +677,13 @@ do_owl_analyze_semeai(int apos, int bpos,
     /* Next the shape moves. */
     owl_shapes(&shape_defensive_patterns, shape_defensive_moves, color, owla, 
 	       &owl_defendpat_db);
-    for (k = 0; k < MAX_SEMEAI_MOVES; k++)
+    for (k = 0; k < MAX_MOVES-1; k++)
       if (!get_next_move_from_list(&shape_defensive_patterns, color,
 	                           shape_defensive_moves, 1))
 	break;
     owl_shapes(&shape_offensive_patterns, shape_offensive_moves, color, owlb, 
 	       &owl_attackpat_db);
-    for (k = 0; k < MAX_SEMEAI_MOVES; k++)
+    for (k = 0; k < MAX_MOVES-1; k++)
       if (!get_next_move_from_list(&shape_offensive_patterns, color,
 	                           shape_offensive_moves, 1))
 	break;
@@ -695,7 +696,7 @@ do_owl_analyze_semeai(int apos, int bpos,
      */
     
     for (k = 0; 
-	 k < MAX_SEMEAI_MOVES && vital_defensive_moves[k].pos != NO_MOVE;
+	 k < MAX_MOVES-1 && vital_defensive_moves[k].pos != NO_MOVE;
 	 k++) {
       if (liberty_of_goal(vital_defensive_moves[k].pos, owlb)) {
 	if (!liberty_of_goal(vital_defensive_moves[k].pos, owla)) {
@@ -718,10 +719,11 @@ do_owl_analyze_semeai(int apos, int bpos,
       owl_add_move(moves, vital_defensive_moves[k].pos,
 		   move_value, "vital defensive move", 
 		   vital_defensive_moves[k].same_dragon,
-		   vital_defensive_moves[k].escape, NO_MOVE);
+		   vital_defensive_moves[k].escape, NO_MOVE,
+		   MAX_SEMEAI_MOVES);
     }
     for (k = 0; 
-	 k < MAX_SEMEAI_MOVES && vital_offensive_moves[k].pos != NO_MOVE;
+	 k < MAX_MOVES-1 && vital_offensive_moves[k].pos != NO_MOVE;
 	 k++) {
       if (liberty_of_goal(vital_offensive_moves[k].pos, owlb)) {
 	if (!liberty_of_goal(vital_offensive_moves[k].pos, owla)) {
@@ -747,11 +749,11 @@ do_owl_analyze_semeai(int apos, int bpos,
 				     vital_offensive_moves[k].value) + 30;
       owl_add_move(moves, vital_offensive_moves[k].pos,
 		   move_value, vital_offensive_moves[k].name,
-		   same_dragon,
-		   vital_offensive_moves[k].escape, NO_MOVE);
+		   same_dragon, vital_offensive_moves[k].escape, 
+		   NO_MOVE, MAX_SEMEAI_MOVES);
     }
     for (k = 0; 
-	 k < MAX_SEMEAI_MOVES && shape_defensive_moves[k].pos != NO_MOVE;
+	 k < MAX_MOVES-1 && shape_defensive_moves[k].pos != NO_MOVE;
 	 k++) {
       if (liberty_of_goal(shape_defensive_moves[k].pos, owlb)) {
 	if (!liberty_of_goal(shape_defensive_moves[k].pos, owla)) {
@@ -775,10 +777,10 @@ do_owl_analyze_semeai(int apos, int bpos,
 		   move_value,
 		   shape_defensive_moves[k].name,
 		   shape_defensive_moves[k].same_dragon,
-		   shape_defensive_moves[k].escape, NO_MOVE);
+		   shape_defensive_moves[k].escape, NO_MOVE, MAX_SEMEAI_MOVES);
     }
     for (k = 0; 
-	 k < MAX_SEMEAI_MOVES && shape_offensive_moves[k].pos != NO_MOVE;
+	 k < MAX_MOVES-1 && shape_offensive_moves[k].pos != NO_MOVE;
 	 k++) {
       if (liberty_of_goal(shape_offensive_moves[k].pos, owlb)) {
 	if (!liberty_of_goal(shape_offensive_moves[k].pos, owla)) {
@@ -803,10 +805,9 @@ do_owl_analyze_semeai(int apos, int bpos,
 				     owla, owlb,
 				     shape_offensive_moves[k].value);
       owl_add_move(moves, shape_offensive_moves[k].pos,
-		   move_value,
-		   shape_offensive_moves[k].name,
-		   same_dragon,
-		   shape_offensive_moves[k].escape, NO_MOVE);
+		   move_value, shape_offensive_moves[k].name,
+		   same_dragon, shape_offensive_moves[k].escape, 
+		   NO_MOVE, MAX_SEMEAI_MOVES);
     }
     /* If no owl moves were found, turn off the owl phase */
     if (moves[0].pos == 0)
@@ -854,32 +855,37 @@ do_owl_analyze_semeai(int apos, int bpos,
     move_value = semeai_move_value(outside_liberty.pos,
 				   owla, owlb, 50);
     owl_add_move(moves, outside_liberty.pos, move_value,
-		 "safe outside liberty", 0, 0, NO_MOVE);
+		 "safe outside liberty", 0, 0, NO_MOVE, MAX_SEMEAI_MOVES);
   }
   else if (backfilling_move_found && backfilling_move.pos != NO_MOVE) {
     move_value = semeai_move_value(backfilling_move.pos,
 				   owla, owlb, 50);
     owl_add_move(moves, backfilling_move.pos, move_value,
-		 "backfilling move", 0, 0, NO_MOVE);
+		 "backfilling move", 0, 0, NO_MOVE, MAX_SEMEAI_MOVES);
   }
   else if (safe_common_liberty_found
 	   && common_liberty.pos != NO_MOVE) {
     move_value = semeai_move_value(common_liberty.pos,
 				   owla, owlb, 10);
     owl_add_move(moves, common_liberty.pos, move_value,
-		 "safe common liberty", 1, 0, NO_MOVE);
+		 "safe common liberty", 1, 0, NO_MOVE, MAX_SEMEAI_MOVES);
   }
   /* Now we are ready to try moves. Turn on the sgf output ... */
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
-  for (k = 0; k < 2*MAX_SEMEAI_MOVES+2; k++) {
+  for (k = 0; k < MAX_SEMEAI_MOVES; k++) {
     int mpos = moves[k].pos;
 
     if (k > 2
 	|| (stackp > 6 && k > 1)
-	|| (stackp > SEMEAI_BRANCH_DEPTH && k > 0))
+	|| (stackp > SEMEAI_BRANCH_DEPTH && k > 0)) {
+      /* If allpats, try and pop to get the move in the sgf record */
+      if (allpats && mpos!= NO_MOVE &&
+	  semeai_trymove(mpos, color, moves[k].name, apos, bpos,
+			 owl_phase, moves[k].value))
+	popgo();
       continue;
-
+    }
     if (mpos != NO_MOVE 
 	&& count_variations < semeai_variations
 	&& stackp < MAX_SEMEAI_DEPTH
@@ -2383,11 +2389,10 @@ owl_estimate_life(struct local_owl_data *owl,
      * Let's try to defend against it.
      */
     owl_add_move(vital_moves, dummy_moves[0].defense_pos,
-		 dummy_moves[0].value, dummy_moves[0].name, 2, 0, NO_MOVE);
+		 dummy_moves[0].value, dummy_moves[0].name, 2, 0, NO_MOVE,
+		 MAX_MOVES);
   }
 
-    
-      
   return 0;
 }
 
@@ -2639,7 +2644,8 @@ owl_determine_life(struct local_owl_data *owl,
 	      TRACE("vital point looked stupid, moved it to %1m\n",
 		    attack_point);
 	    
-	    owl_add_move(moves, attack_point, value, reason, 1, 0, NO_MOVE);
+	    owl_add_move(moves, attack_point, value, reason, 1, 0, NO_MOVE,
+			 MAX_MOVES);
 	    vital_values[attack_point] = value;
 	    eyes_attack_points[num_eyes] = attack_point;
 	  }
@@ -2690,7 +2696,8 @@ owl_determine_life(struct local_owl_data *owl,
 	      TRACE("vital point looked stupid, moved it to %1m\n",
 		    defense_point);
 	    
-	    owl_add_move(moves, defense_point, value, reason, 1, 0, NO_MOVE);
+	    owl_add_move(moves, defense_point, value, reason, 1, 0, NO_MOVE,
+			 MAX_MOVES);
 	    vital_values[defense_point] = value;
 	  }
 	}
@@ -2769,7 +2776,7 @@ owl_determine_life(struct local_owl_data *owl,
 	  TRACE("save lunch at %1m with %1m, score %d\n",
 		owl->lunch[lunch], defense_point, value);
 	  owl_add_move(moves, defense_point, value,
-	      	       "save lunch", 1, 0, NO_MOVE);
+	      	       "save lunch", 1, 0, NO_MOVE, MAX_MOVES);
 	}
 	else {
 	  attack_point = improve_lunch_attack(owl->lunch[lunch],
@@ -2777,7 +2784,7 @@ owl_determine_life(struct local_owl_data *owl,
 	  TRACE("eat lunch at %1m with %1m, score %d\n",
 		owl->lunch[lunch], attack_point, value);
 	  owl_add_move(moves, attack_point, value, "eat lunch",
-	      	       1, 0, NO_MOVE);
+	      	       1, 0, NO_MOVE, MAX_MOVES);
 	  num_lunch++;
 	  eyevalue_list[num_eyes++] = e;
 	}
@@ -3383,7 +3390,7 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
   }
   
   owl_add_move(moves, move, tval, pattern->name, same_dragon, escape,
-	       defense_pos);
+	       defense_pos, MAX_MOVES);
 }
 
 
@@ -3391,7 +3398,8 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
 
 static void
 owl_add_move(struct owl_move_data *moves, int move, int value,
-	     const char *reason, int same_dragon, int escape, int defense_pos)
+	     const char *reason, int same_dragon, int escape, int defense_pos,
+	     int max_moves)
 {
   int k;
 
@@ -3405,7 +3413,7 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
    *
    * First we must see if this move already is in the list.
    */
-  for (k = 0; k < MAX_MOVES; k++) {
+  for (k = 0; k < max_moves; k++) {
     if (moves[k].value == -1)
       break;
     if (moves[k].pos == move) {
@@ -3418,7 +3426,7 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
   }
 
   /* Did we already have this move in the list with a higher value? */
-  if (k < MAX_MOVES && moves[k].value >= value)
+  if (k < max_moves && moves[k].value >= value)
     return;
 
   /* Insert the move at the right place in the list and adjust other
@@ -3429,7 +3437,7 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
       /* Can't get higher. Insert the move below this point and quit
        * looping.
        */
-      if (k < MAX_MOVES) {
+      if (k < max_moves) {
 	moves[k].pos = move;
 	moves[k].value = value;
 	moves[k].name = reason;
@@ -3443,15 +3451,15 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
       break;
     }
     /* Shuffle the passed move one step downwards. */
-    if (k < MAX_MOVES)
+    if (k < max_moves)
       moves[k] = moves[k-1]; /* struct copy */
   }
 
   /* Assert that the list contains unique moves. */
   if (0) {
     int l;
-    for (k = 0; k < MAX_MOVES; k++)
-      for (l = k+1; l < MAX_MOVES; l++)
+    for (k = 0; k < max_moves; k++)
+      for (l = k+1; l < max_moves; l++)
 	gg_assert(moves[k].pos == 0
 		  || moves[k].pos != moves[l].pos);
   }
