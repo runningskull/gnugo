@@ -28,6 +28,7 @@
   eye_data
 - find_cuts() no longer allowed to modify eyespaces
 - bugfix in do_owl_analyze_semeai()
+- tuning
 - new and revised tests
 
 3.5.7 released May 27, 2004

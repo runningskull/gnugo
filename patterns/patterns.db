@@ -13646,10 +13646,12 @@ Pattern S3
 
 |AAAAA
 |..*.A
-|....A
+|.b..A
 +-----
 
 ;lib(A)==5 && seki_helper(A)
+
+>replace(b,*)
 
 
 Pattern S4
