@@ -1397,9 +1397,9 @@ add_replacement_move(int from, int to)
   ASSERT_ON_BOARD1(from);
   ASSERT_ON_BOARD1(to);
 
-  if (board[from] != EMPTY
-      || board[to] != EMPTY)
+  if (board[from] != EMPTY)
     return;
+  ASSERT1(board[to] == EMPTY, to);
 
   cc = replacement_map[to];
 
