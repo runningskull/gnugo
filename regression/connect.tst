@@ -266,13 +266,15 @@ loadsgf golois/Indigo-Golois-991106-1.sgf
 67 disconnect N12 N14
 #? [0]
 
+# The ladder works, so F11 is also okay.
 loadsgf golois/Indigo-Golois-991106-2.sgf
 68 connect F8 F12
-#? [1 E11]*
+#? [1 (E11|F11)]*
 
+# The ladder works, so F11 is also okay.
 loadsgf golois/Indigo-Golois-991106-2.sgf
 69 connect F8 D11
-#? [1 E11]*
+#? [1 (E11|F11)]*
 
 loadsgf golois/Indigo-Golois-991106-3.sgf
 70 disconnect P3 M3

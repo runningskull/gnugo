@@ -265,6 +265,11 @@ loadsgf games/strategy45.sgf
 206 gg_genmove black
 #? [L8]*
 
+# T6 fails badly. Locally S9 looks best.
+loadsgf games/owl30.sgf 84
+207 gg_genmove black
+#? [!T6]*
+
 
 ############ End of Tests #################
 

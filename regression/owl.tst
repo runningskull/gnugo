@@ -828,8 +828,11 @@ loadsgf games/owl29.sgf 132
 226 owl_attack J10
 #? [1 O8]*
 
-########### end of tests #####################
+loadsgf games/owl30.sgf 172
+227 owl_attack L19
+#? [1 Q19|P17]
 
+########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
