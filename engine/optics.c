@@ -307,12 +307,8 @@ make_domains(struct eye_data b_eye[BOARDMAX],
  *
  */
 
-#define lively_stone(pos, color) (board[pos] == color && lively[pos])
-#define has_inf(color, pos) (domain[pos] || lively_stone(pos, color))
 #define sufficient_influence(pos, apos, bpos) \
- (ON_BOARD(bpos) \
-  && (domain[apos] + domain[bpos]) \
-      > (inhibit[pos] > 1) + (inhibit[apos] > 0) + (inhibit[bpos] > 0))
+  (ON_BOARD(bpos) && influence[bpos] > threshold[pos] - influence[apos])
 
 static void
 compute_primary_domains(int color, int domain[BOARDMAX],
@@ -321,88 +317,112 @@ compute_primary_domains(int color, int domain[BOARDMAX],
 			int first_time)
 {
   int other = OTHER_COLOR(color);
-  int found_one;
-  int i, j;
-  int pos;
-  int inhibit[BOARDMAX];
-  memset(inhibit, 0, sizeof(inhibit));
+  int i, j, k;
+  int pos, pos2;
+  int own, enemy;
+  char threshold[BOARDMAX];
+  signed char influence[BOARDMAX];
+  int list[BOARDMAX];
+  int size = 0, lastchange = 0;
 
+  memset(threshold, 0, sizeof(threshold));
+  memset(influence, 0, sizeof(influence));
+  
   /* In the first pass we
    * 1. Give influence to lively own stones and their neighbors.
    *    (Cases (1) and (2) above.)
-   * 2. Set inhibit for lively opponent stones and their neighbors.
+   * 2. Fill influence[] and threshold[] arrays with initial values.
    */
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      pos = POS(i, j);
-      if (lively_stone(pos, color))
-	domain[pos] = 1; /* Case (1) above. */
-      else if (lively_stone(pos, other))
-	inhibit[pos] = 1;
-      else {
-	if (lively_stone(SOUTH(pos), color)
-	    || lively_stone(WEST(pos), color)
-	    || lively_stone(NORTH(pos), color)
-	    || lively_stone(EAST(pos), color)) {
-	  /* Case (2) above.
-	   *
-	   * To explain the asymmetry between the first time around
-	   * this loop and subsequent ones, a false margin is adjacent
-	   * to both B and W lively stones, so it's found on the first
-	   * pass through the loop.
-	   */
-	  if (first_time) {
-	    if (board[pos] == EMPTY && false_margin(pos, color, lively))
-	      false_margins[pos] = 1;
-	    else if (board[pos] == EMPTY
-		     && false_margin(pos, other, lively))
-	      false_margins[pos] = 1;
-	    else
-	      domain[pos] = 1;
-	  }
-	  else {
-	    if (IS_STONE(board[pos]) || false_margins[pos] != 1)
-	      domain[pos] = 1;
-	  }
-	}
-	
-	if (lively_stone(SOUTH(pos), other)
-	    || lively_stone(WEST(pos), other)
-	    || lively_stone(NORTH(pos), other)
-	    || lively_stone(EAST(pos), other))
-	  inhibit[pos] = 2;
-	else if (is_edge_vertex(pos))
-	  inhibit[pos] = 1;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+   
+    if (lively[pos]) {
+      if (board[pos] == color) {
+        domain[pos] = 1; /* Case (1) above. */
+        influence[pos] = 1;
+      }
+      else
+        influence[pos] = -1;
+      continue;
+    }
+    
+    own = enemy = 0;
+    for (k = 0; k < 4; k++) {
+      pos2 = pos + delta[k];
+      if (ON_BOARD(pos2) && lively[pos2]) {
+        if (board[pos2] == color)
+          own = 1;
+        else
+          enemy = 1;
       }
     }
-
+    
+    if (own) {
+      /* To explain the asymmetry between the first time around
+       * this loop and subsequent ones, a false margin is adjacent
+       * to both B and W lively stones, so it's found on the first
+       * pass through the loop.
+       */
+      if (first_time) {
+        if (board[pos] == EMPTY && (false_margin(pos, color, lively)
+				    || false_margin(pos, other, lively)))
+          false_margins[pos] = 1;
+        else {
+          domain[pos] = 1;
+          influence[pos] = 1;
+        }
+      }
+      else if (board[pos] != EMPTY || !false_margins[pos]) {
+        domain[pos] = 1;
+        influence[pos] = 1;
+      }
+    }
+    else
+      list[size++] = pos;
+    
+    if (enemy) {
+      threshold[pos] = 1;
+      influence[pos]--;
+    }
+    else if (is_edge_vertex(pos))
+      influence[pos]--;
+  }
+  
   /* Now we loop over the board until no more vertices can be added to
    * the domain through case (3) above.
    */
-  do {
-    found_one = 0;
-    for (i = 0; i < board_size; i++)
-      for (j = 0; j < board_size; j++) {
-	pos = POS(i, j);
+  if (size) {
+    k = size;
+    while (1) {
+      if (!k)
+        k = size;
+      pos = list[--k];
+   
+      /* Case (3) above. */
+      if (sufficient_influence(pos, SOUTH(pos), SE(pos))
+          || sufficient_influence(pos, SOUTH(pos), SW(pos))
+          || sufficient_influence(pos, EAST(pos), SE(pos))
+          || sufficient_influence(pos, EAST(pos), NE(pos))
+          || sufficient_influence(pos, WEST(pos), SW(pos))
+          || sufficient_influence(pos, WEST(pos), NW(pos))
+          || sufficient_influence(pos, NORTH(pos), NW(pos))
+          || sufficient_influence(pos, NORTH(pos), NE(pos))) {
+        domain[pos] = 1;
+        influence[pos]++;
 	
-	/* First we handle the trivial cases. */
-	if (domain[pos] || lively_stone(pos, other) || false_margins[pos])
-	  continue;
-
-	/* Case (3) above. */
-	if (sufficient_influence(pos, SOUTH(pos), SE(pos))
-	    || sufficient_influence(pos, SOUTH(pos), SW(pos))
-	    || sufficient_influence(pos, WEST(pos), SW(pos))
-	    || sufficient_influence(pos, WEST(pos), NW(pos))
-	    || sufficient_influence(pos, NORTH(pos), NW(pos))
-	    || sufficient_influence(pos, NORTH(pos), NE(pos))
-	    || sufficient_influence(pos, EAST(pos), NE(pos))
-	    || sufficient_influence(pos, EAST(pos), SE(pos))) {
-	  domain[pos] = 1;
-	  found_one = 1;
-	}
+        if (!--size)
+          break;
+        if (k < size)
+          list[k] = list[size];
+        else
+          k--;
+        lastchange = k;
       }
-  } while (found_one);
+      else if (k == lastchange)
+        break; /* Looped the whole list and found nothing new */
+    }
+  }
   
   if (0 && (debug & DEBUG_EYES)) {
     start_draw_board();
@@ -413,7 +433,6 @@ compute_primary_domains(int color, int domain[BOARDMAX],
     end_draw_board();
   }
 }
-
 
 
 static void
@@ -446,16 +465,15 @@ count_neighbours(struct eye_data eyedata[BOARDMAX])
 static int
 is_lively(int owl_call, int pos)
 {
-  int result;
+  if (board[pos] == EMPTY)
+    return 0;
 
   if (owl_call)
-    result = owl_lively(pos);
+    return owl_lively(pos);
   else
-    result = (!worm[pos].inessential
-	      && (worm[pos].attack_codes[0] == 0
-		  || worm[pos].defense_codes[0] != 0));
-
-  return result;
+    return (!worm[pos].inessential
+      && (worm[pos].attack_codes[0] == 0
+      ||  worm[pos].defense_codes[0] != 0));
 }
 
 
