@@ -167,10 +167,10 @@ The public functions in @file{owl.c} are:
 @item @code{void owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move, int owl)}
 @findex owl_analyze_semeai
 @quotation
-Called when (apos) and (bpos) point to adjacent dragons
-of the opposite color, both with matcher_status DEAD or
+Called when @code{apos} and @code{bpos} point to adjacent dragons
+of the opposite color, both with @code{matcher_status} DEAD or
 CRITICAL, analyzes the semeai, assuming that the player
-of the (apos) dragon moves first.
+of the @code{apos} dragon moves first.
 @end quotation
 @item @code{int owl_attack(int target, int *attack_point, int *certain)}
 @findex owl_attack
@@ -180,7 +180,7 @@ at @code{target}, in which case @code{*attack_point} is the recommended move.
 @code{attack_point} can be a null pointer if only the result is needed.
 The array goal marks the extent of the dragon. This must
 be maintained during reading. Call this function only when
-@code{stackp==0}; otherwise you can call do_owl_attack but you must
+@code{stackp==0}; otherwise you can call @code{do_owl_attack} but you must
 set up the goal and boundary arrays by hand first.
 @end quotation
 @item @code{int owl_threaten_attack(int target, int *attack1, int *attack2)}
@@ -267,7 +267,7 @@ status, but it should never be overestimated.
 @item @code{int owl_topological_eye(int pos, int color)}
 @findex owl_topological_eye
 @quotation
-Retrieve topological eye values stored in the half_eye[] array of
+Retrieve topological eye values stored in the @code{half_eye[]} array of
 the current owl data.
 @end quotation
 @end itemize

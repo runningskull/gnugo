@@ -83,7 +83,7 @@ NULL)}.
 
 Depth of reading is controlled by the parameters @code{depth}
 and @code{branch_depth}. The @code{depth} has a default value
-@code{DEPTH} (in @file{liberty.h}), which is set to 14 in the
+@code{DEPTH} (in @file{liberty.h}), which is set to 16 in the
 distribution, but it may also be set at the command line using
 the @option{-D} or @option{--depth} option.  If @code{depth} is
 increased, GNU Go will be stronger and slower. GNU Go will read
@@ -108,7 +108,7 @@ classified as @code{DEAD}. To resolve such situations, a function
 @code{small_semeai()} (in @file{engine/semeai.c}) looks for such
 pairs of strings and corrects their classification.
 
-The @code{backfill_depth} is a similar variable with a default 10. Below
+The @code{backfill_depth} is a similar variable with a default 12. Below
 this depth, GNU Go will try "backfilling" to capture stones.
 For example in this situation:
 
@@ -127,7 +127,7 @@ Backfilling is only tried with @code{stackp <= backfill_depth}. The
 parameter @code{backfill_depth} may be set using the @option{-B}
 option.
 
-The @code{fourlib_depth} is a parameter with a default of only 5.
+The @code{fourlib_depth} is a parameter with a default of only 7.
 Below this depth, GNU Go will try to attack strings with
 four liberties. The @code{fourlib_depth} may be set using the
 @option{-F} option.
@@ -187,7 +187,7 @@ considered safe. This may or may not be a good convention.
 
 @cindex Hashing of positions
 @cindex Reading optimisation
-@cindex speedup of reading process
+@cindex Speedup of reading process
 @cindex Zobrist hashing algorithm
 @cindex Transposition table
 
@@ -728,39 +728,39 @@ case of a nested ko, taking one ko is a precondition to taking the
 other one, so we allow this.
 
 If the komaster's opponent takes a ko, then both players have taken
-one ko. In this case `komaster' is set to GRAY and after this further
+one ko. In this case @code{komaster} is set to @code{GRAY} and after this further
 ko captures are not allowed.
 
 If the ko at @code{kom_pos} is filled, then the komaster
-reverts to EMPTY.
+reverts to @code{EMPTY}.
 
 The komaster scheme may be summarized as follows. It is assumed
 that @samp{O} is about to move.
 
 @itemize @bullet
-@item 1. Komaster is EMPTY.
+@item 1. Komaster is @code{EMPTY}.
 @itemize @minus
-@item Unconditional ko capture is allowed. Komaster remains EMPTY.
+@item Unconditional ko capture is allowed. Komaster remains @code{EMPTY}.
 @item Conditional ko capture is allowed. Komaster is set to @samp{O} and
 @code{kom_pos} to the location of the ko, where a stone was
 just removed.
 @end itemize
-@item Komaster is O:
+@item Komaster is @samp{O}:
 @itemize @minus 
 @item Only nested ko captures are allowed.
 @item If komaster fill the ko at @code{kom_pos} then komaster reverts to
-EMPTY.
+@code{EMPTY}.
 @end itemize
-@item Komaster is X:
+@item Komaster is @samp{X}:
 @itemize @minus
 @item
 Play at @code{kom_pos} is not allowed. Any other ko capture
-is allowed. If @samp{O} takes another ko, komaster becomes GRAY.
+is allowed. If @samp{O} takes another ko, komaster becomes @code{GRAY}.
 @end itemize
-@item Komaster is GRAY:
+@item Komaster is @code{GRAY}:
 @itemize @minus
 @item Ko captures are not allowed. If the ko at @code{kom_pos} is
-filled then the komaster reverts to EMPTY.
+filled then the komaster reverts to @code{EMPTY}.
 @end itemize
 @end itemize
 
@@ -836,7 +836,7 @@ The board looks like this:
 @end group
 @end example
 
-W takes the ko at B3 after which the komaster is GRAY and
+W takes the ko at B3 after which the komaster is @code{GRAY} and
 ko recaptures are not allowed.
 
 @example
@@ -855,7 +855,7 @@ ko recaptures are not allowed.
 @end group
 @end example
 
-Since X is not allowed any ko recaptures, there is nothing
+Since B is not allowed any ko recaptures, there is nothing
 he can do and he is found dead. Thus the komaster scheme
 produces the correct result.
 
@@ -865,7 +865,7 @@ produces the correct result.
 @section Another Ko Example
 
 We now consider an example to show why the komaster is reset
-to EMPTY if the ko is resolved in the komaster's favor. This
+to @code{EMPTY} if the ko is resolved in the komaster's favor. This
 means that the ko is filled, or else that is becomes no longer
 a ko and it is illegal for the komaster's opponent to play
 there.
@@ -894,7 +894,7 @@ examining the variation file produced by the command:
 gnugo -l ko5.sgf --quiet --decidestring L1 -o vars.sgf
 @end example
 
-The correct resolution is that H1 attacks L1 while K2
+The correct resolution is that H1 attacks L1 unconditionally while K2
 defends it with ko (code KO_A).
 
 After Black (X) takes the ko at K3, white can do nothing
@@ -1045,50 +1045,55 @@ which must be answered (the defender makes the first ko capture).
 @item @code{int attack(int str, int *move)}
 @findex attack
 @quotation
-Determines if the string at (str) can be captured, and if so, (*move) returns
-the attacking move, unless (move) is a null pointer. Use a null pointer if you
-are interested in the result of the attack but not the attacking move itself.
+Determines if the string at @code{str} can be captured, and if so,
+@code{*move} returns the attacking move, unless @code{move} is a null
+pointer. Use a null pointer if you are interested in the result of the
+attack but not the attacking move itself.
 @end quotation
 @item @code{int find_defense(int str, int *move)}
 @findex find_defense
 @quotation
-Attempts to find a move that will save the string at (str). It returns WIN if
-such a move is found, with (*move) the location of the saving move, unless
-(move) is a null pointer. It is not checked that tenuki defends, so this may
-give an erroneous answer if !attack(str).
+Attempts to find a move that will save the string at @code{str}. It
+returns WIN if such a move is found, with @code{*move} the location of
+the saving move, unless @code{move} is a null pointer. It is not checked
+that tenuki defends, so this may give an erroneous answer if
+@code{!attack(str)}.
 @end quotation
 @item @code{int attack_and_defend(int str, int *attack_code, int *attack_point, int *defend_code, int *defense_point)}
 @findex attack_and_defend
 @quotation
-This is a frontend to the @code{attack()} and @code{find_defense()} functions,
-which guarantees a consistent result. If a string cannot be attacked, 0 is
-returned and acode is 0. If a string can be attacked and defended, @code{WIN}
-is returned, acode and dcode are both non-zero, and (attack_point),
-(defense_point) both point to vertices on the board. If a string can be
-attacked but not defended, 0 is again returned, acode is non-zero, dcode is 0,
-and (attack_point) points to a vertex on the board. This function in
+This is a frontend to the @code{attack()} and @code{find_defense()}
+functions, which guarantees a consistent result. If a string cannot be
+attacked, 0 is returned and @code{*attack_code} is 0. If a string can be
+attacked and defended, @code{WIN} is returned, @code{*attack_code} and
+@code{*defend_code} are both non-zero, and @code{*attack_point},
+@code{*defense_point} both point to vertices on the board. If a string
+can be attacked but not defended, 0 is again returned,
+@code{*attack_code} is non-zero, @code{*defend_code} is 0, and
+@code{*attack_point} points to a vertex on the board. This function in
 particular guarantees that if there is an attack, it will never return
-@code{defense_point}=@code{NO_MOVE}, which means the string is safe without
-defense. Separate calls to @code{attack()} and @code{find_defense()} may
-occasionally give this result, due to irregularities introduced by the
-persistent reading cache.
+@code{defense_point = NO_MOVE}, which means the string is safe
+without defense. Separate calls to @code{attack()} and
+@code{find_defense()} may occasionally give this result, due to
+irregularities introduced by the persistent reading cache.
 @end quotation
 @item @code{int attack_either(int astr, int bstr)}
 @findex attack_either
 @quotation
-Returns true if there is a move which guarantees that at least one of the
-strings (astr) and (bstr) can be captured. A typical application for this is
-in connection patterns, where after a cut it suffices to capture one of the
-cutting stones. The current implementation only looks for uncoordinated
-attacks. This is insufficient to find double ataris or 
-moves such as @samp{a} in positions like
+Returns true if there is a move which guarantees that at least one of
+the strings @code{astr} and @code{bstr} can be captured. A typical
+application for this is in connection patterns, where after a cut it
+suffices to capture one of the cutting stones. The current
+implementation only looks for uncoordinated attacks. This is
+insufficient to find double ataris or moves such as @samp{a} in
+positions like
 @example
        XOOOOOOOX
        XOXXOXXOX
        XX..a..XX
        ---------
 @end example
-where neither of the threatened X stones can be captured outright.
+where neither of the threatened @samp{X} stones can be captured outright.
 Still either can be captured by a move down to @samp{a}.
 @end quotation
 @item @code{int defend_both(int astr, int bstr)}
@@ -1104,31 +1109,33 @@ reading.
 @item @code{int break_through(int apos, int bpos, int cpos)}
 @findex break_through
 @quotation
-returns WIN if a position can succesfully be broken through and CUT if it can
-be cut. The position is assumed to have the shape (the colors may be reversed)
+returns @code{WIN} if a position can succesfully be broken through and
+@code{CUT} if it can be cut. The position is assumed to have the shape
+(the colors may be reversed)
 @example
 .O.       dbe
 OXO       aFc
 @end example
-It is X to move and try to capture at least one of a, b, and c. If
-this succeeds, X is said to have broken through the position.
-Otherwise X may try to cut through the position, which means
-keeping F safe and getting a tactically safe string at either d or
-e. @strong{Important}: a, b, and c must be given in the correct order.
+It is @samp{X} to move and try to capture at least one of @samp{a},
+@samp{b}, and @samp{c}. If this succeeds, @samp{X} is said to have
+broken through the position. Otherwise @samp{X} may try to cut through
+the position, which means keeping @samp{F} safe and getting a tactically
+safe string at either @samp{d} or @samp{e}. @strong{Important}:
+@samp{a}, @samp{b}, and @samp{c} must be given in the correct order.
 @end quotation
 @item @code{int attack_threats(int str, int max_points, int moves[], int codes[])}
 @findex attack_threats
 @quotation
-Return up to max_threats threats to capture the string at str. If the string
-is directly attackable the number of threats is reported to be 0. NOTE: You
-can call attack_threats with moves[] and codes[] already partly filled in. So
-if you want to get the threats from scratch, you have to set them to 0
-yourself.
+Return up to max_threats threats to capture the string at @code{str}. If
+the string is directly attackable the number of threats is reported to
+be 0. NOTE: You can call attack_threats with @code{moves[]} and
+@code{codes[]} already partly filled in. So if you want to get the
+threats from scratch, you have to set them to 0 yourself.
 @end quotation
 @item @code{int safe_move(int move, int color)}
 @findex safe_move
 @quotation
-Checks whether a move at (move) is illegal or can immediately be captured. If
+Checks whether a move at @code{move} is illegal or can immediately be captured. If
 @code{stackp==0} the result is cached. If the move only can be captured by a
 ko, it's considered safe.
 @end quotation

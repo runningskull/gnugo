@@ -22,31 +22,31 @@ functions underlie autohelper functions (@pxref{Autohelper Functions}).
 @item @code{void change_matcher_status(int dr, int status)}
 @findex change_matcher_status
 @quotation
-Change the status of all the stones in the dragon at (dr).
+Change the status of all the stones in the dragon at @code{dr}.
 @end quotation
 @item @code{int defend_against(int move, int color, int apos)}
 @findex defend_against
 @quotation
-Check whether a move at (move) stops the enemy from playing at (apos).
+Check whether a move at @code{move} stops the enemy from playing at (apos).
 @end quotation
 @item @code{int cut_possible(int pos, int color)}
 @quotation
-Returns true if color can cut at (pos), or if connection through (pos)
-is inhibited. This information is collected by find_cuts(), using the B
+Returns true if color can cut at @code{pos}, or if connection through @code{pos}
+is inhibited. This information is collected by @code{find_cuts()}, using the B
 patterns in the connections database.
 @end quotation
 @item @code{int does_attack(int move, int str)}
 @findex does_attack
 @quotation
-returns true if the move at (move) attacks (str). This means that it captures
-the string, and that (str) is not already dead.  
+returns true if the move at @code{move} attacks @code{str}. This means that it captures
+the string, and that @code{str} is not already dead.  
 @end quotation
 @item @code{int does_defend(int move, int str)}
 @findex does_defend
 @quotation
-does_defend(move, str) returns true if the move at (move)
-defends (str). This means that it defends the string, and that
-(str) can be captured if no defense is made.
+@code{does_defend(move, str)} returns true if the move at @code{move}
+defends @code{str}. This means that it defends the string, and that
+@code{str} can be captured if no defense is made.
 @end quotation
 @item @code{int somewhere(int color, int last_move, ...)}
 @findex somewhere
@@ -60,7 +60,7 @@ Example: @code{somewhere(WHITE, 2, apos, bpos, cpos)}.
 @quotation
 Plays a sequence of moves, alternating between the players and starting with
 color. After having played through the sequence, the three last coordinate
-pairs gives a position to be analyzed by break_through(), to see whether
+pairs gives a position to be analyzed by @code{break_through()}, to see whether
 either color has managed to enclose some stones and/or connected his own
 stones. If any of the three last positions is empty, it's assumed that the
 enclosure has failed, as well as the attempt to connect. If one or more of the
@@ -86,7 +86,7 @@ works or not.
 @item @code{int play_attack_defend2_n(int color, int do_attack, int num_moves, ...)}
 @findex play_attack_defend2_n
 @quotation
-The function play_attack_defend2_n() plays a sequence of moves, alternating
+Plays a sequence of moves, alternating
 between the players and starting with color. After having played through the
 sequence, the two last coordinate pairs give two targets to simultaneously
 attack or defend, depending on the value of do_attack. If there is no stone
@@ -100,9 +100,9 @@ can be captured.
 @item @code{void set_depth_values(int level)}
 @findex set_depth_values
 @quotation
-Set the various reading depth parameters. If mandated_depth_value
+Set the various reading depth parameters. If @code{mandated_depth_value}
 is not -1 that value is used; otherwise the depth values are
-set as a function of level. The parameter mandated_depth_value
+set as a function of level. The parameter @code{mandated_depth_value}
 can be set at the command line to force a particular value of
 depth; normally it is -1.
 @end quotation
@@ -147,7 +147,7 @@ liberties of an adjacent friendly string, there is a danger that the move
 could backfire, so the function checks that no friendly worm which was
 formerly not attackable becomes attackable, and it checks that no opposing
 worm which was not defendable becomes defendable. Only worms with
-worm.size>size are checked. The arrays @code{saved_dragons[]} and 
+@code{worm.size>size} are checked. The arrays @code{saved_dragons[]} and 
 @code{saved_worms[]} should be one for stones belonging to dragons or worms
 respectively, which are supposedly saved by @code{move}. These may be 
 @code{NULL} if no stones are supposed to gaving been saved.  For use when
@@ -252,17 +252,17 @@ called from @file{owl.c}.
 This function computes the superstring at @code{str} as described above,
 but omitting connections of type 5. Then it constructs a list of
 liberties of the superstring which are not already liberties of
-@code{str}. If liberty_cap is nonzero, only liberties of substrings of the
-superstring which have fewer than liberty_cap liberties are
+@code{str}. If @code{liberty_cap} is nonzero, only liberties of substrings of the
+superstring which have fewer than @code{liberty_cap} liberties are
 generated.
 @end quotation
 @item @code{void find_proper_superstring_liberties(int str, int *num_libs, int *libs, int liberty_cap)}
 @findex find_proper_superstring_liberties
 @quotation
-This function is the same as find_superstring_liberties, but it omits those
+This function is the same as @code{find_superstring_liberties()}, but it omits those
 liberties of the string @code{str}, presumably since those have already been
-treated elsewhere. If liberty_cap is nonzero, only liberties of substrings of
-the superstring which have at most liberty_cap liberties are generated.
+treated elsewhere. If @code{liberty_cap} is nonzero, only liberties of substrings of
+the superstring which have at most @code{liberty_cap} liberties are generated.
 @end quotation
 @item @code{void find_superstring_stones_and_liberties(int str, int *num_stones, int *stones, int *num_libs, int *libs, int liberty_cap)}
 @findex find_superstring_stones_and_liberties
@@ -270,16 +270,18 @@ the superstring which have at most liberty_cap liberties are generated.
 This function computes the superstring at @code{str} as described above,
 but omitting connections of type 5. Then it constructs a list of
 liberties of the superstring which are not already liberties of
-@code{str}. If liberty_cap is nonzero, only liberties of substrings of the
-superstring which have fewer than liberty_cap liberties are
+@code{str}. If @code{liberty_cap} is nonzero, only liberties of substrings of the
+superstring which have fewer than @code{liberty_cap} liberties are
 generated.
 @end quotation
-void
-superstring_chainlinks(int str, int *num_adj, int adjs[MAXCHAIN], int liberty_cap)
+@item @code{void superstring_chainlinks(int str, int *num_adj, int adjs[MAXCHAIN], int liberty_cap)}
+@findex superstring_chainlinks
+@quotation
 Analogous to chainlinks, this function finds boundary chains of the
 superstring at @code{str}, including those which are boundary chains of
 @code{str} itself. If @code{liberty_cap != 0}, only those boundary chains with
 @code{<= liberty_cap} liberties are reported.
+@end quotation
 @item @code{void proper_superstring_chainlinks(int str, int *num_adj, int adjs[MAXCHAIN], int liberty_cap)}
 @findex proper_superstring_chainlinks
 @quotation
@@ -337,11 +339,11 @@ The most common formatted print function, writes to stderr.
 @item @code{void  gfprintf(FILE *outfile, const char *fmt, ...)}
 @findex gfprintf
 @quotation
-Wrapper around vgprintf, writes to outfile.
+Wrapper around @code{vgprintf}, writes to outfile.
 @end quotation
 void
 mprintf(const char *fmt, ...)
-Wrapper around vgprintf, in contrast to gprintf this one
+Wrapper around @code{vgprintf}, in contrast to @code{gprintf} this one
 writes to stdout.
 TRACE(const char *fmt, ...)
 Like @code{gprintf}, but silent if the global variable @code{verbose} is
@@ -397,5 +399,3 @@ is the column. Both coordinates are between 0 and
 return 0; 
 @end quotation
 @end itemize
-
-

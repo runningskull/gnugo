@@ -353,28 +353,28 @@ in @file{patterns.h}.
 As an example to show how to write a helper function, we consider
 a hypothetical helper called @code{wedge_helper}. Such a helper
 used to exist, but has been replaced by a constraint. Due to
-its simplicity it's still a good example.) The helper begins with a
+its simplicity it's still a good example. The helper begins with a
 comment:
 
 @example
 /*
 
 ?O.           ?Ob
-.X*           aXt
+.X*           aX*
 ?O.           ?Oc
 
 :8,C,wedge_helper
 */
 @end example
 
-The image on the left is the actual pattern. On the right we've
-taken this image and added letters to label (ti, tj), (ai, aj)
-and (bi, bj). Of course t is always at *, the point where GNU
-Go will move if the pattern is adopted.
+The image on the left is the actual pattern. On the right we've taken
+this image and added letters to label @code{apos}, @code{bpos}, and
+@code{cpos}. The position of *, the point where GNU Go will move if the
+pattern is adopted, is passed through the parameter @code{move}.
 
 @example
 int 
-wedge_helper (ARGS)
+wedge_helper(ARGS)
 @{
   int apos, bpos, cpos;
   int other = OTHER_COLOR(color);
@@ -409,7 +409,7 @@ guarantees a connection, we do some reading. First we use the
 @code{TRYMOVE} macro to place an @samp{O} at @samp{move} and let
 @samp{X} draw back to @samp{a}. Then we ask whether @samp{O} can capture
 these stones by calling @code{attack()}. The test if there is a stone at
-a before calling @code{attack()} is in this position not really
+@samp{a} before calling @code{attack()} is in this position not really
 necessary but it's good practice to do so, because if the attacked stone
 should happen to already have been captured while placing stones, GNU Go
 would crash with an assertion failure.
@@ -703,7 +703,7 @@ These functions make it possible to do more complex reading
 experiments in the constraints. All of them work so that first the
 sequence of moves @samp{a},@samp{b},@samp{c},... is played through with
 alternating colors, starting with @samp{X} or @samp{O} as indicated by
-the name. Then it is tested whether the worm at z can be attacked or
+the name. Then it is tested whether the worm at @samp{z} can be attacked or
 defended, respectively. It doesn't matter who would be in turn to move,
 a worm of either color may be attacked or defended. For attacks the
 opposite color of the string being attacked starts moving and for
@@ -711,7 +711,7 @@ defense the same color starts. The defend functions return true if the
 worm cannot be attacked in the position or if it can be attacked but
 also defended.  The attack functions return true if there is a way to
 capture the worm, whether or not it can also be defended. If there is no
-stone present at z after the moves have been played, it is assumed that
+stone present at @samp{z} after the moves have been played, it is assumed that
 an attack has already been successful or a defense has already failed.
 If some of the moves should happen to be illegal, typically because it
 would have been suicide, the following moves are played as if nothing
@@ -737,20 +737,20 @@ instead of @code{oplay_defend(?,a,b,c)} you can use
 
 These functions are similar to the previous ones. The difference is
 that the last *two* arguments denote worms to be attacked or defended
-simultaneously. Obviously y and z must have the same color. If either
+simultaneously. Obviously @samp{y} and @samp{z} must have the same color. If either
 location is empty, it is assumed that an attack has been successful or
 a defense has failed. The typical use for these functions is in
 cutting patterns, where it usually suffices to capture either
 cutstone.
 
 The function @code{xplay_defend_both} plays alternate moves
-beginning with an X at @samp{a}. Then it passes the last
+beginning with an @samp{X} at @samp{a}. Then it passes the last
 two arguments to @code{defend_both} in
 @file{engine/utils.c}. This function checks to determine
 whether the two strings can be simultaneously defended.
 
 The function @code{xplay_attack_either} plays alternate
-moves beginning with an X move at @samp{a}. Then it passes
+moves beginning with an @samp{X} move at @samp{a}. Then it passes
 the last two arguments to @code{attack_either} in
 @file{engine/utils.c}. This function looks for a move
 which captures at least one of the two strings. In its
@@ -819,7 +819,7 @@ Returns the amount of space in the area around @samp{x}.
 @code{marginal_eye(x)}
 @end example
 
-True if x is an eye space for either color, a non-marginal eye space
+True if @samp{x} is an eye space for either color, a non-marginal eye space
 for either color, or a marginal eye space for either color,
 respectively.
 
@@ -827,7 +827,7 @@ respectively.
 @code{antisuji(x)}
 @end example
 
-Tell the move generation that x is a substandard move that never should
+Tell the move generation that @samp{x} is a substandard move that never should
 be played.
 
 @example
@@ -835,7 +835,7 @@ same_dragon(x,y)
 same_worm(x,y)
 @end example
 
-Return true if x and y are the same dragon or worm respectively.
+Return true if @samp{x} and @samp{y} are the same dragon or worm respectively.
 
 @example
 @code{dragonsize(x)}
@@ -871,7 +871,7 @@ work.
 @code{potential_cutstone(x)}
 @end example
 
-True if cutstone2 field from worm data is larger than one. This
+True if @code{cutstone2} field from worm data is larger than one. This
 indicates that saving the worm would introduce at least two new
 cutting points.
 
@@ -882,7 +882,7 @@ cutting points.
 Prevents the misreporting of @samp{x} as lunch for @samp{y}.
 For example, the following pattern tells GNU Go that even
 though the stone at @samp{a} can be captured, it should not
-be considered "lunch" for the dragon at @samp{b}, because
+be considered ``lunch'' for the dragon at @samp{b}, because
 capturing it does not produce an eye:
 
 @example
@@ -913,7 +913,7 @@ Amalgamate (join) the dragons at @samp{x} and @samp{y} (@pxref{Worms and Dragons
 @code{amalgamate_most_valuable(x,y,z)}
 @end example
 
-Called when (x,y,z) point to three (preferably distinct)
+Called when @samp{x}, @samp{y}, @samp{z} point to three (preferably distinct)
 dragons, in situations such as this:
 
 @example
@@ -924,7 +924,7 @@ X*OX
 
 @end example
 
-In this situation, the opponent can play at *, preventing
+In this situation, the opponent can play at @samp{*}, preventing
 the three dragons from becoming connected. However @samp{O}
 can decide which cut to allow. The helper amalgamates the
 dragon at @samp{y} with either @samp{x} or @samp{z}, 
@@ -971,9 +971,7 @@ is a true eye.
 @end example
 
 Returns the escape value at @samp{x}. This is only useful in owl
-attack and defense patterns and only if the
-@option{--alternative_escape} option is turned on. Otherwise 0 is
-returned.
+attack and defense patterns.
 
 @node  Attack and Defense DB, Connections Database, Autohelper Functions, Patterns
 @comment  node-name,  next,  previous,  up
@@ -997,7 +995,7 @@ reason for the move @samp{*} and the defense point of the worm is set to
 For each @samp{X} worm in the pattern, it's tested whether the move
 at @samp{*} captures the worm. If that is the case, this is
 registered as a reason for the move at @samp{*}. The attack point of
-the worm is set to * and if it wasn't attacked before, a
+the worm is set to @samp{*} and if it wasn't attacked before, a
 defense is searched for.
 @end table
 
@@ -1078,7 +1076,7 @@ X..O
 X.OO
 @end example
 @noindent
-The previous pattern is matched here twice, yet X can push
+The previous pattern is matched here twice, yet @samp{X} can push
 in and break one of the connections. To fix this, we include
 a pattern:
 
@@ -1116,7 +1114,7 @@ Here are the public functions in @file{connections.c}.
         struct pattern *pattern, int ll, void *data)}
 @findex cut_connect_callback
 @quotation
-Try to match all (permutations of) connection patterns at (m,n).
+Try to match all (permutations of) connection patterns at @code{(m,n)}.
 For each match, if it is a B pattern, set cutting point in worm
 data structure and make eye space marginal for the connection
 inhibiting entries of the pattern. If it is a C pattern, amalgamate
@@ -1168,19 +1166,19 @@ reasons, decide GNU Go's personality, much time can be devoted to
 ``tuning'' them. Here are some suggestions.
 
 If you want to experiment with modifying the pattern database, invoke
-with the -a option. This will cause every pattern to be evaluated,
+with the @option{-a} option. This will cause every pattern to be evaluated,
 even when some of them may be skipped due to various optimizations.
 
 You can obtain a Smart Go Format (SGF) record of your game in at least
 two different ways. One is to use CGoban to record the game. You can
-also have GNU Go record the game in Smart Go Format, using the -o
-option. It is best to combine this with -a. Do not try to read the SGF
+also have GNU Go record the game in Smart Go Format, using the @option{-o}
+option. It is best to combine this with @option{-a}. Do not try to read the SGF
 file until the game is finished and you have closed the game
 window. This does not mean that you have to play the game out to its
 conclusion. You may close the CGoban window on the game and GNU Go
 will close the SGF file so that you can read it.
 
-If you record a game in SGF form using the -o option, GNU Go will add
+If you record a game in SGF form using the @option{-o} option, GNU Go will add
 labels to the board to show all the moves it considered, with their
 values. This is an extremely useful feature, since one can see at a
 glance whether the right moves with appropriate weights are being
@@ -1207,7 +1205,7 @@ CGoban but you may have to resize the window in order to see all three
 digits. Grab the lower right margin of the CGoban window and pull it
 until the window is large. All three digits should be visible.
 
-If you are playing a game without the -o option and you wish to
+If you are playing a game without the @option{-o} option and you wish to
 analyze a move, you may still use CGoban's ``Save Game'' button to get
 an SGF file. It will not have the values of the moves labelled, of
 course.
@@ -1228,9 +1226,9 @@ repeat the move to see how the behavior changes. If you're using
 emacs, it's a good idea to run GNU Go in a shell in a buffer (M-x
 shell) since this gives good navigation and search facilities.
 
-Instead of a move number, you can also give a board coordinate to -L
+Instead of a move number, you can also give a board coordinate to @option{-L}
 in order to stop at the first move played at this location. If you
-omit the -L option, the move after those in the file will be
+omit the @option{-L} option, the move after those in the file will be
 considered. 
 
 If a bad move is proposed, this can have several reasons. To begin
@@ -1256,7 +1254,8 @@ If a connecting move reason is found, but the strings are already
 effectively connected, there may be missing patterns in @file{conn.db}.
 Similarly, worms may be incorrectly amalgamated due to some too
 general or faulty pattern in @file{conn.db}. To get trace output from the
-matching of patterns in @file{conn.db} you need to add a second -t option.
+matching of patterns in @file{conn.db} you need to add a second
+@option{-t} option.
 
 If a move reason is missing, there may be a hole in the database. It
 could also be caused by some existing pattern being needlessly
@@ -1300,7 +1299,7 @@ to be rather conservative. As usual it should be measured in terms of
 actual points on the board. These values are also additive so the same
 care must be taken to avoid unintended multiple matches.
 
-You can also get a visual display of the dragons using the -T
+You can also get a visual display of the dragons using the @option{-T}
 option. The default GNU Go configuration tries to build a
 version with color support using either curses or the
 ansi escape sequences. You are more likely to find color
@@ -1332,7 +1331,7 @@ Red:    Status critical (1.5 eyes) or weak by the algorithm
 
 If you want to get the same game over and over again, you can
 eliminate the randomness in GNU Go's play by providing a fixed
-random seed with the -r option.
+random seed with the @option{-r} option.
 
 
 @node PM Implementation, Symmetry & transformations, Tuning, Patterns
@@ -1354,12 +1353,12 @@ In GNU Go, the ascii @file{.db} files are precompiled into tables (see
 Each pattern is compiled to a header, and a sequence of elements,
 which are (notionally) checked sequentially at every position and
 orientation of the board. These elements are relative to the pattern
-'anchor' (or origin).  One X or O stone is (arbitrarily) chosen to
+'anchor' (or origin).  One @samp{X} or @samp{O} stone is (arbitrarily) chosen to
 represent the origin of the pattern. (We cannot dictate one or the
 other since some patterns contain only one colour or the other.)  All
 the elements are in co-ordinates relative to this position. So a
-pattern matches "at" board position (m,n,o) if the the pattern anchor
-stone is on (m,n), and the other elements match the board when the
+pattern matches "at" board position @code{(m,n,o)} if the the pattern anchor
+stone is on @code{(m,n)}, and the other elements match the board when the
 pattern is transformed by transformation number @samp{o}. (See below for
 the details of the transformations, though these should not be
 necessary)
@@ -1418,7 +1417,8 @@ about one arbitrary axis followed by one of the rotations (a-d).  We
 can choose to reflect about the axis of symmetry (which causes no
 net change) and can therefore conclude that each of e-h is
 equivalent to the reflection (no-op) followed by a-d.  This argument
-therefore extends to include - and / as well as | and \.
+therefore extends to include @samp{-} and @samp{/} as well as @samp{|}
+and @samp{\}.
 
 @node  Details, grid optimization, Symmetry & transformations, Patterns
 @comment  node-name,  next,  previous,  up
@@ -1428,11 +1428,11 @@ therefore extends to include - and / as well as | and \.
 @cindex grid optimization
 
 @enumerate
-@item An entry in the pattern header states whether the anchor is an X or
-an O. This helps performance, since all transformations can be
+@item An entry in the pattern header states whether the anchor is an @samp{X} or
+an @samp{O}. This helps performance, since all transformations can be
 rejected at once if the anchor stone does not match. (Ideally, we
-could just define that the anchor is always O or always X, but some
-patterns contain no O's and some contain no X's.)
+could just define that the anchor is always @samp{O} or always @samp{X}, but some
+patterns contain no @samp{O} and some contain no @samp{X}.)
 
 @item The pattern header contains the size of the pattern (ie the
 co-ordinates of the top left and bottom right elements) relative to
@@ -1467,7 +1467,7 @@ pattern can be more quickly rejected doing it this way.
 
 @item The actual tests are performed using an 'and-compare'
 sequence. Each board position is a 2-bit quantity.
-%00 for empty, %01 for O, %10 for X.
+%00 for empty, %01 for @samp{O}, %10 for @samp{X}.
 We can test for an exact match by and-ing with %11 (no-op),
 then comparing with 0, 1 or 2. The test for @samp{o} is the
 same as a test for 'not-X', ie not %10. So and with %01
