@@ -478,7 +478,7 @@ loadsgf games/trevor/auto/b72.sgf 52
 
 
 loadsgf games/trevor/auto/b72.sgf 64
-790 gg_genmove white
+790 restricted_genmove white K5 K6 H6
 #? [K6|K5]*
 
 

@@ -147,6 +147,10 @@ loadsgf games/owl44.sgf
 296 owl_attack D6
 #? [1 E5|D8]*
 
+loadsgf games/nngs/gnugo-3.3.16-ccwills-200302151826.sgf 110
+297 owl_defend C8
+#? [1 A13]
+
 
 ########### end of tests #####################
 

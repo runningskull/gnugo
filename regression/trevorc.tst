@@ -602,7 +602,7 @@ loadsgf games/trevor/auto/c61.sgf 88
 
 loadsgf games/trevor/auto/c61.sgf 92
 1060 gg_genmove white
-#? [!D13]*
+#? [K11]*
 
 
 

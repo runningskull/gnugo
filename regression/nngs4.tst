@@ -32,7 +32,7 @@ loadsgf games/nngs/evand-gnugo-3.3.11-200211151742.sgf 16
 
 loadsgf games/nngs/evand-gnugo-3.3.11-200211151742.sgf 142
 70 owl_defend J11
-#? [1 S12]
+#? [1 (S12|S13)]
 
 loadsgf games/nngs/gnugo-3.3.12-jimm-200211261724.sgf 20
 80 restricted_genmove white M7 J6

@@ -174,9 +174,10 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 204
 
 
 #E4 better than C4, if must defend.
+# - We must defend. E4 only move. -ab
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 234
 420 gg_genmove black
-#? [!C4|D3|C3|B3]
+#? [E4]
 
 
 

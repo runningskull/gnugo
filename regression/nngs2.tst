@@ -232,7 +232,7 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 211
 
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 122
 550 gg_genmove white
-#? [!H19]
+#? [!H19|F19]*
 
 # The next two tests pass and perhaps don't need to be in the regressions.
 # loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 146

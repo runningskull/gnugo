@@ -31,4 +31,9 @@ loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 112
 70 gg_genmove white
 #? [N7|O9]
 
+# Only move.
+loadsgf games/nngs/gnugo-3.3.16-ccwills-200302151826.sgf 74
+80 gg_genmove white
+#? [L2]
+
 
