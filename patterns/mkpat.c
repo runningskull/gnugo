@@ -1681,7 +1681,6 @@ main(int argc, char *argv[])
 	}
       }
       else {
-	check_constraint_diagram();
 	patno++;
 	reset_pattern();
       }
