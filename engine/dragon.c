@@ -968,14 +968,13 @@ add_adjacent_dragon(int a, int b)
 /* A dragon is considered invincible if it satisfies either of the two
  * following conditions:
  * a) At least two distinct eyespaces without topological halfeyes,
- * marginal vertices, or tactically critical or alive opponent strings.
+ *    marginal vertices, or tactically critical or alive opponent strings.
+ *    Furthermore there may not be an owl attack of the dragon.
  * b) At least one string which is unconditionally alive according to the
- * unconditional_life() function in utils.c.
+ *    unconditional_life() function in utils.c.
  *
  * For the requirement on opponent strings in a), see e.g.
  * seki:404,408,409,413,504,604,908.
- *
- * FIXME: This function fails for the lower left corner dragon in seki:1001.
  */
 
 static int
@@ -996,8 +995,11 @@ dragon_invincible(int dr)
       return 1;
   }
 
-  /* Examine the eye spaces.
-   */
+  /* Can the dragon be owl attacked? */
+  if (DRAGON2(dr).owl_status != UNCHECKED && DRAGON2(dr).owl_status != ALIVE)
+    return 0;
+  
+  /* Examine the eye spaces. */
   if (board[dr] == BLACK) {
     eye = black_eye;
     eye_color = BLACK;
