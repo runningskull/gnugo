@@ -400,4 +400,4 @@ dnl autoconf 2.50 recommends AC_CONFIG_FILES and AC_OUPUT
 dnl This however requires automake 1.4p2 or better
 
 AC_OUTPUT([Makefile interface/Makefile patterns/Makefile sgf/Makefile
-utils/Makefile engine/Makefile doc/Makefile regression/Makefile interface/debugboard/Makefile config.vc:config.vcin])
+utils/Makefile engine/Makefile doc/Makefile regression/Makefile config.vc:config.vcin])
