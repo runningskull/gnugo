@@ -305,6 +305,7 @@ main(int argc, char *argv[])
    * (Change seed to get a different game).
    */
   int seed = 0;
+  int seed_specified = 0;
 
   komi = 0.0;
   
@@ -367,7 +368,7 @@ main(int argc, char *argv[])
 	break;
 	
       case 'b': benchmark = atoi(gg_optarg); playmode = MODE_SOLO; break;
-      case 'r': seed = atoi(gg_optarg); break;
+      case 'r': seed = atoi(gg_optarg); seed_specified = 1; break;
       case 'S': showstatistics = 1; break;
       case 'w': printworms = 1; break;
       case 'm': printmoyo = strtol(gg_optarg, NULL, 0);  /* allows 0x... */ break;
@@ -903,7 +904,7 @@ main(int argc, char *argv[])
   }
   
   /* Start random number seed. */
-  if (!seed)
+  if (!seed_specified)
     seed = time(0);
   
   /* Initialize the GNU Go engine. */
