@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- comments in readconnect.c
+- snapback only looks at one liberty in readconnect.c
 - do_atari_atari confirms the *defense_point is safe before returning
 - atari_atari_confirm_safety initializes defense_point
 - trivial bugfix in move_reasons.c
