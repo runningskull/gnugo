@@ -349,10 +349,15 @@ loadsgf games/strategy42.sgf 248
 
 # This example shows that we need to find additional owl attack
 # points. Currently only K15 is found to owl attack N19, but clearly
-# the J14 move also does this and is generally superior to K15.
+# the J14 move also does this, without sacrificing K13.
 loadsgf games/strategy43.sgf 271
 175 gg_genmove white
 #? [J14]*
+
+# Best to capture with snapback.
+loadsgf games/strategy44.sgf
+176 gg_genmove black
+#? [D9]
 
 ############ End of Tests #################
 

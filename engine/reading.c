@@ -852,7 +852,7 @@ atari_atari(int color, int *i, int *j, int save_verbose)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (p[m][n] == other) {
-	if (dragon[m][n].status == DEAD)
+	if (dragon[m][n].matcher_status == DEAD)
 	  aa_status[m][n] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
 	  if (worm[m][n].defend_code != 0)
@@ -1190,7 +1190,7 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (p[m][n] == color) {
-	if (dragon[m][n].status == DEAD)
+	if (dragon[m][n].matcher_status == DEAD)
 	  aa_status[m][n] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
 	  if (worm[m][n].defend_code != 0)
@@ -1297,7 +1297,7 @@ atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (p[m][n] == other) {
-	if (dragon[m][n].status == DEAD)
+	if (dragon[m][n].matcher_status == DEAD)
 	  aa_status[m][n] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
 	  if (worm[m][n].defend_code != 0)

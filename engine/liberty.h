@@ -425,8 +425,6 @@ void move_considered(int i, int j, float value);
 
 
 /* SGF routines for debugging purposes in sgffile.c */
-void begin_sgfdump(const char *filename);
-void end_sgfdump(void);
 int  sgffile_write_line(const char *, ...);
 void sgffile_dragon_status(int, int, int );
 void goaldump(char goal[MAX_BOARD][MAX_BOARD]);
@@ -478,7 +476,6 @@ extern int chinese_rules;
 
 extern int stackp;                /* stack pointer */
 extern int count_variations;      /* count (decidestring) */
-extern int sgf_dump;              /* writing file (decidestring) */
 extern SGFTree *sgf_dumptree;
 
 

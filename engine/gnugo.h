@@ -396,7 +396,6 @@ void setup_board(Intersection new_p[MAX_BOARD][MAX_BOARD], int koi, int koj,
 /* Putting stones on the board.. */
 void add_stone(int i, int j, int color);
 void remove_stone(int i, int j);
-void remove_string(int i, int j);
 void play_move(int i, int j, int color);
 int is_legal(int i, int j, int color);
 int is_suicide(int i, int j, int color);

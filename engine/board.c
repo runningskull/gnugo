@@ -388,44 +388,8 @@ trymove(int i, int j, int color, const char *message, int k, int l,
   if (!do_trymove(i, j, color, 0))
     return 0;
   
-  /* Store the move in the sgf file if there is a dump file. */
-  if (sgf_dump) {
-    if (k == -1) {
-      if (komaster != EMPTY)
-	sgffile_write_line("\n(;%c[%c%c]C[%s (variation %d, hash %lx, komaster %s:%c%d)\n]", 
-			   (color == BLACK) ? 'B' : 'W', 		   
-			   'a'+j, 'a'+i, message, count_variations,
-			   hashdata.hashval, 
-			   color_to_string(komaster),
-			   kom_j + 'A' + (kom_j >= 8), board_size - kom_i);
-      if (color == WHITE)
-	sgffile_write_line("\n(;W[%c%c]C[%s (variation %d, hash %lx)\n]",
-			   'a'+j, 'a'+i, message, count_variations,
-			   hashdata.hashval);
-    }
-    else {
-      char movename[4];
-	
-      if (l < 8)
-	*movename = l+65;
-      else
-	*movename = l+66;
-      sprintf(movename+1, "%d", board_size-k);
-	
-      if (komaster != EMPTY)
-	sgffile_write_line("\n(;%c[%c%c]C[%s at %s (variation %d, hash %lx, komaster %s:%c%d)\n]",
-			   (color == BLACK) ? 'B' : 'W', 
-			   'a'+j, 'a'+i, message, movename, count_variations,
-			   hashdata.hashval, color_to_string(komaster),
-			   kom_j + 'A' + (kom_j >= 8), board_size - kom_i);
-      else
-	sgffile_write_line("\n(;%c[%c%c]C[%s at %s (variation %d, hash %lx)\n]",
-			   (color == BLACK) ? 'B' : 'W', 
-			   'a'+j, 'a'+i, message, movename, count_variations,
-			   hashdata.hashval);
-    }
-  }
-  else if (sgf_dumptree) {
+  /* Store the move in an sgf tree if one is available. */
+  if (sgf_dumptree) {
     char buf[100];
     if (k == -1) {
       if (komaster != EMPTY)
@@ -481,23 +445,7 @@ tryko(int i, int j, int color, const char *message,
   if (!do_trymove(i, j, color, 1))
     return 0;
 
-  if (sgf_dump) {
-    if (komaster != EMPTY)
-      sgffile_write_line("\n(;%c[tt]C[tenuki (ko threat)]\n\
-;W[tt]C[tenuki (answers ko threat)]\n;B[%c%c]C[%s (variation %d, hash %lx, komaster %s:%c%d)\n]", 
-			 (color == BLACK) ? 'B' : 'W',
-			 'a'+j, 'a'+i, message, count_variations,
-			 hashdata.hashval,
-			 color_to_string(komaster),
-			 kom_i + 'A' + (kom_i >= 8), board_size - kom_j);
-    else
-      sgffile_write_line("\n(;%c[tt]C[tenuki (ko threat)]\n\
-;B[tt]C[tenuki (answers ko threat)]\n;W[%c%c]C[%s (variation %d, hash %lx)\n]",
-			 (color == BLACK) ? 'B' : 'W',
-			 'a'+j, 'a'+i, message, count_variations,
-			 hashdata.hashval);
-  }
-  else if (sgf_dumptree) {
+  if (sgf_dumptree) {
     char buf[100];
     if (!message)
       message = "???";
@@ -640,9 +588,7 @@ popgo()
   undo_move();
   
   memcpy(&hashdata, &(hashdata_stack[stackp]), sizeof(hashdata));
-  if (sgf_dump) 
-    sgffile_write_line(")\n");
-  else if (sgf_dumptree) {
+  if (sgf_dumptree) {
     sgf_dumptree->lastnode = sgf_dumptree->lastnode->parent;
     /* After tryko() we need to undo two pass nodes too. Since we have
      * no other way to identify ko moves, we skip all pass nodes.
@@ -748,7 +694,11 @@ add_stone(int i, int j, int color)
   ASSERT(p[i][j] == EMPTY, i, j);
 
   do_add_stone(i, j, color);
+#if 0
   new_position();
+#else
+  CLEAR_STACKS();
+#endif
 }
 
 
@@ -762,7 +712,11 @@ remove_stone(int i, int j)
   ASSERT(p[i][j] != EMPTY, i, j);
 
   do_remove_stone(i, j);
+#if 0
   new_position();
+#else
+  CLEAR_STACKS();
+#endif
 }
 
 
@@ -815,7 +769,11 @@ play_move(int i, int j, int color)
   }
   
   movenum++;
+#if 0
   new_position();
+#else
+  CLEAR_STACKS();
+#endif
 }
 
 

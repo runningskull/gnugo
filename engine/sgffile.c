@@ -284,48 +284,6 @@ sgffile_dragon_status(int i, int j, int status)
 /* ---------------------------------------------------------------- */
 
 /*
- * Dumping of information about a position. 
- * Used by sgffile_decideposition, etc.
- */
-
-
-/*
- * begin_sgfdump begins outputting all moves considered by
- * trymove and tryko to an sgf file.
- */
-
-void
-begin_sgfdump(const char *filename)
-{
-  if (!sgffile_open_file(filename))
-    return;
-
-  fprintf(sgfout, "(;SZ[%d];", board_size);
-  sgffile_printboard(-1);
-  fprintf(sgfout, "\n(;");
-  sgf_dump = 1;
-}
-
-
-/*
- * end_sgfdump ends the dump and closes the sgf file.
- */
-
-void 
-end_sgfdump()
-{
-  while (stackp>0)
-    popgo();
-
-  fprintf(sgfout, ")\n)\n");
-  fclose(sgfout);
-  count_variations = 0;
-  sgf_dump = 0;
-  sgfout = NULL;
-}
-
-
-/*
  * sgffile_printboard writes the current board position to the output file.
  * The parameter next, tells whose turn it is to move.
  */
@@ -405,8 +363,8 @@ static void
 sgftree_printboard(SGFTree *tree);
 
 /*
- * begin_sgfdump begins outputting all moves considered by
- * trymove and tryko to an sgf file.
+ * begin_sgftreedump begins outputting all moves considered by
+ * trymove and tryko into an internal sgf tree.
  */
 
 void
@@ -423,7 +381,7 @@ begin_sgftreedump(SGFTree *tree)
 
 
 /*
- * end_sgfdump ends the dump and closes the sgf file.
+ * end_sgftreedump ends the dump and writes it to a file.
  */
 
 void 

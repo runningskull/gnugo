@@ -1001,9 +1001,23 @@ add_replacement_move(int ai, int aj, int bi, int bj)
   ci = replacement_mapi[bi][bj];
   cj = replacement_mapj[bi][bj];
 
-  TRACE("Move at %m is replaced by %m.\n", ai, aj, bi, bj);
+  /* First check for an incompatible redistribution rule. */
+  if (replacement_mapi[ai][aj] != -1) {
+    int di = replacement_mapi[ai][aj];
+    int dj = replacement_mapj[ai][aj];
+    /* Crash if the old rule isn't compatible with the new one. */
+    ASSERT((bi == di && bj == dj)
+	   || (bi == replacement_mapi[di][dj]
+	       && bj == replacement_mapj[di][dj]), ai, aj);
+    /* There already is a compatible redistribution in effect so we
+     * have nothing more to do.
+     */
+    return;
+  }
 
-  /* First verify that we don't introduce a cyclic redistribution. */
+  TRACE("Move at %m is replaced by %m.\n", ai, aj, bi, bj);    
+
+  /* Verify that we don't introduce a cyclic redistribution. */
   if (ci == ai && cj == aj) {
     gprintf("Cyclic point redistribution detected.\n");
     ASSERT(0, ai, aj);
@@ -3276,6 +3290,7 @@ value_move_reasons(int m, int n, int color, float pure_threat_value,
 		   float score)
 {
   float tot_value;
+  float shape_factor;
   char saved_stones[MAX_BOARD][MAX_BOARD];
 
   gg_assert (stackp == 0);
@@ -3312,6 +3327,8 @@ value_move_reasons(int m, int n, int color, float pure_threat_value,
 	       + move[m][n].strategical_value
 	       + move[m][n].influence_value);
 
+  shape_factor = compute_shape_factor(m, n);
+
   if (tot_value > 0.0) {
     int c;
     
@@ -3347,7 +3364,8 @@ value_move_reasons(int m, int n, int color, float pure_threat_value,
     }
     else {
       move[m][n].additional_ko_value =
-	move[m][n].followup_value + move[m][n].reverse_followup_value;
+	shape_factor *
+	(move[m][n].followup_value + move[m][n].reverse_followup_value);
     }
 
     tot_value += 0.05 * move[m][n].secondary_value;
@@ -3356,7 +3374,7 @@ value_move_reasons(int m, int n, int color, float pure_threat_value,
 	    m, n, 0.05 * move[m][n].secondary_value);
 
     if (move[m][n].numpos_shape + move[m][n].numneg_shape > 0) {
-      float shape_factor = compute_shape_factor(m, n);
+      /* shape_factor has already been computed. */
       float old_value = tot_value;
       tot_value *= shape_factor;
       if (verbose) {
@@ -3373,22 +3391,24 @@ value_move_reasons(int m, int n, int color, float pure_threat_value,
     /* Add a special shape bonus for moves which connect strings. */
     c = move_connects_strings(m, n, color);
     if (c > 0) {
-      float shape_factor = pow(1.02, (float) c) - 1;
+      float shape_factor2 = pow(1.02, (float) c) - 1;
       float base_value = gg_max(gg_min(tot_value, 5.0), 1.0);
       if (verbose) {
 	/* Should all have been TRACE, except we want field sizes. */
 	gprintf("  %m: %f - connects strings ", m, n,
-		base_value * shape_factor);
+		base_value * shape_factor2);
 	fprintf(stderr, "(connect value %d, shape factor %5.3f)\n", c,
-		shape_factor);
+		shape_factor2);
       }
-      tot_value += base_value * shape_factor;
+      tot_value += base_value * shape_factor2;
     }
   }
   else {
     move[m][n].additional_ko_value =
-      move[m][n].followup_value + 
-      gg_min(move[m][n].followup_value, move[m][n].reverse_followup_value);
+      shape_factor *
+      (move[m][n].followup_value +
+       gg_min(move[m][n].followup_value,
+	      move[m][n].reverse_followup_value));
   }
 
   /* If the move is valued 0 or small, but has followup values and is

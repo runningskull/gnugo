@@ -2,7 +2,19 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
-3.1.1 released September 4, 2001
+3.1.3 released September 6, 2001
+
+- bugfix in the atari_atari code
+- obsolete sgf_dump facilities removed
+- remove_string removed from gnugo.h
+- add_replacement_move() in move_reasons.c revised
+- in value_move_reasons() ko threats are affected by shape values
+- tuning
+- don't call new_position for every stone when playing out an SGF tree.
+- new gtp engine metamachine in interface/gtp_examples
+- new gtp command query_boardsize
+
+3.1.2 released September 4, 2001
 
 - realloc space for owl stack if needed
 - new static functions push_owl and pop_owl
