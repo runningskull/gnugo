@@ -1402,28 +1402,6 @@ O.cd?
 ; x_somewhere(a,b,c,d)
 
 
-# Pattern EC7a
-# # gf Where does this pattern come from? It's completely unreasonable
-# #    to have a big fixed value without checking whether the X stones
-# #    can live, as can be seen in test case trevor:421.
-# #    Pattern removed. (3.1.11)
-# 
-# ?O.X      break connection in sente
-# X*..
-# ....
-# ----
-# 
-# :8,OBda,value(20)
-# 
-# ?O.X
-# A*..
-# ....
-# ----
-# 
-# ; oplay_attack(*,A)
-
-
-
 Pattern EC9
 # Probably redundant
 
@@ -10878,39 +10856,6 @@ OaO
 cb.
 
 ; xplay_attack(a,b,c,c) && !oplay_attack(*,a,b,c,c)
-
-
-Pattern CD103
-# gf Revised constraint. (3.1.13)
-
-?XOX?       capture something!
-.*X..
-?...?
-
-:|,sa,value(12)
-
-?XbX?
-.*Xa.
-?...?
-
-;!oplay_attack(*,b) && o_aa_attack(*,a) && o_aa_attack(a,*)
-
-
-Pattern CD103a
-# valued slightly more than CD103 because at least potentially this
-# pattern could be devastating. (See blunder14.sgf.)
-
-?OXO?       defend against the attack!
-.*O..
-?...?
-
-:|,d,value(15)
-
-?OXO?
-.*Oa.
-?...?
-
-; x_aa_attack(*,a) && x_aa_attack(a,*)
 
 
 Pattern CD104

@@ -225,8 +225,6 @@ find_double_threats(int color)
  * size of the smallest of the worms under attack.
  */
 
-#define USE_ATARI_ATARI_PATTERNS 1
-
 static int aa_status[BOARDMAX]; /* ALIVE, DEAD or CRITICAL */
 static int forbidden[BOARDMAX];
 static int vital_string[BOARDMAX]; /* May not sacrifice these stones. */
@@ -379,41 +377,6 @@ atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
       *defense = after_defense_point;
     return 0;
   }
-}
-
-
-/* Ask the atari_atari code if after color plays at (apos)
- * and other plays at (bpos) there appears any combination
- * attack. Returns the size of the combination.
- */
-
-int
-atari_atari_try_combination(int color, int apos, int bpos)
-{
-  int other = OTHER_COLOR(color);
-  int aa_val = 0;
-  int save_verbose = verbose;
-
-  if (USE_ATARI_ATARI_PATTERNS)
-    return 0;
-  
-  if (aa_depth < 2)
-    return 0;
-  if (verbose > 0)
-    verbose--;
-  memset(forbidden, 0, sizeof(forbidden));
-
-  compute_aa_status(color, NULL, NULL);
-
-  if (trymove(apos, color, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
-    if (trymove(bpos, other, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
-      aa_val = do_atari_atari(color, NULL, NULL, apos, 0, 0);
-      popgo();
-    }
-    popgo();
-  }
-  verbose = save_verbose;
-  return aa_val;
 }
 
 
@@ -835,61 +798,7 @@ atari_atari_find_attack_moves(int color, int minsize,
   
   aa_init_moves(attacks);
 
-  if (USE_ATARI_ATARI_PATTERNS)
-    atari_atari_attack_patterns(color, minsize, attacks);
-  else {
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (board[pos] != other) 
-	continue;
-      
-      if (pos != find_origin(pos))
-	continue;
-      
-      if (minsize > 0 && countstones(pos) < minsize && !is_vital_string(pos))
-	continue;
-      
-      if (get_aa_status(pos) != ALIVE)
-	continue;
-      
-      /* Pick up general threat moves or simple ataris. */
-      if (stackp < aa_threat_depth) {
-	memset(threat_moves, 0, sizeof(threat_moves));
-	memset(threat_codes, 0, sizeof(threat_codes));
-	num_threat_moves = attack_threats(pos, MAX_THREAT_MOVES,
-					  threat_moves, threat_codes);
-	if ((debug & DEBUG_ATARI_ATARI)
-	    && num_threat_moves > 0) {
-	  int i;
-	  gprintf("Threats on %1m: ", pos);
-	  for (i = 0; i < num_threat_moves; i++)
-	    gprintf("%1m ", threat_moves[i]);
-	  gprintf("\n");
-	}
-      }
-      else {
-	num_threat_moves = findlib(pos, 2, threat_moves);
-	if (num_threat_moves != 2)
-	  continue;
-      }
-      
-      /* Add the threats on (pos) to the moves[] array, unless forbidden
-       * or assumed to be ineffective.
-       */
-      for (k = 0; k < num_threat_moves; k++) {
-	int move = threat_moves[k];
-	
-	if (aa_move_known(attacks, move, pos) || forbidden[move])
-	  continue;
-	
-	if ((is_self_atari(move, color)
-	     || !is_atari(move, color))
-	    && !safe_move(move, color))
-	  continue;
-
-	aa_add_move(attacks, move, pos);
-      }
-    }
-  }
+  atari_atari_attack_patterns(color, minsize, attacks);
 
   /* Sort the attack moves. */
   aa_sort_moves(attacks);

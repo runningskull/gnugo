@@ -246,8 +246,6 @@ static struct autohelper_func autohelper_functions[] = {
   {"squeeze_ko_helper",1,"squeeze_ko_helper(%s)"},
   {"backfill_helper", 3, "backfill_helper(%s, %s, %s)"},
   {"owl_threatens",   2, "owl_threatens_attack(%s,%s)"},
-  {"o_aa_attack",     2, "atari_atari_try_combination(color,%s,%s)"},
-  {"x_aa_attack",     2, "atari_atari_try_combination(OTHER_COLOR(color),%s,%s)"},
   {"replace",         2, "add_replacement_move(%s,%s)"},
   {"non_oterritory",  1, "influence_mark_non_territory(%s, color)"},
   {"non_xterritory",  1, "influence_mark_non_territory(%s, OTHER_COLOR(color))"}

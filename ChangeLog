@@ -3,6 +3,7 @@
 -------------------------------------------------------------------------
 
 - bugfixes in the atari_atari code
+- obsolete atari_atari code removed
 - tuning
 - owl tuning
 - sgf2tst repair

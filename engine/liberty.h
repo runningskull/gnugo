@@ -394,7 +394,6 @@ int atari_atari(int color, int *attack_move, int *defense_move,
 int atari_atari_confirm_safety(int color, int tpos, int *move,
 			       int minsize, int saved_dragons[BOARDMAX],
 			       int saved_worms[BOARDMAX]);
-int atari_atari_try_combination(int color, int apos, int bpos);
 
 int review_move_reasons(int *move, float *val, int color,
 			float pure_threat_value, float lower_bound);
