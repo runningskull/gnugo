@@ -1,0 +1,81 @@
+(;GM[1]FF[3]
+RU[New Zealand]BR[]WR[]SZ[19]HA[0]KM[6.5]
+PW[GnuGo]
+PB[Aya]
+GN[White (W) vs. Black (B)]
+DT[2003-11-23]
+SY[Cgoban 1.9.14]TM[50:00]
+RE[W+239.5]
+;B[qc]BL[2969];W[dc]WL[3000];B[qf]BL[2962];W[hd]WL[3000];B[qq]BL[2957]
+;W[dp]WL[2999];B[mc]BL[2953];W[de]WL[2999];B[ic]BL[2948];W[hc]WL[2999]
+;B[hb]BL[2943];W[gb]WL[2999];B[qj]BL[2935];W[je]WL[2997];B[kd]BL[2926]
+;W[lf]WL[2996];B[qm]BL[2919];W[pp]WL[2994];B[po]BL[2913];W[qp]WL[2992]
+;B[op]BL[2903];W[pq]WL[2988];B[cq]BL[2889];W[cp]WL[2984];B[pr]BL[2873]
+;W[er]WL[2974];B[dq]BL[2863];W[eq]WL[2969];B[or]BL[2850];W[rq]WL[2962]
+;B[qr]BL[2844];W[rr]WL[2957];B[oq]BL[2831];W[qo]WL[2951];B[rn]BL[2825]
+;W[pn]WL[2948];B[oo]BL[2819];W[qn]WL[2946];B[ro]BL[2803];W[om]WL[2944]
+;B[pm]BL[2791];W[dl]WL[2942];B[iq]BL[2762];W[on]WL[2940];B[mn]BL[2750]
+;W[nf]WL[2937];B[nl]BL[2730];W[ci]WL[2934];B[gp]BL[2719];W[gn]WL[2931]
+;B[fo]BL[2708];W[in]WL[2928];B[bq]BL[2702];W[bp]WL[2917];B[dn]BL[2668]
+;W[en]WL[2911];B[dr]BL[2640];W[eo]WL[2895];B[me]BL[2601];W[mf]WL[2890]
+;B[og]BL[2571];W[mi]WL[2885];B[fn]BL[2528];W[fm]WL[2880];B[jo]BL[2480]
+;W[hl]WL[2875];B[em]BL[2455];W[fl]WL[2869];B[nh]BL[2398];W[kk]WL[2864]
+;B[do]BL[2374];W[ep]WL[2847];B[mj]BL[2354];W[lj]WL[2842];B[dm]BL[2334]
+;W[cm]WL[2822];B[ke]BL[2323];W[kf]WL[2816];B[el]BL[2308];W[dk]WL[2807]
+;B[cn]BL[2291];W[bm]WL[2799];B[es]BL[2254];W[fr]WL[2794];B[bn]BL[2240]
+;W[ek]WL[2781];B[an]BL[2226];W[nj]WL[2777];B[ap]BL[2199];W[am]WL[2767]
+;B[ao]BL[2190];W[ne]WL[2762];B[id]BL[2165];W[ie]WL[2754];B[ho]BL[2141]
+;W[nd]WL[2744];B[hn]BL[2127];W[nc]WL[2732];B[nb]BL[2117];W[ob]WL[2716]
+;B[mb]BL[2107];W[ib]WL[2704];B[jb]BL[2098];W[ha]WL[2695];B[im]BL[2084]
+;W[pc]WL[2686];B[pd]BL[2062];W[qb]WL[2680];B[mh]BL[2041];W[mk]WL[2676]
+;B[kh]BL[2019];W[lh]WL[2673];B[lg]BL[2000];W[li]WL[2671];B[jj]BL[1978]
+;W[kg]WL[2666];B[hk]BL[1951];W[gk]WL[2661];B[hj]BL[1926];W[il]WL[2655]
+;B[od]BL[1905];W[qd]WL[2644];B[oc]BL[1881];W[rc]WL[2630];B[oa]BL[1868]
+;W[pb]WL[2625];B[qe]BL[1853];W[jd]WL[2620];B[jc]BL[1844];W[ji]WL[2613]
+;B[ll]BL[1791];W[oi]WL[2609];B[jh]BL[1758];W[ph]WL[2600];B[rd]BL[1721]
+;W[rh]WL[2572];B[pi]BL[1674];W[qc]WL[2546];B[pf]BL[1643];W[oe]WL[2528]
+;B[pe]BL[1610];W[rf]WL[2510];B[re]BL[1581];W[rb]WL[2497];B[jk]BL[1509]
+;W[ki]WL[2482];B[pa]BL[1489];W[jl]WL[2476];B[md]BL[1431];W[qg]WL[2471]
+;B[rg]BL[1383];W[sg]WL[2465];B[qa]BL[1328];W[pg]WL[2460];B[of]BL[1314]
+;W[se]WL[2455];B[sd]BL[1300];W[oh]WL[2446];B[ra]BL[1284];W[ng]WL[2442]
+;B[le]BL[1274];W[sc]WL[2438];B[ok]BL[1253];W[ja]WL[2433];B[kb]BL[1237]
+;W[lc]WL[2432];B[lb]BL[1224];W[ka]WL[2431];B[la]BL[1204];W[na]WL[2430]
+;B[ia]BL[1188];W[ja]WL[2428];B[ri]BL[1173];W[jm]WL[2425];B[hm]BL[1147]
+;W[jn]WL[2423];B[gm]BL[1130];W[lm]WL[2420];B[ln]BL[1107];W[ml]WL[2412]
+;B[mm]BL[1088];W[ko]WL[2407];B[kq]BL[1061];W[qi]WL[2403];B[qh]BL[1043]
+;W[nm]WL[2399];B[oj]BL[1029];W[lo]WL[2394];B[km]BL[1016];W[ol]WL[2386]
+;B[nk]BL[1000];W[pl]WL[2374];B[ql]BL[985];W[qk]WL[2367];B[rk]BL[965];
+W[kn]WL[2360];B[lk]BL[952];W[ii]WL[2348];B[gl]BL[903];W[fk]WL[2338];
+B[qi]BL[873];W[mj]WL[2333];B[mo]BL[860];W[pk]WL[2329];B[fi]BL[846];
+W[rp]WL[2322];B[pj]BL[828];W[si]WL[2316];B[dj]BL[812];W[gj]WL[2303];
+B[cj]BL[801];W[bk]WL[2293];B[hi]BL[786];W[hh]WL[2276];B[gi]BL[774];
+W[ej]WL[2261];B[di]BL[760];W[ei]WL[2225];B[eh]BL[740];W[fh]WL[2195];
+B[bj]BL[718];W[cl]WL[2156];B[aj]BL[676];W[fp]WL[2133];B[go]BL[662];
+W[gh]WL[2122];B[cg]BL[635];W[gq]WL[2115];B[ck]BL[616];W[ip]WL[2109];
+B[bl]BL[593];W[eg]WL[2100];B[dh]BL[584];W[ij]WL[2094];B[jp]BL[573];
+W[io]WL[2088];B[hq]BL[566];W[hp]WL[2078];B[gr]BL[560];W[fq]WL[2066];
+B[ce]BL[553];W[cd]WL[2056];B[bd]BL[547];W[be]WL[2051];B[cc]BL[537];
+W[cf]WL[2029];B[bb]BL[523];W[ad]WL[2012];B[db]BL[509];W[bc]WL[1985];
+B[fb]BL[498];W[bg]WL[1968];B[ah]BL[486];W[lp]WL[1953];B[fd]BL[476];
+W[mr]WL[1936];B[lq]BL[472];W[mq]WL[1920];B[mp]BL[468];W[gc]WL[1910];
+B[he]BL[464];W[ge]WL[1890];B[fe]BL[456];W[fc]WL[1879];B[if]BL[449];
+W[hf]WL[1868];B[ec]BL[444];W[cb]WL[1856];B[ca]BL[439];W[ed]WL[1841];
+B[cc]BL[433];W[eb]WL[1800];B[ea]BL[427];W[fa]WL[1786];B[bh]BL[421];
+W[hr]WL[1783];B[ir]BL[416];W[gs]WL[1779];B[al]BL[410];W[gn]WL[1761];
+B[nq]BL[406];W[ak]WL[1759];B[ef]BL[401];W[dg]WL[1757];B[ag]BL[398];
+W[ch]WL[1755];B[rs]BL[395];W[is]WL[1752];B[sm]BL[389];W[rl]WL[1745];
+B[lr]BL[385];W[js]WL[1743];B[ls]BL[383];W[kl]WL[1742];B[sr]BL[382];
+W[sq]WL[1741];B[nn]BL[380];W[rm]WL[1740];B[lm]BL[379];W[kp]WL[1740];
+B[jq]BL[378];W[ss]WL[1740];B[jf]BL[377];W[he]WL[1739];B[qs]BL[376];
+W[sr]WL[1738];B[tt]BL[375];W[hs]WL[1738];B[ds]BL[371];W[fs]WL[1738];
+B[br]BL[370];W[ks]WL[1737];B[co]BL[369];W[bo]WL[1737];B[aq]BL[368];
+W[kr]WL[1737];B[nr]BL[368];W[jr]WL[1736];B[ms]BL[368];W[tt]WL[1735];
+B[tt]BL[368];
+TW[aa][ba][ca][da][ea][ga][ia][ka][la][ma][oa][pa][qa][ra][sa][ab][bb][cb][db][fb][hb][jb][kb][lb][mb][nb][sb][ac][cc][ec][ic][jc][kc][mc][oc][bd][dd][fd][gd][id][kd][ld][md][od][pd][rd][sd][ae][ce][ee][fe][ke][le][me][pe][qe][re][af][bf][df][ef][ff][gf][if][jf][of][pf][qf][sf][ag][cg][fg][gg][hg][ig][jg][lg][mg][og][rg][ah][bh][dh][eh][ih][jh][kh][mh][nh][qh][sh][ai][bi][di][fi][gi][hi][ni][pi][qi][ri][aj][bj][cj][dj][fj][hj][jj][kj][oj][pj][qj][rj][sj][ck][hk][ik][jk][nk][ok][rk][sk][al][bl][gl][nl][ql][sl][gm][hm][im][pm][qm][sm][fn][hn][rn][sn][fo][go][ho][ro][so][gp][sp][gr]
+TB[no][np][mq][ar][cr][mr][as][bs][cs][ns][os][ps]
+C[The game is over.  Final score:
+   White = 146 territory + 151 living stones + 0 dame + 6.5 komi = 303.5
+   Black = 12 territory + 52 living stones + 0 dame = 64
+White wins by 239.5.
+]
+)

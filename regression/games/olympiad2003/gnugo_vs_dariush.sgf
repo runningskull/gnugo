@@ -1,0 +1,40 @@
+(;GM[1]FF[3]
+SZ[19]TM[]BR[]WR[]
+PB[GnuGo]
+PW[Dariush]
+GN[GNU Go 3.5.2olympiad Random Seed 1069690561 level 12]
+DT[2003-11-24]
+KM[6.5]AP[GNU Go:3.5.2olympiad]RU[Chinese]HA[0]
+RE[B+12.5]
+;B[pd];W[cp];B[qp];W[dc];B[pl];W[qf];B[eq];W[nc];B[nd];W[md];B[ne];
+W[ip];B[oc];W[dq];B[mc];W[of];B[dr];W[ce];B[lc];W[op];B[oq];W[nq];
+B[pq];W[hd];B[np];W[mp];B[no];W[cr];B[dp];W[cq];B[do];W[go];B[er];
+W[dj];B[co];W[bn];B[bo];W[ao];B[bp];W[oo];B[mo];W[lp];B[on];W[hr];
+B[dm];W[bl];B[mq];W[lq];B[le];W[mr];B[pj];W[os];B[if];W[ge];B[hh];
+W[qe];B[fh];W[qd];B[cg];W[bi];B[km];W[ph];B[qi];W[rh];B[nh];W[ng];
+B[ri];W[qg];B[lh];W[si];B[sj];W[qc];B[jb];W[ib];B[ic];W[oi];B[hb];
+W[gb];B[mj];W[eh];B[hj];W[lo];B[mn];W[hc];B[ia];W[nj];B[qh];W[rg];
+B[ga];W[fb];B[pb];W[nl];B[rb];W[rc];B[qr];W[mk];B[lj];W[om];B[pm];
+W[pn];B[nn];W[mg];B[fa];W[ea];B[ha];W[eb];B[ni];W[oh];B[oj];W[ln];
+B[qn];W[mm];B[po];W[nm];B[pn];W[lm];B[kl];W[fg];B[gg];W[ff];B[fi];
+W[or];B[hm];W[in];B[ap];W[lg];B[kg];W[nk];B[im];W[lk];B[kk];W[mh]
+(;B[li];W[mi];B[an];W[di];B[bm];W[cl];B[jn];W[jo];B[hn];W[fk];B[ho];
+W[hp];B[gj];W[qs];B[rs];W[ps];B[gp];W[gq];B[fp];W[rr];B[rq];W[ss];
+B[el];W[ek];B[al];W[ak];B[am];W[bk];B[gl];W[je];B[ie];W[fl];B[fm];
+W[qb];B[qa];W[sb];B[ra];W[fr];B[dl];W[dk];B[io];W[ko];B[lf];W[hf];
+B[id];W[hg];B[ig];W[gk];B[hk];W[cm];B[cn];W[sh];B[rk];W[kh];B[jj];
+W[ki];B[kj];W[pc];B[nb];W[es];B[ds];W[fs];B[pe];W[gf];B[gh];W[oe];
+B[od];W[jg];B[kf];W[pr];B[qq];W[pf];B[mf];W[ll];B[ok];W[fj];B[ei];
+W[dh];B[sq];W[fq];B[nf];W[fo];B[ep];W[he];B[sr];W[rs];B[pi];W[kn];
+B[ol];W[ej];B[pa];W[tt];B[sa];W[sc];B[tt];W[tt];B[tt]
+TW[aa][ba][ca][da][ab][bb][cb][db][ac][bc][cc][ec][fc][gc][ad][bd][cd][dd][ed][fd][gd][rd][sd][ae][be][de][ee][fe][re][se][af][bf][cf][df][ef][rf][sf][ag][bg][cg][dg][eg][og][pg][sg][ah][bh][ch][nh][ai][ci][ni][aj][bj][cj][ck][ml][jp][kp][hq][iq][jq][kq][mq][gr][ir][jr][kr][lr][nr][gs][hs][is][js][ks][ls][ms][ns]
+TB[ja][ka][la][ma][na][oa][ib][kb][lb][mb][ob][jc][kc][nc][jd][kd][ld][md][je][ke][me][jf][jg][ih][jh][kh][gi][hi][ii][ji][ki][ij][qj][rj][ik][jk][pk][qk][sk][hl][il][jl][ql][rl][sl][em][gm][jm][qm][rm][sm][bn][dn][en][fn][gn][in][rn][sn][ao][eo][fo][go][oo][qo][ro][so][cp][op][pp][rp][sp][aq][bq][cq][dq][ar][br][cr][as][bs][cs]
+C[The game is over.  Final score:
+   White = 78 territory + 93 living stones + 0 dame + 6.5 komi = 177.5
+   Black = 82 territory + 108 living stones + 0 dame = 190
+Black wins by 12.5.
+])
+
+(;B[li])
+
+)
