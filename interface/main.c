@@ -924,6 +924,7 @@ main(int argc, char *argv[])
       exit(EXIT_FAILURE);
     }
     else {
+      sgffile_open_file(printsgffile);
       sgffile_write_gameinfo(&gameinfo, "load and print"); 
       sgffile_printboard(gameinfo.to_move);
     }
