@@ -40,6 +40,9 @@
 
 #define DEBUG(x)  /* printf x */
 
+int fatal_errors = 0;
+
+
 int
 main(void)
 {
@@ -79,7 +82,7 @@ main(void)
   memset(three_neighbors, 0, sizeof(three_neighbors));
   memset(esize, 0, sizeof(esize));
 
-  while (fgets(line, MAXLINE, stdin)) {
+  while (fgets(line, MAXLINE, stdin) && !fatal_errors) {
 
     if (line[strlen(line)-1] != '\n') {
       fprintf(stderr, "mkeyes: line truncated: %s\n", line);
@@ -213,7 +216,7 @@ main(void)
 	    fprintf(stderr, 
 		    "mkeyes: invalid character %c in pattern %d\n",
 		    line[n], eye_number[patno]);
-	    abort();
+	    fatal_errors++;
 	    break;
 	}
 	esize[patno]++;
@@ -233,7 +236,7 @@ main(void)
 	  fprintf(stderr,
 		  "mkeyes: missing attack or defense point in pattern %d\n",
 		  eye_number[patno]);
-	  abort();
+	  fatal_errors++;
 	}
       }
       
@@ -242,7 +245,7 @@ main(void)
 	  fprintf(stderr,
 		  "mkeyes: attack or defense point in settled pattern %d\n",
 		  eye_number[patno]);
-	  abort();
+	  fatal_errors++;
 	}
       }
       
@@ -328,7 +331,7 @@ main(void)
       if (patno >= MAXPATNO) {
 	fprintf(stderr,
 		"mkeyes: Too many eye patterns. Increase MAXPATNO in mkeyes.c\n");
-	abort();
+	fatal_errors++;
       }
     }
   }
@@ -345,7 +348,12 @@ main(void)
     else
       printf(",\n{NULL, 0, 0, 0, 0, 0, 0, 0, 0}\n};\n");
   }
-  return 0;
+
+  if (fatal_errors) {
+    printf("\n\n#error in eye database.  Rebuild.\n\n");
+  }
+
+  return fatal_errors;
 }
 
 /*

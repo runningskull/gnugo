@@ -1541,6 +1541,24 @@ O*.|
 :8,-,value(45)
 
 
+Pattern A514
+# tm New Pattern (3.1.15)
+#   see also Pattern A615
+
+?XO.|	 special edge position
+?.XX|
+?.*O|
+?...|
+
+:8,s,value(45)
+
+?XOb|
+?CXX|
+?A*O|
+?...|
+
+; !oplay_attack(*,A,b,C,b)
+
 #########################################################
 #                                                       #
 #          Eye reducing moves on the first line         #
@@ -1779,6 +1797,65 @@ X.*.
 ;!oplay_attack(a,*,*)
 
 
+Pattern A614
+# tm New Pattern (3.1.15)
+
+OXXXO	attack shortage of liberties
+?...?
+?.*.?
+-----
+
+:8,s,value(65)
+
+OXAXO
+?...?
+?.*.?
+-----
+
+;lib(A) == 3
+
+
+Pattern A615
+# tm New Pattern (3.1.15)
+#   May be possible to generalize away from corner
+
+?XO.|	 special corner eyespace collapse
+?.X.|
+?..*|
+?...|
+----+
+
+:8,s,value(45)
+
+?Xb.|
+?.A.|
+?..*|
+?...|
+----+
+
+;!attack(b)
+
+
+
+Pattern A616
+# tm New Pattern (3.1.15)
+
+OX?	threaten snapback.
+X.X
+X.O
+X*.
+---
+
+:8,s,value(50)
+
+OX?	threaten snapback.
+A.X
+X.O
+X*.
+---
+
+; lib(A) == 3
+
 #########################################################
 #                                                       #
 #          Eye reducing moves in the center             #
@@ -1836,20 +1913,21 @@ OXOX
 :8,-,value(80)
 
 
-Pattern A705
-# gf Reduced value. (3.1.11)
-
-?*?        attack eye shape
-X.X
-?.?
-
-:|,-,value(58)
-
-?*?
-X.B
-?a?
-
-;owl_eyespace(a,B)
+#Pattern A705
+## gf Reduced value. (3.1.11)
+# tm removed (3.1.15)
+#
+#?*?        attack eye shape
+#X.X
+#?.?
+#
+#:|,-,value(58)
+#
+#?*?
+#X.B
+#?a?
+#
+#;owl_eyespace(a,B)
 
 
 Pattern A705b
@@ -4070,5 +4148,22 @@ X.edXf
 
 ;oplay_attack(*,a,b,c,d,e,e) && !oplay_attack(*,f)
 
+
+Pattern A1612
+# tm New pattern (3.1.15)
+
+?*X??
+?X.X.
+?.X.O
+-----
+
+:8,-,value(45)
+
+?*X??
+?eDX.
+?BXCA
+-----
+
+;lib(A) > 2 && !oplay_defend(*,?,B,?,C,?,D,e)
 
 # END OF FILE

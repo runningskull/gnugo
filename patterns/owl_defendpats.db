@@ -596,6 +596,24 @@ X*.
 :8,n,value(70)
 
 
+Pattern D209a
+# tm New pattern (3.1.15)
+
+?OO	  sente block on first line.
+X..
+.*.
+---
+
+:8,n,value(35)
+
+?OO
+B..
+.*.
+---
+
+; oplay_attack(*,B)
+
+
 Pattern D209b
 
 ?O.O        block on edge
@@ -1066,16 +1084,17 @@ b*A
 
 
 Pattern D309
+# tm modified (3.1.15)
 
 ?O?        block off area
 X*.
-...
+ooo
 
 :8,-,value(60)
 
 ?O?
 X*a
-...
+ooo
 
 ; oplay_attack(*,a,a)
 
@@ -2122,6 +2141,141 @@ Pattern D628
 ; !xplay_attack(*,*) && oplay_attack(*,A,A)
 
 
+
+Pattern D629
+# tm New Pattern (3.1.15)
+
+|xX?	make an eye on the edge.
+|.OO
+|*.O
+|..O
+|..O
+|xX?
+
+:8,s,value(65)
+
+
+Pattern D630
+# tm New Pattern (3.1.15)
+
+.*O    Cut off black stone
+OX?
+???
+---
+
+:8,0,value(65)
+
+.*O    Cut off black stone
+OA?
+???
+---
+
+; defend(A) && oplay_attack(*,A)
+
+
+Pattern D631
+# tm New Pattern (3.1.15)
+
+OOOO	funny edge capture.
+.XX.
+.*O.
+----
+
+:8,s,value(75)
+
+OOOO	funny edge capture.
+.XC.
+A*OB
+----
+
+; oplay_attack(*,C) &&
+; oplay_defend(*,A,*) && 
+; oplay_defend(*,B,*)
+
+
+Pattern D632
+# tm New Pattern (3.1.15)
+
+OOX?	  Eat lunch with snapback.
+OXOX
+OX.*
+----
+
+:8,-,value(65)
+
+OOX?	  Eat lunch with snapback.
+OXOA
+OX.*
+----
+
+; oplay_attack(*,A)
+
+
+Pattern D633
+# tm New pattern (3.1.15)
+
+OOoO?   vital point for eye shape
+O..OO
+..*..
+-----
+
+:8,-,value(65)
+
+
+Pattern D634
+# tm New pattern (3.1.15)
+#   only really useful if short of liberties.
+
+XXO   Hane in sente
+.*.
+---
+
+:8,-,value(70)
+
+BXA   Hane in sente
+.*.
+---
+
+; lib(A) < 4 && oplay_attack(*,B)
+
+
+Pattern D635
+
+# tm New Pattern (3.1.15)
+
+?OO?
+O..O
+O*.O
+....
+----
+
+:8,-,value(65)
+
+?OO?
+O.BO
+O*FO
+aecD
+----
+
+; !oplay_defend(*,a,B,c,D,e,F,a)
+
+
+Pattern D636
+# tm New Pattern (3.1.15)
+
+OOO.X	special eye shape on edge.
+...*.
+-----
+
+:8,-,value(65)
+
+OOOaX	special eye shape on edge.
+..B*.
+-----
+
+; oplay_attack(*,a,B,a)
+
+
 #########################################################
 #                                                       #
 #            Make eyeshape in the center                #
@@ -3049,19 +3203,21 @@ xX*o
 :8,-,value(75)
 
 
-Pattern D901
-
-?*?         expand eyeshape
-O.O
-?.?
-
-:|,n,value(60)
-
-?*?
-O.O
-?a?
-
-; !safe_xmove(a)
+# tm removed (3.1.15)
+#    This pattern way to generic.  Too many bad matches.
+#Pattern D901
+#
+#?*?         expand eyeshape
+#O.O
+#?.?
+#
+#:|,n,value(60)
+#
+#?*?
+#O.O
+#?a?
+#
+#; !safe_xmove(a)
 
 
 Pattern D902
@@ -3677,6 +3833,28 @@ Pattern D1117
 ;oplay_attack(*,a,B)
 
 
+Pattern D1117a
+# tm New Pattern (3.1.15)
+#   continuation of D1117
+
+.xX?        try to push out
+.*OO
+.XXO
+..xX
+----
+
+:8,-,value(75)
+
+.xX?
+a*OO
+.XXO
+..xB
+----
+
+;oplay_attack(*,a,B) && wormsize(B) > 2
+
+
+
 Pattern D1118
 
 ooo?       capture to defend and threaten escape
@@ -3959,8 +4137,10 @@ cB?
 Pattern D1136
 #tm new pattern (3.1.14)
 #See strategy:206
+#FIXME:  This pattern may match inappropriately, and
+#        probably need a constraint.
 
-OOO	very low value - can't hurt to try!
+OOO	very low value
 ..X
 X*.
 ???
@@ -5356,6 +5536,22 @@ ab..Xo
 ------
 
 ;o_somewhere(a,b) && owl_escape_value(a) + owl_escape_value(b) > 0
+
+
+Pattern D1375
+# tm New pattern (3.1.15)
+
+O?.?  connect out w/ atari.
+.*XO
+..O.
+
+:8,-,value(75)
+
+O?.?  connect out w/ atari.
+.*AO
+..O.
+
+; defend(A)
 
 
 #########################################################

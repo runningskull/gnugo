@@ -3,19 +3,19 @@
 -------------------------------------------------------------------------
 
 - new field value in struct half_eye_data
-- topological_eye() and evaluate_diagonal_intersection() reimplemented
-  to take ko into account
+- topological_eye() and evaluate_diagonal_intersection() take ko into account
 - improved debug output in compute_eyes() and compute_eyes_pessimistic()
 - add_half_eye() renamed add_false_eye
 - make_proper_eye_space() and remove_eyepoint() removed
 - owl_topological_eye() reimplemented to look up stored data
 - new function special_rescue5() in reading.c
 - defend2() and defend3() revised
-- new GTP command list_stones
+- new GTP commands list_stones and tactical_analyze_semeai()
 - support for marginal eye points with opponent stones in eyes.db
 - persistent caching added to owl_does_attack()
 - owl_does_defend() and owl_does_attack() now understand ko
 - owl_determine_life() revised
+- owl_analyze_semeai() revised
 - new function silent_examine_position()
 - find_more_owl_attack_and_defense_moves() revised
 - ko valuation revised
@@ -43,6 +43,7 @@
 - compute_escape_influence now 1D
 - new function in reading.c: attack_threats
 - handling of tactical moves in worm.c no longer static
+- replaced abort() in mkeyes with fatal error messages
 - tuning
 - influence tuning
 - connection_tuning
