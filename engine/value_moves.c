@@ -2404,7 +2404,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
      * the reasons for different moves in the trace outputs.
      */
     num_reasons = 0;
-    while (move[pos].reason[num_reasons] >= 0)
+    while (move[pos].reason[num_reasons] >= 0 && num_reasons < MAX_REASONS)
       num_reasons++;
     gg_sort(move[pos].reason, num_reasons, sizeof(move[pos].reason[0]),
 	    compare_move_reasons);
