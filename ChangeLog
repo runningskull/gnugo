@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- 'printfsgf -' supported from GTP	
 - copyright notices added to xpm files
 - gnugo.el brought up to Thi's gnugo.el-2.2.8
 - new gtp_move_history() for use with gnugo.el

@@ -1504,7 +1504,8 @@ writesgf(SGFNode *root, const char *filename)
 
   sgf_column = 0;
   unparse_game(outfile, root, 1);
-  fclose(outfile);
+  if (outfile != stdout)
+    fclose(outfile);
   
   /* Remove "printed" marks so that the tree can be written multiple
    * times.

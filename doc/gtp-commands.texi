@@ -1503,10 +1503,11 @@
 
 @example
 
- Function:  Dump the current position as a static sgf file
- Arguments: filename
- Fails:     missing filename
- Returns:   nothing
+ Function:  Dump the current position as a static sgf file to filename,
+            or as output if filename is missing or "-" 
+ Arguments: optional filename
+ Fails:     never
+ Returns:   nothing if filename, otherwise the sgf
 
 @end example
 

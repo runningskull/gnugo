@@ -4226,10 +4226,11 @@ gtp_finish_sgftrace(char *s)
 }
 
 
-/* Function:  Dump the current position as a static sgf file
- * Arguments: filename
- * Fails:     missing filename
- * Returns:   nothing
+/* Function:  Dump the current position as a static sgf file to filename,
+ *            or as output if filename is missing or "-" 
+ * Arguments: optional filename
+ * Fails:     never
+ * Returns:   nothing if filename, otherwise the sgf
  */
 static int
 gtp_printsgf(char *s)
@@ -4238,17 +4239,26 @@ gtp_printsgf(char *s)
   int nread;
   int next;
   
-  nread = sscanf(s, "%s", filename);
-  if (nread < 1)
-    return gtp_failure("missing filename");
-
   if (get_last_player() == EMPTY)
     next = BLACK;
   else
     next = OTHER_COLOR(get_last_player());
 
-  sgffile_printsgf(next, filename);
-  return gtp_success("");
+  nread = sscanf(s, "%s", filename);
+
+  if (nread < 1)
+    gg_snprintf(filename, GTP_BUFSIZE, "%s", "-");
+
+  if (strcmp(filename, "-") == 0) {
+    gtp_start_response(GTP_SUCCESS);
+    sgffile_printsgf(next, filename);
+    gtp_printf("\n");
+    return GTP_OK;
+  }
+  else {
+    sgffile_printsgf(next, filename);
+    return gtp_success("");
+  }
 }
 
 
