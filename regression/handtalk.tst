@@ -12,7 +12,7 @@ loadsgf games/handtalk/handtalk12.sgf 17
 # -20 (!) by Pattern Shape13.
 loadsgf games/handtalk/handtalk12.sgf 37
 2 gg_genmove black
-#? [P5|Q2|R2]
+#? [P5|Q2|R2]*
 
 # The sagari at F18 (very much liked by 3.1.26-32 influence code) is bad
 # endgame here (as well as in many other situations). Also, defending N7

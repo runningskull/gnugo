@@ -22,7 +22,7 @@ loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 157
 # L17 is horribly overconcentrated
 loadsgf games/nngs/gnugo-3.3.10-rcde05-200210300235.sgf 27
 4 gg_genmove white
-#? [!L17]*
+#? [!L17]
 
 # G1 is the wrong way to defend G2. Both F2 and K2/K3 are locally better.
 # But what's really urgent is a move around F12.

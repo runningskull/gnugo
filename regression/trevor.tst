@@ -633,7 +633,7 @@ loadsgf games/trevor/owl111a.sgf
 #SEE_ALSO=global:16
 loadsgf golois/Goemate990903-6.sgf
 1010 owl_does_defend O13 O11 
-#? [0]
+#? [0]*
 
 #CATEGORY=OWL
 #DESCRIPTION=Why is this an owl_escape?

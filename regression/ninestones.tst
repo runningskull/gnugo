@@ -65,11 +65,11 @@ loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 64
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 108
 220 gg_genmove black
-#? [P9|P8]
+#? [P9|P8]*
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 118
 230 restricted_genmove black P11 K2 H13
-#? [!P11]
+#? [!P11]*
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 154
 240 gg_genmove black

@@ -1,3 +1,50 @@
+========================== 3.3.13 pre 5 ============================
+
+./regress.sh . owl.tst 
+170 unexpected FAIL: Correct '0', got '1 B15'
+./regress.sh . nngs1.tst 
+31 unexpected FAIL: Correct 'N17', got 'N14'
+./regress.sh . strategy.tst 
+35 unexpected PASS!
+./regress.sh . trevor.tst 
+1010 unexpected FAIL: Correct '0', got '1'
+./regress.sh . nngs.tst 
+290 unexpected PASS!
+480 unexpected PASS!
+500 unexpected FAIL: Correct 'J17', got 'C12'
+560 unexpected FAIL: Correct 'S15', got 'E11'
+1750 unexpected FAIL: Correct 'L8', got 'J9'
+./regress.sh . global.tst 
+4 unexpected PASS!
+5 unexpected PASS!
+./regress.sh . 13x13.tst 
+37 unexpected PASS!
+52 unexpected PASS!
+./regress.sh . owl1.tst 
+272 unexpected PASS!
+./regress.sh . handtalk.tst 
+2 unexpected FAIL: Correct 'P5|Q2|R2', got 'O4'
+./regress.sh . nngs3.tst 
+300 unexpected PASS!
+390 unexpected PASS!
+400 unexpected FAIL: Correct 'N13', got 'Q15'
+630 unexpected FAIL: Correct 'A17', got 'C16'
+./regress.sh . nngs4.tst 
+280 unexpected FAIL: Correct 'F3', got 'H3'
+290 unexpected FAIL: Correct '!H1', got 'H1'
+300 unexpected FAIL: Correct 'A3|D1', got '1 B1'
+./regress.sh . strategy5.tst 
+232 unexpected FAIL: Correct 'D11|E11', got 'C7'
+./regress.sh . century2002.tst 
+110 unexpected PASS!
+./regress.sh . safety.tst 
+3 unexpected FAIL: Correct 'H15|H16|G14|F13|C17', got 'M3'
+./regress.sh . ninestones.tst 
+220 unexpected FAIL: Correct 'P9|P8', got 'R9'
+230 unexpected FAIL: Correct '!P11', got 'P11'
+./regress.sh . gunnar.tst 
+4 unexpected PASS!
+
 ========================== 3.3.13 pre 4 ============================
 
 ./regress.sh . nngs1.tst 

@@ -48,7 +48,7 @@ loadsgf games/owl37.sgf
 
 loadsgf games/owl38.sgf
 272 owl_defend H12
-#? [1 F13]*
+#? [1 F13]
 
 loadsgf games/owl39.sgf 1
 273 owl_attack E7

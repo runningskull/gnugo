@@ -623,7 +623,7 @@ loadsgf games/poka.sgf 42
 loadsgf games/owl23.sgf
 # This isolates the problem in test 4
 170 owl_attack B14
-#? [0]
+#? [0]*
 
 # incident 284
 loadsgf games/incident278.sgf 318

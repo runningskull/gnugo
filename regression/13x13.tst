@@ -190,7 +190,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 110
 #SEVERITY=8
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 12
 37 gg_genmove white
-#? [E10]*
+#? [E10]
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 38 gg_genmove white
@@ -281,7 +281,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 33
 # GNU Go 3.1.15 wants to play F10 here (although 3.0.0 got H10)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 35
 52 gg_genmove black
-#? [H10]*
+#? [H10]
 
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
