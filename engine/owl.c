@@ -3494,31 +3494,47 @@ owl_reasons(int color)
 	     && dragon[pos].owl_status == DEAD
 	     && dragon[pos].owl_threat_status == CAN_THREATEN_DEFENSE) {
       if (board[pos] == color 
-	  && dragon[pos].owl_defense_point != NO_MOVE)
+	  && dragon[pos].owl_defense_point != NO_MOVE) {
 	add_owl_defense_threat_move(dragon[pos].owl_defense_point, pos, WIN);
+	DEBUG(DEBUG_OWL, "owl: %1m threatens to defend %1m at move %d\n", 
+	      dragon[pos].owl_defense_point, pos, movenum+1);
+      }
       if (board[pos] == color
 	    && dragon[pos].owl_second_defense_point != NO_MOVE
-	  && is_legal(dragon[pos].owl_second_defense_point, color))
+	  && is_legal(dragon[pos].owl_second_defense_point, color)) {
 	add_owl_defense_threat_move(dragon[pos].owl_second_defense_point,
 				    pos, WIN);
+	DEBUG(DEBUG_OWL, "owl: %1m threatens to defend %1m at move %d\n", 
+	      dragon[pos].owl_second_defense_point, pos, movenum+1);
+      }
+
       /* If the opponent can threaten to live, an attacking
        * move gets a small value to make sure it's really dead.
        */
       if (board[pos] == OTHER_COLOR(color)
 	  && dragon[pos].owl_threat_status == CAN_THREATEN_DEFENSE
-	  && dragon[pos].owl_attack_point != NO_MOVE)
+	  && dragon[pos].owl_attack_point != NO_MOVE) {
 	add_owl_prevent_threat_move(dragon[pos].owl_attack_point, pos);
+	DEBUG(DEBUG_OWL, "owl: %1m prevents a threat against %1m at move %d\n",
+	      dragon[pos].owl_attack_point, pos, movenum+1);
+      }
     }
     else if (dragon[pos].origin == pos
 	     && dragon[pos].owl_status == ALIVE
 	     && board[pos] == OTHER_COLOR(color)
 	     && dragon[pos].owl_threat_status == CAN_THREATEN_ATTACK) {
-      if (dragon[pos].owl_attack_point != NO_MOVE)
+      if (dragon[pos].owl_attack_point != NO_MOVE) {
 	add_owl_attack_threat_move(dragon[pos].owl_attack_point, pos, WIN);
+	DEBUG(DEBUG_OWL, "owl: %1m threatens %1m at move %d\n",
+	      dragon[pos].owl_attack_point, pos, movenum+1);
+      }
       if (dragon[pos].owl_second_attack_point != NO_MOVE
-	  && is_legal(dragon[pos].owl_second_attack_point, color))
+	  && is_legal(dragon[pos].owl_second_attack_point, color)) {
 	add_owl_attack_threat_move(dragon[pos].owl_second_attack_point, pos,
 				   WIN);
+	DEBUG(DEBUG_OWL, "owl: %1m threatens %1m at move %d\n",
+	      dragon[pos].owl_second_attack_point, pos, movenum+1);
+      }
     }
     /* The owl code found the friendly dragon alive, but was uncertain,
      * and an extra point of defense was found, so this might
@@ -3529,8 +3545,13 @@ owl_reasons(int color)
 	     && board[pos] == color
 	     && !dragon[pos].owl_attack_certain
 	     && dragon[pos].owl_defense_certain
-	     && ON_BOARD(dragon[pos].owl_defense_point))
+	     && ON_BOARD(dragon[pos].owl_defense_point)) {
       add_owl_uncertain_defense_move(dragon[pos].owl_defense_point, pos);
+      DEBUG(DEBUG_OWL, 
+	    "owl: %1m defends the uncertain dragon at %1m at move %d\n",
+	    dragon[pos].owl_defense_point, pos, movenum+1);
+    }
+
     /* The owl code found the dragon dead, but was uncertain,
      * and an extra point of attack was found, so this might
      * be a good place to play.
@@ -3539,8 +3560,12 @@ owl_reasons(int color)
 	     && dragon[pos].owl_status == DEAD
 	     && board[pos] == OTHER_COLOR(color)
 	     && !dragon[pos].owl_attack_certain
-	     && ON_BOARD(dragon[pos].owl_attack_point))
+	     && ON_BOARD(dragon[pos].owl_attack_point)) {
       add_owl_uncertain_defense_move(dragon[pos].owl_attack_point, pos);
+      DEBUG(DEBUG_OWL,
+	    "owl: %1m might defend the uncertain dragon at %1m at move %d\n",
+	    dragon[pos].owl_attack_point, pos, movenum+1);
+    }
   }
 }
 
@@ -4792,6 +4817,7 @@ store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
   if (ON_BOARD1(move2))
     active[move2] = 1;
 
+  /* Distance four expansion through empty intersections and own stones. */
   for (k = 1; k < 5; k++) {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++){
       if (!ON_BOARD(pos) || board[pos] == other || active[pos] != 0) 
@@ -4808,18 +4834,23 @@ store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
     }
   }
   
+  /* Adjacent opponent strings. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] != other || active[pos] != 0) 
       continue;
     for (r = 0; r < 4; r++) {
       int pos2 = pos + delta[r];
       if (ON_BOARD(pos2) && board[pos2] != other && active[pos2] != 0) {
-	active[pos] = 1;
+       mark_string(pos, active, (char) 1);
 	break;
       }
     }
   }
   
+  /* Liberties of adjacent opponent strings with less than five liberties +
+   * liberties of low liberty neighbors of adjacent opponent strings
+   * with less than five liberties.
+   */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] == other && active[pos] != 0 && countlib(pos) < 5) {
       int libs[4];
