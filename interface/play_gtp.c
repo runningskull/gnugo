@@ -126,6 +126,7 @@ DECLARE(gtp_play);
 DECLARE(gtp_playblack);
 DECLARE(gtp_playwhite);
 DECLARE(gtp_popgo);
+DECLARE(gtp_printsgf);
 DECLARE(gtp_captures);
 DECLARE(gtp_protocol_version);
 DECLARE(gtp_query_boardsize);
@@ -250,6 +251,7 @@ static struct gtp_command commands[] = {
   {"owl_threaten_defense",    gtp_owl_threaten_defense},
   {"play",            	      gtp_play},
   {"popgo",            	      gtp_popgo},
+  {"printsgf",         	      gtp_printsgf},
   {"orientation",     	      gtp_set_orientation},
   {"place_free_handicap",     gtp_place_free_handicap},
   {"protocol_version",        gtp_protocol_version},
@@ -3429,6 +3431,32 @@ gtp_finish_sgftrace(char *s)
 
   sgffile_enddump(filename);
   count_variations = 0;
+  return gtp_success("");
+}
+
+
+/* Function:  Dump the current position as a static sgf file
+ * Arguments: filename
+ * Fails:     missing filename
+ * Returns:   nothing
+ */
+static int
+gtp_printsgf(char *s)
+{
+  char filename[GTP_BUFSIZE];
+  int nread;
+  int next;
+  
+  nread = sscanf(s, "%s", filename);
+  if (nread < 1)
+    return gtp_failure("missing filename");
+
+  if (get_last_player() == EMPTY)
+    next = BLACK;
+  else
+    next = OTHER_COLOR(get_last_player());
+
+  sgffile_printsgf(next, filename);
   return gtp_success("");
 }
 

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new GTP command printsgf
 - debugboard repaired
 - TODO revised
 - new function partition_eyespaces()
