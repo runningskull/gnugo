@@ -1178,10 +1178,10 @@ strategic_penalty(int pos, int color)
    */
   for (k = 0; k < 4; k++)
     if (board[pos + delta[k]] == EMPTY
-        && whose_area(&OPPOSITE_INFLUENCE(color), pos + delta[k])
+        && whose_area(OPPOSITE_INFLUENCE(color), pos + delta[k])
 	   != OTHER_COLOR(color))
       return 0.0;
-  if (whose_area(&OPPOSITE_INFLUENCE(color), pos) != OTHER_COLOR(color))
+  if (whose_area(OPPOSITE_INFLUENCE(color), pos) != OTHER_COLOR(color))
     return 0.0;
 
   for (k = 0; k < MAX_REASONS; k++) {
@@ -1272,7 +1272,7 @@ strategic_penalty(int pos, int color)
    * is dominated by the opponent. The territorial valuation is a
    * good try here.
    */
-  ret_val = influence_territory(&INITIAL_INFLUENCE(OTHER_COLOR(color)),
+  ret_val = influence_territory(INITIAL_INFLUENCE(OTHER_COLOR(color)),
       				pos, OTHER_COLOR(color));
   ret_val *= 12.0;
   ret_val = gg_max(0.0, ret_val);
@@ -1877,7 +1877,7 @@ estimate_territorial_value(int pos, int color, float score)
 	  		&move_influence, pos, "after move");
       compute_followup_influence(&move_influence, &followup_influence,
 	  			 pos, "followup");
-      this_value = influence_delta_territory(&OPPOSITE_INFLUENCE(color),
+      this_value = influence_delta_territory(OPPOSITE_INFLUENCE(color),
 	   				     &move_influence, color, pos);
       move[pos].influence_followup_value
 	= influence_delta_territory(&move_influence, &followup_influence,

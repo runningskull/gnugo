@@ -868,8 +868,8 @@ find_neighbor_dragons()
 
 	/* We can always expand the first step, regardless of influence. */
 	if (dist == 1
-	    || (whose_area(&INITIAL_INFLUENCE(color), pos) == color
-		&& whose_area(&INITIAL_INFLUENCE(color), pos2)
+	    || (whose_area(INITIAL_INFLUENCE(color), pos) == color
+		&& whose_area(INITIAL_INFLUENCE(color), pos2)
 		   != OTHER_COLOR(color))) {
 	  /* Expansion ok. Now see if someone else has tried to
 	   * expand here. In that case we indicate a collision by

@@ -689,7 +689,7 @@ revise_thrashing_dragon(int color, float advantage)
 
   set_strength_data(OTHER_COLOR(color), safe_stones, strength);
   compute_influence(OTHER_COLOR(color), safe_stones, strength,
-      		    &OPPOSITE_INFLUENCE(color),
+      		    OPPOSITE_INFLUENCE(color),
 		    NO_MOVE, "revised thrashing dragon");
   compute_refined_dragon_weaknesses();
   

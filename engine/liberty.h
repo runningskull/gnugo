@@ -631,8 +631,9 @@ extern struct influence_data initial_white_influence;
 extern struct influence_data move_influence;
 extern struct influence_data followup_influence;
 
-#define INITIAL_INFLUENCE(color) ((color) == WHITE ? initial_white_influence \
-						   : initial_black_influence)
+#define INITIAL_INFLUENCE(color) ((color) == WHITE ? \
+				    &initial_white_influence \
+				  : &initial_black_influence)
 #define OPPOSITE_INFLUENCE(color) (INITIAL_INFLUENCE(OTHER_COLOR(color)))
 
 #define DEFAULT_STRENGTH 100.0

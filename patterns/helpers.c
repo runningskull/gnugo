@@ -112,7 +112,7 @@ jump_out_helper(ARGS)
   else
     own_eyespace = (black_eye[move].color == BLACK_BORDER);
   
-  if (whose_area(&OPPOSITE_INFLUENCE(color), move) != color && !own_eyespace)
+  if (whose_area(OPPOSITE_INFLUENCE(color), move) != color && !own_eyespace)
     return 1;
   else
     return 0;
@@ -127,7 +127,7 @@ jump_out_helper(ARGS)
 int 
 jump_out_far_helper(ARGS)
 {
-  if (whose_area(&OPPOSITE_INFLUENCE(color), move) != OTHER_COLOR(color))
+  if (whose_area(OPPOSITE_INFLUENCE(color), move) != OTHER_COLOR(color))
     return jump_out_helper(pattern, trans, move, color);
   else
     return 0;

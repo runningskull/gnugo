@@ -3048,7 +3048,7 @@ gtp_influence(char *s)
   silent_examine_position(color, EXAMINE_ALL);
 
   gtp_start_response(GTP_SUCCESS);
-  get_influence(&OPPOSITE_INFLUENCE(color), white_influence,
+  get_influence(OPPOSITE_INFLUENCE(color), white_influence,
 		black_influence, influence_regions);
   print_influence(white_influence, black_influence, influence_regions);
   /* We already have one newline and thus can't use gtp_finish_response(). */
