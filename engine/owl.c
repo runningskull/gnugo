@@ -1378,7 +1378,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
       int ko_move = -1;
       int new_komaster;
       int new_kom_pos;
-      int origin = 0;
+      int origin = NO_MOVE;
 
       /* Consider only the highest scoring move if we're deeper than
        * owl_branch_depth.
@@ -1446,21 +1446,17 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
       if (IS_STONE(board[str]))
 	origin = str;
       else {
-	int found_string = 0;
-	int oi, oj;
-	for (oi = 0; oi < board_size && !found_string; oi++)
-	  for (oj = 0; oj < board_size && !found_string; oj++) {
-	    if (BOARD(oi, oj) == color && owl->goal[POS(oi, oj)] == 1) {
-	      origin = find_origin(POS(oi, oj));
-	      found_string = 1;
-	    }
+	int pos;
+	origin = NO_MOVE;
+	for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+	  if (board[pos] == color && owl->goal[pos] == 1) {
+	      origin = find_origin(pos);
+	      break;
 	  }
-	
-	if (!found_string)
-	  origin = 0;
+	}
       }
 
-      if (origin == 0)
+      if (origin == NO_MOVE)
 	dcode = 0;
       else
 	dcode = do_owl_defend(origin, NULL, owl, 
@@ -1473,7 +1469,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
   	  if (sgf_dumptree) {
 	    const char *wintxt;
 	    char winstr[192];
-	    if (origin == 0)
+	    if (origin == NO_MOVE)
 	      wintxt = "all original stones captured";
 	    else
 	      wintxt = "attack effective";
@@ -1574,8 +1570,8 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
 
       if (mpos != NO_MOVE && moves[k].value > 0)
 	if (trymove(mpos, other, moves[k].name, target, EMPTY, 0)) {
-	  int oi, oj;
-	  int origin = 0;
+	  int pos;
+	  int origin = NO_MOVE;
 	  owl->lunches_are_current = 0;
 	  owl_update_boundary_marks(mpos, owl);
 	  
@@ -1586,16 +1582,14 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
 	   */
 	  
 	  if (board[target] == EMPTY) {
-	    int found_string = 0;
-	    for (oi = 0; oi < board_size && !found_string; oi++)
-	      for (oj = 0; oj < board_size && !found_string; oj++) {
-		if (IS_STONE(BOARD(oi, oj)) 
-		    && owl->goal[POS(oi, oj)] == 1) {
-		  origin = find_origin(POS(oi, oj));
-		  found_string = 1;
-		}
+	    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+	      if (IS_STONE(board[pos]) && owl->goal[pos] == 1) {
+		origin = find_origin(pos);
+		break;
 	      }
-	    if (!found_string 
+	    }
+	    
+	    if (origin == NO_MOVE
 		|| do_owl_attack(origin, NULL, owl, EMPTY, 0, 0)) {
 	      /* probably this can't happen */
 	      popgo();
@@ -4338,6 +4332,8 @@ owl_topological_eye(int pos, int color)
 
 /* This function returns true if it is judged that the capture of the
  * string at (pos) is sufficient to create one eye.
+ *
+ * Update: Now it instead returns the max number of eyes.
  */
 
 int
@@ -4348,10 +4344,7 @@ vital_chain(int pos)
   int max;
   sniff_lunch(pos, &min, &probable, &max, current_owl_data);
 
-  if (max > 0)
-    return 1;
-  
-  return 0;
+  return max;
 }
 
 
@@ -4410,53 +4403,76 @@ owl_goal_dragon(int pos)
 }
 
 /* Used by autohelpers.
- * Returns 1 if (apos) is an eyespace for the color of the dragon currently
+ * Returns 1 if (pos) is an eyespace for the color of the dragon currently
  * under owl investigation.
  */
 int
-owl_eyespace(int apos)
+owl_eyespace(int pos)
 {
   int origin;
-  ASSERT_ON_BOARD1(apos);
+  ASSERT_ON_BOARD1(pos);
   
-  origin = current_owl_data->my_eye[apos].origin;
+  origin = current_owl_data->my_eye[pos].origin;
   return (ON_BOARD(origin)
-	  && current_owl_data->my_eye[origin].color
-	  	== BORDER_COLOR(current_owl_data->color)
+	  && (current_owl_data->my_eye[origin].color
+	      == BORDER_COLOR(current_owl_data->color))
 	  && current_owl_data->my_eye[origin].maxeye > 0);
 }
 
 
 /* Used by autohelpers.
- * Returns 1 if (apos) is an eyespace for the color of the dragon currently
+ * Returns 1 if (pos) is an eyespace for the color of the dragon currently
  * under owl inverstigation, which is possibly worth 2 eyes.
  */
 int
-owl_big_eyespace(int apos)
+owl_big_eyespace(int pos)
 {
   int origin;
-  ASSERT_ON_BOARD1(apos);
+  ASSERT_ON_BOARD1(pos);
 
-  origin = current_owl_data->my_eye[apos].origin;
+  origin = current_owl_data->my_eye[pos].origin;
   return (ON_BOARD(origin) 
-	  && current_owl_data->my_eye[origin].color
-	  	== BORDER_COLOR(current_owl_data->color)
+	  && (current_owl_data->my_eye[origin].color
+	      == BORDER_COLOR(current_owl_data->color))
 	  && current_owl_data->my_eye[origin].maxeye == 2);
 }
 
 
 /* Used by autohelpers.
- * Returns 1 if (apos) is a non-marginal eyespace for the color of the
+ * Returns 1 if (pos) is a non-marginal eyespace for the color of the
  * dragon currently under owl investigation.
  */
 int
-owl_proper_eye(int apos)
+owl_proper_eye(int pos)
 {
-  ASSERT_ON_BOARD1(apos);
+  ASSERT_ON_BOARD1(pos);
 
-  return (current_owl_data->my_eye[apos].color
-            == BORDER_COLOR(current_owl_data->color)
-	  && !current_owl_data->my_eye[apos].marginal);
+  return ((current_owl_data->my_eye[pos].color
+	   == BORDER_COLOR(current_owl_data->color))
+	  && !current_owl_data->my_eye[pos].marginal);
+}
+  
+
+/* Used by autohelpers.
+
+ * Returns 1 if (pos) is considered to be a strong dragon. This is
+ * intended to be used to decide whether connecting to some external
+ * stones is an easy way to live. The current implementation is fairly
+ * conservative, requiring that (pos) was part of a dragon with two
+ * eyes according to the static analysis. This requirement may be
+ * relaxed considerably in the future.
+ *
+ * (pos) must not be part of the goal dragon.
+ */
+int
+owl_strong_dragon(int pos)
+{
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(IS_STONE(board[pos]), pos);
+  
+  return (!current_owl_data->goal[pos]
+	  && dragon[pos].color == board[pos]
+	  && DRAGON2(pos).genus >= 2);
 }
   
 

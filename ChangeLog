@@ -2,6 +2,17 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function owl_strong_dragon() and new autohelper with the same name
+- vital_chain() returns the max number of eyes
+- no amalgamation around eye spaces with experimental_connections enabled
+- eye spaces no longer modified by INHIBIT_CONNECTION with
+  experimental_connections enabled
+- bugfix in find_connection_moves()
+- pattern classes Y and W introduced in conn.db to identify patterns
+  which only applies with or without experimental_connections
+- patterns with class e in conn.db changed to class I to better
+  reflect current usage
+- connection tuning
 - improves DFA compile time by doing fewest possible large syncs 
 - experimental_influence command line and configure option removed
 - new flags dragons_known and is_territorial_influence in influence_data

@@ -192,7 +192,7 @@ YO*   defend super-string
 
 :8,D,minvalue(40),maxvalue(65)
 
-ab*
+Yb*
 
 ; lib(b) < 4  && xlib(*) > 1
 
@@ -208,7 +208,7 @@ Y.O*   defend super-string
 
 :8,D,value(40)
 
-a.b*
+Y.b*
 
 ; lib(b) < 4  && xlib(*) > 1
 

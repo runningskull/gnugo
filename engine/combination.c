@@ -316,7 +316,7 @@ atari_atari(int color, int *attack_move, int *defense_move, int save_verbose)
  * The arrays saved_dragons[] and saved_worms[] should be one for
  * stones belonging to dragons or worms respectively, which are
  * supposedly saved by (move). These may be NULL if no stones are
- * supposed to gaving been saved.
+ * supposed to having been saved.
  */
 int
 atari_atari_confirm_safety(int color, int move, int *defense, int minsize,

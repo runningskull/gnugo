@@ -1590,7 +1590,7 @@ list_move_reasons(int color)
 	  worm2 = all_data[move_reasons[r].what].what2;
 	  aa = worms[worm1];
 	  bb = worms[worm2];
-	  gprintf("Move at %1m both %s %1m or %s %1m\n", pos, 
+	  gprintf("Move at %1m both %s %1m and %s %1m\n", pos, 
 		  reason1 == ATTACK_STRING ? "attacks" : "defends", aa, 
 		  reason2 == ATTACK_STRING ? "attacks" : "defends", bb);
 	  break;

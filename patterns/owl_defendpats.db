@@ -978,7 +978,7 @@ OX*o
 
 :8,-,value(76)
 
-Xboo
+XOoo
 OX*o
 ...a
 ----
@@ -1856,7 +1856,7 @@ oOOX         descend to close eyeshape
 
 :8,-,value(35)
 
-occA
+oOOA
 ?b*x
 ----
 
@@ -1947,11 +1947,11 @@ ooO.X          eat lunch in the right direction
 
 :8,-,value(50)
 
-oob.X
-aC*..
+ooO.X
+aB*..
 -----
 
-;owl_eyespace(a) && does_attack(*,C)
+;owl_eyespace(a) && does_attack(*,B)
 
 
 Pattern D609
@@ -2622,7 +2622,7 @@ O..
 
 OO*
 O.a
-?bb
+?OO
 
 ;!owl_big_eyespace(a) && !obvious_false_oeye(a)
 
@@ -2698,10 +2698,10 @@ XO.           defend against atari inside eyespace on edge
 :8,-,value(36)
 
 O.*
-Xab
+XOa
 ---
 
-;xlib(b)>1 && owl_big_eyespace(b) && oplay_attack(*,b,b)
+;xlib(a)>1 && owl_big_eyespace(a) && oplay_attack(*,a,a)
 
 
 Pattern D716
@@ -2714,10 +2714,10 @@ O..o
 :8,-,value(60)
 
 ?*OO
-O.bo
-?oaX
+O.ao
+?oOX
 
-;owl_eyespace(b) && !owl_big_eyespace(b)
+;owl_eyespace(a) && !owl_big_eyespace(a)
 
 
 Pattern D717
@@ -2776,9 +2776,9 @@ O.*o
 :8,-,value(55)
 
 ?O.o
-Ba*o
+Oa*o
 
-; owl_proper_eye(a)
+;owl_proper_eye(a)
 
 
 #########################################################
@@ -4491,9 +4491,9 @@ Pattern D1140
 b*.
 cd?
 
-;(owl_escape_value(d) > 0 ||
-; owl_escape_value(b) > 0 ||
-; owl_escape_value(c) > 0)
+;(owl_escape_value(b) > 0
+; || owl_escape_value(c) > 0
+; || owl_escape_value(d) > 0)
 ;&& oplay_attack(*,a)
 
 

@@ -1078,10 +1078,12 @@ string_connect(int str1, int str2, int *move)
     verbose = save_verbose;
     tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
-    if (0)
+    if (0) {
       gprintf("%oconnect    %1M %1M, result %d %1M (%d, %d nodes, %f seconds)\n",
 	      str1, str2, result, *move,
 	      nodes_connect, tactical_nodes, gg_cputime() - start);
+      dump_stack();
+    }
 
     return result;
   }
@@ -1211,10 +1213,12 @@ disconnect(int str1, int str2, int *move)
     verbose = save_verbose;
     tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
-    if (0)
+    if (0) {
       gprintf("%odisconnect %1m %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
 	      str1, str2, result, *move,
 	      nodes_connect, tactical_nodes, gg_cputime() - start);
+      dump_stack();
+    }
 
     return result;
   }

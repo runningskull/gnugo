@@ -283,7 +283,7 @@ X..?
 :8,-,value(46)
 
 ----
-.A.X
+.X.X
 .*Xx
 X..?
 
@@ -372,7 +372,7 @@ XO?       bogus eyespace
 :8,-,value(75)
 
 XO?
-.*B
+.*X
 .a.
 ---
 
@@ -409,7 +409,7 @@ x.*X
 :8,-,value(75)
 
 ??O?
-xc*D
+xc*X
 .ba.
 ....
 ----
@@ -664,7 +664,7 @@ XOO|
 :8,s,value(95)
 
 XO*|
-ABX|
+AXX|
 XOO|
 
 ; owl_eyespace(A)
@@ -747,11 +747,11 @@ o*o
 
 :8,s,value(57)
 
-XBd
-A*C
+XbX
+a*c
 
 ; owl_proper_eye(*)
-; && (owl_proper_eye(A) + owl_proper_eye(B) + owl_proper_eye(C) > 2)
+; && (owl_proper_eye(a) + owl_proper_eye(b) + owl_proper_eye(c) > 2)
 ; && safe_xmove(*)
 
 

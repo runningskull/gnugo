@@ -475,7 +475,7 @@ gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color)
  *
  * Returns the color of the next move to be made.
  *
- * Head is a sgf tree. 
+ * Head is an sgf tree. 
  * Untilstr is an optional string of the form either 'L12' or '120'
  * which tells it to stop playing at that move or move-number.
  * When debugging, this is the location of the move being examined.

@@ -705,8 +705,8 @@ xX*.
 ....
 ----
 
-; (owl_escape_value(b) <= 0 && owl_escape_value(c) <= 0) ||
-; !oplay_attack(*,a,d)
+; (owl_escape_value(b) <= 0 && owl_escape_value(c) <= 0)
+; || !oplay_attack(*,a,d)
 
 
 Pattern A221
@@ -1607,7 +1607,7 @@ O*.x
 
 :8,-,value(35)
 
-?B.x
+?X.x
 O*ax
 ...x
 ----
@@ -1701,12 +1701,12 @@ x.*..
 
 :8,s,value(35)
 
-xCX.a
-DB*..
+xXX.a
+cb*..
 -----
 
-;!attack(a) && owl_proper_eye(B)
-;&& (x_somewhere(D) || owl_proper_eye(D))
+;!attack(a) && owl_proper_eye(b)
+;&& (x_somewhere(c) || owl_proper_eye(c))
 
 
 Pattern A603b
@@ -1718,7 +1718,7 @@ xX.x       reduce eye space
 
 :8,s,value(35)
 
-xC.x
+xX.x
 b*.a
 ----
 
@@ -1782,7 +1782,7 @@ xXO        the push is also deadly
 
 :8,-,value(55)
 
-xCa
+xXa
 b*a
 ---
 
@@ -2065,11 +2065,11 @@ X*X
 
 :|,-,value(61)
 
-?c?
-X*B
+?b?
+X*X
 ?a?
 
-;owl_eyespace(a) && xlib(c) <= 2 && oplay_attack(*,c,c)
+;owl_eyespace(a) && xlib(b) <= 2 && oplay_attack(*,b,b)
 
 
 Pattern A706
@@ -2213,7 +2213,7 @@ x..x
 
 ?*XX
 x.bx
-?xCa
+?xXa
 
 ;owl_eyespace(b) && !owl_proper_eye(*) && !attack(a)
 
@@ -2400,10 +2400,10 @@ X.X        safe invasion into eye
 :8,-,value(45)
 
 ?O?
-A.X
+X.X
 ?*?
 
-;owl_eyespace(*) && safe_omove(*)
+;owl_eyespace(*)
 
 
 Pattern A811
@@ -2415,11 +2415,11 @@ X.X
 
 :8,s,value(65)
 
-aC?
-XbD
+aX?
+XbC
 .*X
 
-; lib(D) <= 3
+; lib(C) <= 3
 ; && owl_proper_eye(a)
 ; && owl_proper_eye(b)
 
@@ -3487,9 +3487,9 @@ Pattern A1124
 be*
 cd?
 
-;(owl_escape_value(d) > 0 ||
-; owl_escape_value(b) > 0 ||
-; owl_escape_value(c) > 0)
+;(owl_escape_value(d) > 0
+; || owl_escape_value(b) > 0
+; || owl_escape_value(c) > 0)
 ;&& oplay_defend_both(*,e,A,*)
 
 
@@ -3507,10 +3507,10 @@ Pattern A1124a
 b*e
 cd?
 
-;(owl_escape_value(d) > 0 ||
-; owl_escape_value(b) > 0 ||
-; owl_escape_value(c) > 0)
-; && !oplay_defend_both(e,*,A,e)
+;(owl_escape_value(d) > 0
+; || owl_escape_value(b) > 0
+; || owl_escape_value(c) > 0)
+;&& !oplay_defend_both(e,*,A,e)
 
 
 Pattern A1125
@@ -3697,7 +3697,7 @@ OXX*
 
 :8,-,value(65)
 
-OAA*
+OXX*
 .O..
 ----
 

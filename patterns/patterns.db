@@ -4896,8 +4896,8 @@ Pattern EB702a
 .cX*.?
 ------
 
-;lib(a)>2 ||
-;!oplay_attack_either(*,b,c,*,a)
+;lib(a)>2
+;|| !oplay_attack_either(*,b,c,*,a)
 
 
 Pattern EB702b
@@ -8783,7 +8783,7 @@ OX?
 :8,OXeEcd,shape(3)
 
 ?.?
-...      
+...
 .*O
 OA?
 

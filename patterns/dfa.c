@@ -76,7 +76,7 @@ static dfa_t aux_temp;          /* used to store temporary DFAs */
 
 /* To be sure that everything was well initialized */
 static int dfa_was_initialized = 0;
-static aux_count = 0;
+static int aux_count = 0;
 
 
 /* convert is a table to convert the colors */
@@ -794,7 +794,7 @@ dfa_init(void)
     fprintf(stderr, "dfa: init\n");
   dfa_was_initialized++;
   buildSpiralOrder(spiral);
-  for (j=0; j < DFA_BINS; j++)
+  for (j = 0; j < DFA_BINS; j++)
     new_dfa(&(aux_dfa[j]), "binAux ");
   new_dfa(&aux_temp, "tempAux ");
 
@@ -811,7 +811,7 @@ dfa_end(void)
   if (dfa_verbose > 1)
     fprintf(stderr, "dfa: end\n");
 
-  for (j=0; j < DFA_BINS; j++)
+  for (j = 0; j < DFA_BINS; j++)
     kill_dfa(&(aux_dfa[j]));
   kill_dfa(&aux_temp);
   dfa_was_initialized--;
@@ -828,14 +828,13 @@ dfa_finalize(dfa_t *pdfa)
   int next_bin = aux_count;
   int last_bin = aux_count + DFA_BINS - 1;
   while (next_bin + 1 != last_bin) {
-    for (j=aux_count+1; j <= last_bin; j+=2) {
-      if (j+1 == next_bin) {
+    for (j = aux_count + 1; j <= last_bin; j += 2) {
+      if (j+1 == next_bin)
         copy_dfa(&aux_dfa[next_bin % DFA_BINS], &aux_dfa[j % DFA_BINS]);
-      } else {
+      else
         sync_product(&aux_dfa[next_bin % DFA_BINS], 
                      &aux_dfa[j % DFA_BINS], 
                      &aux_dfa[(j+1) % DFA_BINS]);
-      }
       next_bin++;
     }
     last_bin = next_bin-1;
@@ -871,9 +870,7 @@ dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index)
   create_dfa(&aux_temp, str, pattern_index);
 
   /* then we do the synchronization product with dfa */
-  sync_product(new_dfa,
-               old_dfa,
-               &aux_temp);
+  sync_product(new_dfa, old_dfa, &aux_temp);
   aux_count++;
 
   ratio = 1;

@@ -3295,13 +3295,12 @@ Pattern Temp5
 ........|
 ........|
 ........|
-.*a.O...|
+.*..O...|
 ........|
 ........|
 --------+
 
 >antisuji(*);
-# antisuji(a); - a is often a fine move.
 
 
 Pattern Temp6
