@@ -66,16 +66,15 @@ static struct influence_data escape_influence;
 /* Pointer to influence data used during pattern matching. */
 static struct influence_data *current_influence = NULL;
 
-#if COSMIC_GNUGO
 
-/* Threholds values used in the whose_moyo() functions */
+/* Thresholds values used in the whose_moyo() functions */
 struct moyo_determination_data moyo_data;
 struct moyo_determination_data moyo_restricted_data;
  
-/* Threholds value used in the whose_territory() function */
+/* Thresholds value used in the whose_territory() function */
 float territory_determination_value; 
  
-#endif
+
 
 /* This curve determines how much influence is needed at least to claim
  * an intersection as territory, in dependence of the "center value".
@@ -383,14 +382,13 @@ init_influence(struct influence_data *q, int color,
   int ii;
   float attenuation;
   
-#if COSMIC_GNUGO
-    
-  float t;
-
   /* Initialisation of some global positional values, based on 
    * game stage. 
    */
-    if ((board_size != 19) || (movenum <= 2) || ((movenum / 2) % 2)   )
+  if (cosmic_gnugo) {
+    float t;
+
+    if ((board_size != 19) || (movenum <= 2) || ((movenum / 2) % 2))
       cosmic_importance = 0.0;
     else {
       cosmic_importance = 1.0 - (movenum / 150.0)*(movenum / 150.0); 
@@ -404,18 +402,11 @@ init_influence(struct influence_data *q, int color,
     moyo_data.opp_influence_maximum = t * 30.0  +  (1.0-t) * 30.0;
     
     /* we use the same values for moyo and moyo_restricted */
-    moyo_restricted_data.influence_balance
-      = moyo_data.influence_balance;
-    moyo_restricted_data.my_influence_minimum
-      = moyo_data.my_influence_minimum;
-    moyo_restricted_data.opp_influence_maximum
-      = moyo_data.opp_influence_maximum;
-    
-    territory_determination_value   = t * 0.95 +  (1.0-t) * 0.95;  
-     
-    /* non-cosmic values are: 
-     * { 6,  0.0, 24.0, { 6.0, 15.0, 26.0, 36.0, 45.0, 50.0, 55.0 }};
-     */
+    moyo_restricted_data.influence_balance     = moyo_data.influence_balance;
+    moyo_restricted_data.my_influence_minimum  = moyo_data.my_influence_minimum;
+    moyo_restricted_data.opp_influence_maximum = moyo_data.opp_influence_maximum;
+
+    territory_determination_value   = t * 0.95 +  (1.0-t) * 0.95; 
       
     min_infl_for_territory.values[0] = t * 6.0   +  (1.0-t) * 10.0;
     min_infl_for_territory.values[1] = t * 10.0  +  (1.0-t) * 15.0;
@@ -424,8 +415,35 @@ init_influence(struct influence_data *q, int color,
     min_infl_for_territory.values[4] = t * 20.0  +  (1.0-t) * 20.0;
     min_infl_for_territory.values[5] = t * 15.0  +  (1.0-t) * 15.0;
     min_infl_for_territory.values[6] = t * 10.0  +  (1.0-t) * 15.0;   
-#endif  
-
+    
+  }
+  else {  
+  
+    /* non-cosmic values */
+    
+    cosmic_importance = 0.0;
+  
+    moyo_data.influence_balance     = 7.0;
+    moyo_data.my_influence_minimum  = 5.0;
+    moyo_data.opp_influence_maximum = 10.0;
+    
+    moyo_restricted_data.influence_balance     = 10.0;
+    moyo_restricted_data.my_influence_minimum  = 10.0;
+    moyo_restricted_data.opp_influence_maximum = 10.0;
+    
+    territory_determination_value = 0.95;
+    
+    min_infl_for_territory.values[0] = 6.0;
+    min_infl_for_territory.values[1] = 15.0;
+    min_infl_for_territory.values[2] = 26.0;
+    min_infl_for_territory.values[3] = 36.0;
+    min_infl_for_territory.values[4] = 45.0;
+    min_infl_for_territory.values[5] = 50.0;
+    min_infl_for_territory.values[6] = 55.0; 
+    
+  }
+  
+  
   if (q != &escape_influence) {
     q->color_to_move = color;
     if (q->is_territorial_influence)
@@ -662,8 +680,8 @@ add_marked_intrusions(struct influence_data *q, int color)
  * B - Intrusion patterns, adding a low intensity influence source.
  * E - Enhance patterns, FIXME: document this one!
  * t - Non-territory patterns, marking vertices as not territory.
- * I - Invasion patterns, adding a low intensity influence source.
- * e - Escape bonus. Used together with I to increase the value substantially
+ * I - Invasion patterns, adding a low intensity influence source. 
+* e - Escape bonus. Used together with I to increase the value substantially
  *     if escape influence is being computed.
  *
  * Classes A, D, and B are matched with color as O, and it is assumed
@@ -812,66 +830,44 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
     pattern->autohelper(ll, pos, color, INFLUENCE_CALLBACK);
   }
   
-#if COSMIC_GNUGO  
 
   /* For I patterns, add a low intensity, both colored, influence
    * source at *.
    */
   if (pattern->class & CLASS_I) {
     int this_color = EMPTY;
-    float t = 0.15 + (1.0 - cosmic_importance);
-    float source_strength;
+    float strength;
+    float attenuation;
 
     if (q->color_to_move == EMPTY || (pattern->class & CLASS_s))
       this_color = BLACK | WHITE;
     else if (q->color_to_move != color)
       this_color = q->color_to_move;
       
-    t = gg_min(1.0, t);
-    t = gg_max(0.0, t);
+    if (cosmic_gnugo) {
+      float t = 0.15 + (1.0 - cosmic_importance);
+      t = gg_min(1.0, t);
+      t = gg_max(0.0, t);
+      strength = t * pattern->value;  
+      attenuation = 1.6;
+    }
+    else {
+      strength = pattern->value;  
+      attenuation = 1.5;
+    }
+
+     /* Increase strength if we're computing escape influence. */
+     if (q == &escape_influence && (pattern->class & CLASS_e))
+       add_influence_source(pos, this_color, 20 * strength, attenuation, q);
+     else
+       add_influence_source(pos, this_color, strength, attenuation, q);
+
+     DEBUG(DEBUG_INFLUENCE,
+	  "  low intensity influence source at %1m, strength %f, color %C\n",
+	  pos, strength, this_color);
+     return;
+  }
     
-    source_strength = t * pattern->value;  
-
-    /* Increase strength if we're computing escape influence. */
-    if (q == &escape_influence && (pattern->class & CLASS_e))
-      add_influence_source(pos, this_color, 20 * source_strength, 1.6, q);
-    else
-      add_influence_source(pos, this_color, source_strength, 1.6, q);
-
-    DEBUG(DEBUG_INFLUENCE,
-	  "  low intensity influence source at %1m, strength %f, color %C\n",
-	  pos, pattern->value, this_color);
-    return;
-  }
-
-#else
-
-  /* For I patterns, add a low intensity, both colored, influence
-   * source at *.
-   */
-  if (pattern->class & CLASS_I) {
-    int this_color = EMPTY;
-    if (q->color_to_move == EMPTY || (pattern->class & CLASS_s))
-      this_color = BLACK | WHITE;
-    else if (q->color_to_move != color)
-      this_color = q->color_to_move;
-
-    /* Increase strength if we're computing escape influence. */
-    if (q == &escape_influence && (pattern->class & CLASS_e))
-      add_influence_source(pos, this_color,
-			   20 * pattern->value, 1.5, q);
-    else
-      add_influence_source(pos, this_color, pattern->value, 1.5, q);
-
-    DEBUG(DEBUG_INFLUENCE,
-	  "  low intensity influence source at %1m, strength %f, color %C\n",
-	  pos, pattern->value, this_color);
-    return;
-  }
-
-
-#endif
-  
   /* For E patterns, add a new influence source of the same color and
    * pattern defined strength at *.
    */
@@ -896,10 +892,7 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
 	    && pattern->patn[k].att == ATT_not)) {
       /* transform pattern real coordinate */
       int ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
-#if COSMIC_GNUGO
-      float t = 0.15 + (1.0 - cosmic_importance);
-      float source_strength;
-#endif
+      float strength;
 
       /* Territorial connection, making a barrier for opponent influence. */
       if (pattern->class & (CLASS_A | CLASS_D)) {
@@ -926,39 +919,26 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
 	}
       }
 
-#if COSMIC_GNUGO
-      t = gg_min(1.0, t);
-      t = gg_max(0.0, t);
+     if (cosmic_gnugo)  {
+        float t = 0.15 + (1.0 - cosmic_importance);
+        t = gg_min(1.0, t);
+        t = gg_max(0.0, t);
+        strength = t * pattern->value;
+      }
+      else 
+        strength = pattern->value;
       
-      source_strength = t * pattern->value;  
-      
-      /* Low intensity influence source for the color in turn to move. */
+      /* Low intensity influence source for the color in turn to move. */  
       if (pattern->class & CLASS_B) {
         if (q->is_territorial_influence)
-          enter_intrusion_source(anchor, ii, source_strength, 
+          enter_intrusion_source(anchor, ii, strength, 
 	  		         TERR_DEFAULT_ATTENUATION, q);
         else
-          add_influence_source(ii, color, source_strength, 
+          add_influence_source(ii, color, strength, 
                                  DEFAULT_ATTENUATION, q); 
 	DEBUG(DEBUG_INFLUENCE, "  intrusion at %1m\n", ii);
       }
-      
-#else
-
-      /* Low intensity influence source for the color in turn to move. */
-      if (pattern->class & CLASS_B) {
-        if (q->is_territorial_influence)
-          enter_intrusion_source(anchor, ii, pattern->value,
-	  		         TERR_DEFAULT_ATTENUATION, q);
-        else
-          add_influence_source(ii, color,
-			       pattern->value, DEFAULT_ATTENUATION, q);
-	DEBUG(DEBUG_INFLUENCE, "  intrusion at %1m\n", ii);
-      }
-
-
-#endif
-      
+            
     }
   }
 }
@@ -1201,17 +1181,10 @@ whose_territory(const struct influence_data *q, int pos)
 
   ASSERT_ON_BOARD1(pos);
 
-#if COSMIC_GNUGO
   if (bi > 0.0 && wi == 0.0 && terr < -territory_determination_value)
-    return BLACK;
+     return BLACK;
   if (wi > 0.0 && bi == 0.0 && terr > territory_determination_value)
-    return WHITE;
-#else
-  if (bi > 0.0 && wi == 0.0 && terr < -0.95)
-    return BLACK;
-  if (wi > 0.0 && bi == 0.0 && terr > 0.95)
-    return WHITE;
-#endif
+     return WHITE;
 
   return EMPTY;
 }
@@ -1233,33 +1206,31 @@ whose_loose_territory(const struct influence_data *q, int pos)
 {
   float bi = q->black_influence[pos];
   float wi = q->white_influence[pos];
-  float terr = q->territory_value[pos];
   int owner;
 
   ASSERT_ON_BOARD1(pos);
   
-  /* if the global flag use_optimistic_territory is not set,
-   * be very strict.
-   */
+  /* if the global flag use_optimistic_territory is not 
+     set, be very strict. */
   if (!use_optimistic_territory)
     return whose_territory(q, pos);
   
+  
   /* If set, we use essentially a somewhat conservative 
-   * version of whose_moyo().
-   */
+   * version of whose_moyo().  */
    
   owner = whose_territory(q, pos);
   
-  if ((owner == EMPTY) && (bi > 20.0 * wi && bi > 7.0 && wi < 30.0))
+  if ((owner == EMPTY) && (bi > 10.0 * wi && bi > 7.0 && wi < 40.0))
     owner = BLACK;
-  if ((owner == EMPTY) && (wi > 20.0 * bi && wi > 7.0 && bi < 30.0))
+  if ((owner == EMPTY) && (wi > 10.0 * bi && wi > 7.0 && bi < 40.0))
     owner = WHITE;
 
   if (ON_BOARD(pos) && IS_STONE(board[pos]) && !q->safe[pos]) { 
-    if (0)
+    if (0) 
       TRACE("dead stone : %1m, territory for %s\n", pos,
-	    (owner == WHITE ? "White" : 
-	      (owner == BLACK ? "Black" : "nobody????")));
+                  (owner == WHITE ? "White": 
+                  (owner == BLACK ? "Black": "nobody????")));
     owner = OTHER_COLOR(board[pos]);
   }
     
@@ -1281,21 +1252,14 @@ whose_moyo(const struct influence_data *q, int pos)
   if (territory_color != EMPTY)
     return territory_color;
     
-#if COSMIC_GNUGO
-  if (bi > moyo_data.influence_balance * wi
-      && bi > moyo_data.my_influence_minimum
-      && wi < moyo_data.opp_influence_maximum)
+  if (bi > moyo_data.influence_balance * wi && 
+      bi > moyo_data.my_influence_minimum && 
+      wi < moyo_data.opp_influence_maximum)
     return BLACK;
-  if (wi > moyo_data.influence_balance * bi
-      && wi > moyo_data.my_influence_minimum
-      && bi < moyo_data.opp_influence_maximum)
+  if (wi > moyo_data.influence_balance * bi && 
+      wi > moyo_data.my_influence_minimum && 
+      bi < moyo_data.opp_influence_maximum)
     return WHITE;
-#else
-  if (bi > 7.0 * wi && bi > 5.0 && wi < 10.0)
-    return BLACK;
-  if (wi > 7.0 * bi && wi > 5.0 && bi < 10.0)
-    return WHITE;
-#endif
   
   return EMPTY;
 }
@@ -1326,22 +1290,14 @@ whose_moyo_restricted(const struct influence_data *q, int pos)
   /* default */
   if (territory_color != EMPTY)
     color = territory_color;
-#if COSMIC_GNUGO
-  else if (bi > moyo_restricted_data.influence_balance * wi
-           && bi > moyo_restricted_data.my_influence_minimum
-	   && wi < moyo_restricted_data.opp_influence_maximum)
+  else if (bi > moyo_restricted_data.influence_balance * wi &&
+           bi > moyo_restricted_data.my_influence_minimum   && 
+           wi < moyo_restricted_data.opp_influence_maximum)
     color = BLACK;
-  else if (wi > moyo_restricted_data.influence_balance * bi
-      	   && wi > moyo_restricted_data.my_influence_minimum
-	   && bi < moyo_restricted_data.opp_influence_maximum)
-    color = WHITE;
-#else
-  else if (bi > 10.0 * wi && bi > 10.0 && wi < 10.0)
-    color = BLACK;
-  else if (wi > 10.0 * bi && wi > 10.0 && bi < 10.0)
-    color = WHITE;
-#endif    
-
+  else if (wi > moyo_restricted_data.influence_balance * bi && 
+           wi > moyo_restricted_data.my_influence_minimum   && 
+           bi < moyo_restricted_data.opp_influence_maximum)
+    color = WHITE; 
   else
     color = EMPTY;
   
@@ -1587,8 +1543,12 @@ segment_influence(struct influence_data *q)
       q->area_segmentation[ii] = 0;
     }
     
-  segment_region(q, whose_loose_territory, IS_TERRITORY,
-	 	 q->territory_segmentation);
+  if (use_optimistic_territory)
+     segment_region(q, whose_loose_territory, 
+                    IS_TERRITORY, q->territory_segmentation);
+  else 
+     segment_region(q, whose_territory, 
+                    IS_TERRITORY, q->territory_segmentation); 
   segment_region(q, whose_moyo_restricted, IS_MOYO, q->moyo_segmentation);
   segment_region(q, whose_area,      IS_AREA,      q->area_segmentation);
 }

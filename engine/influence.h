@@ -28,12 +28,9 @@
 #include "liberty.h"
 
 
-/* STEPHANE NICOLET's modification : playing for influence in the fuseki */
 
-#if COSMIC_GNUGO
-
-
-/* We use much more influence than the defaults attenuation coefficients !
+/* The cosmic style uses more influence than the defaults attenuation 
+ * coefficients !
  * The "TERR_.."-values are used in the influence computations used
  * for territory evaluation. (initial_influence with dragons_known,
  * move_influence)
@@ -49,23 +46,6 @@
 #define TERR_DIAGONAL_DAMPING \
 	(cosmic_importance * 2.5 + (1.0 - cosmic_importance) * 1.7)
 
-
-#else
-
-
-/* Default attenuation coefficient.
- * The "TERR_.."-values are used in the influence computations used
- * for territory evaluation. (initial_influence with dragons_known,
- * move_influence)
- */
-#define DEFAULT_ATTENUATION 3.0
-#define TERR_DEFAULT_ATTENUATION 2.4
-
-/* Extra damping coefficient for spreading influence diagonally. */
-#define DIAGONAL_DAMPING 2.0
-#define TERR_DIAGONAL_DAMPING 1.7
-
-#endif
 
 
 
@@ -160,8 +140,6 @@ typedef int (*owner_function_ptr)(const struct influence_data *q, int pos);
 
 
 
-#if COSMIC_GNUGO
-
 /* cosmic_importance is a number between 0.0 and 1.0 ;
  * when cosmic_importance is 0.0, the default influence
  * values are used; when cosmic_importance is 1.0, GNU Go
@@ -181,8 +159,6 @@ struct moyo_determination_data
   float opp_influence_maximum;
 };
 
-
-#endif
 
 
 

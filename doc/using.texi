@@ -748,6 +748,10 @@ has no effect at level 9 or below. The break in code is enabled
 by default at level 10, and the only difference between levels
 9 and level 10 is that the break in code is disabled at level 9.
 @end quotation
+@item @option{--cosmic-gnugo}
+@quotation
+Use center oriented influence.
+@end quotation
 @item @option{--nofusekidb}
 @quotation
 Turn off the fuseki database.

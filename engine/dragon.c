@@ -2230,11 +2230,10 @@ size_of_biggest_critical_dragon(void)
 	continue;
         
       /* Get the best available status for the dragon */
-      if (dragon[str].status == CRITICAL)
-        {
+      if (dragon[str].status == CRITICAL) {
         if (dragon[str].size >= max_size)
           max_size = dragon[str].size;
-        }
+      }
     }
   return max_size;
 }

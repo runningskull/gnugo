@@ -608,6 +608,7 @@ extern int experimental_connections; /* use experimental connection module */
 extern int alternate_connections;    /* use alternate connection module */
 extern int owl_threats;              /* compute owl threats */
 extern int experimental_break_in;    /* use experimental module breakin.c */
+extern int cosmic_gnugo;             /* use center oriented influence */
 
 
 extern int thrashing_dragon;        /* Dead opponent's dragon trying to live */
@@ -853,7 +854,8 @@ extern float maximum_value_weight;
 extern float invasion_malus_weight;
 extern float strategical_weight;
 extern float territorial_weight;
-extern float attack_dragon_weigth;
+extern float attack_dragon_weight;
+extern float followup_weight;
 
 struct aftermath_data {
   int white_captured;

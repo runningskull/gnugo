@@ -1870,7 +1870,7 @@ estimate_territorial_value(int pos, int color, float score)
 	this_value = 1.5 * dragon[aa].effective_size;
 	TRACE("  %1m: %f - attack last move played, although it seems dead\n",
 	      pos, this_value);
-	tot_value += this_value * attack_dragon_weigth;
+	tot_value += this_value * attack_dragon_weight;
       }
       else if (!doing_scoring && ((color == BLACK && score < 0.0)
 				  || (color == WHITE && score > 0.0))) {
@@ -1880,7 +1880,7 @@ estimate_territorial_value(int pos, int color, float score)
 	this_value = gg_max(this_value, 0);
 	TRACE("  %1m: %f - attack %1m, although it seems dead, as we are ahead\n",
 	      pos, this_value, aa);
-	tot_value += this_value * attack_dragon_weigth;
+	tot_value += this_value * attack_dragon_weight;
       }
       else {
 	/* FIXME: Why are we computing a this_value here when it's
@@ -2399,10 +2399,8 @@ estimate_strategical_value(int pos, int color, float score)
 	  }
 	}
 	
-	/* SN : we multiply by attack_dragon_weigth to try to find a
-	 * best fit (3.3.23)
-	 */
-	this_value = this_value * attack_dragon_weigth;
+	/* Multiply by attack_dragon_weight to try to find a best fit */
+	this_value = this_value * attack_dragon_weight;
 		
 	if (this_value > dragon_value[aa]) {
 	  dragon_value[aa] = this_value;
@@ -2515,7 +2513,7 @@ estimate_strategical_value(int pos, int color, float score)
 
   /* Finally, subtract penalty for invasion type moves. */
   this_value = strategic_penalty(pos, color);
-  /* SN: multiply by invasion_malus_weight to allow us to fit the weight */
+  /* Multiply by invasion_malus_weight to allow us to fit the weight */
   this_value = this_value * invasion_malus_weight;
   if (this_value > 0.0) {
     TRACE("  %1m: %f - strategic penalty, considered as invasion.\n",
@@ -2590,9 +2588,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     estimate_strategical_value(pos, color, score);
   }
 
-  /* SN: introduction of strategical_weight and territorial_weight, 
-   * for automatic fitting (3.3.23)
-   */
+  /* Introduction of strategical_weight and territorial_weight, 
+     for automatic fitting (3.5.1) */
   tot_value = territorial_weight * move[pos].territorial_value + 
               strategical_weight * move[pos].strategical_value;
 
@@ -2627,7 +2624,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
 				   + followup_value),
 			    1.1 * tot_value
 			    + move[pos].reverse_followup_value);
-      tot_value += contribution * attack_dragon_weigth;
+      tot_value += contribution * followup_weight;
       /* The first case applies to gote vs gote situation, the
        * second to reverse sente, and the third to sente situations.
        * The usual rule is that a sente move should count at double
@@ -2756,7 +2753,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     }
   }
   
-  /* SN: min_value is now subject to reduction with a fitted weight (3.3.23) */
+  /* min_value is now subject to reduction with a fitted weight (3.5.1) */
   move[pos].min_value = move[pos].min_value * minimum_value_weight;
   move[pos].max_value = move[pos].max_value * maximum_value_weight;
   
@@ -3296,7 +3293,7 @@ review_move_reasons(int *the_move, float *val, int color,
  *
  */
 
-void
+void 
 choose_strategy(int color, float score, float game_status)
 {
 
@@ -3304,47 +3301,52 @@ choose_strategy(int color, float score, float game_status)
   maximum_value_weight  = 1.0;
   territorial_weight    = 1.0;
   strategical_weight    = 1.0;
-  attack_dragon_weigth  = 1.0;
+  attack_dragon_weight  = 1.0;
   invasion_malus_weight = 1.0;
+  followup_weight       = 1.0;
 
-
-#if COSMIC_GNUGO
-  
   TRACE("  Game status = %f (0.0 = start, 1.0 = game over)\n", game_status);
 
-  if (game_status > 0.65
-      && ((color == BLACK && score < -15.0)
-          || (color == WHITE && score > 15.0))) {
-    /* We seem to be winning, so we use conservative settings */
-    minimum_value_weight  = 0.66;
-    maximum_value_weight  = 2.0;
-    territorial_weight    = 0.95; 
-    strategical_weight    = 1.0; 
-    attack_dragon_weigth  = 1.1; 
-    invasion_malus_weight = 1.3;
-    TRACE("  %s is leading, using conservative settings.\n",
-	  color == WHITE ? "White" : "Black");
-  }
-  else if (game_status > 0.16) {
-    /* We're not winning enough yet, try aggressive settings */
-    minimum_value_weight  = 0.66;
-    maximum_value_weight  = 2.0;
-    territorial_weight    = 1.4;
-    strategical_weight    = 0.5; 
-    attack_dragon_weigth  = 0.62;
-    invasion_malus_weight = 2.0;
-    
-    /* If we're getting desesperate, try invasions as a last resort */
-    if (game_status > 0.75
-	&& ((color == BLACK && score > 25.0)
-	    || (color == WHITE && score < -25.0)))
-      invasion_malus_weight = 0.2;
-	
-   TRACE("  %s is not winning enough, using aggressive settings.\n", 
-	 color == WHITE ? "White" : "Black");
+  
+  if (cosmic_gnugo) {
+
+    if ((game_status > 0.65) &&
+       ((color == BLACK && score < -15.0)
+       || (color == WHITE && score > 15.0))) {
+      
+      /* We seem to be winning, so we use conservative settings */
+      minimum_value_weight  = 0.66;
+      maximum_value_weight  = 2.0;
+      territorial_weight    = 0.95; 
+      strategical_weight    = 1.0; 
+      attack_dragon_weight  = 1.1; 
+      invasion_malus_weight = 1.3;
+      followup_weight       = 1.1;
+      TRACE("  %s is leading, using conservative settings.\n",
+               color == WHITE ? "White" : "Black");
+    }
+    else if (game_status > 0.16) {
+      
+      /* We're not winning enough yet, try aggressive settings */
+      minimum_value_weight  = 0.66;
+      maximum_value_weight  = 2.0;
+      territorial_weight    = 1.4;
+      strategical_weight    = 0.5; 
+      attack_dragon_weight  = 0.62;
+      invasion_malus_weight = 2.0;
+      followup_weight       = 0.62;
+       
+      /* If we're getting desesperate, try invasions as a last resort */
+      if ((game_status > 0.75)  &&
+          ((color == BLACK && score > 25.0)
+           || (color == WHITE && score < -25.0)))
+        invasion_malus_weight = 0.2;
+            
+      TRACE("  %s is not winning enough, using aggressive settings.\n", 
+             color == WHITE ? "White" : "Black");
+    }
   }
 
-#endif
 }
 
 

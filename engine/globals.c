@@ -121,6 +121,8 @@ int owl_threats = OWL_THREATS;
 int experimental_owl_ext = EXPERIMENTAL_OWL_EXT;
 /* use experimental territory break-in module */
 int experimental_break_in = USE_BREAK_IN;
+/* use central oriented influence */
+int cosmic_gnugo = COSMIC_GNUGO;
 
 int capture_all_dead    = 0;    /* capture all dead opponent stones */
 int play_out_aftermath  = 0;    /* make everything unconditionally settled */
@@ -169,4 +171,5 @@ float maximum_value_weight  = 1.0;
 float invasion_malus_weight = 1.0;
 float territorial_weight    = 1.0;
 float strategical_weight    = 1.0;
-float attack_dragon_weigth  = 1.0;
+float attack_dragon_weight  = 1.0;
+float followup_weight       = 1.0;
