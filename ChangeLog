@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- TRACE_CACHED_RESULT* macros implemented for new caching scheme
+- old cache implementation commented out
 - new file engine/unconditional.c added
 - break-in reading tuned
 - safety checks improved for owl defense moves
