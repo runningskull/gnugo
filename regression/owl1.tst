@@ -81,6 +81,10 @@ loadsgf games/nngs/gnugo-3.3.8-Joorin-200209251541.sgf 169
 278 owl_attack E6
 #? [1 F4]
 
+loadsgf games/nngs/gnugo-3.3.8-evand-200209170730.sgf 227
+279 owl_attack O19
+#? [1 O12]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
