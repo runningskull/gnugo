@@ -1578,7 +1578,7 @@ compute_surrounding_moyo_sizes(int opposite)
   int pos;
   int m, n;
   int result[MAX_BOARD * MAX_BOARD];
-  int moyo_is_adjacent[MAX_BOARD * MAX_BOARD][MAX_MOYOS + 1];
+  static int moyo_is_adjacent[MAX_BOARD * MAX_BOARD][MAX_MOYOS + 1];
   struct moyo_data moyos;
 
   influence_get_moyo_segmentation(opposite, &moyos);
