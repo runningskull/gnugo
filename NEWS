@@ -1,8 +1,10 @@
-VERSION 3.3.22
+VERSION 3.3.23
 
-New in 3.4 (since 3.4)
+New in 3.4 (since 3.2)
 
-- reading connection and semeai modules
+- new connection and semeai modules use lookahead
+- new break-in code
+- improvements to many parts of the program
 
 New in 3.2 (since 3.0)
 

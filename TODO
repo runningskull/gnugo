@@ -107,13 +107,14 @@ playing strength of the program and/or enhance certain aspects of it.
    square, and so on. Other areas where test suites would be most
    welcome are fuseki, tesuji, and endgame.
 
- * Tuning the pattern databases. These are under constant revision.  This
-   is a sort of art. It is not necessary to do any programming to do this
-   since most of the patterns do not require helpers. We would like it if
+ * Tuning the pattern databases. These are under constant revision.  Tuning
+   them is a sort of art. It is not necessary to do any programming to do 
+   this since most of the patterns do not require helpers. We would like it if
    a few more Dan level players would learn this skill.
 
  * Extend and tune the Joseki database. It might be very useful to implement
-   a semi-automatic way of doing this.
+   a semi-automatic way of doing this. The current method based on sgf files
+   becomes difficult with existing tools.
 
  * The semeai module is still in need of improvement. (This is underway.)
 
@@ -206,7 +207,7 @@ are presented here for inspiration.
    graph representation of threats that can be searched to see how
    different threats interact.
 
-
-
-
+ * An endgame module based on ideas from combinatorial game theory.
+   To be really useful this would have to deal with early endgame
+   positions.
 
