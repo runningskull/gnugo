@@ -430,6 +430,7 @@ do_genmove(int *move, int color, float pure_threat_value,
     verbose--;
   collect_move_reasons(color);
   verbose = save_verbose;
+  time_report(1, "generate move reasons", NO_MOVE, 1.0);
   
   /* Try to find empty corner moves. */
   if (!limit_search)
@@ -437,7 +438,6 @@ do_genmove(int *move, int color, float pure_threat_value,
   gg_assert(stackp == 0);
 
   /* The general pattern database. */
-  start_timer(1);
   shapes(color);
   time_report(1, "shapes", NO_MOVE, 1.0);
   gg_assert(stackp == 0);

@@ -102,18 +102,15 @@ make_dragons(int color, int stop_before_owl)
   int str;
   int d;
 
-  start_timer(2);
   dragon2_initialized = 0;
   initialize_dragon_data();
 
   make_domains(black_eye, white_eye, 0);
-  time_report(2, "  time to make domains", NO_MOVE, 1.0);
 
   /* Find explicit connections patterns in database and amalgamate
    * involved dragons.
    */
   find_connections();
-  time_report(2, "  time to find connections", NO_MOVE, 1.0);
 
   /* At this time, all dragons have been finalized and we can
    * initialize the dragon2[] array. After that we can no longer allow
@@ -309,14 +306,13 @@ make_dragons(int color, int stop_before_owl)
     }
   }
 
-  time_report(2, "  pre-owl dragon data", NO_MOVE, 1.0);
-  
   if (stop_before_owl)
     return;
   
   /* Determine life and death status of each dragon using the owl code
    * if necessary.
    */
+  start_timer(2);
   purge_persistent_owl_cache();
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str)) {
@@ -409,7 +405,6 @@ make_dragons(int color, int stop_before_owl)
 	  DRAGON2(str).owl_attack_point = NO_MOVE;
 	  DRAGON2(str).owl_attack_code = 0;
 	  
-	  time_report(3, "    owl reading for dragon at ", str, 1.0);
 	}
       }
     }
@@ -441,7 +436,6 @@ make_dragons(int color, int stop_before_owl)
 	}
       }
     }
-  time_report(2, "  compute status", NO_MOVE, 1.0);
 
   /* The dragon data is now correct at the origin of each dragon but
    * we need to copy it to every vertex.  
@@ -498,7 +492,6 @@ make_dragons(int color, int stop_before_owl)
 	      DRAGON2(str).owl_threat_status = ALIVE;
 	  }
 	}
-	time_report(3, "    owl threats for dragon at ", str, 1.0);
       }
     }
   
@@ -549,7 +542,6 @@ make_dragons(int color, int stop_before_owl)
     else
       dragon2[d].safety = ALIVE;
   }
-  time_report(2, "  post owl dragon data", NO_MOVE, 1.0);
 
   /* The status is now correct at the origin of each dragon
    * but we need to copy it to every vertex.
@@ -625,7 +617,6 @@ make_dragons(int color, int stop_before_owl)
 	}
       }
     }
-  time_report(2, "  revise worm inessentiality", NO_MOVE, 1.0);
 
   /* Revise essentiality of critical dragons. Specifically, a critical
    * dragon consisting entirely of inessential worms is considered
@@ -649,7 +640,6 @@ make_dragons(int color, int stop_before_owl)
       }
     }
   }
-  time_report(2, "  revise dragon inessentiality", NO_MOVE, 1.0);
 
   semeai();
   time_report(2, "  semeai module", NO_MOVE, 1.0);
