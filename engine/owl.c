@@ -192,9 +192,9 @@ static int do_owl_defend(int str, int *move,
 static int owl_shapes(struct matched_patterns_list_data *list,
                       struct owl_move_data moves[MAX_MOVES], int color,
 		      struct local_owl_data *owl, struct pattern_db *type);
-static void owl_shapes_collect_callback(int m, int n, int color,
-					struct pattern *pattern_db,
-					int ll, void *data);
+static void collect_owl_shapes_callbacks(int m, int n, int color,
+	  			         struct pattern *pattern_db,
+				         int ll, void *data);
 static int get_next_move_from_list(struct matched_patterns_list_data *list,
                                    int color, struct owl_move_data *moves,
 				   int cutoff);
@@ -1307,12 +1307,13 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
       
 #if PATTERN_CHECK_ON_DEMAND
       owl_shapes(&shape_patterns, shape_moves, other, owl, &owl_attackpat_db);
-      get_next_move_from_list(&shape_patterns, other, shape_moves, 99);
+      /* A move of value 100 is considered a win */
+      if (get_next_move_from_list(&shape_patterns, other, shape_moves, 100)) {
 #else
       owl_shapes(shape_moves, other, owl, &owl_attackpat_db);
-#endif
       /* A move of value 100 is considered a win */
       if (shape_moves[0].value >= 100) {
+#endif
 	/* to make sure this move is recorded in the sgf file */
 	if (trymove(shape_moves[0].pos, other,
 		    shape_moves[0].name, str, komaster, kom_pos))
@@ -1326,25 +1327,20 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	READ_RETURN(read_result, move, shape_moves[0].pos, WIN);
       }
 
+#if !PATTERN_CHECK_ON_DEMAND
       /* A move of value 99 is considered a forced move. No other move need
        * be considered. If there are two of these on the board, we lose.
        */
       if (shape_moves[0].value == 99) {
-#if PATTERN_CHECK_ON_DEMAND
-	if (get_next_move_from_list(&shape_patterns, other, shape_moves, 99)) {
-#else
 	if (shape_moves[1].value == 99) {
-#endif
 	  TRACE("%oVariation %d: ALIVE (multiple forced moves)\n",
 		this_variation_number);
 	  SGFTRACE(0, 0, "multiple forced moves");
-#if PATTERN_CHECK_ON_DEMAND
-	  close_pattern_list(&shape_patterns);
-#endif
 	  READ_RETURN0(read_result);
 	}
 	move_cutoff = 99;
       }
+#endif
 
       moves = shape_moves;
     }
@@ -1466,6 +1462,21 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
         if (!get_next_move_from_list(&shape_patterns, other,
 	                             shape_moves, move_cutoff))
           break;
+	/* A move of value 99 is considered a forced move. No other move
+	 * needs to be considered. If there are two of them, we loose.
+	 */
+	if (moves[k].value == 99) {
+	  gg_assert(k == 0);
+          if (get_next_move_from_list(&shape_patterns, other,
+	                              shape_moves, 99)) {
+	    TRACE("%oVariation %d: ALIVE (multiple forced moves)\n",
+		  this_variation_number);
+	    SGFTRACE(0, 0, "multiple forced moves");
+	    close_pattern_list(&shape_patterns);
+	    READ_RETURN0(read_result);
+	  }
+	  move_cutoff = 99;
+	}
       }
       else
 #endif
@@ -1978,12 +1989,13 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       
 #if PATTERN_CHECK_ON_DEMAND
       owl_shapes(&shape_patterns, shape_moves, color, owl, &owl_defendpat_db);
-      get_next_move_from_list(&shape_patterns, color, shape_moves, 100);
+      /* A move of value 100 is considered a win */
+      if (get_next_move_from_list(&shape_patterns, color, shape_moves, 100)) {
 #else
       owl_shapes(shape_moves, color, owl, &owl_defendpat_db);
-#endif
       /* A move of value 100 is considered a win */
       if (shape_moves[0].value >= 100) {
+#endif
 	/* to make sure this move is recorded in the sgf file */
 	if (trymove(shape_moves[0].pos, color, shape_moves[0].name, str,
 		    komaster, kom_pos))
@@ -2759,7 +2771,7 @@ owl_shapes(
   }
   memset(&owl_safe_move_cache_stack[stackp * BOARDMAX],
          0, BOARDMAX * sizeof(int));
-  matchpat(owl_shapes_collect_callback, color, type, pattern_list, owl->goal);
+  matchpat(collect_owl_shapes_callbacks, color, type, pattern_list, owl->goal);
 #else
   memset(owl_safe_move_cache, 0, sizeof(owl_safe_move_cache));
   matchpat(owl_shapes_callback, color, type, moves, owl->goal);
@@ -2825,7 +2837,7 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
 #if PATTERN_CHECK_ON_DEMAND
 
 /* This initializes a pattern list, allocating memory for 200 patterns.
- * If more patterns need to be stored, owl_shapes_collect_callback will
+ * If more patterns need to be stored, collect_owl_shapes_callbacks will
  * dynamically reallocate additional memory.
  * Only the space for list->pattern_list is allocated here, *list needs to
  * have been allocated by the calling function.
@@ -2867,14 +2879,36 @@ close_pattern_list(struct matched_patterns_list_data *list)
   list->counter = -1;
 }
 
+/* Can be called from gdb for debugging:
+ * (gdb) print dump_pattern_list(&shape_patterns);
+ * or similar.
+ */
+void
+dump_pattern_list(struct matched_patterns_list_data *list)
+{
+  int i;
+  struct matched_pattern_data *matched_pattern;
+  if (!list->initialized)
+    return;
+  gprintf("%oList size %d. %d Patterns in list, %d have been used, odered up to
+      %d.\n",
+          list->list_size, list->counter, list->used, list->ordered_up_to);
+  for (i = 0; i < list->counter; i++) {
+    matched_pattern = &list->pattern_list[i];
+    gprintf("%o  Pattern %s (orient. %d) at %1m, value %f.\n",
+	    matched_pattern->pattern->name, matched_pattern->ll,
+	    matched_pattern->move, matched_pattern->pattern->value);
+  }
+}
+
 
 /* This function stores a found pattern in the list for later evaluation.
  * The only processing done is computing the position of the move, and
  * forgetting the color.
  */
 static void
-owl_shapes_collect_callback(int m, int n, int color, struct pattern *pattern,
-			    int ll, void *data)
+collect_owl_shapes_callbacks(int m, int n, int color, struct pattern *pattern,
+                             int ll, void *data)
 {
   struct matched_patterns_list_data *matched_patterns = data;
   struct matched_pattern_data *next_pattern;
