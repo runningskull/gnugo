@@ -108,7 +108,7 @@ struct connection_cache {
 };
 
 static struct connection_cache
-persistent_connection_cache[MAX_READING_CACHE_SIZE];
+persistent_connection_cache[MAX_CONNECTION_CACHE_SIZE];
 static int persistent_connection_cache_size = 0;
 
 
