@@ -1,0 +1,516 @@
+#! /usr/bin/perl -w
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This program is distributed with GNU GO, a Go program.        #
+#                                                               #
+# Write gnugo@gnu.org or see http://www.gnu.org/software/gnugo/ #
+# for more information.                                         #
+#                                                               #
+# Copyright 1999, 2000, 2001 by the Free Software Foundation.   #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA.                                        #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# twogtp info:
+#
+# Here is a small perlscript twogtp. Its purpose is to run
+# two programs against each other. Both must support the Go
+# Text Protocol. For example GNU Go 2.7.241 or higher works.
+#
+# It is easier to implement this program in gtp than gmp.
+# The script is almost trivial. It also works with cygwin on
+# windows.
+#
+# Run with:
+#
+# twogtp --white '<path to program 1> --mode gtp <options>' \
+#        --black '<path to program 2> --mode gtp <options>' \
+#        [twogtp options]
+#
+# Possible twogtp options:
+#
+#   --verbose 1 (to list moves) or --verbose 2 (to draw board)
+#   --komi <amount>
+#   --handicap <amount>
+#   --size <board size>                     (default 19)
+#   --games <number of games to play>       (-1 to play forever)
+#   --sgffile <filename>
+#
+#
+# matcher_status info:
+#
+# plays two gtp programs against each other, and watches for bad
+# matcher_status transitions.  Currently, one data structure is
+# used for each program, this should probably be made optional.
+# However, it might be a good idea to use only one (catch which
+# program saw the attack that changed it).
+#
+# FIXME: optionally, separate statuses for each program. (ie 2 match_hist
+# structures)
+# FIXME: allow analysis of sgf files
+# FIXME: if the vertex by which a dragon is named ever changes,
+# the hash table used will consider it new.  therefore, if the
+# vertex changes at the same time an illegal state change occurs,
+# it will get missed.  Also, it is possible that a dragon would
+# be captured, and that vertex go unused until a new piece was
+# played in that spot, resulting in a false positive.  However,
+# this should be rare (?).
+# FIXME: get random seeds when an error is detected.
+# FIXME: better $verbose levels
+
+package TWOGTP_A;
+
+use IPC::Open2;
+use Getopt::Long;
+use FileHandle;
+use strict;
+use warnings;
+use Carp;
+
+STDOUT->autoflush(1);
+
+#following added globally to allow "use strict" :
+my $vertex;
+my $first;
+my $sgfmove;
+my $sgffilename;
+my $pidw;
+my $pidb;
+my $sgffile;
+my $handicap_stones;
+my $resultw;
+my $resultb;
+my @vertices;
+my $second;
+my %game_list;
+#end of "use strict" repairs
+
+
+my $white;
+my $black;
+my $size = 19;
+my $verbose = 0;
+my $komi = 5.5;
+my $handicap = 0;
+my $games = 1;
+my $wanthelp;
+
+#added for matcher_check
+my %match_hist;
+my $movenum;
+
+my $helpstring = "
+
+Run with:
+
+twogtp --white \'<path to program 1> --mode gtp [program options]\' \\
+       --black \'<path to program 2> --mode gtp [program options]\' \\
+       [twogtp options]
+
+Possible twogtp options:
+
+  --verbose 1 (to list moves) or --verbose 2 (to draw board)
+  --komi <amount>
+  --handicap <amount>
+  --size <board size>                     (default 19)
+  --games <number of games to play>       (-1 to play forever)
+  --sgffile <filename>
+  --help                                  (show this)
+
+";
+
+GetOptions(
+           "white|w=s"              => \$white,
+           "black|b=s"              => \$black,
+           "verbose|v=i"            => \$verbose,
+           "komi|k=f"               => \$komi,
+           "handicap|h=i"           => \$handicap,
+           "size|boardsize|s=i"     => \$size,
+           "sgffile|o=s"            => \$sgffilename,
+           "games=i"                => \$games,
+           "help"                   => \$wanthelp,
+);
+
+if ($wanthelp) {
+  print $helpstring;
+  exit;
+}
+
+
+if (!$white) {
+  $white = '../gnugo.exe --mode gtp --quiet';
+  warn "Defaulting white to: $white";
+}
+if (!$black) {
+  $black = '../gnugo.exe --mode gtp --quiet';
+  warn "Defaulting black to: $black";
+}
+
+die $helpstring unless defined $white and defined $black;
+
+# create FileHandles
+my $black_in  = new FileHandle;		# stdin of black player
+my $black_out = new FileHandle;		# stdout of black player
+my $white_in  = new FileHandle;		# stdin of white player
+my $white_out = new FileHandle;		# stdout of white player
+
+while ($games > 0) {
+    $pidb = open2($black_out, $black_in, $black);
+    print "black pid: $pidb\n" if $verbose;
+    $pidw = open2($white_out, $white_in, $white);
+    print "white pid: $pidw\n" if $verbose;
+
+    $sgffile = rename_sgffile($games, $sgffilename) if defined $sgffilename;
+
+    if ((defined $sgffilename) && !open(SGFFILEHANDLE, ">$sgffile")) {
+	printf("can't open $sgffile\n");
+	undef($sgffilename);
+    }
+
+    print $black_in  "boardsize $size\n";
+    eat_no_response($black_out);
+    print $black_in  "komi $komi\n";
+    eat_no_response($black_out);
+
+    print $white_in  "boardsize $size\n";
+    eat_no_response($white_out);
+    print $white_in  "komi $komi\n";
+    eat_no_response($white_out);
+
+    print SGFFILEHANDLE "(;GM[1]FF[4]RU[Japanese]SZ[$size]HA[$handicap]KM[$komi]"
+	if defined $sgffilename;
+
+    my $pass = 0;
+    my ($move, $toplay);
+
+    if ($handicap < 2) {
+	$toplay = 'B';
+    }
+    else {
+	$toplay = 'W';
+	print $black_in "fixed_handicap $handicap\n";
+	$handicap_stones = eat_handicap($black_out);
+	if (defined $sgffilename) {
+	    print SGFFILEHANDLE $handicap_stones;
+	}
+	print $white_in "fixed_handicap $handicap\n";
+	$handicap_stones = eat_handicap($white_out);
+    }
+
+    $movenum = 1;
+    while ($pass < 2) {
+	if ($toplay eq 'B') {
+	    print $black_in "genmove_black\n";
+	    $move = eat_move($black_out);
+	    $sgfmove = standard_to_sgf($move);
+	    print SGFFILEHANDLE ";B[$sgfmove]\n" if defined $sgffilename;
+	    print "Black plays $move\n" if $verbose;
+	    if ($move =~ /PASS/i) {
+		$pass++;
+	    } else {
+		$pass = 0;
+	    }
+	    print $white_in "black $move\n";
+	    eat_no_response($white_out);
+	    if ($verbose > 1) {
+		print $white_in "showboard\n";
+		eat_no_response($white_out);
+	    }
+
+	    #check matcher_status here
+	    check_matcher($black_in, $black_out);
+	    $toplay = 'W';
+	} else {
+	    print $white_in "genmove_white\n";
+	    $move = eat_move($white_out);
+	    $sgfmove = standard_to_sgf($move);
+	    print SGFFILEHANDLE ";W[$sgfmove]\n" if defined $sgffilename;
+	    print "White plays $move\n" if $verbose;
+	    if ($move =~ /PASS/i) {
+		$pass++;
+	    } else {
+		$pass = 0;
+	    }
+	    print $black_in "white $move\n";
+	    eat_no_response($black_out);
+	    if ($verbose > 1) {
+		print $black_in "showboard\n";
+		eat_no_response($black_out);
+	    }
+
+	    #check matcher_status here
+	    check_matcher($white_in, $white_out);
+	    $toplay = 'B';
+	}
+	$movenum++;	#next move
+    }
+    print $white_in "estimate_score\n";
+    $resultw = eat_score($white_out);
+    print "Result according to W: $resultw\n";
+    print $black_in "new_score\n";
+    $resultb = eat_score($black_out);
+    print "Result according to B: $resultb\n";
+    print $white_in "quit\n";
+    print $black_in "quit\n";
+    if (defined $sgffilename) {
+	print "sgf file: $sgffile\n";
+	print SGFFILEHANDLE ")";
+	close SGFFILEHANDLE;
+	$game_list{$sgffile} = $resultw . "|" . $resultb
+    }
+    $games-- if $games > 0;
+    print "games remaining: $games\n";
+}
+
+if (defined $sgffilename) {
+  my $index_out  = new FileHandle;
+  open ($index_out, "> " . index_name($sgffilename));
+  print $index_out
+"<HTML><HEAD><TITLE>game results</TITLE></HEAD>
+<BODY><H3>Game Results</H3>
+<H4>White: ".html_encode($white)."</H4>
+<H4>Black: ".html_encode($black)."</H4>
+<TABLE border=1>
+ <TR>
+  <TD>SGF file</TD>
+  <TD>Result</TD>
+ </TR>
+";
+ foreach (sort by_result keys(%game_list)) {
+    print $index_out "<TR><TD><A href=\"$_\">$_</A></TD>" .
+    		"<TD>".html_encode(game_result($_))."</TD></TR>\n";
+  }
+  print $index_out "</TABLE></BODY></HTML>\n";
+}
+
+#all done here.
+
+sub game_result {
+  $_ = shift;
+  $_ = $game_list{$_};
+  #i.e.:  B+13.5 (upper bound: -13.5, lower: -13.5)|B+13.5 (upper bound: -13.5, lower: -13.5)
+  #Make sure that all 4 values are the same.  I've not seen them different yet.
+  #If they are ever different, need to improve the HTML output (now just -999) -
+  # an explanation of the score mismatch problem would be appropriate.
+  $_ =~ /^.*upper bound..([0-9+.\-]*)..lower..\1.\|.*upper bound..\1..lower..\1./;
+  if (defined($1)) {
+    return $1;
+  } else {
+    return -999;
+  }
+}
+
+sub by_result {
+  game_result($a) <=> game_result($b) || $a cmp $b;
+}
+
+sub html_encode {
+  #print shift;
+  my $r = shift;
+  $r =~ s/&/&amp;/g;
+  $r =~ s/</&lt;/g;
+  $r =~ s/>/&gt;/g;
+  return $r;
+}
+
+
+
+sub eat_no_response {
+    my $h = shift;
+
+# ignore empty lines
+    my $line = "";
+    while ($line eq "") {
+	chop($line = <$h>) or die "No response!";
+        $line =~ s/(\s|\n)*$//smg;
+    }
+}
+
+sub eat_move {
+    my $h = shift;
+# ignore empty lines
+    my $line = "";
+    while ($line eq "") {
+	if (!defined($line = <$h>)) {
+	    print SGFFILEHANDLE ")";
+	    close SGFFILEHANDLE;
+	    die "Engine crashed!\n";
+	}
+        $line =~ s/(\s|\n)*$//smg;
+    }
+    my ($equals, $move) = split(' ', $line, 2);
+    $line = <$h>;
+    defined($move) or confess "no move found: line was: '$line'";
+    return $move;
+}
+
+sub eat_handicap {
+    my $h = shift;
+    my $sgf_handicap = "AB";
+# ignore empty lines, die if process is gone
+    my $line = "";
+    while ($line eq "") {
+	chop($line = <$h>) or die "No response!";
+    }
+    @vertices = split(" ", $line);
+    foreach $vertex (@vertices) {
+	if (!($vertex eq "=")) {
+	    $vertex = standard_to_sgf($vertex);
+	    $sgf_handicap = "$sgf_handicap\[$vertex\]";
+	}
+    }
+    return "$sgf_handicap;";
+}
+
+sub eat_score {
+    my $h = shift;
+# ignore empty lines, die if process is gone
+    my $line = "";
+    while ($line eq "") {
+	chop($line = <$h>) or die "No response!";
+	$line =~ s/^\s*//msg;
+	$line =~ s/\s*$//msg;
+    }
+    $line =~ s/\s*$//;
+    my ($equals, $result) = split(' ', $line, 2);
+    $line = <$h>;
+    return $result;
+}
+
+sub standard_to_sgf {
+    for (@_) { confess "Yikes!" if !defined($_); }
+    for (@_) { tr/A-Z/a-z/ };
+    $_ = shift(@_);
+    /([a-z])([0-9]+)/;
+    return "tt" if $_ eq "pass";
+
+    $first = ord $1;
+    if ($first > 104) {
+	$first = $first - 1;
+    }
+    $first = chr($first);
+    $second = chr($size+1-$2+96);
+    return "$first$second";
+}
+
+sub rename_sgffile {
+    my $nogames = int shift(@_);
+    $_ = shift(@_);
+    s/\.sgf$//;
+    # Annoying to loose _001 on game #1 in multi-game set.
+    # Could record as an additional parameter.
+    # return "$_.sgf" if ($nogames == 1);
+    return sprintf("$_" . "_%03d.sgf", $nogames);
+}
+
+sub index_name {
+    $_ = shift;
+    s/\.sgf$//;
+    return $_ . "_index.html";
+}
+
+sub check_matcher {
+    #check for illegal transitions, and print things if they happen
+    my $in = shift;
+    my $out = shift;
+    my $line = "";
+    my $legality = "illegal";
+
+    #send command
+    print $in "matcher_status\n";
+
+    #ignore empty lines
+    #while ($line eq "")
+    #{
+    #    #print "ignoring a line\n";
+    #    $line = <$out>;
+    #    $line =~ s/\s*//msg;
+    #}
+
+    while ($line = <$out>)
+    {
+        #print "parsing a line\n";
+        if ($line eq "\n") {last;}	#stop at end of response
+        $line =~ s/=//g;	#zap the = at the fron of the response
+	$line =~ s/\n//g;	#zap newlines...
+	$line =~ s/\s//g;	#zap whitespace
+	my ($vertex, $new_status) = split(":", $line);
+	my $old_status;
+	$old_status = $match_hist{$vertex} if (exists($match_hist{$vertex}));
+
+	#debug output
+	if ($verbose > 1)
+	{
+	    print "Vertex: $vertex\n";
+	    print "Old Status: $old_status\n" if (exists($match_hist{$vertex}));
+	    print "New Status: $new_status\n";
+	}
+
+	#if it's new, we don't care
+	if (!exists($match_hist{$vertex})) {
+	    print "$vertex is new.\n" if ($verbose > 0);
+	    $match_hist{$vertex} = $new_status;
+	    next;
+	}
+
+	#ok, so it's old
+
+	$legality = "illegal";
+	if ($old_status eq "CRITICAL") {$legality = "legal"};
+	if ($new_status eq "CRITICAL") {$legality = "legal"};
+	if ($new_status eq "UNKNOWN") {$legality = "legal"};
+	if ($old_status eq "UNKNOWN") {
+	    if ($new_status eq "ALIVE") {$legality = "legal";}
+	    if ($new_status eq "CRITICAL") {$legality = "legal";}
+	}
+
+	if ($match_hist{$vertex} eq $new_status)
+	{
+	    #state didn't change -- valid result
+	    print "$vertex remained unchanged.\n" if ($verbose > 0);
+	} else
+	{
+	    #state changed
+	    if ($legality eq "legal")
+	    {
+	        #legal state change
+		if ($verbose > 1)
+		{
+		    print "Legal state change:\n";
+		    print "Games remaining: $games\n";
+		    print "Move: $movenum\n";
+		    print "Vertex: $vertex\n";
+		    print "Old Status: $old_status\n";
+		    print "New Status: $new_status\n";
+		    print "\n";
+		}
+	    } else
+	    {
+	        #illegal state change -- ALIVE to DEAD or vice versa
+		print "Illegal state change:\n";
+		print "Games remaining: $games\n";
+		print "Move: $movenum\n";
+		print "Vertex: $vertex\n";
+		print "Old Status: $old_status\n";
+		print "New Status: $new_status\n";
+		print "\n";
+	    }
+	    $match_hist{$vertex} = $new_status;
+	}
+    }
+    print "\n" if ($verbose > 0);
+}
+
