@@ -345,8 +345,58 @@ loadsgf games/gunnar/gunnar19.sgf
 
 # Major endgame tesuji.
 loadsgf games/gunnar/gunnar20.sgf
-61 genmove black
+61 reg_genmove black
 #? [D8]
+
+# O19 is both bigger and safer than the played move at G14.
+loadsgf games/kgs/GnuGoCVS-john.sgf 204
+62 reg_genmove white
+#? [O19]
+
+# Q2 more solid than P1.
+loadsgf games/kgs/dogo-TheGNUGo.sgf 42
+63 restricted_genmove black Q2 P1
+#? [Q2]
+
+# The game move at M1 is just weird. R2 is locally better than Q2.
+loadsgf games/kgs/dogo-TheGNUGo.sgf 44
+64 restricted_genmove black M1 Q2 R2 M5 R5
+#? [!(M1|Q2)]
+
+# P19 is one point reverse sente. There are many larger moves.
+loadsgf games/kgs/dogo-TheGNUGo.sgf 146
+65 restricted_genmove black P19 Q12 B11 S8
+#? [!P19]
+
+# A10 was an overplay. Black should capture it and not fall back.
+loadsgf games/kgs/dogo-TheGNUGo.sgf 162
+66 restricted_genmove black B11 B10 B9 A9 A11
+#? [B11]
+
+# O16 severely overvalued and D9 undervalued
+loadsgf games/kgs/dogo-TheGNUGo.sgf 164
+67 restricted_genmove black D9 O16
+#? [D9]
+
+# Capture on a large scale.
+loadsgf games/kgs/dogo-TheGNUGo.sgf 170
+68 restricted_genmove black F6 D8
+#? [D8]
+
+# Stop the main incursion first.
+loadsgf games/kgs/dogo-TheGNUGo.sgf 178
+69 restricted_genmove black A9 D7
+#? [D7]
+
+# A13 and A18 live, the game move at D14 dies.
+loadsgf games/kgs/dogo-TheGNUGo.sgf 190
+70 reg_genmove black
+#? [A18|A13]
+
+# D5 huge.
+loadsgf games/kgs/dogo-TheGNUGo.sgf 198
+71 reg_genmove black
+#? [D5]
 
 ############ End of Tests #################
 

@@ -399,6 +399,29 @@ loadsgf games/owl54.sgf
 357 owl_defend D3
 #? [0]
 
+loadsgf games/scoring/score55.sgf
+358 owl_defend Q18
+#? [0]
+
+loadsgf games/scoring/score53.sgf
+359 owl_defend P5
+#? [0]
+
+loadsgf games/scoring/score43.sgf
+play black O16
+play black N17
+360 owl_defend L18
+#? [0]
+play white L14
+361 owl_attack L18
+#? [1 K16]
+362 owl_defend L18
+#? [1 M16]
+
+loadsgf games/kgs/GnuGoCVS-john.sgf 166
+363 owl_defend F9
+#? [1 (F5|G5|G6|H6)]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

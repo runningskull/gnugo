@@ -31,6 +31,7 @@ loadsgf games/scoring/score37.sgf
 # 38 final_score
 # #? [B\+8.5]*
 
+# See also owl1:354.
 loadsgf games/scoring/score39.sgf
 39 final_score
 #? [B\+45.5]*
@@ -47,6 +48,7 @@ loadsgf games/scoring/score42.sgf
 42 final_score
 #? [B\+145.5]
 
+# See also owl1:360-362.
 loadsgf games/scoring/score43.sgf
 43 final_score
 #? [B\+29.5]*
@@ -89,6 +91,7 @@ loadsgf games/scoring/score52.sgf
 52 final_score
 #? [B\+46.5]
 
+# See also owl1:359.
 loadsgf games/scoring/score53.sgf
 53 final_score
 #? [B\+95.5]*
@@ -97,6 +100,7 @@ loadsgf games/scoring/score54.sgf
 54 final_score
 #? [B\+187.5]
 
+# See also owl1:358.
 loadsgf games/scoring/score55.sgf
 55 final_score
 #? [B\+145.5]*
