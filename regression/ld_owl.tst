@@ -53,7 +53,7 @@ loadsgf games/life_and_death/ld5.sgf
 19 dragon_status S2
 #? [critical (S3|T5) (S3|T5)]
 20 dragon_status B2
-#? [critical (B3|A2|A6) (A2|B3)]
+#? [critical (B3|A2|A6) (A2|A4|B3)]
 
 loadsgf games/life_and_death/ld6.sgf
 21 dragon_status B18

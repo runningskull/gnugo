@@ -3048,6 +3048,22 @@ a*.|
 ;!obvious_false_oeye(a)
 
 
+Pattern D804a
+#spl 3.5.1 owl1:320
+
+|OO? defend eye in the corner
+|.*X
++---
+
+:8,-,value(75)
+
+|aa?
+|.*X
++---
+
+;lib(a) > 2
+
+
 Pattern D804b
 # This is kind of obscure, but sometimes D804 leads to a shortage of
 # liberties, e.g. in the position
