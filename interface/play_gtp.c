@@ -3739,6 +3739,8 @@ gtp_move_influence(char *s)
 
 
 /* Function:  List probabilities of each move being played (when non-zero).
+ *            If no previous genmove command has been issued, the result
+ *            of this command will be meaningless.
  * Arguments: none
  * Fails:     never
  * Returns:   Move, probabilty pairs, one per row.
@@ -3766,7 +3768,14 @@ gtp_move_probabilities(char *s)
   if (!any_moves_printed)
     gtp_printf("\n");
   gtp_printf("\n");
+
+  return GTP_OK;
+}
+
+
 /* Function:  Return the number of bits of uncertainty in the move.
+ *            If no previous genmove command has been issued, the result
+ *            of this command will be meaningless.
  * Arguments: none
  * Fails:     never
  * Returns:   bits of uncertainty
@@ -3796,10 +3805,6 @@ gtp_move_uncertainty(char *s)
   return GTP_OK;
 }
 
-
-
-  return GTP_OK;
-}
 
 
 /* Function:  Return information about the followup influence after a move.
