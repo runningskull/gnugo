@@ -25,10 +25,10 @@
 #include "gg_utils.h"
 
 static int dilate_erode(int dilations, int erosions, 
-			int gb[MAX_BOARD][MAX_BOARD], int color);
+			int gb[BOARDMAX], int color);
 static void print_new_moyo(int dilations, int erosions);
-static void close_bubbles(int gb[MAX_BOARD][MAX_BOARD]);
-static int captured_territory(int i, int j, int color);
+static void close_bubbles(int gb[BOARDMAX]);
+static int captured_territory(int pos, int color);
 
 #define ARRAYSIZE MAX_BOARD*MAX_BOARD
 
@@ -45,91 +45,100 @@ static int captured_territory(int i, int j, int color);
  */
 
 static int
-dilate_erode(int dilations, int erosions, int gb[MAX_BOARD][MAX_BOARD],
+dilate_erode(int dilations, int erosions, int gb[BOARDMAX],
 	     int color)
 {
   int i, j;
-  int work[MAX_BOARD][MAX_BOARD];
+  int ii;
+  int work[BOARDMAX];
   int n;
   int critical_found = 0;
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) && dragon[POS(i, j)].matcher_status == CRITICAL)
+      ii = POS(i, j);
+
+      if (board[ii] && dragon[ii].matcher_status == CRITICAL)
 	critical_found = 1;
-      if (BOARD(i, j) == WHITE && !captured_territory(i, j, color))
-	gb[i][j] = 128;
-      else if (BOARD(i, j) == BLACK && !captured_territory(i, j, color))      
-	gb[i][j] = -128;
+      if (board[ii] == WHITE && !captured_territory(ii, color))
+	gb[ii] = 128;
+      else if (board[ii] == BLACK && !captured_territory(ii, color))      
+	gb[ii] = -128;
       else
-	gb[i][j] = 0;
+	gb[ii] = 0;
     }
   /* dilate */
   memcpy(work, gb, sizeof(work));
   for (n = 0; n < dilations; n++) {
     for (i = 0; i < board_size; i++)
       for (j = 0; j < board_size; j++) {
-	if (gb[i][j] >= 0
-	    && (i == 0 || gb[i-1][j] >= 0)
-	    && (i == board_size-1 || gb[i+1][j] >= 0)
-	    && (j == 0 || gb[i][j-1] >= 0)
-	    && (j == board_size-1 || gb[i][j+1] >= 0)) {
-	  if (i > 0 && gb[i-1][j] > 0)
-	    work[i][j]++;
-	  if (i < board_size-1 && gb[i+1][j] > 0)
-	    work[i][j]++;
-	  if (j > 0 && gb[i][j-1] > 0)
-	    work[i][j]++;
-	  if (j < board_size-1 && gb[i][j+1] > 0)
-	    work[i][j]++;
+	ii = POS(i, j);
+
+	if (gb[ii] >= 0
+	    && (i == 0 || gb[ii-NS] >= 0)
+	    && (i == board_size-1 || gb[ii+NS] >= 0)
+	    && (j == 0 || gb[ii-1] >= 0)
+	    && (j == board_size-1 || gb[ii+1] >= 0)) {
+	  if (i > 0 && gb[ii-NS] > 0)
+	    work[ii]++;
+	  if (i < board_size-1 && gb[ii+NS] > 0)
+	    work[ii]++;
+	  if (j > 0 && gb[ii-1] > 0)
+	    work[ii]++;
+	  if (j < board_size-1 && gb[ii+1] > 0)
+	    work[ii]++;
 	}
-	if (gb[i][j] <= 0
-	    && (i == 0 || gb[i-1][j] <= 0)
-	    && (i == board_size-1 || gb[i+1][j] <= 0)
-	    && (j == 0 || gb[i][j-1] <= 0)
-	    && (j == board_size-1 || gb[i][j+1] <= 0)) {
-	  if (i > 0 && gb[i-1][j] < 0)
-	    work[i][j]--;
-	  if (i < board_size-1 && gb[i+1][j] < 0)
-	    work[i][j]--;
-	  if (j > 0 && gb[i][j-1] < 0)
-	    work[i][j]--;
-	  if (j < board_size-1 && gb[i][j+1] < 0)
-	    work[i][j]--;
+	if (gb[ii] <= 0
+	    && (i == 0 || gb[ii-NS] <= 0)
+	    && (i == board_size-1 || gb[ii+NS] <= 0)
+	    && (j == 0 || gb[ii-1] <= 0)
+	    && (j == board_size-1 || gb[ii+1] <= 0)) {
+	  if (i > 0 && gb[ii-NS] < 0)
+	    work[ii]--;
+	  if (i < board_size-1 && gb[ii+NS] < 0)
+	    work[ii]--;
+	  if (j > 0 && gb[i-1] < 0)
+	    work[ii]--;
+	  if (j < board_size-1 && gb[ii+1] < 0)
+	    work[ii]--;
 	}
       }
     memcpy(gb, work, sizeof(work));
   }
+
   /* erode */
   for (n = 0; n < erosions; n++) {
     for (i = 0; i < board_size; i++)
       for (j = 0; j < board_size; j++) {
-	if (work[i][j] > 0) {
-	  if (i > 0 && gb[i-1][j] <= 0)
-	    work[i][j]--;
-	  if (i < board_size-1 && gb[i+1][j] <= 0 && work[i][j] > 0)
-	    work[i][j]--;
-	  if (j > 0 && gb[i][j-1] <= 0 && work[i][j] > 0)
-	    work[i][j]--;
-	  if (j < board_size-1 && gb[i][j+1] <= 0 && work[i][j] > 0)
-	    work[i][j]--;
+	ii = POS(i, j);
+
+	if (work[ii] > 0) {
+	  if (i > 0 && gb[ii-NS] <= 0)
+	    work[ii]--;
+	  if (i < board_size-1 && gb[ii+NS] <= 0 && work[ii] > 0)
+	    work[ii]--;
+	  if (j > 0 && gb[ii-1] <= 0 && work[ii] > 0)
+	    work[ii]--;
+	  if (j < board_size-1 && gb[ii+1] <= 0 && work[ii] > 0)
+	    work[ii]--;
 	}
-	if (work[i][j] < 0) {
-	  if (i > 0 && gb[i-1][j] >= 0)
-	    work[i][j]++;
-	  if (i < board_size-1 && gb[i+1][j] >= 0 && work[i][j] < 0)
-	    work[i][j]++;
-	  if (j > 0 && gb[i][j-1] >= 0 && work[i][j] < 0)
-	    work[i][j]++;
-	  if (j < board_size-1 && gb[i][j+1] >= 0 && work[i][j] < 0)
-	    work[i][j]++;
+	if (work[ii] < 0) {
+	  if (i > 0 && gb[ii-NS] >= 0)
+	    work[ii]++;
+	  if (i < board_size-1 && gb[ii+NS] >= 0 && work[ii] < 0)
+	    work[ii]++;
+	  if (j > 0 && gb[ii-1] >= 0 && work[ii] < 0)
+	    work[ii]++;
+	  if (j < board_size-1 && gb[ii+1] >= 0 && work[ii] < 0)
+	    work[ii]++;
 	}
       }
     memcpy(gb, work, sizeof(work));
   }
   return critical_found;
 }
-    
+
+
 /* For scoring, it is assumed that any region completely
  * surrounded by territory is territory. This assumption
  * is particularly valid at the end of the game when
@@ -145,10 +154,11 @@ dilate_erode(int dilations, int erosions, int gb[MAX_BOARD][MAX_BOARD],
  */
 
 static void
-close_bubbles(int gb[MAX_BOARD][MAX_BOARD])
+close_bubbles(int gb[BOARDMAX])
 {
-  int bubbles[MAX_BOARD][MAX_BOARD];
+  int bubbles[BOARDMAX];
   int i, j;
+  int ii;
   int found_one = 1;
 
   memset(bubbles, 0, sizeof(bubbles));
@@ -160,37 +170,39 @@ close_bubbles(int gb[MAX_BOARD][MAX_BOARD])
 	int black_neighbor = 0;
 	int new_color = 0;
 
-	if (gb[i][j] || bubbles[i][j] == GRAY)
+	ii = POS(i, j);
+
+	if (gb[ii] || bubbles[ii] == GRAY)
 	  continue;
 	/* If any neighbor is gray, mark the spot gray */
-	if ((i > 0 && bubbles[i-1][j] == GRAY)
-	    || (i < board_size-1 && bubbles[i+1][j] == GRAY)
-	    || (j > 0 && bubbles[i][j-1] == GRAY)
-	    || (j < board_size-1 && bubbles[i][j+1] == GRAY)) {
+	if ((i > 0 && bubbles[ii-NS] == GRAY)
+	    || (i < board_size-1 && bubbles[ii+NS] == GRAY)
+	    || (j > 0 && bubbles[ii-1] == GRAY)
+	    || (j < board_size-1 && bubbles[ii+1] == GRAY)) {
 	  found_one = 1;
-	  bubbles[i][j] = GRAY;
+	  bubbles[ii] = GRAY;
 	}
 	else {
 	  /* Look for white neighbors, including the spot itself */
-	  if (bubbles[i][j] == WHITE
+	  if (bubbles[ii] == WHITE
 	      || (i > 0 
-		  && (gb[i-1][j] > 0 || bubbles[i-1][j] == WHITE))
+		  && (gb[ii-NS] > 0 || bubbles[ii-NS] == WHITE))
 	      || (i < board_size-1
-		  && (gb[i+1][j] > 0 || bubbles[i+1][j] == WHITE))
+		  && (gb[ii+NS] > 0 || bubbles[ii+NS] == WHITE))
 	      || (j > 0 
-		  && (gb[i][j-1] > 0 || bubbles[i][j-1] == WHITE))
+		  && (gb[ii-1] > 0 || bubbles[ii-1] == WHITE))
 	      || (j < board_size-1
-		  && (gb[i][j+1] > 0 || bubbles[i][j+1] == WHITE)))
+		  && (gb[ii+1] > 0 || bubbles[ii+1] == WHITE)))
 	    white_neighbor = 1;
-	  if (bubbles[i][j] == BLACK
+	  if (bubbles[ii] == BLACK
 	      || (i > 0 
-		  && (gb[i-1][j] < 0 || bubbles[i-1][j] == BLACK))
+		  && (gb[ii-NS] < 0 || bubbles[ii-NS] == BLACK))
 	      || (i < board_size-1
-		  && (gb[i+1][j] < 0 || bubbles[i+1][j] == BLACK))
+		  && (gb[ii+NS] < 0 || bubbles[ii+NS] == BLACK))
 	      || (j > 0 
-		  && (gb[i][j-1] < 0 || bubbles[i][j-1] == BLACK))
+		  && (gb[ii-1] < 0 || bubbles[ii-1] == BLACK))
 	      || (j < board_size-1
-		  && (gb[i][j+1] < 0 || bubbles[i][j+1] == BLACK)))
+		  && (gb[ii+1] < 0 || bubbles[ii+1] == BLACK)))
 	    black_neighbor = 1;
 	  if (white_neighbor) {
 	    if (black_neighbor)
@@ -200,9 +212,9 @@ close_bubbles(int gb[MAX_BOARD][MAX_BOARD])
 	  }
 	  else if (black_neighbor)
 	    new_color = BLACK;
-	  if (new_color && new_color != bubbles[i][j]) {
+	  if (new_color && new_color != bubbles[ii]) {
 	    found_one = 1;
-	    bubbles[i][j] = new_color;
+	    bubbles[ii] = new_color;
 	  }
 	}
       }
@@ -211,12 +223,14 @@ close_bubbles(int gb[MAX_BOARD][MAX_BOARD])
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (gb[i][j])
+      ii = POS(i, j);
+
+      if (gb[ii])
 	continue;
-      if (bubbles[i][j] == WHITE)
-	gb[i][j] = 1;
-      if (bubbles[i][j] == BLACK)
-	gb[i][j] = -1;
+      if (bubbles[ii] == WHITE)
+	gb[ii] = 1;
+      if (bubbles[ii] == BLACK)
+	gb[ii] = -1;
     }
 }
 
@@ -228,46 +242,50 @@ close_bubbles(int gb[MAX_BOARD][MAX_BOARD])
  */
 
 static void
-print_regions(int gb[MAX_BOARD][MAX_BOARD])
+print_regions(int gb[BOARDMAX])
 {
   int i, j, k;
+  int ii;
 
   start_draw_board();
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) && dragon[POS(i, j)].matcher_status != DEAD)
-	k = BOARD(i, j);
+      ii = POS(i, j);
+
+      if (board[ii] && dragon[ii].matcher_status != DEAD)
+	k = board[ii];
       else
 	k = EMPTY;
 
       switch (k) {
       case EMPTY:
-	if (gb[i][j] > 0)
-	  draw_color_char(i, j, 'w', GG_COLOR_GREEN);
-	else if (gb[i][j] < 0)
-	  draw_color_char(i, j, 'b', GG_COLOR_MAGENTA);
+	if (gb[ii] > 0)
+	  draw_color_char(I(ii), J(ii), 'w', GG_COLOR_GREEN);
+	else if (gb[ii] < 0)
+	  draw_color_char(I(ii), J(ii), 'b', GG_COLOR_MAGENTA);
 	else
-	  draw_color_char(i, j, '.', GG_COLOR_BLACK);
+	  draw_color_char(I(ii), J(ii), '.', GG_COLOR_BLACK);
 	break;
 
       case BLACK:
-	if (dragon[POS(i, j)].matcher_status == CRITICAL)
-	  draw_color_char(i, j, 'X', GG_COLOR_RED);
+	if (dragon[ii].matcher_status == CRITICAL)
+	  draw_color_char(I(ii), J(ii), 'X', GG_COLOR_RED);
 	else
-	  draw_color_char(i, j, 'X', GG_COLOR_BLACK);
+	  draw_color_char(I(ii), J(ii), 'X', GG_COLOR_BLACK);
 	break;
 
       case WHITE:
-	if (dragon[POS(i, j)].matcher_status == CRITICAL)
-	  draw_color_char(i, j, 'O', GG_COLOR_RED);
+	if (dragon[ii].matcher_status == CRITICAL)
+	  draw_color_char(I(ii), J(ii), 'O', GG_COLOR_RED);
 	else
-	  draw_color_char(i, j, 'O', GG_COLOR_BLACK);
+	  draw_color_char(I(ii), J(ii), 'O', GG_COLOR_BLACK);
 	break;
       }
     }
   }
   end_draw_board();
 }
+
 
 /* Print the moyo regions after a specified number
  * of dilations and erosions.
@@ -289,12 +307,13 @@ print_moyo(void)
 static void
 print_new_moyo(int dilations, int erosions)
 {
-  int gb[MAX_BOARD][MAX_BOARD];
+  int gb[BOARDMAX];
   dilate_erode(dilations, erosions, gb, WHITE);
   close_bubbles(gb);
   print_regions(gb);
 }
-  
+
+
 /* Put upper and lower score estimates into *upper, *lower and
  * return the average. A positive score favors white. In computing
  * the upper bound, CRITICAL dragons are awarded to white; in
@@ -304,13 +323,14 @@ print_new_moyo(int dilations, int erosions)
 float
 estimate_score(float *upper, float *lower)
 {
-  int gb[MAX_BOARD][MAX_BOARD];
+  int gb[BOARDMAX];
 
   float white_territory = 0.0;
   float black_territory = 0.0;
   float white_area = 0.0;
   float black_area = 0.0;
   int i, j;
+  int ii;
   float u, l;
   int critical;
 
@@ -318,16 +338,18 @@ estimate_score(float *upper, float *lower)
   close_bubbles(gb);
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == BLACK) {
-	if (captured_territory(i, j, WHITE)) {
+      ii = POS(i, j);
+
+      if (board[ii] == BLACK) {
+	if (captured_territory(ii, WHITE)) {
 	  white_territory += 2;
 	  white_area++;
 	}
 	else
 	  black_area++;
       }
-      else if (BOARD(i, j) == WHITE) {
-	if (captured_territory(i, j, WHITE)) {
+      else if (board[ii] == WHITE) {
+	if (captured_territory(ii, WHITE)) {
 	  black_territory += 2;
 	  black_area++;
 	}
@@ -335,11 +357,11 @@ estimate_score(float *upper, float *lower)
 	  white_area++;
       }
       else {
-	if (gb[i][j] > 0.0) {
+	if (gb[ii] > 0.0) {
 	  white_territory++;
 	  white_area++;
 	}
-	else if (gb[i][j] < 0.0) {
+	else if (gb[ii] < 0.0) {
 	  black_territory++;
 	  black_area++;
 	}
@@ -369,26 +391,28 @@ estimate_score(float *upper, float *lower)
     close_bubbles(gb);
     for (i = 0; i < board_size; i++) {
       for (j = 0; j < board_size; j++) {
-	if (BOARD(i, j) == BLACK) {
-	  if (captured_territory(i, j, BLACK)) {
+	ii = POS(i, j);
+
+	if (board[ii] == BLACK) {
+	  if (captured_territory(ii, BLACK)) {
 	    white_territory += 2;
 	    white_area++;
 	  }
 	  else
 	    black_area++;
 	}
-	else if (BOARD(i, j) == WHITE) {
-	  if (captured_territory(i, j, BLACK)) {
+	else if (board[ii] == WHITE) {
+	  if (captured_territory(ii, BLACK)) {
 	    black_territory += 2;
 	    black_area++;
 	  }
 	}
 	else {
-	  if (gb[i][j] > 0.0) {
+	  if (gb[ii] > 0.0) {
 	    white_territory++;
 	    white_area++;
 	  }
-	  else if (gb[i][j] < 0.0) {
+	  else if (gb[ii] < 0.0) {
 	    black_territory++;
 	    black_area++;
 	    
@@ -418,11 +442,12 @@ estimate_score(float *upper, float *lower)
   return (u + l) / 2;
 }
 
+
 /* We do not count dead stones inside the eyespace as territory. Such a stone
  * is characterized as having matcher_status DEAD yet having only DEAD
  * dragons as neighbors.
  *
- * If (i, j) is the location of a stone which is DEAD and which is
+ * If (pos) is the location of a stone which is DEAD and which is
  * not an exception of this type then it is safe to count it as
  * two points territory for the opponent. This function tests for
  * this condition.
@@ -431,10 +456,9 @@ estimate_score(float *upper, float *lower)
  */
 
 static int
-captured_territory(int i, int j, int color)
+captured_territory(int pos, int color)
 {
   int d;
-  int pos = POS(i, j);
 
   if (board[pos] == EMPTY 
       || dragon[pos].matcher_status == ALIVE

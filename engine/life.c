@@ -80,26 +80,24 @@
 #define MAX_BOUNDARY_STRINGS 20
 
 /* List of eye point coordinates. */
-static int eyei[MAX_EYE_SIZE+1];
-static int eyej[MAX_EYE_SIZE+1];
+static int eye[MAX_EYE_SIZE+1];
 
 /* Array with inverse mapping. The index MAX_EYE_SIZE is by convention
  * used to encode a pass move.
  */
-static int eyeindex[MAX_BOARD][MAX_BOARD];
+static int eyeindex[BOARDMAX];
 
 /* Proper eye points, i.e. not margins or external diagonals. */
-static int proper_eye[MAX_BOARD][MAX_BOARD];
+static int proper_eye[BOARDMAX];
 
 /* Eye point restrictions. */
-static int eye_restrictions[MAX_BOARD][MAX_BOARD];
+static int eye_restrictions[BOARDMAX];
 #define DEFENDER_NOT_PLAY         0x01
 #define ATTACKER_PLAY_SAFE        0x02
 #define DEFENDER_PLAY_IF_CAPTURE  0x04
 
 /* List of boundary strings. */
-static int boundaryi[MAX_BOUNDARY_STRINGS];
-static int boundaryj[MAX_BOUNDARY_STRINGS];
+static int boundary[MAX_BOUNDARY_STRINGS];
 
 static int eyesize;
 static int eye_color;
@@ -231,7 +229,7 @@ compute_hashvalue(void)
   int k;
   unsigned int hash = 0;
   for (k=0; k<eyesize; k++)
-    hash |= BOARD(eyei[k], eyej[k]) << 2*k;
+    hash |= board[eye[k]] << 2*k;
 
   return hash;
 }
@@ -247,12 +245,10 @@ get_eyehash_node(int attack)
   struct eyehash_node *p;
   struct eyehash_node *last_p;
   int invalid_bit = (attack ? ATTACK_INVALID_BIT : DEFENSE_INVALID_BIT);
-  int board_ko_i = I(board_ko_pos);
-  int board_ko_j = J(board_ko_pos);
 
   /* Add the ko point to the hash value. */
-  if (board_ko_i != -1 && eyeindex[board_ko_i][board_ko_j] >= 0)
-    hash |= 3 << (2 * eyeindex[board_ko_i][board_ko_j]);
+  if (board_ko_pos != NO_MOVE && eyeindex[board_ko_pos] >= 0)
+    hash |= 3 << (2 * eyeindex[board_ko_pos]);
   key = hash % EYEHASH_TABLE_SIZE;
 
   /* Search through the linked list for this entry. */
@@ -297,23 +293,28 @@ get_eyehash_node(int attack)
 /*                          Prepare the eyespace                    */
 /* ================================================================ */
 
+
 static void
 clear_eyepoints(void)
 {
   int i, j;
+  int ii;
+
   eyesize = 0;
   for (i = 0; i < board_size; ++i)
     for (j = 0; j < board_size; ++j) {
-      eyeindex[i][j] = -1;
-      proper_eye[i][j] = 0;
-      eye_restrictions[i][j] = 0;
+      ii = POS(i, j);
+
+      eyeindex[ii] = -1;
+      proper_eye[ii] = 0;
+      eye_restrictions[ii] = 0;
     }
 }
 
 static void
-include_eyepoint(int i, int j, int proper, int restrictions)
+include_eyepoint(int pos, int proper, int restrictions)
 {
-  if (eyeindex[i][j] == -1) {
+  if (eyeindex[pos] == -1) {
     /* FIXME: This is only a temporary workaround to avoid a crash in
      * the assertion below.
      */
@@ -321,72 +322,71 @@ include_eyepoint(int i, int j, int proper, int restrictions)
       return;
     /* FIXME:
      * Should this be < MAX_EYE_SIZE?
-     * The list of eyes in eyei, eyej is ended
-     * with (-1, -1)
+     * The list of points in eye[] is ended with (NO_MOVE)
      */
-    ASSERT2(eyesize <= MAX_EYE_SIZE, i, j);
-    eyeindex[i][j] = eyesize;
-    eyei[eyesize] = i;
-    eyej[eyesize] = j;
+    ASSERT1(eyesize <= MAX_EYE_SIZE, pos);
+    eyeindex[pos] = eyesize;
+    eye[eyesize] = pos;
     eyesize++;
   }
   if (proper)
-    proper_eye[i][j] = 1;
+    proper_eye[pos] = 1;
 
-  eye_restrictions[i][j] |= restrictions;
+  eye_restrictions[pos] |= restrictions;
 }
+
 
 /* Explanations can be found above the calls in prepare_eyespace(). */
 static void
-check_vulnerability(int i, int j, int m, int n)
+check_vulnerability(int marginal_eyepoint, int stone)
 {
-  if (!ON_BOARD2(m, n))
+  if (!ON_BOARD(stone))
     return;
   
-  if (BOARD(m, n) == EMPTY) {
-    if (eyeindex[m][n] == -1)
-      include_eyepoint(m, n, 0, DEFENDER_PLAY_IF_CAPTURE);
+  if (board[stone] == EMPTY) {
+    if (eyeindex[stone] == NO_MOVE)
+      include_eyepoint(stone, 0, DEFENDER_PLAY_IF_CAPTURE);
     return;
   }
   
   /* Both eyespace and boundary are excluded. */
-  if (eyeindex[m][n] != -1)
+  if (eyeindex[stone] != -1)
     return;
 
   /* Play the opposite color of (m, n) on the margin and try to
-   * capture (m, n)
+   * capture (stone)
    */
-  if (!trymove(POS(i, j), OTHER_COLOR(BOARD(m, n)), "check_vulnerability",
-	       POS(m, n), EMPTY, NO_MOVE))
+  if (!trymove(marginal_eyepoint, OTHER_COLOR(board[stone]),
+	       "check_vulnerability", stone, EMPTY, NO_MOVE))
     return;
 
-  if (BOARD(m, n) && attack(POS(m, n), NULL)) {
+  if (board[stone] && attack(stone, NULL)) {
     int liberties;
     int libs[2];
     /* Vulnerability found. First pick up its liberties. */
-    liberties = findlib(POS(m, n), 2, libs);
+    liberties = findlib(stone, 2, libs);
     
-    if (BOARD(m, n) == eye_color && liberties == 1) {
+    if (board[stone] == eye_color && liberties == 1) {
       /* Strategy (c). */
-      include_eyepoint(m, n, 0, 0);
-      include_eyepoint(I(libs[0]), J(libs[0]), 0, DEFENDER_NOT_PLAY);
+      include_eyepoint(stone, 0, 0);
+      include_eyepoint(libs[0], 0, DEFENDER_NOT_PLAY);
     }
-    else if (BOARD(m, n) == OTHER_COLOR(eye_color)) {
+    else if (board[stone] == OTHER_COLOR(eye_color)) {
       if (liberties > 1
-	  || countstones(POS(m, n)) > 6
-	  || eyesize + countstones(POS(m, n)) + 1 > MAX_EYE_SIZE) {
+	  || countstones(stone) > 6
+	  || eyesize + countstones(stone) + 1 > MAX_EYE_SIZE) {
 	/* Strategy (b). */
-	include_eyepoint(i, j, 0, ATTACKER_PLAY_SAFE);
+	include_eyepoint(marginal_eyepoint, 0, ATTACKER_PLAY_SAFE);
       }
       else {
 	/* Strategy (a) */
 	int k;
 	int stones[6];
-	int size = findstones(POS(m, n), 6, stones);
+	int size = findstones(stone, 6, stones);
 	gg_assert(size <= 6);
 	for (k=0; k<size; k++)
-	  include_eyepoint(I(stones[k]), J(stones[k]), 0, 0);
-	include_eyepoint(I(libs[0]), J(libs[0]), 0, DEFENDER_PLAY_IF_CAPTURE);
+	  include_eyepoint(stones[k], 0, 0);
+	include_eyepoint(libs[0], 0, DEFENDER_PLAY_IF_CAPTURE);
       }
     }
   }
@@ -399,6 +399,7 @@ print_eyespace(struct eye_data eyedata[BOARDMAX],
 	       struct half_eye_data heye[BOARDMAX])
 {
   int m, n;
+  int ii;
   int k;
   int mini, maxi;
   int minj, maxj;
@@ -409,8 +410,8 @@ print_eyespace(struct eye_data eyedata[BOARDMAX],
   minj = board_size;
   maxj = -1;
   for (k = 0; k < eyesize; k++) {
-    m = eyei[k];
-    n = eyej[k];
+    m = I(eye[k]);
+    n = J(eye[k]);
     if (m < mini) mini = m;
     if (m > maxi) maxi = m;
     if (n < minj) minj = n;
@@ -426,16 +427,18 @@ print_eyespace(struct eye_data eyedata[BOARDMAX],
   for (m = mini; m <= maxi; m++) {
     gprintf(""); /* Get the indentation right. */
     for (n = minj; n <= maxj; n++) {
-      if (eyeindex[m][n] >= 0) {
-	if (BOARD(m, n) == EMPTY) {
-	  if (eyedata[POS(m, n)].marginal)
+      ii = POS(m, n);
+
+      if (eyeindex[ii] >= 0) {
+	if (board[ii] == EMPTY) {
+	  if (eyedata[ii].marginal)
 	    gprintf("%o!");
-	  else if (is_halfeye(heye, POS(m, n)))
+	  else if (is_halfeye(heye, ii))
 	    gprintf("%oh");
 	  else
 	    gprintf("%o.");
 	}
-	else if (is_halfeye(heye, POS(m, n)))
+	else if (is_halfeye(heye, ii))
 	  gprintf("%oH");
 	else
 	  gprintf("%oX");
@@ -449,14 +452,15 @@ print_eyespace(struct eye_data eyedata[BOARDMAX],
 
 
 static int
-prepare_eyespace(int m, int n, struct eye_data eyedata[BOARDMAX],
+prepare_eyespace(int pos, struct eye_data eyedata[BOARDMAX],
 		 struct half_eye_data heye[BOARDMAX])
 {
   int i, j;
+  int ii;
   int k;
   
   /* Set `eye_color' to the owner of the eye. */
-  eye_color = eyedata[POS(m, n)].color;
+  eye_color = eyedata[pos].color;
   if (eye_color == BLACK_BORDER)
     eye_color = BLACK;
   if (eye_color == WHITE_BORDER)
@@ -470,15 +474,15 @@ prepare_eyespace(int m, int n, struct eye_data eyedata[BOARDMAX],
    */
   for (i = 0; i < board_size; ++i)
     for (j = 0; j < board_size; ++j) {
-      if (eyedata[POS(i, j)].origin == POS(m, n)) {
-	include_eyepoint(i, j, eyedata[POS(i, j)].marginal == 0, 0);
-	if (is_halfeye(heye, POS(i, j))) {
-	  for (k=0; k<heye[POS(i, j)].num_attacks; k++)
-	    include_eyepoint(I(heye[POS(i, j)].attack_point[k]),
-			     J(heye[POS(i, j)].attack_point[k]), 0, 0);
-	  for (k=0; k<heye[POS(i, j)].num_defends; k++)
-	    include_eyepoint(I(heye[POS(i, j)].defense_point[k]),
-			     J(heye[POS(i, j)].defense_point[k]), 0, 0);
+      ii = POS(i, j);
+
+      if (eyedata[ii].origin == pos) {
+	include_eyepoint(ii, eyedata[ii].marginal == 0, 0);
+	if (is_halfeye(heye, ii)) {
+	  for (k=0; k<heye[ii].num_attacks; k++)
+	    include_eyepoint(heye[ii].attack_point[k], 0, 0);
+	  for (k=0; k<heye[ii].num_defends; k++)
+	    include_eyepoint(heye[ii].defense_point[k], 0, 0);
 	}
       }
     }
@@ -498,21 +502,20 @@ prepare_eyespace(int m, int n, struct eye_data eyedata[BOARDMAX],
   boundary_size = 0;
   for (i = 0; i < board_size; ++i)
     for (j = 0; j < board_size; ++j) {
-      if (BOARD(i, j) != eye_color)
+      ii = POS(i, j);
+
+      if (board[ii] != eye_color)
 	continue;
-      if (eyeindex[i][j] >= 0)
+      if (eyeindex[ii] >= 0)
 	continue;
-      if ((   i > 0	       && proper_eye[i-1][j])
-	  || (i < board_size-1 && proper_eye[i+1][j])
-	  || (j > 0	       && proper_eye[i][j-1])
-	  || (j < board_size-1 && proper_eye[i][j+1])) {
-	int origin = find_origin(POS(i, j));
-	int oi = I(origin);
-	int oj = J(origin);
-	if (eyeindex[oi][oj] != -2) {
-	  eyeindex[oi][oj] = -2;
-	  boundaryi[boundary_size] = oi;
-	  boundaryj[boundary_size] = oj;
+      if ((   i > 0	       && proper_eye[ii-NS])
+	  || (i < board_size-1 && proper_eye[ii+NS])
+	  || (j > 0	       && proper_eye[ii-1])
+	  || (j < board_size-1 && proper_eye[ii+1])) {
+	int origin = find_origin(ii);
+	if (eyeindex[origin] != -2) {
+	  eyeindex[origin] = -2;
+	  boundary[boundary_size] = origin;
 	  boundary_size++;
 	  gg_assert(boundary_size <= MAX_BOUNDARY_STRINGS);
 	}
@@ -552,17 +555,16 @@ prepare_eyespace(int m, int n, struct eye_data eyedata[BOARDMAX],
    */
 
   for (k=0; k<eyesize; k++) {
-    i = eyei[k];
-    j = eyej[k];
-    if (!eyedata[POS(i, j)].marginal)
+    ii = eye[k];
+    if (!eyedata[ii].marginal)
       continue;
     /* Found a margin. Now look for a vulnerable stone outside the
      * eyespace.
      */
-    check_vulnerability(i, j, i-1, j);
-    check_vulnerability(i, j, i+1, j);
-    check_vulnerability(i, j, i, j-1);
-    check_vulnerability(i, j, i, j+1);
+    check_vulnerability(ii, ii-NS);
+    check_vulnerability(ii, ii+NS);
+    check_vulnerability(ii, ii-1);
+    check_vulnerability(ii, ii+1);
   }
 
   /* Verify that the effective eyespace still isn't too large. */
@@ -573,8 +575,7 @@ prepare_eyespace(int m, int n, struct eye_data eyedata[BOARDMAX],
   eyehash_clear();
 
   /* Add a pass move at the end of the eyespace list. */
-  eyei[MAX_EYE_SIZE] = -1;
-  eyej[MAX_EYE_SIZE] = -1;
+  eye[MAX_EYE_SIZE] = NO_MOVE;
 
   if (debug & DEBUG_EYES) {
     gprintf("Prepared eyespace:\n");
@@ -628,7 +629,7 @@ recognize_eye2(int pos, int *attack_point, int *defense_point,
   stackp_when_called = stackp;
   
   /* Set up all data structures necessary to analyze the eyespace. */
-  if (!prepare_eyespace(m, n, eyedata, heye))
+  if (!prepare_eyespace(POS(m, n), eyedata, heye))
     return 0;
 
   DEBUG(DEBUG_EYES, "================  MINIMIZE 1 ================\n");
@@ -664,19 +665,17 @@ recognize_eye2(int pos, int *attack_point, int *defense_point,
   if (!result2b)
     return 0;
 
-  DEBUG(DEBUG_EYES, "Min: ko_master %C, eyes=%d, ko=%d, attack: %m\n",
-	eye_color, min1a, ko1a,	eyei[attack_point1a], eyej[attack_point1a]);
+  DEBUG(DEBUG_EYES, "Min: ko_master %C, eyes=%d, ko=%d, attack: %1m\n",
+	eye_color, min1a, ko1a,	eye[attack_point1a]);
   
-  DEBUG(DEBUG_EYES, "Min: ko_master %C, eyes=%d, ko=%d, attack: %m\n",
-	OTHER_COLOR(eye_color), min1b, ko1b,
-	eyei[attack_point1b], eyej[attack_point1b]);
+  DEBUG(DEBUG_EYES, "Min: ko_master %C, eyes=%d, ko=%d, attack: %1m\n",
+	OTHER_COLOR(eye_color), min1b, ko1b, eye[attack_point1b]);
   
-  DEBUG(DEBUG_EYES, "Max: ko_master %C, eyes=%d, ko=%d, defense: %m\n",
-	eye_color, max2a, ko2a,	eyei[defense_point2a], eyej[defense_point2a]);
+  DEBUG(DEBUG_EYES, "Max: ko_master %C, eyes=%d, ko=%d, defense: %1m\n",
+	eye_color, max2a, ko2a,	eye[defense_point2a]);
   
-  DEBUG(DEBUG_EYES, "Max: ko_master %C, eyes=%d, ko=%d, defense: %m\n",
-	OTHER_COLOR(eye_color), max2b, ko2b,
-	eyei[defense_point2b], eyej[defense_point2b]);
+  DEBUG(DEBUG_EYES, "Max: ko_master %C, eyes=%d, ko=%d, defense: %1m\n",
+	OTHER_COLOR(eye_color), max2b, ko2b, eye[defense_point2b]);
   
   *min = min1a;
   *max = max2b;
@@ -689,9 +688,9 @@ recognize_eye2(int pos, int *attack_point, int *defense_point,
   
   if (*min != *max) {
     if (attack_point)
-      *attack_point = POS(eyei[attack_point1a], eyej[attack_point1a]);
+      *attack_point = eye[attack_point1a];
     if (defense_point)
-      *defense_point = POS(eyei[defense_point2b], eyej[defense_point2b]);
+      *defense_point = eye[defense_point2b];
     DEBUG(DEBUG_EYES, "  vital point (attack):  %1m\n", *attack_point);
     DEBUG(DEBUG_EYES, "  vital point (defense): %1m\n", *defense_point);
   }
@@ -713,12 +712,12 @@ recognize_eye2(int pos, int *attack_point, int *defense_point,
  * want to check that an opponent move here would be suicide.
  */
 static int
-is_small_eye(int i, int j)
+is_small_eye(int pos)
 {
-  if (!((   i == 0            || BOARD(i-1, j) == eye_color)
-	&& (i == board_size-1 || BOARD(i+1, j) == eye_color)
-	&& (j == 0            || BOARD(i, j-1) == eye_color)
-	&& (j == board_size-1 || BOARD(i, j+1) == eye_color)))
+  if (!(   (!ON_BOARD(pos-NS) || board[pos-NS] == eye_color)
+	&& (!ON_BOARD(pos+NS) || board[pos+NS] == eye_color)
+	&& (!ON_BOARD(pos-1)  || board[pos-1] == eye_color)
+	&& (!ON_BOARD(pos+1)  || board[pos+1] == eye_color)))
     return 0;
   return 1;
 }
@@ -727,28 +726,28 @@ is_small_eye(int i, int j)
  * topologically false and not a marginal eye point.
  */
 static int
-is_true_eye(struct half_eye_data heye[BOARDMAX], int i, int j)
+is_true_eye(struct half_eye_data heye[BOARDMAX], int pos)
 {
   int other = OTHER_COLOR(eye_color);
   
   /* False eyes and other marginal eye points do not yield eyes. */
-  if (heye[POS(i, j)].type == FALSE_EYE)
+  if (heye[pos].type == FALSE_EYE)
     return 0;
   
   /* If this is a halfeye, check the vital diagonals. */
-  if (is_halfeye(heye, POS(i, j))) {
+  if (is_halfeye(heye, pos)) {
     int good = 0;
     int bad = 0;
     int k;
     /* This requires attack points and defense points to be identical. */
-    for (k=0; k<heye[POS(i, j)].num_attacks; k++) {
-      int apos = heye[POS(i, j)].attack_point[k];
+    for (k=0; k<heye[pos].num_attacks; k++) {
+      int aa = heye[pos].attack_point[k];
 
-      if (board[apos] == eye_color)
+      if (board[aa] == eye_color)
 	good++;
-      else if (board[apos] == other)
+      else if (board[aa] == other)
 	bad++;
-      else if (is_suicide(apos, eye_color))
+      else if (is_suicide(aa, eye_color))
 	bad++;
       else
 	good++;
@@ -761,20 +760,22 @@ is_true_eye(struct half_eye_data heye[BOARDMAX], int i, int j)
   return 1;
 }
 
+
 /* Returns 1 if at least one string in the eyespace is captured when
- * color plays at (m, n).
+ * color plays at (pos).
  */
 static int
-life_does_capture_something(int m, int n, int color)
+life_does_capture_something(int pos, int color)
 {
   int other = OTHER_COLOR(color);
   int k;
+
   for (k=0; k<4; k++) {
-    int dm = deltai[k];
-    int dn = deltaj[k];
-    if (BOARD(m+dm, n+dn) == other
-	&& countlib(POS(m+dm, n+dn)) == 1
-	&& eyeindex[m+dm][n+dn] >= 0)
+    int d = delta[k];
+
+    if (board[pos+d] == other
+	&& countlib(pos+d) == 1
+	&& eyeindex[pos+d] >= 0)
       return 1;
   }
 
@@ -875,8 +876,8 @@ compare_max_eyes(int eyes1, int ko1, int eyes2, int ko2)
   SET_ATTACK(cache_entry, (ko), (eyes), (attack));\
   if (stackp - stackp_when_called < DEBUG_LIMIT)\
     DEBUG(DEBUG_LIFE,\
-	  "exiting minimize_eyes (%s) - result = %d, ko = %d, move %m (%H)\n",\
-	  (message), (eyes), (ko), eyei[(attack)], eyej[(attack)],\
+         "exiting minimize_eyes (%s) - result = %d, ko = %d, move %1m (%H)\n",\
+	  (message), (eyes), (ko), eye[attack],\
 	  hashdata.hashval);\
   return 1;\
   } while(0)
@@ -898,7 +899,7 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
 	      int *attack_point, int cutoff_eyes, int cutoff_ko)
 {
   int other = OTHER_COLOR(eye_color);
-  int i, j;
+  int ii;
   int num_other;
   int num_moves;
   int num_eyes;
@@ -948,9 +949,8 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
       *attack_point = attack_point1;
     
     if (stackp - stackp_when_called < DEBUG_LIMIT)
-      DEBUG(DEBUG_LIFE, "exiting minimize_eyes - got result %d eyes, %d ko (move %m) from the cache. (%H)\n",
-	    *min, *ko_out, eyei[attack_point1], eyej[attack_point1],
-	    hashdata.hashval);
+      DEBUG(DEBUG_LIFE, "exiting minimize_eyes - got result %d eyes, %d ko (move %1m) from the cache. (%H)\n",
+	    *min, *ko_out, eye[attack_point1], hashdata.hashval);
     return 1;
   }
 
@@ -962,8 +962,8 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
    */
   for (k=0; k<boundary_size; k++) {
     int libs[2];
-    if (findlib(POS(boundaryi[k], boundaryj[k]), 2, libs) == 1) {
-      int index = eyeindex[I(libs[0])][J(libs[0])];
+    if (findlib(boundary[k], 2, libs) == 1) {
+      int index = eyeindex[libs[0]];
       /* If the move is outside the eyespace, return a pass.
        * FIXME: This is of course just a workaround.
        */
@@ -986,19 +986,18 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
   num_moves = 0;
   num_eyes = 0;
   for (k=0; k<eyesize; k++) {
-    int i = eyei[k];
-    int j = eyej[k];
-    
-    if (BOARD(i, j) == eye_color)
+    int ii = eye[k];
+
+    if (board[ii] == eye_color)
       continue;
 
-    if (BOARD(i, j) == other) {
-      if (proper_eye[i][j])
+    if (board[ii] == other) {
+      if (proper_eye[ii])
 	num_other++;
       continue;
     } 
 
-    if (!is_suicide(POS(i, j), other)) {
+    if (!is_suicide(ii, other)) {
       score = 0;
       move[num_moves] = k;
       /* Score the move. We give (preliminarily)
@@ -1015,15 +1014,15 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
        * captures at least one of them. This is likely to be good, so
        * we give a high score.
        */
-      if (i > 0            && BOARD(i-1, j) != eye_color)
+      if (I(ii) > 0            && board[ii-NS] != eye_color)
 	score++;
-      if (i < board_size-1 && BOARD(i+1, j) != eye_color)
+      if (I(ii) < board_size-1 && board[ii+NS] != eye_color)
 	score++;
-      if (j > 0            && BOARD(i, j-1) != eye_color)
+      if (J(ii) > 0            && board[ii-1] != eye_color)
 	score++;
-      if (j < board_size-1 && BOARD(i, j+1) != eye_color)
+      if (J(ii) < board_size-1 && board[ii+1] != eye_color)
 	score++;
-      if (eyedata[POS(i, j)].marginal)
+      if (eyedata[ii].marginal)
 	score += 2;
       if (score == 0)
 	score = 5;
@@ -1031,7 +1030,7 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
       num_moves++;
     }
     else {
-      if (is_small_eye(i, j) && is_true_eye(heye, i,j))
+      if (is_small_eye(ii) && is_true_eye(heye, ii))
 	num_eyes++;
     }
   }
@@ -1078,22 +1077,21 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
       if (move_score[k] != score)
 	continue;
 
-      i = eyei[index];
-      j = eyej[index];
+      ii = eye[index];
 
-      gg_assert(i == -1 || BOARD(i, j) == EMPTY);
+      gg_assert(ii == NO_MOVE || board[ii] == EMPTY);
 
       /* Try the move and see if we can reduce the eyes. */
       save_stackp = stackp;
       if (stackp - stackp_when_called < DEBUG_LIMIT)
-	DEBUG(DEBUG_LIFE, "minimize_eyes: trymove %s %m score %d\n",
-	      color_to_string(other), i, j, score);
+	DEBUG(DEBUG_LIFE, "minimize_eyes: trymove %s %1m score %d\n",
+	      color_to_string(other), ii, score);
       if (index == MAX_EYE_SIZE
-	  || trymove(POS(i, j), other, "minimize_eyes", NO_MOVE, EMPTY, NO_MOVE)
+	  || trymove(ii, other, "minimize_eyes", NO_MOVE, EMPTY, NO_MOVE)
 	  || (ko_master == other
 	      && (ko_in < 3)
 	      && (is_ko = 1)   /* Intentional assignment. */
-	      && tryko(POS(i, j), other, "minimize_eyes", EMPTY, NO_MOVE))) {
+	      && tryko(ii, other, "minimize_eyes", EMPTY, NO_MOVE))) {
 
 	/* The attacker has made his move. Now let's answer him and
 	 * see how many eyes we can get.
@@ -1101,8 +1099,8 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
 	  
 	/* But first we must check a restriction. */
 	if (index != MAX_EYE_SIZE
-	    && (eye_restrictions[i][j] & ATTACKER_PLAY_SAFE)
-	    && attack(POS(i, j), NULL))
+	    && (eye_restrictions[ii] & ATTACKER_PLAY_SAFE)
+	    && attack(ii, NULL))
 	  result = 0;
 	else
 	  result = maximize_eyes(eyedata, heye, &max1, &ko1, ko_in + is_ko,
@@ -1128,8 +1126,8 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
 	/* Illegal ko capture. */
 	if (stackp - stackp_when_called < DEBUG_LIMIT)
 	  DEBUG(DEBUG_LIFE,
-		"  illegal ko capture: %s %m ko master %s ko level %d\n",
-		color_to_string(eye_color), i, j, color_to_string(ko_master),
+		"  illegal ko capture: %s %1m ko master %s ko level %d\n",
+		color_to_string(eye_color), ii, color_to_string(ko_master),
 		ko_in);
       }
 
@@ -1172,7 +1170,7 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
     localmin = 3;
 
   MINIMIZE_EYES_RETURN(localmin, localko, localattack, "all moves tested");
-  }
+}
 
 
 /*
@@ -1192,7 +1190,7 @@ maximize_eyes(struct eye_data eyedata[BOARDMAX],
 	      int *defense_point, int cutoff_eyes, int cutoff_ko)
 {
   int other = OTHER_COLOR(eye_color);
-  int i, j;
+  int ii;
   int min1;
   int localmax;
   int localko;
@@ -1245,9 +1243,8 @@ maximize_eyes(struct eye_data eyedata[BOARDMAX],
       *defense_point = defense_point1;
     
     if (stackp - stackp_when_called < DEBUG_LIMIT)
-      DEBUG(DEBUG_LIFE, "exiting maximize_eyes - got result %d eyes, %d ko (move %m) from the cache. (%H)\n",
-	    *max, *ko_out, eyei[defense_point1], eyej[defense_point1],
-	    hashdata.hashval);
+      DEBUG(DEBUG_LIFE, "exiting maximize_eyes - got result %d eyes, %d ko (move %1m) from the cache. (%H)\n",
+	    *max, *ko_out, eye[defense_point1], hashdata.hashval);
     return 1;
   }
 
@@ -1263,10 +1260,9 @@ maximize_eyes(struct eye_data eyedata[BOARDMAX],
 
   /* Collect all possible moves and see what we get. */
   for (k=0; k<eyesize; k++) {
-    int i = eyei[k];
-    int j = eyej[k];
+    int ii = eye[k];
     
-    if (BOARD(i, j) != EMPTY)
+    if (board[ii] != EMPTY)
       continue;
 
     /* If the eye is of size 1, of the eye owners color, and 
@@ -1279,22 +1275,22 @@ maximize_eyes(struct eye_data eyedata[BOARDMAX],
      *
      * FIXME: Add diagonal test here.
      */
-    if (is_suicide(POS(i, j), other) && is_small_eye(i, j)) {
-      if (is_true_eye(heye, i, j))
+    if (is_suicide(ii, other) && is_small_eye(ii)) {
+      if (is_true_eye(heye, ii))
 	num_eyes++;
       continue;
     }
 
     /* Check for own suicide. */
-    if (is_suicide(POS(i, j), eye_color))
+    if (is_suicide(ii, eye_color))
       continue;
     
     /* Check certain move restrictions. */
-    if (eye_restrictions[i][j] & DEFENDER_NOT_PLAY)
+    if (eye_restrictions[ii] & DEFENDER_NOT_PLAY)
       continue;
 
-    if ((eye_restrictions[i][j] & DEFENDER_PLAY_IF_CAPTURE)
-	&& !life_does_capture_something(i, j, eye_color))
+    if ((eye_restrictions[ii] & DEFENDER_PLAY_IF_CAPTURE)
+	&& !life_does_capture_something(ii, eye_color))
       continue;
 
     /* Score the move and save it in a list for later testing.
@@ -1310,32 +1306,32 @@ maximize_eyes(struct eye_data eyedata[BOARDMAX],
     move[num_moves] = k;
     score = 0;
     
-    if (i > 0) {
-      if (BOARD(i-1, j) == other)
+    if (I(ii) > 0) {
+      if (board[ii-NS] == other)
 	score += 2;
-      else if (BOARD(i-1, j) == EMPTY)
+      else if (board[ii-NS] == EMPTY)
 	score++;
     }
-    if (i < board_size-1) {
-      if (BOARD(i+1, j) == other)
+    if (I(ii) < board_size-1) {
+      if (board[ii+NS] == other)
 	score += 2;
-      else if (BOARD(i+1, j) == EMPTY)
+      else if (board[ii+NS] == EMPTY)
 	score++;
     }
-    if (j > 0) {
-      if (BOARD(i, j-1) == other)
+    if (J(ii) > 0) {
+      if (board[ii-1] == other)
 	score += 2;
-      else if (BOARD(i, j-1) == EMPTY)
+      else if (board[ii-1] == EMPTY)
 	score++;
     }
-    if (j < board_size-1) {
-      if (BOARD(i, j+1) == other)
+    if (J(ii) < board_size-1) {
+      if (board[ii+1] == other)
 	score += 2;
-      else if (BOARD(i, j+1) == EMPTY)
+      else if (board[ii+1] == EMPTY)
 	score++;
     }
     
-    if (eyedata[POS(i, j)].marginal)
+    if (eyedata[ii].marginal)
       score += 2;
     
     if (score == 0)
@@ -1359,21 +1355,20 @@ maximize_eyes(struct eye_data eyedata[BOARDMAX],
       if (move_score[k] != score)
 	continue;
       
-      i = eyei[index];
-      j = eyej[index];
+      ii = eye[index];
 
-      gg_assert(BOARD(i, j) == EMPTY);
+      gg_assert(board[ii] == EMPTY);
       
       /* Try the move and see if we can keep the eyes. */
       save_stackp = stackp;
       if (stackp - stackp_when_called < DEBUG_LIMIT)
-	DEBUG(DEBUG_LIFE, "maximize_eyes: trymove %s %m score %d\n",
-	      color_to_string(eye_color), i, j, score);
-      if (trymove(POS(i, j), eye_color, "maximize_eyes", NO_MOVE, EMPTY, NO_MOVE)
+	DEBUG(DEBUG_LIFE, "maximize_eyes: trymove %s %1m score %d\n",
+	      color_to_string(eye_color), ii, score);
+      if (trymove(ii, eye_color, "maximize_eyes", NO_MOVE, EMPTY, NO_MOVE)
 	  || (ko_master == eye_color
 	      && (ko_in < 3)
 	      && (is_ko = 1)   /* Intentional assignment. */
-	      && tryko(POS(i, j), eye_color, "maximize_eyes", EMPTY, NO_MOVE))) {
+	      && tryko(ii, eye_color, "maximize_eyes", EMPTY, NO_MOVE))) {
 	
 	/* Ok, we made our move.  Now let the opponent do his, and see
 	 * how many eyes we can get. 
@@ -1423,8 +1418,8 @@ maximize_eyes(struct eye_data eyedata[BOARDMAX],
 	/* Illegal ko capture. */
 	if (stackp - stackp_when_called < DEBUG_LIMIT)
 	  DEBUG(DEBUG_LIFE,
-		"  illegal ko capture: %s %m ko master %s ko level %d\n",
-		color_to_string(eye_color), i, j, color_to_string(ko_master),
+		"  illegal ko capture: %s %1m ko master %s ko level %d\n",
+		color_to_string(eye_color), ii, color_to_string(ko_master),
 		ko_in);
       }
       gg_assert(stackp == save_stackp);
@@ -1451,9 +1446,8 @@ maximize_eyes(struct eye_data eyedata[BOARDMAX],
   
   if (stackp - stackp_when_called < DEBUG_LIMIT)
     DEBUG(DEBUG_LIFE,
-	  "exiting maximize_eyes (1) - result = %d, ko = %d, move %m (%H)\n", 
-	  localmax, localko, eyei[local_defense], eyej[local_defense],
-	  hashdata.hashval);
+	  "exiting maximize_eyes (1) - result = %d, ko = %d, move %1m (%H)\n", 
+	  localmax, localko, eye[local_defense], hashdata.hashval);
 
   return 1;
 }
@@ -1473,23 +1467,24 @@ life_showboard()
   for (i=0; i<board_size; i++) {
     for (j=0; j<board_size; j++) {
       int c;
-      int color = BOARD(i, j);
+      int ii = POS(i, j);
+      int color = board[ii];
 
       if (color == WHITE) {
-	if (move_in_stack(POS(i, j), stackp_when_called))
+	if (move_in_stack(ii, stackp_when_called))
 	  c = 'o';
 	else
 	  c = 'O';
       }
       else if (color == BLACK) {
-	if (move_in_stack(POS(i, j), stackp_when_called))
+	if (move_in_stack(ii, stackp_when_called))
 	  c = 'x';
 	else
 	  c = 'X';
       }
       else
 	c = EMPTY;
-      draw_char(i, j, c);
+      draw_char(I(ii), J(ii), c);
     }
   }
   end_draw_board();
