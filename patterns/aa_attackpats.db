@@ -61,6 +61,10 @@
 #########################################################
 
 
+goal_elements Xx
+callback_data X
+
+
 Pattern A1
 
 X*

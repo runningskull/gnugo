@@ -130,6 +130,12 @@ const char VALID_CONSTRAINT_LABELS[] = "abcdefghijklmnpqrstuvwyzABCDEFGHIJKLMNPR
 #define ATT_Q    10
 #define ATT_Y    11
 
+/* These arrays control discarding of unnecessary patval elements.
+ * Modify them using `goal_elements ...' and `callback_data ..'
+ * commands in a database. By default, we don't drop any elements.
+ */
+int nongoal[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+int callback_unneeded[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 /* stuff used in reading/parsing pattern rows */
 int maxi, maxj;                 /* (i,j) offsets of largest element */
@@ -393,6 +399,10 @@ int anchor = 0; 	/* Whether both O and/or X may be anchors.
 			*/
 
 int choose_best_anchor = 0;  /* -m */
+/* FIXME: `fixed anchor' option doesn't work properly yet.
+ *	  Probably the first thing to implement is to add
+ *	  checks for anchor validity.
+ */
 int fixed_anchor = 0;        /* -a */
 int pre_rotate = 0;          /* -p */
 
@@ -590,6 +600,9 @@ write_to_dfa(int index)
  * "Don't care" has and_mask = val_mask = 0, which is handy !
  * FIXME: Looks like element "." (don't care) has and_mask 3, not 0,
  *    as indicated in the comments above.
+ * (answer) "Don't care" means '?', not '.'. The comments mean that
+ *	    we don't have to search for '?'s directly, since their
+ *	    masks are 0, and it is set up by initialization.
  */
 
 static void
@@ -597,7 +610,7 @@ compute_grids(void)
 {
 #if GRID_OPT
   /*                              element: .  X  O  x  o  ,  a  ! */
-  static const unsigned int and_mask[] = { 3, 3, 3, 1, 2, 3, 3, 1 };
+  static const unsigned int and_mask[] = { 3, 3, 3, 1, 2, 3, 3, 3 };
   static const unsigned int val_mask[] = { 0, 2, 1, 0, 0, 0, 0, 0 };
 
   int ll;  /* iterate over rotations */
@@ -1572,34 +1585,78 @@ static void
 write_elements(FILE *outfile)
 {
   int node;
+  int used_nodes = 0;
 
   assert(ci != -1 && cj != -1);
 
   /* sort the elements so that least-likely elements are tested first. */
   gg_sort(elements, el, sizeof(struct patval_b), compare_elements);
 
-  fprintf(outfile, "static struct patval %s%d[] = {\n", prefix, patno);
+  fprintf(outfile, "static struct patval %s%d[] = {", prefix, patno);
 
-  /* This may happen for fullboard patterns. */
-  if (el == 0) {
-    fprintf(outfile, "  {0,-1}}; /* Dummy element, not used. */\n\n");
-    return;
-  }
-  
-  for (node = 0;node < el; node++) {
-    assert(elements[node].x >= mini && elements[node].y >= minj);
-    if (!(elements[node].x <= maxi && elements[node].y <= maxj)) {
+  for (node = 0; node < el; node++) {
+    int x = elements[node].x;
+    int y = elements[node].y;
+    int att = elements[node].att;
+
+    assert(x >= mini && y >= minj);
+    if (!(x <= maxi && y <= maxj)) {
       fprintf(stderr, 
 	      "%s(%d) : error : Maximum number of elements exceeded in %s.\n",
 	      current_file, current_line_number, prefix);
       fatal_errors++;
     }
 
-    fprintf(outfile, "  {%d,%d}%s",
-	    OFFSET(elements[node].x - ci, elements[node].y - cj),
-	    elements[node].att,
-            node < el-1 ?  ((node + 1) % 4 ? ",\t" : ",\n")  : "};\n\n");
+    /* Check if this element is not needed for goal checking and by
+     * callback function. Also, check that pattern class doesn't
+     * require dragon status checking on it.
+     */
+    if ((fixed_anchor || nongoal[att]) && callback_unneeded[att]
+	&& (((pattern[patno].class & (CLASS_X | CLASS_x)) == 0)
+	    || (att != ATT_X && att != ATT_x))
+	&& (((pattern[patno].class & (CLASS_O | CLASS_o)) == 0)
+	    || (att != ATT_O && att != ATT_o))) {
+      /* Now check that pattern matcher won't need the element for
+       * matching itself.
+       */
+
+#if GRID_OPT == 1
+      /* If we do grid optimization, we can avoid matching 9 pattern elements
+       * around its anchor (the 9 elements are the intersection of 16 grid
+       * elements for all possible transformations).
+       */
+      if ((database_type == DB_GENERAL || database_type == DB_CONNECTIONS)
+	  && ci-1 <= x && x <= ci+1 && cj-1 <= y && y <= cj+1)
+	continue;
+#endif /* GRID_OPT == 1 */
+
+      /* DFA pattern matcher doesn't itself need these elements at all. But
+       * they might be needed for goal checking or by callback function, so
+       * we check it before discarding an element.
+       *
+       * FIXME: What about tree matcher?
+       */
+      if (database_type == DB_DFA)
+	continue;
+    } /* If the element is discardable. */
+
+    if (used_nodes)
+      fprintf(outfile, ",");
+    fprintf(outfile, used_nodes % 4 ? "\t" : "\n  ");
+    used_nodes++;
+
+    fprintf(outfile, "{%d,%d}", OFFSET(x - ci, y - cj), att);
   }
+
+  /* This may happen for fullboard patterns or if we have discarded all
+   * the elements as unneeded by the matcher.
+   */
+  if (!used_nodes)
+    fprintf(outfile, "{0,-1}}; /* Dummy element, not used. */\n\n");
+  else
+    fprintf(outfile, "\n};\n\n");
+
+  pattern[patno].patlen = used_nodes;
 
 #if EXPERIMENTAL_READING
   if (database_type == DB_TREE)
@@ -2361,6 +2418,9 @@ main(int argc, char *argv[])
     current_line_number = 0;
 
     while (fgets(line, MAXLINE, input_FILE)) {
+      int command = 0;
+      char command_data[MAXLINE];
+
       current_line_number++;
       if (line[strlen(line)-1] != '\n') {
 	fprintf(stderr, "%s(%d) : Error : line truncated (longer than %d characters)\n",
@@ -2378,12 +2438,19 @@ main(int argc, char *argv[])
 	line[i+2] = '\0';
       }
       
-      /* FIXME: We risk overruning a buffer here. */
-      if (sscanf(line, "Pattern %s", pattern_names[patno+1]) == 1) {
-	char *p = strpbrk(pattern_names[patno+1], " \t");
+      if (sscanf(line, "Pattern %s", command_data) == 1)
+	command = 1;
+      else if (sscanf(line, "goal_elements %s", command_data) == 1)
+	command = 2;
+      else if (sscanf(line, "callback_data %s", command_data) == 1)
+	command = 3;
+
+      if (command) {
+	char *p = strpbrk(command_data, " \t");
 	
 	if (p)
 	  *p = 0;
+
 	if (patno >= 0) {
 	  switch (state) {
 	  case 1:
@@ -2409,15 +2476,63 @@ main(int argc, char *argv[])
 	  case 0:
 	  case 4:
 	    check_constraint_diagram();
-	    patno++;
-	    reset_pattern();
 	  }
 	}
-	else {
+
+	if (command == 1) { /* Pattern `name' */
 	  patno++;
 	  reset_pattern();
+
+	  if (strlen(command_data) > 79) {
+	    fprintf(stderr, "%s(%d) : Warning : pattern name is too long, truncated\n",
+		    current_file, current_line_number);
+	    command_data[79] = 0;
+	  }
+	  strcpy(pattern_names[patno], command_data);
+
+	  state = 1;
 	}
-	state = 1;
+	else {
+	  int *sort_out = (command == 2 ? nongoal : callback_unneeded);
+	  int k;
+
+	  for (k = 0; k < 8; k++)
+	    sort_out[k] = 1;
+
+	  if (strcmp(command_data, "none")) {
+	    char *c;
+
+	    for (c = command_data; *c; c++) {
+	      switch (*c) {
+	      case '.':
+		sort_out[ATT_dot] = 0;
+		if (command == 2) { /* goal_elements */
+		  sort_out[ATT_comma] = 0;
+		  sort_out[ATT_not]   = 0;
+		}
+		break;
+	      case 'X': sort_out[ATT_X] = 0; break;
+	      case 'O': sort_out[ATT_O] = 0; break;
+	      case 'x': sort_out[ATT_x] = 0; break;
+	      case 'o': sort_out[ATT_o] = 0; break;
+	      case ',':
+		sort_out[ATT_comma] = 0;
+		if (command != 2)
+		  break;
+	      case '!':
+		sort_out[ATT_not] = 0;
+		if (command != 2)
+		  break;
+	      default:
+		fprintf(stderr, "%s(%d) : Error : illegal character `%c'\n",
+			current_file, current_line_number, *c);
+		fatal_errors++;
+	      }
+	    }
+	  }
+
+	  state = 0;
+	}
       }
       else if (line[0] == '\n' || line[0] == '#') { 
 	/* nothing */
@@ -2459,9 +2574,10 @@ main(int argc, char *argv[])
 	if (state == 2 || state == 3) {
 	  finish_pattern(line);
 	  
-	  write_elements(output_FILE);
 	  if (database_type == DB_DFA)
 	    write_to_dfa(patno);
+	  write_elements(output_FILE);
+
 	  state = 4;
 	}
 	else {

@@ -72,6 +72,10 @@
 #  cutoffs involved, see engine/handicap.c for details.
 
 
+goal_elements none
+callback_data !
+
+
 Pattern H1
 
 |.....       4-4 in empty corner
