@@ -343,6 +343,26 @@ result_to_string(int result)
 }
 
 
+#ifndef HAVE_VARIADIC_DEFINE
+
+/* See gnugo.h for related TRACE family macro definitions */
+
+/* Always returns 1 to allow use in short-circuit logical expressions. */
+int 
+DEBUG_func(int flag, const char *fmt, ...)
+{
+  va_list ap;
+
+  if (debug & flag)
+    gprintf(fmt, ap);
+
+  return 1;
+}
+
+#endif /*HAVE_VARIADIC_DEFINE*/
+
+
+
 /*
  * Local Variables:
  * tab-width: 8

@@ -209,27 +209,6 @@ mprintf(const char *fmt, ...)
   va_end(ap);
 }
 
-#ifndef HAVE_VARIADIC_DEFINE
-
-/* See gnugo.h for related TRACE family macro definitions */
-
-/* Always returns 1 to allow use in short-circuit logical expressions. */
-int 
-DEBUG_func(int flag, const char *fmt, ...)
-{
-  va_list ap;
-
-  if (debug & flag) {
-    va_start(ap, fmt);
-    vgprintf(stderr, fmt, ap);
-    va_end(ap);
-  }
-
-  return 1;
-}
-
-#endif /*HAVE_VARIADIC_DEFINE*/
-
 
 /*
  * A wrapper around abort() which shows the state variables at the time
