@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
+- bufix in do_find_superstring()
 - bugfix in aftermath_genmove()
 - bugfix in hashdata_recalc()
 - assertions added to are_neighbor_strings()
@@ -11,6 +12,7 @@
 - tuning
 - new game record and new and revised filllib regression tests
 - make internals of worm[][] 1-dimensional
+- make eye data 1-dimensional
 - new macros: PASS_MOVE and NO_MOVE
 - change_attack and change_defense are now 1-dimensional
 - worm handling in move_reasons.c is now 1-dimensional
