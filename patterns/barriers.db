@@ -1953,5 +1953,39 @@ Xa
 >non_oterritory(a);
 
 
+Pattern Nonterritory25
+# gf New pattern. (3.1.20)
+
+|XO
+|..
+
+:8,t
+
+|AO
+|bc
+
+;lib(A)==2 && connect_and_cut_helper(A,b,c)
+
+>non_oterritory(b);
+>non_oterritory(c);
+
+
+Pattern Nonterritory26
+# gf New pattern. (3.1.20)
+
+?.X
+OX.
+?OX
+
+:8,t
+
+?aX
+OXb
+?OX
+
+;safe_omove(a)
+
+>non_xterritory(b);
+
 
 # END OF FILE
