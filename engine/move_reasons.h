@@ -22,40 +22,52 @@
 
 
 /* values for move_reason.type */
-#define ATTACK_MOVE              1
-#define DEFEND_MOVE              2
-#define ATTACK_THREAT_MOVE       3
-#define DEFEND_THREAT_MOVE       4
-#define CONNECT_MOVE             5
-#define CUT_MOVE                 6
-#define ANTISUJI_MOVE            7
-#define SEMEAI_MOVE              8
-#define SEMEAI_THREAT            9
-#define VITAL_EYE_MOVE          12
-#define ATTACK_EITHER_MOVE      13
-#define DEFEND_BOTH_MOVE        14
-#define BLOCK_TERRITORY_MOVE    15
-#define EXPAND_TERRITORY_MOVE   16
-#define EXPAND_MOYO_MOVE        17
-#define STRATEGIC_ATTACK_MOVE   18
-#define STRATEGIC_DEFEND_MOVE   19
-#define OWL_ATTACK_MOVE         20
-#define OWL_DEFEND_MOVE         21
-#define OWL_ATTACK_THREAT       22
-#define OWL_DEFENSE_THREAT      23
-#define OWL_PREVENT_THREAT      24
-#define UNCERTAIN_OWL_ATTACK    25
-#define UNCERTAIN_OWL_DEFENSE   26
-#define MY_ATARI_ATARI_MOVE     27
-#define YOUR_ATARI_ATARI_MOVE   28
-#define ATTACK_MOVE_GOOD_KO     29
-#define ATTACK_MOVE_BAD_KO      30
-#define DEFEND_MOVE_GOOD_KO     31
-#define DEFEND_MOVE_BAD_KO      32
-#define OWL_ATTACK_MOVE_GOOD_KO 33
-#define OWL_ATTACK_MOVE_BAD_KO  34
-#define OWL_DEFEND_MOVE_GOOD_KO 35
+#define THREAT_BIT    1
+
+#define ATTACK_MOVE              2
+#define ATTACK_MOVE_GOOD_KO      4
+#define ATTACK_MOVE_BAD_KO       6
+#define ATTACK_THREAT           (ATTACK_MOVE | THREAT_BIT)
+#define DEFEND_MOVE              8
+#define DEFEND_MOVE_GOOD_KO     10
+#define DEFEND_MOVE_BAD_KO      12
+#define DEFEND_THREAT           (DEFEND_MOVE | THREAT_BIT)
+
+#define CONNECT_MOVE            14
+#define CUT_MOVE                16
+
+#define SEMEAI_MOVE             18
+#define SEMEAI_THREAT           (SEMEAI_MOVE | THREAT_BIT)
+
+#define BLOCK_TERRITORY_MOVE    20
+#define EXPAND_TERRITORY_MOVE   22
+#define EXPAND_MOYO_MOVE        24
+
+#define OWL_ATTACK_MOVE         26
+#define OWL_ATTACK_MOVE_GOOD_KO 28
+#define OWL_ATTACK_MOVE_BAD_KO  30
+#define OWL_ATTACK_THREAT       (OWL_ATTACK_MOVE | THREAT_BIT)
+#define OWL_DEFEND_MOVE         32
+#define OWL_DEFEND_MOVE_GOOD_KO 34
 #define OWL_DEFEND_MOVE_BAD_KO  36
+#define OWL_DEFEND_THREAT       (OWL_DEFEND_MOVE | THREAT_BIT)
+#define OWL_PREVENT_THREAT      38
+#define UNCERTAIN_OWL_ATTACK    40
+#define UNCERTAIN_OWL_DEFENSE   42
+#define STRATEGIC_ATTACK_MOVE   44
+#define STRATEGIC_DEFEND_MOVE   46
+
+#define MY_ATARI_ATARI_MOVE     50
+#define YOUR_ATARI_ATARI_MOVE   52
+#define VITAL_EYE_MOVE          54
+
+#define ATTACK_EITHER_MOVE      60
+#define DEFEND_BOTH_MOVE        62
+
+#define ANTISUJI_MOVE           70
+
+
+#define EITHER_MOVE             100
 
 /* Bitmap values for move_reason.status */
 #define ACTIVE 0

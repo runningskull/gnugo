@@ -331,7 +331,9 @@ void add_owl_uncertain_attack_move(int pos, int dr);
 void add_my_atari_atari_move(int pos, int size);
 void add_your_atari_atari_move(int pos, int size);
 void add_vital_eye_move(int pos, int eyespace, int color);
+#if 0
 void add_attack_either_move(int pos, int str1, int str2);
+#endif
 void add_defend_both_move(int pos, int str1, int str2);
 void add_block_territory_move(int pos);
 void add_expand_territory_move(int pos);
@@ -347,6 +349,12 @@ void set_maximum_territorial_value(int pos, float value);
 void add_shape_value(int pos, float value);
 void add_followup_value(int pos, float value);
 void add_reverse_followup_value(int pos, float value);
+
+/* Parameters to add_either_move */
+#define ATTACK_STRING  1
+void add_either_move(int pos, int reason1, int target1,
+		     int reason2, int target2);
+
 
 int get_attack_threats(int pos, int max_strings, int strings[]);
 int get_defense_threats(int pos, int max_strings, int strings[]);

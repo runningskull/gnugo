@@ -1895,4 +1895,29 @@ O?
 >non_xterritory(a);
 
 
+Pattern Nonterritory23
+# tm New Pattern (3.1.20)
+
+O.
+
+:-,t
+
+Oa
+
+>non_xterritory(a);
+
+
+Pattern Nonterritory24
+# tm New Pattern (3.1.20)
+
+X.
+
+:-,t
+
+Xa
+
+>non_oterritory(a);
+
+
+
 # END OF FILE

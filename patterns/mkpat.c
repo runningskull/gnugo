@@ -224,7 +224,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"antisuji",        1, "add_antisuji_move(%s)"},
   {"add_connect_move",2, "add_connection_move(move,%s,%s)"},
   {"add_cut_move",    2, "add_cut_move(move,%s,%s)"},
-  {"add_attack_either_move",2,"add_attack_either_move(move,%s,%s)"},
+  {"add_attack_either_move",2,"add_either_move(move,ATTACK_STRING,%s,ATTACK_STRING,%s)"},
   {"add_defend_both_move",2, "add_defend_both_move(move,%s,%s)"},
   {"same_dragon",     2, "is_same_dragon(%s,%s)"},
   {"same_string",     2, "same_string(%s,%s)"},

@@ -35,13 +35,14 @@
  * Private data structures used to collect information about moves.
  */
 
-#define MAX_MOVE_REASONS 1000
-#define MAX_WORMS 2*MAX_BOARD*MAX_BOARD/3
-#define MAX_DRAGONS MAX_WORMS
-#define MAX_CONNECTIONS 4*MAX_WORMS
-#define MAX_WORM_PAIRS MAX_WORMS
-#define MAX_EYES MAX_BOARD*MAX_BOARD/2
-#define MAX_LUNCHES MAX_WORMS
+#define MAX_MOVE_REASONS  1000
+#define MAX_WORMS         2*MAX_BOARD*MAX_BOARD/3
+#define MAX_DRAGONS       MAX_WORMS
+#define MAX_CONNECTIONS   4*MAX_WORMS
+#define MAX_WORM_PAIRS    MAX_WORMS
+#define MAX_EYES          MAX_BOARD*MAX_BOARD/2
+#define MAX_LUNCHES       MAX_WORMS
+#define MAX_EITHER        100
 
 static float compute_shape_factor(int pos);
 static float connection_value(int dragona, int dragonb, int tt, float margin);
@@ -67,6 +68,15 @@ static int next_connection;
 static int worm_pair1[MAX_WORM_PAIRS];
 static int worm_pair2[MAX_WORM_PAIRS];
 static int next_worm_pair;
+
+/* Unordered pairs of threats */
+static struct {
+  int reason1;
+  int what1;
+  int reason2;
+  int what2;
+} either_data[MAX_EITHER];
+static int next_either;
 
 /* Eye shapes */
 static int eyes[MAX_EYES];
@@ -104,6 +114,7 @@ clear_move_reasons(void)
   next_dragon = 0;
   next_connection = 0;
   next_worm_pair = 0;
+  next_either = 0;
   next_eye = 0;
   next_lunch = 0;
   
@@ -242,6 +253,36 @@ find_worm_pair(int worm1, int worm2)
   return next_worm_pair - 1;
 }
 
+
+static int
+find_either_data(int reason1, int what1, int reason2, int what2)
+{
+  int k;
+  
+  /* Make sure the worms are ordered canonically. */
+  if (what1 > what2) {
+    int tmp = what1;
+    what1 = what2;
+    what2 = tmp;
+  }
+
+  for (k = 0; k < next_either; k++)
+    if (either_data[k].reason1    == reason1
+	&& either_data[k].what1   == what1
+	&& either_data[k].reason2 == reason2
+	&& either_data[k].what2   == what2)
+      return k;
+  
+  /* Add a new entry. */
+  gg_assert(next_either < MAX_EITHER);
+  either_data[next_either].reason1 = reason1;
+  either_data[next_either].what1   = what1;
+  either_data[next_either].reason2 = reason2;
+  either_data[next_either].what2   = what2;
+  next_either++;
+  return next_either - 1;
+}
+
 /*
  * Find the index of an eye space in the list of eye spaces.
  * If necessary, add a new entry.
@@ -275,8 +316,8 @@ get_pos(int reason, int what)
   switch (reason) {
   case ATTACK_MOVE:
   case DEFEND_MOVE:
-  case ATTACK_THREAT_MOVE:
-  case DEFEND_THREAT_MOVE:
+  case ATTACK_THREAT:
+  case DEFEND_THREAT:
   case ATTACK_MOVE_GOOD_KO:
   case ATTACK_MOVE_BAD_KO:
   case DEFEND_MOVE_GOOD_KO:
@@ -290,7 +331,7 @@ get_pos(int reason, int what)
   case OWL_ATTACK_MOVE:
   case OWL_DEFEND_MOVE:
   case OWL_ATTACK_THREAT:
-  case OWL_DEFENSE_THREAT:
+  case OWL_DEFEND_THREAT:
   case OWL_PREVENT_THREAT:
   case UNCERTAIN_OWL_ATTACK:
   case UNCERTAIN_OWL_DEFENSE:
@@ -302,6 +343,9 @@ get_pos(int reason, int what)
   case ATTACK_EITHER_MOVE:
   case DEFEND_BOTH_MOVE:
     return worms[worm_pair1[what]];
+  case EITHER_MOVE:
+    /* FIXME: What should we return here? */
+    return worms[either_data[what].what1];
   case CONNECT_MOVE:
   case CUT_MOVE:
     return dragons[conn_dragon1[what]];
@@ -621,7 +665,7 @@ add_attack_threat_move(int pos, int ww, int code)
   UNUSED(code);
   
   ASSERT_ON_BOARD1(ww);
-  add_move_reason(pos, ATTACK_THREAT_MOVE, worm_number);
+  add_move_reason(pos, ATTACK_THREAT, worm_number);
 }
 
 void
@@ -630,7 +674,7 @@ remove_attack_threat_move(int pos, int ww)
   int worm_number = find_worm(worm[ww].origin);
 
   ASSERT_ON_BOARD1(ww);
-  remove_move_reason(pos, ATTACK_THREAT_MOVE, worm_number);
+  remove_move_reason(pos, ATTACK_THREAT, worm_number);
 }
 
 /*
@@ -644,7 +688,7 @@ add_defense_threat_move(int pos, int ww, int code)
   UNUSED(code);
 
   ASSERT_ON_BOARD1(ww);
-  add_move_reason(pos, DEFEND_THREAT_MOVE, worm_number);
+  add_move_reason(pos, DEFEND_THREAT, worm_number);
 }
 
 
@@ -663,7 +707,7 @@ get_attack_threats(int pos, int max_strings, int strings[])
     if (r < 0)
       break;
 
-    if (move_reasons[r].type == ATTACK_THREAT_MOVE)
+    if (move_reasons[r].type == ATTACK_THREAT)
       strings[num_strings++] = worms[move_reasons[r].what];
 
     if (num_strings == max_strings)
@@ -688,7 +732,7 @@ get_defense_threats(int pos, int max_strings, int strings[])
     if (r < 0)
       break;
 
-    if (move_reasons[r].type == DEFEND_THREAT_MOVE)
+    if (move_reasons[r].type == DEFEND_THREAT)
       strings[num_strings++] = worms[move_reasons[r].what];
 
     if (num_strings == max_strings)
@@ -830,7 +874,7 @@ add_attack_either_move(int pos, int str1, int str2)
   if (worm1 == worm2)
     return;
   
-  if (worm[str1].attack_codes[0] != 0 && worm[str2].defend_codes[0] == 0)
+  if (worm[str1].attack_codes[0] != 0 && worm[str1].defend_codes[0] == 0)
     return;
   
   if (worm[str2].attack_codes[0] != 0 && worm[str2].defend_codes[0] == 0)
@@ -839,6 +883,78 @@ add_attack_either_move(int pos, int str1, int str2)
   worm_pair = find_worm_pair(worm1, worm2);
   add_move_reason(pos, ATTACK_EITHER_MOVE, worm_pair);
 }
+
+
+/*
+ * Add to the reasons for the move at (pos) that it will accomplish
+ * one of two things: either (reason1) on (target1) or (reason2) on 
+ * (target2).  
+ *
+ * At this time, (reason) can only be ATTACK_STRING, so this is, for the
+ * time being, only a complicated version of ATTACK_EITHER_MOVE.
+ * However, more reasons will be implemented in the future.
+ *
+ * FIXME: Implement at least ATTACK_MOVE_GOOD_KO, ATTACK_MOVE_BAD_KO,
+ *         DEFEND_MOVE and associates, CONNECT_MOVE, OWL_ATTACK_MOVE,
+ *         OWL_DEFEND_MOVE, and possibly more.
+ *
+ * FIXME: Generalize to more than 2 parameters.
+ *        When that is done, this will be a good way to add 
+ *        atari_atari moves.  */
+void
+add_either_move(int pos, int reason1, int target1, int reason2, int target2)
+{
+  int  what1 = 0;
+  int  what2 = 0;
+  int  index;
+
+  ASSERT_ON_BOARD1(target1);
+  ASSERT_ON_BOARD1(target2);
+  if (reason1 == reason2 && target1 == target2)
+    return;
+  
+  /* For now. */
+  gg_assert(reason1 == ATTACK_STRING);
+  gg_assert(reason2 == ATTACK_STRING);
+
+  switch (reason1) {
+  case ATTACK_STRING:
+    {
+      what1 = find_worm(worm[target1].origin);
+
+      /* If this string is already attacked, and with no defense, then
+       * there is no additional value of this move reason. */
+      if (worm[target1].attack_codes[0] != 0
+	  && worm[target1].defend_codes[0] == 0)
+	return;
+    }
+    break;
+
+  default:
+    break;
+  }
+
+  switch (reason2) {
+  case ATTACK_STRING:
+    {
+      what2 = find_worm(worm[target2].origin);
+
+      /* If this string is already attacked, and with no defense, then
+       * there is no additional value of this move reason. */
+      if (worm[target2].attack_codes[0] != 0 
+	  && worm[target2].defend_codes[0] == 0)
+	return;
+    }
+    break;
+
+  default:
+    break;
+  }
+
+  index = find_either_data(reason1, what1, reason2, what2);
+  add_move_reason(pos, EITHER_MOVE, index);
+}
+
 
 /*
  * Add to the reasons for the move at (pos) that it defends
@@ -1072,7 +1188,7 @@ add_owl_defense_threat_move(int pos, int dr, int code)
   UNUSED(code);
 
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, OWL_DEFENSE_THREAT, dragon1);
+  add_move_reason(pos, OWL_DEFEND_THREAT, dragon1);
   add_worthwhile_threat_move(pos);
 }
 
@@ -1288,7 +1404,9 @@ get_saved_dragons(int pos, int saved[BOARDMAX])
 }
 
 
-/* ---------------------------------------------------------------- */
+/* ================================================================ */
+/*                   Valuation of the move reasons                  */
+/* ================================================================ */
 
 
 /* Test all moves which defend, attack, connect or cut to see if they
@@ -1309,6 +1427,7 @@ find_more_attack_and_defense_moves(int color)
   int ii;
   int k;
   int other = OTHER_COLOR(color);
+  int cursor_at_start_of_line;
   
   TRACE("\nLooking for additional attack and defense moves. Trying moves ...\n");
   
@@ -1351,63 +1470,64 @@ find_more_attack_and_defense_moves(int color)
 	    || move_reasons[r].type == ATTACK_EITHER_MOVE
 	    || move_reasons[r].type == DEFEND_BOTH_MOVE)
 	  break;
+	/* FIXME: Add code for EITHER_MOVE here. */
       }
       
-      if (k < MAX_REASONS && move[ii].reason[k] != -1) {
-	/* Try the move at (ii) and see what happens. */
-	int cursor_at_start_of_line = 0;
+      if (k == MAX_REASONS || move[ii].reason[k] == -1)
+	continue;
 
-	TRACE("%1m ", ii);
-	if (trymove(ii, color, "find_more_attack_and_defense_moves",
-		     NO_MOVE, EMPTY, NO_MOVE)) {
-	  for (k = 0; k < N; k++) {
-	    int aa = worms[unstable_worms[k]];
+      /* Try the move at (ii) and see what happens. */
+      cursor_at_start_of_line = 0;
+      TRACE("%1m ", ii);
+      if (trymove(ii, color, "find_more_attack_and_defense_moves",
+		  NO_MOVE, EMPTY, NO_MOVE)) {
+	for (k = 0; k < N; k++) {
+	  int aa = worms[unstable_worms[k]];
 
-	    /* string of our color, see if there still is an attack,
-	     * unless we already know the move works as defense move.
-	     */
-	    if (board[aa] == color
-		&& !defense_move_reason_known(ii, unstable_worms[k]))
-	      if (!attack(aa, NULL)) {
+	  /* string of our color, see if there still is an attack,
+	   * unless we already know the move works as defense move.
+	   */
+	  if (board[aa] == color
+	      && !defense_move_reason_known(ii, unstable_worms[k]))
+	    if (!attack(aa, NULL)) {
+	      if (!cursor_at_start_of_line)
+		TRACE("\n");
+	      TRACE("%ofound extra point of defense of %1m at %1m\n", 
+		    aa, ii);
+	      cursor_at_start_of_line = 1;
+	      add_defense_move(ii, aa, WIN);
+	    }
+	    
+	  /* string of opponent color, see if there still is a defense,
+	   * unless we already know the move works as attack move.
+	   */
+	  if (board[aa] == other
+	      && !attack_move_reason_known(ii, unstable_worms[k]))
+	    if (!find_defense(aa, NULL)) {
+	      /* Maybe find_defense() doesn't find the defense. Try to
+	       * defend with the stored defense move.
+	       */
+	      int attack_works = 1;
+
+	      if (trymove(worm[aa].defense_points[0], other, 
+			  "find_more_attack_and_defense_moves", 0,
+			  EMPTY, 0)) {
+		if (!attack(aa, NULL))
+		  attack_works = 0;
+		popgo();
+	      }
+		
+	      if (attack_works) {
 		if (!cursor_at_start_of_line)
 		  TRACE("\n");
-		TRACE("%ofound extra point of defense of %1m at %1m\n", 
+		TRACE("%ofound extra point of attack of %1m at %1m\n",
 		      aa, ii);
 		cursor_at_start_of_line = 1;
-		add_defense_move(ii, aa, WIN);
+		add_attack_move(ii, aa, WIN);
 	      }
-	    
-	    /* string of opponent color, see if there still is a defense,
-	     * unless we already know the move works as attack move.
-	     */
-	    if (board[aa] == other
-		&& !attack_move_reason_known(ii, unstable_worms[k]))
-	      if (!find_defense(aa, NULL)) {
-		/* Maybe find_defense() doesn't find the defense. Try to
-		 * defend with the stored defense move.
-		 */
-		int attack_works = 1;
-
-		if (trymove(worm[aa].defense_points[0], other, 
-			     "find_more_attack_and_defense_moves", 0,
-			     EMPTY, 0)) {
-		  if (!attack(aa, NULL))
-		    attack_works = 0;
-		  popgo();
-		}
-		
-		if (attack_works) {
-		  if (!cursor_at_start_of_line)
-		    TRACE("\n");
-		  TRACE("%ofound extra point of attack of %1m at %1m\n",
-			aa, ii);
-		  cursor_at_start_of_line = 1;
-		  add_attack_move(ii, aa, WIN);
-		}
-	      }
-	  }
-	  popgo();
+	    }
 	}
+	popgo();
       }
     }
   
@@ -1835,6 +1955,7 @@ examine_move_safety(int color)
 	case OWL_DEFEND_MOVE_GOOD_KO:
 	case OWL_DEFEND_MOVE_BAD_KO:
 	case MY_ATARI_ATARI_MOVE:
+	case EITHER_MOVE:         /* FIXME: More advanced handling? */
 	  tactical_safety = 1;
 	  safety = 1;
 	  break;
@@ -1997,8 +2118,8 @@ examine_move_safety(int color)
 	    break;
 	  }
 	  
-	case ATTACK_THREAT_MOVE:
-	case DEFEND_THREAT_MOVE:
+	case ATTACK_THREAT:
+	case DEFEND_THREAT:
 	  break;
 
 	case CONNECT_MOVE:
@@ -2097,13 +2218,13 @@ list_move_reasons(int color)
 	  gprintf("Move at %1m defends %1m with bad ko\n", pos, aa);
 	  break;
 	  
-	case ATTACK_THREAT_MOVE:
-	case DEFEND_THREAT_MOVE:
+	case ATTACK_THREAT:
+	case DEFEND_THREAT:
 	  aa = worms[move_reasons[r].what];
 	  
-	  if (move_reasons[r].type == ATTACK_THREAT_MOVE)
+	  if (move_reasons[r].type == ATTACK_THREAT)
 	    gprintf("Move at %1m threatens to attack %1m\n", pos, aa);
-	  else if (move_reasons[r].type == DEFEND_THREAT_MOVE)
+	  else if (move_reasons[r].type == DEFEND_THREAT)
 	    gprintf("Move at %1m threatens to defend %1m\n", pos, aa);
 	  break;
 
@@ -2167,6 +2288,16 @@ list_move_reasons(int color)
 	    gprintf("Move at %1m defends both %1m and %1m\n", pos, aa, bb);
 	  break;
 	  	
+	case EITHER_MOVE:
+	  /* FIXME: Generalize this. */
+	  worm1 = either_data[move_reasons[r].what].what1;
+	  worm2 = either_data[move_reasons[r].what].what2;
+	  aa = worms[worm1];
+	  bb = worms[worm2];
+	  gprintf("Move at %1m either attacks %1m or attacks %1m\n", 
+		  pos, aa, bb);
+	  break;
+
 	case OWL_ATTACK_MOVE:
 	  aa = dragons[move_reasons[r].what];
 	  gprintf("Move at %1m owl-attacks %1m\n", pos, aa);
@@ -2198,7 +2329,7 @@ list_move_reasons(int color)
 	  gprintf("Move at %1m owl-threatens to attack %1m\n", pos, aa);
 	  break;
 	  
-	case OWL_DEFENSE_THREAT:
+	case OWL_DEFEND_THREAT:
 	  aa = dragons[move_reasons[r].what];
 	  gprintf("Move at %1m owl-threatens to defend %1m\n", pos, aa);
 	  break;
@@ -2516,9 +2647,9 @@ adjusted_worm_attack_value(int pos, int ww)
 static struct discard_rule discard_rules[] =
 {
   { { ATTACK_MOVE, ATTACK_MOVE_GOOD_KO,
-      ATTACK_MOVE_BAD_KO, ATTACK_THREAT_MOVE,
+      ATTACK_MOVE_BAD_KO, ATTACK_THREAT,
       DEFEND_MOVE, DEFEND_MOVE_GOOD_KO,
-      DEFEND_MOVE_BAD_KO, DEFEND_THREAT_MOVE, -1 },
+      DEFEND_MOVE_BAD_KO, DEFEND_THREAT, -1 },
     owl_move_vs_worm_known, TERRITORY_REDUNDANT,
     "  %1m: 0.0 - (threat of) attack/defense of %1m (owl attack/defense as well)\n" },
   { { SEMEAI_MOVE, SEMEAI_THREAT, -1 },
@@ -2530,10 +2661,11 @@ static struct discard_rule discard_rules[] =
   { { ATTACK_EITHER_MOVE, DEFEND_BOTH_MOVE, -1 },
     tactical_move_vs_either_worm_known, REDUNDANT,
     "  %1m: 0.0 - att. either/def. both involving %1m (direct att./def. as well)\n"},
+  /* FIXME: Add handling of EITHER_MOVE */
   { { ATTACK_MOVE, ATTACK_MOVE_GOOD_KO,
-      ATTACK_MOVE_BAD_KO, ATTACK_THREAT_MOVE,
+      ATTACK_MOVE_BAD_KO, ATTACK_THREAT,
       DEFEND_MOVE, DEFEND_MOVE_GOOD_KO,
-      DEFEND_MOVE_BAD_KO, DEFEND_THREAT_MOVE, -1 },
+      DEFEND_MOVE_BAD_KO, DEFEND_THREAT, -1 },
     concerns_inessential_worm, TERRITORY_REDUNDANT,
     "  %1m: 0.0 - attack/defense of %1m (inessential)\n"},
   { { OWL_ATTACK_MOVE, OWL_ATTACK_MOVE_GOOD_KO,
@@ -2570,6 +2702,7 @@ discard_redundant_move_reasons(int pos)
     }
   }
 }
+
 
 /*
  * Estimate the direct territorial value of a move at (pos).
@@ -2710,7 +2843,7 @@ estimate_territorial_value(int pos, int color, float score)
       does_block = 1;
       break;
 
-    case ATTACK_THREAT_MOVE:
+    case ATTACK_THREAT:
       aa = worms[move_reasons[r].what];
 
       /* Threat on our stones. */
@@ -2744,7 +2877,7 @@ estimate_territorial_value(int pos, int color, float score)
        *        leave it as it is for now.
        *
        * FIXME: The same analysis should be applied to
-       *        DEFEND_THREAT_MOVE,
+       *        DEFEND_THREAT,
        *        ATTACK_EITHER_MOVE, DEFEND_BOTH_MOVE. It should be 
        *        broken out as separate functions and dealt with in
        *        a structured manner.
@@ -2814,7 +2947,7 @@ estimate_territorial_value(int pos, int color, float score)
       }
       break;
 
-    case DEFEND_THREAT_MOVE:
+    case DEFEND_THREAT:
       aa = worms[move_reasons[r].what];
 
       /* Threat on our stones. */
@@ -2981,7 +3114,7 @@ estimate_territorial_value(int pos, int color, float score)
       }
       break;
 
-    case OWL_DEFENSE_THREAT:
+    case OWL_DEFEND_THREAT:
       aa = dragons[move_reasons[r].what];
 
       add_followup_value(pos, 2 * dragon[aa].effective_size);
@@ -3229,10 +3362,42 @@ estimate_strategical_value(int pos, int color, float score)
 
 	break;
 	
-      case ATTACK_THREAT_MOVE:
-      case DEFEND_THREAT_MOVE:
+      case ATTACK_THREAT:
+      case DEFEND_THREAT:
         break;
 
+      case EITHER_MOVE:
+	/* FIXME: Generalize this to more types of threats. */
+	{
+	  float aa_value;
+	  float bb_value;
+
+	  worm1 = either_data[move_reasons[r].what].what1;
+	  worm2 = either_data[move_reasons[r].what].what2;
+	  aa = worms[worm1];
+	  bb = worms[worm2];
+
+	  /* If both worms are dead, this move reason has no value. */
+	  if (dragon[aa].matcher_status == DEAD 
+	      && dragon[bb].matcher_status == DEAD)
+	    break;
+
+	  /* Also if there is a combination attack, we assume it covers
+	   * the same thing.
+	   */
+	  if (move_reason_known(pos, MY_ATARI_ATARI_MOVE, -1))
+	    break;
+
+	  aa_value = adjusted_worm_attack_value(pos, aa);
+	  bb_value = adjusted_worm_attack_value(pos, bb);
+	  this_value = gg_min(aa_value, bb_value);
+
+	  TRACE("  %1m: %f - either attacks %1m (%f) or attacks %1m (%f)\n",
+		pos, this_value, aa, aa_value, bb, bb_value);
+	}
+	tot_value += this_value;
+	break;
+	
       case ATTACK_EITHER_MOVE:
       case DEFEND_BOTH_MOVE:
 	/* This is complete nonsense, but still better than nothing.
@@ -3535,6 +3700,7 @@ is_antisuji_move(int pos)
   return 0;
 }
 
+
 /* Count how many distinct strings are (solidly) connected by the move
  * at (pos). Add a bonus for strings with few liberties. Also add
  * bonus for opponent strings put in atari or removed.
@@ -3626,9 +3792,9 @@ compare_move_reasons(const void *p1, const void *p2)
 
 
 /*
- * Combine the reasons for a move at (pos) into an old style value.
- * These heuristics are now somewhat less ad hoc but probably still
- * need a lot of improvement.
+ * Combine the reasons for a move at (pos) into a simple numerical value.
+ * These heuristics are now somewhat less ad hoc than before but probably
+ * still need a lot of improvement.
  */
 static float
 value_move_reasons(int pos, int color, float pure_threat_value,
@@ -3657,6 +3823,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
       num_reasons++;
     gg_sort(move[pos].reason, num_reasons, sizeof(move[pos].reason[0]),
 	    compare_move_reasons);
+
     /* Discard move reasons that only duplicate another. */
     discard_redundant_move_reasons(pos);
 
@@ -3725,9 +3892,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     }
     else {
       move[pos].additional_ko_value =
-	shape_factor *
-	(move[pos].followup_value
-	 + move[pos].reverse_followup_value);
+	shape_factor * (move[pos].followup_value
+			+ move[pos].reverse_followup_value);
     }
 
     tot_value += 0.05 * move[pos].secondary_value;
@@ -3766,10 +3932,9 @@ value_move_reasons(int pos, int color, float pure_threat_value,
   }
   else {
     move[pos].additional_ko_value =
-      shape_factor *
-      (move[pos].followup_value +
-       gg_min(move[pos].followup_value,
-	      move[pos].reverse_followup_value));
+      shape_factor * (move[pos].followup_value +
+		      gg_min(move[pos].followup_value,
+			     move[pos].reverse_followup_value));
   }
 
   /* If the move is valued 0 or small, but has followup values and is
@@ -3809,6 +3974,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
    */
   if (move[pos].min_value > move[pos].max_value)
     move[pos].max_value = move[pos].min_value;
+
   /* If several moves have an identical minimum value, then GNU Go uses the
    * following secondary criterion (unless min_value and max_value agree, and
    * unless min_value is bigger than 25, in which case it probably comes from
@@ -3838,6 +4004,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
   return tot_value;
 }
 
+
 /*
  * Loop over all possible moves and value the move reasons for each.
  */
@@ -3850,7 +4017,7 @@ value_moves(int color, float pure_threat_value, float score)
 
   TRACE("\nMove valuation:\n");
   
-  /* visit the moves in the standard lexicographical order */
+  /* Visit the moves in the standard lexicographical order */
   for (n = 0; n < board_size; n++)
     for (m = board_size-1; m >= 0; m--) {
       pos = POS(m, n);
@@ -3859,6 +4026,7 @@ value_moves(int color, float pure_threat_value, float score)
 					   pure_threat_value, score);
       if (move[pos].value == 0.0)
 	continue;
+
       /* Maybe this test should be performed elsewhere. This is just
        * to get some extra safety. We don't filter out illegal ko
        * captures here though, because if that is the best move, we
@@ -3874,6 +4042,7 @@ value_moves(int color, float pure_threat_value, float score)
       }
     }
 }
+
 
 static void
 print_top_moves(void)
@@ -3915,6 +4084,7 @@ print_top_moves(void)
   }
 }
 
+
 static void
 reevaluate_ko_threats(void)
 {
@@ -3934,6 +4104,7 @@ reevaluate_ko_threats(void)
       }
     }
 }
+
 
 static void
 redistribute_points(void)
@@ -3966,6 +4137,7 @@ redistribute_points(void)
       move[pos].final_value = 0.0;
     }
 }
+
 
 /*
  * Review the move reasons to find which (if any) move we want to play.
@@ -4105,8 +4277,8 @@ review_move_reasons(int *the_move, float *val, int color,
     *val = bestval;
     return 1;
   }
-  else
-    return 0;
+
+  return 0;
 }
 
 
