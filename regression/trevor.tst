@@ -528,6 +528,14 @@ loadsgf games/trevor/trevor_60.sgf 2
 600 owl_attack E3
 #? [1 E2]*
 
+
+#CATEGORY=OWL
+#DESCRIPTION=OWL code misreads cut.
+#SEVERITY=10
+loadsgf games/trevor/trevor_63.sgf
+630 owl_attack G13
+#? [1 H13]*
+
 #CATEGORY=OWL_EYES
 #DESCRIPTION=Fixed by eye pattern 402
 #SEVERITY=10

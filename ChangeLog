@@ -30,7 +30,11 @@
 - do_atari_atari() restructured
 - experimental-semeai configure option
 - experimental_semeai command line option
+- new function new_semeai()
 - owl_analyze_semeai improvements
+- split USAGE_DEBUG in half due to VC limitation
+- removed final VC warning in dfa.c
+- revised trace in value_move_reasons()
 - regress.plx improvements
 - test revisions
 

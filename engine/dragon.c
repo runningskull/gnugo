@@ -605,7 +605,10 @@ make_dragons(int color, int stop_before_owl)
   time_report(2, "  compute dragon safety", NO_MOVE, 1.0);
 
   /* Resolve semeais. This may revise the safety and status fields. */
-  semeai(color);
+  if (experimental_semeai)
+    new_semeai(color);
+  else 
+    semeai(color);
   time_report(2, "  semeai module", NO_MOVE, 1.0);
 
   /* The matcher_status is now correct at the origin of each dragon
@@ -889,7 +892,8 @@ find_neighbor_dragons()
 static void
 add_adjacent_dragons(int a, int b)
 {
-  gg_assert(a >= 0 && a < number_of_dragons && b >= 0 && b < number_of_dragons);
+  gg_assert(a >= 0 
+	    && a < number_of_dragons && b >= 0 && b < number_of_dragons);
   if (a == b)
     return;
   add_adjacent_dragon(a, b);
@@ -901,7 +905,8 @@ static void
 add_adjacent_dragon(int a, int b)
 {
   int i;
-  gg_assert(a >= 0 && a < number_of_dragons && b >= 0 && b < number_of_dragons);
+  gg_assert(a >= 0 
+	    && a < number_of_dragons && b >= 0 && b < number_of_dragons);
   /* If the array of adjacent dragons already is full, ignore
    * additional neighbors.
    */

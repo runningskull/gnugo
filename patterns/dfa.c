@@ -871,7 +871,7 @@ dfa_add_string (dfa_t * pdfa, const char *str, int pattern_index)
 
   ratio = 1;
   if (dfa_size(pdfa) > 0)
-    ratio = dfa_size(&aux_dfa2) / dfa_size(pdfa);
+    ratio = (float)dfa_size(&aux_dfa2) / (float)dfa_size(pdfa);
 
   /* the result is copied in dfa */
   copy_dfa (pdfa, &aux_dfa2);

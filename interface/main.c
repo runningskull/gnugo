@@ -1214,6 +1214,9 @@ License along with this program; if not, write to the Free\n\
 Software Foundation, Inc., 59 Temple Place - Suite 330,\n\
 Boston, MA 02111, USA.\n\n\
 "
+
+/* USAGE_DEBUG Split in half because of VC limit on constant string 
+ * length of 2048 characters!*/
 #define USAGE_DEBUG "\n\
 Debugging Options:\n\
 \n\
@@ -1236,6 +1239,8 @@ Debugging Options:\n\
    --showtime                    print timing diagnostic\n\
    --showscore                   print estimated score\n\
    -r, --seed number             set random number seed\n\
+"
+#define USAGE_DEBUG2 "\
        --decide-string <string>  can this string live? (try with -o)\n\
        --decide-connection <string/string> can these strings be connected? (try with -o)\n\
        --decide-dragon <dragon>  can this dragon live? (try with -o or -t)\n\
@@ -1274,7 +1279,7 @@ show_help(void)
 static void
 show_debug_help(void)
 {
-  fprintf(stderr, USAGE_DEBUG);
+  fprintf(stderr, USAGE_DEBUG USAGE_DEBUG2);
 }
 
 

@@ -35,6 +35,8 @@ static void add_appropriate_semeai_moves(int move,
 					 int my_status, int your_status,
 					 int margin_of_safety);
 static void small_semeai_analyzer(int str1, int str2);
+static void update_status(int dr, int new_status, int new_safety);
+
 
 /* semeai() searches for pairs of dragons of opposite color which
  * have safety DEAD. If such a pair is found, analyze_semeai is
@@ -82,9 +84,124 @@ semeai(int color)
 	  || DRAGON2(bpos).safety == INESSENTIAL)
 	continue;
 
-      if (experimental_semeai)
-	experimental_analyze_semeai(apos, bpos);
-      else analyze_semeai(apos, bpos);      
+      analyze_semeai(apos, bpos);      
+    }
+  }
+}
+
+
+/* Experimental alternative to semeai() using owl reading */
+
+void
+new_semeai(int color)
+{
+  int d1, d2;
+  int k;
+  int apos = NO_MOVE;
+  int bpos = NO_MOVE;
+  int other = OTHER_COLOR(color);
+  int best_result_a[MAX_NEIGHBOR_DRAGONS];
+  int best_result_b[MAX_NEIGHBOR_DRAGONS];
+  int worst_result_a[MAX_NEIGHBOR_DRAGONS];
+  int worst_result_b[MAX_NEIGHBOR_DRAGONS];
+  int a_best_status;  /* status if a plays first */
+  int b_worst_status; /* status if a plays first */
+  int a_worst_status; /* status if b plays first */
+  int b_best_status;  /* status if b plays first */
+
+  int move[MAX_NEIGHBOR_DRAGONS];
+  int a_status = UNKNOWN;
+  int b_status = UNKNOWN;
+  int pass;
+
+  TRACE("Experimental Semeai Module is THINKING for %s!\n", 
+	color_to_string(color));
+  
+  for (d1 = 0; d1 < number_of_dragons; d1++) {
+    int semeai_found = 0;
+    if (DRAGON(d1).color != color
+	|| (DRAGON(d1).matcher_status != DEAD
+	    && DRAGON(d1).matcher_status != CRITICAL))
+      continue;
+    
+    /* First pass : collect data
+     * Second pass: update statuses
+     */
+    
+    for (k = 0; k < dragon2[d1].neighbors; k++) {
+      best_result_a[k] = DEAD;
+      worst_result_b[k] = ALIVE;
+      move[k] = NO_MOVE;
+    }
+
+    for (pass = 0; pass < 2; pass ++) {
+      for (k = 0; k < dragon2[d1].neighbors; k++) {
+	d2 = dragon2[d1].adjacent[k];
+	if (DRAGON(d2).color != other
+	    || (DRAGON(d2).matcher_status != DEAD
+		&& DRAGON(d2).matcher_status != CRITICAL))
+	  continue;
+	
+	/* Dragons d1 (our) and d2 (opponent) are adjacent and both DEAD
+	 * or CRITICAL.
+	 */
+	apos = DRAGON(d1).origin;
+	bpos = DRAGON(d2).origin;
+	
+	/* Ignore inessential worms or dragons */
+	if (worm[apos].inessential 
+	    || DRAGON2(apos).safety == INESSENTIAL
+	    || worm[bpos].inessential 
+	    || DRAGON2(bpos).safety == INESSENTIAL)
+	  continue;
+	
+	semeai_found = 1;
+	a_best_status = UNKNOWN;
+	b_best_status = UNKNOWN;
+	a_worst_status = UNKNOWN;
+	b_worst_status = UNKNOWN;
+
+	if (pass == 0) {
+	  DEBUG(DEBUG_SEMEAI, "Considering semeai between %1m and %1m\n",
+		apos, bpos);
+	  owl_analyze_semeai(apos, bpos,
+			     best_result_a+k, worst_result_b+k, move+k, 1);
+	  if (a_best_status == DEAD
+	      || a_best_status == UNKNOWN
+	      || (a_best_status == ALIVE_IN_SEKI 
+		  && best_result_a[k] == ALIVE)) {
+	    a_best_status = best_result_a[k];
+	    b_worst_status = worst_result_b[k];
+	  }
+	  owl_analyze_semeai(bpos, apos, 
+			     best_result_b+k, worst_result_a+k, NULL, 1);
+	  if (b_best_status == DEAD
+	      || b_best_status == UNKNOWN
+	      || (b_best_status == ALIVE_IN_SEKI
+		  && best_result_b[k] == ALIVE)) {
+	    b_best_status = best_result_b[k];
+	    a_worst_status = worst_result_a[k];
+	  }
+	}
+	else { /* pass == 1 */
+	  if (a_status == CRITICAL
+	      && best_result_a[k] != DEAD)
+	    add_owl_defense_move(move[k], apos, WIN);
+	  if (b_status == CRITICAL
+	      && worst_result_b[k] == DEAD)
+	    add_owl_attack_move(move[k], bpos, WIN);
+	}
+      } /* loop over neighbor dragons */
+      if (pass == 0 && semeai_found) {
+	if (a_best_status != DEAD && a_worst_status == DEAD)
+	  a_status = CRITICAL;
+	else a_status = a_worst_status;
+	if (b_best_status != DEAD && b_worst_status == DEAD)
+	  b_status = CRITICAL;
+	else b_status = b_worst_status;
+	update_status(apos, a_status, dragon[apos].matcher_status);
+	update_status(bpos, b_status, dragon[bpos].matcher_status);
+      }
     }
   }
 }
@@ -117,12 +234,13 @@ static void
 update_status(int dr, int new_status, int new_safety)
 {
   int pos;
-  
-  DEBUG(DEBUG_SEMEAI, "Changing matcher_status of %1m from %s to %s.\n", dr,
-	status_to_string(dragon[dr].matcher_status),
-	status_to_string(new_status));
-  DEBUG(DEBUG_SEMEAI, "Changing safety of %1m from %s to %s.\n", dr,
-	safety_to_string(DRAGON2(dr).safety), safety_to_string(new_safety));
+  if (dragon[dr].matcher_status != new_status)
+    DEBUG(DEBUG_SEMEAI, "Changing matcher_status of %1m from %s to %s.\n", dr,
+	  status_to_string(dragon[dr].matcher_status),
+	  status_to_string(new_status));
+  if (DRAGON2(dr).safety != new_safety)
+    DEBUG(DEBUG_SEMEAI, "Changing safety of %1m from %s to %s.\n", dr,
+	  safety_to_string(DRAGON2(dr).safety), safety_to_string(new_safety));
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (IS_STONE(board[pos]) && is_same_dragon(dr, pos))
