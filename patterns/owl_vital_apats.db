@@ -597,7 +597,7 @@ XO.|
 :8,s,value(45)
 
 ?XX|
-XAB|
+XA.|
 X*X|
 XO.|
 ---+
@@ -717,7 +717,7 @@ OXX
 
 b*c
 .X.
-XAX
+X.X
 DXX
 
 ;!attack(D) && oplay_attack(*,b) && oplay_attack(*,c)
@@ -732,12 +732,12 @@ XXX.
 
 :8,s,value(50)
 
-bXXd
-aO*c
+XXXb
+.O*a
 ----
 
-; !oplay_attack(*,c,d,d)
-; && !oplay_attack(*,d,c,c)
+; !oplay_attack(*,a,b,b)
+; && !oplay_attack(*,b,a,a)
 
 
 Pattern VA44

@@ -3727,12 +3727,12 @@ X*.O
 :8,OXe
 
 ??.?
-B*.a
+A*.O
 ....
 ....
 ----
 
-;!weak(B)
+;!weak(A)
 
 
 Pattern EB307
@@ -3919,13 +3919,13 @@ O...x
 
 :8,Oe,jump_out_far_helper
 
-?..ex
-da..g
+?..dx
+Oa..e
 cb.*.
 .....
 -----
 
-;oplay_attack(*,a,b,c,c) && x_somewhere(e,g)
+;oplay_attack(*,a,b,c,c) && x_somewhere(d,e)
 
 
 Pattern EB404
@@ -5009,6 +5009,7 @@ Pattern EB709
 
 :8,OXbFY,followup(1),reverse_followup(3)
 
+
 Pattern EB709Y
 
 |.XO    extending in the corner is huge: double sente
@@ -5068,7 +5069,7 @@ X*..
 
 ?O..
 XOb.
-C*a.
+X*a.
 ----
 
 ; !xplay_attack_either(*,a,b,*,b)
@@ -5085,7 +5086,7 @@ X*..
 :8,OXb,reverse_followup(3)
 
 ?Ob.
-C*a.
+X*a.
 ----
 
 ;!xplay_attack_either(*,a,b,*,b)
@@ -5833,6 +5834,7 @@ O*a.
 
 ;xmoyo(c) && oplay_attack(*,a,a) && !oplay_attack(*,a,b,*)
 
+
 Pattern EB1101Y
 
 ?x??       big push in sente
@@ -5843,11 +5845,11 @@ O*..
 :8,OXeY
 
 ?x??
-?Xbc
-O*a.
+?X.a
+O*..
 ----
 
-;xmoyo(c) 
+;xmoyo(a)
 
 
 Pattern EB1102
@@ -7288,7 +7290,7 @@ O....
 e....
 .....
 cb*..
-da...
+Oa...
 ?X...
 
 ;!xmoyo(e) && oplay_attack(*,a,b,c,c)
@@ -7469,7 +7471,7 @@ Pattern CB217a
 
 :8,a
 
-?.a
+?.O
 .*A
 ?OA
 
@@ -7733,7 +7735,6 @@ A..X
 ?.o?
 
 ; oplay_connect(*,A,*)
-
 
 
 Pattern CB238
@@ -8177,15 +8178,16 @@ X...
 
 :8,OXe
 
-??O?        jump out
+??O?
 ?XOa
 Xecd
 ..*b
 ????
 
-; o_somewhere(a,b) 
+; o_somewhere(a,b)
 ; || oplay_attack(*,c,d,e,b,a)
 ; || oplay_attack(*,c,d,e,a,b)
+
 
 Pattern CB274
 
@@ -8659,7 +8661,7 @@ O.*.
 
 :8,OXe
 
-xX..          jump!
+xX..
 ?...
 A.*.
 ?o??
@@ -10725,7 +10727,7 @@ O..O
 :8,OXdac
 
 a*..
-Ob.O
+O..O
 
 ; does_attack(*,a)
 
@@ -10771,10 +10773,10 @@ OOX.
 :8,XEd,shape(10)
 
 ?Xa.
-BBX.
+OOX.
 ..*.
 
-; attack(a)&&!defend(a)
+; attack(a) && !defend(a)
 
 
 Pattern CD92
@@ -11734,8 +11736,8 @@ Pattern EJ45
 
 ....
 .*..
-bXOO
-.aCC
+.XOO
+.aXX
 ....
 ....
 ----
@@ -13052,6 +13054,7 @@ O.Xx
 
 ;xmoyo(a)
 
+
 Pattern LE1Y
 
 O.Xx      fourth line sente kosumi
@@ -13100,6 +13103,7 @@ O.Xxx
 
 ;xmoyo(a) && (!o_somewhere(c)||o_somewhere(b))
 
+
 Pattern LE2Y
 
 ?????     third line sente kosumi
@@ -13128,6 +13132,7 @@ O..
 oa.
 
 ;omoyo(a)
+
 
 Pattern LE3Y
 
@@ -13173,6 +13178,7 @@ A...
 ----
 
 ; xmoyo(*) && lib(A) > 2
+
 
 Pattern LE5Y
 
@@ -13252,6 +13258,7 @@ O*X..
 
 :8,OXFY,value(10)
 
+
 Pattern LE9Y
 
 oo..?       good local sente
@@ -13294,6 +13301,7 @@ Pattern LE11
 .O?
 
 ; xmoyo(a)
+
 
 Pattern LE11Y
 
@@ -13389,6 +13397,7 @@ OoO
 ?o?
 
 ; xmoyo(a)||xmoyo(b)||xmoyo(c)||xmoyo(d)||xmoyo(e)||xmoyo(f)
+
 
 Pattern LE15Y
 # tm decreased value (3.1.20) (see nngs:1150 move G4)

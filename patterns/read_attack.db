@@ -113,8 +113,6 @@ a*x
 ; rgoal[a] == 1 && olib(*) == 1
 
 
-
-
 Pattern RA007
 
 Y*   snapback or better
@@ -122,7 +120,7 @@ X.
 
 :8,A,minvalue(55),maxvalue(71)
 
-aA
+a*
 Xb
 
 ; rgoal[a] == 1 && xlib(b)==1
@@ -131,7 +129,6 @@ Xb
 >   set_value(71);
 > else
 >   set_value(55);
-
 
 
 Pattern RA008
@@ -146,7 +143,8 @@ X.
 a*
 ab
 
-; 0 && rgoal[a] == 1 && xlib(b) <= 2 && olib(*) > 1 
+; 0 && rgoal[a] == 1 && xlib(b) <= 2 && olib(*) > 1
+
 
 ###################
 #Protect boundary:#
@@ -161,11 +159,11 @@ XQ   capture for liberties
 :8,A,minvalue(10), maxvalue(73)
 
 ab
-C.
+*?
 
 ; lib(a) == 1  && lib(b) <=2
 
-> if (!ko(C))
+> if (!ko(*))
 >   set_value(73);
 > else
 >   set_value(10);
@@ -189,7 +187,6 @@ Pattern RA101a
 >   set_value(72);
 
 
-
 Pattern RA102
 
 Q*	extend or connect for liberties
@@ -204,13 +201,11 @@ A*
 >   set_value(77);
 > else if (lib(A) == 1)
 >   set_value(71);
-> else if (lib(A) == 2 && olib(*) > 2)  
+> else if (lib(A) == 2 && olib(*) > 2)
 >   /* FIXME: i.e. backfill hack; causes explosion; see reading:35*/
 >   set_value(10);
 > else
 >   set_value(0);
-
-
 
 
 ###########
@@ -243,6 +238,7 @@ B*
 ;&& ((goallib() == 3 && stackp <= backfill2_depth)
 ;    || (goallib() == 2 && stackp <= backfill_depth))
 
+
 Pattern RA202
 # FIXME: Need a better way to protect border.
 
@@ -252,11 +248,11 @@ QX*   Protect border (maybe with ko)
 
 Ba*
 
-# FIMXE: Taking out to reduce variations
-; 0 && 
-; rgoal[B] == 2 
-; && lib(a) <= 2 
-; && lib(B) <= goallib() 
+# FIXME: Taking out to reduce variations
+; 0 &&
+; rgoal[B] == 2
+; && lib(a) <= 2
+; && lib(B) <= goallib()
 ; && (ko(*) || olib(*) > 1)
 
 
@@ -274,6 +270,7 @@ Ba
 # FIXME: This still looks like a valid pattern, but it breaks
 #   reading:26
 ; 0 && rgoal[B] == 2 && lib(a) <= 2 && lib(B) <= goallib() && (ko(*) || olib(*) > 1)
+
 
 Pattern RA203
 # FIXME: Need a better way to double back
@@ -310,7 +307,7 @@ XQ    back-atari
 
 :8,A,value(35)
 
-ab    back-atari
+ab
 *.
 
 ; lib(b) < goallib()
@@ -324,7 +321,7 @@ Pattern RA205a
 
 :8,A,value(36)
 
-*ab    back-atari
+*ab
 
 ; lib(b) < goallib()
 ; && lib(a) == lib(b)
@@ -338,13 +335,12 @@ OXQ    back-atari
 
 :8,A,value(30)
 
-Oab    back-atari
+Oab
 *X.
 
 ; lib(b) < goallib()
 ; && lib(a) == lib(b)
 ; && olib(*) >= lib(b)
-
 
 ###############################
 #superstring attacks (need to add entire superstring to rgoal?)
@@ -395,10 +391,6 @@ Pattern RA302
 >   set_value(0)
 
 
-
-
-
-
 Pattern RA303
 
 X*
@@ -411,10 +403,11 @@ ab
 
 ; goallib() < lib(a) && lib(a) <=3 && olib(*) >= 2 && xlib(b) <= 4
 
+
 ###########
 #draw back#
 ###########
-Pattern RA301
+Pattern RA401
 
 *O
 .Y
@@ -450,12 +443,11 @@ X.    diagonal liberty
 
 :8,A,value(9)
 
-a.    diagonal liberty
+a.
 ?*
 
 # Too many variations.
 ; 0 && rgoal[a] == 1
-
 
 
 Pattern RA999

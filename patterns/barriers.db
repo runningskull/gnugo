@@ -834,6 +834,7 @@ XO
 
 ;oplay_attack(a,b,b)
 
+
 Pattern Barrier60a
 
 .X.
@@ -902,6 +903,7 @@ X.cX
 
 >return (lib(a)>2 || (lib(a) == 2 && connect_and_cut_helper(a,b,c)));
 
+
 Pattern Intrusion1c
 
 xxxx
@@ -918,6 +920,7 @@ X.dX
 
 ;safe_omove(a)
 >return (lib(b)>2 || (lib(b) == 2 && connect_and_cut_helper(b,c,d)));
+
 
 Pattern Intrusion1d
 # ab New pattern (3.1.24).
@@ -1008,6 +1011,7 @@ XbdX
 
 ;oplay_attack(a,b,C)
 >return (!xplay_attack(b,d));
+
 
 Pattern Intrusion5b
 
@@ -1276,13 +1280,13 @@ xXx
 
 :8,B,value(30)
 
-
 X..
 ba.
 o..
 xXx
 
 >return (!xplay_attack(a,b));
+
 
 Pattern Intrusion20
 
@@ -1310,7 +1314,7 @@ b.X
 a!.
 x..
 
->return(!xplay_attack(a,b));
+>return (!xplay_attack(a,b));
 
 
 Pattern Intrusion21b
@@ -1325,7 +1329,8 @@ ooX
 ba.
 x..
 
->return(!xplay_attack(a,b));
+>return (!xplay_attack(a,b));
+
 
 Pattern Intrusion22
 
@@ -1338,8 +1343,8 @@ Q.X
 b.X
 a..
 .!.
-  
->return(!xplay_attack(a,b));
+
+>return (!xplay_attack(a,b));
 
 
 Pattern Intrusion23
@@ -1735,6 +1740,7 @@ a....
 
 ;lib(a)>2
 
+
 Pattern Intrusion48
 # ab New pattern. (3.1.23)
 # FIXME: This would need a constraint. The one below did not work.
@@ -1753,6 +1759,7 @@ Q.!
 # 
 # ;oplay_attack(a,b,c,d,e,f,f)
 
+
 Pattern Intrusion49
 # ab added (3.1.24)
 
@@ -1767,6 +1774,7 @@ bcX
 ;oplay_attack(a,b) && ! attack(b)
 >return (!xplay_attack(a,c));
 
+
 Pattern Intrusion50
 # ab added (3.1.25)
 
@@ -1776,7 +1784,7 @@ QX!
 ---
 
 :8,BO,value(30)
-  
+
 ?c.
 dXa
 .b.
@@ -2085,7 +2093,7 @@ Pattern Nonterritory16
 
 :8,t
 
-|ef
+|e?
 |cd
 |ab
 |OX

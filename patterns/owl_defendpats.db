@@ -756,7 +756,7 @@ xx..
 
 o...
 O.*.
-AB..
+Ax..
 ----
 
 ; oplay_attack(*,A)
@@ -1582,9 +1582,9 @@ Pattern D503
 |*aO
 |?Oc
 
-; oplay_attack(*,a,a) && 
-; !xplay_attack_either(a,a,c) &&
-; oplay_attack(*,b,a,b)
+; oplay_attack(*,a,a)
+; && !xplay_attack_either(a,a,c)
+; && oplay_attack(*,b,a,b)
 
 
 Pattern D504
@@ -2770,7 +2770,7 @@ OO.
 
 Pattern D720
 # tm New pattern (3.1.16)
-  
+
 ?O.o
 O.*o
 
@@ -3429,7 +3429,7 @@ X*O?     Extend side eye-space in sente
 
 :8,-,value(80)
 
-C*O?     Extend side eye-space in sente
+C*O?
 ?bao
 ----
 
@@ -4400,10 +4400,10 @@ X.?
 :8,-,value(35)
 
 O*a
-cB?
+B.?
 
 ; owl_escape_value(a)>0
-; && oplay_attack(*,a,c)
+; && oplay_attack(*,a,B)
 
 
 Pattern D1136
@@ -4460,6 +4460,7 @@ AOCd
 ; && (owl_escape_value(f) > 0 || vital_chain(C))
 ; && olib(*) > 1
 ; && oplay_attack_either(*,d,B,A)
+
 
 Pattern D1139
 # tm New Pattern (3.1.20) (see nngs:110)
@@ -5262,8 +5263,8 @@ XOX
 :8,-,value(90)
 
 ?O?
-AdX
-*BO
+XdX
+*XO
 ?c?
 
 ;owl_escape_value(c)>0 && owl_goal_dragon(d)
@@ -5311,7 +5312,7 @@ oOX
 :8,-,value(95)
 
 XOo
-*Xb
+*XO
 aOX
 
 ; owl_escape_value(a)>0
@@ -6111,6 +6112,7 @@ A..
 ; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
 ; && (!x_somewhere(c) || oplay_attack_either(*,d,c,d))
 
+
 Pattern D1385
 # tm New Pattern (3.1.23)
 
@@ -6121,7 +6123,7 @@ X*
 
 :8,-,value(75)
 
-fB    escape or capture
+fB
 dc
 e*
 ?A
@@ -6165,8 +6167,8 @@ O.OX
 
 ----
 .*A?
-O.Oa
-?Ob?
+O.OX
+?OX?
 
 ;lib(A)==1
 

@@ -722,14 +722,13 @@ xX.*?
 
 :8,-,value(50)
 
-???a?             back off to prevent jump
+???a?
 ?xx.?
 xX.*?
 ....?
 -----
 
 ;owl_escape_value(a) < 1
-
 
 
 Pattern A222
@@ -1127,12 +1126,12 @@ X...
 
 :8,-,value(70)
 
-b*.?
-Xa..
+a*.?
+X...
 ?..?
 ????
 
-;lib(b)<=2 || xlib(*)>2
+;lib(a)<=2 || xlib(*)>2
 
 
 Pattern A403
@@ -1231,6 +1230,7 @@ eXO
 
 ;owl_escape_value(a)>0
 ; && (xplay_attack(b,c,*,d,d) || !xplay_defend(*,b,d,e,e))
+
 
 Pattern A407
 
@@ -2640,11 +2640,11 @@ X.*.
 
 :8,s,value(25)
 
-AAbX
-A.*.
+XXaX
+X.*.
 ----
 
-;!safe_omove(b)
+;!safe_omove(a)
 
 
 Pattern A915
@@ -2859,7 +2859,7 @@ ooo
 a*b
 Oc?
 
-;(owl_escape_value(a)>0 || owl_escape_value(b)>0) 
+;(owl_escape_value(a)>0 || owl_escape_value(b)>0)
 ; && oplay_attack(*,c,c)
 
 
@@ -2967,10 +2967,10 @@ X..X
 
 :8,-,value(75)
 
-Ae*D
-BfgC
+Ae*B
+AfgB
 
-; (owl_escape_value(A) > 0 || owl_escape_value(C) > 0)
+; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
 ; && oplay_defend_both(*,g,f,e,f,*)
 
 
@@ -3352,8 +3352,8 @@ X*O         don't let defender cut and capture to escape
 
 :8,n,value(80)
 
-C*b
-?aD
+X*b
+?aX
 
 ;!xplay_defend_both(*,a,b)
 
@@ -3416,8 +3416,8 @@ X.??
 ; (owl_escape_value(a) > 0)
 ; + (owl_escape_value(b) > 0)
 ; + (owl_escape_value(c) > 0) > 1
-; || (!o_somewhere(g) && !o_somewhere(h) &&
-;     owl_escape_value(e) + owl_escape_value(f) > 0)
+; || (!o_somewhere(g) && !o_somewhere(h)
+;     && owl_escape_value(e) + owl_escape_value(f) > 0)
 
 
 Pattern A1121
@@ -3459,12 +3459,12 @@ o.*X
 
 :8,-,value(75)
 
-bdF?
-ec*a
+bdE?
+oc*a
 ----
 
 ; (owl_escape_value(a) > 0 || owl_escape_value(b) > 0)
-; && xplay_attack_either(*,c,d,c,F)
+; && xplay_attack_either(*,c,d,c,E)
 
 
 Pattern A1124

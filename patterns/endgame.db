@@ -130,10 +130,8 @@ Pattern EE1a
 ba*x
 ----
 
-; marginal_eye(*) && proper_eye(a) && proper_eye(b) 
+; marginal_eye(*) && proper_eye(a) && proper_eye(b)
 ; && xplay_attack(*,a,c)
-
-
 
 
 Pattern EE2
@@ -490,6 +488,7 @@ bO*a
 
 ;marginal_eye(*) && marginal_eye(a) && marginal_eye(c)
 ;&& (oplay_attack(*,a,b,a) || oplay_attack(*,a,b,D))
+
 
 Pattern EE203Y
 
@@ -1322,6 +1321,7 @@ X.O
 
 ;marginal_eye(*) && proper_eye(a)
 
+
 Pattern CE15Y
 
 .X?       sente endgame move
@@ -1366,6 +1366,7 @@ X??
 
 ;marginal_eye(*) && proper_eye(a) && olib(*)>2
 
+
 Pattern CE16Y
 
 .X?       sente endgame move
@@ -1409,6 +1410,7 @@ a*
 xX
 
 ;marginal_eye(*) && proper_eye(a) && olib(*)>2
+
 
 Pattern CE17Y
 
@@ -1611,7 +1613,6 @@ d*A
 ; && proper_eye(b) && oplay_attack(*,A)
 
 
-
 ######################################################################
 #
 # Center followup patterns
@@ -1659,6 +1660,8 @@ X*X
 Pattern CF3
 # tm New Pattern (3.1.23) (see arend:36)
 # FIXME: Perhaps better in patterns.db?
+# gf This pattern is redundant because the followup has already been
+#    found by find_worm_threats(). (This was broken in 3.1.23 and 3.1.24.)
 
 O*.O  threaten to save
 

@@ -441,16 +441,15 @@ O!.  cutable keima on edge.
 
 :8,B
 
-Gb.
-caF
+ca.
+b*d
 .!.
 ---
 
-; xplay_attack_either(a,b,G,F) &&
-; xplay_attack_either(a,c,G,F)
+; xplay_attack_either(*,a,c,d)
+; && xplay_attack_either(*,b,c,d)
 
 
- 
 ##########################
 #
 # B patterns in the center
@@ -665,7 +664,7 @@ O!O!
 
 :8,BX
 
-XA*O	double cut.
+XA*O
 ObOc
 
 ; xplay_attack(*,A) && !xplay_attack_either(*,b,c,c,*)
@@ -683,12 +682,12 @@ OXO
 
 :8,B
 
-?*?   save cutting stone.
+?*?
 OXO
 aOb
 
-; !xplay_attack_either(*,b,a,*,a) &&
-; !xplay_attack_either(*,a,b,*,b)
+; !xplay_attack_either(*,b,a,*,a)
+; && !xplay_attack_either(*,a,b,*,b)
 
 
 ########################
@@ -893,7 +892,7 @@ O.O
 OaO
 bcd
 efg
-hOi
+.O.
 
 ;omoyo(a) && oarea(c) && oarea(f)
 ;&& ((omoyo(b) + omoyo(c) + omoyo(d) + omoyo(e) + omoyo(f) +omoyo(g)) >= 3)

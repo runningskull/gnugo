@@ -554,7 +554,7 @@ OX.O
 
 :8,C
 
-eDbf
+ODbO
 *Oac
 
 ;!oplay_defend_both(*,a,b,a,D) && !oplay_defend_both(*,b,a,c,b,c)
@@ -1276,7 +1276,7 @@ O*      empty triangle. Ok if the empty point of the triangle is an eye.
 O*
 aO
 
-;!eye(a) 
+;!eye(a)
 
 
 Pattern Shape3
@@ -2089,7 +2089,7 @@ OXO
 
 ?.?
 *.a
-bDa
+bXa
 ?c?
 
 ;lib(a)>1 && lib(b)>1 && lib(c)>1
@@ -2516,7 +2516,6 @@ O..
 XOO
 
 :8,X,shape(1)
-
 
 
 ###########################
