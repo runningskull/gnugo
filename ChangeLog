@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- code simplification in safe_move (use REVERSE_RESULT)
 - new randomness_scaling field in struct move_data and new scale_randomness()
 - moves matching Fj and Ft patterns get extra randomness
 - fuseki pattern tuning for kakaris in high handicap games

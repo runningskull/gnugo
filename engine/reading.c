@@ -5447,15 +5447,7 @@ safe_move(int move, int color)
 
   /* Otherwise calculate the value... */
   if (trymove(move, color, "safe_move-A", 0, EMPTY, 0)) {
-    int acode = attack(move, NULL);
-    if (acode == 0)
-      safe = WIN;
-    else if (acode == WIN)
-      safe = 0;
-    else if (acode == KO_A)
-      safe = KO_B;
-    else if (acode == KO_B)
-      safe = KO_A;
+    safe = REVERSE_RESULT(attack(move, NULL));
     popgo();
   }
   else if (is_ko(move, color, NULL)
