@@ -2309,7 +2309,8 @@ owl_estimate_life(struct local_owl_data *owl,
     gprintf("owl: eyemin=%d matches_found=%d\n", *eyemin, matches_found);
   if (*eyemin >= matches_found)
     *eyemin -= matches_found;
-  else *eyemin = 0;
+  else
+    *eyemin = 0;
 
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
@@ -2498,6 +2499,7 @@ owl_determine_life(struct local_owl_data *owl,
   find_half_and_false_eyes(color, eye, owl->half_eye, mw);
 
   set_eyevalue(probable_eyes, 0, 0, 0, 0);
+
   /* This test must be conditioned on (m, n) being its own origin,
    * because some origins get moved during the topological eye
    * code.
@@ -2553,8 +2555,7 @@ owl_determine_life(struct local_owl_data *owl,
 	 * 1. Due to the vital attack moves being able to later reduce
 	 * the *eyemin, we can't say that a certain *eyemin is
 	 * sufficient.
-	 * 2. This part of the code is in now way time critical. If
-	 * the life code is enabled, this may change.
+	 * 2. This part of the code is in no way time critical.
 	 */
 #if 0
 	/* Found two certain eyes---look no further. */

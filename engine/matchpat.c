@@ -49,7 +49,6 @@ static int totals[6];
 static void
 clear_profile(struct pattern *pattern)
 {
-
   for (; pattern->patn; ++pattern) {
     pattern->hits = 0;
     pattern->reading_nodes = 0;
@@ -225,7 +224,6 @@ static unsigned int class_mask[MAX_DRAGON_STATUS][3];
 static void
 fixup_patterns_for_board_size(struct pattern *pattern)
 {
-
   for (; pattern->patn; ++pattern)
     if (pattern->edge_constraints != 0) {
 
@@ -269,7 +267,6 @@ fixup_patterns_for_board_size(struct pattern *pattern)
 	if (pattern->minj > pattern->maxj - (board_size-1))
 	  pattern->minj = pattern->maxj - (board_size-1);
     }
-
 }
 
 
@@ -325,7 +322,8 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	    char goal[BOARDMAX]) 
 {
   const int anchor_test = board[anchor] ^ color;  /* see below */
-  int m = I(anchor), n = J(anchor);
+  int m = I(anchor);
+  int n = J(anchor);
   int merged_val;
 
   /* Basic sanity checks. */
@@ -506,7 +504,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	/* Make sure the grid optimisation wouldn't have 
            rejected this pattern */
 	ASSERT2((merged_val & pattern->and_mask[ll])
-	       == pattern->val_mask[ll], m, n);
+		== pattern->val_mask[ll], m, n);
 
 #endif /* we don't trust the grid optimisation */
 
@@ -630,7 +628,7 @@ tree_matchpat_loop(matchpat_callback_fn_ptr callback,
 
 }
 
-/* possibly cheeper to pass a little less recursively.
+/* Possibly cheaper to pass a little less recursively.
  * Note: This could even just be static data, unless the
  * tree pattern matcher is itself used recursively.*/
 struct rec_data {
@@ -656,7 +654,7 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
   while (tnl) {
     struct tree_node *node = &(tnl->node);
     int x = m + node->x;
-    int y = n + node->y;;
+    int y = n + node->y;
     if (ON_BOARD2(x,y)) {
       int att = node->att;
       int point_color = BOARD(x,y);
@@ -682,11 +680,11 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
 	    else {
               if (0) {
                 gprintf("  P[%s, %d] matches at %m)\n",
-			pattern->name, 
-			match->orientation, x, y);
+			pattern->name, match->orientation, x, y);
               }
               /* A match! */
-              pdata->callback(POS(m, n), color, pattern, ll, pdata->callback_data);
+              pdata->callback(POS(m, n), color, pattern, ll,
+			      pdata->callback_data);
             }
 
             match = match->next;
@@ -768,7 +766,6 @@ tree_initialize_pointers(struct tree_node_list *tnl,
 
 #endif
 
-#
 
 /**************************************************************************/
 /* DFA matcher:                                                           */
@@ -871,8 +868,7 @@ dfa_prepare_for_match(int color)
   /* copy the board */
   for (i = 0; i < dfa_board_size; i++)
     for (j = 0; j < dfa_board_size; j++)
-      dfa_p[DFA_POS(i, j) + DFA_OFFSET] = 
-	EXPECTED_COLOR(color, BOARD(i, j));
+      dfa_p[DFA_POS(i, j) + DFA_OFFSET] = EXPECTED_COLOR(color, BOARD(i, j));
 
   prepare_for_match(color);
 }
@@ -1009,8 +1005,8 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
 
 static void
 check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
-	      struct pattern *pattern, int ll, void *callback_data,
-	      char goal[BOARDMAX], int anchor_in_goal)
+		    struct pattern *pattern, int ll, void *callback_data,
+		    char goal[BOARDMAX], int anchor_in_goal)
 {
   int k;			/* Iterate over elements of pattern */
   int found_goal = 0;
@@ -1061,8 +1057,7 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
 
     /* class check */
     ASSERT1(dragon[pos].status < 4, anchor);
-    if ((pattern->class
-	 & class_mask[dragon[pos].status][board[pos]]) != 0)
+    if ((pattern->class & class_mask[dragon[pos].status][board[pos]]) != 0)
       goto match_failed;
     
   } /* loop over elements */
@@ -1218,19 +1213,12 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
   int k;    /* Iterate over elements of pattern */
   /* We transform around the center point. */
   int mid = POS((board_size-1)/2, (board_size-1)/2);
-  int pos;
-  int number_of_stones_on_board = 0;
+  int number_of_stones_on_board = stones_on_board(BLACK | WHITE);
   
   /* Basic sanity check. */
   gg_assert(color != EMPTY);
-  gg_assert(board_size%2 == 1);
+  gg_assert(board_size % 2 == 1);
 
-  /* Count the number of stones on the board. */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (IS_STONE(board[pos]))
-      number_of_stones_on_board++;
-  }
-  
   /* Try each pattern - NULL pattern marks end of list. */
   for (; pattern->patn; pattern++) { 
     /* The number of stones on the board must be right. This is not

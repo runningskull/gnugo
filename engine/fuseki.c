@@ -47,9 +47,9 @@
 #define LOWER_RIGHT 3
 
 /* Global variables remembering which symmetries the position has. */
-int horizontally_symmetric; /* symmetry with respect to K column */
-int vertically_symmetric;   /* symmetry with respect to 10 row */
-int diagonally_symmetric;   /* ... with respect to diagonal from UR to LL */
+static int horizontally_symmetric; /* symmetry with respect to K column */
+static int vertically_symmetric;   /* symmetry with respect to 10 row */
+static int diagonally_symmetric;   /* with respect to diagonal from UR to LL */
 
 /* This value must be lower than the value for an ongoing joseki. 
  * (Gets multiplied with board_size / 19.) 

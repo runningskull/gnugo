@@ -203,8 +203,8 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
 
 #define SETUP_TRACE_INFO2(name, str1, str2) \
   const char *read_function_name = name; \
-  int q1 = find_origin(str1); \
-  int q2 = find_origin(str2);
+  int q1 = board[str1] == EMPTY ? str1 : find_origin(str1); \
+  int q2 = board[str2] == EMPTY ? str2 : find_origin(str2);
 
 #else
 
@@ -314,7 +314,7 @@ int get_read_result2(int routine, int komaster, int kom_pos,
     if (read_result) { \
       rr_set_result_move(*(read_result), 0, 0); \
     } \
-    gprintf("%o%s %1m %d 0 0 0 ", read_function_name, q, stackp); \
+    gprintf("%o%s %1m %d 0 0 ", read_function_name, q, stackp); \
     dump_stack(); \
     return 0; \
   } while (0)
@@ -325,7 +325,7 @@ int get_read_result2(int routine, int komaster, int kom_pos,
     if (read_result) { \
       rr_set_result_move(*(read_result), (value), (move)); \
     } \
-    gprintf("%o%s %1m %d %d %d ", read_function_name, q, stackp, \
+    gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
 	    (value), (move)); \
     dump_stack(); \
     return (value); \
@@ -337,7 +337,7 @@ int get_read_result2(int routine, int komaster, int kom_pos,
     if (read_result) { \
       rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
     } \
-    gprintf("%o%s %1m %1m %d %d %d %d ", read_function_name, q1, q2, stackp, \
+    gprintf("%o%s %1m %1m %d %d %d %1m ", read_function_name, q1, q2, stackp, \
 	    (value_a), (value_b), (move)); \
     dump_stack(); \
     return; \
@@ -349,7 +349,7 @@ int get_read_result2(int routine, int komaster, int kom_pos,
     if (read_result) { \
       rr_set_result_move(*(read_result), (value), (move)); \
     } \
-    gprintf("%o%s %1m %1m %d %d %d ", read_function_name, q1, q2, stackp, \
+    gprintf("%o%s %1m %1m %d %d %1m ", read_function_name, q1, q2, stackp, \
 	    (value), (move)); \
     dump_stack(); \
     return (value); \

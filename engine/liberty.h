@@ -318,7 +318,7 @@ int search_persistent_reading_cache(int routine, int str, int *result,
 				    int *move);
 void store_persistent_reading_cache(int routine, int str, int result,
 				    int move, int nodes);
-void delete_persistent_reading_entry(int index);
+void delete_persistent_reading_cache_entry(int routine, int str);
 void reading_hotspots(float values[BOARDMAX]);
 void purge_persistent_owl_cache(void);
 void clear_persistent_owl_cache(void);
@@ -350,8 +350,6 @@ int komaster_trymove(int pos, int color,
 		     int komaster, int kom_pos,
 		     int *new_komaster, int *new_kom_pos,
 		     int *is_conditional_ko, int consider_conditional_ko);
-int komaster_is_empty(int komaster, int kom_pos);
-const char *komaster_to_string(int komaster, int kom_pos);
 int does_capture_something(int pos, int color);
 void mark_string(int str, char mx[BOARDMAX], char mark);
 int move_in_stack(int pos, int cutoff);
@@ -739,7 +737,6 @@ extern int branch_depth;        /* deep reading cutoff */
 extern int fourlib_depth;       /* deep reading cutoff */
 extern int ko_depth;            /* deep ko reading cutoff */
 extern int aa_depth;            /* deep global reading cutoff */
-extern int aa_threat_depth;
 extern int owl_distrust_depth;  /* below this owl trusts the optics code */
 extern int owl_branch_depth;    /* below this owl tries only one variation */
 extern int owl_reading_depth;   /* owl does not read below this depth */
@@ -814,12 +811,12 @@ struct eyevalue {
 
 
 struct half_eye_data {
-  float value;      /* Topological eye value. */
-  char type;         /* HALF_EYE or FALSE_EYE; */
-  int num_attacks;  /* number of attacking points */
-  int attack_point[4];  /* the move to attack a topological halfeye */
+  float value;          /* Topological eye value. */
+  char type;            /* HALF_EYE or FALSE_EYE; */
+  int num_attacks;      /* number of attacking points */
+  int attack_point[4];  /* the moves to attack a topological halfeye */
   int num_defends;      /* number of defending points */
-  int defense_point[4]; /* the move to defend a topological halfeye */
+  int defense_point[4]; /* the moves to defend a topological halfeye */
 };
 
 /* array of half-eye data */

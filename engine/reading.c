@@ -248,7 +248,7 @@ attack(int str, int *move)
     return 0;
 
   origin = find_origin(str);
-  if (search_persistent_reading_cache(ATTACK, origin, &result, &the_move) != -1) {
+  if (search_persistent_reading_cache(ATTACK, origin, &result, &the_move)) {
     if (move)
       *move = the_move;
     return result;
@@ -311,7 +311,7 @@ find_defense(int str, int *move)
 
   origin = find_origin(str);
   if (search_persistent_reading_cache(FIND_DEFENSE, origin, 
-				      &result, &the_move) != -1) {
+				      &result, &the_move)) {
     if (move)
       *move = the_move;
     return result;
@@ -374,33 +374,20 @@ attack_and_defend(int str,
   if (acode != 0) {
     dcode = find_defense(str, &dpos);
     
-    /* If find_defense() says the string is safe as is, we believe
-     * this in favor of attack()'s opinion. Actually this is probably
-     * incorrect, but we can't easily find a defense point to return.
+    /* If find_defense() says the string is safe as is, contradicting
+     * the opinion of attack(), we remove the corresponding entries
+     * from the persistent cache and try again.
      */
     if (dcode == WIN && dpos == NO_MOVE) {
-      int ai, di;
-      ai = search_persistent_reading_cache(ATTACK, find_origin(str),
-					   NULL, NULL);
-      di = search_persistent_reading_cache(FIND_DEFENSE, find_origin(str),
-					   NULL, NULL);
-      while (ai != -1) {
-	delete_persistent_reading_entry(ai);
-	ai = search_persistent_reading_cache(ATTACK, find_origin(str),
-					     NULL, NULL);
-      }
-      while (di != -1) {
-	delete_persistent_reading_entry(di);
-	di = search_persistent_reading_cache(FIND_DEFENSE, find_origin(str),
-					     NULL, NULL);
-      }
+      delete_persistent_reading_cache_entry(ATTACK, str);
+      delete_persistent_reading_cache_entry(FIND_DEFENSE, str);
       acode = attack(str, &apos);
       if (acode != 0)
         dcode = find_defense(str, &dpos);
     }
   }
 
-  gg_assert(!((acode != 0) && (dcode == WIN && dpos == NO_MOVE)));
+  ASSERT1(!(acode != 0 && dcode == WIN && dpos == NO_MOVE), str);
 
   if (attack_code)
     *attack_code = acode;
@@ -1172,7 +1159,7 @@ defend1(int str, int *move, int komaster, int kom_pos)
       for (k = 0; k < liberties; k++) {
 	int apos = libs2[k];
 	if ((liberties == 1 || !is_self_atari(apos, other))
-	    && trymove(apos, color, "attack1-C", str, komaster, kom_pos)) {
+	    && trymove(apos, color, "defend1-C", str, komaster, kom_pos)) {
 	  int acode = do_attack(str, NULL, komaster, kom_pos);
 	  popgo();
 	  CHECK_RESULT(savecode, savemove, acode, apos, move, "backfilling");

@@ -27,7 +27,7 @@
 #include <string.h>
 #include "liberty.h"
 
-SGFTree *aftermath_sgftree;
+static SGFTree *aftermath_sgftree;
 
 /* Generate a move to definitely settle the position after the game
  * has been finished. The purpose of this is to robustly determine

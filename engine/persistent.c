@@ -117,6 +117,7 @@ static void draw_active_area(char board[BOARDMAX], int apos);
 static int verify_stored_board(char board[BOARDMAX]);
 
 /* Tactical reading functions. */
+static int find_persistent_reading_cache_entry(int routine, int str);
 static void print_persistent_reading_cache_entry(int k);
 static void mark_string_hotspot_values(float values[BOARDMAX],
 				       int m, int n, float contribution);
@@ -271,11 +272,11 @@ clear_persistent_reading_cache()
 }
 
 
-/* Look for a valid read result in the persistent cache.
- * Return index of the entry found if there is a match, -1 if no match.
+/* Locate a matching entry in the persistent reading cache. Return the
+ * entry number or -1 if none found.
  */
-int
-search_persistent_reading_cache(int routine, int str, int *result, int *move)
+static int
+find_persistent_reading_cache_entry(int routine, int str)
 {
   int k;
   int r;
@@ -305,34 +306,51 @@ search_persistent_reading_cache(int routine, int str, int *result, int *move)
     if (!verify_stored_board(entry->board))
       continue;
 
-    /* Matched alright. Increase score, fill in the answer, and return. */
-    entry->score += entry->nodes;
-    if (result)
-      *result = entry->result;
-    if (move)
-      *move = entry->move;
-    ASSERT1(entry->result == 0
-	    || entry->move == NO_MOVE
-	    || ON_BOARD(entry->move),
-	    entry->move);
-
-    if ((debug & DEBUG_READING_PERFORMANCE)
-	&& entry->nodes >= MIN_READING_NODES_TO_REPORT) {
-      if (entry->result != 0)
-	gprintf("%o%s %1m = %d %1m, cached (%d nodes) ",
-		routine == ATTACK ? "attack" : "defend",
-		str, entry->result, entry->move, entry->nodes);
-      else 
-	gprintf("%o%s %1m = %d, cached (%d nodes) ",
-		routine == ATTACK ? "attack" : "defend",
-		str, entry->result, entry->nodes);
-      dump_stack();
-    }
-
     return k;
   }
-
+  
   return -1;
+}
+
+/* Look for a valid read result in the persistent cache.
+ * Return 1 if found, 0 otherwise.
+ */
+int
+search_persistent_reading_cache(int routine, int str, int *result, int *move)
+{
+  int k;
+  struct reading_cache *entry;
+
+  k = find_persistent_reading_cache_entry(routine, str);
+  if (k == -1)
+    return 0;
+
+  /* Match found. Increase score and fill in the answer. */
+  entry = &(persistent_reading_cache[k]);
+  entry->score += entry->nodes;
+  if (result)
+    *result = entry->result;
+  if (move)
+    *move = entry->move;
+  ASSERT1(entry->result == 0
+	  || entry->move == NO_MOVE
+	  || ON_BOARD(entry->move),
+	  entry->move);
+  
+  if ((debug & DEBUG_READING_PERFORMANCE)
+      && entry->nodes >= MIN_READING_NODES_TO_REPORT) {
+    if (entry->result != 0)
+      gprintf("%o%s %1m = %d %1m, cached (%d nodes) ",
+	      routine == ATTACK ? "attack" : "defend",
+	      str, entry->result, entry->move, entry->nodes);
+    else 
+      gprintf("%o%s %1m = %d, cached (%d nodes) ",
+	      routine == ATTACK ? "attack" : "defend",
+	      str, entry->result, entry->nodes);
+    dump_stack();
+  }
+  
+  return 1;
 }
 
 
@@ -484,13 +502,16 @@ store_persistent_reading_cache(int routine, int str, int result, int move,
   persistent_reading_cache_size++;
 }
 
-/*delete an entry from the cache, given its index*/
+/* Delete an entry from the cache, if it's there. */
 void
-delete_persistent_reading_entry(int index)
+delete_persistent_reading_cache_entry(int routine, int str)
 {
-  gg_assert(index >= 0 && index < persistent_reading_cache_size);
-  persistent_reading_cache[index]
-	  = persistent_reading_cache[--persistent_reading_cache_size];
+  int k = find_persistent_reading_cache_entry(routine, find_origin(str));
+  while (k != -1) {
+    persistent_reading_cache[k]
+      = persistent_reading_cache[--persistent_reading_cache_size];
+    k = find_persistent_reading_cache_entry(routine, find_origin(str));
+  }
 }
 
 

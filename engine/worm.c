@@ -751,7 +751,7 @@ find_worm_attacks_and_defenses()
     for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
       worm[str].attack_codes[k]   = 0;
       worm[str].attack_points[k]  = 0;
-      worm[str].defense_codes[k]   = 0;
+      worm[str].defense_codes[k]  = 0;
       worm[str].defense_points[k] = 0;
     }
     propagate_worm(str);
@@ -1765,8 +1765,8 @@ ascii_report_worm(char *string)
 void
 report_worm(int m, int n)
 {
-  int  pos = POS(m, n);
-  int  i;
+  int pos = POS(m, n);
+  int i;
 
   if (board[pos] == EMPTY) {
     gprintf("There is no worm at %1m\n", pos);

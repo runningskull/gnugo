@@ -1128,13 +1128,13 @@ whose_area(const struct influence_data *q, int pos)
  * sufficient to claim territory. The center values are more arbitrary
  * suspect to tuning.
  */
-struct interpolation_data min_infl_for_territory =
+static struct interpolation_data min_infl_for_territory =
   { 6,  0.0, 24.0, { 6.0, 15.0, 26.0, 36.0, 45.0, 50.0, 55.0 }};
 
 /* Determines the territory correction factor in dependence of the ratio
  * ( influence of stronger color / min_infl_for_territory(intersection))
  */
-struct interpolation_data territory_correction = 
+static struct interpolation_data territory_correction = 
   { 5, (float) 0.0, 1.0, {0.0, 0.25, 0.45, 0.65, 0.85, 1.0}};
 
 static void
@@ -1645,7 +1645,8 @@ influence_delta_territory(const struct influence_data *base,
       if (move != -1
 	  && (this_delta > 0.02
               || -this_delta > 0.02))
-	DEBUG(DEBUG_TERRITORY, "  %1m:   - %1m territory change %f (%f -> %f)\n",
+	DEBUG(DEBUG_TERRITORY,
+	      "  %1m:   - %1m territory change %f (%f -> %f)\n",
 	      move, ii, this_delta, old_value, new_value);
       total_delta += this_delta;
     }

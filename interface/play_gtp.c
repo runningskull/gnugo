@@ -29,7 +29,6 @@
 #include "interface.h"
 #include "liberty.h"
 #include "gtp.h"
-#include "random.h"
 #include "gg_utils.h"
 
 /* Internal state that's not part of the engine. */

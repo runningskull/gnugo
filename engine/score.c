@@ -490,8 +490,10 @@ estimate_score(float *upper, float *lower)
   else
     l = u;
 
-  if (upper) *upper = u;
-  if (lower) *lower = l;
+  if (upper)
+    *upper = u;
+  if (lower)
+    *lower = l;
 
   return (u + l) / 2;
 }

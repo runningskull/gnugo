@@ -501,7 +501,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	      dragon[str].owl_second_defense_point = second_defense_point;
 	    }
 	    else
-	      dragon[str].owl_threat_status = DEAD;;
+	      dragon[str].owl_threat_status = DEAD;
 	  }
 	  else if (!acode) {
 	    int attack_point, second_attack_point;
@@ -1380,7 +1380,7 @@ void
 show_dragons(void)
 {
   static const char *snames[] = 
-    {"dead", "alive", "critical", "unknown", "unchecked"};
+  {"dead", "alive", "critical", "unknown", "unchecked"};
 
   static const char *safety_names[] =
   {"dead", "alive", "critical", "inessential", "tactically dead", "weak",
@@ -2035,11 +2035,11 @@ compute_surrounding_moyo_sizes(const struct influence_data *q)
 }
 
 
-struct interpolation_data moyo_value2weakness =
+static struct interpolation_data moyo_value2weakness =
   { 5, 0.0, 15.0, {1.0, 0.65, 0.3, 0.15, 0.05, 0.0}};
-struct interpolation_data escape_route2weakness =
+static struct interpolation_data escape_route2weakness =
   { 5, 0.0, 25.0, {1.0, 0.6, 0.3, 0.1, 0.05, 0.0}};
-struct interpolation_data genus2weakness =
+static struct interpolation_data genus2weakness =
   { 6, 0.0, 3.0, {1.0, 0.95, 0.8, 0.5, 0.2, 0.1, 0.0}};
 
 float

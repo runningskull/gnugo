@@ -1061,7 +1061,6 @@ connection_value(int dragona, int dragonb, int tt, float margin)
   if (return_value < 0.0)
     return_value = 0.0;
 
-
   return return_value;
 }
 

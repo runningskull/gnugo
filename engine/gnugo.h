@@ -77,12 +77,8 @@ void init_gnugo(float memory);
 #define KO_B 1
 #define LOSE 0
 
-/* FIXME: should this be changed too or not ? */
-#if 1
-#define CUT  4
-#else
+/* Used by break_through(). Must be different from 0 and WIN. */
 #define CUT  2
-#endif
 
 /* Group statuses */
 #define DEAD        0
@@ -304,7 +300,6 @@ extern int mandated_fourlib_depth;
 extern int mandated_ko_depth;
 extern int mandated_branch_depth;
 extern int mandated_aa_depth;
-extern int mandated_aa_threat_depth;
 extern int mandated_owl_distrust_depth;
 extern int mandated_owl_branch_depth;
 extern int mandated_owl_reading_depth;
@@ -446,7 +441,7 @@ void popgo(void);
 
 /* utils.c */
 void change_dragon_status(int dr, int status);
-void who_wins(int color, FILE* outfile);
+void who_wins(int color, FILE *outfile);
 
 /* high-level routine to generate the best move for the given color */
 int genmove(int *i, int *j, int color);

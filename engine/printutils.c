@@ -44,7 +44,7 @@
  */
 
 static void 
-vgprintf(FILE* outputfile, const char *fmt, va_list ap)
+vgprintf(FILE *outputfile, const char *fmt, va_list ap)
 {
   if (fmt[0] == '%' && fmt[1] == 'o')
     fmt += 2;  /* cancel indent */

@@ -556,7 +556,6 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
 
 
 #define AA_DEPTH              6
-#define AA_THREAT_DEPTH       3
 
 /* Pattern based reading */
 #define OWL_DISTRUST_DEPTH    6
@@ -615,14 +614,10 @@ set_depth_values(int level)
   urgent              = 0;
 
   /* Atari-atari depth levels are unchanged only between levels 7/8: */
-  if (level >= 8) {
+  if (level >= 8)
     aa_depth            = gg_max(0, AA_DEPTH        + (level - 10));
-    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH + (level - 10));
-  }
-  else {
+  else
     aa_depth            = gg_max(0, AA_DEPTH        + (level - 9));
-    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH + (level - 9));
-  }
 
   /* Exceptions:
    * fourlib_depth: This is constant from levels 7 to 10.
@@ -671,8 +666,6 @@ set_depth_values(int level)
     branch_depth = mandated_branch_depth;
   if (mandated_aa_depth != -1)
     aa_depth = mandated_aa_depth;
-  if (mandated_aa_threat_depth != -1)
-    aa_threat_depth = mandated_aa_threat_depth;
   if (mandated_owl_distrust_depth != -1)
     owl_distrust_depth = mandated_owl_distrust_depth;
   if (mandated_owl_branch_depth != -1)
@@ -880,6 +873,7 @@ detect_owl_blunder(int move, int color, int *defense_point,
   int ii;
   int trouble = 0;
   int dragon_analyzed[4] = {0, 0, 0, 0};
+  int current_verbose = verbose;
   
   for (k = 0; k < 4; k++) {
     int bpos = move + delta[k];
@@ -920,8 +914,7 @@ detect_owl_blunder(int move, int color, int *defense_point,
       if (acode == 0) {
 	verbose = save_verbose;
 	TRACE("Dragon at %1m becomes attackable.\n", bpos);
-	if (verbose > 0)
-	  verbose--;
+	verbose = current_verbose;
 	*return_value += 2.0 * dragon[bpos].effective_size;
 	if (safe_stones)
 	  for (ii = first_worm_in_dragon(bpos); ii != NO_MOVE; 
@@ -931,8 +924,7 @@ detect_owl_blunder(int move, int color, int *defense_point,
       else if (acode == LOSS) {
 	verbose = save_verbose;
 	TRACE("Dragon at %1m becomes attackable.\n", bpos);
-	if (verbose > 0)
-	  verbose--;
+	verbose = current_verbose;
 	if (kworm == move) {
 	  int l;
 	  /* the worm origin was messed by our own move */

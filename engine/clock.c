@@ -64,30 +64,30 @@ extern int board_size;
 typedef struct {
 
   /* clock parameters */
-  int     clock_on;
-  int     ready;
-  double  main_time;
-  double  byoyomi_time; /* zero if no byo-yomi */
-  int     byoyomi_stones;
+  int    clock_on;
+  int    ready;
+  double main_time;
+  double byoyomi_time; /* zero if no byo-yomi */
+  int    byoyomi_stones;
 
   /* clock status */
-  double  timer[3];
-  double  btimer[3];
-  int     byoyomi[3];
-  int     dead[3];
+  double timer[3];
+  double btimer[3];
+  int    byoyomi[3];
+  int    dead[3];
 
   /* dates of each move */
-  int     moveno; /* invariant: COLOR(clk.moveno) = color of last move */
-  double  date[CLOCK_MAX_MOVES];
+  int    moveno; /* invariant: COLOR(clk.moveno) = color of last move */
+  double date[CLOCK_MAX_MOVES];
 
   /* adapative system parameters */
-  int     autolevel_on;
-  double  min_level;
-  double  level;
-  double  levels[CLOCK_MAX_MOVES];
-  double  expected[CLOCK_MAX_MOVES];
-  double  max_level;
-  double  error; /* time/move estimation error */
+  int    autolevel_on;
+  double min_level;
+  double level;
+  double levels[CLOCK_MAX_MOVES];
+  double expected[CLOCK_MAX_MOVES];
+  double max_level;
+  double error; /* time/move estimation error */
 } gnugo_clock;
 
 static gnugo_clock clk;
@@ -112,7 +112,7 @@ static double estimate_time_by_move(int color, int move);
 /* Echo a time value in STANDARD format */
 
 static void
-timeval_print(FILE* outfile, double tv)
+timeval_print(FILE *outfile, double tv)
 {
   int     min;
   double  sec;
@@ -136,7 +136,7 @@ timeval_print(FILE* outfile, double tv)
 void
 clock_init(int time, int byo_time, int byo_stones)
 {
-  int  color;
+  int color;
 
   if (time > 0) {
     clk.main_time = time;
@@ -398,7 +398,7 @@ clock_get_btime_left(int color, int *stones)
 /*
  * Check if a player is time over.
  */
-int  
+int
 clock_is_time_over(int color)
 {
   return clock_is_byoyomi(color) && clock_get_btime_left(color, NULL) <= 0;

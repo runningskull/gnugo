@@ -45,9 +45,9 @@ int next_connection;
 
 /* Unordered sets (currently pairs) of move reasons / targets */
 Reason_set either_data[MAX_EITHER];
-int        next_either;
+int next_either;
 Reason_set all_data[MAX_ALL];
-int        next_all;
+int next_all;
 
 /* Eye shapes */
 int eyes[MAX_EYES];
@@ -77,9 +77,7 @@ struct discard_rule {
 void
 clear_move_reasons(void)
 {
-  int i;
-  int j;
-  int ii;
+  int pos;
   int k;
   next_reason = 0;
   next_connection = 0;
@@ -88,43 +86,42 @@ clear_move_reasons(void)
   next_eye = 0;
   next_lunch = 0;
   
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      ii = POS(i, j);
-
-      move[ii].value                  = 0.0;
-      move[ii].final_value            = 0.0;
-      move[ii].additional_ko_value    = 0.0;
-      move[ii].territorial_value      = 0.0;
-      move[ii].strategical_value      = 0.0;
-      move[ii].maxpos_shape           = 0.0;
-      move[ii].numpos_shape           = 0;
-      move[ii].maxneg_shape           = 0.0;
-      move[ii].numneg_shape           = 0;
-      move[ii].followup_value         = 0.0;
-      move[ii].influence_followup_value = 0.0;
-      move[ii].reverse_followup_value = 0.0;
-      move[ii].secondary_value        = 0.0;
-      move[ii].min_value              = 0.0;
-      move[ii].max_value              = HUGE_MOVE_VALUE;
-      move[ii].min_territory          = 0.0;
-      move[ii].max_territory          = HUGE_MOVE_VALUE;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (ON_BOARD(pos)) {
+      move[pos].value                    = 0.0;
+      move[pos].final_value              = 0.0;
+      move[pos].additional_ko_value      = 0.0;
+      move[pos].territorial_value        = 0.0;
+      move[pos].strategical_value        = 0.0;
+      move[pos].maxpos_shape             = 0.0;
+      move[pos].numpos_shape             = 0;
+      move[pos].maxneg_shape             = 0.0;
+      move[pos].numneg_shape             = 0;
+      move[pos].followup_value           = 0.0;
+      move[pos].influence_followup_value = 0.0;
+      move[pos].reverse_followup_value   = 0.0;
+      move[pos].secondary_value          = 0.0;
+      move[pos].min_value                = 0.0;
+      move[pos].max_value                = HUGE_MOVE_VALUE;
+      move[pos].min_territory            = 0.0;
+      move[pos].max_territory            = HUGE_MOVE_VALUE;
       for (k = 0; k < MAX_REASONS; k++)     
-	move[ii].reason[k]            = -1;
-      move[ii].move_safety            = 0;
-      move[ii].worthwhile_threat      = 0;
-      move[ii].randomness_scaling     = 1.;
+	move[pos].reason[k]              = -1;
+      move[pos].move_safety              = 0;
+      move[pos].worthwhile_threat        = 0;
+      move[pos].randomness_scaling       = 1.0;
       /* The reason we assign a random number to each move immediately
        * is to avoid dependence on which moves are evaluated when it
        * comes to choosing between multiple moves of the same value.
        * In this way we can get consistent results for use in the
        * regression tests.
        */
-      move[ii].random_number          = gg_drand();
+      move[pos].random_number            = gg_drand();
 
       /* Do not send away the points (yet). */
-      replacement_map[ii] = NO_MOVE;
+      replacement_map[pos] = NO_MOVE;
     }
+  }
 }
 
 
@@ -921,9 +918,9 @@ add_vital_eye_move(int pos, int eyespace, int color)
 void
 add_either_move(int pos, int reason1, int target1, int reason2, int target2)
 {
-  int  what1 = 0;
-  int  what2 = 0;
-  int  index;
+  int what1 = 0;
+  int what2 = 0;
+  int index;
 
   ASSERT_ON_BOARD1(target1);
   ASSERT_ON_BOARD1(target2);
@@ -992,9 +989,9 @@ add_either_move(int pos, int reason1, int target1, int reason2, int target2)
 void
 add_all_move(int pos, int reason1, int target1, int reason2, int target2)
 {
-  int  what1 = 0;
-  int  what2 = 0;
-  int  index;
+  int what1 = 0;
+  int what2 = 0;
+  int index;
 
   ASSERT_ON_BOARD1(target1);
   ASSERT_ON_BOARD1(target2);
@@ -1830,7 +1827,7 @@ list_move_reasons(int color)
 	  gprintf("Move at %1m captures something\n", pos);
 
 	case YOUR_ATARI_ATARI_MOVE:
-	  gprintf("Move at %1m defends threat to capture something\n", pos);
+	  gprintf("Move at %1m defends against combination attack\n", pos);
 	}
       }
       if (k > 0 && move[pos].move_safety == 0)

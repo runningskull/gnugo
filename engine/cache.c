@@ -31,7 +31,7 @@
 #include "cache.h"
 #include "sgftree.h"
 
-Hashtable *movehash;
+static Hashtable *movehash;
 
 static int hashtable_init(Hashtable *table, int tablesize, int num_nodes,
 			  int num_results);

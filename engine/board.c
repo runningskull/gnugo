@@ -42,7 +42,7 @@
 #define KOMASTER_SCHEME 5
 #define KOMASTER_TRACE 0
 
-int tracing_inside_komaster = 0;
+static int tracing_inside_komaster = 0;
 
 
 /* This can be used for internal checks w/in board.c that should
@@ -430,7 +430,7 @@ static Hash_data hashdata_stack[MAXSTACK];
 
 
 /* KOMASTER_SCHEME 4 handles empty case differently from other schemes */
-int
+static int
 komaster_is_empty(int komaster, int kom_pos)
 {
   if (KOMASTER_SCHEME == 4)
@@ -441,7 +441,7 @@ komaster_is_empty(int komaster, int kom_pos)
 
 /* KOMASTER_SCHEME 4 handles komaster interpretation differently from 
  * other schemes */
-const char *
+static const char *
 komaster_to_string(int komaster, int kom_pos)
 {
 #if KOMASTER_SCHEME == 4 
@@ -956,6 +956,9 @@ void
 play_move(int pos, int color)
 {
   ASSERT1(stackp == 0, pos);
+  ASSERT1(color == WHITE || color == BLACK, pos);
+  ASSERT1(pos == PASS_MOVE || ON_BOARD1(pos), pos);
+  ASSERT1(pos == PASS_MOVE || board[pos] == EMPTY, pos);
 
   if (move_history_pointer >= MAX_MOVE_HISTORY) {
     /* The move history is full. We resolve this by collapsing the
@@ -4400,61 +4403,6 @@ incremental_order_moves(int move, int color, int str,
   code1(NORTH(move));
   code1(EAST(move));
 #endif
-}
-
-
-/* Reorientation of point (i, j) into (*ri, *rj). */
-void
-rotate2(int i, int j, int *ri, int *rj, int rot)
-{
-  ASSERT2(rot >= 0 && rot < 8, i, j);
-  if (is_pass(POS(i, j))) {
-    *ri = i;
-    *rj = j;
-    return;
-  }
-  ASSERT_ON_BOARD2(i, j);
-  rotate(i, j, ri, rj, board_size, rot);
-}
-
-/* Inverse reorientation of reorientation rot. */
-void
-inv_rotate2(int i, int j, int *ri, int *rj, int rot)
-{
-  ASSERT2(rot >= 0 && rot < 8, i, j);
-  if (is_pass(POS(i, j))) {
-    *ri = i;
-    *rj = j;
-    return;
-  }
-  ASSERT_ON_BOARD2(i, j);
-  inv_rotate(i, j, ri, rj, board_size, rot);
-}
-
-/* 1D board: return reorientation of point pos */
-int
-rotate1(int pos, int rot)
-{
-  int i, j;
-  ASSERT1(rot >= 0 && rot < 8, pos);
-  if (is_pass(pos))
-    return PASS_MOVE;
-  ASSERT_ON_BOARD1(pos);
-  rotate2(I(pos), J(pos), &i, &j, rot);
-  return POS(i, j);
-}
-
-/* 1D board: return inverse reorientation of point pos */
-int
-inv_rotate1(int pos, int rot)
-{
-  int i, j;
-  ASSERT1(rot >= 0 && rot < 8, pos);
-  if (is_pass(pos))
-    return PASS_MOVE;
-  ASSERT_ON_BOARD1(pos);
-  inv_rotate2(I(pos), J(pos), &i, &j, rot);
-  return POS(i, j);
 }
 
 

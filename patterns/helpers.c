@@ -749,8 +749,7 @@ test_attack_either_move(int move, int color, int worma, int wormb)
 	      move, worma, wormb);
     return;
   }
-  if (trymove(move, color, "suggest_attack_either_move", worma,
-      	     EMPTY, NO_MOVE)) {
+  if (trymove(move, color, "test_attack_either_move", worma, EMPTY, NO_MOVE)) {
     if (board[worma] == OTHER_COLOR(color)
 	&& board[wormb] == OTHER_COLOR(color)) {
       if (!defend_both(worma, wormb))

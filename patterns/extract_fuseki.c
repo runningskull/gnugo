@@ -1210,9 +1210,11 @@ main(int argc, char *argv[])
     
     /* Tell the user everything worked out fine */
     fprintf(stderr, "The pattern database was produced with no errors.\n");
-    for (i = 0; i < number_of_games; i++) {
-      if (unused_games[i]) number_of_unused_games++;
-    }
+
+    for (i = 0; i < number_of_games; i++)
+      if (unused_games[i])
+	number_of_unused_games++;
+
     fprintf(stderr, "Out of %d games, %d were not used.\n", 
 	    number_of_games, number_of_unused_games);
   }
