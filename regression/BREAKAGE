@@ -1,3 +1,74 @@
+CVS version of 11/23/01.
+
+./regress.sh . reading.tst
+./regress.sh . owl.tst
+80 unexpected PASS!
+149 unexpected PASS!
+157 unexpected FAIL: Correct '3 (P16|Q15)', got '0'
+166 unexpected FAIL: Correct '2 P18', got '1 P18'
+./regress.sh . owl_rot.tst
+150 unexpected FAIL: Correct '0', got '1 G13'
+222 unexpected PASS!
+./regress.sh . ld_owl.tst
+152 unexpected FAIL: Correct 'critical (S17|Q18|T16) T17', got 'critical Q18 T18'
+./regress.sh . optics.tst
+./regress.sh . filllib.tst
+./regress.sh . atari_atari.tst
+./regress.sh . connection.tst
+./regress.sh . blunder.tst
+./regress.sh . strategy.tst
+27 unexpected FAIL: Correct 'C3', got 'F2'
+34 unexpected FAIL: Correct 'E17', got 'N14'
+49 unexpected PASS!
+./regress.sh . endgame.tst
+208 unexpected FAIL: Correct 'N1', got 'Q8'
+./regress.sh . heikki.tst
+./regress.sh . neurogo.tst
+3 unexpected FAIL: Correct 'H3|K3|K4', got 'Q3'
+./regress.sh . arb.tst
+./regress.sh . rosebud.tst
+./regress.sh . golife.tst
+./regress.sh . arion.tst
+./regress.sh . viking.tst
+3 unexpected FAIL: Correct 'M15|B7', got 'B16'
+./regress.sh . ego.tst
+./regress.sh . dniwog.tst
+./regress.sh . strategy2.tst
+./regress.sh . nicklas1.tst
+1408 unexpected FAIL: Correct '!dead', got 'dead'
+1601 unexpected FAIL: Correct '!D9', got 'D9'
+./regress.sh . nicklas2.tst
+1407 unexpected FAIL: Correct 'A6', got 'C9'
+./regress.sh . nicklas3.tst
+./regress.sh . nicklas4.tst
+./regress.sh . nicklas5.tst
+./regress.sh . manyfaces.tst
+7 unexpected PASS!
+./regress.sh . niki.tst
+./regress.sh . trevor.tst
+290 unexpected PASS!
+590 unexpected FAIL: Correct '0', got '1 B19'
+./regress.sh . tactics.tst
+./regress.sh . buzco.tst
+./regress.sh . strategy3.tst
+./regress.sh . capture.tst
+./regress.sh . connect.tst
+./regress.sh . global.tst
+4 unexpected FAIL: Correct 'Q6', got 'F5'
+9 unexpected PASS!
+./regress.sh . vie.tst
+./regress.sh . arend.tst
+./regress.sh . trevora.tst
+120 unexpected PASS!
+130 unexpected PASS!
+560 unexpected PASS!
+580 unexpected PASS!
+./regress.sh . strategy4.tst
+197 unexpected PASS!
+198 unexpected PASS!
+199 unexpected PASS!
+200 unexpected PASS!
+
 ========================== 3.1.14 =========================
 
 ./regress.sh . owl.tst
