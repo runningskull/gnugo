@@ -10709,15 +10709,15 @@ Pattern CD107
 # db added (3.1.8)
 # gf Added O classification. (3.1.12)
 
-xX..        good shape keima
-..*.
-O...
+xX..?        good shape keima
+..*.?
+O...?
 
-:8,OXade
+:8,OXdae
 
-xX..        
-.a*.
-Abc.
+xX..?       
+.a*.?
+Abc.?
 
 ; !dead(A) && oplay_attack(*,a,b,c,c)
 

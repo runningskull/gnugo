@@ -145,6 +145,12 @@ struct autohelper_func {
   const char *code;
 };
 
+/*
+ * current_* are useful for debugging broken patterns.
+ */
+char *current_file=0;
+int current_line_number=0;
+
 /* ================================================================ */
 /*                                                                  */
 /*                Autohelper function definitions                   */
@@ -685,8 +691,8 @@ finish_pattern(char *line)
   mini = minj = 0; /* initially : can change with edge-constraints */
 
   if (num_stars > 1 || (pattern_type == PATTERNS && num_stars == 0)) {
-    fprintf(stderr, "No or too many *'s in pattern %s\n",
-	    pattern_names[patno]);
+    fprintf(stderr, "%s(%d) : error : No or too many *'s in pattern %s\n",
+	    current_file, current_line_number, pattern_names[patno]);
     fatal_errors = 1;
   }
 
@@ -1445,12 +1451,14 @@ main(int argc, char *argv[])
   
   if (input_file_name == NULL) {
     input_FILE = stdin;
+    current_file = "<stdin>";
   }
   else {
     if ((input_FILE = fopen(input_file_name, "r")) == NULL) {
       fprintf(stderr, "Cannot open file %s\n", input_file_name);
       exit(1);
     }
+    current_file = input_file_name;  
   }
   
   if (output_file_name == NULL) {
@@ -1506,7 +1514,7 @@ main(int argc, char *argv[])
    */
   
   while (fgets(line, MAXLINE, input_FILE)) {
-
+    current_line_number++;
     if (line[strlen(line)-1] != '\n') {
       fprintf(stderr, "mkpat: line truncated: %s, length %d\n", line,
 	      (int) strlen(line));

@@ -597,7 +597,7 @@ IntDir=.\Debug
 InputPath=.\owl_attackpats.db
 
 "owl_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_attackpat <owl_attackpats.db > owl_attackpat.c
+	$(IntDir)\mkpat -b owl_attackpat -i ..\patterns\owl_attackpats.db > owl_attackpat.c
 
 # End Custom Build
 
