@@ -594,6 +594,8 @@ examine_move_safety(int color)
 	break;
       case EXPAND_TERRITORY_MOVE:
       case EXPAND_MOYO_MOVE:
+      case INVASION_MOVE:   /* A real invasion should be safe.
+			       A sacrifice is something else.*/
         safety = 1;
 	break;
       case ATTACK_MOVE:
@@ -1102,11 +1104,17 @@ strategic_penalty(int pos, int color)
       break;
     /* We assume that invasion moves can only have the move reasons listed
      * below.
+     *
+     * FIXME: EXPAND_TERRITORY should always be connected to our own
+     *        stones.  Remove later when that change is done.
      */
     switch (move_reasons[r].type) {
+#if 0
     case EXPAND_TERRITORY_MOVE:
+#endif
     case EXPAND_MOYO_MOVE:
     case STRATEGIC_ATTACK_MOVE:
+    case INVASION_MOVE:
       continue;
     /* If we find a tactical defense move, we just test whether it concerns
      * a single-stone-dragon; if not, we stop, if yes, we let the necessary
@@ -1523,6 +1531,7 @@ estimate_territorial_value(int pos, int color, float score)
     case STRATEGIC_DEFEND_MOVE:
     case EXPAND_MOYO_MOVE:
     case EXPAND_TERRITORY_MOVE:
+    case INVASION_MOVE:
       does_block = 1;
       break;
       

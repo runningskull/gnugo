@@ -342,6 +342,12 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     TRACE("...expands moyo\n");
   }
 
+  /* Pattern class i, an invasion. */
+  if (class & CLASS_I) {
+    add_invasion_move(move);
+    TRACE("...is an invasion\n");
+  }
+
   /* Pattern class a, strategical level attack on all opponent dragons. */
   if (class & CLASS_a) {
     for (k = 0; k < your_ndragons; k++) {

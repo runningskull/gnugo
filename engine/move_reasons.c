@@ -336,6 +336,7 @@ get_pos(int reason, int what)
   case ANTISUJI_MOVE:
   case EXPAND_TERRITORY_MOVE:
   case EXPAND_MOYO_MOVE:
+  case INVASION_MOVE:
   case MY_ATARI_ATARI_MOVE:
   case YOUR_ATARI_ATARI_MOVE:
     return NO_MOVE;
@@ -1077,6 +1078,15 @@ add_expand_moyo_move(int pos)
 }
 
 /*
+ * Add to the reasons for the move at (pos) that it is an invasion.
+ */
+void
+add_invasion_move(int pos)
+{
+  add_move_reason(pos, INVASION_MOVE, 0);
+}
+
+/*
  * This function is called when a shape value for the move at (pos)
  * is found. 
  * 
@@ -1757,6 +1767,10 @@ list_move_reasons(int color)
 	  
 	case EXPAND_MOYO_MOVE:
 	  gprintf("Move at %1m expands moyo\n", pos);
+	  break;
+	  
+	case INVASION_MOVE:
+	  gprintf("Move at %1m is an invasion\n", pos);
 	  break;
 	  
 	case STRATEGIC_ATTACK_MOVE:

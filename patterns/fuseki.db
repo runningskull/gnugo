@@ -271,7 +271,7 @@ Pattern F6
 |......
 +------
 
-:/,Fe
+:/,FI
 
 
 Pattern F7
@@ -284,7 +284,7 @@ Pattern F7
 |.....
 +-----
 
-:/,Fe,shape(-2)
+:/,FI,shape(-2)
 
 
 Pattern F8
@@ -349,7 +349,7 @@ Pattern F12
 |......
 +------
 
-:8,Fej,shape(2)
+:8,FIj,shape(2)
 
 
 Pattern F13
@@ -407,7 +407,7 @@ Pattern F15
 |......
 +------
 
-:8,Fej,shape(1)
+:8,FIj,shape(1)
 
 
 Pattern F16a
@@ -1369,7 +1369,7 @@ Pattern F601
 .......
 -------
 
-:8,Feaj
+:8,FEaj
 
 
 Pattern F602
@@ -1418,7 +1418,7 @@ x....*....xx
 ............
 ------------
 
-:8,sFEt,shape(1)
+:8,sFIt,shape(1)
 
 X.........ab
 x....*....cd
@@ -1437,7 +1437,7 @@ X....*....xx
 ............
 ------------
 
-:8,sFEt,shape(1)
+:8,sFIt,shape(1)
 
 x.........ab
 X....*....cd
@@ -1456,7 +1456,7 @@ X.......X    invade
 .........
 ---------
 
-:8,sFEt
+:8,sFIt
 
 
 Pattern F704
@@ -1471,7 +1471,7 @@ Pattern F704
 .......
 -------
 
-:8,sFEt,shape(-1)
+:8,sFIt,shape(-1)
 
 ???c?d?
 ?.....?
@@ -1493,7 +1493,7 @@ Pattern F705
 ........
 --------
 
-:8,sFEt
+:8,sFIt
 
 
 Pattern F706
@@ -1504,7 +1504,7 @@ o......
 .......
 -------
 
-:8,sFEj
+:8,sFIj
 
 
 # tm - removed (3.1.20)

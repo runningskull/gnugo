@@ -201,7 +201,9 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 39 gg_genmove white
 #? [H4|J4]
 
-# New failure (comparing 3.1.15 with 3.0.0)
+# CATEGORY=FOLLOWUP
+# The followup of K13 is undervalued.
+# In fact, there is none at all (3.3.8)
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
 40 gg_genmove white
 #? [K13]*
@@ -234,13 +236,13 @@ loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 27
 44 gg_genmove black
 #? [B6]
 
-#CATEGOY=ENDGAME_TUNING
+#CATEGORY=ENDGAME_TUNING
 # B4 is really huge here, appr. 20 pts.
 loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 31
 45 gg_genmove black
 #? [B4]
 
-#CATEGOY=ENDGAME_TUNING
+#CATEGORY=ENDGAME_TUNING
 # L3 is 2pt double sente.
 loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 85
 46 gg_genmove black

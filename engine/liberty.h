@@ -400,6 +400,7 @@ void add_owl_uncertain_attack_move(int pos, int dr);
 void add_my_atari_atari_move(int pos, int size);
 void add_your_atari_atari_move(int pos, int size);
 void add_vital_eye_move(int pos, int eyespace, int color);
+void add_invasion_move(int pos);
 void add_expand_territory_move(int pos);
 void add_expand_moyo_move(int pos);
 void add_strategical_attack_move(int pos, int dr);

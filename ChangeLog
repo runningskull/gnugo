@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new move reason INVASION_MOVE
+- pattern class I (invasions) can now be used in patterns.db et al
+  and not only in influence patterns
+- remove EXPAND_TERRITORY_MOVE from strategic_penalty()
 - new static function do_find_break_chain2_efficient_moves() split off
   from break_chain2_efficient_moves() and revised
 - superstring_breakchain() revised
