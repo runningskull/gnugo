@@ -182,7 +182,7 @@ graphical user interface. Unlike CGoban, it does not require
 X-Windows, so it is an attractive alternative under Windows.
 You will need a Java runtime environment. Obtain Jago at
 
-@url{http://mathsrv.ku-eichstaett.de/MGF/homes/grothmann/jago/Go.html}
+@url{http://www.rene-grothmann.de/jago/}
 @noindent
 and follow the links there for the Java runtime environment.
 

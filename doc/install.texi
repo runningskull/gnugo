@@ -365,7 +365,7 @@ part of the Java Development Kit (JDK) and consists of the Java
 virtual machine, Java platform core classes, and supporting files.
 The Java virtual machine that comes with I.E. 5.0 works also.
 
-Jago: @url{http://mathsrv.ku-eichstaett.de/MGF/homes/grothmann/jago/Go.html}
+Jago: @url{http://www.rene-grothmann.de/jago/}
 
 @enumerate
 @item Invoke GNU Go with @command{gnugo --quiet --mode gmp}
