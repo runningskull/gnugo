@@ -25,7 +25,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 96
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 114
 7 gg_genmove black
-#? [T5]*
+#? [T5]
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 164
 8 gg_genmove black
@@ -56,7 +56,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 74
 # also be considered. 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 102
 14 gg_genmove black
-#? [Q15|T5|H5]*
+#? [Q15|T5|H5]
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 108
 15 gg_genmove black

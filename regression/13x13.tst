@@ -199,7 +199,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 39 gg_genmove white
-#? [H4|J4]
+#? [H4|J4]*
 
 # CATEGORY=FOLLOWUP
 # The followup of K13 is undervalued.

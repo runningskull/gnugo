@@ -137,7 +137,7 @@ loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 80
 
 loadsgf games/owl42.sgf
 294 owl_defend L11
-#? [1 M19]
+#? [1 M19]*
 
 ########### end of tests #####################
 

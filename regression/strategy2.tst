@@ -22,7 +22,7 @@ loadsgf games/strategy14.sgf 53
 
 loadsgf games/strategy14.sgf 81
 54 gg_genmove white
-#? [P6]*
+#? [P6]
 
 loadsgf games/strategy14.sgf 125
 55 gg_genmove white
@@ -134,12 +134,12 @@ loadsgf games/semeai2.sgf 118
 loadsgf games/semeai2.sgf 150
 # If Q11 is not undervalued F7 is acceptable (though not correct)
 75 gg_genmove white
-#? [Q11]
+#? [Q11]*
 
 loadsgf games/semeai2.sgf 152
 # If Q11 is not undervalued F7 is acceptable (though not correct)
 76 gg_genmove white
-#? [Q11]
+#? [Q11]*
 
 loadsgf games/strategy21.sgf 86
 77 gg_genmove black

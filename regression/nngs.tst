@@ -108,7 +108,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 98
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 104
 290 gg_genmove black
-#? [D12|D11|E12]
+#? [D12|D11|E12]*
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 112

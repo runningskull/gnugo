@@ -331,7 +331,7 @@ loadsgf games/gunnar/gunnar3.sgf 74
 
 loadsgf games/nngs/gnugo-3.3.10-jimm-200210222018.sgf 140
 100 disconnect L12 M13
-#? [(2|3) J15]
+#? [(2|3) J15]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

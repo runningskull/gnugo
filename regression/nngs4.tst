@@ -89,7 +89,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 202
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 204
 220 gg_genmove black
-#? [!T2]*
+#? [!T2]
 
 # Kill the whole thing, not just a piece.
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 222

@@ -53,7 +53,7 @@ loadsgf games/FSF-neurogo.sgf 136
 # Semeai problem.
 loadsgf games/FSF-neurogo.sgf 148
 11 gg_genmove white
-#? [N5]*
+#? [N5]
 
 loadsgf games/FSF-neurogo.sgf 152
 12 gg_genmove white
@@ -67,7 +67,7 @@ loadsgf games/FSF-neurogo.sgf 176
 
 loadsgf games/FSF-neurogo.sgf 178
 14 gg_genmove white
-#? [Q4]*
+#? [Q4]
 
 # White A16 is about three points reverse sente. G19 is two points
 # double sente, but black can get in A16 in sente before answering
