@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- semeai moves stored in dragon2 array
+- new functions collect_move_reasons(), semeai_move_reasons()
 - new prevent_attach_threat_helper() adds reverse followup value
 - DEBUG_TERRITORY made less confusing
 - handle suicides in do_commit_suicide(), not in do_play_move()

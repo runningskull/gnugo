@@ -434,6 +434,8 @@ void reset_surround_data(void);
 int surround_map(int dr, int pos);
 
 /* functions to add (or remove) move reasons */
+void collect_move_reasons(int color);
+
 void clear_move_reasons(void);
 void add_lunch(int eater, int food);
 void remove_lunch(int eater, int food);
@@ -533,8 +535,9 @@ int free_handicap_total_stones(void);
 /* Various different strategies for finding a move */
 void fuseki(int color);
 void semeai(int color);
-void new_semeai(int color);
+void new_semeai(void);
 void small_semeai(int save_verbose);
+void semeai_move_reasons(int color);
 void shapes(int color);
 void endgame(int color);
 void endgame_shapes(int color);
@@ -938,8 +941,9 @@ struct dragon_data2 {
   int adjacent[MAX_NEIGHBOR_DRAGONS]; /* adjacent dragons                    */
   int neighbors;                      /* number of adjacent dragons          */
   int hostile_neighbors;              /* neighbors of opposite color         */
+
   int moyo_size;		      /* size of surrounding influence moyo, */
-  float moyo_territorial_value;       /* ...and its territorial value */
+  float moyo_territorial_value;       /* ...and its territorial value        */
   int safety;                         /* a more detailed status estimate     */
   float weakness; /* A new (3.3.x) continuos estimate of the dragon's safety */
   float weakness_pre_owl;     /* Dragon safety based on pre-owl computations */
@@ -948,10 +952,13 @@ struct dragon_data2 {
   int heye;     /* coordinates of a half eye                                 */
   int lunch;    /* if lunch != 0 then lunch points to a boundary worm which  */
                 /* can be captured easily.                                   */
-  int semeai;          /* true if a dragon is part of a semeai               */
-  int semeai_margin_of_safety; /* if small, the semeai is close              */
   int surround_status;         /* Is it surrounded?                          */
   int surround_size;           /* Size of the surrounding area               */
+
+  int semeai;              /* true if a dragon is part of a semeai           */
+  int semeai_margin_of_safety; /* if small, the semeai is close              */
+  int semeai_defense_point;/* Move found by semeai code to rescue dragon     */
+  int semeai_attack_point;  /* Move found by semeai code to kill dragon       */
   int owl_threat_status;   /* CAN_THREATEN_ATTACK or CAN_THREATEN_DEFENSE    */
   int owl_status;          /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
   int owl_attack_point;    /* vital point for attack                         */

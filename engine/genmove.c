@@ -282,6 +282,16 @@ genmove_restricted(int *i, int *j, int color, int allowed_moves[BOARDMAX])
   return retval;
 }
 
+/* This function collects move reasons can be generated immediately from
+ * the data gathered in the examine_position() phase.
+ */
+void
+collect_move_reasons(int color)
+{
+  worm_reasons(color);
+  owl_reasons(color);
+  semeai_move_reasons(color);
+}
 
 /* 
  * Perform the actual move generation.
@@ -402,14 +412,12 @@ do_genmove(int *move, int color, float pure_threat_value,
    * Ok, information gathering is complete. Now start to find some moves!
    */
 
-  /* Pick up tactical moves. */
-  worm_reasons(color);
   
-  /* Pick up owl moves. */
+  /* Pick up moves that we know of already. */
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
-  owl_reasons(color);
+  collect_move_reasons(color);
   verbose = save_verbose;
   
   /* Try to find empty corner moves. */

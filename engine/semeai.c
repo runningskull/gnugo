@@ -97,14 +97,13 @@ semeai(int color)
 #define MAX_DRAGONS 50
 
 void
-new_semeai(int color)
+new_semeai()
 {
   int semeai_results_first[MAX_DRAGONS][MAX_DRAGONS];
   int semeai_results_second[MAX_DRAGONS][MAX_DRAGONS];
   int semeai_move[MAX_DRAGONS][MAX_DRAGONS];
   int d1, d2;
   int k;
-  int other = OTHER_COLOR(color);
   int num_dragons = number_of_dragons;
 
   if (num_dragons > MAX_DRAGONS)
@@ -169,16 +168,17 @@ new_semeai(int color)
        * of d1 after the d1 d2 semeai, giving d2 the first move.
        */
       
+      DEBUG(DEBUG_SEMEAI, "Considering semeai between %1m and %1m\n",
+	    apos, bpos);
       owl_analyze_semeai(apos, bpos,
 			 &(semeai_results_first[d1][d2]), 
 			 &(semeai_results_second[d2][d1]),
 			 &(semeai_move[d1][d2]), 1);
-      DEBUG(DEBUG_SEMEAI, "Considering semeai between %1m and %1m\n",
-	    apos, bpos);
-      DEBUG(DEBUG_SEMEAI, "results if %s moves first: %s %s\n",
+      DEBUG(DEBUG_SEMEAI, "results if %s moves first: %s %s, %1m\n",
 	    board[apos] == BLACK ? "black" : "white",
 	    safety_to_string(semeai_results_first[d1][d2]),
-	    safety_to_string(semeai_results_second[d2][d1]));
+	    safety_to_string(semeai_results_second[d2][d1]),
+	    semeai_move[d1][d2]);
     }
   
   for (d1 = 0; d1 < num_dragons; d1++) {
@@ -191,8 +191,8 @@ new_semeai(int color)
     for (d2 = 0; d2 < num_dragons; d2++) {
       if (semeai_results_first[d1][d2] == -1)
 	continue;
-      gg_assert (semeai_results_second[d1][d2] != -1)
-	semeai_found = 1;
+      gg_assert(semeai_results_second[d1][d2] != -1);
+      semeai_found = 1;
 
       if (best_result == DEAD
 	  || best_result == UNKNOWN
@@ -210,20 +210,11 @@ new_semeai(int color)
       }
     }
     if (semeai_found) {
+      dragon2[d1].semeai = 1;
       if (best_result != DEAD && worst_result == DEAD) {
 	update_status(DRAGON(d1).origin, CRITICAL, CRITICAL);
-	if (DRAGON(d1).color == color
-	    && defense_move != PASS_MOVE) {
-	  add_owl_defense_move(defense_move, DRAGON(d1).origin, WIN);
-	  DEBUG(DEBUG_SEMEAI, "Adding owl defense move for %1m at %1m\n",
-		DRAGON(d1).origin, defense_move);
-	}
-	if (DRAGON(d1).color == other
-	    && attack_move != PASS_MOVE) {
-	  add_owl_attack_move(attack_move, DRAGON(d1).origin, WIN);
-	  DEBUG(DEBUG_SEMEAI, "Adding owl attack move for %1m at %1m\n",
-		DRAGON(d1).origin, attack_move);
-	}
+	dragon2[d1].semeai_defense_point = defense_move;
+	dragon2[d1].semeai_attack_point = attack_move;
       }
       else if (worst_result == ALIVE_IN_SEKI)
 	update_status(DRAGON(d1).origin, ALIVE, ALIVE_IN_SEKI);
@@ -233,6 +224,26 @@ new_semeai(int color)
   }
 }
 
+void
+semeai_move_reasons(int color)
+{
+  int other = OTHER_COLOR(color);
+  int d;
+
+  for (d = 0; d < number_of_dragons; d++)
+    if (dragon2[d].semeai && DRAGON(d).status == CRITICAL) {
+      if (DRAGON(d).color == color && dragon2[d].semeai_defense_point) {
+	add_semeai_move(dragon2[d].semeai_defense_point, dragon2[d].origin);
+	DEBUG(DEBUG_SEMEAI, "Adding semeai defense move for %1m at %1m\n",
+	      DRAGON(d).origin, dragon2[d].semeai_defense_point);
+      }
+      else if (DRAGON(d).color == other && dragon2[d].semeai_attack_point) {
+	add_semeai_move(dragon2[d].semeai_attack_point, dragon2[d].origin);
+	DEBUG(DEBUG_SEMEAI, "Adding owl attack move for %1m at %1m\n",
+	      DRAGON(d).origin, dragon2[d].semeai_attack_point);
+      }
+    }
+}
 
 /* liberty_of_dragon(pos, origin) returns true if the vertex at (pos) is a
  * liberty of the dragon with origin at (origin).

@@ -835,14 +835,11 @@ reduced_genmove(int *move, int color)
    * Ok, information gathering is complete. Now start to find some moves!
    */
 
-  /* Pick up tactical moves. */
-  worm_reasons(color);
-  
-  /* Pick up owl moves. */
+  /* Pick up moves that we know of already. */
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
-  owl_reasons(color);
+  collect_move_reasons(color);
   verbose = save_verbose;
   
   /* Look for combination attacks and defenses against them. */

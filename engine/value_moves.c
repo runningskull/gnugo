@@ -592,8 +592,11 @@ induce_secondary_move_reasons(int color)
 	aa = move_reasons[r].what;
 	for (i = 0; i < DRAGON2(aa).neighbors; i++) {
 	  int bb = dragon2[DRAGON2(aa).adjacent[i]].origin;
-	  if (dragon[bb].color == color && worm[bb].attack_codes[0] == 0)
+	  if (dragon[bb].color == color && worm[bb].attack_codes[0] == 0) {
 	    add_strategical_defense_move(pos, bb);
+	    DEBUG(DEBUG_MOVE_REASONS, "Strategic defense at %1m induced for %1m due to owl attack on %1m\n",
+		  pos, bb, aa);
+	  }
 	}
       }
       else if (move_reasons[r].type == CONNECT_MOVE
@@ -612,10 +615,16 @@ induce_secondary_move_reasons(int color)
 		  && !is_same_worm(pos3, worm2)) {
 		if (trymove(pos, color, "induce_secondary_move_reasons-B",
 			    worm1, EMPTY, NO_MOVE)) {
-		  if (!disconnect(pos3, worm1, NULL))
+		  if (!disconnect(pos3, worm1, NULL)) {
 		    add_connection_move(pos, pos3, worm1);
-		  if (!disconnect(pos3, worm2, NULL))
+		    DEBUG(DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m",
+			  pos, worm1, worm2, pos3, worm1);
+		  }
+		  if (!disconnect(pos3, worm2, NULL)) {
 		    add_connection_move(pos, pos3, worm2);
+		    DEBUG(DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m",
+			  pos, worm1, worm2, pos3, worm2);
+		  }
 		  popgo();
 		}
 	      }
@@ -1677,14 +1686,6 @@ estimate_territorial_value(int pos, int color, float score)
       does_block = 1;
       break;
       
-    case SEMEAI_MOVE:
-      aa = move_reasons[r].what;
-      
-      this_value = 2 * dragon[aa].effective_size;
-      TRACE("  %1m: %f - semeai involving %1m\n", pos, this_value, aa);
-      tot_value += this_value;
-      break;
-      
     case SEMEAI_THREAT:
       aa = move_reasons[r].what;
 
@@ -1701,6 +1702,7 @@ estimate_territorial_value(int pos, int color, float score)
        */
       break;
 	
+    case SEMEAI_MOVE:
     case OWL_ATTACK_MOVE:
     case OWL_ATTACK_MOVE_GOOD_KO:
     case OWL_ATTACK_MOVE_BAD_KO:
@@ -1742,7 +1744,8 @@ estimate_territorial_value(int pos, int color, float score)
       
       /* FIXME: How much should we reduce the value for ko attacks? */
       if (move_reasons[r].type == OWL_ATTACK_MOVE
-	  || move_reasons[r].type == OWL_DEFEND_MOVE)
+	  || move_reasons[r].type == OWL_DEFEND_MOVE
+	  || move_reasons[r].type == SEMEAI_MOVE)
 	this_value = 0.0;
       else if (move_reasons[r].type == OWL_ATTACK_MOVE_GOOD_KO
 	       || move_reasons[r].type == OWL_DEFEND_MOVE_GOOD_KO) {

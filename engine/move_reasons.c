@@ -1455,16 +1455,20 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(board[affected]), pos);
 
-  if (effective_size != NULL)
+  if (effective_size)
     *effective_size = 0.0;
 
+  /* For attack moves, we immediately can set the effective size.
+   * For defense moves, it will be calculated in the course of
+   * updating the worms' status.
+   */
   switch (move_reason_type) {
     case OWL_ATTACK_MOVE:
     case OWL_ATTACK_MOVE_GOOD_KO:
     case OWL_ATTACK_MOVE_BAD_KO:
       ASSERT1(board[affected] == OTHER_COLOR(color), pos);
       new_status = 0;
-      if (effective_size != NULL)
+      if (effective_size)
 	*effective_size = dragon[affected].effective_size;
       break;
     case OWL_DEFEND_MOVE:
@@ -1482,16 +1486,27 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
     case OWL_ATTACK_MOVE_GAIN:
       ASSERT1(board[affected] == OTHER_COLOR(color), pos);
       new_status = 0;
-      if (effective_size != NULL)
+      if (effective_size)
 	*effective_size = worm[affected2].effective_size;
       break;
     case OWL_DEFEND_MOVE_LOSS:
       ASSERT1(board[affected] == color, pos);
-      if (effective_size != NULL)
+      if (effective_size)
 	*effective_size = dragon[affected].effective_size
 			  - worm[affected2].effective_size;
       result_to_beat = WIN;
       break;
+    case SEMEAI_MOVE:
+      ASSERT1(IS_STONE(board[affected]), pos);
+      if (board[affected] == color)
+	result_to_beat = WIN;
+      else {
+	new_status = 0;
+	if (effective_size)
+	  *effective_size = dragon[affected].effective_size;
+      }
+      break;
+
     default:
       /* mark_changed_dragon() called with invalid move reason. */
       ASSERT1(0, pos);
@@ -1520,7 +1535,7 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
 	   * whole string as such:
 	   */
 	  mark_changed_string(ii, safe_stones, strength, new_status);
-	  if (effective_size != NULL)
+	  if (effective_size)
 	    *effective_size += worm[ii].effective_size;
 	}
       }

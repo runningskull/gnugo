@@ -566,7 +566,7 @@ make_dragons(int color, int stop_before_owl)
 
   /* Resolve semeais. This may revise the safety and status fields. */
   if (experimental_semeai && level >= 8)
-    new_semeai(color);
+    new_semeai();
   else 
     semeai(color);
 
@@ -767,15 +767,20 @@ initialize_supplementary_dragon_data(void)
   for (d = 0; d < number_of_dragons; d++) {
     dragon2[d].neighbors                = 0;
     dragon2[d].hostile_neighbors        = 0;
+
     dragon2[d].moyo_size	        = -1;
     dragon2[d].moyo_territorial_value   = 0.0;
     dragon2[d].safety                   = -1;
     dragon2[d].escape_route             = 0;
     dragon2[d].heye                     = NO_MOVE;
     dragon2[d].lunch                    = NO_MOVE;
+    dragon2[d].surround_status          = 0;
+    set_eyevalue(&dragon2[d].genus, 0, 0, 0, 0);
+
     dragon2[d].semeai                   = 0;
     dragon2[d].semeai_margin_of_safety  = -1;
-    dragon2[d].surround_status          = 0;
+    dragon2[d].semeai_defense_point	= NO_MOVE;
+    dragon2[d].semeai_attack_point	= NO_MOVE;
     dragon2[d].owl_attack_point         = NO_MOVE;
     dragon2[d].owl_attack_code          = 0;
     dragon2[d].owl_attack_certain       = 1;
@@ -786,7 +791,6 @@ initialize_supplementary_dragon_data(void)
     dragon2[d].owl_threat_status        = UNCHECKED;
     dragon2[d].owl_second_attack_point  = NO_MOVE;
     dragon2[d].owl_second_defense_point = NO_MOVE;
-    set_eyevalue(&dragon2[d].genus, 0, 0, 0, 0);
   }
   
   dragon2_initialized = 1;
@@ -1540,6 +1544,12 @@ show_dragons(void)
 		d2->owl_attack_point, d2->owl_attack_code);
 	gprintf("... owl defendable at %1m, code %d\n",
 		d2->owl_defense_point, d2->owl_defense_code);
+      }
+      if (dd->status == CRITICAL && d2->semeai) {
+	if (d2->semeai_defense_point)
+	  gprintf("... semeai defense move at %1m\n", d2->semeai_defense_point);
+	if (d2->semeai_attack_point)
+	  gprintf("... semeai attack move at %1m\n", d2->semeai_attack_point);
       }
       gprintf("... neighbors");
       for (k = 0; k < d2->neighbors; k++) {
