@@ -79,6 +79,7 @@ loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 170
 250 gg_genmove black
 #? [T10]
 
+# a little difficult since B16 doesn't make life locally
 loadsgf games/nngs/norate-ggl-200212301513.sgf 32
 260 gg_genmove black
 #? [B16]
@@ -89,7 +90,7 @@ loadsgf games/nngs/norate-ggl-200212301513.sgf 52
 
 loadsgf games/nngs/norate-ggl-200212301513.sgf 62
 280 gg_genmove black
-#? [R1|S2]
+#? [R1|S1|S2]
 
 loadsgf games/nngs/norate-ggl-200212301513.sgf 234
 290 gg_genmove black
