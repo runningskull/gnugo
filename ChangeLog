@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new tests
 - owl tuning
 - speed up scan_for_patterns()
 - remove DFA_SORT
