@@ -757,10 +757,16 @@ static void
 find_more_semeai_moves(int color)
 {
   int pos;
+  int save_verbose = verbose;
+
+  if (verbose > 0)
+    verbose--;
+
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     int k, r;
     int potential_semeai_move_found = 0;
     int other_move_reason_found = 0;
+
     if (!ON_BOARD1(pos))
       continue;
     for (k = 0; k < MAX_REASONS; k++) {
@@ -791,6 +797,7 @@ find_more_semeai_moves(int color)
 	try_potential_semeai_move(pos, color, &(move_reasons[r]));
     }
   }
+  verbose = save_verbose;
 }
 
 
