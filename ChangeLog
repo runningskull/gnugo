@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- boardsize field added to persistent caches in reading.c and owl.c
+- break_chain_efficient_moves() revised
+- new function reduced_init_owl() in owl.c
+- mark_dragon_hotspot_values() revised
 - revised handling of inessential stones in init_influence()
 - bugfix in strategic_penalty()
 - owl speedup: owl data immediately stored in owl_stack

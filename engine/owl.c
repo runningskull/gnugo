@@ -130,6 +130,7 @@ void dump_pattern_list(struct matched_patterns_list_data *list);
 
 /* Persistent owl result cache to reuse owl results between moves. */
 struct owl_cache {
+  int boardsize;
   char board[BOARDMAX];
   int movenum;
   int tactical_nodes;
@@ -171,8 +172,9 @@ static void store_persistent_owl_cache(int routine, int apos,
 				       char goal[BOARDMAX],
 				       int goal_color);
 static void print_persistent_owl_cache_entry(int k);
-static void mark_dragon_hotspot_values(float values[BOARDMAX],
-				       int pos, float contribution);
+static void mark_dragon_hotspot_values(float values[BOARDMAX], int pos,
+				       float contribution,
+				       char active_board[BOARDMAX]);
 
 
 static int do_owl_attack(int str, int *move, 
@@ -239,6 +241,7 @@ static int liberty_of_goal(int pos, struct local_owl_data *owl);
 static int matches_found;
 static char found_matches[BOARDMAX];
 
+static void reduced_init_owl(struct local_owl_data **owl);
 static void init_owl(struct local_owl_data **owl, int target1, int target2,
 		     int move, int use_stack);
 
@@ -4132,13 +4135,10 @@ owl_substantial(int str)
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
 
-  /* FIXME: We want to use init_owl here too (cf. similar remark below). */
-  if (owl_stack_size == 0) {
-    owl_stack = malloc((owl_reading_depth + 1) * sizeof(*owl_stack));
-    gg_assert(owl_stack != NULL);
-    owl_stack_size = owl_reading_depth + 1;
-  }
-  owl = &owl_stack[0];
+  /* FIXME: We want to use the full init_owl here too (cf. similar
+   * remark below).
+   */
+  reduced_init_owl(&owl);
 
   owl->color = OTHER_COLOR(board[str]);
   owl->local_owl_node_counter = 0;
@@ -4529,8 +4529,24 @@ owl_escape_route(struct local_owl_data *owl)
 
 /****************************
  * Initialization of owl data
- ****************************
- *
+ ****************************/
+
+/* This is a temporary solution. We want to be able to use the full
+ * init_owl() also in owl_substantial.
+ */
+static void
+reduced_init_owl(struct local_owl_data **owl)
+{
+  if (owl_stack_size == 0) {
+    owl_stack_size = owl_reading_depth + 2;
+    owl_stack = malloc(owl_stack_size * sizeof(*owl_stack));
+    gg_assert(owl_stack != NULL);
+  }
+  *owl = &owl_stack[0];
+}
+
+
+/*
  * If use_stack is set, the stack is initialized, and the return value
  * of *owl is a pointer to the bottom of the stack.
  */
@@ -4538,14 +4554,8 @@ static void
 init_owl(struct local_owl_data **owl, int target1, int target2, int move,
          int use_stack)
 {
-  if (use_stack) {
-    if (owl_stack_size == 0) {
-      owl_stack_size = owl_reading_depth + 2;
-      owl_stack = malloc(owl_stack_size * sizeof(*owl_stack));
-      gg_assert(owl_stack != NULL);
-    }
-    *owl = &owl_stack[0];
-  }
+  if (use_stack)
+    reduced_init_owl(owl);
 
   (*owl)->local_owl_node_counter = 0;
   (*owl)->lunches_are_current = 0;
@@ -4684,7 +4694,8 @@ purge_persistent_owl_cache()
     last_purge_position_number = position_number;
 
   for (k = 0; k < persistent_owl_cache_size; k++) {
-    if (!verify_stored_board(persistent_owl_cache[k].board)) {
+    if (persistent_owl_cache[k].boardsize != board_size
+	|| !verify_stored_board(persistent_owl_cache[k].board)) {
       /* Move the last entry in the cache here and back up the loop
        * counter to redo the test at this position in the cache.
        */
@@ -4747,14 +4758,15 @@ store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
     return;
   }
 
-  persistent_owl_cache[persistent_owl_cache_size].routine = routine;
-  persistent_owl_cache[persistent_owl_cache_size].apos	  = apos;
-  persistent_owl_cache[persistent_owl_cache_size].bpos	  = bpos;
-  persistent_owl_cache[persistent_owl_cache_size].cpos	  = cpos;
-  persistent_owl_cache[persistent_owl_cache_size].result  = result;
+  persistent_owl_cache[persistent_owl_cache_size].boardsize  	 = board_size;
+  persistent_owl_cache[persistent_owl_cache_size].routine    	 = routine;
+  persistent_owl_cache[persistent_owl_cache_size].apos	     	 = apos;
+  persistent_owl_cache[persistent_owl_cache_size].bpos	     	 = bpos;
+  persistent_owl_cache[persistent_owl_cache_size].cpos	     	 = cpos;
+  persistent_owl_cache[persistent_owl_cache_size].result     	 = result;
   persistent_owl_cache[persistent_owl_cache_size].result_certain = certain;
-  persistent_owl_cache[persistent_owl_cache_size].move	  = move;
-  persistent_owl_cache[persistent_owl_cache_size].move2	  = move2;
+  persistent_owl_cache[persistent_owl_cache_size].move	         = move;
+  persistent_owl_cache[persistent_owl_cache_size].move2	         = move2;
   persistent_owl_cache[persistent_owl_cache_size].tactical_nodes =
     tactical_nodes;
   persistent_owl_cache[persistent_owl_cache_size].movenum = movenum;
@@ -4873,35 +4885,52 @@ print_persistent_owl_cache_entry(int k)
 
 /* Helper for the owl_hotspots() function below. */
 static void
-mark_dragon_hotspot_values(float values[BOARDMAX], int pos, float contribution)
+mark_dragon_hotspot_values(float values[BOARDMAX], int dr,
+			   float contribution, char active_board[BOARDMAX])
 {
-  int i, j, k;
-  ASSERT1(IS_STONE(board[pos]), pos);
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) != EMPTY)
-	continue;
-      for (k = 0; k < 8; k++) {
-	int di = deltai[k];
-	int dj = deltaj[k];
-	if (IS_STONE(BOARD(i+di, j+dj))
-	    && is_same_dragon(POS(i+di, j+dj), pos)
-	    && (countlib(POS(i+di, j+dj)) <= 4
-		|| i == 0 || i == board_size-1
-		|| j == 0 || j == board_size-1)) {
-	  if (k < 4) {
-	    values[POS(i, j)] += contribution;
-	    break;
-	  }
-	  else {
-	    if (BOARD(i+di, j) == EMPTY || countlib(POS(i+di, j)) <= 2
-		|| BOARD(i, j+dj) == EMPTY || countlib(POS(i, j+dj)) <= 2)
-	      values[POS(i, j)] += 0.5 * contribution;
-	    break;
-	  }
+  int pos;
+  int k;
+  ASSERT1(IS_STONE(board[dr]), dr);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] != EMPTY)
+      continue;
+    for (k = 0; k < 8; k++) {
+      int pos2 = pos + delta[k];
+      if (IS_STONE(board[pos2])
+	  && (is_same_dragon(pos2, dr)
+	      || (are_neighbor_dragons(pos2, dr)
+		  && board[pos2] == board[dr]))
+	  && (countlib(pos2) <= 4
+	      || is_edge_vertex(pos))) {
+	if (k < 4) {
+	  if (is_same_dragon(pos2, dr))
+	    values[pos] += contribution;
+	  else
+	    values[pos] += 0.5 * contribution;
+	  break;
+	}
+	else {
+	  /* If pos2 = SOUTHWEST(pos), this construction makes
+	   *    pos3 = SOUTH(pos) and
+	   *    pos4 = WEST(pos)
+	   * and corresponding for all other diagonal movements.
+	   */
+	  int pos3 = pos + delta[k % 4];
+	  int pos4 = pos + delta[(k+1) % 4];
+	  if (board[pos3] == EMPTY || countlib(pos3) <= 2
+	      || board[pos4] == EMPTY || countlib(pos4) <= 2)
+	    values[pos] += 0.5 * contribution;
+	  break;
 	}
       }
     }
+    /* If not close to the dragon, but within the active area, give
+     * negative hotspot contribution.
+     */
+    if (k == 8 && active_board[pos] == EMPTY) {
+      values[pos] -= 0.5 * contribution;
+    }
+  }
 }
   
 
@@ -4912,14 +4941,15 @@ mark_dragon_hotspot_values(float values[BOARDMAX], int pos, float contribution)
 void
 owl_hotspots(float values[BOARDMAX])
 {
-  int m, n, k, r;
+  int pos;
+  int k, r;
   int libs[MAXLIBS];
   int liberties;
   int sum_tactical_nodes = 0;
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      values[POS(m, n)] = 0.0;
+  /* Don't bother checking out of board. Set values[] to zero there too. */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    values[pos] = 0.0;
   
   /* Compute the total number of tactical nodes for the cached entries. */
   for (k = 0; k < persistent_owl_cache_size; k++)
@@ -4943,15 +4973,19 @@ owl_hotspots(float values[BOARDMAX])
     case OWL_THREATEN_ATTACK:
     case OWL_DEFEND:
     case OWL_THREATEN_DEFENSE:
-      mark_dragon_hotspot_values(values, entry->apos, contribution);
+      mark_dragon_hotspot_values(values, entry->apos,
+				 contribution, entry->board);
       break;
     case OWL_DOES_DEFEND:
     case OWL_DOES_ATTACK:
-      mark_dragon_hotspot_values(values, entry->bpos, contribution);
+      mark_dragon_hotspot_values(values, entry->bpos,
+				 contribution, entry->board);
       break;
     case OWL_CONNECTION_DEFENDS:
-      mark_dragon_hotspot_values(values, entry->bpos, contribution);
-      mark_dragon_hotspot_values(values, entry->cpos, contribution);
+      mark_dragon_hotspot_values(values, entry->bpos,
+				 contribution, entry->board);
+      mark_dragon_hotspot_values(values, entry->cpos,
+				 contribution, entry->board);
       break;
     case OWL_SUBSTANTIAL:
       /* Only consider the liberties of (apos). */

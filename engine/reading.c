@@ -158,6 +158,7 @@ static int in_list(int move, int num_moves, int *moves);
 #define MAX_CACHE_DEPTH 5
 
 struct reading_cache {
+  int boardsize;
   char board[BOARDMAX];
   int movenum;
   int nodes;
@@ -4784,7 +4785,8 @@ break_chain2_efficient_moves(int str, int moves[MAX_MOVES],
     if (adj2 == 1 && countlib(str) > 2) {
       int apos;
       findlib(adjs2[0], 1, &apos);
-      ADD_CANDIDATE_MOVE(apos, 0, moves, scores, *num_moves);
+      if (!is_self_atari(apos, color))
+	ADD_CANDIDATE_MOVE(apos, 0, moves, scores, *num_moves);
       continue;
     }
     
@@ -6080,22 +6082,28 @@ purge_persistent_reading_cache()
   else
     last_purge_position_number = position_number;
 
+  
+  
   for (k = 0; k < persistent_reading_cache_size; k++) {
     int played_moves = 0;
     int entry_ok = 1;
 
-    for (r = 0; r < MAX_CACHE_DEPTH; r++) {
-      int apos = persistent_reading_cache[k].stack[r];
-      int color = persistent_reading_cache[k].move_color[r];
-      if (apos == 0)
-	break;
-      if (board[apos] == EMPTY
-	  && trymove(apos, color, "purge_persistent_reading_cache", 0,
-		     EMPTY, 0))
-	played_moves++;
-      else {
-	entry_ok = 0;
-	break;
+    if (persistent_reading_cache[k].boardsize != board_size)
+      entry_ok = 0;
+    else {
+      for (r = 0; r < MAX_CACHE_DEPTH; r++) {
+	int apos = persistent_reading_cache[k].stack[r];
+	int color = persistent_reading_cache[k].move_color[r];
+	if (apos == 0)
+	  break;
+	if (board[apos] == EMPTY
+	    && trymove(apos, color, "purge_persistent_reading_cache", 0,
+		       EMPTY, 0))
+	  played_moves++;
+	else {
+	  entry_ok = 0;
+	  break;
+	}
       }
     }
 
@@ -6134,7 +6142,8 @@ search_persistent_reading_cache(int routine, int str, int *result, int *move)
     int apos = 0;
     if (entry->routine != routine
 	|| entry->str != str
-	|| entry->remaining_depth < (depth - stackp))
+	|| entry->remaining_depth < (depth - stackp)
+	|| entry->boardsize != board_size)
       continue;
     
     for (r = 0; r < MAX_CACHE_DEPTH; r++) {
@@ -6241,14 +6250,15 @@ store_persistent_reading_cache(int routine, int str, int result, int move,
   }
 
   entry = &(persistent_reading_cache[persistent_reading_cache_size]);
-  entry->movenum = movenum;
-  entry->nodes   = nodes;
-  entry->score   = score;
+  entry->boardsize       = board_size;
+  entry->movenum         = movenum;
+  entry->nodes           = nodes;
+  entry->score           = score;
   entry->remaining_depth = depth - stackp;
-  entry->routine = routine;
-  entry->str	 = str;
-  entry->result  = result;
-  entry->move	 = move;
+  entry->routine         = routine;
+  entry->str	         = str;
+  entry->result          = result;
+  entry->move	         = move;
 
   for (r = 0; r < MAX_CACHE_DEPTH; r++) {
     if (r < stackp)
@@ -6353,6 +6363,7 @@ print_persistent_reading_cache_entry(int k)
 {
   struct reading_cache *entry = &(persistent_reading_cache[k]);
   int r;
+  gprintf("%oboardsize       = %d\n",  entry->boardsize);
   gprintf("%omovenum         = %d\n",  entry->movenum);
   gprintf("%onodes           = %d\n",  entry->nodes);
   gprintf("%oscore           = %d\n",  entry->score);
