@@ -1365,7 +1365,8 @@ main(int argc, char *argv[])
     }
 
     play_gtp(gtp_input_FILE, gtp_dump_commands_FILE, orientation);
-    fclose(gtp_dump_commands_FILE);
+    if (gtp_dump_commands_FILE)
+      fclose(gtp_dump_commands_FILE);
     break;
 
   case MODE_ASCII_EMACS:  
