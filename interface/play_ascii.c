@@ -617,6 +617,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  sgftreeWriteResult(&sgftree,
 			     gameinfo->to_move == WHITE ? -1000.0 : 1000.0,
 			     1);
+         sgffile_output(sgftree.root);
 	case END:
 	case EXIT:
 	case QUIT:
@@ -940,7 +941,7 @@ Type \"save <filename>\" to save,\n\
 	if (tmpstring) {
 	  /* discard newline */
 	  tmpstring[strlen(tmpstring)-1] = 0;
-         init_sgf(gameinfo,sgftree.root);
+          init_sgf(gameinfo,sgftree.root);
 	  writesgf(sgftree.root, tmpstring);
 	}
 	else
@@ -963,6 +964,8 @@ Type \"save <filename>\" to save,\n\
 	state = 0;
       }
     }
+    sgftreeWriteResult(&sgftree, estimate_score(NULL, NULL), 1);
+    sgffile_output(sgftree.root);
     passes = 0;
     showdead = 0;
     /* Play a different game next time. */

@@ -118,7 +118,7 @@ play_gmp(Gameinfo *gameinfo)
   }
 
   gameinfo->computer_player = mycolor;
-  sgffile_write_gameinfo(gameinfo, "gmp");
+  sgf_write_header(sgftree.root, 1, random_seed, gnugo_get_komi(), level, chinese_rules);
   gameinfo->handicap = gnugo_sethand(gameinfo->handicap, sgftree.root);
   sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 
@@ -132,7 +132,8 @@ play_gmp(Gameinfo *gameinfo)
 
       if (message == gmp_err) {
 	fprintf(stderr, "GNU Go: Sorry, error from gmp client\n");
-	sgffile_close_file();
+        sgfAddComment(curnode, "got error from gmp client");
+        sgffile_output(sgftree.root);
 	return;
       }
 
@@ -146,8 +147,8 @@ play_gmp(Gameinfo *gameinfo)
 		    j - k);
 	    break;
 	  }
-	  sgffile_write_comment("undo");
-	  curnode = curnode->parent;
+         sgfAddComment(curnode, "undone");
+          curnode = curnode->parent;
 	  to_move = OTHER_COLOR(to_move);
 	}
 	continue;
@@ -157,7 +158,7 @@ play_gmp(Gameinfo *gameinfo)
 	++passes;
         curnode = sgfAddPlay(curnode, to_move, -1, -1);
 	gnugo_play_move(-1, -1, yourcolor);
-	sgffile_move_made(-1, -1, to_move, moveval);
+       sgffile_output(sgftree.root);
       }
       else {
 	/* not pass */
@@ -165,7 +166,7 @@ play_gmp(Gameinfo *gameinfo)
         curnode = sgfAddPlay(curnode, to_move, i, j);
 	TRACE("\nyour move: %m\n\n", i, j);
 	gnugo_play_move(i, j, yourcolor);
-	sgffile_move_made(i, j, to_move, moveval);
+       sgffile_output(sgftree.root);
       }
 
     }
@@ -173,22 +174,23 @@ play_gmp(Gameinfo *gameinfo)
       /* Generate my next move. */
       moveval = gnugo_genmove(&i, &j, mycolor);
       gnugo_play_move(i, j, mycolor);
+      sgffile_debuginfo(curnode, moveval);
       
       if (moveval < 0) {
 	/* pass */
         curnode = sgfAddPlay(curnode, to_move, -1, -1);
 	gmp_sendPass(ge);
-	sgffile_move_made(-1, -1, to_move, moveval);
 	++passes;
       }
       else {
 	/* not pass */
         curnode = sgfAddPlay(curnode, to_move, i, j);
 	gmp_sendMove(ge, j, i);
-	sgffile_move_made(i, j, to_move, moveval);
 	passes = 0;
 	TRACE("\nmy move: %m\n\n", i, j);
       }
+      sgffile_debuginfo(curnode, 0);
+      sgffile_output(sgftree.root);
     }
     
     to_move = OTHER_COLOR(to_move);
@@ -203,7 +205,6 @@ play_gmp(Gameinfo *gameinfo)
   
   if (!quiet)
     fprintf(stderr, "Game over - waiting for client to shut us down\n");
-  sgffile_close_file();
   who_wins(mycolor, stderr);
   
   
@@ -213,6 +214,7 @@ play_gmp(Gameinfo *gameinfo)
   score = gnugo_estimate_score(&lower_bound, &upper_bound);
 
   sgfWriteResult(sgftree.root, score, 1);
+  sgffile_output(sgftree.root);
   
   while (!time_to_die) {
     message = gmp_check(ge, 1, &j, &i, &error);

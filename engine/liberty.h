@@ -582,16 +582,14 @@ void test_eyeshape(int eyesize, int *eye_vertices);
 
 
 /* debugging support */
+void goaldump(char goal[BOARDMAX]);
 void move_considered(int move, float value);
 
 
 /* SGF routines for debugging purposes in sgffile.c */
-int sgffile_write_line(const char *line, ...);
-void sgffile_dragon_status(int i, int j, int status);
-void goaldump(char goal[BOARDMAX]);
-void sgftree_printboard(struct SGFTree_t *tree);
-void begin_sgftreedump(struct SGFTree_t *tree);
-void end_sgftreedump(const char *filename);
+void sgffile_printboard(struct SGFTree_t *tree);
+void sgffile_begindump(struct SGFTree_t *tree);
+void sgffile_enddump(const char *filename);
 
 
 

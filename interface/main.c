@@ -285,7 +285,7 @@ main(int argc, char *argv[])
   char debuginfluence_move[4] = "\0";
   
   int benchmark = 0;  /* benchmarking mode (-b) */
-  FILE *gtp_input_FILE;
+  FILE *gtp_input_FILE, *output_check;
   int orientation = 0;
 
   /* If seed is zero, GNU Go will play a different game each time. If
@@ -385,10 +385,6 @@ main(int argc, char *argv[])
       case 'o':
 	outfile = gg_optarg;
 	strcpy(outfilename, gg_optarg);
-
-        /* FIXME: remove this line once all sgf output goes through trees */
-	strcpy(gameinfo.outfilename, gg_optarg);
-
 	break;
 
       case 'O':
@@ -881,9 +877,8 @@ main(int argc, char *argv[])
     gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
 			      untilstring, orientation);
   }
-
+  else
   /* Initialize and empty sgf tree if there was no infile. */
-  if (!sgftree.root)
     sgftreeCreateHeaderNode(&sgftree, board_size, komi);
 
   /* Set the game_record to be identical to the loaded one or the
@@ -906,21 +901,14 @@ main(int argc, char *argv[])
     else
       playmode = (isatty(0)) ? MODE_ASCII : MODE_GMP;
   }
-  
-  if (outfile) {
-    if (playmode != MODE_DECIDE_STRING
-	&& playmode != MODE_DECIDE_CONNECTION
-	&& playmode != MODE_DECIDE_DRAGON
-	&& playmode != MODE_DECIDE_DRAGON_DATA
-	&& playmode != MODE_DECIDE_POSITION
-	&& playmode != MODE_DECIDE_SEMEAI
-	&& playmode != MODE_DECIDE_TACTICAL_SEMEAI
-	&& playmode != MODE_DECIDE_EYE
-	&& playmode != MODE_DECIDE_COMBINATION)
-      if (!sgffile_open_file(outfile)) {
-	fprintf(stderr, "Error: could not open '%s'\n", gg_optarg);
-	exit(EXIT_FAILURE);
-      }
+
+  if (outfile && playmode != MODE_LOAD_AND_PRINT) {
+    output_check = fopen(outfile, "w");
+    if (!output_check) {
+      fprintf(stderr, "Error: could not open '%s' for writing\n", outfile);
+      exit(EXIT_FAILURE);
+    }
+    fclose(output_check);
   }
   
   switch (playmode) {
@@ -933,26 +921,26 @@ main(int argc, char *argv[])
     break;
     
   case MODE_REPLAY:    
-    if (!sgftree.root) {
+    if (!infilename) {
       fprintf(stderr, "You must use -l infile with replay mode.\n");
       exit(EXIT_FAILURE);
     }
-    play_replay(sgftree.root, replay_color);
+    play_replay(&gameinfo, replay_color);
     break;
     
   case MODE_LOAD_AND_ANALYZE:
     if (mandated_color != EMPTY)
       gameinfo.to_move = mandated_color;
     
-    if (!sgftree.root) {
+    if (!infilename) {
       fprintf(stderr, "You must use -l infile with load and analyze mode.\n");
       exit(EXIT_FAILURE);
     }
-    load_and_analyze_sgf_file(&gameinfo, benchmark);
+    load_and_analyze_sgf_file(&gameinfo);
     break;
     
   case MODE_LOAD_AND_SCORE:
-    if (!sgftree.root) {
+    if (!infilename) {
       fprintf(stderr, "gnugo: --score must be used with -l\n");
       exit(EXIT_FAILURE);
     }
@@ -960,14 +948,20 @@ main(int argc, char *argv[])
     break;
     
   case MODE_LOAD_AND_PRINT:
-    if (!sgftree.root) {
+    if (!infilename) {
       fprintf(stderr, "gnugo: --printsgf must be used with -l\n");
       exit(EXIT_FAILURE);
     }
+
     else {
-      sgffile_open_file(printsgffile);
-      sgffile_write_gameinfo(&gameinfo, "load and print"); 
-      sgffile_printboard(gameinfo.to_move);
+      if (mandated_color != EMPTY)
+        gameinfo.to_move = mandated_color;
+      sgftree.root->child = NULL;
+      sgftreeSetLastNode(&sgftree, sgftree.root);
+      sgffile_printboard(&sgftree);
+      sgfAddProperty(sgftree.lastnode, "PL",
+        (gameinfo.to_move == WHITE ? "W" : "B"));
+      writesgf(sgftree.root, printsgffile);
     }
     break;
     
@@ -986,7 +980,7 @@ main(int argc, char *argv[])
       }
 
       rotate(m, n, &m, &n, board_size, orientation);
-      decide_string(POS(m, n), outfile);
+      decide_string(POS(m, n));
     }
     break;
   
@@ -1011,7 +1005,7 @@ main(int argc, char *argv[])
 
       rotate(ai, aj, &ai, &aj, board_size, orientation);
       rotate(bi, bj, &bi, &bj, board_size, orientation);
-      decide_connection(POS(ai, aj), POS(bi, bj), outfile);
+      decide_connection(POS(ai, aj), POS(bi, bj));
     }
   break;
   
@@ -1030,7 +1024,7 @@ main(int argc, char *argv[])
       }
 
       rotate(m, n, &m, &n, board_size, orientation);
-      decide_dragon(POS(m, n), outfile);
+      decide_dragon(POS(m, n));
     }
     break;
   
@@ -1076,7 +1070,7 @@ main(int argc, char *argv[])
 
       rotate(ai, aj, &ai, &aj, board_size, orientation);
       rotate(bi, bj, &bi, &bj, board_size, orientation);
-      decide_semeai(POS(ai, aj), POS(bi, bj), outfile);
+      decide_semeai(POS(ai, aj), POS(bi, bj));
     }
     break;
     
@@ -1104,7 +1098,7 @@ main(int argc, char *argv[])
 
       rotate(ai, aj, &ai, &aj, board_size, orientation);
       rotate(bi, bj, &bi, &bj, board_size, orientation);
-      decide_tactical_semeai(POS(ai, aj), POS(bi, bj), outfile);
+      decide_tactical_semeai(POS(ai, aj), POS(bi, bj));
     }
     break;
     
@@ -1119,7 +1113,7 @@ main(int argc, char *argv[])
       color = gameinfo.to_move;
       if (mandated_color != EMPTY)
 	color = mandated_color;
-      decide_position(color, outfile);
+      decide_position(color);
     }
     break;
     
@@ -1138,7 +1132,7 @@ main(int argc, char *argv[])
       }
       
       rotate(m, n, &m, &n, board_size, orientation);
-      decide_eye(POS(m, n), outfile);
+      decide_eye(POS(m, n));
     }
     break;
   
@@ -1152,7 +1146,7 @@ main(int argc, char *argv[])
       color = gameinfo.to_move;
       if (mandated_color != EMPTY)
 	color = mandated_color;
-      decide_combination(color, outfile);
+      decide_combination(color);
     }
     break;
     
@@ -1185,8 +1179,6 @@ main(int argc, char *argv[])
     play_ascii(&sgftree, &gameinfo, infilename, untilstring);
     break;
   }
-  
-  sgffile_close_file();
   
   if (profile_patterns)
     report_pattern_profiling();
@@ -1299,7 +1291,7 @@ Scoring:\n\
    --score estimate        estimate score at loaded position\n\
    --score finish          generate moves to finish game, then score\n\
    --score aftermath       generate moves to finish, use best algorithm\n\
-   --score aftermath --capture-all-dead --chinese rules   Tromp-Taylor score\n\
+   --score aftermath --capture-all-dead --chinese-rules   Tromp-Taylor score\n\
 \n\
 Cache size (higher=more memory usage, faster unless swapping occurs):\n\
    -M, --cache-size <megabytes>  RAM cache for hashing (default %4.1f Mb)\n\
@@ -1365,7 +1357,7 @@ Debugging Options:\n\
    -O, --output-flags <flags>    optional output (use with -o)\n\
                     d: mark dead and critical dragons\n\
                     v: show values of considered moves\n\
-                    specify either no flags (default), 'd', 'v' or 'dv'\n\
+                    specify either 'd', 'v' or 'dv' (nothing by default)\n\
    --showtime                    print timing diagnostic\n\
    --replay <color>              replay game. Use with -o.\n\
    --showscore                   print estimated score\n\

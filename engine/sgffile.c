@@ -39,260 +39,6 @@
 #include "liberty.h"
 #include "sgftree.h"
 
-/* The SGF file while a game is played. */
-static FILE *sgfout = NULL;
-
-static int sgffile_flush_file(void);
-
-
-/* ================================================================ */
-
-
-/*
- * Handling of the SGF file itself (open, close, etc).
- * FIXME: remove this part once it isn't used anymore
- */
-
-
-/*
- * Open the sgf file for output.  The filename "-" means stdout.
- */
-
-int 
-sgffile_open_file(const char *sgf_filename)
-{
-  /* If the file already was open, close it and assume we want to
-   * start writing from scratch.
-   */
-  if (sgfout)
-    sgffile_close_file();
-  
-  if (strcmp(sgf_filename, "-") == 0)
-    sgfout = stdout;
-  else
-    sgfout = fopen(sgf_filename, "w");
-  
-  if (!sgfout)
-    return 0;
-  else
-    return 1;
-}
-
-
-/*
- * Flush buffered output to the sgf file.
- */
-
-static int 
-sgffile_flush_file()
-{
-  if (!sgfout) 
-    return 0;
-  
-  fflush(sgfout);
-  return 1;
-}
-
-
-/*
- * Close the sgf file for output.
- */
-
-int 
-sgffile_close_file()
-{
-  if (!sgfout)
-    return 0;
-
-  /* enable if we ever return to creating of sgf files on the fly */
-#if 0
-  fprintf(sgfout, ")\n"); 
-#endif
-
-  /* Don't close sgfout if it happens to be stdout. */
-  if (sgfout != stdout)
-    fclose(sgfout);
-  sgfout = NULL;
-  
-  return 1;
-}
-
-
-/* ---------------------------------------------------------------- */
-
-
-/*
- * Basic output functions.
- */
-
-
-/*
- * Write a line to the sgf file.
- */
-
-int 
-sgffile_write_line(const char * line, ...)
-{
-  va_list ap;
-
-  if (!sgfout)
-    return 0;
-
-  va_start(ap, line);
-  vfprintf(sgfout, line, ap);
-  va_end(ap);
-
-  return sgffile_flush_file();
-}
-
-
-/*
- * Write a comment to the SGF file.
- */
-
-void
-sgffile_write_comment(const char *comment)
-{
-  if (sgfout)
-    fprintf(sgfout, "C[%s]", comment);
-}
-
-
-/*
- * Add a stone to the SGF file.
- */
-
-void
-sgffile_put_stone(int i, int j, int color)
-{
-  if (sgfout)
-    fprintf(sgfout, "A%c[%c%c]", color==WHITE ? 'W' : 'B',
-	    'a' + j, 'a' + i);
-}
-
-
-/*
- * Add a circle mark to the SGF file
- */
-
-void
-sgffile_write_circle_mark(int i, int j)
-{
-  if (sgfout)
-    fprintf(sgfout, "CR[%c%c]", 'a' + j, 'a' + i);
-}
-
-
-/* 
- * Write header information to the sgf file.
- */
-
-int 
-sgffile_write_gameinfo(Gameinfo *ginfo, const char *gametype)
-{
-  char outbuf[200];
-
-  if (!sgfout) 
-    return 0;
-
-  fprintf(sgfout, "(;GM[1]FF[4]");
-  fprintf(sgfout, "RU[%s]", "Japanese");
-  fprintf(sgfout, "SZ[%d]", board_size);
-  fprintf(sgfout, "\n");
-  
-  sprintf(outbuf, "GNU Go %s (level %d) %s", VERSION, level, gametype);
-  fprintf(sgfout, "PW[%s]PB[%s]", 
-	  (ginfo->computer_player == WHITE 
-	   || ginfo->computer_player == GRAY) ? outbuf : "Unknown",
-	  (ginfo->computer_player == BLACK 
-	   || ginfo->computer_player == GRAY) ? outbuf : "Unknown");
-  fprintf(sgfout, "HA[%d]", ginfo->handicap);
-  fprintf(sgfout, "KM[%.1f]", komi);
-  fprintf(sgfout, "GN[GNU Go %s %s ", VERSION, gametype);
-  fprintf(sgfout, "Random Seed %d", random_seed);
-  fprintf(sgfout, "] ");
-  fprintf(sgfout, "\n");
-  
-  return sgffile_flush_file();
-}
-
-
-/* ---------------------------------------------------------------- */
-
-
-/*
- * The functions below here accesses internal gnugo data structures.
- */
-
-
-/*
- * A move has been made; Write out the move and the potential moves
- * that were also considered.
- */
-
-void 
-sgffile_move_made(int i, int j, int color, int value)
-{
-  int m, n;
-  int done_label = 0;
-  
-  if (!sgfout)
-    return;
-
-  for (m = 0; m < board_size; ++m) {
-    for (n = 0; n < board_size; ++n) {
-      if (potential_moves[m][n] > 0.0) {
-	if (!done_label) {
-	  fprintf(sgfout, "\nLB");
-	  done_label = 1;
-	}
-	if (potential_moves[m][n] < 1.0)
-	  fprintf(sgfout, "[%c%c:<1]", 'a'+n, 'a'+m);
-	else
-	  fprintf(sgfout, "[%c%c:%d]", 'a'+n, 'a'+m,
-		  (int) potential_moves[m][n]);
-      }
-    }
-  }
-
-  if (value)
-    fprintf(sgfout, "\nC[Value of move: %d]", value);
-
-  /* If it is a pass move */
-  if (is_pass(POS(i, j))) {
-    if (board_size > 19)
-      fprintf(sgfout, "\n;%c[]\n", color == WHITE ? 'W' : 'B');
-    else
-      fprintf(sgfout, "\n;%c[tt]\n", color == WHITE ? 'W' : 'B');
-  }
-  else
-    fprintf(sgfout, "\n;%c[%c%c]\n", color == WHITE ? 'W' : 'B',
-	    'a' + j, 'a' + i);
-
-  fflush(sgfout);  /* in case cgoban terminates us without notice */
-}  
-
-
-/*
- * Mark dead and critical dragons in the sgf file.
- */
-
-void 
-sgffile_dragon_status(int i, int j, int status)
-{
-  if (sgfout) {
-    switch (status) {
-      case DEAD:
-	fprintf(sgfout, "LB[%c%c:X]\n", 'a'+j, 'a'+i);
-	break;
-      case CRITICAL:
-	fprintf(sgfout, "LB[%c%c:!]\n", 'a'+j, 'a'+i);
-	break;
-    }
-  }
-}
-
-/* ---------------------------------------------------------------- */
 
 /*
  * Add debug information to a node if user requested it from command
@@ -308,7 +54,7 @@ sgffile_debuginfo(SGFNode *node, int value)
   if (outfilename[0]) {
     for (m = 0; m < board_size; ++m)
       for (n = 0; n < board_size; ++n) {
-        if (BOARD(m,n) && (output_flags & OUTPUT_MARKDRAGONS))
+        if (BOARD(m, n) && (output_flags & OUTPUT_MARKDRAGONS))
           switch (dragon[POS(m, n)].crude_status) {
             case DEAD:
              sgfLabel(node, "X", m, n);
@@ -344,78 +90,6 @@ sgffile_output(SGFNode *root)
 }
 
 
-/* ---------------------------------------------------------------- */
-
-/*
- * sgffile_printboard writes the current board position to the output file.
- * The parameter next, tells whose turn it is to move.
- */
-
-void
-sgffile_printboard(int next) 
-{
-  int i, j;
-  int start = 0;
-
-  if (!sgfout)
-    return;
-
-  /* Write the white stones to the file. */
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == WHITE) {
-	if (!start) {
-	  fprintf(sgfout, "AW");
-	  start = 1;
-	}
-	fprintf(sgfout, "[%c%c]", j+'a', i+'a');
-      }
-    }
-  }
-  fprintf(sgfout, "\n");
-
-  /* Write the black stones to the file. */
-  start = 0;
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == BLACK) {
-	if (!start) {
-	  fprintf(sgfout, "AB");
-	  start = 1;
-	}
-	fprintf(sgfout, "[%c%c]", j+'a', i+'a');
-      }
-    }
-  }
-  fprintf(sgfout, "\n");
-
-  /* If no game is going on, then return. */
-  if (next != WHITE && next != BLACK) 
-    return;
-
-  /* Write whose turn it is to move. */
-  if (next == WHITE) 
-    fprintf(sgfout, "PL[W]\n"); 
-  else if (next == BLACK)
-    fprintf(sgfout, "PL[B]\n"); 
-
-  /* Mark the intersections where it is illegal to move. */
-  start = 0;
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == EMPTY && !is_legal(POS(i, j), next)) {
-	if (!start) {
-	  fprintf(sgfout, "IL");
-	  start = 1;
-	}
-	fprintf(sgfout, "[%c%c]", j+'a', i+'a');
-      }
-    }
-  }
-  fprintf(sgfout, "\n");
-}
-
-
 /* ================================================================ 
  * Dumping of information about a position into an sgftree.
  * Used by sgffile_decideposition, etc.
@@ -423,16 +97,16 @@ sgffile_printboard(int next)
 
 
 /*
- * begin_sgftreedump begins storing all moves considered by
+ * sgffile_begindump begins storing all moves considered by
  * trymove and tryko in an sgf tree in memory.
  *
  * The caller only has to provide an own SGFTree pointer if he wants
  * to do something more with the tree than writing it to file as done
- * by end_sgftreedump().
+ * by sgffile_enddump().
  */
 
 void
-begin_sgftreedump(SGFTree *tree)
+sgffile_begindump(SGFTree *tree)
 {
   SGFNode *node;
   static SGFTree local_tree;
@@ -446,28 +120,30 @@ begin_sgftreedump(SGFTree *tree)
   sgftree_clear(sgf_dumptree);
   node = sgftreeCreateHeaderNode(sgf_dumptree, board_size, 0.0);
   sgftreeSetLastNode(sgf_dumptree, node);
-  sgftree_printboard(sgf_dumptree);
+  sgffile_printboard(sgf_dumptree);
 }
 
 
 /*
- * end_sgftreedump ends the dump and writes the sgf tree to file.
+ * sgffile_enddump ends the dump and writes the sgf tree to file.
  */
 
 void 
-end_sgftreedump(const char *filename)
+sgffile_enddump(const char *filename)
 {
-  writesgf(sgf_dumptree->root, filename);
+  /* check if we have a valid filename */
+  if (filename && *filename)
+    writesgf(sgf_dumptree->root, filename);
   sgf_dumptree = NULL;
 }
 
 
 /*
- * sgftree_printboard adds the current board position to the tree.
+ * sgffile_printboard adds the current board position to the tree.
  */
 
 void
-sgftree_printboard(SGFTree *tree)
+sgffile_printboard(SGFTree *tree)
 {
   int i, j;
   SGFNode *node;
@@ -500,15 +176,11 @@ sgffile_recordboard(SGFNode *node)
 {
   int i, j;
 
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == BLACK) {
-	sgffile_put_stone(i, j, BLACK);
-	if (node)
-	  sgfAddStone(node, BLACK, i, j);
-      }
-    }
-  }
+  if (node)
+    for (i = 0; i < board_size; i++)
+      for (j = 0; j < board_size; j++)
+        if (BOARD(i, j) == BLACK)
+          sgfAddStone(node, BLACK, i, j);
 }
 
 

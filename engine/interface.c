@@ -388,9 +388,6 @@ gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi)
 
   /* Info relevant to the computer player. */
   ginfo->computer_player = WHITE; /* Make an assumption. */
-
-  ginfo->outfilename[0] = '\0';
-  ginfo->outfile = NULL;
 }
 
 
@@ -462,8 +459,6 @@ gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color)
 {
   gnugo_play_move(i, j, color);
   sgftreeAddPlay(&ginfo->game_record, 0, color, i, j);
-
-  sgffile_move_made(i, j, color, 0);
 
   ginfo->to_move = OTHER_COLOR(color);
 }
@@ -552,7 +547,6 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	 */
 	rotate(i, j, &i, &j, board_size, orientation);
 	gnugo_add_stone(i, j, BLACK);
-	sgffile_put_stone(i, j, BLACK);
 	addstone = 1;
 	break;
 	      
@@ -560,7 +554,6 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	get_moveXY(prop, &i, &j, board_size);
 	rotate(i, j, &i, &j, board_size, orientation);
 	gnugo_add_stone(i, j, WHITE);
-	sgffile_put_stone(i, j, WHITE);
 	addstone = 1;
 	break;
 	      
@@ -608,7 +601,6 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	if ((ON_BOARD2(i, j) && board[POS(i, j)] == EMPTY)
 	    || (i == -1 && j == -1)) {
 	  gnugo_play_move(i, j, next);
-	  sgffile_move_made(i, j, next, 0);
 	  next = OTHER_COLOR(next);
 	}
 	else {

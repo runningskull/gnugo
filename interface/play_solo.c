@@ -34,6 +34,8 @@
 #include "random.h"
 #include "gg_utils.h"
 
+SGFTree sgftree;
+SGFNode *curnode;
 
 void
 play_solo(Gameinfo *gameinfo, int moves)
@@ -56,7 +58,11 @@ play_solo(Gameinfo *gameinfo, int moves)
   int n = 6 + 2*gg_rand()%5;
   int i, j;
 
-  sgffile_write_gameinfo(gameinfo, "solo");
+  gnugo_set_komi(5.5);
+
+  sgftree_clear(&sgftree);
+  curnode = sgftreeCreateHeaderNode(&sgftree, gnugo_get_boardsize(), gnugo_get_komi());
+  sgf_write_header(sgftree.root, 1, random_seed, 5.5, level, chinese_rules);
  
   /* Generate some random moves. */
   if (boardsize > 6) {
@@ -65,8 +71,11 @@ play_solo(Gameinfo *gameinfo, int moves)
 	i = (gg_rand() % 4) + (gg_rand() % (boardsize - 4));
 	j = (gg_rand() % 4) + (gg_rand() % (boardsize - 4));
       } while (!gnugo_is_legal(i, j, gameinfo->to_move));
-      
-      gameinfo_play_move(gameinfo, i, j, gameinfo->to_move);
+
+      gnugo_play_move(i, j, gameinfo->to_move);
+      curnode = sgfAddPlay(curnode, gameinfo->to_move, i, j);
+      sgfAddComment(curnode, "random move");
+      gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
     } while (--n > 0);
   }
   
@@ -75,7 +84,12 @@ play_solo(Gameinfo *gameinfo, int moves)
   while (passes < 2 && --moves >= 0 && !time_to_die) {
     reset_owl_node_counter();
     move_val = gnugo_genmove(&i, &j, gameinfo->to_move);
-    gameinfo_play_move(gameinfo, i, j, gameinfo->to_move);
+
+    gnugo_play_move(i, j, gameinfo->to_move);
+    sgffile_debuginfo(curnode, move_val);
+    curnode = sgfAddPlay(curnode, gameinfo->to_move, i, j);
+    sgffile_output(sgftree.root);
+    gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
 
     if (move_val < 0) {
       ++passes;
@@ -99,6 +113,10 @@ play_solo(Gameinfo *gameinfo, int moves)
   
   /* Two passes and it's over. (EMPTY == BOTH) */
   gnugo_who_wins(EMPTY, stdout);
+
+  score = gnugo_estimate_score(&lower_bound, &upper_bound);
+  sgfWriteResult(sgftree.root, score, 1);
+  sgffile_output(sgftree.root);
 
 #if 0
   if (t2 == t1)
@@ -131,36 +149,29 @@ play_solo(Gameinfo *gameinfo, int moves)
  */
 
 void 
-load_and_analyze_sgf_file(Gameinfo *gameinfo, int benchmark)
+load_and_analyze_sgf_file(Gameinfo *gameinfo)
 {
   int i, j;
   int next;
-  int r;
+  int move_val;
   
   next = gameinfo->to_move;
-  gameinfo->computer_player = next;
-  sgffile_write_gameinfo(gameinfo, "load and analyze");
+  sgftree = gameinfo->game_record;
 
-  if (benchmark) {
-    for (r = 0; r < benchmark; ++r) {
-      genmove(&i, &j, next);
-      next = OTHER_COLOR(next);
-    }
-  }
-  else {
-    genmove(&i, &j, next);
-    
-    if (is_pass(POS(i, j))) {
-      gprintf("%s move: PASS!\n", next == WHITE ? "white (O)" : "black (X)");
-      sgffile_move_made(i, j, next, 0);
-    }
-    else {
-      gprintf("%s move %m\n", next == WHITE ? "white (O)" : "black (X)",
-	      i, j);
-      gnugo_play_move(i, j, next);
-      sgffile_move_made(i, j, next, 0);
-    }
-  }
+  move_val = gnugo_genmove(&i, &j, next);
+
+  if (is_pass(POS(i, j)))
+    gprintf("%s move: PASS!\n", next == WHITE ? "white (O)" : "black (X)");
+  else
+    gprintf("%s move %m\n", next == WHITE ? "white (O)" : "black (X)",
+      i, j);
+
+  gnugo_play_move(i, j, next);
+  curnode = sgftreeNodeCheck(&sgftree, 0);
+  curnode = sgfAddPlay(curnode, next, i, j);
+  sgfAddComment(curnode, "load and analyze mode");
+  sgffile_debuginfo(curnode, move_val);
+  sgffile_output(sgftree.root);
 }
 
 
@@ -192,11 +203,10 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
   sgftree_clear(&score_tree);
   node = sgftreeCreateHeaderNode(&score_tree, board_size, komi);
   sgftreeSetLastNode(&score_tree, node);
-  sgftree_printboard(&score_tree);
+  sgffile_printboard(&score_tree);
   
-  sgffile_write_gameinfo(gameinfo, "load and score");
   next = gameinfo->to_move;
-  sgffile_printboard(next);
+  node = node->child;
   doing_scoring = 1;
   reset_engine();
   
@@ -215,13 +225,13 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
 		next == WHITE ? "white (O)" : "black (X)");
       }
       play_move(POS(i, j), next);
-      sgffile_move_made(i, j, next, move_val);
-      sgftreeAddPlay(&score_tree, NULL, next, i, j);
+      sgffile_debuginfo(node, move_val);
+      node = sgfAddPlay(node, next, i, j);
+      sgffile_output(score_tree.root);
       next = OTHER_COLOR(next);
     } while (movenum <= until && pass < 2);
 
     if (pass >= 2) {
-      node = score_tree.lastnode;
       /* Calculate the score */
       if (!strcmp(scoringmode, "aftermath"))
 	score = aftermath_compute_score(next, komi, &score_tree);
@@ -242,7 +252,6 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
       }
       fputs(text, stdout);
       sgfAddComment(node, text);
-      sgffile_write_comment(text);
       if (sgfGetCharProperty(tree->root, "RE", &tempc)) {
 	if (sscanf(tempc, "%1c%f", &dummy, &result) == 2) {
 	  fprintf(stdout, "Result from file: %1.1f\n", result);
@@ -265,26 +274,23 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
 	}
       }
       sgfWriteResult(score_tree.root, score, 1);
+      sgffile_output(score_tree.root);
     }
   }
   doing_scoring = 0;
 
 
-  if (!strcmp(scoringmode, "aftermath")) {
-    if (gameinfo->outfilename)
-      writesgf(score_tree.root, gameinfo->outfilename);
-    return;
+  if (strcmp(scoringmode, "aftermath")) {
+    /* Before we call estimate_score() we must make sure that the dragon
+     * status is computed. Therefore the call to examine_position().
+     */
+    examine_position(next, EXAMINE_ALL);
+    score = estimate_score(NULL, NULL);
+
+    fprintf(stdout, "\n%s seems to win by %1.1f points\n",
+      score < 0 ? "B" : "W",
+      score < 0 ? -score : score);
   }
-
-  /* Before we call estimate_score() we must make sure that the dragon
-   * status is computed. Therefore the call to examine_position().
-   */
-  examine_position(next, EXAMINE_ALL);
-  score = estimate_score(NULL, NULL);
-
-  fprintf(stdout, "\n%s seems to win by %1.1f points\n",
-	  score < 0 ? "B" : "W",
-	  score < 0 ? -score : score);
 }
 
 

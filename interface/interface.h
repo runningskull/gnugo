@@ -37,9 +37,9 @@ void play_ascii_emacs(SGFTree *tree, Gameinfo *gameinfo,
 void play_gtp(FILE *gtp_input, int gtp_initial_orientation);
 void play_gmp(Gameinfo *gameinfo);
 void play_solo(Gameinfo *gameinfo, int benchmark);
-void play_replay(SGFNode *sgf_head, int color_to_test);
+void play_replay(Gameinfo *gameinfo, int color_to_test);
 
-void load_and_analyze_sgf_file(Gameinfo *gameinfo, int benchmark);
+void load_and_analyze_sgf_file(Gameinfo *gameinfo);
 void load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
 			     const char *scoringmode);
 

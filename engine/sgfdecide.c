@@ -39,7 +39,7 @@
  */
 
 void
-decide_string(int pos, const char *sgf_output)
+decide_string(int pos)
 {
   int aa, dd;
   int acode, dcode;
@@ -50,8 +50,8 @@ decide_string(int pos, const char *sgf_output)
     return ;
   }
 
-  if (sgf_output)
-    begin_sgftreedump(&tree);
+  if (*outfilename)
+    sgffile_begindump(&tree);
 
   /* Prepare pattern matcher and reading code. */
   reset_engine();
@@ -105,10 +105,8 @@ decide_string(int pos, const char *sgf_output)
     }
   }
 
-  if (sgf_output) {
-    end_sgftreedump(sgf_output);
-    count_variations = 0;
-  }
+  sgffile_enddump(outfilename);
+  count_variations = 0;
 }
 
 
@@ -119,7 +117,7 @@ decide_string(int pos, const char *sgf_output)
  */
 
 void
-decide_connection(int apos, int bpos, const char *sgf_output)
+decide_connection(int apos, int bpos)
 {
   int move;
   int result;
@@ -138,8 +136,8 @@ decide_connection(int apos, int bpos, const char *sgf_output)
     return;
   }
 
-  if (sgf_output)
-    begin_sgftreedump(&tree);
+  if (*outfilename)
+    sgffile_begindump(&tree);
 
   /* Prepare pattern matcher and reading code. */
   reset_engine();
@@ -184,10 +182,8 @@ decide_connection(int apos, int bpos, const char *sgf_output)
     gprintf("%1m and %1m cannot be disconnected (%d variations)\n", 
 	    apos, bpos, count_variations);
   
-  if (sgf_output) {
-    end_sgftreedump(sgf_output);
-    count_variations = 0;
-  }
+  sgffile_enddump(outfilename);
+  count_variations = 0;
 }
 
 
@@ -198,7 +194,7 @@ decide_connection(int apos, int bpos, const char *sgf_output)
  */
 
 void
-decide_dragon(int pos, const char *sgf_output)
+decide_dragon(int pos)
 {
   int move = NO_MOVE;
   int acode, dcode;
@@ -221,8 +217,8 @@ decide_dragon(int pos, const char *sgf_output)
    */
   reading_cache_clear();
   
-  if (sgf_output)
-    begin_sgftreedump(&tree);
+  if (*outfilename)
+    sgffile_begindump(&tree);
 
   count_variations = 1;
   acode = owl_attack(pos, &move, &result_certain);
@@ -277,10 +273,8 @@ decide_dragon(int pos, const char *sgf_output)
   else
     gprintf(" result uncertain\n");
   
-  if (sgf_output) {
-    end_sgftreedump(sgf_output);
-    count_variations = 0;
-  }
+  sgffile_enddump(outfilename);
+  count_variations = 0;
 }
 
 
@@ -308,7 +302,7 @@ decide_dragon_data(int pos)
  */
 
 void
-decide_semeai(int apos, int bpos, const char *sgf_output)
+decide_semeai(int apos, int bpos)
 {
   SGFTree tree;
   int resulta, resultb, move;
@@ -330,8 +324,9 @@ decide_semeai(int apos, int bpos, const char *sgf_output)
    * from the cache. Thus we clear the cache here. */
   reading_cache_clear();
   
-  if (sgf_output)
-    begin_sgftreedump(&tree);
+  if (*outfilename)
+    sgffile_begindump(&tree);
+
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 1);
   gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
 	  color == BLACK ? "black" : "white",
@@ -347,15 +342,13 @@ decide_semeai(int apos, int bpos, const char *sgf_output)
   	  bpos, safety_to_string(resultb),
 	  count_variations);
 
-  if (sgf_output) {
-    end_sgftreedump(sgf_output);
-    count_variations = 0;
-  }
+  sgffile_enddump(outfilename);
+  count_variations = 0;
 }
 
 
 void
-decide_tactical_semeai(int apos, int bpos, const char *sgf_output)
+decide_tactical_semeai(int apos, int bpos)
 {
   SGFTree tree;
   int resulta, resultb, move;
@@ -377,8 +370,9 @@ decide_tactical_semeai(int apos, int bpos, const char *sgf_output)
    * from the cache. Thus we clear the cache here. */
   reading_cache_clear();
   
-  if (sgf_output)
-    begin_sgftreedump(&tree);
+  if (*outfilename)
+    sgffile_begindump(&tree);
+
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0);
   gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
 	  color == BLACK ? "black" : "white",
@@ -394,10 +388,8 @@ decide_tactical_semeai(int apos, int bpos, const char *sgf_output)
   	  bpos, safety_to_string(resultb),
 	  count_variations);
 
-  if (sgf_output) {
-    end_sgftreedump(sgf_output);
-    count_variations = 0;
-  }
+  sgffile_enddump(outfilename);
+  count_variations = 0;
 }
 
 
@@ -407,7 +399,7 @@ decide_tactical_semeai(int apos, int bpos, const char *sgf_output)
  */
 
 void
-decide_position(int color, const char *sgf_output)
+decide_position(int color)
 {
   int pos;
   int move = NO_MOVE;
@@ -424,8 +416,8 @@ decide_position(int color, const char *sgf_output)
    * from the cache. Thus we clear the cache here. */
   reading_cache_clear();
 
-  if (sgf_output)
-    begin_sgftreedump(&tree);
+  if (*outfilename)
+    sgffile_begindump(&tree);
 
   count_variations = 1;
 
@@ -490,10 +482,8 @@ decide_position(int color, const char *sgf_output)
       gprintf("status of %1m revised to ALIVE\n", pos);
   }
   
-  if (sgf_output) {
-    end_sgftreedump(sgf_output);
-    count_variations = 0;
-  }
+  sgffile_enddump(outfilename);
+  count_variations = 0;
 }
 
 
@@ -502,7 +492,7 @@ decide_position(int color, const char *sgf_output)
  */
 
 void
-decide_eye(int pos, const char *sgf_output)
+decide_eye(int pos)
 {
   int color;
   struct eyevalue value;
@@ -530,8 +520,8 @@ decide_eye(int pos, const char *sgf_output)
     reset_life_node_counter();
 
   /* Enable sgf output. */
-  if (sgf_output)
-    begin_sgftreedump(&tree);
+  if (*outfilename)
+    sgffile_begindump(&tree);
   count_variations = 1;
   
   if (black_eye[pos].color == BLACK_BORDER) {
@@ -563,10 +553,8 @@ decide_eye(int pos, const char *sgf_output)
 	   get_life_node_counter());
 
   /* Finish sgf output. */
-  if (sgf_output) {
-    end_sgftreedump(sgf_output);
-    count_variations = 0;
-  }
+  sgffile_enddump(outfilename);
+  count_variations = 0;
 }
 
 
@@ -576,7 +564,7 @@ decide_eye(int pos, const char *sgf_output)
  */
 
 void
-decide_combination(int color, const char *sgf_output)
+decide_combination(int color)
 {
   int attack_move;
   int defense_move;
@@ -587,8 +575,8 @@ decide_combination(int color, const char *sgf_output)
 
   silent_examine_position(color, EXAMINE_ALL);
 
-  if (sgf_output)
-    begin_sgftreedump(&tree);
+  if (*outfilename)
+    sgffile_begindump(&tree);
   count_variations = 1;
 
   if (atari_atari(color, &attack_move, &defense_move, verbose))
@@ -597,10 +585,8 @@ decide_combination(int color, const char *sgf_output)
   else
     gprintf("No Combination attack for %C\n", color);
   
-  if (sgf_output) {
-    end_sgftreedump(sgf_output);
-    count_variations = 0;
-  }
+  sgffile_enddump(outfilename);
+  count_variations = 0;
 }
 
 

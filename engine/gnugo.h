@@ -164,10 +164,6 @@ typedef struct {
   SGFTree   game_record;	/* Game record in sgf format. */
 
   int       computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
-
-  /* FIXME: remove these fields once all sgf output goes through trees */
-  char     outfilename[128];
-  FILE      *outfile;
 } Gameinfo;
 
 void gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi);
@@ -480,27 +476,19 @@ void report_pattern_profiling(void);
 void sgffile_debuginfo(SGFNode *node, int value);
 void sgffile_output(SGFNode *root);
 
-void sgffile_move_made(int i, int j, int color, int value);
-void sgffile_put_stone(int i, int j, int color);
-
-int sgffile_open_file(const char *);
-int sgffile_close_file(void);
-int sgffile_write_gameinfo(Gameinfo *gameinfo, const char *);
-void sgffile_write_comment(const char *comment);
-void sgffile_write_circle_mark(int i, int j);
-void sgffile_printboard(int next);
+void sgffile_printboard(SGFTree *tree);
 void sgffile_recordboard(SGFNode *node);
 
 /* sgfdecide.c */
-void decide_string(int pos, const char *sgf_output);
-void decide_connection(int apos, int bpos, const char *sgf_output);
-void decide_dragon(int pos, const char *sgf_output);
+void decide_string(int pos);
+void decide_connection(int apos, int bpos);
+void decide_dragon(int pos);
 void decide_dragon_data(int pos);
-void decide_semeai(int apos, int bpos, const char *sgf_output);
-void decide_tactical_semeai(int apos, int bpos, const char *sgf_output);
-void decide_position(int color, const char *sgf_output);
-void decide_eye(int pos, const char *sgf_output);
-void decide_combination(int color, const char *sgf_output);
+void decide_semeai(int apos, int bpos);
+void decide_tactical_semeai(int apos, int bpos);
+void decide_position(int color);
+void decide_eye(int pos);
+void decide_combination(int color);
 
 
 #endif  /* _GNUGO_H_ */

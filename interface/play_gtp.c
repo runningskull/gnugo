@@ -2792,7 +2792,7 @@ static int
 gtp_start_sgftrace(char *s)
 {
   UNUSED(s);
-  begin_sgftreedump(&gtp_sgftree);
+  sgffile_begindump(&gtp_sgftree);
   count_variations = 1;
   return gtp_success("");
 }
@@ -2820,7 +2820,7 @@ gtp_finish_sgftrace(char *s)
   if (nread < 1)
     return gtp_failure("missing filename");
 
-  end_sgftreedump(filename);
+  sgffile_enddump(filename);
   count_variations = 0;
   return gtp_success("");
 }
