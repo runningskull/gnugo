@@ -366,6 +366,17 @@ loadsgf games/life_and_death/ld19.sgf
 313 owl_defend C3
 #? [1 (B1|A4)]
 
+loadsgf games/owl49.sgf 1
+314 owl_defend R17
+#? [1 P18]
+play black P17
+315 owl_attack P17
+#? [1 P18]
+
+loadsgf games/owl49.sgf 7
+316 owl_defend Q17
+#? [1 T16]
+
 
 # tough under the stones problem from Sensei's Library
 loadsgf games/owl47.sgf 5

@@ -267,6 +267,15 @@ loadsgf games/nngs/evand-gnugo-3.3.21-200306130638.sgf 156
 630 gg_genmove black
 #? [B6]*
 
+#unneeded.  Take a big point somewhere.
+loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 16
+640 gg_genmove black
+#? [!R7]
+
+loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 42
+650 gg_genmove black
+#? [Q2]
+
 
 ############ End of Tests #################
 
