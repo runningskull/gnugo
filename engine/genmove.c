@@ -421,14 +421,13 @@ do_genmove(int color, float pure_threat_value,
   /* Look for moves to break mirror play by the opponent. */
   break_mirror_go(color);
 
-  /* If we are ahead by 10 points or more, consider a thrashing
+  /* If we are ahead by 5 points or more, consider a thrashing
    * dragon dangerous and change its status from DEAD to
-   * UNKNOWN. This may generate a move. Otherwise, pretend there is no
-   * thrashing dragon.
+   * UNKNOWN. Otherwise, pretend there is no thrashing dragon.
    */
   if (!doing_scoring && !limit_search)
     use_thrashing_dragon_heuristics
-      = revise_thrashing_dragon(color, our_score, -30.0);
+      = revise_thrashing_dragon(color, our_score, 5.0);
   
   /* The general pattern database. */
   shapes(color);
