@@ -2499,12 +2499,12 @@ owl_determine_life(struct local_owl_data *owl,
   int pessimistic_min;
   int attack_point;
   int defense_point;
-  int m, n;
+  int pos;
   int k;
   int lunch;
   int eye_color;
   int num_eyes = 0;
-  int num_lunch = 0;
+  int num_lunches = 0;
   int save_debug = debug;
   memset(mw, 0, sizeof(mw));
   memset(mz, 0, sizeof(mz));
@@ -2556,195 +2556,187 @@ owl_determine_life(struct local_owl_data *owl,
   else
     eye_color = BLACK_BORDER;
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (board[pos] == color) {
-	for (k = 0; k < 8; k++) {
-	  int pos2 = pos + delta[k];
-	  if (ON_BOARD(pos2)
-	      && eye[pos2].color == eye_color
-	      && eye[pos2].origin != NO_MOVE
-	      && !eye[pos2].marginal) {
-	    if (owl->goal[pos])
-	      mw[eye[pos2].origin]++;
-	    else
-	      mz[eye[pos2].origin]++;
-	  }	      
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == color) {
+      for (k = 0; k < 8; k++) {
+	int pos2 = pos + delta[k];
+	if (ON_BOARD(pos2)
+	    && eye[pos2].color == eye_color
+	    && !eye[pos2].marginal) {
+	  if (owl->goal[pos])
+	    mw[eye[pos2].origin]++;
+	  else
+	    mz[eye[pos2].origin]++;
 	}
       }
     }
+  }
 
   /* Reset halfeye data. Set topological eye value to something big. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      owl->half_eye[POS(m, n)].type = 0;
-      owl->half_eye[POS(m, n)].value = 10.0;
-    }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    owl->half_eye[pos].type = 0;
+    owl->half_eye[pos].value = 10.0;
+  }
   
   /* Find topological half eyes and false eyes. */
   find_half_and_false_eyes(color, eye, owl->half_eye, mw);
 
   set_eyevalue(probable_eyes, 0, 0, 0, 0);
 
-  /* This test must be conditioned on (m, n) being its own origin,
-   * because some origins get moved during the topological eye
-   * code.
-   *
-   * FIXME: I don't think eye origins are moved around any more. 
-   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (ON_BOARD(pos) && mw[pos] > 1) {
+      int value = 0;
+      const char *reason = "";
+      int pos2;
+      compute_eyes_pessimistic(pos, &eyevalue, &pessimistic_min,
+			       &attack_point, &defense_point,
+			       eye, owl->half_eye);
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (mw[pos] > 1 && eye[pos].origin == pos) {
-	int value = 0;
-	const char *reason = "";
-	int i, j;
-	compute_eyes_pessimistic(pos, &eyevalue, &pessimistic_min,
-				 &attack_point, &defense_point,
-				 eye, owl->half_eye);
-	/* If this eyespace includes an owl inessential string, we
-         * must assume that the pessimistic min is 0.
-	 */
-	for (i = 0; i < board_size; i++)
-	  for (j = 0; j < board_size; j++)
-	    if (mw[POS(i, j)] > 1
-		&& eye[POS(i, j)].origin == pos
-		&& owl->inessential[POS(i, j)])
-	      pessimistic_min = 0;
+      /* If the eyespace is more in contact with own stones not in the goal,
+       * than with ones in the goal, there is a risk that we can be cut off
+       * from a major part of the eyespace. Thus we can't trust the opinion
+       * of compute_eyes().
+       *
+       * (Obviously this is a quite fuzzy heuristic. With more accurate
+       * connection analysis in the owl code we could do this more robustly.)
+       */
+      if (mw[pos] < mz[pos]
+	  || (mw[pos] < 3 * mz[pos] && mz[pos] > 5))
+	pessimistic_min = 0;
 
-	/* If the eyespace is more in contact with own stones not in the
-         * goal, than with ones in the goal, there is a risk that we
-         * can be cut off from a major part of the eyespace. Thus we
-         * can't trust the opinion of compute_eyes().
-	 *
-	 * (Obviously this is a quite fuzzy heuristic. With more
-	 * accurate connection analysis in the owl code we could do
-	 * this more robustly.)
-	 */
-	for (i = 0; i < board_size; i++)
-	  for (j = 0; j < board_size; j++)
-	    if (eye[POS(i, j)].origin == pos
-		&& (mw[POS(i, j)] < mz[POS(i,j)]
-		    || (mw[POS(i, j)] < 3 * mz[POS(i, j)]
-			&& mz[POS(i, j)] > 5)))
-	      pessimistic_min = 0;
-
-	eyes_attack_points[num_eyes] = NO_MOVE;
-	eyevalue_list[num_eyes] = eyevalue;
-	*eyemin += pessimistic_min;
-
-	/* Fill in the value field for use by the owl_eyespace() function. */
-	eye[pos].value = eyevalue;
-	
-	/* This shortcut has been disabled for two reasons:
-	 * 1. Due to the vital attack moves being able to later reduce
-	 * the *eyemin, we can't say that a certain *eyemin is
-	 * sufficient.
-	 * 2. This part of the code is in no way time critical.
-	 */
-#if 0
-	/* Found two certain eyes---look no further. */
-	if (*eyemin >= 2) {
-	  debug = save_debug;
-	  return 2;
-	}
-#endif
-	
-	if (eye_move_urgency(&eyevalue)) {
-	  value = 50;
-	  if (max_eyes(&eyevalue) - min_eyes(&eyevalue) == 2)
-	    value = 70;
-	  else if (max_eyes(&eyevalue) - pessimistic_min == 2)
-	    value = 60;
-	  reason = "vital move";
-	}
-	else if (max_eyes(&eyevalue) != pessimistic_min) {
-	  if (max_eyes(&eyevalue) - pessimistic_min == 2)
-	    value = 40;
-	  else
-	    value = 30;
-	  reason = "marginal eye space";
-	}
-
-	if (value > 0) {
-	  if (does_attack && attack_point != NO_MOVE) {
-	    if (vital_values[attack_point] > 0) {
-	      value += vital_values[attack_point];
-	      if (value > 98)
-		value = 98; /* Higher values may get special interpretation. */
-	    }
-	    
-	    TRACE("%s at %1m, score %d (eye at %1m, value %s, pessimistic_min %d)\n",
-		  reason, attack_point, value,
-		  pos, eyevalue_to_string(&eyevalue), pessimistic_min);
-	    
-	    if (eye[attack_point].marginal
-		&& modify_stupid_eye_vital_point(owl, &attack_point, 1))
-	      TRACE("vital point looked stupid, moved it to %1m\n",
-		    attack_point);
-	    
-	    owl_add_move(moves, attack_point, value, reason, 1, 0, NO_MOVE,
-			 MAX_MOVES);
-	    vital_values[attack_point] = value;
-	    eyes_attack_points[num_eyes] = attack_point;
-	  }
-	  /* The reason for the last set of tests is that we don't
-	   * want to play a self atari in e.g. this position
-	   *
-	   * |XXX.
-	   * |OOX.
-	   * |.OX.
-	   * |XOXX
-	   * |XOOX
-	   * |O*OX
-	   * +----
-	   *
-	   * but it's okay in this position
-	   * 
-	   * |XXXXX
-	   * |....X
-	   * |OOOOX
-	   * |.XXOX
-	   * |.*XOX
-	   * +-----
-	   *
-	   * In both cases * is the vital point according to the graph
-	   * matching. The significant difference is that in the first
-	   * case the vital point is adjacent to stones in the goal.
-	   */
-	  else if (!does_attack
-		   && defense_point != NO_MOVE
-		   && board[defense_point] == EMPTY
-		   && (!liberty_of_goal(defense_point, owl)
-		       || !is_self_atari(defense_point, color)
-		       || is_ko(defense_point, color, NULL)
-		       || safe_move(defense_point, color) != 0)) {
-	    if (vital_values[defense_point] > 0) {
-	      value += vital_values[defense_point];
-	      if (value > 98)
-		value = 98; /* Higher values may get special interpretation. */
-	    }
-	    
-	    TRACE("%s at %1m, score %d (eye at %1m, value %s, pessimistic_min %d)\n",
-		  reason, defense_point, value, pos,
-		  eyevalue_to_string(&eyevalue), pessimistic_min);
-
-	    if ((eye[defense_point].marginal
-		 || eye[defense_point].origin != pos)
-		&& modify_stupid_eye_vital_point(owl, &defense_point, 0))
-	      TRACE("vital point looked stupid, moved it to %1m\n",
-		    defense_point);
-	    
-	    owl_add_move(moves, defense_point, value, reason, 1, 0, NO_MOVE,
-			 MAX_MOVES);
-	    vital_values[defense_point] = value;
+      /* If this eyespace includes an owl inessential string, we must assume
+       * assume that the pessimistic min is 0.
+       *
+       * See owl1:304 for an example where this policy is important.
+       * FIXME: However, a better approach would be to improve inessential
+       *	strings detection (S13 in owl1:304 must count as essential).
+       */
+      if (pessimistic_min > 0) {
+	for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
+	  if (ON_BOARD(pos2)
+	      && eye[pos2].origin == pos
+	      && owl->inessential[pos2]) {
+	    pessimistic_min = 0;
+	    break;
 	  }
 	}
-	num_eyes++;
       }
+
+      eyes_attack_points[num_eyes] = NO_MOVE;
+      eyevalue_list[num_eyes] = eyevalue;
+      *eyemin += pessimistic_min;
+
+      /* Fill in the value field for use by the owl_eyespace() function. */
+      eye[pos].value = eyevalue;
+
+      /* This shortcut has been disabled for two reasons:
+       * 1. Due to the vital attack moves being able to later reduce
+       * the *eyemin, we can't say that a certain *eyemin is
+       * sufficient.
+       * 2. This part of the code is in no way time critical.
+       */
+#if 0
+      /* Found two certain eyes---look no further. */
+      if (*eyemin >= 2) {
+	debug = save_debug;
+	return 2;
+      }
+#endif
+
+      if (eye_move_urgency(&eyevalue)) {
+	value = 50;
+	if (max_eyes(&eyevalue) - min_eyes(&eyevalue) == 2)
+	  value = 70;
+	else if (max_eyes(&eyevalue) - pessimistic_min == 2)
+	  value = 60;
+	reason = "vital move";
+      }
+      else if (max_eyes(&eyevalue) != pessimistic_min) {
+	if (max_eyes(&eyevalue) - pessimistic_min == 2)
+	  value = 40;
+	else
+	  value = 30;
+	reason = "marginal eye space";
+      }
+
+      if (value > 0) {
+	if (does_attack && attack_point != NO_MOVE) {
+	  if (vital_values[attack_point] > 0) {
+	    value += vital_values[attack_point];
+	    if (value > 98)
+	      value = 98; /* Higher values may get special interpretation. */
+	  }
+
+	  TRACE("%s at %1m, score %d (eye at %1m, value %s, pessimistic_min %d)\n",
+		reason, attack_point, value,
+		pos, eyevalue_to_string(&eyevalue), pessimistic_min);
+
+	  if (eye[attack_point].marginal
+	      && modify_stupid_eye_vital_point(owl, &attack_point, 1))
+	    TRACE("vital point looked stupid, moved it to %1m\n",
+		  attack_point);
+
+	  owl_add_move(moves, attack_point, value, reason, 1, 0, NO_MOVE,
+		       MAX_MOVES);
+	  vital_values[attack_point] = value;
+	  eyes_attack_points[num_eyes] = attack_point;
+	}
+
+	/* The reason for the last set of tests is that we don't
+	 * want to play a self atari in e.g. this position
+	 *
+	 * |XXX.
+	 * |OOX.
+	 * |.OX.
+	 * |XOXX
+	 * |XOOX
+	 * |O*OX
+	 * +----
+	 *
+	 * but it's okay in this position
+	 * 
+	 * |XXXXX
+	 * |....X
+	 * |OOOOX
+	 * |.XXOX
+	 * |.*XOX
+	 * +-----
+	 *
+	 * In both cases * is the vital point according to the graph
+	 * matching. The significant difference is that in the first
+	 * case the vital point is adjacent to stones in the goal.
+	 */
+	else if (!does_attack
+		 && defense_point != NO_MOVE
+		 && board[defense_point] == EMPTY
+		 && (!liberty_of_goal(defense_point, owl)
+		     || !is_self_atari(defense_point, color)
+		     || is_ko(defense_point, color, NULL)
+		     || safe_move(defense_point, color) != 0)) {
+	  if (vital_values[defense_point] > 0) {
+	    value += vital_values[defense_point];
+	    if (value > 98)
+	      value = 98; /* Higher values may get special interpretation. */
+	  }
+
+	  TRACE("%s at %1m, score %d (eye at %1m, value %s, pessimistic_min %d)\n",
+		reason, defense_point, value, pos,
+		eyevalue_to_string(&eyevalue), pessimistic_min);
+
+	  if ((eye[defense_point].marginal
+	       || eye[defense_point].origin != pos)
+	      && modify_stupid_eye_vital_point(owl, &defense_point, 0))
+	    TRACE("vital point looked stupid, moved it to %1m\n",
+		  defense_point);
+
+	  owl_add_move(moves, defense_point, value, reason, 1, 0, NO_MOVE,
+		       MAX_MOVES);
+	  vital_values[defense_point] = value;
+	}
+      }
+      num_eyes++;
     }
+  }
 
   /* Sniff each lunch for nutritional value. The assumption is that
    * capturing the lunch is gote, therefore the number of half eyes
@@ -2766,27 +2758,20 @@ owl_determine_life(struct local_owl_data *owl,
 	set_eyevalue(&e, 0, 0, lunch_probable, lunch_probable);
 	*eyemax += lunch_max;
 
-	if (lunch_probable == 0)
+	if (lunch_probable == 0) {
+	  if (countstones(owl->lunch[lunch]) == 1)
+	    continue;
 	  value = 20;
-	else if (lunch_probable == 1 && lunch_max == 1) {
-	  value = 60 + countstones(owl->lunch[lunch]);
 	}
+	else if (lunch_probable == 1 && lunch_max == 1)
+	  value = 60 + countstones(owl->lunch[lunch]);
 	else if (lunch_probable == 1 && lunch_max == 2)
 	  value = 70 + countstones(owl->lunch[lunch]);
 	else
 	  value = 75 + countstones(owl->lunch[lunch]);
-	
+
 	if (owl->lunch_attack_code[lunch] != WIN)
 	  value -= 10;
-
-	if (value < 21  && countstones(owl->lunch[lunch]) == 1) {
-	  /* FIXME: consistent with previous implementation, but
-	   *        is this necessary ? if I'm not mistaken, here
-	   *        e is 0000, so remove this shouldn't hurt ... */
-	  num_lunch++;
-	  eyevalue_list[num_eyes++] = e;
-	  continue;
-	}
 
 	if (does_attack) {
 	  defense_point = improve_lunch_defense(owl->lunch[lunch],
@@ -2799,10 +2784,10 @@ owl_determine_life(struct local_owl_data *owl,
 	     * to be adapted accordingly.
 	     */
 	    int ne;
-	    for (ne = 0; ne < num_eyes - num_lunch; ne++)
+	    for (ne = 0; ne < num_eyes - num_lunches; ne++)
 	      if (eyes_attack_points[ne] == defense_point)
 		break;
-	    gg_assert(ne < num_eyes - num_lunch);
+	    gg_assert(ne < num_eyes - num_lunches);
 	    /* merge eye values */
 	    add_eyevalues(&eyevalue_list[ne], &e, &eyevalue_list[ne]);
 	    /* and adjust */
@@ -2810,7 +2795,7 @@ owl_determine_life(struct local_owl_data *owl,
 	    eyevalue_list[ne].b = 0;
 	  } 
 	  else {
-	    num_lunch++;
+	    num_lunches++;
 	    eyevalue_list[num_eyes++] = e;
 	  }
 
@@ -2828,7 +2813,7 @@ owl_determine_life(struct local_owl_data *owl,
 		lunch_probable, lunch_max);
 	  owl_add_move(moves, attack_point, value, "eat lunch",
 	      	       1, 0, NO_MOVE, MAX_MOVES);
-	  num_lunch++;
+	  num_lunches++;
 	  eyevalue_list[num_eyes++] = e;
 	}
       }
@@ -2837,7 +2822,7 @@ owl_determine_life(struct local_owl_data *owl,
   /* now, totalize the eye potential */
   {
     int ne;
-    for (ne = 0; ne < num_eyes - num_lunch; ne++)
+    for (ne = 0; ne < num_eyes - num_lunches; ne++)
       add_eyevalues(probable_eyes, &eyevalue_list[ne], probable_eyes);
 
     *eyemax += max_eyes(probable_eyes);
@@ -2847,7 +2832,7 @@ owl_determine_life(struct local_owl_data *owl,
      * each other and combination moves (i.e. double threats to create an
      * eye).
      */
-    if (num_eyes - num_lunch > 1 && max_eye_threat(probable_eyes) > 1)
+    if (num_eyes - num_lunches > 1 && max_eye_threat(probable_eyes) > 1)
       *eyemax += 1;
 
     for (; ne < num_eyes; ne++)
@@ -4313,8 +4298,8 @@ owl_connection_defends(int move, int target1, int target2)
 static void
 owl_find_lunches(struct local_owl_data *owl)
 {
-  int m, n;
   int k;
+  int pos;
   int lunches = 0;
   int prevlunch;
   int lunch;
@@ -4336,134 +4321,132 @@ owl_find_lunches(struct local_owl_data *owl)
   memset(owl->inessential, 0, sizeof(owl->inessential));
   
   memset(already_checked, 0, sizeof(already_checked));
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (board[pos] == color && owl->goal[pos]) {
-	/* Loop over the eight neighbors. */
-	for (k = 0; k < 8; k++) {
-	  int d = delta[k];
-	  
-	  /* If the immediate neighbor is empty, we look two steps away. */
-	  if (k < 4 && board[pos + d] == EMPTY)
-	    d *= 2;
-	  
-	  if (board[pos + d] != other)
-	    continue;
-	    
-	  lunch = find_origin(pos + d);
-	  if (already_checked[lunch])
-	    continue;
-	  already_checked[lunch] = 1;
-	  
-	  attack_and_defend(lunch, &acode, &apos, &dcode, &dpos);
-	  if (acode != 0) {
-	    owl->lunch[lunches] = lunch;
-	    owl->lunch_attack_code[lunches]  = acode;
-	    owl->lunch_attack_point[lunches] = apos;
-	    owl->lunch_defend_code[lunches]  = dcode;
-	    if (dcode != 0)
-	      owl->lunch_defense_point[lunches] = dpos;
-	    else
-	      owl->lunch_defense_point[lunches] = NO_MOVE;
-	    lunches++;
-	    if (lunches == MAX_LUNCHES) {
-	      sgf_dumptree = save_sgf_dumptree;
-	      count_variations = save_count_variations;
-	      owl->lunches_are_current = 1;
-	      return;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == color && owl->goal[pos]) {
+      /* Loop over the eight neighbors. */
+      for (k = 0; k < 8; k++) {
+	int pos2 = pos + delta[k];
+
+	/* If the immediate neighbor is empty, we look two steps away. */
+	if (k < 4 && board[pos2] == EMPTY)
+	  pos2 += delta[k];
+
+	if (board[pos2] != other)
+	  continue;
+
+	lunch = find_origin(pos2);
+	if (already_checked[lunch])
+	  continue;
+	already_checked[lunch] = 1;
+
+	attack_and_defend(lunch, &acode, &apos, &dcode, &dpos);
+	if (acode != 0) {
+	  owl->lunch[lunches] = lunch;
+	  owl->lunch_attack_code[lunches]  = acode;
+	  owl->lunch_attack_point[lunches] = apos;
+	  owl->lunch_defend_code[lunches]  = dcode;
+	  if (dcode != 0)
+	    owl->lunch_defense_point[lunches] = dpos;
+	  else
+	    owl->lunch_defense_point[lunches] = NO_MOVE;
+	  lunches++;
+	  if (lunches == MAX_LUNCHES) {
+	    sgf_dumptree = save_sgf_dumptree;
+	    count_variations = save_count_variations;
+	    owl->lunches_are_current = 1;
+	    return;
+	  }
+	}
+	else if (!owl->inessential[lunch]) {
+	  /* Test for inessentiality. */
+	  int adj;
+	  int adjs[MAXCHAIN];
+	  int num_stones;
+	  int stones[MAX_BOARD * MAX_BOARD];
+	  int liberties;
+	  int libs[MAXLIBS];
+	  int r;
+	  int essential = 0;
+	  int superstring[BOARDMAX];
+
+	  /* First check the neighbors of the string. */
+	  adj = chainlinks(lunch, adjs);
+	  for (r = 0; r < adj; r++) {
+	    if (!owl->goal[adjs[r]] || attack(adjs[r], NULL) != 0) {
+	      essential = 1;
+	      break;
 	    }
 	  }
-	  else if (!owl->inessential[lunch]) {
-	    /* Test for inessentiality. */
-	    int adj;
-	    int adjs[MAXCHAIN];
-	    int num_stones;
-	    int stones[MAX_BOARD * MAX_BOARD];
-	    int liberties;
-	    int libs[MAXLIBS];
-	    int r;
-	    int essential = 0;
-	    int superstring[BOARDMAX];
 
-	    /* First check the neighbors of the string. */
-	    adj = chainlinks(lunch, adjs);
-	    for (r = 0; r < adj; r++) {
-	      if (!owl->goal[adjs[r]] || attack(adjs[r], NULL) != 0) {
-		essential = 1;
-		break;
-	      }
-	    }
-	    
-	    if (essential)
-	      continue;
+	  if (essential)
+	    continue;
 
-	    find_superstring_stones_and_liberties(lunch, &num_stones, stones,
-						  &liberties, libs, 0);
+	  find_superstring_stones_and_liberties(lunch, &num_stones, stones,
+						&liberties, libs, 0);
 
-	    memset(superstring, 0, sizeof(superstring));
-	    for (r = 0; r < num_stones; r++)
-	      superstring[stones[r]] = 1;
-	    
-	    for (r = 0; r < liberties; r++) {
-	      int bpos = libs[r];
-	      int goal_found = 0;
-	      int s;
+	  memset(superstring, 0, sizeof(superstring));
+	  for (r = 0; r < num_stones; r++)
+	    superstring[stones[r]] = 1;
 
-	      for (s = 0; s < 4; s++) {
-		int cpos = bpos + delta[s];
+	  for (r = 0; r < liberties; r++) {
+	    int bpos = libs[r];
+	    int goal_found = 0;
+	    int s;
 
-		if (!ON_BOARD(cpos))
-		  continue;
-		if (board[cpos] == color) {
-		  if (attack(cpos, NULL) != 0) {
-		    essential = 1;
-		    break;
-		  }
-		  else if (owl->goal[cpos])
-		    goal_found = 1;
-		  else {
-		    essential = 1;
-		    break;
-		  }
+	    for (s = 0; s < 4; s++) {
+	      int cpos = bpos + delta[s];
+
+	      if (!ON_BOARD(cpos))
+		continue;
+	      if (board[cpos] == color) {
+		if (attack(cpos, NULL) != 0) {
+		  essential = 1;
+		  break;
 		}
-		else if (board[cpos] == other
-			 && !superstring[cpos]) {
+		else if (owl->goal[cpos])
+		  goal_found = 1;
+		else {
 		  essential = 1;
 		  break;
 		}
 	      }
-	      if (!goal_found) {
-		/* Requirement 1 not satisfied. Test requirement 1b.
-		 * N.B. This is a simplified topological eye test.
-		 * The simplification may be good, bad, or neutral.
-		 */
-		int off_board = 0;
-		int diagonal_goal = 0;
-		for (s = 4; s < 8; s++) {
-		  if (!ON_BOARD(bpos + delta[s]))
-		    off_board++;
-		  else if (owl->goal[bpos + delta[s]])
-		    diagonal_goal++;
-		}
-		if (diagonal_goal + (off_board >= 2) < 2)
-		  essential = 1;
-	      }
-
-	      if (essential)
+	      else if (board[cpos] == other
+		       && !superstring[cpos]) {
+		essential = 1;
 		break;
+	      }
 	    }
-	    
-	    if (!essential) {
-	      TRACE("Inessential string found at %1m.\n", lunch);
-	      for (r = 0; r < num_stones; r++)
-		owl->inessential[stones[r]] = 1;
+	    if (!goal_found) {
+	      /* Requirement 1 not satisfied. Test requirement 1b.
+	       * N.B. This is a simplified topological eye test.
+	       * The simplification may be good, bad, or neutral.
+	       */
+	      int off_board = 0;
+	      int diagonal_goal = 0;
+	      for (s = 4; s < 8; s++) {
+		if (!ON_BOARD(bpos + delta[s]))
+		  off_board++;
+		else if (owl->goal[bpos + delta[s]])
+		  diagonal_goal++;
+	      }
+	      if (diagonal_goal + (off_board >= 2) < 2)
+		essential = 1;
 	    }
+
+	    if (essential)
+	      break;
+	  }
+
+	  if (!essential) {
+	    TRACE("Inessential string found at %1m.\n", lunch);
+	    for (r = 0; r < num_stones; r++)
+	      owl->inessential[stones[r]] = 1;
 	  }
 	}
       }
     }
-  
+  }
+
   owl->lunches_are_current = 1;
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
@@ -4635,22 +4618,23 @@ owl_lively(int pos)
   if (other_owl_data) {
     if (other_owl_data->goal[pos] && !semeai_trust_tactical_attack(pos))
       return 1;
+    /* FIXME: Shouldn't we check other_owl_data->inessential[origin] here? */
     for (lunch = 0; lunch < MAX_LUNCHES; lunch++)
       if (other_owl_data->lunch[lunch] == origin
 	  && other_owl_data->lunch_defense_point[lunch] == NO_MOVE)
 	return 0;
   }
-  /* Lunches that can't be saved are dead, so don't report them as lively. */
 
+  /* Inessential stones are not lively. */
+  if (current_owl_data->inessential[origin])
+    return 0;
+
+  /* Lunches that can't be saved are dead, so don't report them as lively. */
   for (lunch = 0; lunch < MAX_LUNCHES; lunch++)
     if (current_owl_data->lunch[lunch] == origin
 	&& current_owl_data->lunch_defense_point[lunch] == NO_MOVE)
       return 0;
-  
-  /* Inessential stones are not lively. */
-  if (current_owl_data->inessential[origin])
-    return 0;
-  
+
   return 1;
 }
 

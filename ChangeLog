@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- owl_determine_life() bugfixed
+- owl.c made completely 1D and other revisions
 - new GTP command analyze_eyegraph
 - new functions analyze_eyegraph(), evaluate_eyespace(), tactical_life(),
   tactical_life_attack(), and tactical_life_defend() in optics.c
