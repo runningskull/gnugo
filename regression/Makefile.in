@@ -79,19 +79,18 @@ install_sh = @install_sh@
 perl = @perl@
 
 TST = 13x13.tst arb.tst arend.tst arion.tst atari_atari.tst blunder.tst \
-       buzco.tst capture.tst connect.tst connect_rot.tst connection.tst \
-       connection_rot.tst cutstone.tst dniwog.tst ego.tst endgame.tst \
-       endgame_rot.tst filllib.tst global.tst golife.tst handtalk.tst \
-       heikki.tst lazarus.tst ld_owl.tst ld_owl_rot.tst \
+       buzco.tst capture.tst century-2002.tst connect.tst connect_rot.tst \
+       connection.tst connection_rot.tst cutstone.tst dniwog.tst ego.tst \
+       endgame.tst endgame_rot.tst filllib.tst global.tst golife.tst \
+       handtalk.tst heikki.tst lazarus.tst ld_owl.tst ld_owl_rot.tst \
        life.tst manyfaces.tst neurogo.tst newscore.tst nicklas1.tst \
        nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst niki.tst \
-       nngs.tst nngs1.tst nngs2.tst optics.tst optics_rot.tst \
-       owl.tst owl1.tst owl_rot.tst reading.tst reading_rot.tst \
-       rosebud.tst score.tst score2.tst score_rot.tst semeai.tst \
-       semeai2.tst strategy.tst strategy2.tst strategy3.tst strategy4.tst \
-       strategy5.tst strategy_rot.tst tactics.tst trevor.tst \
-       trevora.tst trevorb.tst trevorc.tst trevord.tst \
-       vie.tst viking.tst
+       nngs.tst nngs1.tst nngs2.tst optics.tst optics_rot.tst owl.tst \
+       owl1.tst owl_rot.tst reading.tst reading_rot.tst rosebud.tst \
+       score.tst score2.tst score_rot.tst semeai.tst semeai2.tst \
+       strategy.tst strategy2.tst strategy3.tst strategy4.tst \
+       strategy5.tst strategy_rot.tst tactics.tst trevor.tst trevora.tst \
+       trevorb.tst trevorc.tst trevord.tst vie.tst viking.tst
 
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
@@ -250,6 +249,9 @@ buzco: buzco.tst
 
 capture: capture.tst
 	$(srcdir)/eval.sh capture.tst  $(GG_OPTIONS)
+
+century: century-2002.tst
+	$(srcdir)/eval.sh century-2002.tst  $(GG_OPTIONS)
 
 connect: connect.tst
 	$(srcdir)/eval.sh connect.tst $(GG_OPTIONS)
@@ -501,6 +503,7 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) handtalk.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) nngs2.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) strategy5.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) century-2002.tst $(GG_OPTIONS)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
