@@ -2311,6 +2311,21 @@ lively_dragon_exists(int color)
 }
 
 
+/* Is this dragon weak? */
+
+int 
+dragon_weak(int pos)
+{
+  ASSERT_ON_BOARD1(pos);
+  /* FIXME: This should not happen, but avoids a crash.  What is
+   *   the proper fix for calling this at stackp != 0 ?
+   */
+  if (dragon[pos].id < 0 || dragon[pos].id >= number_of_dragons)
+     return 1;
+  return (DRAGON2(pos).weakness > 0.40001);
+}
+
+
 /* ================================================================ */
 /*                      Debugger functions                          */
 /* ================================================================ */

@@ -380,6 +380,7 @@ int owl_topological_eye(int pos, int color);
 int vital_chain(int pos);
 int confirm_safety(int move, int color, int *defense_point,
 		   char safe_stones[BOARDMAX]);
+int dragon_weak(int pos);
 float blunder_size(int move, int color, int *defense_point,
 		   char safe_stones[BOARDMAX]);
 void set_depth_values(int level);

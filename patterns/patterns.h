@@ -298,7 +298,6 @@ int owl_threatens_attack(int apos, int bpos);
 int connect_and_cut_helper(int Apos, int bpos, int cpos);
 int connect_and_cut_helper2(int Apos, int bpos, int cpos, int color);
 int edge_double_sente_helper(int move, int apos, int bpos, int cpos);
-int dragon_weak(int pos);
 void test_attack_either_move(int move, int color, int worma, int wormb);
 int adjacent_to_defendable_stone_in_atari(int str);
 

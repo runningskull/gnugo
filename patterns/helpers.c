@@ -741,20 +741,6 @@ connect_and_cut_helper2(int Apos, int bpos, int cpos, int color)
 
 
 
-/* replaces macro with assert-enabled function */
-int 
-dragon_weak(int pos)
-{
-  ASSERT_ON_BOARD1(pos);
-  /* FIXME: This should not happen, but avoids a crash.  What is
-   *   the proper fix for calling this at stackp != 0 ?
-   */
-  if (dragon[pos].id < 0 || dragon[pos].id >= number_of_dragons)
-     return 1;
-  return (DRAGON2(pos).weakness > 0.40001);
-}
-
-
 void
 test_attack_either_move(int move, int color, int worma, int wormb)
 {
@@ -765,7 +751,7 @@ test_attack_either_move(int move, int color, int worma, int wormb)
 
   if (!defend_both(worma, wormb)) {
     if (0)
-      gprintf("%1m: Rej. attack_either_move for %1m & %1m (can't defend both anyway)\n",
+      gprintf("%1m: Reject attack_either_move for %1m, %1m (can't defend both)\n",
 	      move, worma, wormb);
     return;
   }

@@ -2049,7 +2049,7 @@ gtp_genmove_black(char *s)
   val = genmove(&i, &j, BLACK);
 
   if (resign_allowed && val < 0.0 && ON_BOARD(POS(i, j))) {
-    return gtp_echo("resign");
+    return gtp_success("resign");
   }
 
   play_move(POS(i, j), BLACK);
@@ -2079,7 +2079,7 @@ gtp_genmove_white(char *s)
   val = genmove(&i, &j, WHITE);
 
   if (resign_allowed && val < 0.0 && ON_BOARD(POS(i, j))) {
-    return gtp_echo("resign");
+    return gtp_success("resign");
   }
 
   play_move(POS(i, j), WHITE);
@@ -2114,7 +2114,7 @@ gtp_genmove(char *s)
   val = genmove(&i, &j, color);
 
   if (resign_allowed && val < 0.0 && ON_BOARD(POS(i, j))) {
-    return gtp_echo("resign");
+    return gtp_success("resign");
   }
 
   play_move(POS(i, j), color);
