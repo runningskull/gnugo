@@ -81,7 +81,7 @@ loadsgf golois/Goemate990904-3.sgf
 # white" /gf
 loadsgf golois/Goemate990907-2.sgf
 20 gg_genmove white
-#? [R15]
+#? [R15]*
 
 loadsgf golois/Goemate990911-1.sgf
 21 gg_genmove black
@@ -174,7 +174,7 @@ loadsgf golois/MeilleurCoup0008.sgf
 # tm - K5 seems OK, if a little touch & go.
 loadsgf golois/MeilleurCoup0009.sgf
 43 gg_genmove black
-#? [L8|K5]*
+#? [L8|K5]
 
 loadsgf golois/MeilleurCoup0010.sgf
 44 gg_genmove black

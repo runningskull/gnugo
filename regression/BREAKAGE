@@ -1,3 +1,141 @@
+===================== 3.1.18, experimental =========================
+
+After the test results are updated, we have the following
+results when compiling with --enable-experimental-semeai:
+
+./regress.sh . strategy2.tst
+72 unexpected PASS!
+./regress.sh . nicklas1.tst
+./regress.sh . nicklas2.tst
+904 unexpected FAIL: Correct 'B1|E1', got 'H7'
+./regress.sh . nicklas3.tst
+602 unexpected PASS!
+./regress.sh . nicklas4.tst
+./regress.sh . nicklas5.tst
+1204 unexpected PASS!
+./regress.sh . manyfaces.tst
+./regress.sh . niki.tst
+./regress.sh . trevor.tst
+461 unexpected FAIL: Correct 'E14', got 'S8'
+./regress.sh . tactics.tst
+./regress.sh . buzco.tst
+./regress.sh . strategy3.tst
+./regress.sh . capture.tst
+./regress.sh . connect.tst
+./regress.sh . global.tst
+16 unexpected FAIL: Correct 'O10', got 'Q11'
+46 unexpected PASS!
+./regress.sh . vie.tst
+./regress.sh . arend.tst
+./regress.sh . 13x13.tst
+1 unexpected PASS!
+25 unexpected FAIL: Correct 'J5', got 'L4'
+36 unexpected FAIL: Correct 'C5', got 'B2'
+39 unexpected FAIL: Correct 'H4|J4', got 'B2'
+49 unexpected FAIL: Correct 'K7', got 'E4'
+66 unexpected PASS!
+./regress.sh . trevora.tst
+./regress.sh . trevorb.tst
+./regress.sh . trevorc.tst
+270 unexpected PASS!
+340 unexpected FAIL: Correct 'M3|M4', got 'L2'
+680 unexpected PASS!
+800 unexpected PASS!
+./regress.sh . semeai.tst
+32 unexpected FAIL: Correct 'ALIVE_IN_SEKI ALIVE_IN_SEKI B6', got 'ALIVE_IN_SEKI ALIVE_IN_SEKI B7'
+33 unexpected FAIL: Correct 'ALIVE DEAD B7', got 'ALIVE DEAD B9'
+34 unexpected FAIL: Correct 'ALIVE DEAD S18', got 'ALIVE DEAD T18'
+./regress.sh . strategy4.tst
+155 unexpected FAIL: Correct 'D18', got 'E16'
+168 unexpected FAIL: Correct 'A3|A4', got 'B7'
+188 unexpected PASS!
+190 unexpected FAIL: Correct 'D13', got 'E7'
+197 unexpected FAIL: Correct 'K3|S18', got 'T18'
+199 unexpected FAIL: Correct 'N5|S18', got 'T18'
+200 unexpected FAIL: Correct 'P6|P7|Q7|S18', got 'T18'
+
+========================== 3.1.18 =========================
+
+./regress.sh . owl.tst
+196 unexpected PASS!
+./regress.sh . owl_rot.tst
+150 unexpected FAIL: Correct '0', got '1 G13'
+./regress.sh . strategy.tst
+8 unexpected PASS!
+17 unexpected PASS!
+26 unexpected PASS!
+36 unexpected PASS!
+./regress.sh . arb.tst
+101 unexpected PASS!
+./regress.sh . strategy2.tst
+73 unexpected PASS!
+./regress.sh . nicklas1.tst
+1510 unexpected PASS!
+2301 unexpected PASS!
+./regress.sh . niki.tst
+14 unexpected FAIL: Correct 'F16', got 'G15'
+./regress.sh . trevor.tst
+190 unexpected FAIL: Correct 'B7', got 'H7'
+381 unexpected PASS!
+382 unexpected PASS!
+690 unexpected PASS!
+./regress.sh . strategy3.tst
+119 unexpected PASS!
+121 unexpected PASS!
+./regress.sh . global.tst
+20 unexpected FAIL: Correct 'R15', got 'D6'
+43 unexpected PASS!
+./regress.sh . vie.tst
+16 unexpected PASS!
+19 unexpected PASS!
+./regress.sh . arend.tst
+17 unexpected PASS!
+29 unexpected PASS!
+./regress.sh . 13x13.tst
+14 unexpected PASS!
+17 unexpected PASS!
+48 unexpected FAIL: Correct 'K7', got 'K6'
+59 unexpected PASS!
+61 unexpected FAIL: Correct 'K8', got 'L13'
+64 unexpected FAIL: Correct 'L2|M3|L4|M5', got 'M9'
+72 unexpected FAIL: Correct 'J10', got 'F5'
+79 unexpected PASS!
+82 unexpected PASS!
+./regress.sh . trevora.tst
+280 unexpected FAIL: Correct '!E4', got 'E4'
+460 unexpected FAIL: Correct 'H8', got 'B4'
+600 unexpected PASS!
+./regress.sh . trevorb.tst
+180 unexpected PASS!
+250 unexpected PASS!
+310 unexpected PASS!
+340 unexpected PASS!
+400 unexpected PASS!
+440 unexpected PASS!
+510 unexpected PASS!
+530 unexpected PASS!
+540 unexpected PASS!
+560 unexpected PASS!
+590 unexpected PASS!
+610 unexpected PASS!
+720 unexpected PASS!
+750 unexpected PASS!
+780 unexpected PASS!
+840 unexpected PASS!
+860 unexpected PASS!
+870 unexpected PASS!
+890 unexpected PASS!
+910 unexpected PASS!
+./regress.sh . trevorc.tst
+350 unexpected PASS!
+360 unexpected PASS!
+400 unexpected PASS!
+410 unexpected PASS!
+610 unexpected PASS!
+1070 unexpected PASS!
+
+===================== 3.1.17, experimental =========================
+
 3.1.17 compiled with --enable-experimental-semeai gives the
 following failures:
 

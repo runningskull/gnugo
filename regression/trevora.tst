@@ -152,7 +152,7 @@ loadsgf games/trevor/auto/a015.sgf 20
 #Locally, E5 better than E4.
 loadsgf games/trevor/auto/a016.sgf 18
 280 gg_genmove white
-#? [!E4]
+#? [!E4]*
 
 
 
@@ -294,7 +294,7 @@ loadsgf games/trevor/auto/a029.sgf 14
 #B4, B6 too passive. H8 prob. best.
 loadsgf games/trevor/auto/a030.sgf 22
 460 gg_genmove white
-#? [H8]
+#? [H8]*
 
 
 
@@ -394,7 +394,7 @@ loadsgf games/trevor/auto/a036.sgf 26
 #B4 almost always better in this shape.
 loadsgf games/trevor/auto/a037.sgf 12
 600 gg_genmove white
-#? [!A5]*
+#? [!A5]
 
 
 

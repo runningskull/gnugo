@@ -16,7 +16,7 @@ loadsgf games/incident263.sgf 32
 orientation 2
 loadsgf games/strategy25.sgf 63
 150 owl_attack D15
-#? [0]
+#? [0]*
 
 orientation 3
 loadsgf games/strategy33.sgf 15

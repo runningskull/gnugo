@@ -187,7 +187,7 @@ loadsgf games/trevor/trevor_18.sgf 32
 # Whoops, don't let go of the dragon's tail!
 loadsgf games/trevor/trevor_19.sgf 12
 190 gg_genmove white
-#? [B7]
+#? [B7]*
 
 # W should connect his two dragons.
 loadsgf games/trevor/trevor_20.sgf 14
@@ -367,14 +367,14 @@ loadsgf games/trevor/trevor_38.sgf 22
 # Added E8. /gf
 loadsgf games/trevor/trevor_38.sgf 39
 381 gg_genmove black
-#? [D7|C7|E8]*
+#? [D7|C7|E8]
 
 #CATEGORY=KO_THREATS
 #DESCRIPTION=E9 is terrible for leaving Ko threats.
 #SEVERITY=1
 loadsgf games/trevor/trevor_38.sgf 41
 382 gg_genmove black
-#? [E8]*
+#? [E8]
 
 
 #CATEGORY=PATTERN_TUNING
@@ -572,7 +572,7 @@ loadsgf games/trevor/trevor_68.sgf
 
 loadsgf games/trevor/trevor_69.sgf
 690 owl_attack H2
-#? [1 G2]*
+#? [1 G2]
 
 
 #CATEGORY=OWL_OPTICS

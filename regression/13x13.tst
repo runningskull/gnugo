@@ -83,7 +83,7 @@ loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 22
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 28
 14 gg_genmove white
-#? [!C11]*
+#? [!C11]
 
 #CATEGORY=STRATEGY
 # New failure (comparing 3.1.15 and 3.0.0)
@@ -99,7 +99,7 @@ loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 32
 17 gg_genmove white
-#? [L5|L3]*
+#? [L5|L3]
 
 #CATEGORY=OWL_TUNING
 # This got broke between 3.0.0 and 3.1.14.
@@ -252,14 +252,15 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 7
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 11
 48 gg_genmove black
-#? [K7]
+#? [K7]*
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 13
 49 gg_genmove black
-#? [K7]
+#? [K7]*
 
+# Renumbered since there were 2 test 49's
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 19
-49 gg_genmove black
+149 gg_genmove black
 #? [L7]*
 
 # Here N11 is generated as an "additional attack/defense move", although
@@ -316,7 +317,7 @@ loadsgf games/mertin13x13/gnugo-goliath3.B+16.sgf 55
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 13
 59 gg_genmove black
-#? [!J12]*
+#? [!J12]
 
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 15
 60 gg_genmove black
@@ -324,7 +325,7 @@ loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 15
 
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 75
 61 gg_genmove black
-#? [K8]
+#? [K8]*
 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 13
 62 gg_genmove black
@@ -338,7 +339,7 @@ loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 25
 #CATEGORY=OWL_TUNING
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 33
 64 gg_genmove black
-#? [L2|M3|L4|M5]
+#? [L2|M3|L4|M5]*
 
 # New failure (comparing 3.0.0 and 3.1.15)
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 35
@@ -379,7 +380,7 @@ loadsgf games/mertin13x13/gnugo-gointellect1.W+28.sgf 19
 
 loadsgf games/mertin13x13/gnugo-gointellect1.W+28.sgf 29
 72 gg_genmove black
-#? [J10]
+#? [J10]*
 
 # New failure (comparing 3.1.15 with 3.0.0)
 # The "attack last move played, although it seems bad" heuristic sometimes
@@ -416,7 +417,7 @@ loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 21
 
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 23
 79 gg_genmove black
-#? [M5]*
+#? [M5]
 
 # M2 is better for eye shape here.
 # New failure (comparing 3.1.15 with 3.0.0)
@@ -432,7 +433,7 @@ loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 55
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 11
 82 gg_genmove black
-#? [K4]*
+#? [K4]
 
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 23
 83 gg_genmove black

@@ -12,7 +12,7 @@ reset_reading_node_counter
 
 loadsgf games/arb/game01.sgf 53
 101 gg_genmove black
-#? [(C2|D2|F2|G2|F1|D1|E1)]*
+#? [(C2|D2|F2|G2|F1|D1|E1)]
 
 loadsgf games/arb/game01.sgf 54
 102 gg_genmove white

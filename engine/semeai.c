@@ -168,6 +168,26 @@ new_semeai(int color)
 	    || DRAGON2(bpos).safety == INESSENTIAL)
 	  continue;
 	
+	/* A dragon consisting of a single worm which is tactically dead or
+	 * critical and having just one neighbor should be ignored.
+	 */
+	if (dragon[apos].size == worm[apos].size
+	    && worm[apos].attack_codes[0] == WIN
+	    && DRAGON2(apos).hostile_neighbors == 1)
+	  continue;
+	if (dragon[bpos].size == worm[bpos].size
+	    && worm[bpos].attack_codes[0] == WIN
+	    && DRAGON2(bpos).hostile_neighbors == 1)
+	  continue;
+
+	/* If one dragon consist of a single stone, don't treat it
+	 * as a semeai. (But see nicklas1:1405 for an example where
+	 * this rule is bad.
+	 */
+
+	if (dragon[apos].size == 1 || dragon[bpos].size == 1)
+	  continue;
+
 	semeai_found = 1;
 	a_best_status = UNKNOWN;
 	b_best_status = UNKNOWN;

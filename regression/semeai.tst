@@ -173,3 +173,17 @@ loadsgf games/strategy11.sgf 127
 loadsgf games/strategy11.sgf 127
 31 owl_analyze_semeai G4 B3
 #? [ALIVE DEAD C1]*
+
+loadsgf games/nicklas/nicklas14.sgf 55
+32 owl_analyze_semeai B8 D9
+#? [ALIVE_IN_SEKI ALIVE_IN_SEKI B6]*
+
+loadsgf games/nicklas/nicklas14.sgf 55
+33 owl_analyze_semeai D9 B8
+#? [ALIVE DEAD B7]*
+
+# S18 produces a favorable ko. T18 makes seki.
+loadsgf games/bretz.sgf 130
+34 owl_analyze_semeai N18 Q18
+#? [ALIVE DEAD S18]*
+

@@ -722,7 +722,7 @@ loadsgf games/strategy33.sgf 119
 195 owl_attack B11
 #? [1 (B10|A9|C9|A10|A8)]
 196 owl_defend B11
-#? [1 (B10|A9)]*
+#? [1 (B10|A9)]
 197 owl_attack D15
 #? [1 (F18|G19)]
 198 owl_defend D15

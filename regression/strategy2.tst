@@ -123,7 +123,7 @@ loadsgf games/strategy19.sgf 94
 # I have added R17, as it seems to kill the huge black dragon --arend
 loadsgf games/semeai2.sgf 116
 73 gg_genmove white
-#? [F7|R17]*
+#? [F7|R17]
 
 # I have added R17, as it seems to kill the huge black dragon --arend
 loadsgf games/semeai2.sgf 118

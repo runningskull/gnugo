@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.18 released December 23, 2001
+
 - 1D conversion of incremental.texi
 - new function dragon_looks_inessential() in dragon.c
 - adjusted_worm_attack_value() revised
@@ -9,8 +11,7 @@
 - new local struct aa_move in combinations.c
 - new pattern class 'c' for conditional moves in aa_attackspats.db
 - atari_atari() tries to attack smallest targets first
-- combinations() reports multiple defense moves when the opponent
-  has an atari_atari attack sequence
+- combinations() finds multiple defenses when opponent has a combination attack
 - new gtp commands owl_connection_defends and owl_substantial
 - mkpat checks that main diagram and constraint diagram have the same size 
 - mkpat stricter in parsing of classification field

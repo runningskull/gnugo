@@ -712,15 +712,16 @@ initialize_supplementary_dragon_data()
 
   /* Initialize the rest of the dragon2 data. */
   for (d = 0; d < number_of_dragons; d++) {
-    dragon2[d].neighbors    = 0;
-    dragon2[d].moyo         = -1;
-    dragon2[d].safety       = -1;
-    dragon2[d].escape_route = 0;
-    dragon2[d].genus        = 0;
-    dragon2[d].heyes        = 0;
-    dragon2[d].heye         = NO_MOVE;
-    dragon2[d].lunch        = NO_MOVE;
-    dragon2[d].semeai       = 0;
+    dragon2[d].neighbors            = 0;
+    dragon2[d].hostile_neighbors    = 0;
+    dragon2[d].moyo                 = -1;
+    dragon2[d].safety               = -1;
+    dragon2[d].escape_route         = 0;
+    dragon2[d].genus                = 0;
+    dragon2[d].heyes                = 0;
+    dragon2[d].heye                 = NO_MOVE;
+    dragon2[d].lunch                = NO_MOVE;
+    dragon2[d].semeai               = 0;
     dragon2[d].semeai_margin_of_safety = -1;
   }
 
@@ -912,6 +913,8 @@ add_adjacent_dragon(int a, int b)
       return;
 
   dragon2[a].adjacent[dragon2[a].neighbors++] = b;
+  if (DRAGON(a).color == OTHER_COLOR(DRAGON(b).color))
+    dragon2[a].hostile_neighbors++;
 }
 
 /* A dragon is considered invincible if it satisfies either of the two
@@ -1783,7 +1786,7 @@ report_dragon(int m, int n)
   gprintf("neighbor dragons: ");
   for (k = 0; k < d2->neighbors; k++)
     gprintf("%1m ", dragon2[d2->adjacent[k]].origin);
-
+  gprintf("\nhostile neighbors: %d\n", d2->hostile_neighbors);
   gprintf("\nmoyo: %d; safety: %d\n", d2->moyo, d2->safety);
 }
 

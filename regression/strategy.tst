@@ -38,7 +38,7 @@ loadsgf games/incident104.sgf 215
 # incident 107
 loadsgf games/incident107.sgf 216
 8 gg_genmove black
-#? [N2|N1]*
+#? [N2|N1]
 
 # incident 109
 loadsgf games/incident108b.sgf 172
@@ -98,7 +98,7 @@ loadsgf games/incident121.sgf 116
 # incident 165
 loadsgf games/incident165.sgf 108
 17 gg_genmove black
-#? [N11]*
+#? [N11]
 
 
 #CATEGORY=DYNAMIC_READING
@@ -157,7 +157,7 @@ loadsgf games/incident291.sgf 250
 
 loadsgf games/strategy5.sgf 12
 26 gg_genmove black
-#? [D3]*
+#? [D3]
 
 
 #CATEGORY=PATTERN_TUNING
@@ -210,7 +210,7 @@ loadsgf games/nicklas/nicklas8.sgf 80
 
 loadsgf games/nicklas/nicklas8.sgf 82
 36 gg_genmove black
-#? [!D18]*
+#? [!D18]
 
 loadsgf games/nicklas/nicklas8.sgf 84
 37 gg_genmove black

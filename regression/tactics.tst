@@ -18,7 +18,8 @@ loadsgf games/tactics03.sgf
 
 # This is in part an atari_atari problem. The best local move is K18
 # though J18 or G18 might be acceptable.
-4 loadsgf games/rosebud4.sgf
+loadsgf games/rosebud4.sgf 138
+4 gg_genmove white
 #? [K18]*
 
 

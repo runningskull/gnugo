@@ -679,6 +679,7 @@ struct dragon_data2 {
   int origin;                         /* the origin of the dragon            */
   int adjacent[MAX_NEIGHBOR_DRAGONS]; /* adjacent dragons                    */
   int neighbors;                      /* number of adjacent dragons          */
+  int hostile_neighbors;              /* neighbors of opposite color         */
   int moyo;                           /* size of surrounding influence moyo  */
   int safety;                         /* a more detailed status estimate     */
   int escape_route; /* a measurement of likelihood of escape                 */

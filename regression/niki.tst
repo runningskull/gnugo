@@ -94,7 +94,7 @@ loadsgf games/niki.sgf 226
 #SEVERITY=8
 loadsgf games/niki.sgf 214
 14 gg_genmove white
-#? [F16]
+#? [F16]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
