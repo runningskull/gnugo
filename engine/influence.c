@@ -129,13 +129,8 @@ static int debug_influence_j = -1;
 	  int a = (arg_di)*(i-m) + (arg_dj)*(j-n); \
 	  contribution *= (a*a) * b; /* contribution *= cos(phi) */ \
 	} \
-	if (contribution <= INFLUENCE_CUTOFF) { \
-          if (permeability < 1.0 || q->w[arg_i][arg_j] != 0.0) \
-	    continue; \
-          else { \
-            contribution = 1.01 * INFLUENCE_CUTOFF; \
-	  } \
-	} \
+	if (contribution <= INFLUENCE_CUTOFF) \
+	  continue; \
 	if (q->w[arg_i][arg_j] == 0.0) { \
 	  q->queuei[queue_end] = (arg_i); \
 	  q->queuej[queue_end] = (arg_j); \
@@ -241,7 +236,7 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
 	 */
 	if (d > 3) { /* diagonal movement */
 	  permeability *= gg_max(permeability_array[i+di][j],
-				         permeability_array[i][j+dj]);
+				 permeability_array[i][j+dj]);
 	  inv_damping = inv_diagonal_damping;
 	  dfactor = 0.5;
 	}
@@ -253,7 +248,7 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
 	if (permeability == 0.0)
 	  continue;
 
-	contribution = permeability * current_strength * inv_diagonal_damping;
+	contribution = permeability * current_strength * inv_damping;
 
 	/* Finally direction dependent damping. */
 	if (i != m || j != n) {
@@ -263,14 +258,8 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
 	}
 
 	/* Stop spreading influence if the contribution becomes too low. */
-	if (contribution <= INFLUENCE_CUTOFF) {
-          if (permeability_array[i][j] < 1.0 
-	      || (d > 3 && diagonal_permeability < 1.0)
-	      || q->w[i+di][j+dj] != 0.0)
-	    continue;
-          else
-            contribution = 1.01 * INFLUENCE_CUTOFF;
-	}
+	if (contribution <= INFLUENCE_CUTOFF)
+	  continue;
 	
 	/* If no influence here before, add the point to the queue for
 	 * further spreading.
@@ -1096,8 +1085,7 @@ compute_influence(struct influence_data *q, int color, int m, int n,
 	accumulate_influence(q, i, j, BLACK);
     }
 
-  if (q->is_territorial_influence)
-    value_territory(q, m, n, color);
+  value_territory(q, m, n, color);
   segment_influence(q);
   
   if (((q == &initial_influence || q == &initial_opposite_influence)
@@ -1123,13 +1111,14 @@ whose_territory(struct influence_data *q, int m, int n)
 {
   float bi = q->black_influence[m][n];
   float wi = q->white_influence[m][n];
+  float terr = q->territory_value[m][n];
 
   ASSERT_ON_BOARD2(m, n);
   
-  if (bi > 0.0 && wi == 0.0)
+  if (bi > 0.0 && wi == 0.0 && terr < -0.95)
     return BLACK;
 
-  if (wi > 0.0 && bi == 0.0)
+  if (wi > 0.0 && bi == 0.0 && terr > 0.95)
     return WHITE;
 
   return EMPTY;
@@ -1184,9 +1173,9 @@ whose_moyo_restricted(struct influence_data *q, int m, int n)
   /* default */
   if (territory_color != EMPTY)
     color = territory_color;
-  else if ((bi > 10.0 * wi && bi > 10.0 && wi < 10.0) || bi > 25.0 * wi)
+  else if (bi > 10.0 * wi && bi > 10.0 && wi < 10.0)
     color = BLACK;
-  else if ((wi > 10.0 * bi && wi > 10.0 && bi < 10.0) || wi > 25.0 * bi)
+  else if (wi > 10.0 * bi && wi > 10.0 && bi < 10.0)
     color = WHITE;
   else
     color = EMPTY;
