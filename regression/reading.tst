@@ -1,5 +1,4 @@
 # Reset reading node counter
-orientation 8
 reset_reading_node_counter
 
 # incident 2
