@@ -1,0 +1,13 @@
+(;GM[1]FF[4]
+SZ[9]HA[0]KM[0.5]
+PW[speciman]WR[12k*]
+PB[GnuGo (GNU Go 3.1.32)]BR[13k*]
+PC[NNGS]DT[2002-04-21]AP[gnugoclient:2.0]
+RE[W+5.5]
+;B[ee];W[fg];B[gf];W[ef];B[gg];W[de];B[ed];W[dd];B[cc];W[dc];B[cd]
+C[L:7];W[ce];B[ff]C[L:8];W[eg];B[db]C[L:9];W[eb];B[be]C[L:8];W[bf]
+;B[ad]C[L:9];W[gc];B[gh]C[L:7];W[fh];B[cb]C[L:8];W[fe];B[af]C[L:9]
+;W[bg];B[fd]C[L:10];W[ge];B[gd];W[he];B[hd];W[hc];B[id];W[hf];B[hg]
+;W[gi];B[hi];W[fi];B[ih];W[ec];B[ag];W[ah];B[ea];W[fa];B[da];W[fc]
+;B[ie];W[ic];B[if];W[ae];B[af];W[ag];B[];W[ae];B[bd];W[af];B[bb];W[]
+;B[]C[final_score: W+5.5])
