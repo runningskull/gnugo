@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- break-in code turned off below level 10; other level cutoffs revised
 - support for ranges in sgf files
 - time summaries reported with --showtime in gmp mode
 - TODO revised.
