@@ -1,17 +1,18 @@
 TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       ld_owl.tst ld_owl_life.tst connection.tst  \
       neurogo.tst arb.tst strategy2.tst strategy3.tst rosebud.tst \
-      owl_rot.tst heikki.tst golife.tst dniwog.tst strategy4.tst \
+      heikki.tst golife.tst dniwog.tst strategy4.tst \
       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst \
       filllib.tst arion.tst endgame.tst viking.tst ego.tst atari_atari.tst \
       score.tst manyfaces.tst cutstone.tst newscore.tst blunder.tst \
       niki.tst trevor.tst tactics.tst buzco.tst \
-      capture.tst connect.tst global.tst vie.tst
+      capture.tst connect.tst global.tst vie.tst \
+      owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
 EXTRA_DIST = golois games $(TST) $(noinst_SCRIPTS) regress.awk \
-             STRATEGY NICKLAS READING rot0 rot1 rot5 BREAKAGE \
+             STRATEGY NICKLAS READING BREAKAGE \
 	     regress.pl
 
 # Remove these files here... they are created locally
@@ -53,6 +54,9 @@ filllib: filllib.tst
 
 strategy: strategy.tst
 	$(srcdir)/eval.sh strategy.tst
+
+strategy_rot: strategy_rot.tst
+	$(srcdir)/eval.sh strategy_rot.tst
 
 strategy2: strategy2.tst
 	$(srcdir)/eval.sh strategy2.tst
@@ -120,6 +124,9 @@ manyfaces: manyfaces.tst
 score: score.tst
 	$(srcdir)/eval.sh score.tst
 
+score_rot: score_rot.tst
+	$(srcdir)/eval.sh score_rot.tst
+
 newscore: newscore.tst
 	$(srcdir)/eval.sh newscore.tst
 
@@ -159,6 +166,9 @@ capture: capture.tst
 
 connect: connect.tst
 	$(srcdir)/eval.sh connect.tst
+
+connect_rot: connect_rot.tst
+	$(srcdir)/eval.sh connect_rot.tst
 
 global: global.tst
 	$(srcdir)/eval.sh global.tst
