@@ -647,7 +647,7 @@ loadsgf games/reading35.sgf
 #? [1 C7]*
 
 # See also 13x13:78
-loadsgf games/reading36.sgf
+loadsgf games/reading36.sgf 23
 165 attack L4
 #? [1 K3]*
 
