@@ -4194,10 +4194,14 @@ draw_back(int str, int *move, int komaster, int kom_pos)
     findlib(adjs[r], 2, libs);
     for (k = 0; k < 2; k++) {
       if (!liberty_of_string(libs[k], str)
-	  && (liberty_of_string(SOUTH(libs[k]), str)
-	      || liberty_of_string(WEST(libs[k]), str)
-	      || liberty_of_string(NORTH(libs[k]), str)
-	      || liberty_of_string(EAST(libs[k]), str))) {
+	     && ((ON_BOARD1(SOUTH(libs[k]))
+		     && liberty_of_string(SOUTH(libs[k]), str))
+	      || (ON_BOARD1(WEST(libs[k]))
+	      	     && liberty_of_string(WEST(libs[k]), str))
+	      || (ON_BOARD1(NORTH(libs[k]))
+	             && liberty_of_string(NORTH(libs[k]), str))
+	      || (ON_BOARD1(EAST(libs[k]))
+	             && liberty_of_string(EAST(libs[k]), str)))) {
 	if (trymove(libs[k], OTHER_COLOR(board[str]), "draw_back", str,
 		    komaster, kom_pos)) {
 	  int dcode = do_find_defense(str, NULL, komaster, kom_pos);

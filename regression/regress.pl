@@ -320,13 +320,13 @@ while (defined($next_cmd))
 	      	  print "$num skipped.\n";
 	      	  html_results ($num, "skipped", "&nbsp;", "&nbsp;", 0);
 	      } else {
-	        foreach (times) {
-	          print  "$_  ";
-	        } print ":TIMES\n";
+	        #foreach (times) {
+	        #  print  "$_  ";
+	        #} print ":TIMES\n";
    	        print "TST: $negate - $correct_re - $fail - $ignore\n" if $verbose > 1;
    	      
 		    if (!$ignore) {
-		      my $match_result = $result =~ $correct_re ;
+		      my $match_result = $result =~ /^$correct_re$/ ;
 		      if ($negate) {
 			$match_result = ! $match_result;
 		      }
@@ -339,8 +339,11 @@ while (defined($next_cmd))
 			} else {
 			  if ($verbose) {
 			    print "$num passed\n";
-			    html_results  ( $num, "passed", "$bang$correct_re", "$result",  1);
 			  }
+			  if ($verbose >=2 ) {
+			    print "  Correct: '$bang$correct_re', got '$result'\n";
+			  }
+		          html_results  ( $num, "passed", "$bang$correct_re", "$result",  1);
 			}
 		      } else {
 		        $failures++;
@@ -353,8 +356,8 @@ while (defined($next_cmd))
 			  push @failed_links, $num;
 			  if ($verbose) {
 			    print "$num failed: Correct '$bang$correct_re', got '$result'\n";
-			    html_results ($num, "failed", "$bang$correct_re", "$result", 1);
 			  }
+    		          html_results ($num, "failed", "$bang$correct_re", "$result", 1);
 			}
 		      }
 		    }
@@ -448,10 +451,11 @@ sub html_results {
 	  	print $brd "<TR><TD>correct:</TD><TD>$correct<BR></TD></TR>\n";
 	  	print $brd "<TR><TD>answer:</TD><TD>$incorrect</TD></TR>\n";
 	  	print $brd "<TR><TD>gtp:</TD><TD>$prev_cmd</TD></TR>\n";
-	  	foreach ("DESCRIPTION", "CATEGORY", "SEVERITY") {
-	  	  $html_whole_gtp =~ /$_=(.*?)<BR>/)
-	  	  $_ = defined($1) ? $1 : "";
-	          print $brd "<TR><TD>".lc($_).":</TD><TD>$1</TD>\n";
+	  	foreach my $listval ("DESCRIPTION", "CATEGORY", "SEVERITY") {
+	  	  my $astxt;
+	  	  $html_whole_gtp =~ /$listval=(.*?)<BR>/;
+	  	  if (defined($1)) {$astxt = $1;} else {$astxt = "";};
+	          print $brd "<TR><TD>".lc($listval).":</TD><TD>$astxt</TD>\n";
   	        }
 	  	print $brd "</TABLE>\n\n<HR>\n";
 	  	print $brd "<A HREF=\"$num.sgf\">sgf board</A><HR>\n";
@@ -748,20 +752,20 @@ sub eat_board {
               my $markcolor = "";
               my $status = $stones{$iA.$j};
               if ($status =~ /;known_wrong;/) {
-                print "  known_wrong: $iA$j\n";
+                #print "  known_wrong: $iA$j\n";
                 $markcolor = "magenta";
               }
               if ($status =~ /;known_right;/) {
-                print "  known_right: $iA$j\n";
+                #print "  known_right: $iA$j\n";
                 $markcolor = "green";
               }
               if ($status =~ /;try_right;/) {
-                print "  try_right: $iA$j\n";
+                #print "  try_right: $iA$j\n";
                 $markcolor = "cyan";
               }              
               if ($status =~ /;try_wrong;/) {
-                print "  try_wrong: $iA$j\n";
-                $markcolor = "red";
+                #print "  try_wrong: $iA$j\n";
+                $markcolor = "yellow";
               }
               
               $colorboard_imgsrc = createPngFile($bw, $img_pix_size, "", $dragonletter, $dragoncolor, $markcolor);

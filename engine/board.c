@@ -1664,6 +1664,8 @@ is_self_atari(int pos, int color)
 int
 liberty_of_string(int pos, int str)
 {
+  ASSERT_ON_BOARD1(pos);
+  ASSERT_ON_BOARD1(str);
   if (IS_STONE(board[pos]))
     return 0;
 
@@ -1681,6 +1683,8 @@ neighbor_of_string(int pos, int str)
   int s;
   int color = board[str];
 
+  ASSERT_ON_BOARD1(str);
+  ASSERT_ON_BOARD1(pos);
   ASSERT1(IS_STONE(color), str);
 
   if (!strings_initialized)

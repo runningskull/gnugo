@@ -28,7 +28,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
-#ifndef HAVE_VISUAL_C
+#ifndef WIN32
 #include <sys/times.h>
 #endif
 

@@ -107,8 +107,10 @@ loadsgf games/eyes3.sgf
 #? [0 1 J18 J18]
 # Correct answer to 322 should be 0 2 G17 G17, a chimera, but this is
 # temporarily changed to accomodate for a workaround in the code.
+# When run w/out --life, gg gets the "true" correct answer.
+#   So, adding the correct answer as an option:  -Trevor
 322 eval_eye F17
-#? [1 2 G17 G17]
+#? [(0|1) 2 G17 G17]
 323 eval_eye O19
 #? [1 1]
 324 eval_eye K13

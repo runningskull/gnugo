@@ -31,6 +31,10 @@ loadsgf games/ego.sgf 54
 4 gg_genmove white
 #? [!(G19|H19|K17)]*
 
+
+#CATEGORY=
+#DESCRIPTION=Why is B15 so bad?  -Trevor
+#SEVERITY=0
 # D7 is a good move.
 loadsgf games/ego.sgf 68
 5 gg_genmove white

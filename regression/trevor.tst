@@ -351,3 +351,102 @@ loadsgf games/trevor/trevor_36.sgf
 360 owl_defend G8
 #? [(2|3) J9]*
 
+#CATEGORY=OWL_BUG
+#DESCRIPTION=Can safely connect out!
+#SEVERITY=10
+loadsgf games/trevor/trevor_37.sgf
+370 owl_defend C9
+#? [1 F8]*
+
+
+#CATEGORY=PATTERN_TUNING
+#DESCRIPTION=E3 is certainly better locally
+#SEVERITY=2
+loadsgf games/trevor/trevor_38.sgf 22
+380 gg_genmove white
+#? [!E4]*
+
+#CATEGORY=READING
+#DESCRIPTION=C6 is wrong way to protect the cut.  Loses one point.
+#SEVERITY=3
+loadsgf games/trevor/trevor_38.sgf 39
+381 gg_genmove black
+#? [D7|C7]*
+
+#CATEGORY=KO_THREATS
+#DESCRIPTION=E9 is terrible for leaving Ko threats.
+#SEVERITY=1
+loadsgf games/trevor/trevor_38.sgf 41
+382 gg_genmove black
+#? [E8]*
+
+
+#CATEGORY=PATTERN_TUNING
+#DESCRIPTION=White misses cut.
+#SEVERITY=10
+loadsgf games/trevor/trevor_39.sgf 38
+390 gg_genmove white
+#? [!PASS]*
+
+
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=F8 is tough to find, but not too tough.
+#SEVERITY=3
+loadsgf games/trevor/trevor_40.sgf 1
+400 gg_genmove black
+#? [F8]*
+
+#CATEGORY=
+#DESCRIPTION=White can live!
+#SEVERITY=4
+loadsgf games/trevor/trevor_40a.sgf 2
+401 gg_genmove white
+#? [F8]*
+
+#CATEGORY=
+#DESCRIPTION=White can live!
+#SEVERITY=8
+loadsgf games/trevor/trevor_40.sgf 2
+402 gg_genmove white
+#? [!PASS]*
+
+
+#CATEGORY=PATTERN_TUNING
+#DESCRIPTION=Black should block, not play B4.
+#SEVERITY=5
+loadsgf games/trevor/trevor_41.sgf 29
+410 gg_genmove black
+#? [D5|E5]*
+
+#CATEGORY=BLUNDER
+#DESCRIPTION=A3 leaves behind a double-atari.
+#SEVERITY=10
+loadsgf games/trevor/trevor_41.sgf 35
+411 gg_genmove black
+#? [!A3]*
+
+#CATEGORY=TACTICAL_READING
+#DESCRIPTION=D4 worm is more important to save than B2.
+#SEVERITY=3
+loadsgf games/trevor/trevor_41.sgf 37
+412 gg_genmove black
+#? [C4]*
+
+#CATEGORY=KO
+#DESCRIPTION=Terrible confusion on GnuGo's part here.
+#SEVERITY=10
+#Submitted by:softlife@8848.net (Cai Qiang)
+#Cai said: I made a play between GnuGo 3.0.0 and FunGo with 3 
+#  handicaps. Gnugo played quite well. And in the end it almost 
+#  killed a corner of FunGo, but it played a big blunder:-(. 
+#  Attachment is the SGF file.
+loadsgf games/trevor/trevor_42.sgf 211
+420 gg_genmove black
+#? [G16]*
+
+#CATEGORY=TACTICAL_READING
+#DESCRIPTION=Minus 1 point, attacking very dead stone.
+#SEVERITY=10
+loadsgf games/trevor/trevor_42.sgf 191
+421 gg_genmove black
+#? [!C2]*
