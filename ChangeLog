@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- owl code reorganization
+- new clear_owl_move_data() set_single_owl_move(), 
+- break out reading_limit_reached(), owl_estimate_life() 
+  from do_owl_attack/defend 
+- mode local_owl_node_counter global variable for owl.c
+- made long "if (pass == ...)" statements "switch (pass)" in owl.c
+- eliminated unnecessary variable "found_read_result" in owl.c
 - new strategic_effective_size()
 - computation of strategic effect is modified
 - new static read_eye() tries to improve recognize_eye() results
