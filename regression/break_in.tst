@@ -8,12 +8,12 @@ trymove white F2
 #? [0]
 popgo
 
-loadsgf games/break_in.sgf
-30 break_in D7 F9 G9 H9 J9 F8 G8 H8 J8 G7 H7 J7 H6 J6 G5 H5 J5 H4 J4 G3 H3 J3 H2 J2 H1 J1 
-#? [G7|G5]
+#loadsgf games/break_in.sgf
+#30 break_in D7 F9 G9 H9 J9 F8 G8 H8 J8 G7 H7 J7 H6 J6 G5 H5 J5 H4 J4 G3 H3 J3 H2 J2 H1 J1 
+##? [G7|G5]
 
-40 reg_genmove black
-#? [G7|G5]
+#40 reg_genmove black
+##? [G7|G5]
 
 loadsgf games/trevor/auto/a013.sgf 20
 trymove white C4
