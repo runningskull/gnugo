@@ -136,35 +136,35 @@ loadsgf games/strategy44.sgf
 176 gg_genmove black
 #? [D9]
 
-loadsgf games/xxxlin.sgf 8
+loadsgf games/xxlin.sgf 8
 177 gg_genmove black
 #? [E2]
 
-loadsgf games/xxxlin.sgf 16
+loadsgf games/xxlin.sgf 16
 178 gg_genmove black
 #? [P4|P3]
 
-loadsgf games/xxxlin.sgf 20
+loadsgf games/xxlin.sgf 20
 179 gg_genmove black
 #? [P3|O2|P2|O4]
 
-loadsgf games/xxxlin.sgf 30
+loadsgf games/xxlin.sgf 30
 180 gg_genmove black
 #? [Q8]
 
-loadsgf games/xxxlin.sgf 38
+loadsgf games/xxlin.sgf 38
 181 gg_genmove black
 #? [F3]
 
-loadsgf games/xxxlin.sgf 48
+loadsgf games/xxlin.sgf 48
 182 gg_genmove black
 #? [E7|F8]
 
-loadsgf games/xxxlin.sgf 76
+loadsgf games/xxlin.sgf 76
 183 gg_genmove black
 #? [P10]
 
-loadsgf games/xxxlin.sgf 106
+loadsgf games/xxlin.sgf 106
 183 gg_genmove black
 #? [H13]
 
