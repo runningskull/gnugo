@@ -753,7 +753,7 @@ store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
     for (r = 0; r < 4; r++) {
       int pos2 = pos + delta[r];
       if (ON_BOARD(pos2) && board[pos2] != other && active[pos2] != 0) {
-       mark_string(pos, active, (char) 1);
+	mark_string(pos, active, (char) 1);
 	break;
       }
     }

@@ -2,12 +2,15 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- owl_determine_life is careful if saving a lunch attacks an eye
 - bugfix: typo in store_persistent_reading_cache()
 - major cleanup in influence.[ch]
 - pre-rotated pattern generation in mkpat. (-p option) implemented.
 - %2m added as valid syntax for gprintf
 - relabel rotation matrices in transform.c
 - bugfix in atari_atari_blunder_size: don't crash on inconsistent defense
+- eye tuning
+- owl tuning
 
 3.3.11 released October 29, 2002
 
