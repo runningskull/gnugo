@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in read_eye()	
 - bugfix in fast_defense()
 - improved printing of hashvalues
 - bugfix in atari_atari_blunder_size()	

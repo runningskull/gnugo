@@ -1204,7 +1204,7 @@ read_eye(int pos, int *attack_point, int *defense_point,
       vital = black_vital_points;
     for (k = 0; k < best_vp->num_defenses && k < MAX_EYE_ATTACKS; k++)
       vital[pos].defense_points[k] = best_vp->defenses[k];
-    for (k = 0; k < best_vp->num_attacks; k++)
+    for (k = 0; k < best_vp->num_attacks && k < MAX_EYE_ATTACKS; k++)
       vital[pos].attack_points[k] = best_vp->attacks[k];
   }
 
