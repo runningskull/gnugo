@@ -384,10 +384,16 @@ attack_and_defend(int str,
 					   NULL, NULL);
       di = search_persistent_reading_cache(FIND_DEFENSE, find_origin(str),
 					   NULL, NULL);
-      if (ai != -1)
-        delete_persistent_reading_entry(ai);
-      if (di != -1)
-        delete_persistent_reading_entry(di);
+      while (ai != -1) {
+	delete_persistent_reading_entry(ai);
+	ai = search_persistent_reading_cache(ATTACK, find_origin(str),
+					     NULL, NULL);
+      }
+      while (di != -1) {
+	delete_persistent_reading_entry(di);
+	di = search_persistent_reading_cache(FIND_DEFENSE, find_origin(str),
+					     NULL, NULL);
+      }
       acode = attack(str, &apos);
       if (acode != 0)
         dcode = find_defense(str, &dpos);
