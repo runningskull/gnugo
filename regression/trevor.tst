@@ -516,6 +516,14 @@ loadsgf games/trevor/trevor_48.sgf
 #? [1 B8]*
 
 
+#CATEGORY=TACTICAL_READING
+#DESCRIPTION=See problem this causes w/ owl in Pattern D805
+#SEVERITY=7
+loadsgf games/trevor/trevor_59.sgf
+590 attack A18*
+#? [0]
+
+
 
 #CATEGORY=OWL_EYES
 #DESCRIPTION=Fixed by eye pattern 402

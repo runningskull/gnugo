@@ -6,8 +6,10 @@ reset_trymove_counter
 
 loadsgf games/gwe.sgf 231
 # strictly speaking tenuki is possible here. Q1 is of course bad
+# tm - Indeed GNU Go has finally figured out that tenuki is best!
+# tm - yes, Q1 is bad.  T5 also wastes a point.
 151 gg_genmove white
-#? [T5]
+#? [!(Q1|T5)]
 
 loadsgf games/gwe.sgf 241
 152 gg_genmove white

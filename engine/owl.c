@@ -1600,6 +1600,13 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	move_cutoff = 99; /* Effectively disable vital moves. */
     }
     else {
+#if 0
+      /* This code came up with a lot of useless moves, and the few cases
+       * where it helped can be fixed with patterns.
+       * FIXME: Perhaps this code should be reinstated with a test
+       * to determine whether the whole dragon is a single worm.
+       */
+
       /* Look for a tactical defense. This is primarily intended for
        * the case where the whole dragon is a single string, therefore
        * we only look at the string at the "origin".
@@ -1608,8 +1615,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
        * using a liberty heuristic. The reason for this is problems
        * with ineffective self ataris which do defend tactically but
        * have no strategical effect other than wasting owl nodes or
-       * confusing the eye analysis.
-       */
+       * confusing the eye analysis.  */
       int dpos;
       SGFTree *save_sgf_dumptree = sgf_dumptree;
       int save_count_variations = count_variations;
@@ -1628,6 +1634,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       }
       sgf_dumptree = save_sgf_dumptree;
       count_variations = save_count_variations;
+#endif
     }
 
     if (!moves)

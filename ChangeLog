@@ -3,9 +3,15 @@
 -------------------------------------------------------------------------
 
 - new gtp command owl_analyze_semeai
-- commends made 1D in owl.c
-- new gtp_example/sgf2tst.pl
 - empty_corner_value adjusted to board size in fuseki()
+- removed tactical reading move pass from owl.c
+- contribution of (reverse) followup values revised in value_move_reasons
+- comments made 1D in owl.c
+- regress.pl now accepts "problem sets"
+- regress.plx includes "unexpected result" list
+- new gtp_example/sgf2tst.pl
+- tuning
+- a few test revisions
 
 3.1.14 released November 17, 2001
 

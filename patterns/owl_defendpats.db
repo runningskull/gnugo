@@ -2049,6 +2049,17 @@ XO.
 ;lib(a)==1
 
 
+Pattern D626
+# tm New pattern. (3.1.15)
+# special position - see ld_owl:188
+
+OOX.|
+*..X|
+----+
+
+:8,-,value(45)
+
+
 #########################################################
 #                                                       #
 #            Make eyeshape in the center                #
@@ -2439,13 +2450,16 @@ X*..|
 
 
 Pattern D805
+# tm modified (3.1.15)
+#   s category incorrectly necessary - see ld_owl:53
+#   see also trevor:590 for underlying problem.
 
 |oOO?
 |...O         try to secure corner
 |.*.o
 +----
 
-:8,-,value(36)
+:8,s,value(98)
 
 
 Pattern D805b
@@ -2541,6 +2555,18 @@ Pattern D811
 +----
 
 :8,-,value(60)
+
+
+Pattern D811a
+# tm New Pattern (3.1.15) (see cho1:200)
+
+|oO??         miai eyes or better
+|o.Oo
+|.*..
++----
+
+:8,-,value(60)
+
 
 
 Pattern D812

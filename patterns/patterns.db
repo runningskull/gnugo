@@ -1124,7 +1124,7 @@ Pattern CC74b
 .O*.          connect and constrain X
 OXXO
 
-:8,C,shape(7)
+:8,C,shape(2)
 
 aO*b
 OCCO

@@ -3677,13 +3677,46 @@ Pattern A1342
 
 Pattern A1343
 # gf New pattern. (3.1.14)
+# tm modified (3.1.15)  (cho1:150)
 
-|xxX?     destroy eyespace
+|xxx?     destroy eyespace
 |..XX
 |.*.x
 +----
 
 :8,s,value(46)
+
+
+Pattern A1344
+# tm new pattern (3.1.15) (see cho1:150)
+
+XXX?	  consolidate or destroy eyespace
+X.*O
+----
+
+:8,s,value(46)
+
+Pattern A1345
+# tm new pattern (3.1.15) (see cho1:160)
+
+|.X.O	  special corner shape
+|.*XO
+|...O
++----
+
+:8,s,value(46)
+
+Pattern A1346
+# tm new pattern (3.1.15) (see cho1:200)
+
+??Xx|	important 1-2 attack.
+XX.x|
+x.*.|
+----+
+
+:8,s,value(75)
+
+
 
 
 #########################################################

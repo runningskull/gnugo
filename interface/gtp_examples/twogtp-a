@@ -82,6 +82,7 @@ my $verbose = 0;
 my $komi = 5.5;
 my $handicap = 0;
 my $games = 1;
+my $wanthelp;
 
 my $helpstring = "
 
@@ -99,6 +100,7 @@ Possible twogtp options:
   --size <board size>                     (default 19)
   --games <number of games to play>       (-1 to play forever)
   --sgffile <filename>
+  --help                                  (show this)
 
 ";
 
@@ -110,8 +112,15 @@ GetOptions(
            "handicap|h=i"           => \$handicap,
            "size|boardsize|s=i"     => \$size,
            "sgffile|o=s"            => \$sgffilename,
-           "games=i"                => \$games
+           "games=i"                => \$games,
+           "help"                   => \$wanthelp,
 );
+
+if ($wanthelp) {
+  print $helpstring;
+  exit;
+}
+
 
 if (!$white) {
   $white = '../gnugo.exe --mode gtp --quiet';
@@ -330,6 +339,8 @@ sub eat_score {
     my $line = "";
     while ($line eq "") {
 	chop($line = <$h>) or die "No response!";
+	$line =~ s/^\s*//msg;
+	$line =~ s/\s*$//msg;
     }
     $line =~ s/\s*$//;
     my ($equals, $result) = split(' ', $line, 2);

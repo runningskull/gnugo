@@ -429,4 +429,16 @@ A*
 ;lib(A)==1 && owl_eyespace(*,A) && olib(*) > 0
 
 
+Pattern VA24
+# tm New pattern. (3.1.15)  (see cho1:161)
+
+?OO|       special corner shape.
+*X.|
+XOX|
+XO.|
+---+
+
+:8,-,value(76)
+
+
 # END OF FILE

@@ -139,6 +139,7 @@ my %counters;
 
 my $next_cmd = "";
 my $prev_cmd = "";
+my $problem_set;
 
 
 GetOptions(
@@ -146,7 +147,8 @@ GetOptions(
            "verbose|v=i"        => \$verbose,
            "numbers|n=s"	=> \$numbers,
            "all_batches|all-batches|a=i" => \$all_batches,
-           "make_images|m=i"    => \$make_images
+           "make_images|m=i"    => \$make_images,
+           "problemset|ps|p=s"  => \$problem_set,
 );
 
 if ($make_images) {
@@ -211,14 +213,43 @@ if ($one_gg_process) {
 }
 
 
-if ($all_batches) {
-  @ARGV = allTargets();
-}
+  
+if ($problem_set) {
+  open(F, $problem_set) or confess "can't open problem set: $problem_set";
+  my %filehash;
+  while (<F>) {
+    next if ($_ =~ /^\s*(#.*)?$/);
+    last if ($_ =~ /DONE|STOP/);
+    my ($filename, $probnum) = $_ =~ /^(.*):(\d+)/;
+    if (!defined $filename) {
+      warn "Unexpected line: $_";
+      last;
+    }
+    $filename =~ s/(\.tst)$//;
+    push @{$filehash{$filename}}, $probnum;
+  }
+  close F;
+  open(F, $problem_set) or confess "can't open problem set: $problem_set";
+  while (<F>) {
+    next if ($_ =~ /^\s*(#.*)?$/);
+    my ($filename, $probnum) = $_ =~ /^(.*):(\d+)/;
+    last unless defined $filename;
+    $filename =~ s/(\.tst)$//;
+    if (exists ($filehash{$filename}) ){
+      regress_file ("$filename.tst", @{$filehash{$filename}});
+      delete $filehash{$filename};
+    }
+  }
+  close F;
   
   
-my $curtstfile = "";
-my $file_count = 0;
-while ($file_count <= $#ARGV) {
+} else {
+  if ($all_batches) {
+    @ARGV = allTargets();
+  }
+  my $curtstfile = "";
+  my $file_count = 0;
+  while ($file_count <= $#ARGV) {
   $curtstfile = $ARGV[$file_count];
   #unlink "html/index.html";
   unlink "html/$curtstfile/index.html";
@@ -227,8 +258,8 @@ while ($file_count <= $#ARGV) {
   regress_file ($ARGV[$file_count]);
   $file_count++;
   @failed_links = @FAILED_links = ();
-};
-
+  };
+}
 
 go_command("quit");
 print "waiting\n" if $verbose > 1;
@@ -240,10 +271,19 @@ exit;
 
 my $g_curtestfile;
 
+sub regress_chunk {
+  my @lines = @_;
+}
+
 sub regress_file {
   $testfile = shift;
+  my @problist = @_;
+  if ($verbose) {
+    print "$testfile";
+    print ": ", join ("  ", @problist), "\n" if @problist;
+    print "\n";
+  }
   ($g_curtestfile) = $testfile =~ /(.*)\.tst$/ or confess "Unparsable test file: $testfile";
-  print "$testfile\n" if $verbose;
   
   -e "html" or mkdir "html" or die "Couldn't create html";
   -e "html/$testfile" or mkdir "html/$testfile" or die "Couldn't create html/$testfile";
@@ -285,7 +325,7 @@ sub regress_file {
   }
   
   #main bit.
-  $pidt = open ($testfile_out,"<$testfile");
+  $pidt = open ($testfile_out,"<$testfile") or confess "Can't open $testfile";
   print "testfile pid: $pidt\n" if $verbose > 1;
 
   my $negate;
@@ -305,7 +345,7 @@ sub regress_file {
   ($cputime) = ($cputime =~ /((\d|\.)+)/);
   <$goprog_out>;  
   
-  my $skipping = 0;
+  my $skipping;
   while (defined($next_cmd))
   {
     $filepos++;
@@ -316,7 +356,7 @@ sub regress_file {
       $force_read = 0;
       if (defined($next_cmd)) {
         chop($next_cmd);
-        print "$next_cmd\n" if ($verbose > 1);
+        print "NEXT_CMD: '$next_cmd'\n" if ($verbose > 1);
         if (($next_cmd =~ /^\s*#\?\s+\[(\!*)(.*)\]\s*(\*)*(\&)*\s*$/)) {
           $bang = $1;
           if ($1) { $negate = 1} else {$negate = 0};
@@ -329,13 +369,13 @@ sub regress_file {
           go_command("echo_err $num\n");
           eat();  #ignore output!
 
-          my $old_skipping = $skipping;
-          $skipping = $numbers && ($num =~ $numbers);
-          if ($old_skipping) {
-            print "$num skipped.\n";
+          $skipping = (@problist &&
+            eval {foreach my $i (@problist) { return 0 if $i == $num} return 1;} );
+          if ($skipping) {
+            print "$g_curtestfile:$num skipped.\n" if $verbose > 1;
             tally_result ($num, "skipped", "&nbsp;", "&nbsp;");
           } else {
- 	    print "TST: $negate - $correct_re - $fail - $ignore\n" if $verbose > 1;
+ 	    print "TST:$negate - $correct_re - $fail - $ignore\n" if $verbose>1;
 	    if (!$ignore) {
 	      my $match_result = $result =~ /^$correct_re$/ ;
 	      if ($negate) {
@@ -343,15 +383,15 @@ sub regress_file {
 	      }
 	      if ($match_result) {
 		if ($fail) {
-		  tally_result ( $num, "PASSED", "$bang$correct_re", "$result");
+		  tally_result ($num,"PASSED","$bang$correct_re","$result");
 		} else {
-	          tally_result ( $num, "passed", "$bang$correct_re", "$result");
+	          tally_result ($num,"passed","$bang$correct_re","$result");
 		}
 	      } else {
 		if (!$fail) {
-		  tally_result ( $num, "FAILED", "$bang$correct_re", "$result");
+		  tally_result ($num,"FAILED","$bang$correct_re","$result");
 		} else {
-      		  tally_result ( $num, "failed", "$bang$correct_re", "$result");
+      		  tally_result ($num,"failed","$bang$correct_re","$result");
 		}
 	      }
 	    }
@@ -368,9 +408,14 @@ sub regress_file {
       }
     }
     if (defined($next_cmd)) {
-      $next_cmd =~ /^([0-9]+)/;
-      my $this_number = $1;
-      if (!$skipping) {
+      my ($this_number) = $next_cmd =~ /^([0-9]+)/;
+      $skipping = (defined($this_number) &&
+            (@problist &&
+             eval {foreach my $i (@problist) {return 0 if $i == $this_number} return 1;} ));
+      if ($skipping) {
+        #print "SKIPPING: $next_cmd ($this_number)\n";
+      } else {
+        #print "NOT SKIPPING: $next_cmd\n";
 	$top_moves = "";
 	if ($do_topmove) {
 	  if ($next_cmd =~ /gg_genmove\s+([blackwhite])+/) {
@@ -405,6 +450,7 @@ sub regress_file {
       if (defined $this_number) {$num = $this_number;}
     }
   }
+  
   my $pass_string;
   my $fail_string;
   if ($unexpected_pass == 1) {

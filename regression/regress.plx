@@ -59,7 +59,7 @@ my %colors = ("ALIVE", "green",
 	"UNCHECKED", "magenta");
 
 my $query = new CGI;
-my ($tstfile, $num, $sortby, $sgf, $reset, $trace, $bycat);
+my ($tstfile, $num, $sortby, $sgf, $reset, $trace, $bycat, $unexpected);
 
 ($tstfile, $num) = ($query->query_string() =~ /keywords=(.*)%3A(.*)/);
 
@@ -71,6 +71,7 @@ if (!$tstfile) {
   $reset = $query->param("reset");
   $trace = $query->param("trace");
   $bycat = $query->param("bycat");
+  $unexpected = $query->param("unexpected");
 }
 
 sub sgfFile(%);
@@ -128,6 +129,11 @@ unless ($tstfile) {
     exit;
   }
   
+  if ($unexpected) {
+    printunexpected();
+    exit;
+  }
+  
   if (-z "html/index.html") {
     print "Yikes - index missing - please reset!";
     exit;
@@ -143,7 +149,37 @@ unless ($tstfile) {
  
 
 my %fullHash;
-use Data::Dumper;
+#use Data::Dumper;
+
+sub insinglequote {
+  my $s = shift;
+  $s =~ s@\\@\\\\@;
+  $s =~ s@'@\\'@;
+  return "'$s'";
+}
+
+sub FastDump {
+  my ($h) = @_;
+
+  open (FILE, ">html/one.perldata.new") or confess "can't open";
+  print  FILE "\$VAR1 = [\n {\n";
+  
+
+
+  #print FILE Dumper([\%h]) or confess "couldn't print";
+
+  foreach my $k1 (sort keys %{$h}) {
+    print FILE "  '$k1' =>\n   {\n";
+    foreach my $k2 (sort keys %{%{$h}->{$k1}}) {
+      print FILE "     '$k2' => " . insinglequote(%{$h}->{$k1}->{$k2}) . ",\n";
+    }
+    print FILE "   },\n";
+  }
+  
+  print FILE "  }\n ];";
+
+  close FILE or confess "can't close";
+}
 
 sub createIndex {
   my %h;
@@ -157,10 +193,10 @@ sub createIndex {
     delete $h{"$tst:$prob"}->{gtp_all};
   }
   
-  open (FILE, ">html/one.perldata") or confess "can't open";
-  print FILE Dumper([\%h]) or confess "couldn't print";
-  close FILE or confess "can't close";
+  FastDump(\%h);
   
+  #print "DONE!\n";
+  #return;  
 
   #our $VAR1;
   #do "html/one.perldata" or confess "can't do perldata";
@@ -174,6 +210,7 @@ sub createIndex {
  <H3> Regression test summary - </H3>
  Program: _CMDLINE_TBD_ <BR>
  <A href="?bycat=1">View by category</A><BR>
+ <A href="?unexpected=1">View unexpected results</A><BR>
  <TABLE border=1>
  <TR><TD>file</TD><TD>passed</TD><TD>PASSED</TD><TD>failed</TD><TD>FAILED</TD>
  </TR>';
@@ -197,6 +234,7 @@ sub createIndex {
         print I qq@<TR>\n <TD><A href="?tstfile=$curfile&sortby=result">$curfile</A></TD>\n@;
         foreach my $k2 (@pflist) {
           my $c = @{$subTotHash{$k2}};  #i.e. length of array.
+          $totHash{$k2} += $c;
           if ($k2 !~ /passed/ and $c) {
             print I " <TD>$c:<BR>\n";
             foreach (sort {$a<=>$b} @{$subTotHash{$k2}}) {
@@ -222,6 +260,7 @@ sub createIndex {
         print I qq@<TR>\n <TD><A href="?tstfile=$curfile&sortby=result">$curfile</A></TD>\n@;
         foreach my $k2 (@pflist) {
           my $c = @{$subTotHash{$k2}};  #i.e. length of array.
+          $totHash{$k2} += $c;
           if ($k2 !~ /passed/ and $c) {
             print I " <TD>$c:<BR>\n";
             foreach (sort {$a<=>$b} @{$subTotHash{$k2}}) {
@@ -367,7 +406,7 @@ if ($num) {
     or $gtpall =~m/(.*?)/;  #Problems!!!!  
   
   my $cmdline = "gq -l $1 " . ($2 ? "-L $2 " : "");
-  if ($gtpall =~ m@ .* (owl_(?:attack|defend)*) \s* ([A-Z]\d{1,2}) \s* $ @x) {
+  if ($gtpall =~ m@ .* (owl_attack|owl_defend|dragon_status) \s* ([A-Z]\d{1,2}) \s* $ @x) {
     $cmdline .= "--decide-dragon $2 -o x.sgf" ;
   } elsif ($gtpall =~ m@ .* (gg_genmove\s+[whiteblack]*)  \s* $@x) {
     $cmdline .= "-t";
@@ -629,12 +668,47 @@ sub GTPtoSGF {
 
 
 
+sub printunexpected{
+    our $VAR1;
+    do "html/one.perldata.new" or confess "can't do perldata";
+    my %h = %{$VAR1->[0]};
+
+    my @fails;
+    my @passes; 
+
+    print "<HTML><HEAD><TITLE>Unexpected results - GNU Go</TITLE></HEAD>\n";
+    print "<BODY><H4>Unexpected results</H4>";
+
+    print "<TABLE border=1>";
+    print "<TR><TD><B>Problem</B></TD><TD><B>Status</B></TD>\n";
+    foreach my $k (sort keys %h) {
+      my $status = %{$h{$k}}->{status};
+      if ($status eq 'FAILED') {
+        push @fails, $k;
+      } elsif ($status eq 'PASSED') {
+        push @passes, $k;
+      }
+    }
+    
+    foreach (@fails) {
+      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>FAILED</TD>\n@;
+    }
+    foreach (@passes) {
+      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>PASSED</TD>\n@;
+    }
+    
+    print "</TABLE>\n";
+    print "</body></html>\n";
+    
+
+}
+
 
 
 sub printbycategory {
 
     our $VAR1;
-    do "html/one.perldata" or confess "can't do perldata";
+    do "html/one.perldata.new" or confess "can't do perldata";
     my %hash = %{$VAR1->[0]};
     
     my %fails;
