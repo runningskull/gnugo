@@ -242,7 +242,7 @@ int restricted_defend1(int str, int *move, int komaster, int kom_pos,
 int restricted_attack2(int str, int *move, int komaster, int kom_pos,
 		       int num_forbidden_moves, int *forbidden_moves);
 
-int naive_ladder(int str, int *move);
+int simple_ladder(int str, int *move);
 #define MOVE_ORDERING_PARAMETERS 67
 void tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS]);
 void draw_reading_shadow(void);

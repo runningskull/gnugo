@@ -998,7 +998,7 @@ static int quiescence_capture (int str, int *move) {
     result = WIN;
   }
   else if (countlib(str) == 2)
-    result = naive_ladder(str, move);
+    result = simple_ladder(str, move);
 
   /* Turn the sgf traces back on. */
   sgf_dumptree = save_sgf_dumptree;

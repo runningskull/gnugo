@@ -129,9 +129,8 @@ static void double_atari_chain2(int str, int moves[MAX_MOVES],
 				int scores[MAX_MOVES], int *num_moves);
 static void order_moves(int str, int num_moves, int *moves,
 			int *scores, int color, const char *funcname);
-static int naive_ladder_defense(int str, int apos, int bpos,
-				int color, int other);
-static int naive_ladder_break_through(int str, int apos, int color, int other);
+static int simple_ladder_attack(int str, int *move, int komaster, int kom_pos);
+static int simple_ladder_defend(int str, int *move, int komaster, int kom_pos);
 static int in_list(int move, int num_moves, int *moves);
 
 
@@ -5271,7 +5270,6 @@ order_moves(int str, int num_moves, int *moves, int *scores, int color,
     }
     sgftreeAddComment(sgf_dumptree, NULL, buf);
   }
-
 }
 
 
@@ -5950,183 +5948,215 @@ reading_hotspots(float values[BOARDMAX])
 
 
 /* ================================================================ */
-/*              Experimental code, not currently in use.            */
+/*              Code for special purposes.                          */
 /* ================================================================ */
 
-
-/* naive_ladder(str, &move) tries to capture a string (str)
+/* simple_ladder(str, &move) tries to capture a string (str)
  * with exactly two liberties under simplified assumptions, which are
  * adequate in a ladder. The rules are as follows:
  *
- * 1. The attacker is allowed to play at each of the two liberties.
- *    If the move was legal, the string now has exactly one
- *    liberty.
- * 2. Define the last stone of the string to be the stone of the
- *    string adjacent to the last liberty. The defender is allowed to
- *    try the following moves:
- *    - extend the string by playing on the liberty
- *    - try to capture the last stone played by the attacker
- *    - try to capture any stone that was put into atari by the
- *      previous move. It is conjectured that it's sufficient to look
- *      for such stones at a distance two from the last liberty.
- *    We only consider captures that can be done immediately.
- * 3. Depending on the resulting number of liberties of the string, we
- *    value each node as follows:
- *    3 or more liberties: the attack has failed
- *    2 liberties:         recurse
- *    1 liberty:           the attack has succeeded
+ * 1. The attacker is allowed to play at each of the two liberties,
+ *    but no other move. If the move was legal, the string now has
+ *    exactly one liberty.
+ * 2. The defender must move out of atari. This can only be done by
+ *    either extending at the liberty or capturing a neighboring
+ *    string which was in atari. All such moves may be tested.
+ * 3. Depending on the resulting number of liberties of the string
+ *    after the defender's move, we value each node as follows:
+ *
+ *    3 or more liberties:           the attack has failed
+ *    2 liberties:                   recurse
+ *    1 liberty:                     the attack has succeeded
+ *
  *    illegal move for the defender: successful attack
  *    illegal move for the attacker: failed attack
  *
- * Return codes are as usual 0 for failure and 1 for success. If the
- * attack was successful, (*move) contains the attacking move, unless
- * it is a null pointer.
+ * Return codes are as usual 0 for failure, WIN for success, KO_A for
+ * a ko where the defender must make the first ko threat and KO_B for
+ * a ko where the attacked has to make the first threat. If the attack
+ * was successful, (*move) contains the attacking move, unless it is a
+ * null pointer.
  *
  * The differences compared to the attack2()/defend1() combination for
- * reading ladders is that this one really always reads them to the
- * very end and that it is faster (because it doesn't call
- * break_chain()). In contrast to attack2() though, this function can
- * only be used for capturing in ladders.
+ * reading ladders is that this one is a strict ladder reader which
+ * never allows the defender to have more than one liberty when it's
+ * in turn to move. This has a number of consequences.
  *
- * FIXME: The ladder capture may depend on ko. Need to add the ko
- *        return codes.
+ * 1. This function will miss tactical captures involving other
+ *    techniques than the ladder.
+ *
+ * 2. This function is faster because it gives up faster when the
+ *    ladder doesn't work. In particular it can't branch out in a huge
+ *    tree of exotic variations.
+ *
+ * 3. This function always reads ladders to the very end. There are no
+ *    depth limits or other assumptions to stop reading prematurely.
+ *
+ * 4. If this function returns WIN, it is guaranteed that the defender
+ *    has no way whatsoever to escape, all possibilities are tried.
+ *    The converse is definitely not true.
  */
 
 int
-naive_ladder(int str, int *move)
+simple_ladder(int str, int *move)
+{
+  return simple_ladder_attack(str, move, EMPTY, NO_MOVE);
+}
+
+static int
+simple_ladder_attack(int str, int *move, int komaster, int kom_pos)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
-  int liberties;
+  int apos;
   int libs[2];
-  int scores[2];
+  int savemove = 0;
+  int savecode = 0;
+  int dcode;
   int k;
-  
+  int moves[MAX_MOVES];
+  int scores[MAX_MOVES];
+  int num_moves = 0;
+
+  SETUP_TRACE_INFO("simple_ladder_attack", str);
+  reading_node_counter++;
+
+  str = find_origin(str);
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 2, str);
-  DEBUG(DEBUG_READING, "naive_ladder(%1m)\n", str);
 
-  /* Get the two liberties of (str) into (apos) and (bpos). */ 
-  liberties = findlib(str, 2, libs);
-  ASSERT1(liberties == 2, str);
+  /* Get the two liberties of (str). */
+  findlib(str, 2, libs);
 
-  scores[0] = 0;
-  scores[1] = 0;
-  order_moves(str, 2, libs, scores, color, "naive_ladder");
+  for (k = 0; k < 2; k++)
+    ADD_CANDIDATE_MOVE(libs[k], 0, moves, scores, num_moves);
 
-  for (k = 0; k < 2; k++) {
-    if (trymove(libs[k], other, "naive_ladder-A", str, EMPTY, 0)) {
-      if (!naive_ladder_defense(str, libs[k], libs[1-k], color, other)) {
-	popgo();
-	if (move)
-	  *move = libs[k];
-	return WIN;
+  order_moves(str, num_moves, moves, scores, other, read_function_name);
+
+  for (k = 0; k < num_moves; k++) {
+    int new_komaster;
+    int new_kom_pos;
+    int ko_move;
+
+    apos = moves[k];
+    if (komaster_trymove(apos, other, "simple_ladder_attack", str,
+			 komaster, kom_pos, &new_komaster, &new_kom_pos,
+			 &ko_move, savecode == 0)) {
+      if (!ko_move) {
+	dcode = simple_ladder_defend(str, NULL, new_komaster, new_kom_pos);
+	if (dcode != WIN) {
+	  if (dcode == 0) {
+	    popgo();
+	    SGFTRACE(apos, WIN, "attack effective");
+	    if (move)
+	      *move = apos;
+	    return WIN;
+	  }
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, apos);
+	}
+      }
+      else {
+	if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	  savemove = apos;
+	  savecode = KO_B;
+	}
       }
       popgo();
     }
   }
   
-  /* Neither move worked. */
-  return 0;
+  if (savecode == 0) {
+    SGFTRACE(0, 0, NULL);
+    return 0;
+  }
+
+  SGFTRACE(savemove, savecode, "saved move");
+  if (move)
+    *move = savemove;
+  return savecode;
 }
 
-
-/* Try to save the one-liberty string (str) from being caught in a
- * ladder. (apos) is the last played attacking stone and (bpos) is
- * the last remaining liberty.
- */
 
 static int
-naive_ladder_defense(int str, int apos, int bpos, int color, int other)
+simple_ladder_defend(int str, int *move, int komaster, int kom_pos)
 {
-  int liberties;
-  
-  /* Try to capture the just played stone. */
-  if (naive_ladder_break_through(str, apos, color, other))
-    return WIN;
+  int color = board[str];
+  int xpos;
+  int lib;
+  int moves[MAX_MOVES];
+  int scores[MAX_MOVES];
+  int num_moves = 0;
+  int savemove = 0;
+  int savecode = 0;
+  int k;
 
-  /* Try to run away by extending on the last liberty. */
-  if (trymove(bpos, color, "naive_ladder_defense", str, EMPTY, 0)) {
-    liberties = countlib(str);
-    if (liberties >= 3
-	|| (liberties == 2
-	    && !naive_ladder(str, NULL))) {
+  SETUP_TRACE_INFO("simple_ladder_defend", str);
+  reading_node_counter++;
+  
+  gg_assert(IS_STONE(board[str]));
+  ASSERT1(countlib(str) == 1, str);
+
+  /* lib will be the liberty of the string. */
+  findlib(str, 1, &lib);
+
+  moves[0] = lib;
+  scores[0] = 0;
+  num_moves = 1;
+  
+  break_chain_moves(str, moves, scores, &num_moves);
+  order_moves(str, num_moves, moves, scores, color, read_function_name);
+
+  for (k = 0; k < num_moves; k++) {
+    int new_komaster;
+    int new_kom_pos;
+    int ko_move;
+
+    xpos = moves[k];
+    if (komaster_trymove(xpos, color, "simple_ladder_defend", str,
+			 komaster, kom_pos,
+			 &new_komaster, &new_kom_pos,
+			 &ko_move, savecode == 0)) {
+      int acode;
+      int new_libs = countlib(str);
+      if (new_libs > 2)
+	acode = 0;
+      else if (new_libs < 2)
+	acode = WIN;
+      else
+	acode = simple_ladder_attack(str, NULL, new_komaster, new_kom_pos);
       popgo();
-      return WIN;
+      
+      if (!ko_move) {
+	if (acode == 0) {
+	  SGFTRACE(xpos, WIN, "defense effective");
+	  if (move)
+	    *move = xpos;
+	  return WIN;
+	}
+	/* if the move works with ko we save it, then look for something
+	 * better.
+	 */
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+      }
+      else {
+	if (acode != WIN) {
+	  savemove = xpos;
+	  savecode = KO_B;
+	}
+      }
     }
-    popgo();
+  }
+
+  if (savecode != 0) {
+    SGFTRACE(savemove, savecode, "saved move");
+    if (move)
+      *move = savemove;
+    return savecode;
   }
   
-  /* Try to capture a string at distance two (Manhattan metric) from
-   * the last liberty.
-   */
-  if (naive_ladder_break_through(str, SW(bpos), color, other))
-    return WIN;
-
-  if (naive_ladder_break_through(str, NW(bpos), color, other))
-    return WIN;
-
-  if (naive_ladder_break_through(str, NE(bpos), color, other))
-    return WIN;
-
-  if (naive_ladder_break_through(str, SE(bpos), color, other))
-    return WIN;
-
-  if (ON_BOARD(SOUTH(bpos))
-      && naive_ladder_break_through(str, SS(bpos), color, other))
-    return WIN;
-
-  if (ON_BOARD(WEST(bpos))
-      && naive_ladder_break_through(str, WW(bpos), color, other))
-    return WIN;
-
-  if (ON_BOARD(NORTH(bpos))
-      && naive_ladder_break_through(str, NN(bpos), color, other))
-    return WIN;
-
-  if (ON_BOARD(EAST(bpos))
-      && naive_ladder_break_through(str, EE(bpos), color, other))
-    return WIN;
-
-  /* Nothing worked. */
+  SGFTRACE(0, 0, NULL);
   return 0;
 }
-
-
-/* Try to break out of the ladder by capturing (apos). We must first
- * verify that there is an opponent stone there and that it is in
- * atari so we can capture it immediately. After the capture we count
- * liberties for (str) to see if the ladder is decided yet. This
- * function may be called with (apos) off the board, but no further
- * than diagonally away.
- */
-static int
-naive_ladder_break_through(int str, int apos, int color, int other)
-{
-  int liberties;
-  int bpos;
-  
-  if (board[apos] != other)
-    return 0;
-  
-  if (findlib(apos, 1, &bpos) != 1)
-    return 0;
-
-  if (trymove(bpos, color, "naive_ladder_break_through", str, EMPTY, 0)) {
-    liberties = countlib(str);
-    if (liberties >= 3
-	|| (liberties == 2
-	    && !naive_ladder(str, NULL))) {
-      popgo();
-      return WIN;
-    }
-    popgo();
-  }
-  
-  return 0;
-}
-
-
 
 
 /*
