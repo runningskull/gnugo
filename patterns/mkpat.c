@@ -3204,6 +3204,7 @@ main(int argc, char *argv[])
 	  }
 	}
 
+	state = 0;
 	if (command == 1) { /* Pattern `name' */
 	  int k;
 
@@ -3277,8 +3278,6 @@ main(int argc, char *argv[])
 	      }
 	    }
 	  }
-
-	  state = 0;
 	}
 	else {
 	  struct attribute_description *old_map = attribute_map;
