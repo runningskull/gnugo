@@ -13,7 +13,7 @@ noinst_SCRIPTS = eval.sh regress.sh test.sh
 
 EXTRA_DIST = golois games $(TST) $(noinst_SCRIPTS) regress.awk \
              STRATEGY NICKLAS READING BREAKAGE \
-	     regress.pl
+	     regress.pl regress.plx
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *.orig *~

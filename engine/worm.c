@@ -75,14 +75,13 @@ static void defense_callback(int m, int n, int color,
 
 /* make_worms() finds all worms and assembles some data about them.
  *
- * Each worm is marked with an origin, having coordinates (origini, originj).
- * This is an arbitrarily chosen element of the worm, in practice the
- * algorithm puts the origin at the first element when they are given
- * the lexicographical order, though its location is irrelevant for
- * applications. To see if two stones lie in the same worm, compare
- * their origins.
+ * Each worm is marked with an origin.  This is an arbitrarily chosen
+ * element of the worm, in practice the algorithm puts the origin at
+ * the first element when they are given the lexicographical order,
+ * though its location is irrelevant for applications. To see if two
+ * stones lie in the same worm, compare their origins.
  *
- * We will use the field dragon[m][n].genus to keep track of
+ * We will use the field dragon[ii].genus to keep track of
  * black- or white-bordered cavities (essentially eyes) which are found.  
  * so this field must be zero'd now.
  */
@@ -112,7 +111,6 @@ make_worms(void)
   gg_assert(stackp == 0);
 
   /* Count liberties of different orders and initialize cutstone fields. */
-  
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       int pos = POS(m, n);
@@ -805,7 +803,7 @@ find_worm_attacks_and_defenses()
       if (board[pos] == EMPTY || !is_worm_origin(pos, pos))
 	continue;
 
-      TRACE ("considering attack of %m\n", m, n);
+      TRACE ("considering attack of %1m\n", pos);
       /* Initialize all relevant fields at once. */
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
 	worm[pos].attack_codes[k]   = 0;
@@ -817,7 +815,7 @@ find_worm_attacks_and_defenses()
       
       acode = attack(pos, &tpos);
       if (acode) {
-	DEBUG(DEBUG_WORMS, "worm at %m can be attacked at %1m\n", m, n, tpos);
+	DEBUG(DEBUG_WORMS, "worm at %1m can be attacked at %1m\n", pos, tpos);
 	change_attack(pos, tpos, acode);
       }
     }

@@ -178,6 +178,7 @@ static void mark_string_hotspot_values(float values[BOARDMAX],
 /* Statistics. */
 static int reading_node_counter = 0;
 
+
 /* ================================================================ */  
 /*                          Goal functions                          */
 /* ================================================================ */
@@ -324,7 +325,7 @@ find_defense(int str, int *move)
  * is returned and acode is 0. If a string can be attacked and
  * defended, WIN is returned, acode and dcode are both non-zero, and
  * (attack_point), (defense_point) both point to vertices on the board. 
- * If a stringcan be attacked but not defended, 0 is again returned, 
+ * If a string can be attacked but not defended, 0 is again returned, 
  * acode is non-zero, dcode is 0, and (ai, aj) point to a vertex 
  * on the board.
  *
@@ -420,7 +421,8 @@ defend_both(int astr, int bstr)
 {
   int a_threatened = 0;
   int b_threatened = 0;
-  int cpos, dpos;
+  int a_savepos;
+  int b_savepos;
   int acode = 0;
   int dcode = 0;
   
@@ -428,14 +430,14 @@ defend_both(int astr, int bstr)
   ASSERT1(IS_STONE(color) , astr);
   ASSERT1(color == board[bstr], bstr);
 
-  attack_and_defend(astr, &acode, NULL, &dcode, &cpos);
+  attack_and_defend(astr, &acode, NULL, &dcode, &a_savepos);
   if (acode != 0) {
     a_threatened = 1;
     if (dcode == 0)
       return 0; /* (astr) already lost */
   }
   
-  attack_and_defend(bstr, &acode, NULL, &dcode, &dpos);
+  attack_and_defend(bstr, &acode, NULL, &dcode, &b_savepos);
   if (acode != 0) {
     b_threatened = 1;
     if (dcode == 0)
@@ -456,7 +458,7 @@ defend_both(int astr, int bstr)
    * defends either string and see if it also defends the other string.
    */
 
-  if (cpos == dpos)
+  if (a_savepos == b_savepos)
     return WIN; /* Both strings can be attacked but also defended 
                  * by one move. */
 
@@ -465,7 +467,7 @@ defend_both(int astr, int bstr)
    * somewhat pessimistic estimation.
    */
 
-  if (trymove(cpos, color, "defend_both-A", astr, EMPTY, NO_MOVE)) {
+  if (trymove(a_savepos, color, "defend_both-A", astr, EMPTY, NO_MOVE)) {
     if (board[bstr] && !attack(bstr, NULL)) {
       popgo();
       return WIN;
@@ -473,7 +475,7 @@ defend_both(int astr, int bstr)
     popgo();
   }
   
-  if (trymove(dpos, color, "defend_both-B", bstr, EMPTY, NO_MOVE)) {
+  if (trymove(b_savepos, color, "defend_both-B", bstr, EMPTY, NO_MOVE)) {
     if (board[astr] && !attack(astr, NULL)) {
       popgo();
       return WIN;
@@ -498,8 +500,8 @@ defend_both(int astr, int bstr)
     for (r = 0; r < neighbors1; r++) {
       epos = adjs1[r];
       if (countlib(epos) <= 4
-	  && (epos != cpos)
-	  && (epos != dpos)) {
+	  && (epos != a_savepos)
+	  && (epos != b_savepos)) {
 	/* Is (epos) also adjacent to (bstr)? */
 	for (s = 0; s < neighbors2; s++) {
 	  if (adjs2[s] == adjs1[r])
@@ -764,7 +766,7 @@ break_through_helper(int apos, int bpos, int cpos,
 /*                     Global reading functions                     */
 /* ================================================================ */
 
-/* atari_atari(color, *i, *j) looks for a series of ataris on
+/* atari_atari(color, *move) looks for a series of ataris on
  * strings of the other color culminating in the capture of
  * a string which is thought to be invulnerable by the reading
  * code. Such a move can be missed since it may be that each
@@ -913,7 +915,7 @@ compute_aa_status(int color)
 }
 
 /* Helper function for retrieving the aa_status for a string. We can't
- * reliably do this simply by looking up aa_status[m][n] since this is
+ * reliably do this simply by looking up aa_status[pos] since this is
  * only valid at vertices which were non-empty at the start of the
  * reading. For later added stones, we need to find their aa_status by
  * locating a part of the string which was a worm at the beginning of
@@ -936,6 +938,7 @@ get_aa_status(int pos)
 
   return UNKNOWN;
 }
+
 
 /* Helper function for atari_atari. Here worms is the number of
  * opponent worms involved in the combination, and (last_friendly) is
@@ -1202,7 +1205,7 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
 
   /* No sufficiently large combination attack, so the move is safe from
    * this danger.
-   *   
+   *
    * On rare occasions do_atari_atari might find a combination
    * but no defense. In this case we assume that the combination
    * is illusory.
@@ -1227,7 +1230,7 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
   popgo();
   decrease_depth_values();
   /* We know that a combination exists, but we don't know if
-   * the original move at (ai, aj) was really relevant. So we
+   * the original move at (aa) was really relevant. So we
    * try omitting it and see if a combination is still found.
    */
   if (do_atari_atari(other, NULL, NULL, NO_MOVE, 0, minsize) >= after_aa_val)
@@ -1272,8 +1275,6 @@ atari_atari_try_combination(int color, int apos, int bpos)
   verbose = save_verbose;
   return aa_val;
 }
-
-
 
 
 /* ================================================================ */  

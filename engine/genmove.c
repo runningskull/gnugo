@@ -277,6 +277,11 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   start_timer(1);
   examine_position(color, EXAMINE_ALL);
   time_report(1, "examine position", -1, -1, 1.0);
+
+  /* Make a score estimate. This can be used in later stages of the 
+   * move generation.  If we are ahead, we can play safely and if
+   * we are behind, we have to play more daringly.
+   */
   if (level >= 8) {
     estimate_score(&lower_bound, &upper_bound);
     if (verbose || showscore) {
@@ -298,7 +303,8 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     else
       score = upper_bound;
   }
-  else score = 0.;
+  else
+    score = 0.;
 
   /*
    * Print some of the information if the user wants to.
@@ -335,33 +341,16 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   fuseki(color);
   gg_assert(stackp == 0);
 
-  /* Pattern matcher. */
+  /* The general pattern database. */
   start_timer(1);
   shapes(color);
   time_report(1, "shapes", -1, -1, 1.0);
   gg_assert(stackp == 0);
 
-  /* Look for combination attacks. */
-  {
-    int apos;
-    int other = OTHER_COLOR(color);
-    int aa_val;
-
-    int save_verbose = verbose;
-    if (verbose > 0)
-      verbose--;
-
-    if (save_verbose)
-      gprintf("\nlooking for combination attacks ...\n");
-    aa_val = atari_atari(color, &apos, save_verbose);
-    if (aa_val)
-      add_my_atari_atari_move(apos, aa_val);
-    aa_val = atari_atari(other, &apos, save_verbose);
-    if (aa_val && safe_move(apos, color))
-      add_your_atari_atari_move(apos, aa_val);
-    verbose = save_verbose;
-  }
-  time_report(1, "atari atari", -1, -1, 1.0);
+  /* Look for combination attacks and defenses against them. */
+  combinations(color);
+  time_report(1, "combinations", -1, -1, 1.0);
+  gg_assert(stackp == 0);
 
   /* Review the move reasons and estimate move values. */
   if (review_move_reasons(i, j, &val, color, 

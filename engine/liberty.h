@@ -287,6 +287,8 @@ void add_attack_move(int pos, int ww, int code);
 void add_defense_move(int pos, int ww, int code);
 void add_attack_threat_move(int pos, int ww, int code);
 void add_defense_threat_move(int pos, int ww, int code);
+int  get_attack_threats(int pos, int max_strings, int strings[]);
+int  get_defense_threats(int pos, int max_strings, int strings[]);
 void add_connection_move(int pos, int dr1, int dr2);
 void add_cut_move(int pos, int dr1, int dr2);
 void add_antisuji_move(int pos);
@@ -357,6 +359,7 @@ void small_semeai(void);
 void shapes(int color);
 void endgame_shapes(int color);
 
+void combinations(int color);
 int atari_atari(int color, int *move, int save_verbose);
 int atari_atari_confirm_safety(int color, int tpos, int *move,
 			       int minsize);

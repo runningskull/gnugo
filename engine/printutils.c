@@ -118,7 +118,7 @@ vgprintf(FILE* outputfile, const char *fmt, va_list ap)
 	int pos = va_arg(ap, int);
 	int m = I(pos);
 	int n = J(pos);
-	if (pos == 0)
+	if (pos == NO_MOVE)
 	  fputs("PASS", outputfile);
 	else if (!ON_BOARD1(pos))
 	  fprintf(outputfile, "[%d]", pos);

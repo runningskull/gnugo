@@ -525,6 +525,55 @@ add_defense_threat_move(int pos, int ww, int code)
 }
 
 
+/* Report, or up to max_strings all the strings that are threatened 
+ * at (pos).
+ */
+int
+get_attack_threats(int pos, int max_strings, int strings[])
+{
+  int k;
+  int num_strings;
+
+  num_strings = 0;
+  for (k = 0; k < MAX_REASONS; k++) {
+    int r = move[pos].reason[k];
+    if (r < 0)
+      break;
+
+    if (move_reasons[r].type == ATTACK_THREAT_MOVE)
+      strings[num_strings++] = worms[move_reasons[r].what];
+
+    if (num_strings == max_strings)
+      break;
+  }
+
+  return num_strings;
+}
+
+/* Report all, or up to max_strings, the strings that might be defended 
+ * at (pos).
+ */
+int  get_defense_threats(int pos, int max_strings, int strings[])
+{
+  int k;
+  int num_strings;
+
+  num_strings = 0;
+  for (k = 0; k < MAX_REASONS; k++) {
+    int r = move[pos].reason[k];
+    if (r < 0)
+      break;
+
+    if (move_reasons[r].type == DEFEND_THREAT_MOVE)
+      strings[num_strings++] = worms[move_reasons[r].what];
+
+    if (num_strings == max_strings)
+      break;
+  }
+
+  return num_strings;
+}
+
 /*
  * Add to the reasons for the move at (pos) that it connects the
  * dragons at (dr1) and (dr2). Require that the dragons are
@@ -1937,7 +1986,7 @@ list_move_reasons(int color)
 
 
 /* Find the stones which are tactically defended by the move by color
- * at (i, j). This is used to stop opponent influence from passing
+ * at (pos). This is used to stop opponent influence from passing
  * through strings that we have saved. However, the saved strings do
  * not generate influence by themselves, because that would upset the
  * current evaluation of saved strings.
@@ -2183,8 +2232,77 @@ connection_value(int dragona, int dragonb, int tt, float margin)
   return impact * 2.0 * dragon[dragona].effective_size;
 }
 
+
+/* The value attacking a worm at (ww) is twice its effective size, 
+ * with the following adjustments:
+ *
+ * If the worm has an adjacent (friendly) dead dragon we add its
+ * value. At least one of the surrounding dragons must be alive. 
+ * If not, the worm must produce an eye of sufficient size, and that 
+ * should't be accounted for here.  As a guess, we suppose that
+ * a critical dragon is alive for our purpose here.
+ *
+ * On the other hand if it has an adjacent critical worm, and
+ * if (pos) does not defend that worm, we subtract the value of the
+ * worm, since (pos) may be defended by attacking that worm. We make at
+ * most one adjustment of each type. 
+ */
+
+static float
+attacked_worm_value(int ww)
+{
+  int color;
+  int num_adj;
+  int adjs[MAXCHAIN];
+  int has_live_neighbor = 0;
+  int adjusted_value = 2 * worm[ww].effective_size;
+  float adjustment_up = 0.0;
+  float adjustment_down = 0.0;
+  int s;
+
+  color = OTHER_COLOR(board[ww]);
+  num_adj = chainlinks(ww, adjs);
+  for (s = 0; s < num_adj; s++) {
+    int adj = adjs[s];
+
+    if (dragon[adj].matcher_status == ALIVE
+	|| dragon[adj].matcher_status == CRITICAL)
+      has_live_neighbor = 1;
+
+    if (dragon[adj].color == color
+	&& dragon[adj].matcher_status == DEAD
+	&& 2*dragon[adj].effective_size > adjustment_up)
+      adjustment_up = 2*dragon[adj].effective_size;
+
+    if (dragon[adj].color == color
+	&& attack(adj, NULL)
+	&& 2*worm[adj].effective_size > adjustment_down)
+      adjustment_down = 2*worm[adj].effective_size;
+  }
+
+  if (has_live_neighbor)
+    adjusted_value += adjustment_up;
+  adjusted_value -= adjustment_down;
+
+  return adjusted_value;
+
+  /*
+   * FIXME: It might be possible that parts of the dragon
+   *        can be cut in the process of capturing the (ww)
+   *        worm. In that case, not the entire size of the 
+   *        adjacent dead dragon should be counted as a positive
+   *        adjustment.  However, it seems difficult to do this
+   *        analysis, and in most cases it won't apply, so we
+   *        leave it as it is for now.
+   *
+   * TODO:
+   *   - cache the result?
+   */
+}
+
+
 /*
- * Estimate the direct territorial value of a move at (m,n).
+ * Estimate the direct territorial value of a move at (pos).
  */
 static void
 estimate_territorial_value(int pos, int color,
@@ -2237,8 +2355,11 @@ estimate_territorial_value(int pos, int color,
 	break;
       }
 
+#if 0
       this_value = 2 * worm[aa].effective_size;
-
+#else
+      this_value = attacked_worm_value(aa);
+#endif
       /* If the stones are dead, there is only a secondary value in
        * capturing them tactically as well.
        */
@@ -2272,7 +2393,6 @@ estimate_territorial_value(int pos, int color,
 	TRACE("  %1m: %f - attack on worm %1m with bad ko\n",
 	      pos, this_value, aa);
       }	
-
       
       tot_value += this_value;
       break;
@@ -2373,15 +2493,30 @@ estimate_territorial_value(int pos, int color,
 	break;
       }
       
-      /* The followup value of a move threatening to attack (ai,aj)
+      /* The followup value of a move threatening to attack (aa)
        * is twice its effective size, with adjustments. If the
        * worm has an adjacent (friendly) dead dragon we add its
        * value. On the other hand if it has an adjacent critical
-       * worm, and if (m,n) does not defend that worm, we subtract
-       * the value of the worm, since (ai,aj) may be defended by
+       * worm, and if (pos) does not defend that worm, we subtract
+       * the value of the worm, since (aa) may be defended by
        * attacking that worm. We make at most one adjustment
        * of each type.
-       */	 
+       *
+       * FIXME: It might be possible that parts of the dragon
+       *        can be cut in the process of capturing the (aa)
+       *        worm. In that case, not the entire size of the 
+       *        adjacent dead dragon should be counted as a positive
+       *        adjustment.  However, it seems difficult to do this
+       *        analysis, and in most cases it won't apply, so we
+       *        leave it as it is for now.
+       *
+       * FIXME: The same analysis should be applied to
+       *        DEFEND_THREAT_MOVE, ATTACK_MOVE, DEFEND_MOVE;
+       *        ATTACK_EITHER_MOVE, DEFEND_BOTH_MOVE, and possibly
+       *        the owl attack/defend move reasons.  It should be 
+       *        broken out as separate functions and dealt with in
+       *        a structured manner.
+       */
 
       if (trymove(pos, color, "estimate_territorial_value",
 		   NO_MOVE, EMPTY, NO_MOVE)) {
@@ -2732,7 +2867,7 @@ estimate_territorial_value(int pos, int color,
 
 
 /*
- * Estimate the influence value of a move at (m,n).
+ * Estimate the influence value of a move at (pos).
  *
  * FIXME: This is much too simplified.
  */
@@ -2788,7 +2923,7 @@ estimate_influence_value(int pos, int color,
 }
 
 /*
- * Estimate the strategical value of a move at (m,n).
+ * Estimate the strategical value of a move at (pos).
  */
 static void
 estimate_strategical_value(int pos, int color, float score)
@@ -2846,8 +2981,8 @@ estimate_strategical_value(int pos, int color, float score)
 	    && !move[pos].move_safety)
 	  break;
 	
-	/* This is totally ad hoc, just guessing the value of
-         * potential cutting points.
+	/* FIXME: This is totally ad hoc, just guessing the value of
+         *        potential cutting points.
 	 */
 	if (worm[aa].cutstone2 > 1) {
 	  this_value = 10.0 * (worm[aa].cutstone2 - 1);
@@ -2939,15 +3074,26 @@ estimate_strategical_value(int pos, int color, float score)
 	    && move_reason_known(pos, YOUR_ATARI_ATARI_MOVE, -1))
 	  break;
 
-	this_value = 2 * gg_min(worm[aa].effective_size,
-				worm[bb].effective_size);
-	if (move_reasons[r].type == ATTACK_EITHER_MOVE)
-	  TRACE("  %1m: %f - attacks either %1m or %1m\n",
-		pos, this_value, aa, bb);
-	else
-	  TRACE("  %1m: %f - defends both %1m and %1m\n",
-		pos, this_value, aa, bb);
+	{
+	  float aa_value;
+	  float bb_value;
 
+	  if (move_reasons[r].type == ATTACK_EITHER_MOVE) {
+	    aa_value = attacked_worm_value(aa);
+	    bb_value = attacked_worm_value(bb);
+	    this_value = gg_min(aa_value, bb_value);
+
+	    TRACE("  %1m: %f - attacks either %1m (%f) or %1m (%f)\n",
+		  pos, this_value, aa, aa_value, bb, bb_value);
+	  }
+	  else {
+	    this_value = 2 * gg_min(worm[aa].effective_size,
+				    worm[bb].effective_size);
+
+	    TRACE("  %1m: %f - defends both %1m and %1m\n",
+		  pos, this_value, aa, bb);
+	  }
+	}
 	tot_value += this_value;
 	break;
 	
@@ -3184,7 +3330,7 @@ estimate_strategical_value(int pos, int color, float score)
 }
 
 
-/* Look through the move reasons to see whether (m, n) is an antisuji move. */
+/* Look through the move reasons to see whether (pos) is an antisuji move. */
 static int
 is_antisuji_move(int pos)
 {
@@ -3277,7 +3423,7 @@ compare_move_reasons(const void *p1, const void *p2)
 
 
 /*
- * Combine the reasons for a move at (m, n) into an old style value.
+ * Combine the reasons for a move at (pos) into an old style value.
  * These heuristics are now somewhat less ad hoc but probably still
  * need a lot of improvement.
  */

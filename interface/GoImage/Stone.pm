@@ -25,6 +25,10 @@
 
 package GoImage::Stone;
 
+if (0) {
+  require GD;
+}
+
 use GD;
 use strict;
 use warnings;
@@ -35,7 +39,7 @@ BEGIN {
       # set the version for version checking
       $VERSION     = 0.01;
       # if using RCS/CVS, this may be preferred (???-tm)
-      $VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+      $VERSION = do { my @r = (q$Revision: 1.4 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
       @ISA         = qw(Exporter);
       @EXPORT      = qw(&createPngFile &parseFileName);
       %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
@@ -195,10 +199,10 @@ sub createPngFile {
     my ($tw, $th) = ($fw * length($text), $fh);  #TODO: Allow multi-line text.
     my ($ulx, $uly) = ($pixels/2 - $tw/2 + 1, $pixels/2 - $th/2);
     my ($lrx, $lry) = ($ulx + $tw, $uly + $th);
-    if (!$color) {
+    if (!$color or $text_color eq "blue") {
       $im->filledRectangle($ulx-2, $uly, $lrx, $lry, $colors{"ltgrey"});
     }
-    $im->string(gdSmallFont, $ulx, $uly, $text, $colors{$text_color});
+    $im->string($f, $ulx, $uly, $text, $colors{$text_color});
   }
   
   if ($square_color) {

@@ -20,6 +20,7 @@ libengine_a_SOURCES = \
       board.c \
       cache.c \
       clock.c \
+      combination.c \
       dragon.c \
       filllib.c \
       fuseki.c \
