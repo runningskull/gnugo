@@ -26,6 +26,7 @@
 - komaster_to_string now takes 2 arguments
 - new define KOMASTER_TRACE; set to log all komaster_trymove calls
 - copyright notices updated
+- DRAGON2 macro array bounds checking is not the default
 - doc revision
 - additional correct answers added to reading.tst
 
