@@ -1438,8 +1438,8 @@ get_saved_worms(int pos, char saved[BOARDMAX])
  */
 void
 mark_changed_dragon(int pos, int color, int affected, int affected2,
-    		    int move_reason_type, char changed_stones[BOARDMAX],
-		    float *effective_size)
+    		    int move_reason_type, char safe_stones[BOARDMAX],
+		    float strength[BOARDMAX], float *effective_size)
 {
   int ii;
   char new_status = INFLUENCE_SAVED_STONE;
@@ -1456,7 +1456,7 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
     case OWL_ATTACK_MOVE_GOOD_KO:
     case OWL_ATTACK_MOVE_BAD_KO:
       ASSERT1(board[affected] == OTHER_COLOR(color), pos);
-      new_status = INFLUENCE_CAPTURED_STONE;
+      new_status = 0;
       if (effective_size != NULL)
 	*effective_size = dragon[affected].effective_size;
       break;
@@ -1474,7 +1474,7 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
       break;
     case OWL_ATTACK_MOVE_GAIN:
       ASSERT1(board[affected] == OTHER_COLOR(color), pos);
-      new_status = INFLUENCE_CAPTURED_STONE;
+      new_status = 0;
       if (effective_size != NULL)
 	*effective_size = worm[affected2].effective_size;
       break;
@@ -1491,12 +1491,12 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
   }
 
   if (move_reason_type == OWL_ATTACK_MOVE_GAIN)
-    mark_string(affected2, changed_stones, new_status);
+    mark_changed_string(affected2, safe_stones, strength, new_status);
   else {
     for (ii = first_worm_in_dragon(affected); ii != NO_MOVE; 
 	 ii = next_worm_in_dragon(ii))
-      if (new_status == INFLUENCE_CAPTURED_STONE)
-	mark_string(ii, changed_stones, new_status);
+      if (new_status == 0)
+	mark_changed_string(ii, safe_stones, strength, new_status);
       else {
 	int worm_is_safe = 0;
 	if (worm[ii].attack_codes[0] == NO_MOVE
@@ -1512,16 +1512,42 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
 	  /* This string can now be considered safe. Hence we mark the
 	   * whole string as such:
 	   */
-	  mark_string(ii, changed_stones, new_status);
+	  mark_changed_string(ii, safe_stones, strength, new_status);
 	  if (effective_size != NULL)
 	    *effective_size += worm[ii].effective_size;
 	}
       }
     if (move_reason_type == OWL_DEFEND_MOVE_LOSS) {
-      new_status = INFLUENCE_CAPTURED_STONE;
-      mark_string(affected2, changed_stones, new_status);
+      new_status = 0;
+      mark_changed_string(affected2, safe_stones, strength, new_status);
     }
   }
+}
+
+/* Marks the string at (affected) with the new status and accordingly
+ * with the new strength.
+ */
+void
+mark_changed_string(int affected, char safe_stones[BOARDMAX],
+    		    float strength[BOARDMAX], char new_status)
+{
+  float new_strength;
+  int ii;
+
+  gg_assert(IS_STONE(board[affected]));
+
+  if (new_status == 0)
+    new_strength = 0.0;
+  else {
+    gg_assert(new_status == INFLUENCE_SAVED_STONE);
+    new_strength = DEFAULT_STRENGTH;
+  }
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+    if (board[ii] == board[affected]
+	&& same_string(ii, affected)) {
+      strength[ii] = new_strength;
+      safe_stones[ii] = new_status;
+    }
 }
 
 

@@ -193,8 +193,10 @@ void discard_redundant_move_reasons(int pos);
 void list_move_reasons(int color);
 
 void mark_changed_dragon(int pos, int color, int affected, int affected2,
-			 int move_reason_type, char changed_stones[BOARDMAX],
-			 float *effective_size);
+			 int move_reason_type, char safe_stones[BOARDMAX],
+			 float strength[BOARDMAX], float *effective_size);
+void mark_changed_string(int affected, char changed_stones[BOARDMAX],
+			 float strength[BOARDMAX], char new_status);
 
 /*
  * Local Variables:

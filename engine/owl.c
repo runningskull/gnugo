@@ -4929,8 +4929,10 @@ compute_owl_escape_values(struct local_owl_data *owl)
 {
   int pos;
   int m, n;
+  char safe_stones[BOARDMAX];
   
-  compute_escape_influence(owl->goal, owl->color, owl->escape_values, 0);
+  get_lively_stones(OTHER_COLOR(owl->color), safe_stones);
+  compute_escape_influence(owl->color, safe_stones, NULL, owl->escape_values);
   DEBUG(DEBUG_ESCAPE, "Owl escape values:\n");
 
   for (m = 0; m < board_size; m++) {

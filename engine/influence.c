@@ -34,36 +34,30 @@ static void add_influence_source(int pos, int color, float strength,
                                  float attenuation,
                                  struct influence_data *q);
 static void segment_influence(struct influence_data *q);
-static void print_influence(struct influence_data *q,
-			    const char *info_string);
-static void print_numeric_influence(struct influence_data *q,
-				    float values[BOARDMAX],
+void print_influence(const struct influence_data *q,
+		     const char *info_string);
+static void print_numeric_influence(const struct influence_data *q,
+				    const float values[BOARDMAX],
 				    const char *format, int width,
 				    int draw_stones, int mark_epsilon);
-static void print_influence_areas(struct influence_data *q);
+static void print_influence_areas(const struct influence_data *q);
  
-static void value_territory(struct influence_data *q, int pos, int color);
+static void value_territory(struct influence_data *q);
 static void enter_intrusion_source(int source_pos, int strength_pos,
                                    float strength, float attenuation,
                                    struct influence_data *q);
 static void add_marked_intrusions(struct influence_data *q, int color);
-static void print_influence_territory(struct influence_data *q,
-                                      const char *info_string);
  
 
 /* Influence computed for the initial position, i.e. before making
  * some move.
  */
-static struct influence_data initial_influence;
-static struct influence_data initial_opposite_influence;
+struct influence_data initial_black_influence;
+struct influence_data initial_white_influence;
 
 /* Influence computed after some move has been made. */
-static struct influence_data move_influence;
-static struct influence_data followup_influence;
-
-/* Coordinates for the move influence was last computed for. */
-static int influence_move = NO_MOVE;
-static int influence_color = EMPTY;
+struct influence_data move_influence;
+struct influence_data followup_influence;
 
 /* Influence used for estimation of escape potential. */
 static struct influence_data escape_influence;
@@ -74,6 +68,8 @@ static struct influence_data *current_influence = NULL;
 /* Cache of delta_territory_values. */
 static float delta_territory_cache[BOARDMAX];
 static float followup_territory_cache[BOARDMAX];
+static int territory_cache_position_number = -1;
+static int territory_cache_color = -1;
 
 /* If set, print influence map when computing this move. Purely for
  * debugging.
@@ -113,7 +109,7 @@ static int debug_influence = NO_MOVE;
 
 
 #define code1(arg_di, arg_dj, arg, arg_d) do { \
-      if (q->p[arg] == EMPTY \
+      if (!q->safe[arg] \
 	  && ((arg_di)*(delta_i) + (arg_dj)*(delta_j) > 0 \
 	      || queue_start == 1)) { \
 	float contribution; \
@@ -334,29 +330,16 @@ accumulate_influence(struct influence_data *q, int pos, int color)
   }
 }
 
-/* Initialize the influence_data structure. If the dragons have been
- * computed, we weight the strength of the influence with the dragon
- * status.
- *
- * The saved_stones parameter tells which critical stones have been
- * defended (value INFLUENCE_SAVED_STONE) or attacked (value
- * INFLUENCE_CAPTURED_STONE) by the current move. If no move has been
- * done, it should only contain zeros (INFLUENCE_UNCHANGED_STONE).
- *
- * The name saved_stones is historic and should probably be changed
- * since it also includes captured stones.
- *
- */
+/* Initialize the influence_data structure.  */
 
 static void
 init_influence(struct influence_data *q, int color,
-	       char saved_stones[BOARDMAX])
+	       const char safe_stones[BOARDMAX], 
+	       const float strength[BOARDMAX])
 {
   int ii;
   float attenuation;
 
-  gg_assert(saved_stones != NULL);
-  
   if (q != &escape_influence) {
     q->color_to_move = color;
     if (q->is_territorial_influence)
@@ -373,8 +356,12 @@ init_influence(struct influence_data *q, int color,
   }
   
   q->intrusion_counter = 0;
+
+  /* Remember this for later. */
+  memcpy(q->safe, safe_stones, BOARDMAX * sizeof(*safe_stones));
+  q->captured = black_captured - white_captured;
   
-  for (ii = 0; ii < BOARDMAX; ii++)
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
       /* Initialize. */
       q->white_influence[ii] = 0.0;
@@ -385,97 +372,39 @@ init_influence(struct influence_data *q, int color,
       q->black_permeability[ii] = 1.0;
       q->white_strength[ii] = 0.0;
       q->black_strength[ii] = 0.0;
-      q->p[ii] = board[ii];
       q->non_territory[ii] = EMPTY;
 
-      /* FIXME: Simplify the code below! */
-      
-      /* Dead stones (or critical ones for the color which will not
-       * make the next move) count as empty space. However, influence
-       * cannot flow through these for the owner of the stones.
-       */
       if (IS_STONE(board[ii])) {
-	if (saved_stones[ii] == INFLUENCE_CAPTURED_STONE
-	    || (saved_stones[ii] == INFLUENCE_UNCHANGED_STONE
-		&& ((worm[ii].attack_codes[0] != 0
-		    && (OTHER_COLOR(q->p[ii]) == color
-			|| worm[ii].defense_codes[0] == 0))
-		    || (q->dragons_known
-			&& dragon[ii].id != -1
-			&& (DRAGON2(ii).safety == DEAD
-			    || DRAGON2(ii).safety == TACTICALLY_DEAD
-			    || (DRAGON2(ii).safety == CRITICAL
-				&& board[ii] == OTHER_COLOR(color))))))) {
-	  if (q->p[ii] == WHITE)
+	if (!safe_stones[ii]) {
+	  if (board[ii] == WHITE)
 	    q->white_permeability[ii] = 0.0;
 	  else
 	    q->black_permeability[ii] = 0.0;
-	  q->p[ii] = EMPTY;
 	}
-	else if (saved_stones[ii] == INFLUENCE_SAVED_STONE
-		 || !q->dragons_known
-		 || dragon[ii].id == -1
-		 || (DRAGON2(ii).safety != DEAD
-		     && DRAGON2(ii).safety != TACTICALLY_DEAD
-		     && DRAGON2(ii).safety != CRITICAL)
-		 || (DRAGON2(ii).safety == CRITICAL
-		     && board[ii] == color)) {
-	  if (q->p[ii] == WHITE)
+	else {
+	  if (board[ii] == WHITE) {
+	    if (strength)
+	      q->white_strength[ii] = strength[ii];
+	    else
+	      q->white_strength[ii] = DEFAULT_STRENGTH;
 	    q->black_permeability[ii] = 0.0;
-	  else
+	  }
+	  else {
+	    if (strength)
+	      q->black_strength[ii] = strength[ii];
+	    else
+	      q->black_strength[ii] = DEFAULT_STRENGTH;
 	    q->white_permeability[ii] = 0.0;
+	  }
 	}
-
-	/* We need to make an exception to the rules above for
-         * INESSENTIAL stones. Instead of making the conditions above
-         * still more complex we correct it here.
-	 *
-	 * If q->p[ii] is allowed to be 0, the territory evaluation
-	 * will think it's a prisoner for the opponent, and various
-	 * territory corrections and interpolations will mess up.
+      }
+      else
+	/* Ideally, safe_stones[] should always be zero for empty
+	 * intersections. This is currently, however, sometimes not true
+	 * when an inessential worm gets captured. So we revise this
+	 * in our private copy here.
 	 */
-	if (IS_STONE(board[ii])
-	    && q->dragons_known
-	    && dragon[ii].id != -1
-	    && (DRAGON2(ii).safety == INESSENTIAL
-	        || (worm[ii].inessential
-		    && ((DRAGON2(ii).safety != DEAD
-			 && DRAGON2(ii).safety != TACTICALLY_DEAD
-		         && DRAGON2(ii).safety != CRITICAL)
-		        || (DRAGON2(ii).safety == CRITICAL
-		            && board[ii] == color)))) 
-	    && q->p[ii] == EMPTY)
-	  q->p[ii] = board[ii];
-      }
-      
-      /* When evaluating influence after a move, the newly placed
-       * stone will have the invalid dragon id -1.
-       */
-      if (IS_STONE(board[ii])) {
-	if (!q->dragons_known || saved_stones[ii] == INFLUENCE_SAVED_STONE) {
-	  if (q->p[ii] == WHITE)
-	    q->white_strength[ii] = DEFAULT_STRENGTH;
-	  else if (q->p[ii] == BLACK)
-	    q->black_strength[ii] = DEFAULT_STRENGTH;
-	}
-	else if (saved_stones[ii] != INFLUENCE_CAPTURED_STONE) {
-	  ASSERT1(dragon[ii].id != -1, ii);
-	  if (q->p[ii] == WHITE) {
-	    if (color == BLACK && DRAGON2(ii).safety == CRITICAL)
-	      q->white_strength[ii] = 0.0;
-	    else
-	      q->white_strength[ii] = DEFAULT_STRENGTH
-				      * (1.0 - 0.3 * DRAGON2(ii).weakness_pre_owl);
-	  }
-	  else if (q->p[ii] == BLACK) {
-	    if (color == WHITE && DRAGON2(ii).safety == CRITICAL)
-	      q->black_strength[ii] = 0.0;
-	    else
-	      q->black_strength[ii] = DEFAULT_STRENGTH
-				      * (1.0 - 0.3 * DRAGON2(ii).weakness_pre_owl);
-	  }
-	}
-      }
+	q->safe[ii] = 0;
     }
 }
 
@@ -547,12 +476,12 @@ reset_unblocked_blocks(struct influence_data *q)
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos)) {
-      if (q->p[pos] == EMPTY && q->white_strength[pos] > 0.0
+      if (!q->safe[pos] && q->white_strength[pos] > 0.0
 	  && q->white_permeability[pos] != 1.0) {
 	DEBUG(DEBUG_INFLUENCE, "  black block removed from %1m\n", pos);
 	q->white_permeability[pos] = 1.0;
       }
-      if (q->p[pos] == EMPTY && q->black_strength[pos] > 0.0
+      if (!q->safe[pos] && q->black_strength[pos] > 0.0
 	  && q->black_permeability[pos] != 1.0) {
 	DEBUG(DEBUG_INFLUENCE, "  white block removed from %1m\n", pos);
 	q->black_permeability[pos] = 1.0;
@@ -988,14 +917,14 @@ find_influence_patterns(struct influence_data *q, int color)
    */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)
-	&& IS_STONE(q->p[ii])) {
+	&& q->safe[ii]) {
       int k;
       for (k = 0; k < 8; k++) {
 	int d = delta[k];
-	if (ON_BOARD(ii + d) && q->p[ii + d] == EMPTY) {
+	if (ON_BOARD(ii + d) && !q->safe[ii + d]) {
 	  /* Reduce less diagonally. */
 	  float reduction = (k < 4) ? 0.25 : 0.65;
-	  if (q->p[ii] == BLACK)
+	  if (board[ii] == BLACK)
 	    q->white_permeability[ii + d] *= reduction;
 	  else
 	    q->black_permeability[ii + d] *= reduction;
@@ -1006,48 +935,24 @@ find_influence_patterns(struct influence_data *q, int color)
   reset_unblocked_blocks(q);
 }
 
-/* Compute the influence values for both colors, after having made a
- * move for OTHER_COLOR(color) at (pos). If these move is NO_MOVE
- * no move is made. In any case it's assumed that color is in turn to
- * move. (This affects the barrier patterns (class A, D) and intrusions
- * (class B)).
+
+/* Do the real work of influence computation. This is called from
+ * compute_influence and compute_escape_influence.
  */
 static void
-compute_influence(struct influence_data *q, int color, int pos,
-		  char no_influence[BOARDMAX], char saved_stones[BOARDMAX])
+do_compute_influence(int color, const char safe_stones[BOARDMAX],
+    		     const float strength[BOARDMAX], struct influence_data *q,
+		     int move, const char *trace_message)
 {
   int ii;
-  char dummy_saved_stones[BOARDMAX];
-  if (saved_stones != NULL)
-    init_influence(q, color, saved_stones);
-  else {
-    memset(dummy_saved_stones, 0, sizeof(dummy_saved_stones));
-    init_influence(q, color, dummy_saved_stones);
-  }
+  init_influence(q, color, safe_stones, strength);
 
-#if 0
-  /* This is used when computing escape influence to remove the
-   * influence from the escaping dragon.
-   */
-  if (no_influence) {
-    for (i = 0; i < board_size; i++)
-      for (j = 0; j < board_size; j++)
-	if (no_influence[i][j]) {
-	  q->p[i][j] = EMPTY;
-	  q->white_strength[i][j] = 0.0;
-	  q->black_strength[i][j] = 0.0;
-	  q->white_permeability[i][j] = 1.0;
-	  q->black_permeability[i][j] = 1.0;
-	}
-  }
-#else
-  UNUSED(no_influence);
-#endif
-  
+  modify_depth_values(stackp - 1);
   if (q != &escape_influence)
     find_influence_patterns(q, color);
   else
     find_influence_patterns(q, EMPTY);
+  modify_depth_values(1 - stackp);
   
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
@@ -1057,28 +962,50 @@ compute_influence(struct influence_data *q, int color, int pos,
 	accumulate_influence(q, ii, BLACK);
     }
 
-  value_territory(q, pos, color);
+  value_territory(q);
   segment_influence(q);
   
-  if (((q == &initial_influence || q == &initial_opposite_influence)
+  if ((move == NO_MOVE
        && (printmoyo & PRINTMOYO_INITIAL_INFLUENCE))
-      || (debug_influence && pos == debug_influence)) {
-    if (q == &initial_opposite_influence)
-      print_influence(q, (q->dragons_known ? "dragons_known, opposite, color"
-			  : "dragons_unknown, opposite, color"));
-    else
-      print_influence(q, q->dragons_known ? "dragons_known"
-	  		 : "dragons_unknown");
-  }
+      || (debug_influence && move == debug_influence))
+    print_influence(q, trace_message);
+}
+
+
+/* Compute the influence values for both colors.
+ * 
+ * The caller must
+ * - set up the board[] state
+ * - mark safe stones with INFLUENCE_SAFE_STONE, dead stones with 0
+ * - mark stones newly saved by a move with INFLUENCE_SAVED_STONE
+ *   (this is relevant if the influence_data *q is reused to compute
+ *   a followup value for this move).
+ *
+ * Results will be stored in q.
+ *
+ * (move) has no effects except toggling debugging. Set it to -1
+ * for no debug output at all (otherwise it will be controlled by
+ * the -m command line option).
+ *
+ * It is assumed that color is in turn to move. (This affects the
+ * barrier patterns (class A, D) and intrusions (class B)). Color
+ */
+
+void
+compute_influence(int color, const char safe_stones[BOARDMAX],
+    	          const float strength[BOARDMAX], struct influence_data *q,
+		  int move, const char *trace_message)
+{
+  q->is_territorial_influence = 1;
+  q->color_to_move = color;
+  do_compute_influence(color, safe_stones, strength, q, move, trace_message);
 }
 
 /* Return the color of the territory at (pos). If it's territory for
  * neither color, EMPTY is returned.
- * The definition of territory in terms of the influences is totally
- * ad hoc.
  */
-static int
-whose_territory(struct influence_data *q, int pos)
+int
+whose_territory(const struct influence_data *q, int pos)
 {
   float bi = q->black_influence[pos];
   float wi = q->white_influence[pos];
@@ -1095,12 +1022,12 @@ whose_territory(struct influence_data *q, int pos)
   return EMPTY;
 }
 
-/* Return the color who has a moyo at (m, n). If neither color has a
+/* Return the color who has a moyo at (pos). If neither color has a
  * moyo there, EMPTY is returned. The definition of moyo in terms of the
  * influences is totally ad hoc.
  */
-static int
-whose_moyo(struct influence_data *q, int pos)
+int
+whose_moyo(const struct influence_data *q, int pos)
 {
   float bi = q->black_influence[pos];
   float wi = q->white_influence[pos];
@@ -1118,7 +1045,7 @@ whose_moyo(struct influence_data *q, int pos)
   return EMPTY;
 }
 
-/* Return the color who has a moyo at (m, n). If neither color has a
+/* Return the color who has a moyo at (pos). If neither color has a
  * moyo there, EMPTY is returned.
  * The definition of moyo in terms of the influences is totally ad
  * hoc.
@@ -1129,7 +1056,7 @@ whose_moyo(struct influence_data *q, int pos)
  * an eye space inhibition.
  */
 static int
-whose_moyo_restricted(struct influence_data *q, int pos)
+whose_moyo_restricted(const struct influence_data *q, int pos)
 {
   float bi = q->black_influence[pos];
   float wi = q->white_influence[pos];
@@ -1161,13 +1088,13 @@ whose_moyo_restricted(struct influence_data *q, int pos)
 }
 
 
-/* Return the color who has dominating influence ("area") at (m, n).
+/* Return the color who has dominating influence ("area") at (pos).
  * If neither color dominates the influence there, EMPTY is returned.
  * The definition of area in terms of the influences is totally ad
  * hoc.
  */
-static int
-whose_area(struct influence_data *q, int pos)
+int
+whose_area(const struct influence_data *q, int pos)
 {
   float bi = q->black_influence[pos];
   float wi = q->white_influence[pos];
@@ -1211,7 +1138,7 @@ struct interpolation_data territory_correction =
   { 5, (float) 0.0, 1.0, {0.0, 0.25, 0.45, 0.65, 0.85, 1.0}};
 
 static void
-value_territory(struct influence_data *q, int pos, int color)
+value_territory(struct influence_data *q)
 {
   int ii;
   int dist_i, dist_j;
@@ -1225,7 +1152,7 @@ value_territory(struct influence_data *q, int pos, int color)
     if (ON_BOARD(ii)) {
       first_guess[ii] = 0.0;
 
-      if (q->p[ii] == EMPTY) {
+      if (!q->safe[ii]) {
         float diff = 0.0;
         if (q->white_influence[ii] + q->black_influence[ii] > 0)
           diff = (q->white_influence[ii] - q->black_influence[ii])
@@ -1271,14 +1198,14 @@ value_territory(struct influence_data *q, int pos, int color)
        * FIXME: This does not do what it claims to do. Correcting it
        * seems to break some tests, though.
        */
-      if (q->p[ii] == EMPTY) {
+      if (!q->safe[ii]) {
 	/* Loop over all neighbors. */
         for (k = 0; k < 4; k++) {
           if (!ON_BOARD(ii + delta[k]))
             continue;
           if (q->territory_value[ii] > 0.0) {
             /* White territory. */
-            if (q->p[ii + delta[k]] != WHITE) {
+            if (!q->safe[ii + delta[k]]) {
 	      float neighbor_val =
 		q->black_permeability[ii + delta[k]]
 		  * first_guess[ii + delta[k]]
@@ -1290,7 +1217,7 @@ value_territory(struct influence_data *q, int pos, int color)
           }
           else {
             /* Black territory. */
-            if (q->p[ii + delta[k]] != BLACK) {
+            if (!q->safe[ii + delta[k]]) {
 	      float neighbor_val =
 		q->white_permeability[ii + delta[k]]
 		  * first_guess[ii + delta[k]]
@@ -1307,7 +1234,7 @@ value_territory(struct influence_data *q, int pos, int color)
   /* Third loop: Nonterritory patterns, points for prisoners. */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
-      if (q->p[ii] == EMPTY) {
+      if (!q->safe[ii]) {
 	/* If marked as non-territory for the color currently owning
          * it, reset the territory value.
 	 */
@@ -1319,29 +1246,13 @@ value_territory(struct influence_data *q, int pos, int color)
 	    && (q->non_territory[ii] & BLACK))
 	  q->territory_value[ii] = 0.0;
 	
-	/* Dead stone, add one to the territory value.
-	 *
-	 * We also want to include stones which were captured by the
-	 * last move when computing move influence. Therefore we look
-	 * at worm[ii].color instead of just board[ii].
-	 */
-	if (worm[ii].color == BLACK)
+	/* Dead stone, add one to the territory value. */
+	if (board[ii] == BLACK)
 	  q->territory_value[ii] += 1.0;
-	else if (worm[ii].color == WHITE)
+	else if (board[ii] == WHITE)
 	  q->territory_value[ii] -= 1.0;
       }
     }
-
-  /* Final correction. Never count the last played move as territory
-   * for the color playing it. Ideally this should never happen, but
-   * currently we need this workaround.
-   */
-  if (ON_BOARD(pos)) {
-    if (color == BLACK && q->territory_value[pos] < 0.0)
-      q->territory_value[pos] = 0.0;
-    else if (color == WHITE && q->territory_value[pos] > 0.0)
-      q->territory_value[pos] = 0.0;
-  }
 }
 
 
@@ -1380,7 +1291,7 @@ segment_region(struct influence_data *q, owner_function_ptr region_owner,
 	  int tt = q->queue[queue_start];
 	  int k;
 	  queue_start++;
-	  if (q->p[tt] != color) {
+	  if (!q->safe[tt] || board[tt] != color) {
 	    size++;
 	    if (q->is_territorial_influence)
 	      terr_val += gg_abs(q->territory_value[tt]);
@@ -1437,51 +1348,19 @@ segment_influence(struct influence_data *q)
   segment_region(q, whose_area,      IS_AREA,      q->area_segmentation);
 }
 
-/* Return the size of the moyo around (pos).
- */
-int
-influence_get_moyo_size(int pos, int color)
-{
-  int result1 = 0;
-  int result2 = 0;
-  struct influence_data *q;
 
-  q = &initial_influence;
-
-  /* Does the color match. */
-  if ((q->region_type[q->moyo_segmentation[pos]] == WHITE_MOYO)
-      ^ (color == BLACK))
-    result1 = q->region_size[q->moyo_segmentation[pos]];
-
-  q = &initial_opposite_influence;
-
-  /* Does the color match. */
-  if ((q->region_type[q->moyo_segmentation[pos]] == WHITE_MOYO)
-      ^ (color == BLACK))
-    result2 = q->region_size[q->moyo_segmentation[pos]];
-
-  return gg_min(result1, result2);
-}
-
-/* Export the moyo segmentation. If (opposite) is true, then
- * initial_opposite_influence is used, otherwise initial_influence.
- */
+/* Export the moyo segmentation. */
 void
-influence_get_moyo_segmentation(int opposite, struct moyo_data *moyos)
+influence_get_moyo_segmentation(const struct influence_data *q,
+    			        struct moyo_data *moyos)
 {
   int ii;
   int min_moyo_id;
   int max_moyo_id;
   int i;
-  struct influence_data *q;
 
   min_moyo_id = MAX_REGIONS;
   max_moyo_id = 0;
-
-  if (opposite)
-    q = &initial_opposite_influence;
-  else
-    q = &initial_influence;
 
   /* Find out range of region ids used by moyos. */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
@@ -1518,17 +1397,11 @@ influence_get_moyo_segmentation(int opposite, struct moyo_data *moyos)
 
 /* Another function to export a certain amount of moyo data. */
 void
-influence_get_moyo_data(int opposite, int moyo_color[BOARDMAX],
+influence_get_moyo_data(const struct influence_data *q,
+    		        int moyo_color[BOARDMAX],
 			float territory_value[BOARDMAX])
 {
   int ii;
-  struct influence_data *q;
-
-  if (opposite)
-    q = &initial_opposite_influence;
-  else
-    q = &initial_influence;
-
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
       moyo_color[ii] = whose_moyo_restricted(q, ii);
@@ -1541,177 +1414,101 @@ influence_get_moyo_data(int opposite, int moyo_color[BOARDMAX],
  * it is given from (color)'s point of view.
  */
 float
-influence_initial_territory(int pos, int color)
+influence_territory(const struct influence_data *q, int pos, int color)
 {
   if (color == WHITE)
-    return initial_influence.territory_value[pos];
+    return q->territory_value[pos];
   else
-    return -initial_influence.territory_value[pos];
+    return -q->territory_value[pos];
 }
 
-/* Compute the influence before a move has been made, which can
- * later be compared to the influence after a move. Assume that
- * the other color is in turn to move.
- */
-void
-compute_initial_influence(int color, int dragons_known)
-{
-  int ii;
-
-  initial_influence.dragons_known = dragons_known;
-  initial_influence.is_territorial_influence = dragons_known;
-  initial_opposite_influence.dragons_known = dragons_known;
-  initial_opposite_influence.is_territorial_influence = 1;
-
-  decrease_depth_values();
-
-  compute_influence(&initial_influence, OTHER_COLOR(color), NO_MOVE,
-		    NULL, NULL);
-  if (dragons_known) {
-    if ((printmoyo & PRINTMOYO_VALUE_TERRITORY)
-	&& (printmoyo & PRINTMOYO_INITIAL_INFLUENCE))
-      print_influence_territory(&initial_influence,
-				"territory (initial influence):\n");
-  }
-
-  compute_influence(&initial_opposite_influence, color, NO_MOVE, NULL, NULL);
-  /* Invalidate information in move_influence. */
-  influence_move = NO_MOVE;
-  influence_color = EMPTY;
-  /* Clear delta_territory cache. */
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      delta_territory_cache[ii] = NOT_COMPUTED;
-      followup_territory_cache[ii] = NOT_COMPUTED;
-    }
-
-  increase_depth_values();
-}
 
 /* Redo the segmentation of the initial influence. */
 void
 resegment_initial_influence()
 {
-  segment_influence(&initial_influence);
-  segment_influence(&initial_opposite_influence);
+  segment_influence(&initial_black_influence);
+  segment_influence(&initial_white_influence);
 }
 
-/* Experimental influence: Compute a followup influence for the move at
- * (m, n). Compute the territorial followup value.
+/* Compute a followup influence. It is assumed that the stones that
+ * deserve a followup have been marked INFLUENCE_SAVED_STONE in
+ * base->safe.
  */
-static void
-compute_followup_influence(int pos, int color,
-                           char saved_stones[BOARDMAX])
+void
+compute_followup_influence(const struct influence_data *base,
+    			   struct influence_data *q,
+			   int move, const char *trace_message) 
 {
   int ii;
   char goal[BOARDMAX];
+  /* This is the color that will get a followup value. */
+  int color = OTHER_COLOR(base->color_to_move);
 
-  UNUSED(pos);
-  memcpy(&followup_influence, &move_influence, sizeof(move_influence));
+  memcpy(q, base, sizeof(*q));
  
-  /* We mark the saved stones and their neighbors in the goal array
-   * and in q->w.
+  /* We mark the saved stones and their neighbors in the goal array.
    */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
-      if (saved_stones[ii])
+      if (q->safe[ii] == INFLUENCE_SAVED_STONE)
         goal[ii] = 1;
       else
 	goal[ii] = 0;
     }
 
-  followup_influence.intrusion_counter = 0;
+  q->intrusion_counter = 0;
 
-  current_influence = &followup_influence;
+  current_influence = q;
   /* Match B patterns for saved stones. */
   matchpat_goal_anchor(followup_influence_callback, color, &barrierspat_db, 
-           	       &followup_influence, goal, 1);
+           	       q, goal, 1);
  
   /* Now add the intrusions. */
-  add_marked_intrusions(&followup_influence, color);
+  add_marked_intrusions(q, color);
 
-  reset_unblocked_blocks(&followup_influence);
+  reset_unblocked_blocks(q);
   
   /* Spread influence for new influence sources. */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii))
       if ((color == BLACK
-          && followup_influence.black_strength[ii]
-             > move_influence.black_strength[ii])
+            && q->black_strength[ii] > base->black_strength[ii])
           || (color == WHITE
-          && followup_influence.white_strength[ii]
-             > move_influence.white_strength[ii]))
-        accumulate_influence(&followup_influence, ii, color);
+              && q->white_strength[ii] > base->white_strength[ii]))
+        accumulate_influence(q, ii, color);
 
-  value_territory(&followup_influence, pos, color);
-}
+  value_territory(q);
 
-/* Let color play at (m, n) and compute the influence after this move,
- * assuming that the other color is in turn to move next.
- */
-static void
-compute_move_influence(int pos, int color,
-		       char saved_stones[BOARDMAX])
-{
-  /* Don't recompute if we already have the current values stored. */
-  if (influence_move == pos
-      && influence_color == color)
-    return;
-
-  move_influence.dragons_known = 1;
-  move_influence.is_territorial_influence = 1;
-
-  if (tryko(pos, color, "compute_move_influence", EMPTY, NO_MOVE)) {
-    compute_influence(&move_influence, OTHER_COLOR(color), pos,
-		      NULL, saved_stones);
-    compute_followup_influence(pos, color, saved_stones);
-    popgo();
-
-    if (debug_influence && debug_influence == pos) {
-      if (printmoyo & PRINTMOYO_VALUE_TERRITORY)
-        print_influence_territory(&move_influence,
-	    			  "territory (after move):\n");
-      print_influence(&followup_influence, "followup influence");
-      if (printmoyo & PRINTMOYO_VALUE_TERRITORY)
-	print_influence_territory(&followup_influence,
-				  "territory (followup):\n");
-    }
-  }
-  else {
-    gprintf("Computing influence for illegal move %1m (move number %d)\n",
-	    pos, movenum+1);
-    return;
-  }
-
-  influence_move = pos;
-  influence_color = color;
+  if (debug_influence && debug_influence == move)
+    print_influence(q, trace_message);
 }
 
 
-/* Assume that the stones marked by the goal array do not generate
- * influence and compute influence. Influence based escape values are
- * returned in the escape_value array.  
+/* Compute influence based escape values and return them in the
+ * escape_value array.  
  */
 
 void
-compute_escape_influence(char goal[BOARDMAX], int color,
-			 char escape_value[BOARDMAX],
-			 int dragons_known)
+compute_escape_influence(int color, const char safe_stones[BOARDMAX],
+    			 const float strength[BOARDMAX],
+    			 char escape_value[BOARDMAX])
 {
   int k;
   int ii;
 
-  /* IMPORTANT: This caching relies on the fact that the goal
-   * parameter currently is not used.
+  /* IMPORTANT: The caching relies on the fact that safe_stones[] and
+   * strength[] will currently always be identical for identical board[]
+   * states. Better check for these, too.
    */
   static int cached_board[BOARDMAX];
-  static char escape_values[BOARDMAX][4];
-  static int active_caches[4];
+  static char escape_values[BOARDMAX][2];
+  static int active_caches[2] = {0, 0};
 
   /* Encode the values of color and dragons_known into an integer
    * between 0 and 3.
    */
-  int cache_number = 2 * (color == WHITE) + dragons_known;
+  int cache_number = (color == WHITE);
 
   int board_was_cached = 1;
 
@@ -1726,7 +1523,7 @@ compute_escape_influence(char goal[BOARDMAX], int color,
   }
 
   if (!board_was_cached)
-    for (k = 0; k < 4; k++)
+    for (k = 0; k < 2; k++)
       active_caches[k] = 0;
   
   if (active_caches[cache_number]) {
@@ -1739,12 +1536,10 @@ compute_escape_influence(char goal[BOARDMAX], int color,
 
   /* Use enhance pattern and higher attenuation for escape influence. */
   escape_influence.is_territorial_influence = 0;
-  escape_influence.dragons_known = dragons_known;
+  escape_influence.color_to_move = EMPTY;
 
-  decrease_depth_values();
-  compute_influence(&escape_influence, OTHER_COLOR(color), NO_MOVE,
-		    goal, NULL);
-  increase_depth_values();
+  do_compute_influence(OTHER_COLOR(color), safe_stones, strength,
+      		       &escape_influence, -1, NULL);
   
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
@@ -1774,90 +1569,99 @@ compute_escape_influence(char goal[BOARDMAX], int color,
   active_caches[cache_number] = 1;
 }
 
-
-/* Return the color who has territory at pos, or EMPTY. */
-int
-influence_territory_color(int pos)
-{
-  return whose_territory(&initial_influence, pos);
-}
-
-/* Return the color who has moyo at pos, or EMPTY. */
-int
-influence_moyo_color(int pos)
-{
-  return whose_moyo(&initial_influence, pos);
-}
-
-/* Return the color who has moyo at pos, or EMPTY, using influence
- * computed with the opposite color to move.
+/* We cache territory computations. This avoids unnecessary re-computations
+ * when review_move_reasons is run a second time for the endgame patterns.
  */
-int
-influence_moyo_color_opposite(int pos)
+int 
+retrieve_delta_territory_cache(int pos, int color, float *move_value,
+    			       float *followup_value)
 {
-  return whose_moyo(&initial_opposite_influence, pos);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(IS_STONE(color), pos);
+
+  if (territory_cache_position_number == position_number
+      && territory_cache_color == color
+      && delta_territory_cache[pos] != NOT_COMPUTED) {
+    *move_value = delta_territory_cache[pos];
+    *followup_value = followup_territory_cache[pos];
+    if (0) 
+      gprintf("%1m: retrieved territory value from cache: %f, %f\n", pos,
+	      *move_value, *followup_value);
+    return 1;
+  }
+  return 0;
 }
 
-/* Return the color who has area at pos, or EMPTY. */
-int
-influence_area_color(int pos)
+void 
+store_delta_territory_cache(int pos, int color,
+			    float move_value, float followup_value)
 {
-  return whose_area(&initial_influence, pos);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(IS_STONE(color), pos);
+
+  if (territory_cache_position_number != position_number
+      || territory_cache_color != color) {
+    int ii;
+    for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+      delta_territory_cache[ii] = NOT_COMPUTED;
+    territory_cache_position_number = position_number;
+    territory_cache_color = color;
+    if (0)
+      gprintf("Cleared delta territory cache.\n");
+  }
+  delta_territory_cache[pos] = move_value;
+  followup_territory_cache[pos] = followup_value;
+  if (0)
+    gprintf("%1m: Stored delta territory cache: %f, %f\n", pos, move_value,
+	    followup_value);
 }
 
-/* Compute the difference in territory made by a move by color at (pos).
- * This also includes the changes in moyo and area.
- * In experimental-influence mode, followup_value must not be a NULL
- * pointer, and the followup_value will be returned there.
+/* Compute the difference in territory between two influence data,
+ * from the point of view of (color).
+ * (move) is only passed for debugging output.
  */
 float
-influence_delta_territory(int pos, int color, char saved_stones[BOARDMAX],
-                          float *followup_value)
+influence_delta_territory(const struct influence_data *base,
+    			  const struct influence_data *q, int color,
+			  int move)
 {
   int ii;
-  float delta = 0.0;
-  float followup_delta = 0.0;
-  if (delta_territory_cache[pos] != NOT_COMPUTED) {
-    gg_assert(followup_territory_cache[pos] != NOT_COMPUTED);
-    gg_assert(followup_value != NULL);
-    *followup_value = followup_territory_cache[pos];
-    return delta_territory_cache[pos];
-  }
-  if (0)
-    gprintf("influence_delta_territory for %1m %s = ", pos,
-	    color_to_string(color));
-
-  compute_move_influence(pos, color, saved_stones);
+  float total_delta = 0.0;
+  ASSERT_ON_BOARD1(move);
+  ASSERT1(IS_STONE(color), move);
 
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
-      float new_value = move_influence.territory_value[ii];
-      float old_value = initial_influence.territory_value[ii];
-      float followup_value = followup_influence.territory_value[ii];
+      float new_value = q->territory_value[ii];
+      float old_value = base->territory_value[ii];
+      float this_delta = new_value - old_value;
       /* Negate values if we are black. */
       if (color == BLACK) {
 	new_value = -new_value;
 	old_value = -old_value;
-	followup_value = -followup_value;
+	this_delta = -this_delta;
       }
       
-      if (new_value - old_value > 0.02
-          || old_value - new_value > 0.02)
+      if (move != -1
+	  && (this_delta > 0.02
+              || -this_delta > 0.02))
 	DEBUG(DEBUG_TERRITORY, "  %1m:   - %1m territory change %f (%f -> %f)\n",
-	      pos, ii, new_value - old_value, old_value, new_value);
-      delta += new_value - old_value;
-      followup_delta += followup_value - new_value;
+	      move, ii, this_delta, old_value, new_value);
+      total_delta += this_delta;
     }
-  
-  if (0)
-    gprintf("%f\n", delta);
-  delta_territory_cache[pos] = delta;
 
-  gg_assert(followup_value != NULL);
-  followup_territory_cache[pos] = followup_delta;
-  *followup_value = followup_delta;
-
-  return delta;
+  {
+    /* Finally, captured stones: */
+    float this_delta = q->captured - base->captured;
+    if (color == BLACK)
+      this_delta = -this_delta;
+    if (move != -1
+	&& this_delta != 0.0)
+      DEBUG(DEBUG_TERRITORY, "  %1m:   - captured stones %f\n",
+	    move, this_delta);
+    total_delta += this_delta;
+  }
+  return total_delta;
 }
 
 
@@ -1868,73 +1672,17 @@ influence_delta_territory(int pos, int color, char saved_stones[BOARDMAX],
  * moyo_coeff and area_coeff are the relative weights to be used for
  * the moyo and area difference respectively.
  */
-#define DEBUG_INFLUENCE_SCORE 0
 float
-influence_estimate_score(float moyo_coeff, float area_coeff)
+influence_score(const struct influence_data *q)
 {
-  int black_territory = 0;
-  int white_territory = 0;
-  int black_moyo = 0;
-  int white_moyo = 0;
-  int black_area = 0;
-  int white_area = 0;
-  float score;
+  float score = 0.0;
   int ii;
 
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (board[ii] == EMPTY) {
-      if (whose_territory(&initial_influence, ii) == BLACK) {
-	if (DEBUG_INFLUENCE_SCORE)
-	  gprintf("%1m black 1t\n", ii);
-	black_territory++;
-      }
-      else if (whose_territory(&initial_influence, ii) == WHITE) {
-	if (DEBUG_INFLUENCE_SCORE)
-	  gprintf("%1m white 1t\n", ii);
-	white_territory++;
-      }
-      else if (whose_moyo(&initial_influence, ii) == BLACK) {
-	if (DEBUG_INFLUENCE_SCORE)
-	  gprintf("%1m black 1m\n", ii);
-	black_moyo++;
-      }
-      else if (whose_moyo(&initial_influence, ii) == WHITE) {
-	if (DEBUG_INFLUENCE_SCORE)
-	  gprintf("%1m white 1m\n", ii);
-	white_moyo++;
-      }
-      else if (whose_area(&initial_influence, ii) == BLACK) {
-	if (DEBUG_INFLUENCE_SCORE)
-	  gprintf("%1m black 1a\n", ii);
-	black_area++;
-      }
-      else if (whose_area(&initial_influence, ii) == WHITE) {
-	if (DEBUG_INFLUENCE_SCORE)
-	  gprintf("%1m white 1a\n", ii);
-	white_area++;
-      }
-    }
-    else if (board[ii] == BLACK
-	     && initial_influence.black_strength[ii] == 0) {
-      if (DEBUG_INFLUENCE_SCORE)
-	gprintf("%1m white 2t\n", ii);
-      white_territory += 2;
-    }
-    else if (board[ii] == WHITE
-	     && initial_influence.white_strength[ii] == 0) {
-      if (DEBUG_INFLUENCE_SCORE)
-	gprintf("%1m black 2t\n", ii);
-      black_territory += 2;
-    }
+    if (ON_BOARD(ii))
+      score += q->territory_value[ii];
+  score += black_captured - white_captured;
 
-  DEBUG(DEBUG_SCORING, "black:%d %d %d, white: %d %d %d\n",
-	black_territory, black_moyo,
-	black_area, white_territory, white_moyo, white_area);
-  
-  score = (white_territory - black_territory
-	   + moyo_coeff * (white_moyo - black_moyo)
-	   + area_coeff * (white_area - black_area));
-  
   return score;
 }
 
@@ -1947,12 +1695,15 @@ debug_influence_move(int i, int j)
   debug_influence = POS(i, j);
 }
 
-/* Copy and encode influence data. */
-static void
-retrieve_influence(struct influence_data *q,
-		   float white_influence[BOARDMAX],
-		   float black_influence[BOARDMAX],
-		   int influence_regions[BOARDMAX])
+
+/* One more way to export influence data. This should only be used
+ * for debugging.
+ */
+void
+get_influence(const struct influence_data *q,
+	      float white_influence[BOARDMAX],
+	      float black_influence[BOARDMAX],
+	      int influence_regions[BOARDMAX])
 {
   int ii;
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
@@ -1976,65 +1727,13 @@ retrieve_influence(struct influence_data *q,
     }
 }
   
-/* Compute initial influence and export it. The color parameter tells
- * who is in turn to move.
+
+
+/* Print influence for debugging purposes, according to
+ * printmoyo bitmap (controlled by -m command line option).
  */
 void
-get_initial_influence(int color, int dragons_known,
-		      float white_influence[BOARDMAX],
-		      float black_influence[BOARDMAX],
-		      int influence_regions[BOARDMAX])
-{
-  compute_initial_influence(color, dragons_known);
-  retrieve_influence(&initial_influence, white_influence,
-		     black_influence, influence_regions);
-}
-
-/* Compute influence after a move and export it.
- */
-void
-get_move_influence(int move, int color,
-		   char saved_stones[BOARDMAX],
-		   float white_influence[BOARDMAX],
-		   float black_influence[BOARDMAX],
-		   int influence_regions[BOARDMAX])
-{
-  compute_move_influence(move, color, saved_stones);
-  retrieve_influence(&move_influence, white_influence,
-		     black_influence, influence_regions);
-}
-
-/* Compute initial influence and print it. Notice that it's assumed
- * that the printmoyo global tells what information to print. The
- * color parameter tells who is in turn to move.
- */
-void
-print_initial_influence(int color, int dragons_known)
-{
-  compute_initial_influence(color, dragons_known);
-  print_influence(&initial_influence, (dragons_known ? "dragons_known"
-				       : "dragons_unknown"));
-
-  print_influence(&initial_opposite_influence,
-		  dragons_known ? "dragons_known, opposite color"
-		  : "dragons_unknown, opposite color");
-}
-
-/* Compute influence after doing a move and print it. Notice that it's
- * assumed that the printmoyo global tells what information to print.
- */
-void
-print_move_influence(int pos, int color,
-		     char saved_stones[BOARDMAX])
-{
-  compute_move_influence(pos, color, saved_stones);
-  print_influence(&move_influence, "after move, dragons known");
-
-}
-
-/* Print influence for debugging purposes. */
-static void
-print_influence(struct influence_data *q, const char *info_string)
+print_influence(const struct influence_data *q, const char *info_string)
 {
   if (printmoyo & PRINTMOYO_ATTENUATION) {
     /* Print the attenuation values. */
@@ -2087,23 +1786,20 @@ print_influence(struct influence_data *q, const char *info_string)
     fprintf(stderr, "influence regions (%s):\n", info_string);
     print_influence_areas(q);
   }
+  if (printmoyo & PRINTMOYO_VALUE_TERRITORY) {
+    fprintf(stderr, "territory (%s)", info_string);
+    print_numeric_influence(q, q->territory_value, "%5.2f", 5, 1, 0);
+  }
 }
 
-/* Print the numerical territory valuation. */
-static void
-print_influence_territory(struct influence_data *q, const char *info_string)
-{
-  fprintf(stderr, info_string);
-  print_numeric_influence(q, q->territory_value, "%5.2f", 5, 1, 0);
-}
 
 
 /*
  * Print numeric influence values.
  */
 static void
-print_numeric_influence(struct influence_data *q,
-			float values[BOARDMAX],
+print_numeric_influence(const struct influence_data *q,
+			const float values[BOARDMAX],
 			const char *format, int width,
 			int draw_stones, int mark_epsilon)
 {
@@ -2129,10 +1825,12 @@ print_numeric_influence(struct influence_data *q,
     fprintf(stderr, "%2d ", ii);
     for (j = 0; j < board_size; j++) {
       int ii = POS(i, j);
-      if (draw_stones && q->p[ii] == WHITE)
-	fprintf(stderr, format_stone, 'O');
-      else if (draw_stones && q->p[ii] == BLACK)
-	fprintf(stderr, format_stone, 'X');
+      if (draw_stones && q->safe[ii]) {
+        if (board[ii] == WHITE)
+	  fprintf(stderr, format_stone, 'O');
+	else 
+	  fprintf(stderr, format_stone, 'X');
+      }
       else {
 	if (mark_epsilon && values[ii] > 0.0 && values[ii] < 1.0)
 	  fprintf(stderr, "eps");
@@ -2155,7 +1853,7 @@ print_numeric_influence(struct influence_data *q,
 
 /* Draw colored board illustrating territory, moyo, and area. */
 static void
-print_influence_areas(struct influence_data *q)
+print_influence_areas(const struct influence_data *q)
 {
   int ii;
   start_draw_board();
@@ -2163,13 +1861,12 @@ print_influence_areas(struct influence_data *q)
     if (ON_BOARD(ii)) {
       int c = EMPTY;
       int color = GG_COLOR_BLACK;
-      if (q->p[ii] == WHITE) {
-	c = 'O';
+      if (q->safe[ii]) {
 	color = GG_COLOR_BLACK;
-      }
-      else if (q->p[ii] == BLACK) {
-	c = 'X';
-	color = GG_COLOR_BLACK;
+        if (board[ii] == WHITE)
+	  c = 'O';
+        else
+	  c = 'X';
       }
       else if (whose_territory(q, ii) == WHITE) {
 	c = 'o';

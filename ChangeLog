@@ -2,7 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- mew gtp command clear_cache
+- complete rewrite of interface to influence.c
+- new macros INITIAL_INFLUENCE(color), OPPOSITE_INFLUENCE(color)
+- new functions compute_worm_influence(), get_lively_stones(),
+  compute_dragon_influence(), get_alive_stones(), set_dragon_strengths(),
+  mark_inessential_stones(), set_strength_data(), mark_changed_string()
+  to set up calls to compute_influence()
+- new gtp command clear_cache
 - new functions clear_persistent_owl_cache, clear_persistent_reading_cache
 - joseki preparations: mkpat cleaning
 - joseki preparations: some currently unused mkpat options changed

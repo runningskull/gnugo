@@ -132,7 +132,7 @@ examine_position(int color, int how_much)
 
   if (stones_on_board(BLACK | WHITE) != 0) {
     if (NEEDS_UPDATE(initial_influence_examined))
-      compute_initial_influence(color, 0);
+      compute_worm_influence();
     if (how_much == EXAMINE_INITIAL_INFLUENCE) {
       verbose = save_verbose;
       gg_assert(test_gray_border() < 0);
@@ -170,7 +170,7 @@ examine_position(int color, int how_much)
   verbose = save_verbose;
 
   if (NEEDS_UPDATE(initial_influence2_examined)) {
-    compute_initial_influence(color, 1);
+    compute_dragon_influence();
   }
   if (how_much == EXAMINE_INITIAL_INFLUENCE2) {
     gg_assert(test_gray_border() < 0);
@@ -216,60 +216,6 @@ silent_examine_position(int color, int how_much)
   debug = save_debug;
   printmoyo = save_printmoyo;
 }
-
-
-/*
- * Estimate the current score using the influence function. The value
- * is positive if white is thought to be ahead and negative otherwise.
- *
- * The color is the color to move. We only need this for ugly
- * technical reasons and it shouldn't have any effect on the score
- * estimate.
- */
-void
-old_estimate_score(int color, float *lower_bound, float *upper_bound)
-{
-  static int last_scored_position = -1;
-  static float lower = 0.0;
-  static float upper = 0.0;
-  float score1;
-  float score2;
-
-  if (position_number != last_scored_position) {
-    /* Find out information about the worms and dragons. */
-    examine_position(color, EXAMINE_ALL);
-    compute_initial_influence(OTHER_COLOR(color), 1);
-
-    /* The coefficients should match those close to the end of
-     * estimate_influence_value() in move_reasons.c.
-     */
-    score1 = influence_estimate_score(0.35, 0.13);
-    compute_initial_influence(color, 1);
-    score2 = influence_estimate_score(0.35, 0.13);
-    
-    DEBUG(DEBUG_SCORING, "%f %f %d %d\n", score1, score2,
-	  white_captured, black_captured);
-
-    if (score1 > score2) {
-      lower = score2;
-      upper = score1;
-    }
-    else {
-      lower = score1;
-      upper = score2;
-    }
-
-    lower += black_captured - white_captured;
-    upper += black_captured - white_captured;
- 
-    last_scored_position = position_number;
-  }
-
-  *lower_bound = lower + komi;
-  *upper_bound = upper + komi;
-  gg_assert(test_gray_border() < 0);
-}
-
 
 
 /* 
@@ -716,6 +662,8 @@ static int
 revise_thrashing_dragon(int color, float advantage)
 {
   int pos;
+  char safe_stones[BOARDMAX];
+  float strength[BOARDMAX];
 
   /* Trust the owl code's opinion if we are behind. */
   if ((color == BLACK && score > -advantage)
@@ -738,7 +686,11 @@ revise_thrashing_dragon(int color, float advantage)
       dragon[pos].status = UNKNOWN;
 
   DRAGON2(thrashing_dragon).safety = ALIVE;
-  compute_initial_influence(color, 1);
+
+  set_strength_data(OTHER_COLOR(color), safe_stones, strength);
+  compute_influence(OTHER_COLOR(color), safe_stones, strength,
+      		    &OPPOSITE_INFLUENCE(color),
+		    NO_MOVE, "revised thrashing dragon");
   compute_refined_dragon_weaknesses();
   
   return 1;

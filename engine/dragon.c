@@ -64,7 +64,7 @@ static void connected_to_eye_recurse(int pos, int str, int color,
 static int compute_crude_status(int pos);
 static void dragon_eye(int pos, struct eye_data[BOARDMAX]);
 static int compute_escape(int pos, int dragon_status_known);
-static void compute_surrounding_moyo_sizes(int opposite);
+static void compute_surrounding_moyo_sizes(const struct influence_data *q);
 
 static int dragon2_initialized;
 static int lively_white_dragons;
@@ -868,8 +868,9 @@ find_neighbor_dragons()
 
 	/* We can always expand the first step, regardless of influence. */
 	if (dist == 1
-	    || (influence_area_color(pos) == color
-		&& influence_area_color(pos2) != OTHER_COLOR(color))) {
+	    || (whose_area(&INITIAL_INFLUENCE(color), pos) == color
+		&& whose_area(&INITIAL_INFLUENCE(color), pos2)
+		   != OTHER_COLOR(color))) {
 	  /* Expansion ok. Now see if someone else has tried to
 	   * expand here. In that case we indicate a collision by
 	   * setting the dragon number to -2.
@@ -1096,6 +1097,95 @@ dragon_looks_inessential(int origin)
 #endif
   
   return 1;
+}
+
+
+/* Report which stones are alive if it's (color)'s turn to move. I.e.
+ * critical stones belonging to (color) are considered alive.
+ * A stone is dead resp. critical if the tactical reading code _or_ the
+ * owl code thinks so.
+ */
+static void
+get_alive_stones(int color, char safe_stones[BOARDMAX])
+{
+  int d;
+  int ii;
+  get_lively_stones(color, safe_stones);
+  for (d = 0; d < number_of_dragons; d++) {
+    if (dragon2[d].safety == DEAD
+	|| (dragon2[d].safety == CRITICAL
+	    && board[dragon2[d].origin] == OTHER_COLOR(color))) {
+      for (ii = first_worm_in_dragon(dragon2[d].origin); ii != NO_MOVE;
+	   ii = next_worm_in_dragon(ii))
+	mark_string(ii, safe_stones, 0);
+    }
+  }
+}
+
+static void
+set_dragon_strengths(const char safe_stones[BOARDMAX],
+    		     float strength[BOARDMAX])
+{
+  int ii;
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+    if (ON_BOARD(ii)) {
+      if (safe_stones[ii])  {
+	ASSERT1(IS_STONE(board[ii]), ii);
+	strength[ii] = DEFAULT_STRENGTH
+	  	       * (1.0 - 0.3 * DRAGON2(ii).weakness_pre_owl);
+      }
+      else
+	strength[ii] = 0.0;
+    }
+}
+
+/* Marks all inessential stones with INFLUENCE_SAVE_STONE, leaves
+ * everything else unchanged.
+ */
+static void
+mark_inessential_stones(int color, char safe_stones[BOARDMAX])
+{
+  int ii;
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+    if (IS_STONE(board[ii])
+	&& (DRAGON2(ii).safety == INESSENTIAL
+	    || (worm[ii].inessential
+	        /* FIXME: Why is the check below needed?
+		 * Why does it use .safety, not .status? /ab
+		 */
+		&& ((DRAGON2(ii).safety != DEAD
+		     && DRAGON2(ii).safety != TACTICALLY_DEAD
+		     && DRAGON2(ii).safety != CRITICAL)
+		    || (DRAGON2(ii).safety == CRITICAL
+			&& board[ii] == color)))) )
+      safe_stones[ii] = INFLUENCE_SAFE_STONE;
+}
+
+void
+set_strength_data(int color, char safe_stones[BOARDMAX],
+    		  float strength[BOARDMAX])
+{
+  gg_assert(IS_STONE(color) || color == EMPTY);
+
+  get_alive_stones(color, safe_stones);
+  set_dragon_strengths(safe_stones, strength);
+  mark_inessential_stones(color, safe_stones);
+}
+
+
+void
+compute_dragon_influence()
+{
+  char safe_stones[BOARDMAX];
+  float strength[BOARDMAX];
+
+  set_strength_data(BLACK, safe_stones, strength);
+  compute_influence(BLACK, safe_stones, strength, &initial_black_influence,
+                    NO_MOVE, "initial black influence, dragons known");
+
+  set_strength_data(WHITE, safe_stones, strength);
+  compute_influence(WHITE, safe_stones, strength, &initial_white_influence,
+                    NO_MOVE, "initial white influence, dragons known");
 }
 
 
@@ -1798,6 +1888,7 @@ compute_escape(int pos, int dragon_status_known)
   int ii;
   char goal[BOARDMAX];
   char escape_value[BOARDMAX];
+  char safe_stones[BOARDMAX];
 
   ASSERT1(IS_STONE(board[pos]), pos);
 
@@ -1808,8 +1899,8 @@ compute_escape(int pos, int dragon_status_known)
   /* Compute escape_value array.  Points are awarded for moyo (4),
    * area (2) or EMPTY (1).  Values may change without notice.
    */
-  compute_escape_influence(goal, board[pos], escape_value,
-			   dragon_status_known);
+  get_lively_stones(OTHER_COLOR(board[pos]), safe_stones);
+  compute_escape_influence(board[pos], safe_stones, 0, escape_value);
 
   /* If we can reach a live group, award 6 points. */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
@@ -1836,9 +1927,11 @@ compute_escape(int pos, int dragon_status_known)
 }
 
 /*
- * Sum up the surrounding moyo sizes for each dragon. Write this into
- * dragon2[].moyo if it is smaller than the current entry. If (opposite)
- * is true, we use initial_opposite_influence, otherwise initial_influence.
+ * Sum up the surrounding moyo sizes for each dragon. For this
+ * we retrieve the moyo data stored in influence_data (*q) (which must
+ * have been computed previously) from the influence module.
+ * We set dragon2[].moyo_size and .moyo_value if it is smaller than the 
+ * current entry.
  *
  * Currently this is implemented differently depending on whether
  * experimental connections are used or not. The reason why this is
@@ -1849,7 +1942,7 @@ compute_escape(int pos, int dragon_status_known)
  * surrounding moyo which is closest to some worm of the dragon.
  */
 static void
-compute_surrounding_moyo_sizes(int opposite)
+compute_surrounding_moyo_sizes(const struct influence_data *q)
 {
   int pos;
   int d;
@@ -1858,7 +1951,7 @@ compute_surrounding_moyo_sizes(int opposite)
     int mx[MAX_MOYOS + 1];
     struct moyo_data moyos;
 
-    influence_get_moyo_segmentation(opposite, &moyos);
+    influence_get_moyo_segmentation(q, &moyos);
 
     memset(mx, 0, sizeof(mx));
     for (d = 0; d < number_of_dragons; d++) {
@@ -1892,7 +1985,7 @@ compute_surrounding_moyo_sizes(int opposite)
     float moyo_sizes[BOARDMAX];
     float moyo_values[BOARDMAX];
     
-    influence_get_moyo_data(opposite, moyo_color, territory_value);
+    influence_get_moyo_data(q, moyo_color, territory_value);
 
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       moyo_sizes[pos] = 0.0;
@@ -2059,12 +2152,8 @@ compute_refined_dragon_weaknesses()
     dragon2[d].moyo_size = 2 * BOARDMAX;
   
   /* Set moyo sizes according to initial_influence. */
-  compute_surrounding_moyo_sizes(0);
-  
-  /* Set moyo sizes according to initial_opposite_influence if
-   * this yields smaller results.
-   */
-  compute_surrounding_moyo_sizes(1);
+  compute_surrounding_moyo_sizes(&initial_black_influence);
+  compute_surrounding_moyo_sizes(&initial_white_influence);
 
   for (d = 0; d < number_of_dragons; d++)
     dragon2[d].weakness = compute_dragon_weakness_value(d);

@@ -38,10 +38,6 @@
 #define DIAGONAL_DAMPING 2.0
 #define TERR_DIAGONAL_DAMPING 1.7
 
-/* Default strength of the influence from a stone. May be lowered if
- * it is unsafe.
- */
-#define DEFAULT_STRENGTH 100.0
 
 /* Smallest amount of influence that we care about distributing. */
 #define INFLUENCE_CUTOFF 0.02
@@ -85,9 +81,10 @@ struct intrusion_data
 
 struct influence_data
 {
+  char safe[BOARDMAX];
+
   float white_influence[BOARDMAX]; 	/* Accumulated influence. */
   float black_influence[BOARDMAX]; 	/* Accumulated influence. */
-  int p[BOARDMAX];           		/* Working copy of board array. */
   float white_strength[BOARDMAX];  	/* Strength of influence source. */
   float black_strength[BOARDMAX];  	/* Strength of influence source. */
   float white_attenuation[BOARDMAX]; 
@@ -103,12 +100,11 @@ struct influence_data
   float region_territorial_value[MAX_REGIONS];
   int number_of_regions;
 
-  int dragons_known;  /* True if this is a post-owl influence computation. */
-  int is_territorial_influence; /* True for post-owl initial_influence,
-				 * move_influence, but not escape_influence.*/
+  int is_territorial_influence; /* 0 only if computing escape_influence.*/
 
   float territory_value[BOARDMAX];
   int non_territory[BOARDMAX];
+  int captured;
 
   int color_to_move; /* Which color is in turn to move. */
   
@@ -121,7 +117,7 @@ struct influence_data
 /* Typedef for pointer to either of the functions whose_territory(),
  * whose_moyo(), and whose_area().
  */
-typedef int (*owner_function_ptr)(struct influence_data *q, int pos);
+typedef int (*owner_function_ptr)(const struct influence_data *q, int pos);
 
 /*
  * Local Variables:

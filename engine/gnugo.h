@@ -459,6 +459,7 @@ int aftermath_final_status(int color, int pos);
 /* Basic information gathering. */
 /* worm.c */
 void make_worms(void);
+void compute_worm_influence(void);
 
 /* dragon.c */
 void make_dragons(int color, int stop_before_owl, int save_verbose);

@@ -1178,9 +1178,10 @@ strategic_penalty(int pos, int color)
    */
   for (k = 0; k < 4; k++)
     if (board[pos + delta[k]] == EMPTY
-        && influence_area_color(pos + delta[k]) != OTHER_COLOR(color))
+        && whose_area(&OPPOSITE_INFLUENCE(color), pos + delta[k])
+	   != OTHER_COLOR(color))
       return 0.0;
-  if (influence_area_color(pos) != OTHER_COLOR(color))
+  if (whose_area(&OPPOSITE_INFLUENCE(color), pos) != OTHER_COLOR(color))
     return 0.0;
 
   for (k = 0; k < MAX_REASONS; k++) {
@@ -1271,8 +1272,8 @@ strategic_penalty(int pos, int color)
    * is dominated by the opponent. The territorial valuation is a
    * good try here.
    */
-  ret_val = influence_initial_territory(pos, OTHER_COLOR(color));
-  
+  ret_val = influence_territory(&INITIAL_INFLUENCE(OTHER_COLOR(color)),
+      				pos, OTHER_COLOR(color));
   ret_val *= 12.0;
   ret_val = gg_max(0.0, ret_val);
   return ret_val;
@@ -1316,9 +1317,10 @@ estimate_territorial_value(int pos, int color, float score)
   float secondary_value = 0.0;
 
   int does_block = 0;
-  char saved_stones[BOARDMAX];
+  char safe_stones[BOARDMAX];
+  float strength[BOARDMAX];
 
-  memset(saved_stones, 0, BOARDMAX);
+  set_strength_data(OTHER_COLOR(color), safe_stones, strength);
   
   for (k = 0; k < MAX_REASONS; k++) {
     int r = move[pos].reason[k];
@@ -1361,7 +1363,7 @@ estimate_territorial_value(int pos, int color, float score)
       }
 
       /* Mark the string as captured, for evaluation in the influence code. */
-      mark_string(aa, saved_stones, INFLUENCE_CAPTURED_STONE);
+      mark_changed_string(aa, safe_stones, strength, 0);
       TRACE("  %1m: attack on worm %1m\n", pos, aa);
       
       /* FIXME: How much should we reduce the value for ko attacks? */
@@ -1408,7 +1410,7 @@ estimate_territorial_value(int pos, int color, float score)
       }
 
       /* Mark the string as saved, for evaluation in the influence code. */
-      mark_string(aa, saved_stones, INFLUENCE_SAVED_STONE);
+      mark_changed_string(aa, safe_stones, strength, INFLUENCE_SAVED_STONE);
       TRACE("  %1m: defense of worm %1m\n", pos, aa);
       
       /* FIXME: How much should we reduce the value for ko defenses? */
@@ -1677,12 +1679,11 @@ estimate_territorial_value(int pos, int color, float score)
 	TRACE("  %1m: -0.5 - penalty for ko stone %1m (workaround)\n",
 	      pos, aa);
 	tot_value -= 0.5;
-	break;
       }
 
       /* Mark the affected dragon for use in the territory analysis. */
       mark_changed_dragon(pos, color, aa, bb, move_reasons[r].type,
-	  		  saved_stones, &this_value);
+	  		  safe_stones, strength, &this_value);
       this_value *= 2.0;
 
       TRACE("  %1m: owl attack/defend for %1m\n", pos, aa);
@@ -1858,15 +1859,34 @@ estimate_territorial_value(int pos, int color, float score)
    */
   this_value = 0.0;
 
-  if (move[pos].move_safety == 1 && safe_move(pos, color) == WIN)
-    saved_stones[pos] = INFLUENCE_SAVED_STONE;
-  else
-    saved_stones[pos] = INFLUENCE_CAPTURED_STONE;
+  if (move[pos].move_safety == 1 && safe_move(pos, color) == WIN) {
+    safe_stones[pos] = INFLUENCE_SAVED_STONE;
+    strength[pos] = DEFAULT_STRENGTH;
+  }
+  else {
+    safe_stones[pos] = 0;
+    strength[pos] = 0.0;
+  }
   
   /* tm added move_safety check (3.1.22) (see trevorc:880) */
-  if (does_block && move[pos].move_safety) {
-    this_value = influence_delta_territory(pos, color, saved_stones,
-					   &move[pos].influence_followup_value);
+  if (does_block && move[pos].move_safety
+      && tryko(pos, color, "estimate_territorial_value", EMPTY, NO_MOVE)) {
+    if (!retrieve_delta_territory_cache(pos, color, &this_value, 
+	  				&move[pos].influence_followup_value)) {
+      compute_influence(OTHER_COLOR(color), safe_stones, strength, 
+	  		&move_influence, pos, "after move");
+      compute_followup_influence(&move_influence, &followup_influence,
+	  			 pos, "followup");
+      this_value = influence_delta_territory(&OPPOSITE_INFLUENCE(color),
+	   				     &move_influence, color, pos);
+      move[pos].influence_followup_value
+	= influence_delta_territory(&move_influence, &followup_influence,
+	    			    color, pos);
+      store_delta_territory_cache(pos, color, this_value,
+	 			  move[pos].influence_followup_value);	
+    }
+    popgo();
+					   
     if (this_value != 0.0)
       TRACE("  %1m: %f - change in territory\n", pos, this_value);
     else
@@ -1891,12 +1911,6 @@ estimate_territorial_value(int pos, int color, float score)
 	  pos, tot_value);
   }
     
-  /* subtract one point for a sacrifice (playing in opponent's territory) */
-  if (tot_value > 1.0 && safe_move(pos, color) != WIN) {
-    TRACE("  %1m:   -1 - unsafe move, assumed sacrifice\n", pos);
-    tot_value -= 1.0;
-  }
-
   move[pos].territorial_value = tot_value;
   move[pos].secondary_value  += secondary_value;
 }

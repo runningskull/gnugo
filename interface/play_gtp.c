@@ -41,10 +41,9 @@ static int byo_yomi_stones = 0;
 static int report_uncertainty = 0;
 static int gtp_orientation = 0;
 
-static void
-print_influence(float white_influence[BOARDMAX],
-		float black_influence[BOARDMAX],
-		int influence_regions[BOARDMAX]);
+static void print_influence(float white_influence[BOARDMAX],
+			    float black_influence[BOARDMAX],
+			    int influence_regions[BOARDMAX]);
 static void gtp_print_code(int c);
 static void gtp_print_vertices2(int n, int *moves);
 static void rotate_on_input(int ai, int aj, int *bi, int *bj);
@@ -3049,8 +3048,8 @@ gtp_influence(char *s)
   silent_examine_position(color, EXAMINE_ALL);
 
   gtp_start_response(GTP_SUCCESS);
-  get_initial_influence(color, 1, white_influence,
-			black_influence, influence_regions);
+  get_influence(&OPPOSITE_INFLUENCE(color), white_influence,
+		black_influence, influence_regions);
   print_influence(white_influence, black_influence, influence_regions);
   /* We already have one newline and thus can't use gtp_finish_response(). */
   gtp_printf("\n");

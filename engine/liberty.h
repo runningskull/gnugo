@@ -336,6 +336,7 @@ int string_connect(int str1, int str2, int *move);
 int disconnect(int str1, int str2, int *move);
 int non_transitivity(int str1, int str2, int str3, int *move);
 
+/* board.c */
 int liberty_of_string(int pos, int str);
 int second_order_liberty_of_string(int pos, int str);
 int neighbor_of_string(int pos, int str);
@@ -356,6 +357,7 @@ void mark_string(int str, char mx[BOARDMAX], char mark);
 int move_in_stack(int pos, int cutoff);
 void get_move_from_stack(int k, int *move, int *color);
 int stones_on_board(int color);
+
 int obvious_false_eye(int pos, int color);
 int owl_topological_eye(int pos, int color);
 int vital_chain(int pos);
@@ -370,7 +372,9 @@ void decrease_depth_values(void);
 void set_temporary_depth_values(int d, int b, int f, int k, 
 				int br, int b2, int ss);
 void restore_depth_values(void);
+
 int safe_move(int move, int color);
+
 void join_dragons(int d1, int d2);
 int dragon_escape(char goal[BOARDMAX], int color, char escape_value[BOARDMAX]);
 void compute_refined_dragon_weaknesses(void);
@@ -382,6 +386,11 @@ int are_neighbor_dragons(int d1, int d2);
 int first_worm_in_dragon(int w);
 int next_worm_in_dragon(int w);
 int lively_dragon_exists(int color);
+void compute_dragon_influence(void);
+void set_strength_data(int color, char safe_stones[BOARDMAX],
+		       float strength[BOARDMAX]);
+
+void get_lively_stones(int color, char safe_stones[BOARDMAX]);
 int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
 void propagate_worm(int pos);
@@ -587,13 +596,11 @@ int somewhere(int color, int check_alive, int num_moves, ...);
 #define PRINTMOYO_ATTENUATION       0x100
 #define PRINTMOYO_VALUE_TERRITORY   0x200
 
-/* These values are used to communicate whether stones have been
- * saved, captured, or neither, when computing the influence effects
- * of a move.
+/* These values are used to communicate whether stones are safe or
+ * have been saved, when computing influence.
  */
-#define INFLUENCE_UNCHANGED_STONE 0
-#define INFLUENCE_SAVED_STONE     1
-#define INFLUENCE_CAPTURED_STONE  2
+#define INFLUENCE_SAFE_STONE	1
+#define INFLUENCE_SAVED_STONE	2
 
 /* These values are used to communicate the status of stones when analyzing
  * a move for potentially being a blunder.
@@ -614,39 +621,60 @@ struct moyo_data
   float territorial_value[MAX_MOYOS];
 };
 
+/* We use a forward declaration of influence_data so that the rest
+ * of the engine can reference influence data. It can only be accessed
+ * in influence.c, however!
+ */
+struct influence_data;
+extern struct influence_data initial_black_influence;
+extern struct influence_data initial_white_influence;
+extern struct influence_data move_influence;
+extern struct influence_data followup_influence;
+
+#define INITIAL_INFLUENCE(color) ((color) == WHITE ? initial_white_influence \
+						   : initial_black_influence)
+#define OPPOSITE_INFLUENCE(color) (INITIAL_INFLUENCE(OTHER_COLOR(color)))
+
+#define DEFAULT_STRENGTH 100.0
+
 /* Influence functions. */
-void compute_initial_influence(int color, int dragons_known);
-void resegment_initial_influence(void);
-float influence_delta_territory(int pos, int color,
-				char saved_stones[BOARDMAX],
-                                float *followup_value);
-int influence_territory_color(int pos);
-int influence_moyo_color(int pos);
-int influence_moyo_color_opposite(int pos);
-int influence_area_color(int pos);
-int influence_get_moyo_size(int pos, int color);
-void influence_get_moyo_segmentation(int opposite, struct moyo_data *moyo);
-void influence_get_moyo_data(int opposite, int moyo_color[BOARDMAX],
+void compute_influence(int color, const char safe_stones[BOARDMAX],
+		       const float strength[BOARDMAX],
+		       struct influence_data *q,
+		       int move, const char *trace_message);
+void compute_followup_influence(const struct influence_data *base,
+			        struct influence_data *q, 
+		                int move, const char *trace_message);
+void compute_escape_influence(int color, const char safe_stones[BOARDMAX],
+			      const float strength[BOARDMAX],
+                              char escape_value[BOARDMAX]);
+
+float influence_delta_territory(const struct influence_data *base,
+	                        const struct influence_data *q, int color,
+				int move);
+int retrieve_delta_territory_cache(int pos, int color, float *move_value,
+			           float *followup_value);
+void store_delta_territory_cache(int pos, int color, float move_value,
+				 float followup_value);
+
+int whose_territory(const struct influence_data *q, int pos);
+int whose_moyo(const struct influence_data *q, int pos);
+int whose_area(const struct influence_data *q, int pos);
+float influence_territory(const struct influence_data *q, int pos, int color);
+void influence_get_moyo_segmentation(const struct influence_data *q,
+	       			     struct moyo_data *moyo);
+void influence_get_moyo_data(const struct influence_data *q,
+			     int moyo_color[BOARDMAX],
 			     float territory_value[BOARDMAX]);
-float influence_estimate_score(float moyo_coeff, float area_coeff);
+void get_influence(const struct influence_data *q,
+		   float white_influence[BOARDMAX],
+		   float black_influence[BOARDMAX],
+		   int regions[BOARDMAX]);
+float influence_score(const struct influence_data *q);
+void resegment_initial_influence(void);
 void influence_mark_non_territory(int pos, int color);
-float influence_initial_territory(int pos, int color);
 
-void  old_estimate_score(int color, float *lower_bound, float *upper_bound);
 float estimate_score(float *upper, float *lower);
-
-void print_initial_influence(int color, int dragons_known);
-void print_move_influence(int pos, int color, char saved_stones[BOARDMAX]);
-void get_initial_influence(int color, int dragons_known,
-                           float white_influence[BOARDMAX],
-                           float black_influence[BOARDMAX],
-                           int influence_regions[BOARDMAX]);
-void get_move_influence(int move, int color, char saved_stones[BOARDMAX],
-                        float white_influence[BOARDMAX],
-                        float black_influence[BOARDMAX],
-                        int influence_regions[BOARDMAX]);
-void compute_escape_influence(char goal[BOARDMAX], int color,
-                              char escape_value[BOARDMAX], int dragons_known);
 
 /* Eye space functions. */
 int is_eye_space(int pos);

@@ -1137,8 +1137,9 @@ compute_aa_values(int color)
     value = 2 * countstones(pos);
 
     for (r = 0; r < liberties; r++) {
-      if (!mx[libs[r]] && (influence_moyo_color(libs[r]) == other
-			   || influence_moyo_color_opposite(libs[r]))) {
+      if (!mx[libs[r]]
+	  && (whose_moyo(&initial_black_influence, libs[r]) == other
+	      || whose_moyo(&initial_white_influence, libs[r]) == other)) {
 	mx[libs[r]] = 1;
 	value++;
       }
@@ -1148,8 +1149,8 @@ compute_aa_values(int color)
 	  continue;
 	mx[librd] = 1;
 	if (board[librd] == EMPTY
-	    && (influence_moyo_color(librd) == other
-		|| (influence_moyo_color_opposite(librd) == other)))
+	    && (whose_moyo(&initial_black_influence, librd) == other
+		|| (whose_moyo(&initial_white_influence, librd) == other)))
 	  value++;
       }
     }
