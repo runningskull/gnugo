@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- experimental connections off by default in VC build
+
 3.3.3 released June 4, 2002
 
 - new function owl_strong_dragon() and new autohelper with the same name
