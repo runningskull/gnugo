@@ -89,7 +89,7 @@ TST = 13x13.tst arb.tst arend.tst arion.tst atari_atari.tst \
        manyfaces.tst manyfaces1.tst neurogo.tst newscore.tst \
        nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst \
        nicklas5.tst niki.tst ninestones.tst nngs.tst \
-       nngs1.tst nngs2.tst nngs3.tst nngs4.ts optics.tst \
+       nngs1.tst nngs2.tst nngs3.tst nngs4.tst optics.tst \
        optics_rot.tst owl.tst owl1.tst owl_rot.tst \
        reading.tst reading_rot.tst rosebud.tst safety.tst \
        score.tst score2.tst score_rot.tst semeai.tst \
