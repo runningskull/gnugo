@@ -1,3 +1,22 @@
+========================== 3.3.17 pre 6  ============================
+
+./regress.sh . reading.tst 
+177 unexpected PASS!
+./regress.sh . endgame.tst 
+302 unexpected PASS!
+801 unexpected PASS!
+803 unexpected FAIL: Correct 'J7', got 'F5'
+804 unexpected FAIL: Correct 'J7', got 'F5'
+./regress.sh . golife.tst 
+10 unexpected PASS!
+./regress.sh . trevorc.tst 
+1060 unexpected PASS!
+./regress.sh . 13x13.tst 
+31 unexpected FAIL: Correct 'M4|N4', got 'M6'
+./regress.sh . nando.tst 
+110 unexpected PASS!
+111 unexpected PASS!
+
 ========================== 3.3.17 pre 5  ============================
 
 ./regress.sh . neurogo.tst 

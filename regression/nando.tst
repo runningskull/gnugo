@@ -170,9 +170,9 @@ loadsgf games/nando/auto021.sgf
 #CATEGORY=TACTICAL_READING
 loadsgf games/nando/meijin27_g1.sgf 105
 110 owl_defend B16
-#? [0]*
+#? [0]
 111 attack C18
-#? [0]*
+#? [0]
 
 # Connection overvaluation. This dragon has miai options to
 # connect to strong dragons, so it isn't urgent to do it now.

@@ -730,7 +730,7 @@ trymove black L4
 trymove white N3
 trymove black N2
 177 defend K4
-#? [1 N1]*
+#? [1 N1]
 popgo
 popgo
 popgo

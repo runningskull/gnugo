@@ -161,7 +161,7 @@ loadsgf games/endgame3.sgf
 301 gg_genmove black
 #? [E5]*
 302 gg_genmove white
-#? [E5]*
+#? [E5]
 
 
 #################################################################
@@ -214,7 +214,7 @@ loadsgf games/endgame7.sgf 2
 
 loadsgf games/nngs/gnugo-3.3.11-bconwil-200211202359.sgf 242
 801 gg_genmove white
-#? [S14]*
+#? [S14]
 
 802 gg_genmove black
 #? [S14]*
@@ -222,9 +222,9 @@ loadsgf games/nngs/gnugo-3.3.11-bconwil-200211202359.sgf 242
 # No point for F5.
 loadsgf games/endgame8.sgf
 803 gg_genmove black
-#? [J7]
+#? [J7]*
 804 gg_genmove white
-#? [J7]
+#? [J7]*
 
 ############ End of Tests #################
 
