@@ -2760,15 +2760,16 @@ O.ao
 
 Pattern D717
 # gf New pattern. (3.1.12)
+# pp Modified (3.3.16)
 
 oOXx         eat lunch to make certain eye
-OXOX
+OXOx
 O.*x
 
 :8,-,value(81)
 
 oOXx
-OAOX
+OAOx
 O.*x
 
 ;!oplay_defend(*,A)
