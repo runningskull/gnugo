@@ -110,3 +110,7 @@ loadsgf games/atari_atari09.sgf
 play black T14
 25 combination_attack white
 #? [R16]
+
+loadsgf games/self_play/354-34-2.sgf 150
+26 combination_defend white
+#? [E11|E12]

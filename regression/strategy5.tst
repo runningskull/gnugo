@@ -141,6 +141,14 @@ loadsgf games/nngs/jypower-gnugo-3.3.22-200307050519.sgf 162
 285 restricted_genmove black S10 O11 O10 Q11 N7
 #? [S10]
 
+loadsgf games/self_play/354-34-1.sgf 180
+286 reg_genmove white
+#? [K5]
+
+loadsgf games/self_play/354-34-3.sgf 194
+287 reg_genmove white
+#? [C2]
+
 
 ############ End of Tests #################
 
