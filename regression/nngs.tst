@@ -338,7 +338,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 241
 #J11 is terrible.
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 257
 820 gg_genmove white
-#? [J13|L9]*
+#? [J13|L9]
 
 
 
@@ -452,7 +452,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042031.sgf 86
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042031.sgf 162
 1000 gg_genmove white
-#? [K6]*
+#? [K6]
 
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042031.sgf 180
@@ -839,7 +839,7 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 97
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 117
 1860 gg_genmove black
-#? [!L7|D19]*
+#? [!L7|D19]
 
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 125

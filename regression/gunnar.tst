@@ -12,7 +12,7 @@ loadsgf games/nngs/gnugo-3.3.10-viking4-200210261703.sgf 181
 # D19 is locally worse than both E17 and E18.
 loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 83
 2 restricted_genmove white D19 E18 E17
-#? [E17|E18]*
+#? [E17|E18]
 
 # Just connect at K17. Don't make it difficult.
 loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 157

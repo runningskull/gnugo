@@ -47,7 +47,7 @@ loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 44
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 48
 7 gg_genmove white
-#? [L7|M7|M6]*
+#? [L7|M7|M6]
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 54
@@ -77,7 +77,7 @@ loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 24
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 22
 13 gg_genmove white
-#? [!G7]
+#? [!G7]*
 
 #CATEGORY=STRATEGY
 # New failure (comparing 3.1.15 with 3.0.0)
@@ -199,7 +199,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 39 gg_genmove white
-#? [H4|J4]
+#? [H4|J4]*
 
 # CATEGORY=FOLLOWUP
 # The followup of K13 is undervalued.

@@ -15,7 +15,7 @@ loadsgf games/wing-yuhiko-gnugo.sgf 30
 
 loadsgf games/wing-yuhiko-gnugo.sgf 46
 223 gg_genmove black
-#? [P16]*
+#? [P16]
 
 #CATEGORY=STRATEGY
 loadsgf games/wing-yuhiko-gnugo.sgf 62
@@ -108,7 +108,7 @@ loadsgf games/strategy50.sgf
 
 loadsgf games/vaughn.sgf 44
 278 gg_genmove black
-#? [!J11]
+#? [!J11]*
 
 
 ############ End of Tests #################

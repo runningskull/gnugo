@@ -1,3 +1,40 @@
+========================== 3.3.13 pre 4 ============================
+
+./regress.sh . nngs1.tst 
+33 unexpected PASS!
+34 unexpected FAIL: Correct '!N10|N9|N11|O11|O10', got 'N10'
+35 unexpected PASS!
+51 unexpected PASS!
+./regress.sh . nngs.tst 
+820 unexpected PASS!
+1000 unexpected PASS!
+1860 unexpected PASS!
+./regress.sh . trevorc.tst 
+1580 unexpected PASS!
+./regress.sh . 13x13.tst 
+7 unexpected PASS!
+13 unexpected FAIL: Correct '!G7', got 'G7'
+39 unexpected FAIL: Correct 'H4|J4', got 'J5'
+./regress.sh . nngs3.tst 
+400 unexpected PASS!
+./regress.sh . nngs4.tst 
+./regress.sh . strategy5.tst 
+223 unexpected PASS!
+278 unexpected FAIL: Correct '!J11', got 'J11'
+./regress.sh . century2002.tst 
+240 unexpected FAIL: Correct 'F18', got 'C7'
+./regress.sh . safety.tst 
+3 unexpected PASS!
+./regress.sh . gunnar.tst 
+2 unexpected PASS!
+./regress.sh . arend2.tst 
+10 unexpected FAIL: Correct 'G3|F4', got 'M3'
+20 unexpected FAIL: Correct 'G3|H3', got 'M5'
+30 unexpected FAIL: Correct 'K3|J4|M5', got 'O7'
+40 unexpected FAIL: Correct 'R10|S10|P11', got 'T12'
+60 unexpected FAIL: Correct 'N8|M7|L7|M9|L9|N7|O9|N10', got 'R14'
+70 unexpected FAIL: Correct 'N7|O9', got 'N15'
+
 ========================== 3.3.13 pre 3 ============================
 
 ./regress.sh . strategy.tst 
