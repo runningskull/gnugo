@@ -176,6 +176,8 @@ static void propose_edge_moves(int str, int *libs, int liberties,
 static void break_chain_moves(int str, struct reading_moves *moves);
 static void break_chain2_efficient_moves(int str, 
 					 struct reading_moves *moves);
+static void do_find_break_chain2_efficient_moves(int str, int adj,
+						 struct reading_moves *moves);
 static void break_chain2_moves(int str, struct reading_moves *moves,
 			       int require_safe);
 static void break_chain2_defense_moves(int str, struct reading_moves *moves);
@@ -4391,82 +4393,94 @@ break_chain_moves(int str, struct reading_moves *moves)
 static void
 break_chain2_efficient_moves(int str, struct reading_moves *moves)
 {
-  int color = board[str];
-  int other = OTHER_COLOR(color);
   int r;
-  int k;
   int adj, adjs[MAXCHAIN];
-  int adj2, adjs2[MAXCHAIN];
-  int libs[2];
-  int ai, aj;
-  int bi, bj;
-  int ci, cj;
   
   /* Find links with 2 liberties. */
   adj = chainlinks2(str, adjs, 2);
   
-  for (r = 0; r < adj; r++) {
-    adj2 = chainlinks2(adjs[r], adjs2, 1);
-    if (adj2 == 1 && countlib(str) > 2) {
-      int apos;
-      findlib(adjs2[0], 1, &apos);
-      if (!is_self_atari(apos, color))
-	ADD_CANDIDATE_MOVE(apos, 0, *moves);
-      continue;
-    }
-    
-    if (adj2 > 1)
-      continue;
-    
-    findlib(adjs[r], 2, libs);
-    for (k = 0; k < 2; k++)
-      if (approxlib(libs[k], other, 3, NULL) <= 2
-	  && !is_self_atari(libs[1 - k], color))
-	ADD_CANDIDATE_MOVE(libs[1 - k], 0, *moves);
-    
-    /* A common special case is this kind of edge position
-     * 
-     * ..XXX.
-     * X.XOO.
-     * XOOX*.
-     * ......
-     * ------
-     *
-     * where a move at * is most effective for saving the two stones
-     * to the left.
-     *
-     * The code below tries to identify this case. We use the crude
-     * heuristic that the two liberties of the X stone we want to
-     * capture should be placed diagonally and that one liberty should
-     * be on the edge. Then we propose to play the other liberty.
-     * Notice that both moves may be proposed when attacking a stone
-     * on 2-2.
-     *
-     * Update: This was too crude. Also require that the X stone is on
-     * the second line and that the proposed move is not a self-atari.
-     */
-    ai = I(libs[0]);
-    aj = J(libs[0]);
-    bi = I(libs[1]);
-    bj = J(libs[1]);
-    ci = I(adjs[r]);
-    cj = J(adjs[r]);
-    if (gg_abs(ai - bi) == 1
-	&& gg_abs(aj - bj) == 1
-	&& (ci == 1 || ci == board_size - 2
-	    || cj == 1 || cj == board_size - 2)) {
+  for (r = 0; r < adj; r++)
+    do_find_break_chain2_efficient_moves(str, adjs[r], moves);
+}
 
-      if ((ai == 0 || ai == board_size - 1
-	   || aj == 0 || aj == board_size - 1)
-	  && !is_self_atari(libs[1], board[str]))
-	ADD_CANDIDATE_MOVE(libs[1], 0, *moves);
 
-      if ((bi == 0 || bi == board_size - 1
-	   || bj == 0 || bj == board_size - 1)
-	  && !is_self_atari(libs[0], board[str]))
-	ADD_CANDIDATE_MOVE(libs[0], 0, *moves);
-    }
+/* Helper function for break_chain2_efficient_moves(). */
+static void
+do_find_break_chain2_efficient_moves(int str, int adj,
+				     struct reading_moves *moves)
+{
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int k;
+  int adj2, adjs2[MAXCHAIN];
+  int libs[2];
+  int pos1;
+  int pos2;
+  ASSERT1(countlib(adj) == 2, adj);
+  
+  adj2 = chainlinks2(adj, adjs2, 1);
+  if (adj2 == 1 && countlib(str) > 2) {
+    int apos;
+    findlib(adjs2[0], 1, &apos);
+    if (!is_self_atari(apos, color))
+      ADD_CANDIDATE_MOVE(apos, 0, *moves);
+    return;
   }
+  
+  if (adj2 > 1)
+    return;
+    
+  findlib(adj, 2, libs);
+  for (k = 0; k < 2; k++)
+    if (approxlib(libs[k], other, 3, NULL) <= 2
+	&& !is_self_atari(libs[1 - k], color))
+      ADD_CANDIDATE_MOVE(libs[1 - k], 0, *moves);
+  
+  /* A common special case is this kind of edge position
+   * 
+   * ..XXX.
+   * X.XOO.
+   * XOOX*.
+   * ......
+   * ------
+   *
+   * where a move at * is most effective for saving the two stones
+   * to the left.
+   *
+   * The code below tries to identify this case. We use the crude
+   * heuristic that the two liberties of the X stone we want to
+   * capture should be placed diagonally and that one liberty should
+   * be on the edge. Then we propose to play the other liberty.
+   * Notice that both moves may be proposed when attacking a stone
+   * on 2-2.
+   *
+   * Update: This was too crude. Also require that the X stone is on
+   * the second line and that the proposed move is not a self-atari.
+   */
+  if (libs[0] != SW(libs[1])
+      && libs[0] != NW(libs[1])
+      && libs[0] != NE(libs[1])
+      && libs[0] != SE(libs[1]))
+    return;
+
+  /* Since we know that the two liberties are diagonal, the following
+   * construction gives the two vertices "between" the liberties.
+   */
+  pos1 = NORTH(gg_max(libs[0], libs[1]));
+  pos2 = SOUTH(gg_min(libs[0], libs[1]));
+  if ((board[pos1] != other
+       || !is_edge_vertex(pos2)
+       || !same_string(pos1, adj))
+      && (board[pos2] != other
+	  || !is_edge_vertex(pos1)
+	  || !same_string(pos2, adj)))
+    return;
+
+  if (is_edge_vertex(libs[0]) && !is_self_atari(libs[1], color))
+    ADD_CANDIDATE_MOVE(libs[1], 0, *moves);
+
+  if (is_edge_vertex(libs[1]) && !is_self_atari(libs[0], color))
+    ADD_CANDIDATE_MOVE(libs[0], 0, *moves);
 }
 
 /*
@@ -4701,20 +4715,32 @@ superstring_breakchain(int str, int *move, int komaster, int kom_pos,
   int adjs[MAXCHAIN];
   int k;
   int apos;
+  struct reading_moves moves;
   int savemove = 0;
   int savecode = 0;
 
   SETUP_TRACE_INFO("superstring_breakchain", str);
 
+  moves.num = 0;
+
   proper_superstring_chainlinks(str, &adj, adjs, liberty_cap);
   for (k = 0; k < adj; k++) {
+    int liberties = countlib(adjs[k]);
+    if (liberties == 1) {
+      findlib(adjs[k], 1, &apos);
+      ADD_CANDIDATE_MOVE(apos, 0, moves);
+    }
+    else if (liberties == 2)
+      do_find_break_chain2_efficient_moves(str, adjs[k], &moves);
+  }
+  
+  order_moves(str, &moves, color, read_function_name, 0);
+
+  for (k = 0; k < moves.num; k++) {
     int new_komaster, new_kom_pos;
     int ko_move;
 
-    if (countlib(adjs[k]) > 1)
-      continue;
-    findlib(adjs[k], 1, &apos);
-
+    apos = moves.pos[k];
     if (komaster_trymove(apos, color, "superstring_break_chain", str,
 			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, savecode == 0 && stackp <= ko_depth)) {
