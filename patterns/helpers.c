@@ -499,6 +499,7 @@ amalgamate_most_valuable_helper(int ai, int aj, int bi, int bj, int ci, int cj)
   int apos = POS(ai, aj);
   int bpos = POS(bi, bj);
   int cpos = POS(ci, cj);
+
   if (!same_dragon(apos, bpos) && !same_dragon(bpos, cpos)) {
     if (dragon[apos].effective_size >= dragon[cpos].effective_size)
       join_dragons(apos, bpos);

@@ -234,7 +234,7 @@ ascii_showboard(Position *pos)
 	 pos_is_move = 128;
        else
 	 pos_is_move = 0;
-       dead = (matcher_status(i, j)==DEAD) && showdead;
+       dead = (matcher_status(POS(i, j))==DEAD) && showdead;
        switch (pos->board[i][j] + pos_is_move + last_pos_was_move) {
        case EMPTY+128:
        case EMPTY:
@@ -1089,7 +1089,7 @@ to toggle its state or \"done\".\n");
 	  || gameinfo->position.board[i][j] == EMPTY)
 	printf("\ninvalid!\n");
       else {
-	int status = matcher_status(i, j);
+	int status = matcher_status(POS(i, j));
 	status = (status == DEAD) ? ALIVE : DEAD;
 	change_matcher_status(i, j, status);
 	ascii_showboard(&gameinfo->position);

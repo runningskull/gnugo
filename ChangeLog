@@ -8,6 +8,11 @@
 - Added a few scattered regression comments
 - Updated regress.pl to latest ever evolving version.
 - Adds several test cases and SGF files to trevor.tst & games/trevor/
+- reorientation code moved from gtp.c to play_gtp.c
+- fixed sscanf problem in (worm|dragon)_(stones|data)
+- allow dragon_stones to take color parameter, as well as coord.
+- revisions to capture.tst and vie.tst
+- further 1D revision in dragon.c
 
 3.1.10 released October 14, 2001
 

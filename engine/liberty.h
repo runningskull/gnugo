@@ -125,7 +125,7 @@ int chainlinks2(int str, int adj[MAXCHAIN], int lib);
  */
 extern int position_number;
 
-/* Count and/or find liberties at (i, j). */
+/* Count and/or find liberties at (pos). */
 int countlib(int str);
 int findlib(int str, int maxlib, int *libs);
 int approxlib(int pos, int color, int maxlib, int *libs);
@@ -137,7 +137,7 @@ void start_timer(int n);
 double time_report(int n, const char *occupation, int i, int j, 
 		   double mintime);
 
-/* Play at (m, n) and then count the liberties. */
+/* Play at (pos) and then count the liberties. */
 int accurate_approxlib(int pos, int color, int maxlib, int *libs);
 
 /* Check for self atari. */

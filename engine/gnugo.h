@@ -429,8 +429,9 @@ void make_worms(void);
 /* dragon.c */
 void make_dragons(int color, int stop_before_owl);
 void show_dragons(void);
-int dragon_status(int i, int j);
-int matcher_status(int i, int j);
+int dragon_status(int pos);
+int matcher_status(int pos);
+int same_dragon(int dr1, int dr2);
 
 /* moyo functions */
 void print_moyo(void);

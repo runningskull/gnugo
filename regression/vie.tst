@@ -2,9 +2,10 @@ loadsgf golois/Aya991113-12.sgf
 1 owl_defend S14
 #? [1 T16]
 
+# This attack doesn't work without ko. Changed the correct result. /gf
 loadsgf golois/Aya991113-13.sgf
 2 owl_attack G5
-#? [1 H4]*
+#? [2 H4]*
 
 loadsgf golois/BiwakoFost97-1.sgf
 3 owl_attack G3
@@ -26,13 +27,14 @@ loadsgf golois/DeuxYeuxIndigoIng98.sgf
 7 owl_attack B16
 #? [1 B17]
 
+# S9 seems unlikely to be the only defense. /gf
 loadsgf golois/DeuxYeuxManyFacesIng98.sgf
 8 owl_defend R10
 #? [1 S9]*
 
 loadsgf golois/GoAheadMarseille97.sgf
 9 owl_defend O14
-#? [1 P15]*
+#? [1 (P15|R14)]*
 
 loadsgf golois/GoAheadMarseille97.sgf
 10 owl_attack R15
@@ -58,6 +60,7 @@ loadsgf golois/Goemate990903-12.sgf
 15 owl_attack B17
 #? [0]
 
+# This is more of a semeai. /gf
 loadsgf golois/Goemate990903-5.sgf
 16 owl_attack M4
 #? [0]*
