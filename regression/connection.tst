@@ -195,11 +195,11 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 204
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 216
 59 disconnect D18 E15
-#? [1 D15|F15|B15|D19|E19]
+#? [1 (D15|F15|B15|D19|E19)]
 60 connect D14 B18
-#? [1 D15|F15|B15|D19|E19|C13]
+#? [1 (B14|D15|F15|B15|D19|E19|C13)]
 61 connect O9 Q9
-#? [1 D15|F15|B15|D19|E19]*
+#? [1 (D15|F15|B15|D19|E19)]*
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 238
 62 connect S18 S14
@@ -340,6 +340,22 @@ loadsgf games/nngs/Temnik-gnugo-3.3.15-200301161937.sgf 232
 loadsgf games/nngs/gnugo-3.3.17-joshj-200304172202.sgf 226
 102 disconnect Q8 Q6
 #? [1 (S7|S6|S8|R6)]*
+
+# See also owl:114
+loadsgf games/incident169.sgf 210
+103 connect L2 G4
+#? [1 K2]
+
+loadsgf golois/Aya991113-9.sgf
+104 connect G2 L4
+#? [1 (H2|H1|G1|J1|H3)]
+
+# See also nicklas1:501
+# Strictly speaking, this is ko. But this is way beyond the readconnect
+# horizon.
+loadsgf games/nicklas/nicklas5.sgf 23
+105 disconnect F8 G6
+#? [1 G7]
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

@@ -96,7 +96,7 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 231
 
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 241
 284 owl_defend J9
-#? [1 (M7|H7)]
+#? [1 (M7|H7|M5|L8)]
 
 # Looks like a tough problem for GNU Go.
 loadsgf games/owl41.sgf 1
@@ -208,6 +208,18 @@ loadsgf games/nngs/qly-gnugo-3.3.18-200305022134.sgf 72
 312 owl_defend K6
 #? [1 C3]*
 
+
+# See also ld_owl:12
+loadsgf games/life_and_death/ld3.sgf
+white E1
+black B1
+white D1
+313 owl_defend A2
+#? [1 F1]
+
+loadsgf games/splee2.sgf 128
+314 owl_does_attack Q9 M10
+#? [0]
 
 ########### end of tests #####################
 

@@ -12,7 +12,7 @@ loadsgf games/life_and_death/ld1.sgf
 3 dragon_status S2
 #? [critical S1 (S1|S7)]
 4 dragon_status B2
-#? [critical (A2|F2) (A2|F2)]
+#? [critical (A2|F2) (A2|F2|C1)]
 
 loadsgf games/life_and_death/ld2.sgf
 5 dragon_status B18

@@ -735,8 +735,8 @@ loadsgf games/nngs/juka-gnugo-3.1.16-200112142153.sgf 220
 
 
 loadsgf games/nngs/juka-gnugo-3.1.16-200112142153.sgf 228
-1630 gg_genmove black
-#? [!A2]
+1630 restricted_genmove black A2 C2
+#? [C2]
 
 
 loadsgf games/nngs/juka-gnugo-3.1.16-200112142153.sgf 238

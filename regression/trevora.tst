@@ -244,7 +244,7 @@ loadsgf games/trevor/auto/a023.sgf 50
 #Must defend H5 worm.  G6 prob. best.
 loadsgf games/trevor/auto/a024.sgf 12
 400 gg_genmove white
-#? [!E2]
+#? [G6|H7]
 
 
 
