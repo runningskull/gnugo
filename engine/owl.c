@@ -1952,20 +1952,11 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
    * 3. Tactical defense moves
    */
   for (pass = 0; pass < 4; pass++) {
-    int newpass = pass;
     moves = NULL;
     move_cutoff = 1;
     
-#if 0
-    /* If not too deep, evaluate shape moves (like escaping) first. */
-    /* This experiment not too successful - but may return to it; tm */
-    if (stackp < 4 && pass < 2) {
-      newpass = 1 - newpass;
-    }
-#endif
-
     /* Get the shape moves if we are in the right pass. */
-    if (newpass == 1) {
+    if (pass == 1) {
       
       if (stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
@@ -1993,13 +1984,13 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       }
       moves = shape_moves;
     }
-    else if (newpass == 0 || newpass == 2) {
+    else if (pass == 0 || pass == 2) {
 
       if (stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
       
       moves = vital_moves;
-      if (newpass == 0 || stackp > owl_distrust_depth) {
+      if (pass == 0 || stackp > owl_distrust_depth) {
 	if (stackp == 0)
 	  move_cutoff = 70;
 	else if (true_genus + probable_min > 3)

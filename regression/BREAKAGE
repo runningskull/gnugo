@@ -1,3 +1,39 @@
+======================= 3.1.28 pre 3  =========================
+
+./regress.sh . atari_atari.tst
+14 unexpected PASS!
+./regress.sh . nngs1.tst
+2 unexpected FAIL: Correct 'K18|K19', got 'G8'
+4 unexpected FAIL: Correct 'H3|J5', got 'L2'
+5 unexpected FAIL: Correct 'H3|J5', got 'H6'
+6 unexpected FAIL: Correct 'H4', got 'H3'
+7 unexpected FAIL: Correct '!K7', got 'K7'
+8 unexpected FAIL: Correct 'M10', got 'R17'
+9 unexpected FAIL: Correct 'P15|Q14', got 'H6'
+10 unexpected FAIL: Correct 'R13', got 'T18'
+11 unexpected FAIL: Correct 'T12', got 'S10'
+12 unexpected FAIL: Correct 'A16', got 'B9'
+13 unexpected FAIL: Correct 'S14', got 'J18'
+14 unexpected FAIL: Correct 'S17', got 'L18'
+15 unexpected FAIL: Correct 'F12|G14', got 'D11'
+16 unexpected FAIL: Correct 'M4', got 'R14'
+17 unexpected FAIL: Correct 'L3|L4|J3', got 'N8'
+18 unexpected FAIL: Correct '!L2', got 'L2'
+19 unexpected FAIL: Correct 'Q14', got 'D5'
+20 unexpected FAIL: Correct 'F17', got 'E16'
+21 unexpected FAIL: Correct '!M6', got 'M6'
+22 unexpected FAIL: Correct 'E3', got 'E4'
+23 unexpected FAIL: Correct 'M8', got 'J10'
+24 unexpected FAIL: Correct 'L7|J5|M6', got 'J4'
+26 unexpected FAIL: Correct 'P3', got 'P1'
+27 unexpected FAIL: Correct 'H2', got 'L18'
+28 unexpected FAIL: Correct 'J18', got 'F15'
+29 unexpected FAIL: Correct '!R17', got 'R17'
+30 unexpected FAIL: Correct 'P17|O18', got 'N18'
+31 unexpected FAIL: Correct 'N17', got 'N14'
+./regress.sh . nngs.tst
+875 unexpected FAIL: Correct 'C5', got 'PASS'
+
 Here are the results for 3.1.27 with experimental semeai enabled.
 
 ./regress.sh . strategy.tst

@@ -922,6 +922,13 @@ loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 15
 256 owl_attack K12
 #? [1 J12]
 
+# H3 is the best W move on the board, but it does not capture J3.
+loadsgf games/owl35.sgf
+257 owl_attack J3
+#? [0]*
+
+
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
