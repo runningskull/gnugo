@@ -1,0 +1,34 @@
+(;FF[4]GM[1]SZ[19]HA[0]KM[0.5]PW[scf]WR[12k]PB[GnuGo (GNU Go 3.1.18)]BR[14k*]PC[NNGS]DT[2002-01-06]RE[W+114.5];B[dp];W[pd];B[pp];W[dd];B[qf];W[qh]
+;B[qc];W[qd];B[pc];W[od];B[rd];W[re];B[rc];W[qe];B[nc];W[qn];B[fc];W[cf];B[db]
+;W[cc];B[ic];W[fq];B[nq];W[rp];B[qq];W[on];B[fp];W[ep];B[eq];W[eo];B[gq];W[dq]
+;B[fr];W[er];B[dr];W[fq];B[cq];W[eq];B[cr];W[bo];B[ch];W[cb];B[bp];W[co];B[es]
+;W[gr];B[fo];W[hq];B[fs];W[ds];B[ar];W[gs];B[ck];W[bs];B[cp];W[do]C[!B2];B[br];W[cs]C[!H5]
+;B[ho];W[gp];B[ie];W[lc];B[md];W[ld];B[le];W[ke]C[!L16];B[kd];W[oc];B[ob];W[nb];B[mb]
+;W[mc];B[na];W[me];B[nd];W[ne];B[nb];W[lf];B[kq];W[rq]C[!G5];B[go];W[mo]C[#Something around L6 looks right.
+L6];B[bg]
+;W[mq];B[mr];W[nr];B[mp];W[oq];B[np];W[op];B[or];W[pr];B[ns];W[pq];B[fe];W[bf]C[#locally K12 is better than J13
+K12]
+;B[ig];W[kh];B[no];W[nn]C[#Other moves possible: !N6, though.
+M7|M8];B[mn];W[mm];B[ln];W[lm];B[ii];W[jj];B[hk];W[ef]C[!H12]
+;B[hh];W[dh];B[bm];W[di];B[ci];W[kn];B[lo];W[il]C[!L7];B[km];W[jn];B[ir];W[cg];B[fi]
+;W[dj];B[bh];W[jp]C[!D19];B[da];W[ca];B[dc];W[ed];B[ec];W[fm];B[dm];W[cj];B[bj];W[dk]C[!F6]
+;B[fn]C[L:9];W[em];B[cl];W[kp];B[fk];W[jq];B[kr]C[L:10];W[jr];B[gm];W[gl];B[en];W[hm]
+;B[gn];W[ks];B[oo]C[L:9];W[po];B[lq]C[L:8];W[ps];B[fl]C[L:9];W[hl];B[dl]C[L:10];W[gk];B[gj]
+;W[fd];B[gd];W[ge]C[H16];B[ff];W[gc];B[gb];W[hd];B[hc]C[L:8];W[gd];B[jd]C[L:9];W[id];B[je]C[L:10]
+;W[jc];B[kc];W[hb]C[J18];B[jb];W[ib];B[fa];W[jc]C[E18];B[cd];W[bd];B[eb]C[L:8];W[ha];B[ga]C[L:9]
+;W[lb];B[ja]C[L:7];W[kb];B[ic]C[L:8];W[hf];B[jh]C[L:9];W[kg];B[jf]C[L:8];W[fg];B[ls]C[L:9];W[js]
+;B[se]C[L:10];W[sf];B[sd];W[rf];B[la];W[ag];B[ik];W[jk];B[hp];W[gq];B[in];W[im]C[!L11]
+;B[ki];W[ji];B[nm];W[kl];B[ij]C[L:8];W[ah];B[bi]C[L:9];W[ai];B[aj]C[L:10];W[af];B[al];W[io]
+;B[os];W[qp];B[hn];W[ip];B[dn];W[ek];B[el];W[an];B[cn];W[am];B[bk];W[jg];B[he]
+;W[gg];B[hg];W[gh];B[gi];W[gf];B[if];W[ei];B[bn];W[ao];B[fh];W[eh];B[ko];W[lp]
+;B[ih];W[le];B[ka];W[jo];B[mo];W[hc];B[jc];W[kf];B[kj];W[kk];B[nl];W[mk];B[om]
+;W[pn];B[ia];W[ej];B[fj];W[];B[]C[J2 removed
+C3 removed
+C16 removed
+R3 removed
+P7 removed
+L10 removed
+L7 removed
+R14 removed
+F14 removed
+final_score: W+113.5])

@@ -1,0 +1,26 @@
+(;FF[4]GM[1]SZ[19]HA[0]KM[2.5]PW[GnuGo (GNU Go 3.1.18)]WR[14k*]PB[patch]BR[14k*]PC[NNGS]DT[2002-01-08]RE[B+18.5];B[pd];W[dp];B[pp];W[dc];B[ce];W[ci]
+;B[ef];W[gc];B[cc];W[cb];B[bc];W[nc];B[oc];W[nd];B[nq]C[Q15|Q14];W[jc];B[mc];W[md];B[lc]C[O18]
+;W[qn];B[qo];W[pn];B[fq];W[pj];B[ph];W[cn];B[nb];W[er];B[fr];W[eq];B[jp]C[#other moves possible; !E6
+F4];W[en]
+;B[ec];W[eb];B[fc];W[fb];B[dd];W[db];B[lh];W[ei];B[ld]C[!N14];W[mf];B[lf]C[!P14];W[of]
+;B[pf];W[nh];B[ni];W[fl];B[gd];W[hc]C[L:8];B[hd];W[qi]C[L:9];B[qh];W[ok];B[oi];W[cg]
+;B[jd];W[id];B[ie];W[ic]C[L:7];B[ge];W[nn]C[L:8];B[ln];W[mk]C[L:9];B[lk];W[rh]C[L:10];B[rg]
+;W[ri];B[rn];W[rm]C[L:6];B[so];W[sg]C[L:7];B[sf]C[S14];W[je]C[L:8];B[kd];W[if];B[he]C[!K13];W[jg]C[L:7]
+;B[sh];W[gg]C[L:8];B[bf];W[bg]C[L:9];B[cf];W[ji]C[L:7];B[hh];W[hj];B[hf];W[hg];B[fe];W[kb]C[L:8]
+;B[kf];W[si]C[L:9];B[mj];W[jf];B[kh];W[ml]C[L:7];B[ll];W[jh]C[L:8];B[ij]C[J11];W[gi]C[L:9];B[ii]
+;W[fg]C[L:7];B[hk];W[gk]C[L:8];B[hl]C[!H11];W[hi]C[L:9];B[ih];W[ig]C[L:8];B[jj];W[af]C[L:9];B[ae]
+;W[ag]C[L:10];B[ki]C[!O10];W[nj];B[oj];W[sm]C[L:8];B[mm];W[nm]C[L:7];B[mo];W[nk]C[L:8];B[oo];W[mn]C[L:7]
+;B[lm];W[gn]C[L:8];B[hp];W[in]C[L:7];B[jn];W[fs]C[L:8];B[gs];W[es]C[L:9];B[hr];W[bb];B[ab]
+;W[lb]C[L:10];B[mb];W[sg];B[rf];W[sn]C[L:9];B[ro];W[on]C[L:8];B[no];W[fp];B[gp]C[!Locally G5 better than F5
+G5];W[fo]
+;B[go];W[io]C[L:9];B[hn];W[hm]C[L:10];B[ho];W[il]C[L:9];B[ik];W[gm];B[jm];W[im]C[L:10];B[ip]
+;W[jl];B[dg];W[jo];B[ko]C[D12];W[km];B[kn]C[D12];W[gh];B[kl];W[dh];B[eg];W[jk];B[kk]
+;W[pi];B[oh];W[ma]C[L:9];B[na];W[la]C[L:10];B[eh];W[kc];B[ke];W[ba];B[fh];W[fi];B[sh]
+;W[kg]C[L:9];B[lg];W[sg]C[L:10];B[qm];W[rl];B[po];W[sh];B[ff];W[mi];B[lj];W[gl];B[kj]
+;W[aa];B[ac];W[gf];B[];W[]C[final_score: B+18.5
+O17 removed
+N14 removed
+P14 removed
+O12 removed
+N11 removed
+R7 removed])

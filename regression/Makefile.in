@@ -88,7 +88,8 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       niki.tst trevor.tst tactics.tst buzco.tst \
       capture.tst connect.tst global.tst vie.tst \
       owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst arend.tst \
-      trevora.tst trevorb.tst trevorc.tst trevord.tst semeai.tst 13x13.tst
+      trevora.tst trevorb.tst trevorc.tst trevord.tst semeai.tst 13x13.tst \
+      nngs.tst
 
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
@@ -398,6 +399,9 @@ semeai2: semeai2.tst
 13x13: 13x13.tst
 	$(srcdir)/eval.sh 13x13.tst
 
+nngs: nngs.tst
+	$(srcdir)/eval.sh nngs.tst
+
 all_batches: first_batch second_batch third_batch fourth_batch
 
 first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst filllib.tst atari_atari.tst connection.tst blunder.tst strategy.tst
@@ -425,7 +429,7 @@ second_batch: strategy2.tst endgame.tst heikki.tst neurogo.tst arb.tst rosebud.t
 	$(srcdir)/regress.sh $(srcdir) dniwog.tst
 	$(srcdir)/regress.sh $(srcdir) strategy2.tst
 
-third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst strategy3.tst manyfaces.tst niki.tst tactics.tst
+third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst strategy3.tst manyfaces.tst niki.tst tactics.tst nngs.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas1.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas2.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas3.tst
@@ -436,6 +440,7 @@ third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst st
 	$(srcdir)/regress.sh $(srcdir) trevor.tst
 	$(srcdir)/regress.sh $(srcdir) tactics.tst
 	$(srcdir)/regress.sh $(srcdir) buzco.tst
+	$(srcdir)/regress.sh $(srcdir) nngs.tst
 	$(srcdir)/regress.sh $(srcdir) strategy3.tst
 
 fourth_batch: strategy4.tst capture.tst connect.tst global.tst vie.tst
