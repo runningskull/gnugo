@@ -84,6 +84,12 @@ reset_reading_node_counter
 #
 # These tests do not call genmove. Genmove tests and status tests come
 # at the bottom of the test suite.
+#
+# after analyze_semeai [dragon1] [dragon2]
+# the results are returned in the form (result1) (result2).
+# These are the results of the defense of dragon1 and the attack
+# of dragon2 assuming that the dragon1 player moves first. Thus
+# a result 1 0 typically means seki, while a 1 1 result means a kill.
 
 loadsgf games/semeai/semeai6.sgf
 1 analyze_semeai C1 E1
@@ -431,6 +437,41 @@ play white H2
 119 analyze_semeai H5 H3
 #? [1 1 G1]
 
+# A14 is strictly correct since C19 allows W an unfavorable ko.
+loadsgf games/semeai/semeai19.sgf
+120 analyze_semeai C18 C19
+#? [1 1 (A14|C19)]
+
+# There is a complication that B18 and C17 are not amalgamated.
+# If B plays first C19 gives a favorable ko; A15 allows seki.
+# The ko is very unfavorable for W so in 119 a 1 1 result is 
+# arguably correct.
+loadsgf games/semeai/semeai20.sgf
+118 analyze_semeai C17 C18
+#? [1 0]
+119 analyze_semeai C18 C17
+#? [2 2 C19]
+
+# There is also an amalgamation problem here.
+loadsgf games/semeai/semeai19.sgf 80
+120 analyze_semeai K18 N18
+#? [1 1 M18]
+
+loadsgf games/verybad.sgf 104
+121 analyze_semeai Q16 Q17
+#? [1 1 P19]
+122 analyze_semeai Q17 Q16
+#? [3 3 T17]
+
+loadsgf games/verybad.sgf 114
+123 analyze_semeai Q16 Q17
+#? [2 2 (P19|S17|T17)]
+124 analyze_semeai Q17 Q16
+#? [2 2 (O15|O14|R13)]
+
+loadsgf games/verybad.sgf 118
+126 analyze_semeai Q16 Q17
+#? [3 3 (Q19|S17|T17)]
 
 ########### semeai gen_move tests #################
 
@@ -457,6 +498,11 @@ loadsgf games/semeai/semeai16.sgf 230
 loadsgf games/semeai/semeai17.sgf 52
 107 reg_genmove black
 #? [D6|C7]*
+
+# Take the ko last.
+loadsgf games/verybad.sgf 114
+125 restricted_genmove black T15 T17 S17 P19
+#? [!T15]
 
 ########### semeai status tests #################
 
