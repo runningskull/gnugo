@@ -3,6 +3,7 @@
 * The Go Text Protocol::          The Go Text Protocol
 * Running in GTP mode::           Running GNU Go in GTP mode
 * GTP applications::              GTP applications
+* The Metamachine::               The Metamachine
 * Adding new GTP commands::       Adding new GTP commands
 * GTP command reference::         Details on every GTP command
 @end menu
@@ -102,7 +103,7 @@ only responds to these commands. GNU Go implements the engine end of the
 protocol.
 
 With the source code of GNU Go is also distributed a number of
-applications implementing the controller end. The most interesting of
+applications implementing the controller end. Among the most interesting of
 these are:
 
 @itemize
@@ -158,6 +159,97 @@ Variation of twogtp which includes a graphical board.
 More GTP applications, including bridges to go servers and graphical
 user interfaces, are listed at
 @url{http://www.lysator.liu.se/~gunnar/gtp/}.
+
+@node The Metamachine
+@section The Metamachine
+
+An interesting application of the GTP is the concept of
+using GNU Go as an ``Oracle'' which can be consulted by another
+process. This could be another computer program which asks GNU Go
+to generate future board positions, then evaluate them.
+
+David Doshay has done interesting experiments with a parallel
+engine, known as SlugGo, which is based on GNU Go at the University of
+California at Santa Cruz.  These are described in
+@url{http://lists.gnu.org/archive/html/gnugo-devel/2004-08/msg00060.html}.
+
+A more modest approach using the GTP to communicate with a GNU
+Go process which is used as an oracle is the ``Metamachine'' experiment.
+The following scheme is used.
+
+@itemize @bullet
+@item The GNU Go ``oracle'' is asked to generate its top moves using
+the gtp @code{top_moves_black} and @code{top_moves} command.
+@item Both moves are tried and @code{estimate_score} is called
+from the resulting board position.
+@item The higher scoring position is selected as the engine's move.
+@end itemize
+
+This scheme does not produce a stronger engine, but it is
+suggestive, and the SlugGo experiment seems to show that a
+more elaborate scheme along the same lines could produce
+a stronger engine.
+
+Two implementations are distributed. Both make use of @command{fork} and
+@command{pipe} system calls, so they require a Unix-like environment.
+The Metamachine has been tested under GNU/Linux.
+
+@strong{Note:} If the Metamachine terminates normally, the GNU Go
+process will be killed. However there is a danger that
+something will go wrong. When you are finished running the
+Metamachine, it is a good idea to run @command{ps -A|grep gnugo}
+or @command{ps -aux|grep gnugo} to make sure there are no
+unterminated processes. (If there are, just kill them.)
+
+@subsection The Standalone Metamachine
+
+In @file{interface/gtp_examples/metamachine.c} is a standalone
+implementation of the Metamachine. Compile it with
+@command{cc -o metamachine metamachine.c} and run it. It forks
+a @code{gnugo} process with which it communicates through the
+GTP, to use as an oracle. 
+
+The Metamachine then appears to the client as GTP engine.
+Thus the following scheme is followed:
+
+@example
+             stdin             pipe a
+  GTP client ----> metamachine -----> GTP engine
+             <----             <-----
+            stdout             pipe b
+@end example
+
+Most commands are passed verbatim to the engine. The exception
+is gg_genmove, which is intercepted then processed differently,
+as described above. The top two moves are both tried, the
+position evaluated by estimate_score, and the move yielding the
+higher score is selected.
+
+Usage: no arguments gives normal GTP behavior.
+@command{metamachine --debug} sends diagnostics to stderr.
+
+@subsection GNU Go as a Metamachine
+
+Alternatively, you may compile GNU Go with the configure option
+@option{--enable-metamachine}. This causes the file
+@code{oracle.c} to be compiled, which contains the Metamachine
+code. This has no effect on the engine unless you run GNU
+Go with the runtime option @option{--metamachine}. Thus
+you must use both the configure and the runtime option
+to get the Metamachine.
+
+This method is better than the standalone program since
+you have access to GNU Go's facilities. For example, you
+can run the Metamachine with CGoban or in Ascii mode this
+way.
+
+You can get traces by adding the command line
+@option{-d0x1000000}. In debugging the Metamachine, a danger is
+that any small oversight in designing the program can cause the
+forked process and the controller to hang, each one waiting for
+a response from the other. If this seems to happen it is useful
+to know that you can attach @code{gdb} to a running process and
+find out what it is doing.
 
 @node Adding new GTP commands
 @section Adding new GTP commands
