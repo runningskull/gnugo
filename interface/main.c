@@ -82,6 +82,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_TACTICAL_SEMEAI,
       OPT_EXPERIMENTAL_SEMEAI,
+      OPT_EXPERIMENTAL_OWL_EXT,
       OPT_SEMEAI_VARIATIONS,
       OPT_EXPERIMENTAL_CONNECTIONS,
       OPT_EXPERIMENTAL_INFLUENCE,
@@ -203,6 +204,7 @@ static struct gg_option const long_options[] =
   {"chinese-rules",  no_argument,       0, OPT_CHINESE_RULES},
   {"japanese-rules", no_argument,       0, OPT_JAPANESE_RULES},
   {"experimental-semeai",  no_argument, 0, OPT_EXPERIMENTAL_SEMEAI},
+  {"experimental-owl-ext",  no_argument, 0, OPT_EXPERIMENTAL_OWL_EXT},
   {"semeai-variations",   required_argument, 0, OPT_SEMEAI_VARIATIONS},
   {"experimental-connections",  no_argument, 0, OPT_EXPERIMENTAL_CONNECTIONS},
   {"owl-threats",     no_argument,      0, OPT_OWL_THREATS},
@@ -316,6 +318,7 @@ main(int argc, char *argv[])
     owl_threats = 1;
   else
     owl_threats = 0;
+  experimental_owl_ext = EXPERIMENTAL_OWL_EXT;
   experimental_semeai = EXPERIMENTAL_SEMEAI;
   experimental_connections = EXPERIMENTAL_CONNECTIONS;
 
@@ -413,6 +416,9 @@ main(int argc, char *argv[])
 	if (EXPERIMENTAL_SEMEAI)
 	  fprintf(stderr,
 		  "configure option enabled: experimental semeai\n");
+	if (EXPERIMENTAL_OWL_EXT)
+	  fprintf(stderr,
+		  "configure option enabled: experimental GAIN/LOSS codes\n");
 	if (EXPERIMENTAL_READING)
 	  fprintf(stderr,
 		  "configure option enabled: experimental reading\n");
@@ -483,6 +489,10 @@ main(int argc, char *argv[])
 
       case OPT_JAPANESE_RULES: 
 	chinese_rules = 0;
+	break;
+
+      case OPT_EXPERIMENTAL_OWL_EXT:
+	experimental_owl_ext = 1;
 	break;
 
       case OPT_EXPERIMENTAL_SEMEAI:

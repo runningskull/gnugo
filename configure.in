@@ -78,6 +78,10 @@ AC_ARG_ENABLE(experimental-semeai,
  [  --enable-experimental-semeai    use the experimental semeai module
   --disable-experimental-semeai    use standard semeai module (default)])
 
+AC_ARG_ENABLE(experimental-owl-ext,
+ [  --enable-experimental-owl-ext    use the experimental GAIN/LOSS codes
+  --disable-experimental-owl-ext    use standard owl module (default)])
+
 AC_ARG_ENABLE(experimental-reading,
  [  --enable-experimental-reading    use experimental pattern-based reading
   --disable-experimental-reading    use standard reading (default)])
@@ -392,6 +396,17 @@ if test "$enable_experimental_semeai" = "yes" ; then
    AC_DEFINE(EXPERIMENTAL_SEMEAI, 1)
 else
    AC_DEFINE(EXPERIMENTAL_SEMEAI, 0)
+fi
+
+dnl ------------ Owl extensions ------------
+
+AH_TEMPLATE([EXPERIMENTAL_OWL_EXT],
+[GAIN/LOSS codes. Disabled by default.])
+
+if test "$enable_experimental_owl_ext" = "yes" ; then
+   AC_DEFINE(EXPERIMENTAL_OWL_EXT, 1)
+else
+   AC_DEFINE(EXPERIMENTAL_OWL_EXT, 0)
 fi
 
 dnl ------------ Reading -------------------

@@ -268,6 +268,7 @@ extern float score;
 extern float lower_bound;
 extern float upper_bound;
 extern int chinese_rules;       /* use chinese (area) rules for counting */
+extern int experimental_owl_ext;     /* use experimental owl (GAIN/LOSS) */
 extern int experimental_semeai;      /* use experimental semeai module */
 extern int experimental_connections; /* use experimental connection module */
 extern int alternate_connections;    /* use alternate connection module */
