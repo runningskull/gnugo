@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- dragon_weak() moved to dragon.c
 - bugfix in owl_substantial()
 - merge various code to generate superstring related tactical moves into
   new function superstring_moves()
