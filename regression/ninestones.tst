@@ -59,9 +59,22 @@ loadsgf games/ninestones/bobo-gnugo-3.3.9-200210111309.sgf 66
 150 gg_genmove black
 #? [C5|D5]
 
+loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 64
+190 owl_defend J9
+#? [1 (H8|L9)]
 
+loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 108
+220 gg_genmove black
+#? [P9|P8]
 
+loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 118
+230 restricted_genmove black P11 K2 H13
+#? [!P11]
 
+loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 154
+240 gg_genmove black
+#? [!M19]
 
-
-
+loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 170
+250 gg_genmove black
+#? [T10]

@@ -112,6 +112,18 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 292
 270 gg_genmove black
 #? [!P5]*
 
+loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 32
+280 restricted_genmove black F3 H3
+#? [F3]
+
+loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 38
+290 restricted_genmove black H1 H6 F1
+#? [!H1]
+
+loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 42
+300 owl_defend B4
+#? [A3|D1]
+
 
 ############ End of Tests #################
 
