@@ -179,6 +179,79 @@ loadsgf games/owl29.sgf 134
 186 gg_genmove white
 #? [1 O8]*
 
+# B can play at C4 if we remember the tesuji B:C4 W:E4 B:B2.
+
+loadsgf games/pooo.sgf 16
+187 gg_genmove black
+#? [!C1]
+
+loadsgf games/pooo.sgf 24
+188 gg_genmove black
+#? [B6|C4]
+
+loadsgf games/pooo.sgf 52
+188 gg_genmove black
+#? [D13]
+
+loadsgf games/pooo.sgf 74
+189 gg_genmove black
+#? [A15]
+
+# (3.1.9) owl status of A11 is unchecked.
+
+loadsgf games/bretz.sgf 26
+190 gg_genmove black
+#? [F16]
+
+loadsgf games/bretz.sgf 58
+191 gg_genmove black
+#? [A13]
+
+loadsgf games/bretz.sgf 88
+192 gg_genmove black
+#? [!S14]
+
+loadsgf games/bretz.sgf 100
+192 gg_genmove black
+#? [M17]
+
+loadsgf games/bretz.sgf 130
+193 gg_genmove black
+#? [K3]
+
+loadsgf games/bretz.sgf 148
+194 gg_genmove black
+#? [C10]
+
+loadsgf games/bretz 164
+195 gg_genmove black
+#? [N5]
+
+loadsgf games/bretz.sgf 149
+196 gg_genmove black
+#? [P6|P7|Q7]
+
+loadsgf games/juka1.sgf 8
+197 gg_genmove black
+#? [D5]
+
+loadsgf games/juka1.sgf 14
+198 gg_genmove black
+#? [B6]
+
+loadsgf games/juka1.sgf 18
+199 gg_genmove black
+#? [D5]
+
+loadsgf games/juka1.sgf 28
+200 gg_genmove black
+#? [B2]
+
+loadsgf games/juka1.sgf 48
+201 gg_genmove black
+#? [!O11]
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
