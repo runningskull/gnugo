@@ -46,7 +46,7 @@ loadsgf games/arb/dumonteil-2.sgf 251
 
 loadsgf games/arb/dumonteil-3.sgf 193
 203 gg_genmove black
-#? [T7]*
+#? [T7]
 
 # the root of the problem at test 203 lies at move 185
 loadsgf games/arb/dumonteil-3.sgf 185
@@ -60,7 +60,7 @@ loadsgf games/arb/dumonteil-4.sgf 189
 # Ko mistake observed in gnugo-2.7.231 --level 8 -M 32
 loadsgf games/arb/dumonteil-5.sgf 83
 220 gg_genmove black
-#? [!F6]*
+#? [!F6]
 
 # Ko mistake observed in gnugo-2.7.231 --level 8 -M 32
 loadsgf games/arb/dumonteil-5.sgf 125

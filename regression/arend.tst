@@ -14,7 +14,7 @@ loadsgf games/arend/gnugo-gnugo1.sgf 112
 # SEVERITY=10
 loadsgf games/arend/gnugo-gnugo1.sgf 139
 3 gg_genmove black
-#? [P6|Q5]*
+#? [P6|Q5]
 
 # These kind of fights might be very difficult to do well
 # with current GNU Go methods (How should it choose between the different

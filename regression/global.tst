@@ -184,11 +184,11 @@ loadsgf golois/MeilleurCoup0009.sgf
 
 loadsgf golois/MeilleurCoup0010.sgf
 44 gg_genmove black
-#? [D5]*
+#? [D5]
 
 loadsgf golois/MeilleurCoup990428-1.sgf
 45 gg_genmove black
-#? [D5]*
+#? [D5]
 
 #CATEGORY=SEMEAI
 #DESCRIPTION=

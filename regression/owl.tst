@@ -659,7 +659,7 @@ loadsgf games/incident223.sgf 228
 178 owl_attack R13
 #? [1 (R19|T18)]*
 179 owl_defend R13
-#? [3 R19]
+#? [3 R19]*
 
 loadsgf games/incident269.sgf 200
 180 owl_attack R19

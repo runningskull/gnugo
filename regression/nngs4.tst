@@ -85,7 +85,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 192
 # Make a ko threat. How about T8 or T10?
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 202
 210 gg_genmove black
-#? [!S5]
+#? [!S5]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 204
 220 gg_genmove black

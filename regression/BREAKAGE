@@ -1,3 +1,27 @@
+========================== 3.3.17 pre 7  ============================
+
+./regress.sh . owl.tst 
+179 unexpected FAIL: Correct '3 R19', got '0'
+./regress.sh . blunder.tst 
+23 unexpected PASS!
+./regress.sh . arb.tst 
+203 unexpected PASS!
+220 unexpected PASS!
+./regress.sh . global.tst 
+44 unexpected PASS!
+45 unexpected PASS!
+./regress.sh . arend.tst 
+3 unexpected PASS!
+./regress.sh . handtalk.tst 
+20 unexpected PASS!
+./regress.sh . nngs2.tst 
+./regress.sh . nngs3.tst 
+760 unexpected FAIL: Correct 'Q14', got 'O11'
+./regress.sh . nngs4.tst 
+210 unexpected FAIL: Correct '!S5', got 'S5'
+./regress.sh . ninestones.tst 
+510 unexpected PASS!
+
 ========================== 3.3.17 pre 6  ============================
 
 ./regress.sh . reading.tst 

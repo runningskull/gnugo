@@ -110,7 +110,7 @@ loadsgf games/blunder15.sgf
 # Don't play an outer liberty and let white have a ko.
 loadsgf games/blunder16.sgf
 23 gg_genmove black
-#? [!F4|F5|F6]*
+#? [!F4|F5|F6]
 
 # Don't play the outer liberty and let white make seki.
 loadsgf games/blunder17.sgf
