@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- countlib() calls eliminated in count_common_libs(), find_common_libs(),
+  and have_common_lib()
 - escape_value arrays changed from int to char
 - bugfix in code awarding strategical value for attacks/defenses of lunches
 - bugfix in ATTACK_THREAT handling in estimate_territorial_value()

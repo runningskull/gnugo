@@ -2234,7 +2234,7 @@ count_common_libs(int str1, int str2)
   int all_libs1[MAXLIBS], *libs1;
   int liberties1, liberties2;
   int commonlibs = 0;
-  int k, n;
+  int k, n, tmp;
   
   ASSERT_ON_BOARD1(str1);
   ASSERT_ON_BOARD1(str2);
@@ -2244,15 +2244,17 @@ count_common_libs(int str1, int str2)
   if (!strings_initialized)
     init_board();
 
-  if (countlib(str1) > countlib(str2)) {
-    int tmp = str1;
+  n = string_number[str1];
+  liberties1 = string[n].liberties;
+  
+  if (liberties1 > string[string_number[str2]].liberties) {
+    n = string_number[str2];
+    liberties1 = string[n].liberties;
+    tmp = str1;
     str1 = str2;
     str2 = tmp;
   }
 
-  n = string_number[str1];
-  liberties1 = string[n].liberties;
-  
   if (liberties1 <= MAX_LIBERTIES) {
     /* Speed optimization: don't copy liberties with findlib */
     libs1 = string[n].libs;
@@ -2302,7 +2304,7 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
   int all_libs1[MAXLIBS], *libs1;
   int liberties1, liberties2;
   int commonlibs = 0;
-  int k, n;
+  int k, n, tmp;
   
   ASSERT_ON_BOARD1(str1);
   ASSERT_ON_BOARD1(str2);
@@ -2313,14 +2315,16 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
   if (!strings_initialized)
     init_board();
 
-  if (countlib(str1) > countlib(str2)) {
-    int tmp = str1;
+  n = string_number[str1];
+  liberties1 = string[n].liberties;
+  
+  if (liberties1 > string[string_number[str2]].liberties) {
+    n = string_number[str2];
+    liberties1 = string[n].liberties;
+    tmp = str1;
     str1 = str2;
     str2 = tmp;
   }
-
-  n = string_number[str1];
-  liberties1 = string[n].liberties;
   
   if (liberties1 <= MAX_LIBERTIES) {
     /* Speed optimization: don't copy liberties with findlib */
@@ -2369,9 +2373,9 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
 int
 have_common_lib(int str1, int str2, int *lib)
 {
-  int libs1[MAXLIBS];
+  int all_libs1[MAXLIBS], *libs1;
   int liberties1;
-  int k;
+  int k, n, tmp;
   
   ASSERT_ON_BOARD1(str1);
   ASSERT_ON_BOARD1(str2);
@@ -2381,13 +2385,25 @@ have_common_lib(int str1, int str2, int *lib)
   if (!strings_initialized)
     init_board();
 
-  if (countlib(str1) > countlib(str2)) {
-    int tmp = str1;
+  n = string_number[str1];
+  liberties1 = string[n].liberties;
+  
+  if (liberties1 > string[string_number[str2]].liberties) {
+    n = string_number[str2];
+    liberties1 = string[n].liberties;
+    tmp = str1;
     str1 = str2;
     str2 = tmp;
   }
+  
+  if (liberties1 <= MAX_LIBERTIES)
+    /* Speed optimization: don't copy liberties with findlib */
+    libs1 = string[n].libs;
+  else {
+    findlib(str1, MAXLIBS, all_libs1);
+    libs1 = all_libs1;
+  }
 
-  liberties1 = findlib(str1, MAXLIBS, libs1);
   for (k = 0; k < liberties1; k++) {
     if (neighbor_of_string(libs1[k], str2)) {
       if (lib)
@@ -2641,7 +2657,7 @@ is_self_atari(int pos, int color)
    */
   if (!do_trymove(pos, color, 1))
     return 1;
-  liberties = countlib(pos);
+  liberties = string[string_number[pos]].liberties;
   silent_popgo();
   
   return liberties <= 1;
