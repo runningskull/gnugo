@@ -2168,24 +2168,25 @@ O*.
 :8,-,shape(-2)
 
 
-Pattern Shape52
-# Questionable --- ponnuki capture leaves less aji.
-# Whether direct or indirect capture is best depends
-#    entirely on the context.
-
-?.?	Better to capture indirectly
-*.O
-OXO
-?O?
-
-:8,-,shape(1)
-
-?.?
-*.a
-bXa
-?c?
-
-;lib(a)>1 && lib(b)>1 && lib(c)>1
+# Pattern Shape52
+# # Questionable --- ponnuki capture leaves less aji.
+# # Whether direct or indirect capture is best depends
+# #    entirely on the context.
+# # gf Removed. (3.3.20)
+# 
+# ?.?	Better to capture indirectly
+# *.O
+# OXO
+# ?O?
+# 
+# :8,-,shape(1)
+# 
+# ?.?
+# *.a
+# bXa
+# ?c?
+# 
+# ;lib(a)>1 && lib(b)>1 && lib(c)>1
 
 
 Pattern Shape53

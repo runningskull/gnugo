@@ -330,6 +330,8 @@ static struct autohelper_func autohelper_functions[] = {
   {"owl_goal_dragon",		1, 0, 0.01, "owl_goal_dragon(%s)"},
   {"owl_eyespace",		1, 0, 0.01, "owl_eyespace(%s)"},
   {"owl_big_eyespace",		1, 0, 0.01, "owl_big_eyespace(%s)"},
+  {"owl_mineye",		1, 0, 0.01, "owl_mineye(%s)"},
+  {"owl_maxeye",		1, 0, 0.01, "owl_maxeye(%s)"},
   {"owl_proper_eye",		1, 0, 0.01, "owl_proper_eye(%s)"},
   {"owl_eye_size",		1, 0, 0.01, "owl_eye_size(%s)"},
   {"owl_strong_dragon",		1, 0, 0.01, "owl_strong_dragon(%s)"},

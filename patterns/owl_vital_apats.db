@@ -868,4 +868,33 @@ Pattern VA51
 :8,-,value(35)
 
 
+Pattern VA52a
+# gf New pattern. (3.3.20)
+
+|*Oo         make X short of liberties
+|.XO
+|X.X
+|..X
+|OXX
+|.X?
++---
+
+:8,-,value(65)
+
+
+Pattern VA52b
+# gf New pattern. (3.3.20)
+
+|*Oo
+|OXO         make X short of liberties
+|.XO
+|X.X
+|..X
+|OXX
+|.X?
++---
+
+:8,-,value(65)
+
+
 # END OF FILE

@@ -65,6 +65,8 @@ move_connects_strings(int pos, int color)
   }
 
   for (k = 0; k < strings; k++) {
+    if (worm[ss[k]].invincible)
+      continue;
     if (board[ss[k]] == color) {
       int newlibs = approxlib(pos, color, MAXLIBS, NULL);
       own_strings++;
@@ -691,9 +693,13 @@ examine_move_safety(int color)
       case MY_ATARI_ATARI_MOVE:
       case YOUR_ATARI_ATARI_MOVE:
       case EITHER_MOVE:         /* FIXME: More advanced handling? */
-      case ALL_MOVE:            /* FIXME: More advanced handling? */
 	tactical_safety = 1;
 	safety = 1;
+	break;
+      case ALL_MOVE:
+	/* We don't trust these, unless some other move reason
+	 * indicates safety.
+	 */
 	break;
       case EXPAND_TERRITORY_MOVE:
       case EXPAND_MOYO_MOVE:
@@ -873,7 +879,7 @@ examine_move_safety(int color)
 
 	  if (aa == bb)
 	    continue;
-	  
+
 	  if (DRAGON2(aa).owl_status == ALIVE
 	      || DRAGON2(bb).owl_status == ALIVE) {
 	    tactical_safety = 1;
@@ -2042,7 +2048,7 @@ estimate_strategical_value(int pos, int color, float score)
 	 * FIXME: When worm[aa].cutstone2 == 1 we should probably add
 	 *        a followup value.
 	 */
-	if (worm[aa].cutstone2 > 1) {
+	if (worm[aa].cutstone2 > 1 && !worm[aa].inessential) {
 	  double ko_factor = 1;
 	  if (move_reasons[r].type == ATTACK_MOVE_GOOD_KO
 	      || move_reasons[r].type == DEFEND_MOVE_GOOD_KO) {

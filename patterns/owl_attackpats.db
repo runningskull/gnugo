@@ -2614,6 +2614,22 @@ xXx?
 ; 1 || oplay_attack(*,A)
 
 
+Pattern A719
+# gf New pattern. (3.3.20)
+
+?XXO   reduce eye space 
+X.*X
+?XX.
+
+:8,s,value(50)
+
+?XXc
+Xa*X
+?XXb
+
+;owl_mineye(*)==1 && xlib(b)==2 && !attack(c) && !oplay_attack(*,a,b,b)
+
+
 #########################################################
 #                                                       #
 #            Invade the eye space                       #
@@ -5040,6 +5056,56 @@ Pattern A1348
 +---
 
 ;lib(a)==1 && lib(B)<=3 && defend(a)!=WIN
+
+
+Pattern A1349a
+# gf New pattern. (3.3.20)
+
+|.O?    only chance to kill, sometimes tesuji
+|.XO
+|X.Y
+|..X     
+|*.X
+|.X?
++---
+
+:8,s,value(75)
+
+|.O?
+|.XO
+|X.Y
+|..X     
+|*.X
+|.A?
++---
+
+;!attack(A)
+
+
+Pattern A1349b
+# gf New pattern. (3.3.20)
+
+|oO?    only chance to kill, sometimes tesuji
+|OXO
+|.XO
+|X.Y
+|..X     
+|*.X
+|.X?
++---
+
+:8,s,value(75)
+
+|oO?
+|OXO
+|.XO
+|X.Y
+|..X     
+|*.X
+|.A?
++---
+
+;!attack(A)
 
 
 #########################################################

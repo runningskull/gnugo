@@ -5137,6 +5137,46 @@ owl_big_eyespace(int pos)
 
 
 /* Used by autohelpers.
+ * Returns 1 if (pos) is an eyespace for the color of the dragon currently
+ * under owl investigation.
+ */
+int
+owl_mineye(int pos)
+{
+  int origin;
+  ASSERT_ON_BOARD1(pos);
+  
+  origin = current_owl_data->my_eye[pos].origin;
+  if (!ON_BOARD(origin)
+      || (current_owl_data->my_eye[origin].color
+	  != BORDER_COLOR(current_owl_data->color)))
+    return 0;
+      
+  return min_eyes(&current_owl_data->my_eye[origin].value);
+}
+
+
+/* Used by autohelpers.
+ * Returns 1 if (pos) is an eyespace for the color of the dragon currently
+ * under owl investigation.
+ */
+int
+owl_maxeye(int pos)
+{
+  int origin;
+  ASSERT_ON_BOARD1(pos);
+  
+  origin = current_owl_data->my_eye[pos].origin;
+  if (!ON_BOARD(origin)
+      || (current_owl_data->my_eye[origin].color
+	  != BORDER_COLOR(current_owl_data->color)))
+    return 0;
+      
+  return max_eyes(&current_owl_data->my_eye[origin].value);
+}
+
+
+/* Used by autohelpers.
  * Returns 1 if (pos) is a non-marginal eyespace for the color of the
  * dragon currently under owl investigation.
  */

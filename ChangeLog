@@ -2,6 +2,15 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new static function endgame_find_backfilling_dame() in endgame.c
+- new static function endgame_find_liberties() broken out of
+  endgame_analyze_worm_liberties()
+- new functions owl_mineye() and owl_maxeye() and corresponding
+  autohelper functions
+- move_connects_strings revised not to care about connecting
+  invincible strings
+- ALL_MOVE move reasons no longer considered to guarantee a safe move
+- never give cutstone bonus for an inessential string
 - new test suite joseki.tst
 - do_push_owl() doesn't copy unnecessary fields of local_owl_data anymore
 - retire special meaning of owl pattern values 99 and 100
@@ -25,6 +34,7 @@
   GTP commands
 - adjust conection and semeai depth parameters according to levels
 - don't forget to switch exchange sgf_messages in order_moves()
+- tuning
 - joseki tuning
 - owl tuning
 - major eye tuning

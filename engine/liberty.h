@@ -505,6 +505,8 @@ int owl_escape_value(int pos);
 int owl_goal_dragon(int pos);
 int owl_eyespace(int pos);
 int owl_big_eyespace(int pos);
+int owl_mineye(int pos);
+int owl_maxeye(int pos);
 int owl_proper_eye(int pos);
 int owl_eye_size(int pos);
 int owl_strong_dragon(int pos);

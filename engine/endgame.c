@@ -26,7 +26,14 @@
 
 
 static void endgame_analyze_worm_liberties(int pos, int color);
-
+static void endgame_find_backfilling_dame(int str, int color);
+static int endgame_find_liberties(int str, int *essential_liberties,
+				  int essential_libs[MAXLIBS],
+				  int *inessential_liberties,
+				  int inessential_libs[MAXLIBS],
+				  int *false_eye_liberties,
+				  int false_eye_libs[MAXLIBS]);
+  
 
 /* Generate endgame moves. These are typically moves in settled positions,
  * they aren't worth many points. Currently, we generate such moves using
@@ -52,8 +59,11 @@ endgame(int color)
 	&& dragon[pos].status == ALIVE
 	&& !worm[pos].invincible
 	&& !worm[pos].inessential
-	&& worm[pos].attack_codes[0] == 0)
+	&& worm[pos].attack_codes[0] == 0) {
       endgame_analyze_worm_liberties(pos, color);
+      if (board[pos] == color)
+	endgame_find_backfilling_dame(pos, color);
+    }
   }
 }
 
@@ -68,17 +78,18 @@ endgame(int color)
  *   .OXX..X		X..XOOO|
  *   .OOOXX.		XXXXXXX|
  *
- * The two marked with `*' moves are worth one point in gote each (for both
- * colors). The first one is obvious - once black runs short on liberties,
- * he'll have to defend in his own eyespace, wasting one point. In the second
- * position, although black sacrifice one point by playing in white's territory,
- * he forces white to eventually capture the black string, losing three points.
- * However, white has to play at `*' sooner or later if black doesn't take
- * that vertex, so the move is worth 3 - 1 - 1 = 1 point only, not two.
+ * The two marked with `*' moves are worth one point in gote each (for
+ * both colors). The first one is obvious - once black runs short on
+ * liberties, he'll have to defend in his own eyespace, wasting one
+ * point. In the second position, although black sacrifices one point
+ * by playing in white's territory, he forces white to eventually
+ * capture the black string, losing three points. However, white has
+ * to play at `*' sooner or later if black doesn't take that vertex, so
+ * the move is worth 3 - 1 - 1 = 1 point only, not two.
  *
- * This function is able to find such moves. Algorithm is based on finding
- * such called "inessential liberties". These are defined as liberties, which
- * satisfy five conditions:
+ * This function is able to find such moves. The algorithm is based on
+ * finding so called "inessential liberties". These are defined as
+ * liberties, which satisfy five conditions:
  *
  *	1) they are not within an eye (not in someone's territory),
  *	2) all their adjacent worms and dragons are alive,
@@ -90,7 +101,7 @@ endgame(int color)
  * Such liberties are supposed to never become territory (they can't become
  * an additional eye for the worm under consideration), the worm cannot
  * connect to something via such a liberty and they will (or at least can)
- * be eventually filled by either of the players.
+ * eventually be filled by either of the players.
  *
  * FIXME: This function can probably be improved to handle more cases.
  */
@@ -100,13 +111,11 @@ endgame_analyze_worm_liberties(int pos, int color)
   int k;
   int worm_color = board[pos];
   int other = OTHER_COLOR(worm_color);
-  int liberties;
-  int libs[MAXLIBS];
-  int essential_liberties = 0;
+  int essential_liberties;
   int essential_libs[MAXLIBS];
-  int inessential_liberties = 0;
+  int inessential_liberties;
   int inessential_libs[MAXLIBS];
-  int false_eye_liberties = 0;
+  int false_eye_liberties;
   int false_eye_libs[MAXLIBS];
   int num_attacks;
   int num_attacks2;
@@ -115,54 +124,11 @@ endgame_analyze_worm_liberties(int pos, int color)
   int apos;
   int value;
 
-  /* Find all worm liberties. */
-  liberties = findlib(pos, MAXLIBS, libs);
-
-  /* Loop over the liberties and find inessential and essential ones. The
-   * latter are defined as those, which are not inside an eye space, but
-   * don't otherwise qualify as inessential. If we find a non-alive (dead
-   * or critical) worm or dragon around, we stop looking for liberties and
-   * skip the current worm (position is unstable).
-   */
-  for (k = 0; k < liberties; k++) {
-    int lib = libs[k];
-
-    if (!is_proper_eye_space(lib)) {
-      int i;
-      int essential = 0;
-      int found_other = 0;
-
-      for (i = 0; i < 4; i++) {
-	int pos2 = lib + delta[i];
-
-	if (!IS_STONE(board[pos2]))
-	  continue;
-
-	if (worm[pos2].attack_codes[0] != 0 || dragon[pos2].status != ALIVE)
-	  return;
-
-	if (board[pos2] == worm_color) {
-	  if (worm[pos2].origin != pos)
-	    essential = 1;
-	}
-	else
-	  found_other = 1;
-      }
-
-      if (i < 4)
-	break;
-
-      if (found_other) {
-	if (essential)
-	  essential_libs[essential_liberties++] = lib;
-	else
-	  inessential_libs[inessential_liberties++] = lib;
-      }
-      else if (is_false_eye(half_eye, lib) && !false_eye_territory[lib])
-	false_eye_libs[false_eye_liberties++] = lib;
-    }
-  }
-
+  if (!endgame_find_liberties(pos, &essential_liberties, essential_libs,
+			      &inessential_liberties, inessential_libs,
+			      &false_eye_liberties, false_eye_libs))
+    return;
+  
   apos = NO_MOVE;
   num_attacks = 0;
 
@@ -180,9 +146,9 @@ endgame_analyze_worm_liberties(int pos, int color)
    * worm have appeared.
    */
   if (k == inessential_liberties && board[pos] != EMPTY) {
-    /* Try to look for moves as in position 1. If the worm still has more than
-     * one liberty, try to play on every essential liberty and see if an attack
-     * appears.
+    /* Try to look for moves as in position 1. If the worm still has
+     * more than one liberty, try to play on every essential liberty
+     * and see if an attack appears.
      */
     if (countlib(pos) > 1) {
       for (k = 0; k < essential_liberties; k++) {
@@ -269,8 +235,9 @@ endgame_analyze_worm_liberties(int pos, int color)
     }
   }
   else {
-    /* We were unable to fill all the liberties. Modify `inessential_liberties'
-     * in order to undo the right number of moves.
+    /* We were unable to fill all the liberties. Modify
+     * `inessential_liberties' in order to undo the right number of
+     * moves.
      */
     inessential_liberties = k;
   }
@@ -338,9 +305,10 @@ endgame_analyze_worm_liberties(int pos, int color)
 
   value = 0;
   if (apos != NO_MOVE) {
-    /* We use the number of string's liberties minus 2 as the value of the
-     * move. Minus 2 is explained in the comment before the function. In
-     * some rare cases the value may differ, but this must be a good guess.
+    /* We use the number of string's liberties minus 2 as the value of
+     * the move. Minus 2 is explained in the comment before the
+     * function. In some rare cases the value may differ, but this
+     * should be a good guess.
      */
     value = accuratelib(apos, other, MAXLIBS, NULL) - 2;
   }
@@ -409,3 +377,137 @@ endgame_analyze_worm_liberties(int pos, int color)
     popgo();
   ASSERT1(stackp == 0, pos);
 }
+
+/* A backfilling dame is a defense move, usually within potential own
+ * territory, which does not have to be played immediately but after
+ * outer liberties of some string have been filled. If those outer
+ * liberties are dame points (here inessential liberties), it is
+ * usually better to play the backfilling moves before filling the
+ * dame points. If nothing else it reduces the risk for making stupid
+ * blunders while filling dame.
+ */
+static void
+endgame_find_backfilling_dame(int str, int color)
+{
+  int k;
+  int other = OTHER_COLOR(color);
+  int essential_liberties;
+  int essential_libs[MAXLIBS];
+  int inessential_liberties;
+  int inessential_libs[MAXLIBS];
+  int false_eye_liberties;
+  int false_eye_libs[MAXLIBS];
+  int dpos;
+  int loop_again = 1;
+  int move = NO_MOVE;
+
+  while (loop_again) {
+    loop_again = 0;
+    if (!endgame_find_liberties(str, &essential_liberties, essential_libs,
+				&inessential_liberties, inessential_libs,
+				&false_eye_liberties, false_eye_libs))
+      break;
+    for (k = 0; k < inessential_liberties; k++) {
+      if (!safe_move(inessential_libs[k], other)
+	  || !trymove(inessential_libs[k], other,
+		      "endgame", str, EMPTY, NO_MOVE))
+	continue;
+      if (board[str] == EMPTY)
+	break;
+      if (attack_and_defend(str, NULL, NULL, NULL, &dpos)) {
+	if (worm[dpos].color == EMPTY)
+	  move = dpos;
+	trymove(move, color, "endgame", str, EMPTY, NO_MOVE);
+	loop_again = 1;
+	break;
+      }
+    }
+  }
+  
+  while (stackp > 0)
+    popgo();
+
+  if (move != NO_MOVE && safe_move(move, color)) {
+    TRACE("  backfilling dame found at %1m for string %1m\n", move, str);
+    add_expand_territory_move(move);
+    set_minimum_territorial_value(move, 0.1);
+  }    
+}
+
+/* Find liberties of the string str with various characteristics. See
+ * the comments above endgame_analyze_worm_liberties() for more
+ * information.
+ */
+static int
+endgame_find_liberties(int str,
+		       int *essential_liberties, int essential_libs[MAXLIBS],
+		       int *inessential_liberties,
+		       int inessential_libs[MAXLIBS],
+		       int *false_eye_liberties, int false_eye_libs[MAXLIBS])
+{
+  int liberties;
+  int libs[MAXLIBS];
+  int k;
+
+  ASSERT1(IS_STONE(board[str]), str);
+
+  *essential_liberties = 0;
+  *inessential_liberties = 0;
+  *false_eye_liberties = 0;
+  
+  /* Find all string liberties. */
+  liberties = findlib(str, MAXLIBS, libs);
+
+  /* Loop over the liberties and find inessential and essential ones. The
+   * latter are defined as those, which are not inside an eye space, but
+   * don't otherwise qualify as inessential. If we find a non-alive (dead
+   * or critical) worm or dragon around, we stop looking for liberties and
+   * skip the current worm (position is unstable).
+   */
+  for (k = 0; k < liberties; k++) {
+    int lib = libs[k];
+
+    if (!is_proper_eye_space(lib)) {
+      int i;
+      int essential = 0;
+      int found_other = 0;
+
+      for (i = 0; i < 4; i++) {
+	int pos = lib + delta[i];
+
+	if (!IS_STONE(board[pos]) || !IS_STONE(worm[pos].color))
+	  continue;
+
+	if (worm[pos].attack_codes[0] != 0 || dragon[pos].status != ALIVE)
+	  return 0;
+
+	if (board[pos] == board[str]) {
+	  if (find_origin(pos) != find_origin(str))
+	    essential = 1;
+	}
+	else
+	  found_other = 1;
+      }
+
+      if (i < 4)
+	break;
+
+      if (found_other) {
+	if (essential)
+	  essential_libs[(*essential_liberties)++] = lib;
+	else
+	  inessential_libs[(*inessential_liberties)++] = lib;
+      }
+      else if (is_false_eye(half_eye, lib) && !false_eye_territory[lib])
+	false_eye_libs[(*false_eye_liberties)++] = lib;
+    }
+  }
+  return 1;
+}
+
+/*
+ * Local Variables:
+ * tab-width: 8
+ * c-basic-offset: 2
+ * End:
+ */
