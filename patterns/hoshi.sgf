@@ -24,7 +24,8 @@ RU[Japanese]SZ[19]HA[0]KM[5.5]
 GN[Hoshi joseki variations]
 DT[1999-05-10]
 SY[Cgoban 1.9.5]TM[-];B[pd]C[0]
-(;B[pj];C[#kosumi tsuke for 6-9 stone games];W[qf]PL[B]
+(;B[pj];C[#kosumi tsuke for 6-9 stone games]PL[W]
+(;W[qf]PL[B]
 (;B[qe]MA[mk];W[pf]C[S]MA[mi]
 (;B[nd]MA[mk]C[U]PL[W];W[ph]C[j];B[re]MA[lk]C[j])
 
@@ -34,6 +35,14 @@ MA[mi];B[qb];W[pe]MA[mi];B[qd])
 
 (;B[qh]C[j
 ]MA[nl])
+)
+
+(;W[pg];B[nd];W[ld];B[nf];W[oe]
+(;B[od]MA[kj])
+
+(;B[oh]C[#gnugo likes this.
+])
+)
 )
 
 (;B[qg]C[0];C[#17 stone concrete];B[pj]C[0]
