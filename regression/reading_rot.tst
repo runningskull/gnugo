@@ -1,4 +1,2 @@
-orientation 3
-loadsgf games/trevor/auto/b75.sgf 62
-163 attack E12
-#? [0]
+# last updated for gnugo 3.3.10
+# 3.3.10 had no reorientation problems for reading.tst
