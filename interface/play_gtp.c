@@ -1138,11 +1138,13 @@ gtp_move_history(char *s)
   UNUSED(s);
   
   gtp_start_response(GTP_SUCCESS);
-  for (k = move_history_pointer-1; k >= 0; k--) {
-    color = move_history_color[k];
-    pos = move_history_pos[k];
-    gtp_mprintf("%C %m\n", color, I(pos), J(pos));
-  }
+  if (move_history_pointer > 0)
+    for (k = move_history_pointer-1; k >= 0; k--) {
+      color = move_history_color[k];
+      pos = move_history_pos[k];
+      gtp_mprintf("%C %m\n", color, I(pos), J(pos));
+    }
+  else gtp_printf("\n");
   gtp_printf("\n");
   return GTP_OK;
 }
