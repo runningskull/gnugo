@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- owl_find_lunches() revised
 - owl_determine_life() bugfixed
 - owl.c made completely 1D and other revisions
 - new GTP command analyze_eyegraph

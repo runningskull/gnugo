@@ -4293,6 +4293,21 @@ owl_connection_defends(int move, int target1, int target2)
  *
  * 1b. The liberty is a topologically false eye with respect to the
  *     goal dragon.
+ *
+ * This is not quite good enough though, as shown in this position:
+ *
+ * ----------
+ * OX.X.OO...
+ * OXX.OOX.O.
+ * O.XXXXX.O.
+ * OOOOOOOOO.
+ *
+ * The four O stones are regarded as inessential after inclusion of
+ * rule 1b, which is clearly inappropriate. To solve this problem we
+ * modify the rule:
+ *
+ * 1b'. The liberty is a topologically false eye with respect to the
+ *      goal dragon and is adjacent to no empty vertex.
  */
 
 static void
@@ -4431,6 +4446,17 @@ owl_find_lunches(struct local_owl_data *owl)
 	      }
 	      if (diagonal_goal + (off_board >= 2) < 2)
 		essential = 1;
+	      else {
+		/* Check that the liberty is adjacent to no empty
+		 * vertex, as required by 1b'.
+		 */
+		for (s = 0; s < 4; s++) {
+		  if (board[bpos + delta[s]] == EMPTY) {
+		    essential = 1;
+		    break;
+		  }
+		}
+	      }
 	    }
 
 	    if (essential)
