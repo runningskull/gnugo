@@ -16,6 +16,7 @@
 * grid optimization::             The ``grid'' optimization.
 * Joseki Compiler::               The joseki compiler.
 * Ladders in Joseki::             Example: ladders in joseki.
+* Corner Matcher::                A special matcher for joseki patterns.
 @end menu
 
 @node Patterns Overview, Pattern Classification, Patterns, Patterns
@@ -1638,7 +1639,7 @@ and a constraint
 ;xplay_attack(A,B,C,D,*)
 @end example
 
-@node Ladders in Joseki,  , Joseki Compiler, Patterns
+@node Ladders in Joseki, Corner Matcher , Joseki Compiler, Patterns
 @comment  node-name,  next,  previous,  up
 @section Ladders in Joseki
 
@@ -1713,3 +1714,123 @@ to the four intersections and a comment:
 
 The appropriate constraint (autohelper macro) will then be added
 to the Joseki @file{.db} file.
+
+@node Corner Matcher, , Ladders in Joseki, Patterns
+@comment  node-name, next,  previous,       up
+@section Corner Matcher
+
+@cindex implementation of pattern matching
+@cindex joseki
+@cindex corner matcher
+
+GNU Go uses a special matcher for joseki patterns.  It has certain constraints
+on the patterns it can match, but is much faster and takes far less space to
+store patterns than the standard matcher.
+
+Patterns used with corner matcher have to qualify the following conditions:
+
+@itemize @bullet
+@item They must be matchable only at a corner of the board (hence the name of
+the matcher).
+@item They can consist only of @samp{O}, @samp{X} and @samp{.} elements.
+@item Of all pattern values (@pxref{Pattern Values}), corner matcher only
+support @code{shape(x)}.  This is not because the matcher cannot handle other
+values in principle, just they are currently not used in joseki databases.
+@end itemize
+
+Corner matcher was specifically designed for joseki patterns and they of
+course satisfy all the conditions above.  With some modifications corner
+matcher could be used for fuseki patterns as well, but fullboard matcher
+does its work just fine.
+
+The main idea of the matcher is very same to the one of DFA matcher
+(@pxref{Pattern matching with DFA}): check all available patterns at once,
+not a single pattern at a time.  A modified version of DFA matcher could be
+used for joseki pattern matching, but its database would be very large.
+Corner matcher capitalizes on the fact that there are relatively few
+stones in each such pattern.
+
+Corner pattern database is organized into a tree.  Nodes of the tree are
+called ``variations''.  Variations represent certain sets of stones in a
+corner of the board.  Root variation corresponds to an empty corner and a
+step down the tree is equivalent to adding a stone to the corner.  Each
+variation has several properties:
+
+@itemize @minus
+@item stone position relative to the corner,
+@item a flag determining whether the stone color must be equal to the first
+matched stone color,
+@item number of stones in the corner area (see below) of the variation stone.
+@end itemize
+
+By corner area we define a rectangle which corners are the current corner of
+the board and the position of the stone (inclusive).  For instance, if the
+current board corner is A19 then corner area of a stone at C18 consists
+of A18, A19, B18, B19, C18 and C19.
+
+Variation which is a direct child of the root variation matches if there
+is any stone at the variation position and the stone is alone in its
+corner area.
+
+Variation at a deeper level of the tree matches if there is a stone of
+specified color in variation position and the number of stones in its
+corner area is equal to the number specified in variation structure.
+
+When a certain variation matches, all its children has to be checked
+recursively for a match.
+
+All leaf variations and some inner ones have patterns attached to them.
+For a pattern to match, it is required that its @emph{parent} variation
+matches.  In addition, it is checked that pattern is being matched for
+the appropriate color (using its variation ``stone color'' field) and
+that the number of stones in the area where the pattern is being matched
+is indeed equal to the number of stones in the pattern.  The ``stone
+position'' property of the pattern variation determines the move suggested
+by the pattern.
+
+Consider this joseki pattern which has four stones:
+
+@example
+------+
+......|
+......|
+.O*...|
+.XXO..|
+......|
+......|
+@end example
+
+To encode it for the corner matcher, we have to use five variations,
+each next being a child of previous:
+
+@multitable {Tree level} {Position} {``other''} {Number of stones}
+@item Tree level @tab Position @tab Color @tab Number of stones
+@item 1 @tab R16 @tab ``same'' @tab 1
+@item 2 @tab P17 @tab ``same'' @tab 1
+@item 3 @tab Q16 @tab ``other'' @tab 2
+@item 4 @tab P16 @tab ``other'' @tab 4
+@item 5 @tab Q17 @tab ``same'' @tab 1
+@end multitable
+
+The fifth variation should have an attached pattern.  Note that the stone
+color for the fifth variation is ``same'' because the first matched stone
+for this pattern is @samp{O} which stands for the stones of the player
+to whom moves are being suggested with @samp{*}.
+
+The tree consists of all variations for all patterns combined together.
+Variations for each patterns are sorted to allow very quick tree branch
+rejection and at the same time keep the database small enough.  More
+details can be found in comments in file @file{mkpat.c}
+
+Corner matcher resides in @file{matchpat.c} in two functions:
+@code{corner_matchpat()} and @code{do_corner_matchpat()}.  The former computes
+@code{num_stones[]} array which holds number of stones in corner areas of
+different intersections of the board for all possible transformations.
+@code{corner_matchpat()} also matches top-level variations.
+@code{do_corner_matchpat()} is responsible for recursive matching on the
+variation tree and calling callback function upon pattern match.
+
+Tree-like database for corner matcher is generated by @code{mkpat} program.
+Database generator consists of several functions, most important are:
+@code{corner_best_element()}, @code{corner_variation_new()},
+@code{corner_follow_variation()} and @code{corner_add_pattern()}.

@@ -1288,6 +1288,7 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
 	ASSERT1(board[move] == EMPTY, move);
 
 	callback(move, callback_color, pattern, trans, pattern_stones, stones);
+	continue;
       }
     }
 
