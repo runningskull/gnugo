@@ -12,6 +12,7 @@
 - new command-line option --orientation
 - -l and decide-* options can be combined with --orientation
 - tuning and regression revisions
+- regress.plx revisions: total line, time display, command line hint
 
 3.1.12 released October 28, 2001
 

@@ -110,25 +110,34 @@ sub createIndex {
  <TR><TD>file</TD><TD>passed</TD><TD>PASSED</TD><TD>failed</TD><TD>FAILED</TD>
  </TR>';
   
-
+  my @pflist = ("passed", "PASSED", "failed", "FAILED");
+  my %totHash;
+  @totHash{@pflist} = (0,0,0,0);
 
   foreach my $k1 (sort keys %hha) { #$k1 = filename
-    print I qq@<TR><TD><A href="regress.plx?tstfile=$k1&sortby=result">$k1</A></TD>\n@;
-    foreach my $k2 ("passed", "PASSED", "failed", "FAILED") {
+    print I qq@<TR>\n <TD><A href="regress.plx?tstfile=$k1&sortby=result">$k1</A></TD>\n@;
+    foreach my $k2 (@pflist) {
       my $c = 0;
       $c = @{$hha{$k1}{$k2}} if $hha{$k1}{$k2};
+      $totHash{$k2} += $c;
       if (!($k2 =~ /passed/) and $c) {
-        print I "<TD>$c:<BR>\n";
+        print I " <TD>$c:<BR>\n";
         foreach (sort {$a<=>$b} @{$hha{$k1}{$k2}}) {
-          print I qq@<A HREF="regress.plx?tstfile=$k1&num=$_">$_</A>\n@;
+          print I qq@  <A HREF="regress.plx?tstfile=$k1&num=$_">$_</A>\n@;
         }
-        print I "</TD>\n";
+        print I " </TD>\n";
       } else {
-        print I "<TD>$c</TD>\n";
+        print I " <TD>$c</TD>\n";
       }
       #print I "$k1: $k2: ". (join ";", @{$hha{$k1}{$k2}}) . "\n";
     }
+    print I "</TR>";
   }
+  print I "<TR>\n <TD><B>Total</B></TD>\n";
+  foreach (@pflist) {
+    print I " <TD>$totHash{$_}</TD>\n";
+  }
+  print I "</TR>\n";
   print I " </TABLE></BODY></HTML>\n";
   close I;
 } 
@@ -213,8 +222,25 @@ if ($num) {
   $colorboard .= "\n</TABLE>\n";
 
   print $colorboard;
+  
+  my $gtpall = $attribs{gtp_all};
+  $gtpall  =~ s/<BR>//mg;
+  $gtpall  =~ s/\s+$//mg;
+  $gtpall  =~ m@loadsgf\s+ ((?:\w|[-.\\/])+)  \s* (\d*) @xm or die  $attribs{gtp_all};
+  my $cmdline = "gq -l $1 " . ($2 ? "-L $2 " : "");
+  if ($gtpall =~ m@ .* (owl_[attackdefend]*) \s* ([A-Z]\d{1,2}) \s* $ @x) {
+    $cmdline .= "--decide-dragon $2 -o x.sgf" ;
+  } elsif ($gtpall =~ m@ .* (gg_genmove\s+[whiteblack]*)  \s* $@x) {
+    $cmdline .= "-t";
+  } elsif ($gtpall =~ m@ .* ([attackdefend]*) \s* ([A-Z]\d{1,2}) \s* $ @x) {
+    $cmdline .= "--decide-string $2 -o x.sgf";
+  } else {
+    $cmdline .= " <BR> (directive unrecognized): '$gtpall'";
+  }
   print qq@<HR>\n\n@;
-  print qq@<TABLE border=1><TR><TD>Full GTP:</TD><TD>$attribs{gtp_all}</TD></TR></TABLE>@;
+  print qq@<TABLE border=1>\n@;
+  print qq@ <TR><TD>CMD Line Hint:</TD><TD>$cmdline</TD></TR>\n@;
+  print qq@ <TR><TD>Full GTP:</TD><TD>$attribs{gtp_all}</TD></TR>\n</TABLE>\n@;
   print qq@<HR>\nSGF board not generated - does anybody care?@;
   
   print "\n\n</HTML>";
@@ -255,6 +281,7 @@ sub summarizeTestFile {
   <TH>expected </TH>
   <TH>got</TH>
   <TH>gtp</TH>
+  <TH><A href="regress.plx?tstfile=$tstfile&sortby=cputime">cputime</A></TH>
 </TR>\n@;
 
   my @files = glob("html/$tstfile/*.xml");
@@ -279,6 +306,9 @@ sub summarizeTestFile {
       if $content =~ m@<CORRECT>(.*?)</CORRECT>@s;
     my $got = $1
       if $content =~ m@<ANSWER>(.*?)</ANSWER>@s;
+    my $cputime = $1
+      if $content =~ m@<TIME.*?CPU=((\d|\.)*)@s;
+    $cputime =~ s/0*$//;
     $files{$curfile} = {
       gtp_all => $gtp_all,
       gtp => $gtp,
@@ -286,7 +316,8 @@ sub summarizeTestFile {
       num => $num,
       expected => $expected,
       got => $got,
-      result => $result
+      result => $result,
+      cputime => $cputime
     }
   }
  
@@ -296,12 +327,17 @@ sub summarizeTestFile {
     fptonum($files{$a}{"result"}) <=> fptonum($files{$b}{"result"})
     or byfilepos();
   }
+  sub bycputime {
+    $files{$b}{cputime} <=> $files{$a}{cputime}
+    or byfilepos();
+  }
   
   sub filesby {
     $_ = shift;
-    return byfilepos if /filepos/;
-    return bynum if /num/;
-    return byresult if /result/;
+    return byfilepos if /filepos/i;
+    return bynum if /num/i;
+    return byresult if /result/i;
+    return bycputime if /cputime/i;
     $files{$a}{$_} <=> $files{$b}{$_};   
   }
   
@@ -311,7 +347,7 @@ sub summarizeTestFile {
     my $r = $h{result};
     $r =~ s@^([A-Z]*)$@<B>$1</B>@;
     print TF "<TR><TD>$h{filepos}</TD><TD>$numURL</TD><TD>$r</TD><TD>$h{expected}</TD>"
-        . "<TD>$h{got}</TD><TD>$h{gtp}</TD></TR>\n";
+        . "<TD>$h{got}</TD><TD>$h{gtp}</TD><TD>$h{cputime}</TD></TR>\n";
   }
 
   #close TF;
@@ -399,3 +435,4 @@ sub colorboard_letter_row {
 #}
 #
 #
+
