@@ -155,7 +155,7 @@ loadsgf games/life_and_death/ld15.sgf
 59 dragon_status R3
 #? [alive]
 60 dragon_status C4
-#? [alive]*
+#? [alive]
 
 loadsgf games/life_and_death/ld16.sgf
 61 dragon_status C16

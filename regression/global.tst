@@ -12,7 +12,7 @@ loadsgf golois/Aya991113-13.sgf
 
 loadsgf golois/Aya991113-1.sgf
 4 gg_genmove black
-#? [Q6]*
+#? [Q6]
 
 loadsgf golois/Aya991113-2.sgf
 5 gg_genmove black
@@ -24,7 +24,7 @@ loadsgf golois/Aya991113-3.sgf
 
 loadsgf golois/Aya991113-6.sgf
 7 gg_genmove black
-#? [A5]*
+#? [A5]
 
 loadsgf golois/Aya991113-7.sgf
 8 gg_genmove black
@@ -54,7 +54,7 @@ loadsgf golois/Goemate990902-15.sgf
 # Semeai problem.
 loadsgf golois/Goemate990902-1.sgf
 14 gg_genmove black
-#? [S9]
+#? [S9]*
 
 loadsgf golois/Goemate990903-10.sgf
 15 gg_genmove black
@@ -81,7 +81,7 @@ loadsgf golois/Goemate990904-3.sgf
 # white" /gf
 loadsgf golois/Goemate990907-2.sgf
 20 gg_genmove white
-#? [R15]*
+#? [R15]
 
 loadsgf golois/Goemate990911-1.sgf
 21 gg_genmove black
@@ -105,7 +105,7 @@ loadsgf golois/Goemate991113-1.sgf
 
 loadsgf golois/Goemate991113-4.sgf
 26 gg_genmove black
-#? [D12]*
+#? [D12]
 
 loadsgf golois/Goemate991113-5.sgf
 27 gg_genmove black
@@ -185,7 +185,7 @@ loadsgf golois/MeilleurCoup990428-1.sgf
 
 loadsgf golois/Neurogo97-1.sgf
 46 gg_genmove white
-#? [J2]
+#? [J2]*
 
 loadsgf golois/test.sgf
 47 gg_genmove black

@@ -154,8 +154,8 @@ if ($make_images) {
   exit;
 }
 
+my $s = (lc ($^O) eq 'mswin32') ? '\\' : '/';
 if (!$goprog) {
-  my $s = (lc ($^O) eq 'mswin32') ? '\\' : '/';
   $goprog = "..${s}interface${s}gnugo.exe --mode gtp --quiet -t -w -d0x1000";  
 }
 
@@ -220,7 +220,7 @@ my $curtstfile = "";
 my $file_count = 0;
 while ($file_count <= $#ARGV) {
   $curtstfile = $ARGV[$file_count];
-  unlink "html/index.html";
+  #unlink "html/index.html";
   unlink "html/$curtstfile/index.html";
   print "regressing file $ARGV[$file_count]\n" if $verbose > 1;
   unlink "html/$curtstfile/index.html";
@@ -249,6 +249,7 @@ sub regress_file {
   -e "html/$testfile" or mkdir "html/$testfile" or die "Couldn't create html/$testfile";
   
   my $childpid;
+
   unless ($one_gg_process) {
     $goprog_in  = new FileHandle;		# stdin of computer player
     $goprog_out = new FileHandle;		# stdout of computer player
@@ -275,14 +276,14 @@ sub regress_file {
       }
       close TRACER;
       exit;
+    }
   }
-  }
-  
+
   foreach (@counters) {
     go_command("reset_${_}_counter");
     eat();
   }
-
+  
   #main bit.
   $pidt = open ($testfile_out,"<$testfile");
   print "testfile pid: $pidt\n" if $verbose > 1;
@@ -367,6 +368,8 @@ sub regress_file {
       }
     }
     if (defined($next_cmd)) {
+      $next_cmd =~ /^([0-9]+)/;
+      my $this_number = $1;
       if (!$skipping) {
 	$top_moves = "";
 	if ($do_topmove) {
@@ -374,6 +377,10 @@ sub regress_file {
 	    $next_cmd =~ s/gg_genmove\s+([blackwhite]+)/top_moves_$1/;
 	    $top_moves = 1;
 	  }
+	}
+	if (defined($this_number) && $next_cmd =~ /owl_(attack|defend)/) {
+	  go_command("start_sgftrace");
+	  eat(); #ignore output
 	}
  	go_command($next_cmd); 
  	if ($top_moves) {
@@ -390,9 +397,12 @@ sub regress_file {
 	  if (!defined($result)) {$result="";}
 	}
 	print "RES: $result\n" if $verbose > 1;
+	if (defined($this_number) && $next_cmd =~ /owl_(attack|defend)/) {
+	  go_command("finish_sgftrace html$s$testfile$s$this_number.sgf");
+	  eat(); #ignore output
+	}
       }
-      $next_cmd =~ /^([0-9]+)/;
-      if ($1) {$num = $1;}
+      if (defined $this_number) {$num = $this_number;}
     }
   }
   my $pass_string;
@@ -725,15 +735,15 @@ sub eat_board {
   
   return "<BOARD size=$boardsize>\n" . $xboard . "</BOARD>\n";
 }
-  
+
 
 sub eat() {
   # ignore empty lines
-    my $line = "";
-    while ($line eq "") {
+  my $line = "";
+  while ($line eq "") {
     chop($line = <$goprog_out>) or confess "No response!";
     $line =~ s/\s*$//smg;
-    }
+  }
   <$goprog_out>;
   return $line;
 }  

@@ -27,25 +27,30 @@ loadsgf games/nicklas/nicklas8.sgf 140
 # Locally K18 is superior to L17.
 loadsgf games/nicklas/nicklas12.sgf 69
 1202 gg_genmove black
-#? [!L17]
+#? [!L17]*
 
+# I guess K18, giving up the O17 stones and attacking H17 in exchange,
+# is playable. /ab
 loadsgf games/nicklas/nicklas12.sgf 71
 1203 gg_genmove black
-#? [N18|N19|M19]*
+#? [K18|N18|N19|M19]
 
 loadsgf games/nicklas/nicklas12.sgf 89
 1204 gg_genmove black
 #? [H15]*
 
 # This is presumably a semeai problem.
+# W L8 is alive in semeai. /ab
 loadsgf games/nicklas/nicklas12.sgf 182
 1211 dragon_status L8
-#? [critical]*
+#? [alive]*
 
 # This is presumably a semeai problem.
+# As W L8 is alive in semeai with sufficiently many liberties ahead of
+# B G13, I do not think the black P13 dragon can make eyes. /ab
 loadsgf games/nicklas/nicklas12.sgf 199
 1212 dragon_status P13
-#? [critical]*
+#? [dead]
 
 loadsgf games/nicklas/nicklas12.sgf 263
 1217 gg_genmove black

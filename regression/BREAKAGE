@@ -1,37 +1,33 @@
-CVS version of November 16, 2001
+========================== 3.1.14 =========================
 
-./regress.sh . reading.tst
 ./regress.sh . owl.tst
+4 unexpected FAIL: Correct '1 C12', got '1 B14'
 65 unexpected FAIL: Correct '1 M11', got '1 J12'
-149 unexpected PASS!
 150 unexpected FAIL: Correct '0', got '1 G13'
-192 unexpected FAIL: Correct '1 F3', got '3 G1'
+170 unexpected PASS!
+192 unexpected FAIL: Correct '1 F3', got '0'
 228 unexpected PASS!
 229 unexpected FAIL: Correct '1 D9', got '0'
 ./regress.sh . owl_rot.tst
+150 unexpected PASS!
 193 unexpected PASS!
+228 unexpected FAIL: Correct '0', got '1 D5'
 ./regress.sh . ld_owl.tst
 60 unexpected PASS!
-308 unexpected FAIL: Correct '1 T17', got '1 Q19'
-./regress.sh . optics.tst
-./regress.sh . filllib.tst
-./regress.sh . atari_atari.tst
 ./regress.sh . connection.tst
 32 unexpected FAIL: Correct '1 D9', got '1 PASS'
-./regress.sh . blunder.tst
 ./regress.sh . strategy.tst
 1 unexpected FAIL: Correct 'Q13', got 'Q15'
 18 unexpected FAIL: Correct 'E4|F3', got 'E5'
-49 unexpected FAIL: Correct 'C17|D16|B17', got 'C3'
+49 unexpected FAIL: Correct 'C17|D16|B17', got 'C4'
 ./regress.sh . endgame.tst
 208 unexpected PASS!
 218 unexpected FAIL: Correct 'H1', got 'L1'
-./regress.sh . heikki.tst
 ./regress.sh . neurogo.tst
-11 unexpected FAIL: Correct 'N5', got 'S8'
+19 unexpected PASS!
+21 unexpected PASS!
 ./regress.sh . arb.tst
 200 unexpected PASS!
-./regress.sh . rosebud.tst
 ./regress.sh . golife.tst
 7 unexpected FAIL: Correct 'F3', got 'G1'
 ./regress.sh . arion.tst
@@ -39,11 +35,11 @@ CVS version of November 16, 2001
 ./regress.sh . viking.tst
 2 unexpected FAIL: Correct 'E2', got 'R9'
 ./regress.sh . ego.tst
-./regress.sh . dniwog.tst
+8 unexpected FAIL: Correct 'F12', got 'H11'
 ./regress.sh . strategy2.tst
 73 unexpected PASS!
 74 unexpected PASS!
-91 unexpected FAIL: Correct 'B14', got 'G13'
+77 unexpected PASS!
 ./regress.sh . nicklas1.tst
 501 unexpected PASS!
 1509 unexpected PASS!
@@ -65,11 +61,11 @@ CVS version of November 16, 2001
 6 unexpected PASS!
 7 unexpected FAIL: Correct 'R2|S7', got 'E3'
 9 unexpected FAIL: Correct '!P12', got 'P12'
-10 unexpected FAIL: Correct 'N3', got 'O8'
+10 unexpected FAIL: Correct 'N3', got 'P7'
 ./regress.sh . niki.tst
+4 unexpected PASS!
 ./regress.sh . trevor.tst
 15 unexpected PASS!
-190 unexpected FAIL: Correct 'B7', got 'E8'
 261 unexpected PASS!
 330 unexpected PASS!
 340 unexpected PASS!
@@ -89,11 +85,11 @@ CVS version of November 16, 2001
 145 unexpected FAIL: Correct 'S14|T14', got 'A3'
 ./regress.sh . capture.tst
 18 unexpected PASS!
-./regress.sh . connect.tst
 ./regress.sh . global.tst
 4 unexpected PASS!
 7 unexpected PASS!
 14 unexpected FAIL: Correct 'S9', got 'L13'
+20 unexpected PASS!
 26 unexpected PASS!
 46 unexpected FAIL: Correct 'J2', got 'J4'
 ./regress.sh . vie.tst
@@ -108,10 +104,12 @@ CVS version of November 16, 2001
 9 unexpected PASS!
 11 unexpected PASS!
 12 unexpected PASS!
+15 unexpected PASS!
 16 unexpected PASS!
 18 unexpected PASS!
 20 unexpected PASS!
 21 unexpected PASS!
+24 unexpected PASS!
 25 unexpected PASS!
 30 unexpected PASS!
 34 unexpected PASS!

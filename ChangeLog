@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.14 released November 17, 2001
+
 - recognize_eye() revised
 - new function test_eyeshape() in optics.c
 - new gtp command test_eyeshape
@@ -39,6 +41,8 @@
 - some simple cleaning
 - genmove now 1D
 - out of bounds array violation in showbord.c fixed.
+- regress.pl records sgf trace for owl_attack & owl_defend.
+- regress.plx provides access to sgf trace files if present.
 - tuning
 - connection tuning
 - eye tuning

@@ -16,12 +16,12 @@ loadsgf games/incident263.sgf 32
 orientation 2
 loadsgf games/strategy25.sgf 63
 150 owl_attack D15
-#? [0]*
+#? [0]
 
 orientation 3
 loadsgf games/strategy33.sgf 15
 193 owl_attack Q16
-#? [0]*
+#? [0]
 
 orientation 2
 loadsgf games/trevor/trevor_27.sgf 36
@@ -31,4 +31,4 @@ loadsgf games/trevor/trevor_27.sgf 36
 orientation 1
 loadsgf games/nicklas/nicklas18.sgf 17
 228 owl_attack B5
-#? [0]
+#? [0]*

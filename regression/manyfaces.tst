@@ -10,7 +10,7 @@ loadsgf games/mfgg1.sgf 43
 
 loadsgf games/mfgg1.sgf 49
 2 gg_genmove black
-#? [S16]*
+#? [S16]
 
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=No terribly serious consequences, S11 not optimal.
@@ -30,21 +30,19 @@ loadsgf games/mfgg2.sgf 19
 5 gg_genmove black
 #? [M5|M15|R3|R17]
 
-
 #CATEGORY=FUSEKI_STRATEGY
 #DESCRIPTION=E6 really misses the point.
 #SEVERITY=9
 loadsgf games/mfgg2.sgf 23
 6 gg_genmove black
-#? [R3]*
+#? [R3]
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=Q5 dragon is under severe pressure.
 #SEVERITY=8
 loadsgf games/mfgg2.sgf 45
 7 gg_genmove black
-#? [R2|S7]
-
+#? [R2|S7]*
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=GNU Go doesn't understand this type of corner position!
@@ -56,11 +54,11 @@ loadsgf games/mfgg2.sgf 117
 
 loadsgf games/mfgg3.sgf 42
 9 gg_genmove black
-#? [!P12]
+#? [!P12]*
 
 loadsgf games/mfgg3.sgf 44
 10 gg_genmove black
-#? [N3]
+#? [N3]*
 
 
 ############ End of Tests #################

@@ -17,7 +17,7 @@ loadsgf games/nicklas/nicklas8.sgf 146
 
 loadsgf games/nicklas/nicklas8.sgf 212
 809 gg_genmove black
-#? [B10]*
+#? [B10]
 
 # Changed correct answer from K12 to J12. /gf
 # K14 also secures a connection of all important stones but is one
@@ -29,29 +29,35 @@ loadsgf games/nicklas/nicklas8.sgf 242
 # O9 does leave a ko but is not out of the question. /gf
 loadsgf games/nicklas/nicklas11.sgf 56
 1102 gg_genmove black
-#? [P9]*
+#? [P9|O9]
 
 loadsgf games/nicklas/nicklas11.sgf 172
 1103 gg_genmove black
-#? [C3]*
+#? [C2|C3]
 
-# P9 must be an error. /gf
+# It seems that GNU Go makes a logical mistake here: After seeing that
+# R9 can be defended with S7, and that Q8 can be defended with S7, I
+# doubt it checks whether both will be defended by S7. /ab
 loadsgf games/nicklas/nicklas12.sgf 29
 1201 gg_genmove black
-#? [P9]*
+#? [Q9]*
 
+# I have some doubt about the correct move. I might be advisable for B
+# to defend his center group, although W E16 hurts, of course. However,
+# W's attack after W N11, B N12 and next W L9 or similar might be
+# very useful as well.
 loadsgf games/nicklas/nicklas12.sgf 95
 1205 gg_genmove black
 #? [E16]*
 
 loadsgf games/nicklas/nicklas12.sgf 215
 1215 dragon_status A4
-#? [critical A6 (A1|A6)]*
+#? [critical A6 (A1|A6)]
 
 # Changed move number from 185 to 186. /gf
 loadsgf games/nicklas/nicklas15.sgf 186
 1501 gg_genmove black
-#? [D17]*
+#? [D17]
 
 
 ############ End of Tests #################

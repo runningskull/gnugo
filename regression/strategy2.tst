@@ -123,12 +123,12 @@ loadsgf games/strategy19.sgf 94
 # I have added R17, as it seems to kill the huge black dragon --arend
 loadsgf games/semeai2.sgf 116
 73 gg_genmove white
-#? [F7|R17]*
+#? [F7|R17]
 
 # I have added R17, as it seems to kill the huge black dragon --arend
 loadsgf games/semeai2.sgf 118
 74 gg_genmove white
-#? [F7|R17]*
+#? [F7|R17]
 
 loadsgf games/semeai2.sgf 150
 # If Q11 is not undervalued F7 is acceptable (though not correct)
@@ -142,7 +142,7 @@ loadsgf games/semeai2.sgf 152
 
 loadsgf games/strategy21.sgf 86
 77 gg_genmove black
-#? [H3]*
+#? [H3]
 
 # Compare reading test 131.
 loadsgf games/strategy21.sgf 96

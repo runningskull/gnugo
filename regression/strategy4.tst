@@ -32,7 +32,7 @@ loadsgf games/ssstator.sgf 133
 
 loadsgf games/ssstator.sgf 136
 157 gg_genmove white
-#? [B14|B16]*
+#? [B14|B16]
 
 # E16 is completely aimless and ineffective.
 loadsgf games/strategy38.sgf 51
@@ -54,7 +54,7 @@ loadsgf games/strategy38.sgf 197
 # First live then attack. This should probably be analyzed as a semeai.
 loadsgf games/strategy39.sgf 156
 162 gg_genmove white
-#? [O7|Q7|N7]
+#? [O7|Q7|N7]*
 
 # First live then attack. This should probably be analyzed as a semeai.
 loadsgf games/strategy39.sgf 158
@@ -147,7 +147,7 @@ loadsgf games/xxlin.sgf 8
 # should be added. /gf
 loadsgf games/xxlin.sgf 16
 178 gg_genmove black
-#? [P4|P3]
+#? [P4|P3]*
 
 #DESCRIPTION=Tenuki also seems OK here.
 #Added E2 (3.1.14) -trevor
@@ -175,7 +175,7 @@ loadsgf games/xxlin.sgf 76
 
 loadsgf games/xxlin.sgf 106
 184 gg_genmove black
-#? [H13|F15]
+#? [H13|F15]*
 
 # We may want to move this to a dedicated seki or semeai test suite in
 # the future.
@@ -272,7 +272,7 @@ loadsgf games/juka1.sgf 28
 
 loadsgf games/juka1.sgf 48
 205 gg_genmove black
-#? [!O11]*
+#? [!O11]
 
 #CATEGORY=SEMEAI
 #DESCRIPTION=K6 does take K8 to no eyes, but...
@@ -290,7 +290,7 @@ loadsgf games/owl30.sgf 84
 
 loadsgf games/lordofpi.sgf 36
 208 gg_genmove black
-#? [A5|A2|B1]*
+#? [A5|A2|B1]
 
 # A4 allows W to make seki
 loadsgf games/lordofpi.sgf 46
@@ -308,7 +308,7 @@ loadsgf games/lordofpi.sgf 56
 # Pattern LE14 gives an unreasonable value to H3.
 loadsgf games/owl31.sgf 28
 212 gg_genmove white
-#? [G2]
+#? [G2]*
 
 loadsgf games/strategy46.sgf 172
 213 gg_genmove white

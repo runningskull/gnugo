@@ -144,7 +144,7 @@ loadsgf games/trevor/trevor_14.sgf
 #protecting at E7 is very necessary.
 loadsgf games/trevor/trevor_15.sgf 
 15 gg_genmove white
-#? [E7]*
+#? [E7]
 
 # C1 looks best here.  A7 very unorthodox, and at least
 # worse for ko threats.
@@ -258,7 +258,7 @@ loadsgf games/trevor/trevor_26.sgf 33
 #Move at F9 would be a blunder.
 loadsgf games/trevor/trevor_26.sgf 39
 261 gg_genmove black
-#? [F9]*
+#? [F9]
 
 
 # Ack, protect the cut!
@@ -321,7 +321,7 @@ loadsgf games/trevor/trevor_32.sgf
 
 loadsgf games/trevor/trevor_33.sgf
 330 owl_defend L9
-#? [1 P9]*
+#? [1 P9]
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Very simple to threaten eye or run out here.
@@ -329,7 +329,7 @@ loadsgf games/trevor/trevor_33.sgf
 #SEE_ALSO=owl.tst@226
 loadsgf games/trevor/trevor_34.sgf
 340 owl_defend J10
-#? [1 P9]*
+#? [1 P9]
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Very simple Ko missed here.
@@ -396,14 +396,14 @@ loadsgf games/trevor/trevor_40.sgf 1
 #SEVERITY=4
 loadsgf games/trevor/trevor_40a.sgf 2
 401 gg_genmove white
-#? [F8]*
+#? [F8]
 
 #CATEGORY=
 #DESCRIPTION=White can live!
 #SEVERITY=8
 loadsgf games/trevor/trevor_40.sgf 2
 402 gg_genmove white
-#? [!PASS]*
+#? [!PASS]
 
 
 #CATEGORY=PATTERN_TUNING
@@ -418,7 +418,7 @@ loadsgf games/trevor/trevor_41.sgf 29
 #SEVERITY=10
 loadsgf games/trevor/trevor_41.sgf 35
 411 gg_genmove black
-#? [!A3]
+#? [!A3]*
 
 #CATEGORY=TACTICAL_READING
 #DESCRIPTION=D4 worm is more important to save than B2.

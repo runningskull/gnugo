@@ -96,11 +96,11 @@ loadsgf games/FSF-neurogo.sgf 288
 # a move at S16 is called for.
 loadsgf games/FSF-neurogo.sgf 12
 19 owl_attack Q17
-#? [1 S16]*
+#? [1 S16]
 20 owl_defend Q17
 #? [1 S16]
 21 gg_genmove white
-#? [S16]*
+#? [S16]
 
 # Move 18
 # H16 looks strange. Locally better to make a wider extension towards

@@ -27,7 +27,7 @@ loadsgf games/strategy27.sgf 12
 
 loadsgf games/strategy27.sgf 62
 105 gg_genmove white
-#? [J2]
+#? [J2]*
 
 loadsgf games/strategy27.sgf 152
 106 gg_genmove white
@@ -53,7 +53,7 @@ loadsgf games/strategy27.sgf 220
 
 loadsgf games/me.sgf 44
 111 gg_genmove black
-#? [K3]
+#? [K3]*
 
 loadsgf games/me.sgf 84
 112 gg_genmove black
@@ -136,7 +136,7 @@ loadsgf games/incident74.sgf 236
 # Semeai problem.
 loadsgf games/strategy30.sgf 171
 128 gg_genmove black
-#? [O8]
+#? [O8]*
 
 # Semeai problem.
 loadsgf games/strategy30.sgf 201
@@ -209,7 +209,7 @@ loadsgf games/strategy34.sgf 61
 # Incident 209. Semeai mistake.
 loadsgf games/incident209.sgf 193
 145 gg_genmove white
-#? [S14|T14]
+#? [S14|T14]*
 
 # Incident 210. Semeai mistake.
 loadsgf games/incident209.sgf 259

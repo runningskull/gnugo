@@ -83,7 +83,7 @@ loadsgf golois/Goemate990911-3.sgf
 # B can tenuki. J8 and H9 are miai.
 loadsgf golois/Goemate991106-3.sgf
 20 owl_defend K8
-#? [1 (H9|J8|PASS)]*
+#? [1 (H9|J8|PASS)]
 
 loadsgf golois/Goemate991106-4.sgf
 21 owl_defend L13
@@ -151,7 +151,7 @@ loadsgf golois/MeilleurCoup0001.sgf
 
 loadsgf golois/MeilleurCoup0002.sgf
 37 owl_defend D4
-#? [1 B6]*
+#? [1 B6]
 
 # db added A4
 loadsgf golois/MeilleurCoup0003.sgf

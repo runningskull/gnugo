@@ -15,7 +15,7 @@ loadsgf games/incident85.sgf 104
 3 owl_attack B11
 #? [1 (C12|B14)]
 4 owl_defend B11
-#? [1 C12]
+#? [1 C12]*
 
 # incident 159
 loadsgf games/incident156.sgf 246
@@ -231,7 +231,7 @@ loadsgf games/incident254.sgf 147
 # Dragon amalgamation is a problem here.
 loadsgf games/incident256.sgf 157
 65 owl_defend O9
-#? [1 M11]
+#? [1 M11]*
 
 # incident 258
 # It's possible that this defense does in fact not work, but then
@@ -550,7 +550,7 @@ loadsgf games/FSF-neurogo.sgf 40
 # There might be an attack at G13, but it looks like it fails.
 loadsgf games/strategy25.sgf 63
 150 owl_attack D15
-#? [0]
+#? [0]*
 
 # Now G13 works.
 loadsgf games/strategy25.sgf 67
@@ -621,7 +621,7 @@ loadsgf games/poka.sgf 42
 loadsgf games/owl23.sgf
 # This isolates the problem in test 4
 170 owl_attack B14
-#? [0]*
+#? [0]
 
 # incident 284
 loadsgf games/incident278.sgf 318
@@ -704,7 +704,7 @@ loadsgf games/nicklas/nicklas10.sgf 18
 # See also test case golife:7
 loadsgf games/golife.sgf 46
 192 owl_attack E5
-#? [1 F3]
+#? [1 F3]*
 
 loadsgf games/strategy33.sgf 15
 193 owl_attack Q16
@@ -835,11 +835,11 @@ loadsgf games/owl30.sgf 172
 # The cut at D5 fails.
 loadsgf games/nicklas/nicklas18.sgf 17
 228 owl_attack B5
-#? [0]*
+#? [0]
 
 loadsgf games/incident240.sgf 69
 229 owl_attack B12
-#? [1 D9]
+#? [1 D9]*
 
 loadsgf games/owl31.sgf 20
 230 owl_defend G7

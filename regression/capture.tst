@@ -79,6 +79,6 @@ loadsgf golois/test.sgf
 # F6 works to defend F3 -trevor
 loadsgf golois/web000103.sgf
 18 defend F5
-#? [1 F6]*
+#? [1 F6]
 
 

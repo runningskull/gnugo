@@ -42,7 +42,7 @@ loadsgf games/nicklas/nicklas3.sgf 49
 
 loadsgf games/nicklas/nicklas5.sgf 23
 501 gg_genmove black
-#? [G7]*
+#? [G7]
 
 loadsgf games/nicklas/nicklas5.sgf 27
 502 gg_genmove black
@@ -248,7 +248,7 @@ loadsgf games/nicklas/nicklas15.sgf 232
 
 loadsgf games/nicklas/nicklas15.sgf 258
 1509 gg_genmove black
-#? [!L1]*
+#? [!L1]
 
 loadsgf games/nicklas/nicklas15.sgf 284
 1510 gg_genmove black
@@ -289,11 +289,11 @@ loadsgf games/nicklas/nicklas16.sgf 64
 #The problem with D5 is the same as in nicklas2:1802
 loadsgf games/nicklas/nicklas18.sgf 15
 1801 gg_genmove black
-#? [D2]*
+#? [D2]
 
 loadsgf games/nicklas/nicklas19.sgf 34
 1901 gg_genmove black
-#? [B7]
+#? [B7]*
 
 loadsgf games/nicklas/nicklas19.sgf 46
 1902 gg_genmove black

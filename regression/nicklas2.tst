@@ -23,7 +23,7 @@ reset_trymove_counter
 #    should be in nicklas3.tst (harder problems).
 loadsgf games/nicklas/nicklas1.sgf 29
 102 gg_genmove black
-#? [D4]*
+#? [D4]
 
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=I think G9 is not too terrible here. Very difficult to see.-trevor
@@ -73,7 +73,7 @@ loadsgf games/nicklas/nicklas9.sgf 50
 
 loadsgf games/nicklas/nicklas10.sgf 18
 1001 gg_genmove black
-#? [B7]*
+#? [H8]
 
 loadsgf games/nicklas/nicklas13.sgf 49
 1301 gg_genmove black
@@ -121,7 +121,7 @@ loadsgf games/nicklas/nicklas17.sgf 47
 # Owl reading problem. See also owl:228.
 loadsgf games/nicklas/nicklas18.sgf 17
 1802 gg_genmove black
-#? [E2]*
+#? [E2]
 
 
 #CATEGORY=WASTED_MOVE
@@ -130,7 +130,7 @@ loadsgf games/nicklas/nicklas18.sgf 17
 #SEE_ALSO=trevor.tst?310
 loadsgf games/nicklas/nicklas18.sgf 45
 1803 gg_genmove black
-#? [A8]*
+#? [A6|A8]
 
 
 #CATEGORY=ENDGAME_TUNING
@@ -159,7 +159,7 @@ loadsgf games/nicklas/nicklas22.sgf 42
 
 loadsgf games/nicklas/nicklas22.sgf 50
 2202 gg_genmove black
-#? [B1]*
+#? [B1]
 
 #CATEGORY=ATARI_ATARI
 #DESCRIPTION=Black must defend here - yikes!

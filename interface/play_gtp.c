@@ -868,6 +868,9 @@ gtp_owl_attack(char *s, int id)
   examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
   verbose = save_verbose;
   sgf_dumptree = save_sgf_dumptree;
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+      reading_cache_clear();
   
   attack_code = owl_attack(POS(i, j), &attack_point, &result_certain);
   gtp_printid(id, GTP_SUCCESS);
@@ -908,6 +911,9 @@ gtp_owl_defend(char *s, int id)
   examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
   verbose = save_verbose;
   sgf_dumptree = save_sgf_dumptree;
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+      reading_cache_clear();
 
   defend_code = owl_defend(POS(i, j), &defense_point, &result_certain);
   gtp_printid(id, GTP_SUCCESS);

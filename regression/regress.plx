@@ -92,7 +92,7 @@ if ($tstfile && !($tstfile =~ /^[a-zA-Z0-9_]+\.tst$/)) {
   print "bad test file: $tstfile\n";
   exit;
 }
-
+ 
 if ($reset) {
   unlink glob("html/*.html");# or die "couldn't delete html files: $!";
   unlink glob("html/*/*.html");# or die "couldn't delete html/* files: $!"; 
@@ -165,7 +165,7 @@ sub createIndex {
   #our $VAR1;
   #do "html/one.perldata" or confess "can't do perldata";
   #my %h = %{$VAR1->[0]};
-  
+
 
   open I, ">html/index.html";
 
@@ -215,25 +215,25 @@ sub createIndex {
     }
     push @{$subTotHash{$h{$k1}{status}}}, $h{$k1}{num};
   }
-
+  
       #direct copy from above - don't miss last time through - HACK!  
         if ($curfile ne "") {
         #New file = print old totals
         print I qq@<TR>\n <TD><A href="?tstfile=$curfile&sortby=result">$curfile</A></TD>\n@;
-    foreach my $k2 (@pflist) {
+        foreach my $k2 (@pflist) {
           my $c = @{$subTotHash{$k2}};  #i.e. length of array.
           if ($k2 !~ /passed/ and $c) {
-        print I " <TD>$c:<BR>\n";
+            print I " <TD>$c:<BR>\n";
             foreach (sort {$a<=>$b} @{$subTotHash{$k2}}) {
               print I qq@  <A HREF="?$curfile:$_">$_</A>\n@;
+            }
+            print I " </TD>\n";
+          } else {
+            print I " <TD>$c</TD>\n";
+          }
         }
-        print I " </TD>\n";
-      } else {
-        print I " <TD>$c</TD>\n";
-      }
-    }
         print I qq@</TR>@;
-  }
+      }
 
   
   print I "<TR>\n <TD><B>Total</B></TD>\n";
@@ -265,12 +265,22 @@ my @counters = qw/life_node owl_node reading_node trymove/;
 
 if ($num) {
 #CASE 2 - problem detail.
+
+  if ($sgf && -e "html/$tstfile/$num.sgf") {
+    open (SGFFILE, "html/$tstfile/$num.sgf") or confess "couldn't open file";
+    while (<SGFFILE>) {
+      print;
+    }
+    close SGFFILE;
+    exit;
+  }
+
   open (FILE, "html/$tstfile/$num.xml");
   local $/; undef($/);
   my $content = <FILE>;
   close FILE;
   my %attribs = %{game_parse($content)};
-  
+
   if ($sgf) {
     sgfFile(%attribs);
     exit;
@@ -349,7 +359,7 @@ if ($num) {
   $colorboard .= "\n</TABLE>\n";
 
   print $colorboard;
-  
+ 
   my $gtpall = $attribs{gtp_all};
   $gtpall  =~ s/<BR>//mg;
   $gtpall  =~ s/\s+$//mg;

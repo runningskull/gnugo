@@ -33,7 +33,7 @@ loadsgf games/arb/dumonteil-1.sgf 184
 # Why is this move so urgent? /gf
 loadsgf games/arb/dumonteil-2.sgf 229
 200 gg_genmove black
-#? [F14]*
+#? [F14]
 
 loadsgf games/arb/dumonteil-2.sgf 247
 201 gg_genmove black

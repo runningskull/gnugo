@@ -6,7 +6,7 @@ reset_trymove_counter
 
 loadsgf games/strategy1.sgf
 1 gg_genmove white
-#? [Q13]
+#? [Q13]*
 
 loadsgf games/strategy2.sgf 5
 2 gg_genmove black
@@ -111,7 +111,7 @@ loadsgf games/incident165.sgf 108
 # F3 seems fine to protect the two cuts -arend
 loadsgf games/incident165.sgf 142
 18 gg_genmove black
-#? [E4|F3]
+#? [E4|F3]*
 
 loadsgf games/strategy4.sgf
 19 gg_genmove black
@@ -309,7 +309,7 @@ loadsgf games/strategy12.sgf 19
 loadsgf games/strategy12.sgf 21
 # D16 is the strongest but these are acceptable
 49 gg_genmove black
-#? [C17|D16|B17]
+#? [C17|D16|B17]*
 
 
 #CATEGORY=OWL_TUNING
