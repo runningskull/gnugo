@@ -60,4 +60,4 @@ loadsgf games/trevor/auto/c24.sgf 62
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 104
 14 combination_attack black
-#? [0]*
+#? [PASS]*
