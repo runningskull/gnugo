@@ -14,7 +14,7 @@ loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 15
 
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 25
 30 gg_genmove black
-#? [C14]*
+#? [C14]
 
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 41
 33 gg_genmove black

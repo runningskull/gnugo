@@ -69,7 +69,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 94
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 98
 230 gg_genmove black
-#? [!L12]
+#? [!L12]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 108

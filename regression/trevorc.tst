@@ -95,7 +95,7 @@ loadsgf games/trevor/auto/c14.sgf 18
 
 loadsgf games/trevor/auto/c14.sgf 20
 240 gg_genmove white
-#? [K2]
+#? [K2]*
 
 
 loadsgf games/trevor/auto/c14.sgf 22

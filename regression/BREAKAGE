@@ -1,3 +1,24 @@
+========================== 3.3.22 pre 2 =====================================
+
+./regress.sh . owl.tst 
+150 unexpected PASS!
+./regress.sh . trevora.tst 
+370 unexpected FAIL: Correct 'F6', got 'D9'
+./regress.sh . trevorb.tst 
+510 unexpected FAIL: Correct 'C6|B6', got 'A7'
+./regress.sh . strategy2.tst 
+90 unexpected PASS!
+./regress.sh . nicklas1.tst 
+203 unexpected PASS!
+./regress.sh . trevorc.tst 
+240 unexpected FAIL: Correct 'K2', got 'K3'
+./regress.sh . nngs3.tst 
+230 unexpected FAIL: Correct '!L12', got 'L12'
+./regress.sh . ninestones.tst 
+630 unexpected PASS!
+./regress.sh . manyfaces1.tst 
+30 unexpected PASS!
+
 ========================== 3.3.22 pre 1 =====================================
 
 ./regress.sh . reading.tst 

@@ -26,7 +26,7 @@ loadsgf games/nicklas/nicklas2.sgf 9
 #SEVERITY=4
 loadsgf games/nicklas/nicklas2.sgf 23
 203 gg_genmove black
-#? [J5]*
+#? [J5]
 
 ##tm - if B J8, W J5 kills bigger B corner.  
 ##So, there's no really effective move here.
