@@ -61,12 +61,11 @@ CC = @CC@
 CPP = @CPP@
 DEPDIR = @DEPDIR@
 EXEEXT = @EXEEXT@
-GCC_ONLY = @GCC_ONLY@
-GNUGO_ALL_WARNINGS = @GNUGO_ALL_WARNINGS@
-GNUGO_SOME_WARNINGS = @GNUGO_SOME_WARNINGS@
+GCC_MAJOR_VERSION = @GCC_MAJOR_VERSION@
+GCC_MINOR_VERSION = @GCC_MINOR_VERSION@
+GNU_GO_WARNINGS = @GNU_GO_WARNINGS@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 MAINT = @MAINT@
-NO_WARNINGS = @NO_WARNINGS@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
@@ -299,8 +298,6 @@ uninstall-am: uninstall-info-am
 	mostlyclean-generic tags uninstall uninstall-am \
 	uninstall-info-am
 
-
-@NO_WARNINGS@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -118,6 +118,9 @@
 /* Name of package */
 #undef PACKAGE
 
+/* Enable GNU Readline support */
+#undef READLINE
+
 /* Allow resignation. Default enabled */
 #undef RESIGNATION_ALLOWED
 
