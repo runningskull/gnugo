@@ -4,6 +4,9 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- remove unused functions influence_score(), get_influence(), 
+  restricted_attack2(), restricted_defend1(), small_semeai(),
+  small_semeai_analyzer() 
 - remove RTRACE/VTRACE
 - remove VC specific files from top-level directory
 - remove a lot of #if 0'ed code

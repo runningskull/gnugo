@@ -95,7 +95,6 @@ DECLARE(gtp_get_trymove_counter);
 DECLARE(gtp_gg_genmove);
 DECLARE(gtp_gg_undo);
 DECLARE(gtp_increase_depths);
-DECLARE(gtp_influence);
 DECLARE(gtp_is_legal);
 DECLARE(gtp_known_command);
 DECLARE(gtp_ladder_attack);
@@ -213,7 +212,6 @@ static struct gtp_command commands[] = {
   {"gg-undo",                 gtp_gg_undo},
   {"help",                    gtp_list_commands},
   {"increase_depths",  	      gtp_increase_depths},
-  {"influence",               gtp_influence},
   {"is_legal",         	      gtp_is_legal},
   {"known_command",    	      gtp_known_command},
   {"komi",        	      gtp_set_komi},
@@ -2981,95 +2979,6 @@ gtp_dump_stack(char *s)
   UNUSED(s);
   dump_stack();
   return gtp_success("");
-}
-
-
-/* Function:  Return information about the influence function.
- * Arguments: color to move
- * Fails:     never
- * Returns:   Influence data formatted like:
- *
- * white:
- *   0.51   1.34   3.20   6.60   9.09   8.06   1.96   0.00   0.00 
- *   0.45   1.65   4.92  12.19  17.47  15.92   4.03   0.00   0.00 
- *                   .
- *                   .
- *                   .
- *   0.00   0.00   0.00   0.00   0.00 100.00  75.53  41.47  23.41
- * black:
- *   1.57   2.51   4.10   3.10   3.60   4.54   8.32   4.15   2.71 
- *   2.96   4.62   9.18   5.47   5.89  10.88  20.54  10.19   4.08 
- *                   .
- *                   .
- *                   .
- * 100.00 139.39 100.00 139.39 100.00   0.00   0.00   0.00   0.00
- * regions:
- * -1  0  0  1  1  0 -1 -3 -3
- *              .
- *              .
- *              .
- * -3 -3 -3 -3 -3  3  3  3  3
- *
- * The encoding of the regions is as follows:
- *  3 white territory
- *  2 white moyo
- *  1 white area
- *  0 neutral
- * -1 black area
- * -2 black moyo
- * -3 black territory
- */
-static int
-gtp_influence(char *s)
-{
-  int color;
-  float white_influence[BOARDMAX];
-  float black_influence[BOARDMAX];
-  int influence_regions[BOARDMAX];
-  
-  if (!gtp_decode_color(s, &color))
-    return gtp_failure("invalid color");
-
-  silent_examine_position(color, EXAMINE_ALL);
-
-  gtp_start_response(GTP_SUCCESS);
-  get_influence(OPPOSITE_INFLUENCE(color), white_influence,
-		black_influence, influence_regions);
-  print_influence(white_influence, black_influence, influence_regions);
-  /* We already have one newline and thus can't use gtp_finish_response(). */
-  gtp_printf("\n");
-  return GTP_OK;
-}
-
-static void
-print_influence(float white_influence[BOARDMAX],
-		float black_influence[BOARDMAX],
-		int influence_regions[BOARDMAX])
-{
-  int m, n;
-  gtp_printf("white:\n");
-  for (m = 0; m < board_size; m++) {
-    for (n = 0; n < board_size; n++) {
-      gtp_printf("%6.2f ", white_influence[POS(m, n)]);
-    }
-    gtp_printf("\n");
-  }
-
-  gtp_printf("black:\n");
-  for (m = 0; m < board_size; m++) {
-    for (n = 0; n < board_size; n++) {
-      gtp_printf("%6.2f ", black_influence[POS(m, n)]);
-    }
-    gtp_printf("\n");
-  }
-
-  gtp_printf("regions:\n");
-  for (m = 0; m < board_size; m++) {
-    for (n = 0; n < board_size; n++) {
-      gtp_printf("%2d ", influence_regions[POS(m, n)]);
-    }
-    gtp_printf("\n");
-  }
 }
 
 

@@ -309,11 +309,6 @@ int defend_both(int astr, int bstr);
 int break_through(int apos, int bpos, int cpos);
 int attack_threats(int pos, int max_points, int moves[], int codes[]);
 
-int restricted_defend1(int str, int *move, int komaster, int kom_pos,
-		       int num_forbidden_moves, int *forbidden_moves);
-int restricted_attack2(int str, int *move, int komaster, int kom_pos,
-		       int num_forbidden_moves, int *forbidden_moves);
-
 int simple_ladder(int str, int *move);
 #define MOVE_ORDERING_PARAMETERS 67
 void tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS]);
@@ -519,7 +514,6 @@ int free_handicap_total_stones(void);
 void fuseki(int color);
 void semeai(int color);
 void new_semeai(int color);
-void small_semeai(int save_verbose);
 void shapes(int color);
 void endgame_shapes(int color);
 
@@ -663,11 +657,6 @@ void influence_get_moyo_segmentation(const struct influence_data *q,
 void influence_get_moyo_data(const struct influence_data *q,
 			     int moyo_color[BOARDMAX],
 			     float territory_value[BOARDMAX]);
-void get_influence(const struct influence_data *q,
-		   float white_influence[BOARDMAX],
-		   float black_influence[BOARDMAX],
-		   int regions[BOARDMAX]);
-float influence_score(const struct influence_data *q);
 void resegment_initial_influence(void);
 void influence_mark_non_territory(int pos, int color);
 

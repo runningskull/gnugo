@@ -1667,27 +1667,6 @@ influence_delta_territory(const struct influence_data *base,
 }
 
 
-/* Estimate the score. A positive value means white is ahead. The
- * score is estimated from the initial_influence, which must have been
- * computed in advance. The score estimate does not include captured
- * stones (i.e., the ones having been removed from the board) or komi.
- * moyo_coeff and area_coeff are the relative weights to be used for
- * the moyo and area difference respectively.
- */
-float
-influence_score(const struct influence_data *q)
-{
-  float score = 0.0;
-  int ii;
-
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii))
-      score += q->territory_value[ii];
-  score += black_captured - white_captured;
-
-  return score;
-}
-
 /* Print the influence map when we have computed influence for the
  * move at (i, j).
  */
@@ -1696,39 +1675,6 @@ debug_influence_move(int i, int j)
 {
   debug_influence = POS(i, j);
 }
-
-
-/* One more way to export influence data. This should only be used
- * for debugging.
- */
-void
-get_influence(const struct influence_data *q,
-	      float white_influence[BOARDMAX],
-	      float black_influence[BOARDMAX],
-	      int influence_regions[BOARDMAX])
-{
-  int ii;
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (board[ii] == EMPTY) {
-      white_influence[ii] = q->white_influence[ii];
-      black_influence[ii] = q->black_influence[ii];
-      if (whose_territory(q, ii) == WHITE)
-	influence_regions[ii] = 3;
-      else if (whose_territory(q, ii) == BLACK)
-	influence_regions[ii] = -3;
-      else if (whose_moyo(q, ii) == WHITE)
-	influence_regions[ii] = 2;
-      else if (whose_moyo(q, ii) == BLACK)
-	influence_regions[ii] = -2;
-      else if (whose_area(q, ii) == WHITE)
-	influence_regions[ii] = 1;
-      else if (whose_area(q, ii) == BLACK)
-	influence_regions[ii] = -1;
-      else
-	influence_regions[ii] = 0;
-    }
-}
-  
 
 
 /* Print influence for debugging purposes, according to

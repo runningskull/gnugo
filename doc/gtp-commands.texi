@@ -1140,48 +1140,6 @@
 
 @end example
 
-@cindex influence
-@item influence
-
-@example
-
- Function:  Return information about the influence function.
- Arguments: color to move
- Fails:     never
- Returns:   Influence data formatted like:
-
- white:
-   0.51   1.34   3.20   6.60   9.09   8.06   1.96   0.00   0.00 
-   0.45   1.65   4.92  12.19  17.47  15.92   4.03   0.00   0.00 
-                   .
-                   .
-                   .
-   0.00   0.00   0.00   0.00   0.00 100.00  75.53  41.47  23.41
- black:
-   1.57   2.51   4.10   3.10   3.60   4.54   8.32   4.15   2.71 
-   2.96   4.62   9.18   5.47   5.89  10.88  20.54  10.19   4.08 
-                   .
-                   .
-                   .
- 100.00 139.39 100.00 139.39 100.00   0.00   0.00   0.00   0.00
- regions:
- -1  0  0  1  1  0 -1 -3 -3
-              .
-              .
-              .
- -3 -3 -3 -3 -3  3  3  3  3
-
- The encoding of the regions is as follows:
-  3 white territory
-  2 white moyo
-  1 white area
-  0 neutral
- -1 black area
- -2 black moyo
- -3 black territory
-
-@end example
-
 @cindex worm_data
 @item worm_data
 
