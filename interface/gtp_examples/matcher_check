@@ -168,7 +168,7 @@ specify the number of moves to check with --movecount <n>.
 
     if (defined($stable)) {
         $randseed =~ s/^= //smg;
-        print $stable_in "set_random_seed $rand\n";
+        print $stable_in "set_random_seed $randseed\n";
         eat_no_response($stable_out);
     }
 
@@ -252,7 +252,7 @@ while ($games > 0) {
     }
 
     if (defined($stable)) {
-        print $stable_in "set_random_seed $rand\n";
+        print $stable_in "set_random_seed $randseed\n";
         eat_no_response($stable_out);
     }
 
