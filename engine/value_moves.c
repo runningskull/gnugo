@@ -2330,7 +2330,7 @@ reevaluate_ko_threats(int ko_move, int color)
   /* Find the ko stone. */
   for (k = 0; k <= 3; k++) {
     ko_stone = ko_move + delta[k];
-    if (ON_BOARD(ko_stone) && countlib(ko_stone))
+    if (ON_BOARD(ko_stone) && countlib(ko_stone) == 1)
       break;
   }
   ASSERT_ON_BOARD1(ko_stone);
