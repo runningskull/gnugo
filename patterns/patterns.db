@@ -10928,25 +10928,23 @@ o.e....
 
 Pattern ED91
 # db New pattern (3.1.28)
+# gf Changed to connection pattern. (3.7.2)
 
-???..o?          Extend after the push
-???XXoo
-?O..O*.
-?O....o
-o......
--------
+??XXoo          Extend after the push
+O..O*.
+O....o
+......
+------
 
-:8,j
+:8,C
 
-???..o?
-???XXfo
-?O.aO*.
-?Ocbd.o
-o.e....
--------
+??XXoo
+a..O*.
+a....o
+......
+------
 
-; oplay_attack(*,a,b,c,d,e,e) || !oplay_defend(*,a,b,d,c,d)
-> replace(f,*)
+;!oplay_disconnect(*,*,a)
 
 
 Pattern ED92
