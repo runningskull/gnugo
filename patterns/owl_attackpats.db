@@ -392,18 +392,6 @@ XXOOa
 ; oplay_attack(*,a,a) || !oplay_attack(*,a,b,c,*)
 
 
-# tm Removed (3.1.16)
-#   too many false matches.
-#Pattern A202
-#
-#O?               second line block
-#*X
-#..
-#--
-#
-#:8,-,value(39)
-
-
 Pattern A203
 # tm Modified (3.1.16)
 
@@ -525,30 +513,6 @@ a.*.xx
 ------
 
 ;!attack(a)
-
-
-# Pattern A208
-# This pattern has the problem that it's often inappropriate in
-# positions like
-#
-# ..OO
-# O.YO
-# .*XX
-# ....
-# ----
-#
-# where X can play above * and get miai between capturing * and
-# escaping through the gap towards the center.
-
-# tm removed (3.1.16)
-# 
-# ???         third line kosumi
-# O.X
-# .*X
-# ...
-# ---
-# 
-# :8,-,value(55)
 
 
 Pattern A208a
@@ -1284,42 +1248,6 @@ x*.Xo
 :8,-,value(30)
 
 
-# tm Removed (3.1.17)
-#   X won't try such moves, unless they're successful.
-#   if he does, that pattern should be modified.
-#Pattern A303
-## In this position, X often cannot get away by pushing on the first
-## line. Still it may be possible to evade long enough to hit various
-## reading depth limits. This move is only intended to stop such
-## nonsense, thus the low value.
-#
-#?O..           prevent escape
-#X*..
-#----
-#
-#:8,-,value(30)
-#
-#?O.a
-#X*..
-#----
-#
-#;owl_escape_value(a)>0
-
-
-# Pattern A304
-# # In this position, X often cannot get away by pushing on the first
-# # line. Still it may be possible to evade long enough to hit various
-# # reading depth limits. This move is only intended to stop such
-# # nonsense, thus the low value.
-# 
-# ??....
-# ?O....           prevent escape
-# X*....
-# ------
-# 
-# :8,-,value(20)
-
-
 Pattern A305
 # tm New Pattern (3.1.15)
 
@@ -1432,26 +1360,6 @@ X.X
 .*.
 
 :|,-,value(75)
-
-
-#tm removed (3.1.15)
-#Pattern A405
-## FIXED: Bad pattern.  Probably can be deleted.
-##   See vie:19 for unnecessary blocking.
-#
-#???
-#?..         center block
-#?*O
-#?X?
-#
-#:8,-,value(35)
-#
-#?a?
-#?..
-#?*O
-#?X?
-#
-#;owl_escape_value(a)>0
 
 
 Pattern A406
@@ -1662,36 +1570,6 @@ Pattern A411a
 ??ij???
 
 ;owl_escape_value(a)>0 && o_somewhere(f,g,h,i,j) && o_somewhere(b,c,d,e)
-
-
-# tm Too general, removed (3.3.12)
-#Pattern A412
-#
-#????
-#?*.O        (possibly desperate) center block
-#?.Y?
-#?O??
-#
-#:8,-,value(55)
-#
-#ba??
-#?*.O
-#?.Y?
-#?O??
-#
-#;owl_escape_value(a) + owl_escape_value(b) > 0
-
-
-# Pattern A413
-# # Converse to D1318
-# # gf Too general, removed. (3.1.14)
-# 
-# ??...      stop victim from running towards center
-# ??...
-# ??.*.
-# ??..X
-# 
-# :8,-,value(45)
 
 
 Pattern A413a
@@ -2747,23 +2625,6 @@ OXOX
 :8,C,value(80)
 
 
-#Pattern A705
-## gf Reduced value. (3.1.11)
-# tm removed (3.1.15)
-#
-#?*?        attack eye shape
-#X.X
-#?.?
-#
-#:|,-,value(58)
-#
-#?*?
-#X.B
-#?a?
-#
-#;owl_eyespace(a)
-
-
 Pattern A705b
 
 ?.?        attack eye shape
@@ -3671,22 +3532,6 @@ Pattern A1003
 ; !safe_omove(a) && !oplay_attack_either(*,?,a,a,c)
 
 
-#tm removed 3.1.14
-#Pattern A1004
-#
-#----
-#?*.X     threaten to cut
-#??XO
-#
-#:8,B,value(50)
-#
-#----
-#?*aX
-#??Xc
-#
-#; !safe_omove(a) && !oplay_attack_either(*,?,a,a,c)
-
-
 Pattern A1005
 
 Y?          cut!
@@ -3741,22 +3586,6 @@ XaY
 ?.?
 
 ;lib(a) <= 2
-
-
-# tm removed this pattern (3.1.22) 
-#  (see trevorc:810 owl_does_defend D3 D6)
-#   might be possible to add back with a helper.
-# FIXME: Might be worth adding back when oplay_disconnect(*,a,b)
-#   helper is stable
-#Pattern A1007
-#
-#X*X      stop connection
-#
-#:+,-,value(35)
-#
-#a*b
-#
-#;!owl_goal_dragon(a) || !owl_goal_dragon(b)
 
 
 Pattern A1008
@@ -4200,17 +4029,6 @@ c*O
 ;!xplay_defend_both(*,a,b,a,c)
 
 
-#tm removed 3.1.17
-#Pattern A1103
-## Eliminating this test breaks Owl test 138. But the pattern is
-##    in the wrong category. Notice also the similarites with A1206.
-#
-#X*         unconditional cut
-#OX
-#
-#:8,-,value(30)
-
-
 Pattern A1104
 
 OYO        connect to prevent double atari
@@ -4529,34 +4347,6 @@ Dcb
 ;(owl_escape_value(a)>0 || owl_escape_value(b)>0)
 ;&& ((o_somewhere(E) || x_somewhere(E)) || owl_escape_value(a) < 0)
 ;&& !oplay_attack_either(*,c,D,*,D)
-
-
-# nn Removed (3.3.11)
-#   Too general and (way) too expensive
-#
-# Pattern A1120
-# # tm New Pattern (3.1.20)
-# # tm Modified (3.1.20)
-# #   see global:40 (owl_does_defend F4 H2)
-# # tm Modified (3.1.23) (see D1343b, D1380)
-# 
-# ????
-# ?..?	block escape
-# .*.?
-# X.??
-# 
-# :8,-,value(65)
-# 
-# ?ge?
-# ?abf
-# .*ch
-# X.??
-# 
-# ; (owl_escape_value(a) > 0)
-# ; + (owl_escape_value(b) > 0)
-# ; + (owl_escape_value(c) > 0) > 1
-# ; || (!o_somewhere(g) && !o_somewhere(h)
-# ;     && owl_escape_value(e) + owl_escape_value(f) > 0)
 
 
 Pattern A1121
@@ -6052,20 +5842,6 @@ Y...|       don't let opponent live easily in the corner
 ----+
 
 :\,-,value(46)
-
-
-# nn Removed (3.3.13)
-#   Success rate in regressions : 0% (0/40)
-# 
-# Pattern A1402
-# 
-# ..Y..|       contest the corner territory
-# *....|
-# .....|
-# .....|
-# -----+
-# 
-# :8,-,value(45)
 
 
 Pattern A1403

@@ -311,38 +311,6 @@ Pattern EE103
 ;proper_eye(a)
 
 
-# Pattern EE103b
-# # gf Bad pattern, removed. (3.1.20)
-# 
-# ?OX?        max two points if really gote 
-# ?.*.
-# ----
-# 
-# :8,eOX,maxterri(2)
-# 
-# ?OX?
-# ?b*a
-# ----
-# 
-# ;proper_eye(a) && !oplay_attack(*,a,b,a)
-
-
-# Pattern EE103c
-# # gf Bad pattern, removed. (3.1.20)
-# 
-# ?OX?        max one point if really gote 
-# O.*.
-# ----
-# 
-# :8,eOX,maxterri(1)
-# 
-# ?OX?
-# ?b*a
-# ----
-# 
-# ;proper_eye(a) && !oplay_attack(*,a,b,a) && !oplay_attack(*,a,a)
-
-
 Pattern EE104
 
 ?OX?        two points gote
@@ -1611,24 +1579,6 @@ B*X
 OaX
 
 ;oplay_attack_either(*,a,a,B)
-
-
-# Pattern CE30
-# # tm New Pattern (3.1.20)  (see trevorc:650, trevorc:470)
-# # gf Too general, removed. (3.3.15)
-# 
-# ???    threaten to capture
-# ?*X
-# ??.
-# 
-# :8,nOXe,terri(1),followup(3)
-# 
-# ?c?
-# d*A
-# ??b
-# 
-# ; o_alive_somewhere(c,d) && (!weak(c) || !weak(d))
-# ; && proper_eye(b) && oplay_attack(*,A)
 
 
 Pattern CE31

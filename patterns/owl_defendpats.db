@@ -883,23 +883,6 @@ xx...X.        slide (usually inferior to play on third line)
 :8,-,value(70)
 
 
-# pp Removed (3.3.20). This job is now done by improve_lunch_attack().
-#Pattern D219
-## tm Modified (3.1.17)
-#
-#OO*        capture edge stone to maybe make eye
-#.X.
-#---
-#
-#:8,-,value(50)
-#
-#OO*
-#aA.
-#---
-#
-#;does_attack(*,A) && !obvious_false_oeye(a)
-
-
 Pattern D220
 # tm modified (3.1.17)
 
@@ -1292,21 +1275,6 @@ b*X
 ; oplay_attack(*,b,b) && oplay_attack(*,c,c) && safe_xmove(*)
 
 
-# tm removed this pattern (3.1.20)
-#   almost identical to D308 - in fact more restrictive, with lesser value.
-#Pattern D308b
-#
-#o.O         chimera
-#.*X
-#
-#:8,s,value(75)
-#
-#ocO
-#b*A
-#
-#;lib(A)<=2 && oplay_attack(*,b,b) && oplay_attack(*,c,c) && safe_xmove(*)
-
-
 Pattern D309
 # tm modified (3.1.16)
 # tm reduced value (3.1.20) (see dniwog:5)
@@ -1679,17 +1647,6 @@ XO..
 :8,-,value(60)
 
 
-# tm Removed (3.1.17)  too generic
-#   possibly add back with constraint, or lower value.
-#Pattern D501
-#
-#?OXx        connect
-#O*OX
-#..Xx
-#
-#:8,-,value(80)
-
-
 Pattern D502
 
 ?X.O        sagari
@@ -1974,22 +1931,6 @@ o.*.X
 -----
 
 :8,-,value(81)
-
-
-# Pattern D601
-# gf Strange and ineffective pattern, removed. (3.1.14)
-# 
-# O*       prevent eye stealing cut
-# XO
-# --
-# 
-# :8,n,value(45)
-# 
-# O*
-# AO
-# --
-# 
-# ;vital_chain(A)
 
 
 Pattern D602
@@ -3077,25 +3018,6 @@ OO.
 :8,-,value(60)
 
 
-## tm removing the wedge pending better constraint.
-##  see, for example, trevorb:560
-#Pattern D719
-## tm New patern (3.1.16)
-## gf This pattern is way too general. (3.1.17)
-#
-#?X	wedge
-#?*
-#OX
-#
-#:8,b,value(75)
-#
-#?B
-#C*
-#OA
-#
-#; !ko(*) && !ko(C) && (oplay_attack(*,A) || oplay_attack(*,B))
-
-
 Pattern D720
 # tm New pattern (3.1.16)
 
@@ -3945,23 +3867,6 @@ xX*o
 ----
 
 ;oplay_attack(*,a)!=WIN
-
-
-# tm removed (3.1.15)
-#    This pattern way to generic.  Too many bad matches.
-#Pattern D901
-#
-#?*?         expand eyeshape
-#O.O
-#?.?
-#
-#:|,n,value(60)
-#
-#?*?
-#O.O
-#?a?
-#
-#; !safe_xmove(a)
 
 
 Pattern D902
@@ -4979,20 +4884,6 @@ B.?
 
 ; owl_escape_value(a)>0
 ; && oplay_attack(*,a,B)
-
-
-# Pattern D1136
-# #tm new pattern (3.1.14)
-# #See strategy:206
-# #FIXME:  This pattern may match inappropriately, and
-# #        probably needs a constraint.
-# 
-# OOO	very low value
-# ..X
-# X*.
-# ???
-# 
-# :8,b,value(5)
 
 
 Pattern D1137
@@ -6345,20 +6236,6 @@ a.?
 ?.b
 
 ;owl_strong_dragon(a) || owl_strong_dragon(b)
-
-
-# tm Removed 3.1.17 (duplicate of D1348)
-#Pattern D1349
-#
-#O.?
-#.*O      connect to friendly dragon to escape
-#
-#:8,E,value(36)
-#
-#a.?
-#.*b
-#
-#;owl_escape_value(a)>0 || owl_escape_value(b)>0
 
 
 Pattern D1350

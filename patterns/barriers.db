@@ -1372,19 +1372,6 @@ odb
 >return (!xplay_attack(b,d));
 
 
-# Pattern Intrusion12c
-# 
-# O!
-# X.
-# 
-# :8,OB,value(5)
-#   
-# ab
-# X.
-# 
-# >return (!xplay_attack(b,a));
-# 
-
 Pattern Intrusion13
 
 ?OoQ?

@@ -4470,7 +4470,7 @@ XO...
 
 
 Pattern EB521
-# gf FIXME: This fixed value looks dangerous. (3.3.12)
+# gf FIXED: This fixed value looks dangerous. (3.3.12)
 # gf Removed fixed value and E classification. (3.5.2)
 
 ..O?        urgent atari
@@ -4736,26 +4736,6 @@ Pattern EB624
 ----
 
 ;lib(a)>1 && !oplay_disconnect(*,*,b)
-
-
-# Pattern EB625
-# # gf Redundant, removed. (3.3.12)
-# 
-# ???O?        block after opponent hanes
-# ?XO.?
-# ..X*.
-# .....
-# -----
-# 
-# :8,Oe
-# 
-# ???O?
-# ?Xa.?
-# ..X*.
-# .....
-# -----
-# 
-# ;lib(a)>1
 
 
 Pattern EB626
@@ -5574,17 +5554,6 @@ OAOOa.
 > antisuji(a);
 
 
-# Pattern EB916
-# # gf Redundant, removed. (3.3.12)
-# ??X.           less urgent in this case
-# ?O*.
-# O...
-# ....
-# ----
-# 
-# :8,OXe
-
-
 Pattern EB917
 
 ??X..??         leap out
@@ -6302,31 +6271,6 @@ Pattern EB1404a
 -----
 
 ;!dead(a) && !attack(B)
-
-
-# Pattern EB1404b
-# # Second followup to EB1403.
-# # and guarantees that the move is followed up.
-# # gf Revised pattern. (3.1.3)
-# # eb revised constraint (3.3.13)
-# # see nngs3:1110
-# # ab FIXME: Still needed? Also maybe reuse code from connect_and_cut_helper
-# #           here?
-# # gf Removed. (3.5.2)
-# 
-# ?oX??          Connect after hane.
-# ..XO?
-# ?XO*o
-# -----
-# 
-# :8,Xe,value(12)
-# 
-# ?oB??
-# ecBa?
-# ?AO*o
-# -----
-# 
-# ;!dead(a) && xmoyo(e) && !oplay_defend_both(*,?,c,A,B) && !oplay_attack(*,c,*) && !attack(A)
 
 
 Pattern EB1404c
@@ -7332,21 +7276,6 @@ O.....?	  extend
 :8,OE,shape(-1),jump_out_far_helper
 
 
-#Pattern CB102
-# ab Removed.
-# (No need for negative shape on 3rd line; CB 104 sufficient.)
-#
-#??O??	   extend
-#?...?
-#?...?
-#?...?
-#?.*.?
-#?...?
-#?????
-#
-#:|,OE,shape(-1),jump_out_far_helper
-
-
 Pattern CB103
 
 O....?    extend
@@ -7388,27 +7317,6 @@ Pattern CB106
 ???????
 
 :|,OE,shape(2),jump_out_far_helper
-
-
-#Pattern CB107
-## db New pattern (3.1.28)
-## db corrected (3.1.28)
-## ab Removed (3.3.10). (Now less important due to Intrusion54.)
-#
-#?OXxxx       defend the cut before leaping
-#..O...
-#?*....
-#?.....
-#
-#:8,O
-#
-#?OAxxx
-#.bO...
-#?*c.a.
-#?.....
-#
-#; oplay_defend(a,b,c,b) && !attack(A)
-#> replace(a,*)
 
 
 ########################
@@ -10310,20 +10218,6 @@ deb..
 > antisuji(e);
 
 
-# Pattern ED60
-# # gf This is too often worth much less than the 35 points of a joseki move.
-# #    Removed. (3.3.16)
-# 
-# ??.??        attack one stone
-# ?.O.O
-# .OX*X
-# .....
-# .....
-# -----
-# 
-# :8,J
-
-
 Pattern ED61
 
 ??.??        follow up ED59
@@ -10407,59 +10301,6 @@ xxx..
 -----
 
 :8,OXad
-
-
-# Pattern ED66
-# # tm Modified (3.1.18) (see trevorb:610)
-# # FIXME: Is this just too generic?
-# # gf This pattern is way too general, see e.g. 13x13b:8.
-# #    Furthermore the second half of the constraint doesn't really make
-# #    sense. Consider removal. (3.3.17)
-# # gf Removed. (3.5.2)
-# 
-# ?x?         draw back for safety
-# O.X
-# .*O
-# ...
-# ...
-# ---
-# 
-# :8,OJ
-# 
-# ?x?
-# OaB
-# .*O
-# ...
-# ...
-# ---
-# 
-# ; xplay_defend(*,a,*) && !xplay_attack(*,a,B)
-
-
-# Pattern ED67
-# # tm Modified (3.1.18) (see trevorb:610)
-# # FIXME: Is this just too generic?
-# #   Identical to ED66, but with j attribute instead of J
-# # gf See comments for ED66. This pattern is redundant anyway. (3.3.17)
-# # gf Removed. (3.5.2)
-# 
-# ?x?         draw back for safety
-# O.X
-# .*O
-# ...
-# ...
-# ---
-# 
-# :8,Oj
-# 
-# ?x?
-# OaB
-# .*O
-# ...
-# ...
-# ---
-# 
-# ; xplay_defend(*,a,*) && !xplay_attack(*,a,B)
 
 
 Pattern ED68
@@ -11651,42 +11492,6 @@ OaX
 ; oplay_attack(*,a,B)
 
 
-# Pattern CD97
-# # gf Removed pattern. (3.3.7)
-# 
-# OOXO?       defend everything
-# ..O..
-# .*..?
-# ?????
-# 
-# :8,ed,value(15)
-# 
-# BBXD?
-# .aOc.
-# .*..?
-# ?????
-# 
-# ; xplay_attack(a,B) && xplay_attack(c,D) && oplay_defend(*,c,D)
-# 
-# 
-# Pattern CD98
-# # gf Removed pattern. (3.3.7)
-# 
-# OOXO?        defend as much as we can
-# ..O..
-# .*..?
-# ?????
-# 
-# :8,ed,value(12)
-# 
-# BBXD?
-# .aOc.
-# .*..?
-# ?????
-# 
-# ; xplay_attack(a,B) && xplay_attack(c,D)
-
-
 Pattern CD99
 # gf Revised constraint. (3.1.14)
 # gf Added !doing_scoring since this can generate a losing ko threat.
@@ -11705,50 +11510,6 @@ B*
 
 # FIXME: The two following patterns may be superfluous due to the
 #        atari_atari code.
-
-# Pattern CD100
-# # This should strictly give an "attack one out of three" move reason,
-# # but since there is no support for these, we do something ad hoc
-# # instead.
-# # gf Revised constraint. (3.1.13)
-# # gf Removed. We leave this to the atari_atari code. (3.5.2)
-# 
-# ?OOX         atari twice to capture something
-# XOX.
-# .X*o
-# ?.o?
-# 
-# :8,sXad,value(7)
-# 
-# ?ffX
-# EfXa
-# bD*o
-# ?co?
-# 
-# ;olib(b)>=2 && !attack(E) && !attack(D) && oplay_attack_either(*,a,b,c,D,E)
-# ;&& !oplay_attack(*,f)
-
-
-# Pattern CD101
-# # Converse of previous pattern. Same comment applies.
-# # gf Revised constraint. (3.1.13)
-# # gf Removed. We leave this to the atari_atari code. (3.5.2)
-# 
-# ?XXO         defend against atari sequence
-# OXO.
-# .O*x
-# ?.x?
-# 
-# :8,Xad,value(7)
-# 
-# ?FFO
-# eFOa
-# bd*x
-# ?cx?
-# 
-# ;xlib(b)>=2 && !attack(e) && !attack(d) && !attack(F)
-# ;&& xplay_attack_either(*,a,b,c,d,e)
-
 
 Pattern CD102
 
@@ -11818,28 +11579,6 @@ x...
 xxxx
 
 ; dead(A) && effective_size(A)>8 && lib(b)<=4
-
-
-# Pattern CD106
-# # db added (3.1.7)
-# Removed (3.3.20), see 13x13b:27.
-# 
-# ?x?          make an eye (or die trying!)
-# O*O
-# O.O
-# oOX
-#
-# :8,d
-#
-# ?x?
-# O*A
-# OaA
-# bOX
-#
-# ; does_defend(*,A)
-#
-# > replace(a,*);
-# > if (!o_alive_somewhere(b)) replace(b,*)
 
 
 Pattern CD107
@@ -12445,19 +12184,6 @@ Pattern EJ35
 :8,J
 
 
-# Pattern EJ36
-# # gf Removed. (3.5.2)
-# 
-# ?....ooo     seal the opponent!
-# OO...ooo
-# X*...ooo
-# ........
-# ........
-# --------
-# 
-# :8,-,value(22)
-
-
 Pattern EJ37
 
 ..X...      hane after attachment
@@ -12620,51 +12346,6 @@ X...*....cd
 -----------
 
 ; x_alive_somewhere(a,b,c,d)
-
-
-# Compare EJ42. This gives a bonus if there's additional empty
-#    space towards the center. This is not to say that this pattern
-#    necessarily is good, but it is different.
-#
-# Pattern EJ48
-# 
-# .....           jump out
-# .....
-# .....
-# ..*..
-# ....X
-# X.O.x
-# .....
-# .....
-# -----
-# 
-# :8,Ed,shape(5)
-
-
-# Pattern EJ49
-# ab Removed (3.3.20)
-# # gf Revised. (3.1.17)
-# 
-# .....         cut
-# O*X.o
-# .XO.o
-# .....
-# .....
-# -----
-# 
-# :8,sEj
-# 
-# .....
-# O*X.c
-# .XObd
-# ..a..
-# .....
-# -----
-# 
-# ;o_alive_somewhere(c,d)
-# 
-# >replace(a,*);
-# >replace(b,*)
 
 
 Pattern EJ49b
@@ -12875,26 +12556,6 @@ Pattern EJ60
 -----
 
 ; owl_threatens(*,A)
-
-
-# Pattern EJ61
-# gf Removed. This move may fail to secure life. (3.5.4)
-# 
-# o.X??       follow through after hane
-# O.XO.
-# .XO*.
-# .....
-# -----
-# 
-# :8,J
-# 
-# o.X??
-# O.XA.
-# .XO*.
-# .....
-# -----
-# 
-# ; !critical(A)
 
 
 Pattern EJ62a
@@ -14424,23 +14085,6 @@ o..
 :8,OXe
 
 
-# Pattern LE4
-# # gf Revised constraint. (3.1.9)
-# # gf Removed. (3.5.2)
-# 
-# ...      hane to prevent incursion
-# .*o
-# OX?
-# 
-# :8,OX,value(12)
-# 
-# .a.
-# b*o
-# OC?
-# 
-# ;omoyo(a) && oplay_attack(*,b,b) && !(attack(C) && oplay_defend(*,C))
-
-
 Pattern LE5
 # gf Added e classification and constraint. (3.5.2)
 
@@ -14521,17 +14165,6 @@ A*
 
 ;xmoyo(*) && !attack(A) && !attack(B)
 ;&& safe_omove(*) && oplay_attack_either(*,A,B)
-
-
-# Pattern LE11
-# gf Removed ineffective pattern. (3.5.2)
-# 
-# ...       jump towards the opponent's territory
-# .*.
-# ...
-# .O?
-# 
-# :8,O
 
 
 Pattern LE12
@@ -14832,26 +14465,6 @@ x.O*
 
 ; !dead(b)
 > replace(a,*)
-
-
-#Pattern RE11
-## evand new pattern (3.3.9)
-## should be unneccessary with changes to EB1404 (3.3.13)
-#
-#|..?
-#|X*.
-#|OXX
-#|.O?
-#
-#:8,-
-#
-#|..?
-#|X*.
-#|Occ
-#|ab?
-#
-#; alive(b) && lib(c) == 2 && oplay_attack(*,a,c)
-#> replace(a,*)
 
 
 Pattern RE12
@@ -15348,27 +14961,6 @@ Pattern M8
 .OXX.
 
 ;oplay_attack(*,q,A) && break_mirror_helper(A)
-
-
-Pattern M9
-# gf New pattern. (3.5.11)
-#    FIXME:
-#    This is a complete dummy pattern with no effect at all (notice
-#    the lack of classifications, values, helpers, and actions).
-#    It is only included because a pattern with constraint or action
-#    at the end of patterns.db triggers a bug in mkpat, causing the
-#    same autohelper to be written twice, yielding a compilation
-#    error for patterns.c. This seems to have something to do with
-#    the fact that patterns.db and patterns2.db are concatenated by
-#    mkpat.
-
-.OOX.
-.XXO.
-.XXO.
-.XOO.
-*OXX.
-
-:8,-
 
 
 # END OF FILE

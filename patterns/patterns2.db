@@ -2205,27 +2205,6 @@ O*.
 :8,-,shape(-2)
 
 
-# Pattern Shape52
-# # Questionable --- ponnuki capture leaves less aji.
-# # Whether direct or indirect capture is best depends
-# #    entirely on the context.
-# # gf Removed. (3.3.20)
-# 
-# ?.?	Better to capture indirectly
-# *.O
-# OXO
-# ?O?
-# 
-# :8,-,shape(1)
-# 
-# ?.?
-# *.a
-# bXa
-# ?c?
-# 
-# ;lib(a)>1 && lib(b)>1 && lib(c)>1
-
-
 Pattern Shape53
 
 ?X?     good for eyespace and to avoid shortage of liberties
@@ -3007,24 +2986,6 @@ Pattern Sente11
 ;oplay_attack(*,A)
 
 
-# pp Removed - this pattern is obsolete (3.5.1)
-# Pattern Sente12
-# # For performance reason this pattern has s classification and an
-# # explicit safety test in the constraint. Thus the safety test can be
-# # shortcut by the preceding liberty test.
-# # tm removed attack in ko from constraint.  (3.1.20) (see trevorc:310)
-#
-# *X
-#
-# :-,sX
-#
-# *A
-#
-# ;lib(A) == 2 && !attack(A) && !oplay_attack(*,*)
-# # Action adds a followup value unless the threat is considered ineffective.
-# >threaten_to_capture(A)
-
-
 Pattern Sente13
 # gf Revised constraint. (3.1.20)
 
@@ -3587,67 +3548,6 @@ Pattern Temp1
 +--------
 
 :8,-,maxvalue(25)
-
-
-# Pattern Temp2
-# # Connection of half point kos are severely overvalued.
-# # existed since at least 3.0.0
-# # gf Removed. (3.3.16)
-# 
-# OOXX
-# O*OX
-# ----
-# 
-# :8,X,maxvalue(1)
-# 
-# 
-# Pattern Temp3a
-# # Connection of half point kos are severely overvalued.
-# # existed since at least 3.0.0
-# # gf Removed. (3.3.16)
-# 
-# oOXx
-# O*OX
-# ----
-# 
-# :8,X,maxvalue(1)
-# 
-# obCx
-# a*OD
-# ----
-# 
-# ;lib(a)>=3 && lib(b)>=4 && lib(C)>=3 && lib(D)>=3
-# 
-# 
-# Pattern Temp3b
-# # Connection of half point kos are severely overvalued.
-# # existed since at least 3.0.0
-# # gf Removed. (3.3.16)
-# 
-# OOXX
-# O*OX
-# OOXX
-# 
-# :8,X,maxvalue(1)
-# 
-# 
-# Pattern Temp4
-# # Connection of half point kos are severely overvalued.
-# # existed since at least 3.0.0
-# # gf Removed. (3.3.16)
-# 
-# oOXx
-# O*OX
-# oOXx
-# 
-# :8,X,maxvalue(1)
-# 
-# obEx
-# a*OD
-# ocFx
-# 
-# ;lib(a)>=3 && lib(b)>=4 && lib(c)>=4
-# ;&& lib(D)>=3 && lib(E)>=3 && lib(F)>=3
 
 
 Pattern Temp5
