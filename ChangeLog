@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in find_defense: compare against fourlib_depth when appropriate
+- compiler warnings fixed
 - new struct dfa_rt_t allows different run-time DFA structure from build-time
 - optional #define USE_BDIST in owl.c for better rotational independance
 - new and revised tests
