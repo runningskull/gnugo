@@ -2628,7 +2628,14 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     if (move[pos].numpos_shape + move[pos].numneg_shape > 0) {
       /* shape_factor has already been computed. */
       float old_value = tot_value;
-      tot_value *= shape_factor;
+      /* Maximum 15 points of the territorial value will be weighted by shape_factor */
+      if (move[pos].territorial_value < 15)
+        tot_value *= shape_factor;
+      else {
+        float non_shape_val = move[pos].territorial_value - 15;
+        tot_value = (tot_value - non_shape_val) * shape_factor + non_shape_val;
+      }
+
       if (verbose) {
 	/* Should all have been TRACE, except we want field sizes. */
 	gprintf("  %1m: %f - shape ", pos, tot_value - old_value);

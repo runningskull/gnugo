@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- maximum 15 points of territorial_value will get shape
 - change of semantics for --seed option
 - new GTP command printsgf
 - debugboard repaired
