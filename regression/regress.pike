@@ -345,7 +345,7 @@ int main(int argc, array(string) argv)
     [string name, mixed value] = option;
     switch (name) {
       case "help":
-	werror(help_message, basename(argv[0]));
+	write(help_message, basename(argv[0]));
 	return 0;
 	break;
       

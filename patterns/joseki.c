@@ -387,7 +387,7 @@ main(int argc, char *argv[])
 
   /* Check number of arguments. */
   if (argc != 3) {
-    fprintf(stderr, USAGE);
+    printf(USAGE);
     exit(EXIT_FAILURE);
   }
 

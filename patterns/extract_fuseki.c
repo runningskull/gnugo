@@ -1119,7 +1119,7 @@ main(int argc, char *argv[])
   
   /* Check number of arguments. */
   if (argc < 6) {
-    fprintf(stderr, USAGE);
+    printf(USAGE);
     exit(EXIT_FAILURE);
   }
   

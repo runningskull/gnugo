@@ -1146,12 +1146,12 @@ main(int argc, array(string) argv)
 			basename(argv[0]));
 
   if (Getopt.find_option(argv, UNDEFINED, "help")) {
-    werror(help_message, basename(argv[0]));
+    write(help_message, basename(argv[0]));
     return 0;
   }
 
   if (Getopt.find_option(argv, UNDEFINED, "help-statistics")) {
-    werror(help_statistics_message);
+    write(help_statistics_message);
     return 0;
   }
 

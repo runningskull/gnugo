@@ -54,7 +54,7 @@
 #include "sgftree.h"
 #include "random.h"
 
-static void show_copyright(void);
+static void show_copyright(FILE *where);
 static void show_version(void);
 static void show_help(void);
 static void show_debug_help(void);
@@ -896,7 +896,7 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_SHOWCOPYRIGHT: 
-	show_copyright();
+	show_copyright(stdout);
 	return EXIT_SUCCESS;
 	break;
 	
@@ -975,7 +975,7 @@ main(int argc, char *argv[])
   if (!quiet) {
     fprintf(stderr, "\n");
     show_version();
-    show_copyright();
+    show_copyright(stderr);
   }
   
   /* Start random number seed. */
@@ -1383,7 +1383,7 @@ main(int argc, char *argv[])
 static void
 show_version(void)
 {
-  fprintf(stderr, "GNU Go Version %s\n", VERSION);
+  printf("GNU Go Version %s\n", VERSION);
 }
 
 
@@ -1527,6 +1527,7 @@ Debugging Options:\n\
    -r, --seed number             set random number seed\n\
    --gtp-dump-commands <file>    dump commands received in GTP mode\n\
 "
+
 #define USAGE_DEBUG2 "\
        --decide-string <string>  can this string live? (try with -o)\n\
        --decide-connection <str/str> can these strings connect? (try with -o)\n\
@@ -1581,35 +1582,33 @@ static void
 show_help(void)
 {
   set_depth_values(DEFAULT_LEVEL, 0);
-  fprintf(stderr, USAGE, level,
-	  depth, backfill_depth, fourlib_depth, ko_depth, branch_depth,
-	  backfill2_depth, break_chain_depth, superstring_depth, aa_depth, 
-	  owl_distrust_depth, owl_branch_depth,
-	  owl_reading_depth, owl_node_limit);
-  fprintf(stderr, USAGE1,
-	  (float) DEFAULT_MEMORY, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
+  printf(USAGE, level,
+	 depth, backfill_depth, fourlib_depth, ko_depth, branch_depth,
+	 backfill2_depth, break_chain_depth, superstring_depth, aa_depth, 
+	 owl_distrust_depth, owl_branch_depth,
+	 owl_reading_depth, owl_node_limit);
+  printf(USAGE1,
+	 (float) DEFAULT_MEMORY, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
 }
 
 
 static void
 show_debug_help(void)
 {
-  fprintf(stderr, USAGE_DEBUG USAGE_DEBUG2);
+  printf(USAGE_DEBUG USAGE_DEBUG2);
 }
 
 static void 
 show_debug_flags(void)
 {
-  fprintf(stderr, DEBUG_FLAGS);
+  printf(DEBUG_FLAGS);
 }
 
 static void
-show_copyright(void)
+show_copyright(FILE *where)
 {
-  fputs(COPYRIGHT, stderr);
+  fputs(COPYRIGHT, where);
 }
-
-
 
 
 /*
