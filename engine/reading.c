@@ -1150,7 +1150,8 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 		 * move for other, it probably defends the combination.
 		 */
 		if (defense_point 
-		    && *defense_point == NO_MOVE
+		    && (*defense_point == NO_MOVE
+			|| !safe_move(*defense_point, other))
 		    && safe_move(apos, other)) {
 		  *defense_point = apos;
 		}
@@ -1177,7 +1178,7 @@ int
 atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
 {
   int fpos;
-  int defense_point, after_defense_point;
+  int defense_point = NO_MOVE, after_defense_point = NO_MOVE;
   int aa_val, after_aa_val;
   int other = OTHER_COLOR(color);
 

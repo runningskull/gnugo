@@ -2507,6 +2507,24 @@ obX?
 ; !safe_omove(a) && lib(b)>1
 
 
+#see owl:229; new pattern 3.1.13 -trevor
+Pattern A1013
+?O?         enclose!
+X..
+X*?
+
+:8,-,value(10)
+
+?c?
+XAb
+X*?
+
+; owl_escape_value(b)>0 && 
+; oplay_defend_both(*,A,b,c,b) &&
+; oplay_defend_both(*,A,b,b,*)
+
+
+
 #########################################################
 #                                                       #
 #              Reinforce the perimeter                  #

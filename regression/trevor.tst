@@ -170,14 +170,9 @@ loadsgf games/trevor/trevor_16.sgf 67
 
 # Must connect dragons.
 # B6 should be valued much much lower than B5
-# Top moves:
-#1. B5  32.93 [CORRECT!]
-#2. B6  32.64 [NO, this is terrible, more like B7 & C7]
-#3. B7  18.35
-#4. C7  18.33
 loadsgf games/trevor/trevor_17.sgf 22
 170 gg_genmove white
-#? [FAIL]*
+#? [B5]*
 
 # C8 is terrible.
 loadsgf games/trevor/trevor_17.sgf 28
@@ -457,7 +452,7 @@ loadsgf games/trevor/trevor_42.sgf 191
 #SEVERITY=10
 loadsgf games/trevor/trevor_43.sgf
 430 owl_attack F4
-#? [G4]*
+#? [1 G4]*
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Simple double atari
@@ -467,12 +462,19 @@ loadsgf games/trevor/trevor_43.sgf
 #So, gg_genmove defends appropriately.
 loadsgf games/trevor/trevor_44.sgf
 440 owl_attack E6
-#? [F4]*
+#? [1 F4]*
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Double-threat to eye-space missed.
 #SEVERITY=10
 loadsgf games/trevor/trevor_45.sgf
 450 owl_attack E4
-#? [D4]*
+#? [1 D4]*
 
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=Missing simple cut pattern
+#SEVERITY=10
+#SEE_ALSO=owl:170
+loadsgf games/trevor/trevor_46.sgf
+460 owl_attack B14
+#? [1 E14]*

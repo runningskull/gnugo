@@ -73,6 +73,10 @@ loadsgf games/arb/game03.sgf 109
 232 gg_genmove black
 #? [!PASS]
 
+loadsgf games/arb/game04.sgf 43
+233 gg_genmove black
+#? [J9]*
+
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
