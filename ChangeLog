@@ -19,6 +19,10 @@
 - dragon.c is now 1-dimensional
 - prefix struct option in getopt.c with gg_
 - prefix all occurences of optarg with gg_
+- improved color support in cygwin and VC++
+- brighter colors under VC++
+- increase BOARDSIZE by one
+- set MAX_BOARD to 19 for development versions
 - tuning
 - owl tuning
 - new strategy4.tst and unsorted.tst

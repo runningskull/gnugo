@@ -76,7 +76,7 @@ extern Hash_data    hashdata;
 
 /* 1D board macros. */
 /* Note that POS(-1, -1) == 0 */
-#define BOARDSIZE    ((MAX_BOARD + 2) * (MAX_BOARD + 1))
+#define BOARDSIZE    ((MAX_BOARD + 2) * (MAX_BOARD + 1) + 1)
 #define BOARDMIN     (MAX_BOARD + 2)
 #define BOARDMAX     (MAX_BOARD + 1) * (MAX_BOARD + 1)
 #define POS(i, j)    ((MAX_BOARD + 2) + (i) * (MAX_BOARD + 1) + (j))

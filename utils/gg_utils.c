@@ -96,6 +96,16 @@ gg_init_color()
 #endif /* TERMINFO */
 }
 
+#ifdef WIN32
+verifyW32(BOOL b)
+{
+  if (!b) {
+    fprintf(stderr, "Win32 Err: %ld\n", GetLastError());
+  }
+}
+
+#endif
+
 void 
 write_color_char_no_space(int c, int x)
 {
@@ -107,6 +117,30 @@ write_color_char_no_space(int c, int x)
 #elif defined(ANSI_COLOR)
 
   fprintf(stderr, "\033[%dm%c\033[0m", 30+c, x);
+
+#elif defined(WIN32)
+  
+  static HANDLE hStdErr=0;
+  DWORD iCharsWritten;
+  CONSOLE_SCREEN_BUFFER_INFO bufInfo;
+  if (!hStdErr) {
+    hStdErr = GetStdHandle(STD_ERROR_HANDLE);
+    if (hStdErr == INVALID_HANDLE_VALUE) {
+      fprintf(stderr, "Unable to open stderr.\n");
+    }
+  }
+
+  /*Red & Blue are switched from what MS-Windows wants:
+   *   FOREGROUND_BLUE      0x0001 // text color contains blue.
+   *   FOREGROUND_GREEN     0x0002 // text color contains green.
+   *   FOREGROUND_RED       0x0004 // text color contains red
+   *This magic switches the bits back: */
+  c = (c & 1) * 4 + (c & 2) + (c & 4) / 4;
+  c += FOREGROUND_INTENSITY;
+  verifyW32(GetConsoleScreenBufferInfo(hStdErr, &bufInfo));
+  verifyW32(SetConsoleTextAttribute(hStdErr, (WORD)c) );
+  verifyW32(WriteConsole(hStdErr, &x, 1, &iCharsWritten, 0));
+  verifyW32(SetConsoleTextAttribute(hStdErr, bufInfo.wAttributes));
 
 #else
 
