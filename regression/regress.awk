@@ -44,7 +44,7 @@ END {
 
   if (nexpect != ntest) {
     if (ntest > 0) {
-      print "Possible crash!: expected " nexpect " results, got " ntest ". Last succesful test was " test[ntest-1] ".";
+      print "Possible crash!: expected " nexpect " results, got " ntest ". Last successful test was " test[ntest-1] ".";
     } else {
       print "Possible crash!: expected " nexpect " results, got " ntest ". Crash in first test.";
     }
