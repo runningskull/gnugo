@@ -31,102 +31,20 @@ import re
 
 help_string = """
 Usage:
-breakage2tst.py [--pike] <BREAKAGE_FILE >testfile.tst
-	This creates an excerpt of all test cases that appear as unexpected
-	PASS or FAIL in BREAKAGE_FILE and writes these test to testfile.tst.
+breakage2tst.py [--pike] <BREAKAGE_FILE 
+	This creates a command line invoking regress.pike to run all tes
+	cases that appear as unexpected PASS or FAIL in BREAKAGE_FILE.
 breakage2tst.py [--pike] --update <BREAKAGE_FILE
 	This changes all .tst files so that the expected results match
 	the behaviour of the version that produced BREAKAGE_FILE.
 In both cases, it needs to be run from the regression test directory.
 """
 
-start_tst_string = """
-reset_owl_node_counter
-reset_reading_node_counter
-reset_connection_node_counter
-"""
-		
-finish_tst_string = """
-########### end of tests #####################
-
-# Report number of nodes visited by the tactical reading
-100000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-100001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by connection reading
-100002 get_connection_node_counter
-#? [0]&
-"""
-
-
-# This function scans the .tst-file <tstfilename> for tests with numbers in
-# the list testnumbers. These have to be ordered in the same way as they
-# are occuring in the .tst-file
-
-# We copy all non-numbered commands starting from the last loadsgf leading
-# up to each test to be copied, plus all following non-numbered commands
-# until the next loadsgf.
-# This is to cope with trymove/popgo's or increase/decrease_depth_values
+# This prints out the list of tests from testfile in the format
+# <tstfile>:number
 def write_tests(tstfilename, tests):
-	global command_id
-
-	if len(tests) == 0:
-		return
-
-	print
-	print '# Tests from', tstfilename+':',
-	tstfile = open(tstfilename, 'r')
-	commands = ''
-	state = 0
 	for number, expected in tests:
-		comment = ''
-		current_line = tstfile.readline()
-		command_pattern = re.compile("^%d " % number)
-
-		# Look for the line containing the command with matching id,
-		# while keeping recent commands and comments
-		while (not command_pattern.match(current_line)):
-			if re.match(r"#[^\?]", current_line):
-				comment = comment + current_line
-			elif (re.match(r"$", current_line)
-			      or re.match(r" +$", current_line)):
-				comment = ''
-			elif re.search("loadsgf", current_line):
-				if state == 1:
-					print commands,
-					state = 0
-				commands = current_line
-			elif (not re.match(r"[0-9]|#|^ *$", current_line)):
-				commands = commands + current_line
-			current_line = tstfile.readline()
-		# Found match.
-		state = 1
-		print
-		print '#', tstfilename+':', number
-		print comment + commands, command_id, \
-			re.sub(command_pattern, '', current_line),
-		commands = ''
-
-		# Now look for the result line:
-		while (not re.match(r"^#\?", current_line)):
-			current_line = tstfile.readline()
-		print current_line,
-		command_id = command_id + 10
-
-	# We need to do a final scan for some popgo's or similar until
-	# the next loadsgf or EOF:
-	current_line = tstfile.readline()
-	while (current_line != '' and not re.search(" *loadsgf", current_line)):
-		if (not re.match(r"[0-9]|#| *$", current_line)):
-			print current_line
-		current_line = tstfile.readline()
-
-	tstfile.close
-	print
+		print "%s:%d" % (tstfilename, number),
 
 
 def toggled_result(resultline, expected):
@@ -240,7 +158,6 @@ def parse_pike_input(do_work):
 
 
 def main():
-	global command_id
 	mode = 0
 	pike = 0
 	try:
@@ -265,8 +182,7 @@ def main():
 			pike = 1
 	
 	if (mode == 0):
-		print start_tst_string
-		command_id = 10
+		print "./regress.pike ",
 		do_work = write_tests
 	else:
 		do_work = update_tstfile
@@ -278,7 +194,7 @@ def main():
 		parse_input(do_work)
 
 	if (mode == 0):
-		print finish_tst_string
+		print
 	else:
 		print "Done."
 
