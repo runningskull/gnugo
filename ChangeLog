@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new struct dfa_rt_t allows different run-time DFA structure from build-time
 - optional #define USE_BDIST in owl.c for better rotational independance
 - new tests
 - new eat_lunch_escape_bonus() called by sniff_lunch()
@@ -13,6 +14,9 @@
 - %2m added as valid syntax for gprintf
 - relabel rotation matrices in transform.c
 - bugfix in atari_atari_blunder_size: don't crash on inconsistent defense
+- autoharvesting of documentation from play_gtp.c
+- tuning
+- komoku and hoshi tuning
 - eye tuning
 - owl tuning
 
