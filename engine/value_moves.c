@@ -119,8 +119,6 @@ value_moves_confirm_safety(int move, int color)
  *
  * FIXME: We would like to see whether an arbitrary move works to cut
  *        or connect something else too.
- *
- * FIXME: Keep track of ko results.
  */
 
 static void
@@ -191,22 +189,26 @@ find_more_attack_and_defense_moves(int color)
 	   * unless we already know the move works as defense move.
 	   */
 	  if (board[aa] == color
-	      && !defense_move_reason_known(ii, unstable_worms[k]))
-	    if (!attack(aa, NULL)) {
+	      && !defense_move_reason_known(ii, unstable_worms[k])) {
+	    int acode = attack(aa, NULL);
+	    if (acode < worm[aa].attack_codes[0]) {
 	      if (!cursor_at_start_of_line)
 		TRACE("\n");
-	      TRACE("%ofound extra point of defense of %1m at %1m\n", 
-		    aa, ii);
+	      TRACE("%ofound extra point of defense of %1m at %1m code %d\n",
+		    aa, ii, REVERSE_RESULT(acode));
 	      cursor_at_start_of_line = 1;
-	      add_defense_move(ii, aa, WIN);
+	      add_defense_move(ii, aa, REVERSE_RESULT(acode));
 	    }
+	  }
 	    
 	  /* string of opponent color, see if there still is a defense,
 	   * unless we already know the move works as attack move.
 	   */
 	  if (board[aa] == other
-	      && !attack_move_reason_known(ii, unstable_worms[k]))
-	    if (!find_defense(aa, NULL)) {
+	      && !attack_move_reason_known(ii, unstable_worms[k])) {
+	    
+	    int dcode = find_defense(aa, NULL);
+	    if (dcode < worm[aa].defend_codes[0]) {
 	      /* Maybe find_defense() doesn't find the defense. Try to
 	       * defend with the stored defense move.
 	       */
@@ -215,20 +217,25 @@ find_more_attack_and_defense_moves(int color)
 	      if (trymove(worm[aa].defense_points[0], other, 
 			  "find_more_attack_and_defense_moves", 0,
 			  EMPTY, 0)) {
-		if (!attack(aa, NULL))
-		  attack_works = 0;
+		int this_dcode = REVERSE_RESULT(attack(aa, NULL));
+		if (this_dcode > dcode) {
+		  dcode = this_dcode;
+		  if (dcode >= worm[aa].defend_codes[0])
+		    attack_works = 0;
+		}
 		popgo();
 	      }
 		
 	      if (attack_works) {
 		if (!cursor_at_start_of_line)
 		  TRACE("\n");
-		TRACE("%ofound extra point of attack of %1m at %1m\n",
-		      aa, ii);
+		TRACE("%ofound extra point of attack of %1m at %1m code %d\n",
+		      aa, ii, REVERSE_RESULT(dcode));
 		cursor_at_start_of_line = 1;
-		add_attack_move(ii, aa, WIN);
+		add_attack_move(ii, aa, REVERSE_RESULT(dcode));
 	      }
 	    }
+	  }
 	}
 	popgo();
       }

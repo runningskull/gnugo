@@ -293,10 +293,12 @@ make_worms(int save_verbose)
 	     * initial determination of worm.attack and worm.defend
 	     * to avoid horizon effect. Since stackp has been
 	     * incremented we must also increment depth and
-	     * backfill_depth. */
+	     * backfill_depth.
+	     */
 	    
 	    /* Now we try to find a group which is saved or attacked as well
-	       by this move. */
+	     * by this move.
+	     */
 	    DEBUG(DEBUG_WORMS, "trying %1m\n", aa);
 	    increase_depth_values();
 	    
@@ -326,8 +328,12 @@ make_worms(int save_verbose)
 		      if (worm[pos2].defend_codes[0] != 0
 			  && trymove(worm[pos2].defense_points[0],
 				     color, "make_worms", 0, EMPTY, 0)) {
-			if (!attack(pos2, NULL))
-			  attack_works = 0;
+			int this_dcode = REVERSE_RESULT(attack(pos2, NULL));
+			if (this_dcode > dcode) {
+			  dcode = this_dcode;
+			  if (dcode >= worm[pos2].defend_codes[0])
+			    attack_works = 0;
+			}
 			popgo();
 		      }
 		    
@@ -407,8 +413,12 @@ make_worms(int save_verbose)
 		      if (trymove(worm[pos2].defense_points[0],
 				  other, "make_worms",
 				  NO_MOVE, EMPTY, NO_MOVE)) {
-			if (!attack(pos2, NULL))
-			  attack_works = 0;
+			int this_dcode = REVERSE_RESULT(attack(pos2, NULL));
+			if (this_dcode > dcode) {
+			  dcode = this_dcode;
+			  if (dcode >= worm[pos2].defend_codes[0])
+			    attack_works = 0;
+			}
 			popgo();
 		      }
 		      

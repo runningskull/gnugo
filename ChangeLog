@@ -2,7 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-
+- keep better track of ko results when searching for additional worm
+  attacks and defenses in find_more_attack_and_defense_moves() and
+  make_worms()
 - new option --output-flags <flags>
 - output using sgf trees with -o option
 - cleaning and minor bugfixes in play ascii
