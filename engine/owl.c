@@ -3159,7 +3159,7 @@ collect_owl_shapes_callbacks(int anchor, int color, struct pattern *pattern,
   matched_patterns->counter++;
 }
 
-#define USE_BDIST 0
+#define USE_BDIST 1
 #if USE_BDIST
 
 /* compute the squared of the distance of a point on the board

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- change USE_BDIST to 1 in owl.c
 - who_wins() invokes silent_examine_position()
 - bugfix in do_owl_analyze_semeai()
 - global variable urgent retired
