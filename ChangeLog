@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- endgame1.sgf removed from the distribution
 - play_move_no_history() revised to speed up undo
 - modify_eye_spaces(), remove_lunch(), and not_lunch_helper() removed
 - new function estimate_lunch_eye_value() broken out of sniff_lunch()

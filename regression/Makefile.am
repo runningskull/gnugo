@@ -3,7 +3,7 @@ TST =  13x13.tst 13x13b.tst arb.tst arend.tst arend2.tst arion.tst \
        auto_handtalk.tst blunder.tst buzco.tst capture.tst \
        century2002.tst connect.tst connect_rot.tst \
        connection.tst connection_rot.tst cutstone.tst \
-       dniwog.tst ego.tst endgame.tst endgame_rot.tst \
+       dniwog.tst ego.tst endgame.tst endgame1.tst endgame_rot.tst \
        filllib.tst global.tst golife.tst gunnar.tst handtalk.tst \
        heikki.tst lazarus.tst ld_owl.tst ld_owl_rot.tst \
        manyfaces.tst manyfaces1.tst nando.tst neurogo.tst newscore.tst \
@@ -98,6 +98,9 @@ ego: ego.tst
 
 endgame: endgame.tst
 	$(srcdir)/eval.sh endgame.tst $(GG_OPTIONS)
+
+endgame1: endgame1.tst
+	$(srcdir)/eval.sh endgame1.tst $(GG_OPTIONS)
 
 endgame_rot: endgame_rot.tst
 	$(srcdir)/eval.sh endgame_rot.tst $(GG_OPTIONS)
