@@ -1,0 +1,32 @@
+(;GM[1]FF[3]
+RU[Japanese]SZ[19]HA[0]KM[5.5]
+PW[GNU Go 3.1.1]
+PB[GNU Go 3.0.0]
+GN[Kitani (W) vs. Go Seigen (B)]
+DT[2001-08-31]
+SY[Cgoban 1.9.10]TM[-];B[pd];W[pp];B[cd];W[dp];B[ic];W[jp];B[np];W[pn]
+;B[pq];W[qq];B[oq];W[qr];B[lq];W[qj];B[jr];W[pf];B[nd];W[qd];B[qc];
+W[qe];B[rc];W[ec];B[de];W[dj];B[fd];W[cb];B[fc];W[bc];B[ea];W[da];
+B[eb];W[db];B[dc];W[oj];B[le];W[ol];B[lc];W[cn];B[cq];W[dq];B[dr];
+W[er];B[iq];W[ip];B[ds];W[cp];B[cg];W[lo];B[bd];W[ba];B[bi];W[mi];
+B[mg];W[kh];B[nh];W[qh];B[eg];W[ih];B[fi];W[fj];B[gr];W[cr];B[gf];
+W[je];B[ie];W[kf];B[sf];W[li];B[gp];W[gj];B[nn];W[ml];B[bk];W[mm];
+B[dl];W[fo];B[ho];W[jn];B[hm];W[jl];B[il];W[ei];B[kc];W[fh];B[ij];
+W[ns];B[bm];W[bn];B[an];W[bq];B[hi];W[el];B[gi];W[em];B[dk];W[ao];
+B[am];W[kj];B[ek];W[fk];B[ej];W[gl];B[jk];W[kk];B[jm];W[km];B[kl];
+W[ll];B[ke];W[if];B[jd];W[he];B[jf];W[hf];B[gg];W[kg];B[hg];W[jg];
+B[hd];W[je];B[ac];W[ab];B[pr];W[ps];B[ad];W[jf];B[fr];W[es];B[sh];
+W[rh];B[si];W[rk];B[mr];W[oo];B[no];W[fq];B[hp];W[gq];B[hq];W[fs];
+B[gs];W[eq];B[is];W[nr];B[nq];W[os];B[kp];W[kn];B[in];W[io];B[ko];
+W[jo];B[lp];W[mo];B[mn];W[ln];B[om];W[pm];B[cc];W[bb];B[nm];W[rd];
+B[sd];W[ge];B[fe];W[oh];B[ni];W[ng];B[mf];W[nj];B[og];W[pg];B[nf];
+W[of];B[oi];W[pi];B[ng];W[cm];B[cl];W[oe];B[od];W[mp];B[mq];W[ms];
+B[ls];W[hk];B[gm];W[gn];B[go];W[fn];B[hn];W[ne];B[jq];W[jl];B[or];
+W[im];B[qs];W[ik];B[rs];W[rr];B[sr];W[qp];B[sq];W[jm];B[jj];W[ro];
+B[hl];W[hj];B[ii];W[hh];B[gh];W[ji];B[ig];W[jh];B[fm];W[fl];B[ri];
+W[me];B[lf];W[md];B[mc];W[ld];B[kd];W[gd];B[gc];W[dm];B[id];W[fp];
+B[lh];W[nl];B[qi];W[ph];B[rq];W[op];B[rj];W[qk];B[rp];W[so];B[ss];
+W[sk];B[lg];W[ki];B[pe];W[rf];B[se];W[rg];B[sg];W[re];B[on];W[sp];
+B[ps];W[sj];B[sc];W[mh];B[qo];W[po];B[qn];W[rn];B[qm];W[rm];B[pl];
+W[ql];B[pk];W[pj];B[ok];W[nk];B[pm];W[tt];B[tt]
+)
