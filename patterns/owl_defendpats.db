@@ -128,6 +128,19 @@ Pattern D3
 :8,-,value(77)
 
 
+Pattern D4
+
+.X..        extend along the fourth line
+oO*.
+....
+....
+....
+----
+
+:8,-,value(83)
+
+
+
 #########################################################
 #                                                       #
 #          Expanding moves on the third line            #
@@ -3720,7 +3733,7 @@ O.*a
 
 Pattern D1309
 
-ooooo
+oo..o
 O..*o    try to escape
 .....
 .....
@@ -3728,7 +3741,7 @@ O..*o    try to escape
 
 :8,-,value(81)
 
-oooob
+oo..b
 O..*a
 .....
 .....

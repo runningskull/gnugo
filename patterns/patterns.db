@@ -12001,6 +12001,41 @@ Pattern EJ85
 :8,OJ
 
 
+Pattern EJ86
+# db added (3.1.9)
+
+?.....         extend automatically
+xX..oo
+XO*.oo
+?.....
+?.....
+------
+
+:8,XJ
+
+?.....
+xX..ab
+XO*.cd
+?.....
+?.....
+------
+
+; o_somewhere(a,b,c,d)
+
+
+Pattern EJ87
+#db added (3.1.9)
+
+??....       extend after the top attachment
+..X...
+..O*..
+......
+......
+......
+------
+
+:8,J
+
 
 
 ######################################################################
