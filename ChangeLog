@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in draw_back
+- Add ON_BOARD1 assertions in liberty_of_string and neighbour_of_string
+- Use Win32 API to get CPU time usage for all Win32 builds, not just VC
+- Added a few scattered regression comments
+- Updated regress.pl to latest ever evolving version.
+- Adds several test cases and SGF files to trevor.tst & games/trevor/
+
 3.1.10 released October 14, 2001
 
 - portability fix for MINGW. Don't include crtdbg.h
