@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new sgmp mode
 - regress.pike added to EXTRADIST
 - revision of copyright notices
 - warnings fixed on some platforms
