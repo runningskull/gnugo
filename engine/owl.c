@@ -2307,7 +2307,9 @@ owl_estimate_life(struct local_owl_data *owl,
 
   if ((debug & DEBUG_EYES) && (debug & DEBUG_OWL))
     gprintf("owl: eyemin=%d matches_found=%d\n", *eyemin, matches_found);
-  *eyemin -= matches_found;
+  if (*eyemin >= matches_found)
+    *eyemin -= matches_found;
+  else *eyemin = 0;
 
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
