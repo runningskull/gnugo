@@ -89,6 +89,9 @@ END {
 	    print num " PASSED";
 	  else
 	    print num " unexpected PASS!";
+         if (url)
+           print "   "url""tst":"num;
+
 	} else {
 	  if (verbose) {
 	    print num " passed";
@@ -102,6 +105,8 @@ END {
 	    print num " FAILED: Correct '" correct_prn "', got '" result "'";
 	  else  
 	    print num " unexpected FAIL: Correct '" correct_prn "', got '" result "'";
+          if (url)
+            print "   "url""tst":"num;
 	} else {
 	  if (verbose) {
 	    print num " failed: Correct '" correct_prn "', got '" result "'";

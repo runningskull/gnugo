@@ -19,6 +19,6 @@ shift
 
 cd $srcdir
 $GNUGO --quiet "$@" --mode gtp < $tstfile \
-	| awk -f regress.awk tst=$tstfile
+	| awk -f regress.awk tst=$tstfile url=$GNUGO_REGRESSION_URL
 
 # regress.sh ends here

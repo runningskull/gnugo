@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- provide links to html regression views from regress.sh
 - semeai analysis in make_dragons() postponed until after revision of
   inessentiality 
 - identification of thrashing dragons in make_dragons() postponed
