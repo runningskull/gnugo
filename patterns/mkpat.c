@@ -612,7 +612,9 @@ write_to_dfa(int index)
   }
 
   if (database_type == OPTIMIZE_DFA) {
-    if (pattern[index].trfno != 5)
+    if (transformation_hint == -1)
+      dfa_patterns_select_shortest_variation(&dfa_pats);
+    else if (pattern[index].trfno != 5)
       dfa_patterns_set_last_pattern_variation(&dfa_pats, transformation_hint);
     else
       dfa_patterns_set_last_pattern_variation(&dfa_pats, transformation_hint - 2);
@@ -2998,6 +3000,10 @@ main(int argc, char *argv[])
 	    command_data[79] = 0;
 	  }
 	  strcpy(pattern_names[patno], command_data);
+
+	  /* Special case. Choose shortest transformation later. */
+	  if (database_type == OPTIMIZE_DFA)
+	    transformation_hint = -1;
 
 	  if (transformations_FILE) {
 	    if (!have_pending_name && !feof(transformations_FILE)) {

@@ -282,6 +282,7 @@ void		dfa_patterns_add_pattern(dfa_patterns *patterns,
 					 const char *string, int index);
 void		dfa_patterns_set_last_pattern_variation(dfa_patterns *patterns,
 							int variation);
+void		dfa_patterns_select_shortest_variation(dfa_patterns *patterns);
 void		dfa_patterns_build_graph(dfa_patterns *patterns);
 int *		dfa_patterns_optimize_variations(dfa_patterns *patterns,
 						 int iterations);

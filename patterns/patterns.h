@@ -380,35 +380,37 @@ struct corner_variation;
 struct corner_pattern;
 
 struct corner_db {
-  int max_width;
-  int max_height;
+  int max_width;	/* Largest possible width and... */
+  int max_height;	/* ... largest possible height of database patterns. */
 
-  char num_top_variations;
+  char num_top_variations; /* Number of top level variations. */
   struct corner_variation *top_variations;
 };
 
 struct corner_variation {
-  int move_offset;
-  char xor_att;
-  char num_stones;
+  int move_offset;	/* Offset of the move in this variation. */
+  char xor_att; 	/* 0 - the same color as the first matched stone,
+			 * 3 - the opposite color.
+			 */
+  char num_stones;      /* Number of stones in the `move_offset' rectangle. */
 
-  char num_variations;
-  struct corner_variation *variations;
+  char num_variations;  /* Number of subvariations. */
+  struct corner_variation *variations; /* Pointer to subvariation array. */
 
-  struct corner_pattern *pattern;
+  struct corner_pattern *pattern; /* Address of matched pattern (if any). */
 };
 
 struct corner_pattern {
-  int second_corner_offset;
-  int symmetric;
+  int second_corner_offset; /* Offset of pattern's second corner. */
+  int symmetric;	/* If the pattern is symmetric ('/' symmetry). */
 
-  unsigned int class;
-  const char *name;
+  unsigned int class;	/* Pattern class. */
+  const char *name;	/* Pattern name (optional). */
 
-  float shape;
+  float shape;		/* Pattern shape value. */
 
-  int autohelper_flag;
-  autohelper_fn_ptr autohelper;
+  int autohelper_flag;	/* Whether autohelper has constraint and/or action. */
+  autohelper_fn_ptr autohelper; /* Automatically generated helper (or NULL). */
 };
 
 /* Build time version of corner_variation structure. */

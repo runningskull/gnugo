@@ -1822,6 +1822,30 @@ dfa_patterns_set_last_pattern_variation(dfa_patterns *patterns, int variation)
 }
 
 
+/* Make the shortest variation of the last pattern its current variation. It
+ * is used as a starting point in dfa optimization process.
+ */
+void
+dfa_patterns_select_shortest_variation(dfa_patterns *patterns)
+{
+  int k;
+  int min_length;
+  dfa_pattern *pattern = patterns->last_pattern;
+  assert(pattern);
+
+  pattern->current_variation = 0;
+  min_length = strlen(pattern->variation[0]);
+  for (k = 1; k < pattern->num_variations; k++) {
+    int length = strlen(pattern->variation[k]);
+
+    if (length < min_length) {
+      pattern->current_variation = k;
+      min_length = length;
+    }
+  }
+}
+
+
 /* Build a dfa graph for a list of patterns. */
 void
 dfa_patterns_build_graph(dfa_patterns *patterns)
