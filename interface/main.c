@@ -131,7 +131,8 @@ enum {OPT_BOARDSIZE=127,
       OPT_MIRROR,
       OPT_MIRROR_LIMIT,
       OPT_METAMACHINE,
-      OPT_RESIGN_ALLOWED
+      OPT_RESIGN_ALLOWED,
+      OPT_NEVER_RESIGN
 };
 
 /* names of playing modes */
@@ -264,6 +265,7 @@ static struct gg_option const long_options[] =
   {"mirror-limit",   required_argument, 0, OPT_MIRROR_LIMIT},
   {"metamachine",    no_argument,       0, OPT_METAMACHINE},
   {"resign-allowed", no_argument,       0, OPT_RESIGN_ALLOWED},
+  {"never-resign",   no_argument,       0, OPT_NEVER_RESIGN},
   {NULL, 0, NULL, 0}
 };
 
@@ -342,6 +344,7 @@ main(int argc, char *argv[])
   capture_all_dead = 0;
   play_out_aftermath = 0;
   limit_search = 0;
+  resign_allowed = RESIGNATION_ALLOWED;
 
   /* Default parameters for clock and auto level systems. */
   clock_init(3600, 0, 0);      /* One hour sudden death. */
@@ -558,6 +561,10 @@ main(int argc, char *argv[])
 
       case OPT_RESIGN_ALLOWED:
 	resign_allowed = 1;
+	break;
+
+      case OPT_NEVER_RESIGN:
+	resign_allowed = 0;
 	break;
 
       case OPT_MODE: 
@@ -970,9 +977,6 @@ main(int argc, char *argv[])
     break;
     
   case MODE_SOLO:
-    /* not yet implemented */
-    resign_allowed = 0;
-    
     play_solo(&gameinfo, benchmark);
     break;
     

@@ -74,10 +74,10 @@ endgame(int color)
  * position, although black sacrifice one point by playing in white's territory,
  * he forces white to eventually capture the black string, losing three points.
  * However, white has to play at `*' sooner or later if black doesn't take
- * that point, so the move is worth 3 - 1 - 1 = 1 point only, not two.
+ * that vertex, so the move is worth 3 - 1 - 1 = 1 point only, not two.
  *
  * This function is able to find such moves. Algorithm is based on finding
- * such called "inessential liberties". This are defined as liberties, which
+ * such called "inessential liberties". These are defined as liberties, which
  * satisfy five conditions:
  *
  *	1) they are not within an eye (not in someone's territory),
@@ -88,7 +88,7 @@ endgame(int color)
  *	5) they are safe to fill with stones of other than the worm's color.
  *
  * Such liberties are supposed to never become territory (they can't become
- * and additional eye for the worm under consideration), the worm cannot
+ * an additional eye for the worm under consideration), the worm cannot
  * connect to something via such a liberty and they will (or at least can)
  * be eventually filled by either of the players.
  *
@@ -106,6 +106,8 @@ endgame_analyze_worm_liberties(int pos, int color)
   int essential_libs[MAXLIBS];
   int inessential_liberties = 0;
   int inessential_libs[MAXLIBS];
+  int false_eye_liberties = 0;
+  int false_eye_libs[MAXLIBS];
   int num_attacks;
   int num_attacks2;
   int attacks[MAXLIBS];
@@ -156,6 +158,8 @@ endgame_analyze_worm_liberties(int pos, int color)
 	else
 	  inessential_libs[inessential_liberties++] = lib;
       }
+      else if (is_false_eye(half_eye, lib) && !false_eye_territory[lib])
+	false_eye_libs[false_eye_liberties++] = lib;
     }
   }
 
@@ -193,7 +197,8 @@ endgame_analyze_worm_liberties(int pos, int color)
 	      int i;
 
 	      /* If the attack cannot be defended against by playing on
-	       * another essential liberty or by capturing an opponent
+	       * another essential liberty, filling a pure false eye (an
+	       * eye which can't become territory) or capturing an opponent
 	       * string in atari, keep it for now.
 	       */
 	      for (i = 0; i < essential_liberties; i++) {
@@ -203,22 +208,29 @@ endgame_analyze_worm_liberties(int pos, int color)
 	      }
 
 	      if (i == essential_liberties) {
-		int adj[MAXCHAIN];
-		int adjs;
-
-		adjs = chainlinks2(pos, adj, 1);
-		for (i = 0; i < adjs; i++) {
-		  int lib2;
-		  findlib(adj[i], 1, &lib2);
-		  if (lib2 != dpos && !is_proper_eye_space(lib2)
-		      && does_defend(lib2, pos))
+		for (i = 0; i < false_eye_liberties; i++) {
+		  if (does_defend(false_eye_libs[i], pos))
 		    break;
 		}
 
-		if (i == adjs) {
-		  attacks[num_attacks] = lib;
-		  defenses[num_attacks] = dpos;
-		  num_attacks++;
+		if (i == false_eye_liberties) {
+		  int adj[MAXCHAIN];
+		  int adjs;
+
+		  adjs = chainlinks2(pos, adj, 1);
+		  for (i = 0; i < adjs; i++) {
+		    int lib2;
+		    findlib(adj[i], 1, &lib2);
+		    if (lib2 != dpos && !is_proper_eye_space(lib2)
+			&& does_defend(lib2, pos))
+		      break;
+		  }
+
+		  if (i == adjs) {
+		    attacks[num_attacks] = lib;
+		    defenses[num_attacks] = dpos;
+		    num_attacks++;
+		  }
 		}
 	      }
 	    }
@@ -316,7 +328,7 @@ endgame_analyze_worm_liberties(int pos, int color)
       }
       else {
 	/* This must be the only attack (filling all inessential liberties
-	 * an atari.
+	 * gives an atari).
 	 */
 	ASSERT1(num_attacks == 1, pos);
 	attacks[num_attacks2++] = attacks[k];

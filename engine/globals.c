@@ -141,7 +141,7 @@ int experimental_owl_ext = EXPERIMENTAL_OWL_EXT;
 int allow_suicide       = 0;    /* allow opponent to make suicide moves */
 int capture_all_dead    = 0;    /* capture all dead opponent stones */
 int play_out_aftermath  = 0;    /* make everything unconditionally settled */
-int resign_allowed      = 0;    /* allows GG to resign hopeless games */
+int resign_allowed      = 0;    /* resign hopeless games */
 
 int play_mirror_go      = 0;    /* try to play mirror go if possible */
 int mirror_stones_limit = -1;   /* but stop at this number of stones */

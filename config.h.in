@@ -9,6 +9,9 @@
 /* Ruleset. Default Japanese */
 #undef CHINESE_RULES
 
+/* Allow resignation. Default disabled*/
+#undef RESIGNATION_ALLOWED
+
 /* Define to use curses for color debugging */
 #undef CURSES
 
