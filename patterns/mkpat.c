@@ -1870,7 +1870,7 @@ main(int argc, char *argv[])
   if (dfa_generate) {
     fprintf(stderr, "---------------------------\n");
     fprintf(stderr, "dfa for %s\n", argv[gg_optind]);
-    fprintf(stderr, "size: %dKb for ", dfa_size(&dfa));
+    fprintf(stderr, "size: %d kB for ", dfa_size(&dfa));
     fprintf(stderr, "%d patterns\n", patno);
 
     strcpy(dfa.name, argv[gg_optind]);

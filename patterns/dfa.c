@@ -282,7 +282,7 @@ union_att(dfa_t *pdfa, dfa_t *pdfa1, int att1, dfa_t *pdfa2, int att2)
 
 
 /*
- * return the effective size of a dfa in Kb.
+ * return the effective size of a dfa in kB.
  */
 
 int
@@ -816,7 +816,7 @@ dfa_end(void)
 /*
  * Add a new string with attribute att_val into the dfa.
  * if the new size of the dfa respect some size conditions
- * return increase in Kb or -1 if the pattern was rejected.
+ * return increase in kB or -1 if the pattern was rejected.
  * This function never rejects string of length <= 1.
  */
 

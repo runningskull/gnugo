@@ -121,7 +121,7 @@ void print_c_dfa(FILE* of, const char *name, dfa_t *pdfa);
 void new_dfa(dfa_t *pdfa, const char *name);
 void copy_dfa(dfa_t *p_to, dfa_t *p_from);
 void kill_dfa(dfa_t *pdfa);
-int dfa_size(dfa_t *pdfa);	/* in Kb */
+int dfa_size(dfa_t *pdfa);	/* in kB */
 void save_dfa(const char *f_name, dfa_t *pdfa);
 dfa_t *load_dfa(const char *f_path, const char *f_name, dfa_t **ppdfa);
 void dump_dfa(FILE *f, dfa_t *pdfa);
@@ -161,3 +161,9 @@ extern int dfa_verbose;		/* the verbose level */
 #endif /* _DFA_H_ */
 
 
+/*
+ * Local Variables:
+ * tab-width: 8
+ * c-basic-offset: 2
+ * End:
+ */

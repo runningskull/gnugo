@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- spelling fixes
 - verbosity revisions with alternate connections in readconnect.c
 - bugfix in close_bubbles()
 - revised "stepped on a bug" message

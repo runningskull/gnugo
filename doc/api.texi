@@ -77,7 +77,7 @@ of the moves in a game, and to undo or redo moves. Games can be saved to
 SGF files and then later be read back again. These are also within
 @code{libengine.a}. 
 
-The resposibility of the application is to provide the user with a
+The responsibility of the application is to provide the user with a
 user interface, graphical or not, and let the user interact with the
 engine.
 

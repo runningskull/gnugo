@@ -503,7 +503,7 @@ enter_intrusion_source(int source_pos, int strength_pos,
   q->intrusion_counter++;
 }
 
-/* Experimental influence: Comparision of intrusions datas, to sort them. */
+/* Experimental influence: Comparison of intrusions datas, to sort them. */
 static int
 compare_intrusions(const void *p1, const void *p2)
 {

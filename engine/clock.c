@@ -584,7 +584,7 @@ keep_ahead(int color)
 
 
 /* 
- * Modify the level during a game to avoid loosing by time.
+ * Modify the level during a game to avoid losing by time.
  */
 void
 clock_adapt_level(int *p_level, int color)
