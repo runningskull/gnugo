@@ -675,39 +675,46 @@ set_depth_values(int level, int report_levels)
    */
   if (level >= 10)
     depth_level = level - 10;
-  else if (level >= 8)
-    depth_level = level - 9;
+  else if (level == 9)
+    depth_level = 0;
+  else if (level == 8)
+    depth_level = -1;
   else 
     depth_level = level - 8;
 
-  depth               = gg_max(6, DEPTH 	    + depth_level);
-  branch_depth        = gg_max(3, BRANCH_DEPTH	    + depth_level);
-  backfill_depth      = gg_max(2, BACKFILL_DEPTH    + depth_level);
-  backfill2_depth     = gg_max(1, BACKFILL2_DEPTH   + depth_level);
-  break_chain_depth   = gg_max(2, BREAK_CHAIN_DEPTH + depth_level);
+  depth                = gg_max(6, DEPTH 	    + depth_level);
+  branch_depth         = gg_max(3, BRANCH_DEPTH	    + depth_level);
+  backfill_depth       = gg_max(2, BACKFILL_DEPTH    + depth_level);
+  backfill2_depth      = gg_max(1, BACKFILL2_DEPTH   + depth_level);
+  break_chain_depth    = gg_max(2, BREAK_CHAIN_DEPTH + depth_level);
   if (level >= 8)
-    owl_distrust_depth  = gg_max(1, (2 * OWL_DISTRUST_DEPTH + depth_level) / 2);
-  else
-    owl_distrust_depth  = gg_max(1, (2*OWL_DISTRUST_DEPTH-1 + depth_level) / 2);
-  owl_branch_depth    = gg_max(2, (2 * OWL_BRANCH_DEPTH   + depth_level) / 2);
-  owl_reading_depth   = gg_max(5, (2 * OWL_READING_DEPTH  + depth_level) / 2);
+    owl_distrust_depth = gg_max(1, (2 * OWL_DISTRUST_DEPTH + depth_level) / 2);
+  else owl_distrust_depth = 
+      gg_max(1, (2 * OWL_DISTRUST_DEPTH - 1 + depth_level) / 2);
+  owl_branch_depth     = gg_max(2, (2 * OWL_BRANCH_DEPTH   + depth_level) / 2);
+  owl_reading_depth    = gg_max(5, (2 * OWL_READING_DEPTH  + depth_level) / 2);
 
-  /* Atari-atari depth levels are unchanged only between levels 7/8: */
-  if (level >= 8)
-    aa_depth            = gg_max(0, AA_DEPTH        + (level - 10));
+  /* Atari-atari depth levels are unchanged only between levels 7/8, 9/10: */
+  if (level >= 10)
+    aa_depth = gg_max(0, AA_DEPTH + (level - 10));
+  else if (level == 9)
+    aa_depth = gg_max(0, AA_DEPTH);
+  else if (level >= 7)
+    aa_depth = gg_max(0, AA_DEPTH -1);
   else
-    aa_depth            = gg_max(0, AA_DEPTH        + (level - 9));
+    aa_depth = gg_max(0, AA_DEPTH - (8 - level));
 
   /* Exceptions:
    * fourlib_depth: This is constant from levels 7 to 10.
-   * FIXME: ko_depth: jumps strangely at level 7.
-   * superstring_depth: set to 0 below level 10.
+   * superstring_depth: set to 0 below level 8.
    */
   if (level >= 10)
     ko_depth            = gg_max(1, KO_DEPTH + (level - 10));
-  else if (level != 7)
-    ko_depth            = gg_max(1, KO_DEPTH + (level - 9));
-  else /* level == 7 -- FIXME */ 
+  else if (level == 9)
+    ko_depth            = gg_max(1, KO_DEPTH);
+  else if (level >= 7)
+    ko_depth            = gg_max(1, KO_DEPTH - 1);
+  else
     ko_depth            = gg_max(1, KO_DEPTH + (level - 8));
 
   if (level >= 10)
@@ -717,12 +724,14 @@ set_depth_values(int level, int report_levels)
   else
     fourlib_depth       = gg_max(1, FOURLIB_DEPTH + (level - 7));
 
-  if (level >= 10) {
-    superstring_depth   = gg_max(1, SUPERSTRING_DEPTH + (level - 10));
+  if (level >= 8)
+    superstring_depth = gg_max(1, SUPERSTRING_DEPTH);
+  else
+    superstring_depth = 0;
+
+  if (level >= 10)
     owl_node_limit      = OWL_NODE_LIMIT * pow(1.5, depth_level);
-  }
   else {
-    superstring_depth   = 0;
     owl_node_limit      = (OWL_NODE_LIMIT * node_limits[10 - level] /
 			   node_limits[0]);
     owl_node_limit      = gg_max(20, owl_node_limit);
