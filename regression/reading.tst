@@ -821,6 +821,20 @@ loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312130817.sgf 28
 196 attack E8
 #? [1 (H8|E9)]
 
+# See also blunder:30.
+loadsgf games/blunder23.sgf
+197 defend O8
+#? [0]
+
+# See also connection:113 and blunder:24.
+loadsgf games/blunder17.sgf
+trymove B P5
+trymove W L4
+198 attack L5
+#? [0]
+popgo
+popgo
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

@@ -23,7 +23,7 @@ loadsgf games/blunder3.sgf 229
 
 loadsgf games/blunder4.sgf
 4 reg_genmove white
-#? [B5|C5|C4|D4|E4|E3|F3]
+#? [B5|C5|C4|D4|E4|E3|F3|A4|A5]
 
 # This is an "antiblunder". After black A4, white does not have any
 # kind of double threat at C6, which is a simple snapback.
@@ -113,6 +113,7 @@ loadsgf games/blunder16.sgf
 #? [!F4|F5|F6]
 
 # Don't play the outer liberty and let white make seki.
+# See also connection:113 and reading:198.
 loadsgf games/blunder17.sgf
 24 reg_genmove black
 #? [!P5]*
@@ -143,6 +144,7 @@ loadsgf games/blunder22.sgf 5
 29 reg_genmove white
 #? [!(C1|B3)]
 
+# See also reading:197.
 loadsgf games/blunder23.sgf
 30 reg_genmove black
 #? [!O7]*

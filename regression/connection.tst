@@ -398,6 +398,13 @@ trymove B S6
 #? [0]
 popgo
 
+# See also blunder:24 and reading:198.
+loadsgf games/blunder17.sgf
+trymove B P5
+113 disconnect L3 M4
+#? [1 L4]
+popgo
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
