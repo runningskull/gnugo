@@ -382,6 +382,15 @@ loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 38
 110 connect E3 G3
 #? [0]
 
+# See also gunnar:53
+loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 290
+trymove W R18
+trymove B S17
+111 connect O18 R18
+#? [0]
+popgo
+popgo
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

@@ -50,3 +50,23 @@ loadsgf games/nngs/ccwills-gnugo-3.5.2-200312112026.sgf 173
 11 reg_genmove black
 #? [S3]
 
+# H18 is too far to have any effect on the thrashing dragon.
+loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 204
+12 reg_genmove white
+#? [K10]
+
+# G10 is totally inappropriate. F10 is of course locally better but
+# the natural constraining move is P11.
+loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 210
+13 reg_genmove white
+#? [P11]
+
+# N17 more constraining than L18.
+loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 274
+14 reg_genmove white
+#? [N17]
+
+# More valuable to connect P17 and O15.
+loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 278
+15 reg_genmove white
+#? [P16]
