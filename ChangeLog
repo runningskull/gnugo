@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new file engine/unconditional.c added
 - break-in reading tuned
 - safety checks improved for owl defense moves
 - bugfix in find_neighbor_dragons()

@@ -50,6 +50,7 @@ libengine_a_SOURCES = \
       shapes.c \
       showbord.c \
       surround.c \
+      unconditional.c \
       utils.c \
       value_moves.c \
       worm.c
