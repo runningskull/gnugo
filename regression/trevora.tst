@@ -7,7 +7,7 @@
 
 #must not give up ponuki, no matter what!
 loadsgf games/trevor/auto/a001.sgf 8
-100 gg_genmove white
+100 reg_genmove white
 #? [D6]
 
 
@@ -17,11 +17,11 @@ loadsgf games/trevor/auto/a001.sgf 8
 
 # OK, B8 is fine.  Followup is important.  See trevora:121
 #loadsgf games/trevor/auto/a003.sgf 28
-#120 gg_genmove white
+#120 reg_genmove white
 ##? [E7|D8|E8]
 
 loadsgf games/trevor/auto/a003.sgf 30
-121 gg_genmove white
+121 reg_genmove white
 #? [E8]
 
 
@@ -30,7 +30,7 @@ loadsgf games/trevor/auto/a003.sgf 30
 
 #Best not to give up this ponuki.
 loadsgf games/trevor/auto/a004.sgf 10
-130 gg_genmove white
+130 reg_genmove white
 #? [F4]
 
 
@@ -40,7 +40,7 @@ loadsgf games/trevor/auto/a004.sgf 10
 
 #Must connect.
 loadsgf games/trevor/auto/a005.sgf 12
-140 gg_genmove white
+140 reg_genmove white
 #? [G4]
 
 
@@ -50,7 +50,7 @@ loadsgf games/trevor/auto/a005.sgf 12
 
 #Must stay connected.
 loadsgf games/trevor/auto/a006.sgf 12
-150 gg_genmove white
+150 reg_genmove white
 #? [F6]
 
 
@@ -61,7 +61,7 @@ loadsgf games/trevor/auto/a006.sgf 12
 
 #B9 kills.
 loadsgf games/trevor/auto/a007.sgf 25
-170 gg_genmove black
+170 reg_genmove black
 #? [B9]
 
 
@@ -71,7 +71,7 @@ loadsgf games/trevor/auto/a007.sgf 25
 
 #Quite passive.
 loadsgf games/trevor/auto/a008.sgf 10
-180 gg_genmove white
+180 reg_genmove white
 #? [!F3]
 
 
@@ -82,13 +82,13 @@ loadsgf games/trevor/auto/a008.sgf 10
 
 #Can't give up ponuki.
 loadsgf games/trevor/auto/a009.sgf 8
-200 gg_genmove white
+200 reg_genmove white
 #? [E5]
 
 
 #Full point before ko!
 loadsgf games/trevor/auto/a009.sgf 66
-210 gg_genmove white
+210 reg_genmove white
 #? [J8]
 
 
@@ -108,7 +108,7 @@ loadsgf games/trevor/auto/a010.sgf 10
 
 #F2 is bad overplay.
 loadsgf games/trevor/auto/a011.sgf 14
-230 gg_genmove white
+230 reg_genmove white
 #? [G2]
 
 
@@ -118,7 +118,7 @@ loadsgf games/trevor/auto/a011.sgf 14
 
 #Locally, C3 is much better than B3.
 loadsgf games/trevor/auto/a013.sgf 20
-250 gg_genmove white
+250 reg_genmove white
 #? [C3]
 
 
@@ -128,7 +128,7 @@ loadsgf games/trevor/auto/a013.sgf 20
 
 #Punish black's overplay.
 loadsgf games/trevor/auto/a014.sgf 16
-260 gg_genmove white
+260 reg_genmove white
 #? [B4]*
 
 
@@ -141,7 +141,7 @@ loadsgf games/trevor/auto/a014.sgf 16
 #here in the valuations.  The connection should be worth at least as much
 #as the original hane.
 loadsgf games/trevor/auto/a015.sgf 20
-270 gg_genmove white
+270 reg_genmove white
 #? [C4]
 
 
@@ -151,7 +151,7 @@ loadsgf games/trevor/auto/a015.sgf 20
 
 #Locally, E5 better than E4.
 loadsgf games/trevor/auto/a016.sgf 18
-280 gg_genmove white
+280 reg_genmove white
 #? [!E4]
 
 
@@ -160,25 +160,25 @@ loadsgf games/trevor/auto/a016.sgf 18
 # games/trevor/auto/a017.sgf problems:
 
 loadsgf games/trevor/auto/a017.sgf 20
-290 gg_genmove white
+290 reg_genmove white
 #? [!C8]
 
 
 #B8 makes better eye space, at least one point better here, in reverse sente.
 loadsgf games/trevor/auto/a017.sgf 30
-300 gg_genmove white
+300 reg_genmove white
 #? [B8]
 
 
 #E1 is not big enough sente.  D7 threatens whole white group.
 loadsgf games/trevor/auto/a017.sgf 34
-310 gg_genmove white
+310 reg_genmove white
 #? [D7]*
 
 
 #Full point here!
 loadsgf games/trevor/auto/a017.sgf 56
-320 gg_genmove white
+320 reg_genmove white
 #? [F9]
 
 
@@ -188,13 +188,13 @@ loadsgf games/trevor/auto/a017.sgf 56
 
 #Must defend H4 group.
 loadsgf games/trevor/auto/a018.sgf 14
-330 gg_genmove white
+330 reg_genmove white
 #? [G5|H5]
 
 
 #In this shape, G5 is best, not J6.
 loadsgf games/trevor/auto/a018.sgf 18
-340 gg_genmove white
+340 reg_genmove white
 #? [!J6]
 
 
@@ -204,7 +204,7 @@ loadsgf games/trevor/auto/a018.sgf 18
 
 #H3 is terrible.
 loadsgf games/trevor/auto/a019.sgf 6
-350 gg_genmove white
+350 reg_genmove white
 #? [!H3]
 
 
@@ -214,7 +214,7 @@ loadsgf games/trevor/auto/a019.sgf 6
 
 #Break through important
 loadsgf games/trevor/auto/a021.sgf 16
-370 gg_genmove white
+370 reg_genmove white
 #? [F6]*
 
 
@@ -223,7 +223,7 @@ loadsgf games/trevor/auto/a021.sgf 16
 # games/trevor/auto/a022.sgf problems:
 
 loadsgf games/trevor/auto/a022.sgf 42
-380 gg_genmove white
+380 reg_genmove white
 #? [G8|G7]
 
 
@@ -233,7 +233,7 @@ loadsgf games/trevor/auto/a022.sgf 42
 
 #A3 just looses points.
 loadsgf games/trevor/auto/a023.sgf 50
-390 gg_genmove white
+390 reg_genmove white
 #? [A2]
 
 
@@ -243,7 +243,7 @@ loadsgf games/trevor/auto/a023.sgf 50
 
 #Must defend H5 worm.  G6 prob. best.
 loadsgf games/trevor/auto/a024.sgf 12
-400 gg_genmove white
+400 reg_genmove white
 #? [G6|H7]
 
 
@@ -253,7 +253,7 @@ loadsgf games/trevor/auto/a024.sgf 12
 
 #Last chance to invade.
 loadsgf games/trevor/auto/a025.sgf 12
-410 gg_genmove white
+410 reg_genmove white
 #? [!(J7|D1)]*
 
 
@@ -263,7 +263,7 @@ loadsgf games/trevor/auto/a025.sgf 12
 
 #Once you've haned, you've gotta connect.  (Or you shouldn't have haned.)
 loadsgf games/trevor/auto/a026.sgf 16
-420 gg_genmove white
+420 reg_genmove white
 #? [J5]
 
 
@@ -272,7 +272,7 @@ loadsgf games/trevor/auto/a026.sgf 16
 # games/trevor/auto/a027.sgf problems:
 
 loadsgf games/trevor/auto/a027.sgf 40
-430 gg_genmove white
+430 reg_genmove white
 #? [G4]
 
 
@@ -283,7 +283,7 @@ loadsgf games/trevor/auto/a027.sgf 40
 
 #Must defend G3 group.
 loadsgf games/trevor/auto/a029.sgf 14
-450 gg_genmove white
+450 reg_genmove white
 #? [G2|G4]
 
 
@@ -293,7 +293,7 @@ loadsgf games/trevor/auto/a029.sgf 14
 
 #B4, B6 too passive. H8 prob. best.
 loadsgf games/trevor/auto/a030.sgf 22
-460 gg_genmove white
+460 reg_genmove white
 #? [H8]
 
 
@@ -303,14 +303,14 @@ loadsgf games/trevor/auto/a030.sgf 22
 
 #For a ko threat, D3 is better.
 loadsgf games/trevor/auto/a031.sgf 28
-470 gg_genmove white
+470 reg_genmove white
 #? [!E2]*
 
 
 #Sacrificing these two for the rest seems best.
 # See also reading:181.
 loadsgf games/trevor/auto/a031.sgf 40
-480 gg_genmove white
+480 reg_genmove white
 #? [E4]
 
 
@@ -320,7 +320,7 @@ loadsgf games/trevor/auto/a031.sgf 40
 
 #Locally, D2 is best.
 loadsgf games/trevor/auto/a033.sgf 26
-500 gg_genmove white
+500 reg_genmove white
 #? [D2|D1]
 
 
@@ -331,7 +331,7 @@ loadsgf games/trevor/auto/a033.sgf 26
 # Duplicate of trevora:150. /ab
 ##Must connect groups.
 #loadsgf games/trevor/auto/a034.sgf 12
-#510 gg_genmove white
+#510 reg_genmove white
 ##? [F4]*
 
 
@@ -341,13 +341,13 @@ loadsgf games/trevor/auto/a033.sgf 26
 
 #important tesuji
 loadsgf games/trevor/auto/a035.sgf 28
-520 gg_genmove white
+520 reg_genmove white
 #? [B5]
 
 
 #Have to try.
 loadsgf games/trevor/auto/a035.sgf 42
-530 gg_genmove white
+530 reg_genmove white
 #? [H4]*
 
 #Excellect simple semeai problem.
@@ -356,7 +356,7 @@ loadsgf games/trevor/auto/a035.sgf 42
 #? [1]*
 
 loadsgf games/trevor/auto/a035.sgf 50
-540 gg_genmove white
+540 reg_genmove white
 #? [!A1]
 
 
@@ -371,19 +371,19 @@ loadsgf games/trevor/auto/a035.sgf 51
 
 #D4 is huge.  Other moves possible.
 loadsgf games/trevor/auto/a036.sgf 6
-560 gg_genmove white
+560 reg_genmove white
 #? [!B4]
 
 
 #Breaking into black's area is required.
 loadsgf games/trevor/auto/a036.sgf 10
-570 gg_genmove white
+570 reg_genmove white
 #? [!B5]
 
 
 #E6 is bigger, and enough to win.
 loadsgf games/trevor/auto/a036.sgf 26
-580 gg_genmove white
+580 reg_genmove white
 #? [E6]
 
 
@@ -393,7 +393,7 @@ loadsgf games/trevor/auto/a036.sgf 26
 
 #B4 almost always better in this shape.
 loadsgf games/trevor/auto/a037.sgf 12
-600 gg_genmove white
+600 reg_genmove white
 #? [!A5]
 
 
@@ -403,7 +403,7 @@ loadsgf games/trevor/auto/a037.sgf 12
 
 #Enough to win.
 loadsgf games/trevor/auto/a038.sgf 34
-610 gg_genmove white
+610 reg_genmove white
 #? [D2|F2]
 
 
@@ -413,13 +413,13 @@ loadsgf games/trevor/auto/a038.sgf 34
 
 #Kill black corner first.
 loadsgf games/trevor/auto/a039.sgf 12
-620 gg_genmove white
+620 reg_genmove white
 #? [H6]
 
 
 #H7 is just terrible.
 loadsgf games/trevor/auto/a039.sgf 18
-630 gg_genmove white
+630 reg_genmove white
 #? [H6]
 
 
@@ -429,7 +429,7 @@ loadsgf games/trevor/auto/a039.sgf 18
 
 #C8 is an overplay.
 loadsgf games/trevor/auto/a041.sgf 12
-660 gg_genmove white
+660 reg_genmove white
 #? [!C8]
 
 

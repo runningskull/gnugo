@@ -5,50 +5,50 @@ reset_reading_node_counter
 reset_trymove_counter
 
 loadsgf games/strategy1.sgf
-1 gg_genmove white
+1 reg_genmove white
 #? [Q13]
 
 loadsgf games/strategy2.sgf 5
-2 gg_genmove black
+2 reg_genmove black
 #? [!G2|D2]
 
 loadsgf games/strategy2.sgf 9
-3 gg_genmove black
+3 reg_genmove black
 #? [!H1|H2]
 
 loadsgf games/strategy2.sgf 11
-4 gg_genmove black
+4 reg_genmove black
 #? [!F1]
 
 loadsgf games/strategy3.sgf 14
-5 gg_genmove white
+5 reg_genmove white
 #? [R17|P17]
 
 # incident 104
 # Probably requires a dynamic connection analysis to solve.
 loadsgf games/incident104.sgf 63
-6 gg_genmove white
+6 reg_genmove white
 #? [E10]*
 
 # incident 106
 loadsgf games/incident104.sgf 215
-7 gg_genmove white
+7 reg_genmove white
 #? [S19]
 
 # incident 107
 # tm - moved the test out to move 228; at 216, T17 is arguable bigger.
 loadsgf games/incident107.sgf 228
-8 gg_genmove black
+8 reg_genmove black
 #? [N2|N1]
 
 # incident 109
 loadsgf games/incident108b.sgf 172
-9 gg_genmove black
+9 reg_genmove black
 #? [P15]
 
 # incident 110
 loadsgf games/incident108b.sgf 176
-10 gg_genmove black
+10 reg_genmove black
 #? [Q7]
 
 #CATEGORY=BAD_PROBLEM
@@ -61,30 +61,30 @@ loadsgf games/incident108b.sgf 176
 #    best since the 3-3 point is still open. 
 # incident 111
 loadsgf games/incident108b.sgf 178
-11 gg_genmove black
+11 reg_genmove black
 #? [P15]
 
 # incident 112
 # Suboptimal to make eye at L4.
 loadsgf games/incident108b.sgf 270
-12 gg_genmove black
+12 reg_genmove black
 #? [N4]
 
 # incident 113
 loadsgf games/incident108b.sgf 292
-13 gg_genmove black
+13 reg_genmove black
 #? [N18]
 
 # incident 121
 # E9 is not necessarily the best move since upper left weak too.
 # But the game move at R7 is not urgent!
 loadsgf games/incident121.sgf 24
-14 gg_genmove black
+14 reg_genmove black
 #? [E9]
 
 # incident 132
 loadsgf games/incident121.sgf 116
-16 gg_genmove black
+16 reg_genmove black
 #? [H12]
 
 
@@ -98,7 +98,7 @@ loadsgf games/incident121.sgf 116
 # incident 165
 # H10 looks fine - tm
 loadsgf games/incident165.sgf 108
-17 gg_genmove black
+17 reg_genmove black
 #? [N11|H10]
 
 
@@ -112,7 +112,7 @@ loadsgf games/incident165.sgf 142
 #? [E4|F3]
 
 loadsgf games/strategy4.sgf
-19 gg_genmove black
+19 reg_genmove black
 #? [!PASS]
 
 
@@ -122,39 +122,39 @@ loadsgf games/strategy4.sgf
 #    2.7.179: Owl code finds Q11 but it remains undervalued at 17 points.
 # incident 290
 loadsgf games/incident290.sgf 30
-20 gg_genmove black
+20 reg_genmove black
 #? [Q11]
 
 # incident 291
 loadsgf games/incident291.sgf 54
-21 gg_genmove black
+21 reg_genmove black
 #? [S13]
 
 # incident 292
 loadsgf games/incident291.sgf 70
-22 gg_genmove black
+22 reg_genmove black
 #? [K3]
 
 # incident 294
 loadsgf games/incident291.sgf 88
-23 gg_genmove black
+23 reg_genmove black
 #? [!K5]
 
 # incident 295
 # endgame mistake
 loadsgf games/incident291.sgf 250
-24 gg_genmove black
+24 reg_genmove black
 #? [F4]
 
 # Moved to filllib.tst
 # # incident 296
 # # liberty filling mistake
 # loadsgf games/incident291.sgf 274
-# 25 gg_genmove black
+# 25 reg_genmove black
 # #? [PASS]
 
 loadsgf games/strategy5.sgf 12
-26 gg_genmove black
+26 reg_genmove black
 #? [D3]
 
 
@@ -169,58 +169,58 @@ loadsgf games/strategy5.sgf 12
 #    broken.
 #
 loadsgf games/strategy5.sgf 14
-27 gg_genmove black
+27 reg_genmove black
 #? [C3]
 
 loadsgf games/strategy5.sgf 20
-28 gg_genmove black
+28 reg_genmove black
 #? [!F2]
 
 loadsgf games/strategy5.sgf 40
-29 gg_genmove black
+29 reg_genmove black
 #? [R4]*
 
 loadsgf games/strategy5.sgf 44
-30 gg_genmove black
+30 reg_genmove black
 #? [!T7]
 
 # This is a problem with the semeai analyzer and revise_semeai().
 # But there is no semeai.
 loadsgf games/strategy6.sgf 274
-31 gg_genmove black
+31 reg_genmove black
 #? [!(K19|D17|E16|E15)]
 
 loadsgf games/strategy7.sgf 23
-32 gg_genmove black
+32 reg_genmove black
 #? [A4]
 
 loadsgf games/strategy8.sgf 283
-33 gg_genmove white
+33 reg_genmove white
 #? [O7]
 
 loadsgf games/nicklas/nicklas8.sgf 72
-34 gg_genmove black
+34 reg_genmove black
 #? [E17]*
 
 loadsgf games/nicklas/nicklas8.sgf 80
-35 gg_genmove black
+35 reg_genmove black
 #? [!B17]
 
 loadsgf games/nicklas/nicklas8.sgf 82
-36 gg_genmove black
+36 reg_genmove black
 #? [!D18]
 
 loadsgf games/nicklas/nicklas8.sgf 84
-37 gg_genmove black
+37 reg_genmove black
 #? [!A17|A18|C19]
 
 # The life code solves this mistake.
 loadsgf games/nicklas/nicklas8.sgf 86
-38 gg_genmove black
+38 reg_genmove black
 #? [!B19]
 
 loadsgf games/nicklas/nicklas8.sgf 96
-39 gg_genmove black
+39 reg_genmove black
 #? [P16]
 
 
@@ -233,7 +233,7 @@ loadsgf games/nicklas/nicklas8.sgf 96
 #    large followup value is responsible.
 # I disagree. M11 makes territory while attacking. -arend
 loadsgf games/nicklas/nicklas8.sgf 98
-40 gg_genmove black
+40 reg_genmove black
 #? [E5|M11]*
 
 
@@ -251,16 +251,16 @@ loadsgf games/nicklas/nicklas8.sgf 98
 #    to N16.
 #
 loadsgf games/nicklas/nicklas8.sgf 106
-41 gg_genmove black
+41 reg_genmove black
 #? [N16]*
 
 loadsgf games/strategy9.sgf 232
-42 gg_genmove black
+42 reg_genmove black
 #? [C17]
 
 # A14 works but is inferior shape since it leaves more ko threats.
 loadsgf games/strategy10.sgf
-43 gg_genmove white
+43 reg_genmove white
 #? [B13|B14|A14]
 
 #CATEGORY=STRATEGY
@@ -282,32 +282,32 @@ loadsgf games/strategy10.sgf
 #
 # See also reading:158
 loadsgf games/strategy11.sgf 77
-44 gg_genmove black
+44 reg_genmove black
 #? [G2]*
 
 # G17/G18 and C1 are both huge.
 loadsgf games/strategy11.sgf 127
-45 gg_genmove black
+45 reg_genmove black
 #? [G17|G18|C1]
 
 loadsgf games/strategy11.sgf 245
-46 gg_genmove black
+46 reg_genmove black
 #? [E1]
 
 loadsgf games/strategy12.sgf 9
-47 gg_genmove black
+47 reg_genmove black
 #? [!N17]
 
 #CATEGORY=FUSEKI_STRATEGY
 #DESCRIPTION=B17 better than D17
 #SEVERITY=3
 loadsgf games/strategy12.sgf 19
-48 gg_genmove black
+48 reg_genmove black
 #? [B17]*
 
 loadsgf games/strategy12.sgf 21
 # D16 is the strongest but these are acceptable
-49 gg_genmove black
+49 reg_genmove black
 #? [C17|D16|B17]*
 
 
@@ -318,7 +318,7 @@ loadsgf games/strategy12.sgf 21
 # along the edge.
 # So much better, that I removed Q11 option -trevor
 loadsgf games/strategy13.sgf
-50 gg_genmove white
+50 reg_genmove white
 #? [Q9]
 
 

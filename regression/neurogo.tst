@@ -9,86 +9,86 @@ reset_reading_node_counter
 reset_trymove_counter
 
 loadsgf games/FSF-neurogo.sgf 20
-1 gg_genmove white
+1 reg_genmove white
 #? [Q3]
 
 loadsgf games/FSF-neurogo.sgf 22
-2 gg_genmove white
+2 reg_genmove white
 #? [R3]
 
 loadsgf games/FSF-neurogo.sgf 34
-3 gg_genmove white
+3 reg_genmove white
 #? [H3|K3|K4]
 
 # Tenuki is acceptable. In the local area the game move is bad.
 loadsgf games/FSF-neurogo.sgf 40
-4 gg_genmove white
+4 reg_genmove white
 #? [D6]*
 
 loadsgf games/FSF-neurogo.sgf 50
-5 gg_genmove white
+5 reg_genmove white
 #? [!F8]
 
 # Tenuki is perhaps acceptable.
 loadsgf games/FSF-neurogo.sgf 86
-6 gg_genmove white
+6 reg_genmove white
 #? [C14]*
 
 loadsgf games/FSF-neurogo.sgf 90
-7 gg_genmove white
+7 reg_genmove white
 #? [O2]*
 
 loadsgf games/FSF-neurogo.sgf 92
-8 gg_genmove white
+8 reg_genmove white
 #? [O2]
 
 loadsgf games/FSF-neurogo.sgf 124
-9 gg_genmove white
+9 reg_genmove white
 #? [A18]*
 
 loadsgf games/FSF-neurogo.sgf 136
-10 gg_genmove white
+10 reg_genmove white
 #? [!A3]
 
 # Semeai problem.
 loadsgf games/FSF-neurogo.sgf 148
-11 gg_genmove white
+11 reg_genmove white
 #? [N5]*
 
 loadsgf games/FSF-neurogo.sgf 152
-12 gg_genmove white
+12 reg_genmove white
 #? [B10]*
 
 loadsgf games/FSF-neurogo.sgf 176
 # This may be hard to fix at this point but since we
 # can't win the ko we shouldn't start it.
-13 gg_genmove white
+13 reg_genmove white
 #? [!P7]
 
 loadsgf games/FSF-neurogo.sgf 178
-14 gg_genmove white
+14 reg_genmove white
 #? [Q4]*
 
 # White A16 is about three points reverse sente. G19 is two points
 # double sente, but black can get in A16 in sente before answering
 # G19. We accept both moves as being correct.
 loadsgf games/FSF-neurogo.sgf 230
-15 gg_genmove white
+15 reg_genmove white
 #? [A16|G19]
 
 # It doesn't look like black can live, so this would only be a
 # reinforcing move. It may not be worth regressing over.
 loadsgf games/FSF-neurogo.sgf 276
-16 gg_genmove white
+16 reg_genmove white
 #? [H17|K17|H15|L16]
 
 loadsgf games/FSF-neurogo.sgf 286
 # K19 makes ko. H18 kills right out.
-17 gg_genmove white
+17 reg_genmove white
 #? [H18]
 
 loadsgf games/FSF-neurogo.sgf 288
-18 gg_genmove white
+18 reg_genmove white
 #? [K19|H18|K16]
 
 # Move 12
@@ -100,7 +100,7 @@ loadsgf games/FSF-neurogo.sgf 12
 #? [1 S16]
 20 owl_defend Q17
 #? [1 S16]
-21 gg_genmove white
+21 reg_genmove white
 #? [S16]
 
 # Move 18
@@ -135,7 +135,7 @@ loadsgf games/FSF-neurogo.sgf 96
 #? [1 (PASS|B17)]
 27 owl_defend B16
 #? [0]
-28 gg_genmove white
+28 reg_genmove white
 #? [O2]
 
 ############ End of Tests #################

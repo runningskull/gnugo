@@ -7,7 +7,7 @@ reset_trymove_counter
 # Apparently, T9 gets overvalued because the effect on S7 and T6 is
 # counted twice (territorially and strategically)
 loadsgf games/tactics05.sgf
-10 gg_genmove white
+10 reg_genmove white
 #? [!T9]
 
 loadsgf games/tactics06.sgf
@@ -16,7 +16,7 @@ loadsgf games/tactics06.sgf
 
 # J1 is worth 6 points
 loadsgf games/seki03.sgf
-30 gg_genmove white
+30 reg_genmove white
 #? [J1]*
 
 
@@ -57,15 +57,15 @@ popgo
 # hand, since G13 is judged owl-defenseless, it seems to me
 # that C9 is strangely overvalued.
 loadsgf games/tactics07.sgf
-105 gg_genmove white
+105 reg_genmove white
 #? [F7]
 
 loadsgf games/tactics08.sgf
-106 gg_genmove white
+106 reg_genmove white
 #? [F8|F6]*
 
 loadsgf games/edge_defense1.sgf
-107 gg_genmove white
+107 reg_genmove white
 #? [B13|B14]
 
 

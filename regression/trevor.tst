@@ -1,13 +1,13 @@
 #terrible connection mistake.
 loadsgf games/trevor/trevor_01.sgf 28
-1 gg_genmove white
+1 reg_genmove white
 #? [G5]
 
 #probably a screwed up fuseki library!
 #CATEGORY=JOSEKI_DATABASE
 #DIFFICULTY=1
 loadsgf games/trevor/trevor_02.sgf
-2 gg_genmove white
+2 reg_genmove white
 #? [!PASS]
 
 # underlying reading problem
@@ -38,12 +38,12 @@ loadsgf games/trevor/trevor_02.sgf
 #DIFFICULTY=8
 #PREDECESSOR=reading.tst.154
 loadsgf games/trevor/trevor_03.sgf 28
-3 gg_genmove white
+3 reg_genmove white
 #? [!E3]
 
 #simple edge block missed.
 loadsgf games/trevor/trevor_04.sgf 30
-4 gg_genmove white
+4 reg_genmove white
 #? [G1]
 
 #E5 is the only move.  Is GNU Go playing somewhat randomly here?
@@ -83,12 +83,12 @@ loadsgf games/trevor/trevor_04.sgf 30
 #CATEGORY=JOSEKI_DATABASE
 #DIFFICULTY=8
 loadsgf games/trevor/trevor_05.sgf 6
-5 gg_genmove white
+5 reg_genmove white
 #? [E5]
 
 #locally B9 is terrible.  There are other big moves on the board.
 loadsgf games/trevor/trevor_06.sgf 22
-6 gg_genmove white
+6 reg_genmove white
 #? [B7|C6|F5]
 
 #B5 is certainly better than C5 here.  This is a terrible
@@ -99,12 +99,12 @@ loadsgf games/trevor/trevor_06.sgf 22
 #CATEGORY=OWL_TUNING
 #DIFFICULTY=6
 loadsgf games/trevor/trevor_07.sgf 32
-7 gg_genmove white
+7 reg_genmove white
 #? [!C5]
 
 #Pattern missing here?  B8 is almost always better than B9.
 loadsgf games/trevor/trevor_08.sgf 24
-8 gg_genmove white
+8 reg_genmove white
 #? [!B9]
 
 #E5 (or some defence of D4 worm) is necessary.
@@ -113,43 +113,43 @@ loadsgf games/trevor/trevor_08.sgf 24
 #See also connection:21,22.
 #CATEGORY=DYNAMIC_CONNECTION
 loadsgf games/trevor/trevor_09.sgf
-9 gg_genmove white
+9 reg_genmove white
 #? [E5]*
 
 #This is nearly trivial, it would seem!
 loadsgf games/trevor/trevor_10.sgf
-10 gg_genmove white
+10 reg_genmove white
 #? [E6]
 
 #Yikes, gnugo can't play into here.  See also the next problem.
 loadsgf games/trevor/trevor_11.sgf
-11 gg_genmove white
+11 reg_genmove white
 #? [!B2]*
 
 #J2 is terrible.  H1 leads at least to a Ko.
 loadsgf games/trevor/trevor_12.sgf
-12 gg_genmove black
+12 reg_genmove black
 #? [H1]
 
 #E2 is obvious.
 loadsgf games/trevor/trevor_13.sgf
-13 gg_genmove black
+13 reg_genmove black
 #? [E2]
 
 #Must protect double cut at C2 & E2
 loadsgf games/trevor/trevor_14.sgf
-14 gg_genmove white
+14 reg_genmove white
 #? [!PASS]
 
 #protecting at E7 is very necessary.
 loadsgf games/trevor/trevor_15.sgf 
-15 gg_genmove white
+15 reg_genmove white
 #? [E7]
 
 # C1 looks best here.  A7 very unorthodox, and at least
 # worse for ko threats.
 loadsgf games/trevor/trevor_16.sgf 53
-160 gg_genmove black
+160 reg_genmove black
 #? [!A7]
 
 
@@ -161,83 +161,83 @@ loadsgf games/trevor/trevor_16.sgf 54
 # W can live here unconditionally.
 # A2 is inferior as black gets seki with B1. /ab
 loadsgf games/trevor/trevor_16.sgf 58
-162 gg_genmove white
+162 reg_genmove white
 #? [B1]*
 
 # If Black B9, White can't connect at C7.
 loadsgf games/trevor/trevor_16.sgf 67
-163 gg_genmove black
+163 reg_genmove black
 #? [B9]
 
 # Must connect dragons.
 # B6 should be valued much much lower than B5
 loadsgf games/trevor/trevor_17.sgf 22
-170 gg_genmove white
+170 reg_genmove white
 #? [B5]
 
 # C8 is terrible.
 loadsgf games/trevor/trevor_17.sgf 28
-171 gg_genmove white
+171 reg_genmove white
 #? [!C8]
 
 # Snapback!
 loadsgf games/trevor/trevor_18.sgf 32
-180 gg_genmove white
+180 reg_genmove white
 #? [!A8]
 
 # Whoops, don't let go of the dragon's tail!
 loadsgf games/trevor/trevor_19.sgf 12
-190 gg_genmove white
+190 reg_genmove white
 #? [B7]
 
 # W should connect his two dragons.
 loadsgf games/trevor/trevor_20.sgf 14
-200 gg_genmove white
+200 reg_genmove white
 #? [D7|D4]
 
 # W can live on the right pretty easily (i.e. G8)
 loadsgf games/trevor/trevor_20.sgf
-201 gg_genmove white
+201 reg_genmove white
 #? [!PASS]
 
 # W can live on the right pretty easily (i.e. G8)
 # Black really does pass here, but eval.sh reports a PASSED result. (?)
 loadsgf games/trevor/trevor_20.sgf
-202 gg_genmove black
+202 reg_genmove black
 #? [!PASS]
 
 # Huge negative sacrifice at D8.
 loadsgf games/trevor/trevor_21.sgf 22
-210 gg_genmove white
+210 reg_genmove white
 #? [!D8]
 
 # In this case, the knight's move connection looks best.
 # Black seems not to see the cut coming.
 loadsgf games/trevor/trevor_22.sgf 23
-220 gg_genmove black
+220 reg_genmove black
 #? [E8]
 
 # F2 is not really sente, nor useful if it were!
 loadsgf games/trevor/trevor_23.sgf 27
-230 gg_genmove black
+230 reg_genmove black
 #? [C2|B2|C4]
 
 
 # Connect the dragons!  One eye is not enough, anyway.
 # See also owl.tst 221
 loadsgf games/trevor/trevor_24.sgf 33
-240 gg_genmove black
+240 reg_genmove black
 #? [E8|D8]
 
 
 # G2 is a gift to white.
 loadsgf games/trevor/trevor_25.sgf 31
-250 gg_genmove black
+250 reg_genmove black
 #? [!G2]
 
 # G1 is another gift to white.
 loadsgf games/trevor/trevor_25.sgf 33
-251 gg_genmove black
+251 reg_genmove black
 #? [!G1]
 
 
@@ -247,7 +247,7 @@ loadsgf games/trevor/trevor_25.sgf 33
 #  Move at C1 strategically or tactically unsafe
 #  Move at F9 strategically or tactically unsafe
 loadsgf games/trevor/trevor_26.sgf 33
-260 gg_genmove black
+260 reg_genmove black
 #? [C1|F9]*
 
 #Here's the problem:
@@ -257,7 +257,7 @@ loadsgf games/trevor/trevor_26.sgf 33
 #Checking safety of a black move at F9
 #Move at F9 would be a blunder.
 loadsgf games/trevor/trevor_26.sgf 39
-261 gg_genmove black
+261 reg_genmove black
 #? [F9]
 
 loadsgf games/trevor/trevor_26.sgf 33
@@ -274,40 +274,40 @@ popgo
 
 # Ack, protect the cut!
 loadsgf games/trevor/trevor_27.sgf 35
-270 gg_genmove black
+270 reg_genmove black
 #? [E6|D6]
 
 
 # D5 misses a big problem cut.
 loadsgf games/trevor/trevor_28.sgf 27
-280 gg_genmove black
+280 reg_genmove black
 #? [D4]
 
 # F6 is much better and safer to boot than H6.
 # culprit seems to be pattern LE4 (matches H6) - min. value 12.
 # Perhaps need to replace H6 w/ F6?
 loadsgf games/trevor/trevor_28.sgf 36
-281 gg_genmove white
+281 reg_genmove white
 #? [F6]
 
 
 
 # Yikes, short of liberties!
 loadsgf games/trevor/trevor_29.sgf 54
-290 gg_genmove white
+290 reg_genmove white
 #? [!A9]*
 
 
 # Black A7 is a serious threat.  Also, white should at least 
 # try to invade.
 loadsgf games/trevor/trevor_30.sgf
-300 gg_genmove white
+300 reg_genmove white
 #? [!PASS]
 
 # Black A7 is a serious threat.  Also, white should at least 
 # try to invade.
 loadsgf games/trevor/trevor_30.sgf
-301 gg_genmove black
+301 reg_genmove black
 #? [!PASS]
 
 #CATEGORY=TACTICAL_READING
@@ -315,19 +315,19 @@ loadsgf games/trevor/trevor_30.sgf
 #SEVERITY=6
 loadsgf games/trevor/trevor_30.sgf
 black G3
-302 gg_genmove white
+302 reg_genmove white
 #? [!PASS]*
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=Black still dead after D1!
 #SEVERITY=10
 loadsgf games/trevor/trevor_31.sgf
-310 gg_genmove black
+310 reg_genmove black
 #? [A8]
 
 
 loadsgf games/trevor/trevor_32.sgf
-320 gg_genmove black
+320 reg_genmove black
 #? [J2|H3]
 
 #duplicate of trevor:340
@@ -370,7 +370,7 @@ loadsgf games/trevor/trevor_37.sgf
 #DESCRIPTION=E3 is certainly better locally
 #SEVERITY=2
 loadsgf games/trevor/trevor_38.sgf 22
-380 gg_genmove white
+380 reg_genmove white
 #? [!E4]
 
 #CATEGORY=READING
@@ -378,14 +378,14 @@ loadsgf games/trevor/trevor_38.sgf 22
 #SEVERITY=3
 # Added E8. /gf
 loadsgf games/trevor/trevor_38.sgf 39
-381 gg_genmove black
+381 reg_genmove black
 #? [D7|C7|E8]
 
 #CATEGORY=KO_THREATS
 #DESCRIPTION=E9 is terrible for leaving Ko threats.
 #SEVERITY=1
 loadsgf games/trevor/trevor_38.sgf 41
-382 gg_genmove black
+382 reg_genmove black
 #? [E8]
 
 
@@ -393,7 +393,7 @@ loadsgf games/trevor/trevor_38.sgf 41
 #DESCRIPTION=White misses cut.
 #SEVERITY=10
 loadsgf games/trevor/trevor_39.sgf 38
-390 gg_genmove white
+390 reg_genmove white
 #? [!PASS]
 
 
@@ -401,21 +401,21 @@ loadsgf games/trevor/trevor_39.sgf 38
 #DESCRIPTION=F8 is tough to find, but not too tough.
 #SEVERITY=3
 loadsgf games/trevor/trevor_40.sgf 1
-400 gg_genmove black
+400 reg_genmove black
 #? [F8]
 
 #CATEGORY=
 #DESCRIPTION=White can live!
 #SEVERITY=4
 loadsgf games/trevor/trevor_40a.sgf 2
-401 gg_genmove white
+401 reg_genmove white
 #? [F8]
 
 #CATEGORY=
 #DESCRIPTION=White can live!
 #SEVERITY=8
 loadsgf games/trevor/trevor_40.sgf 2
-402 gg_genmove white
+402 reg_genmove white
 #? [!PASS]
 
 
@@ -423,21 +423,21 @@ loadsgf games/trevor/trevor_40.sgf 2
 #DESCRIPTION=Black should block, not play B4.
 #SEVERITY=5
 loadsgf games/trevor/trevor_41.sgf 29
-410 gg_genmove black
+410 reg_genmove black
 #? [D5|E5]
 
 #CATEGORY=BLUNDER
 #DESCRIPTION=A3 leaves behind a double-atari.
 #SEVERITY=10
 loadsgf games/trevor/trevor_41.sgf 35
-411 gg_genmove black
+411 reg_genmove black
 #? [!A3]
 
 #CATEGORY=TACTICAL_READING
 #DESCRIPTION=D4 worm is more important to save than B2.
 #SEVERITY=3
 loadsgf games/trevor/trevor_41.sgf 37
-412 gg_genmove black
+412 reg_genmove black
 #? [C4]
 
 #CATEGORY=KO
@@ -450,14 +450,14 @@ loadsgf games/trevor/trevor_41.sgf 37
 #  Attachment is the SGF file.
 # gf Added A18 and A16 as acceptable moves. (3.3.16)
 loadsgf games/trevor/trevor_42.sgf 211
-420 gg_genmove black
+420 reg_genmove black
 #? [G16|A18|A16]
 
 #CATEGORY=TACTICAL_READING
 #DESCRIPTION=Minus 1 point, attacking very dead stone.
 #SEVERITY=10
 loadsgf games/trevor/trevor_42.sgf 191
-421 gg_genmove black
+421 reg_genmove black
 #? [!C2]
 
 
@@ -473,7 +473,7 @@ loadsgf games/trevor/trevor_43.sgf
 #SEVERITY=4
 #Note that owl_attack on E3 works, as these stones are treated
 #as separate dragons.  Strange.  Is this a valid test?
-#So, gg_genmove defends appropriately.
+#So, reg_genmove defends appropriately.
 loadsgf games/trevor/trevor_44.sgf
 440 owl_attack E6
 #? [1 (F4|F5|E4)]
@@ -495,7 +495,7 @@ loadsgf games/trevor/trevor_46.sgf
 #? [1 E14]
 
 #SEE_ALSO trevor:460
-461 gg_genmove black
+461 reg_genmove black
 #? [E14]
 
 
@@ -517,7 +517,7 @@ loadsgf games/trevor/trevor_47.sgf
 #SEVERITY=3
 #Shouldn't the move valuator include counting of the eye spaces?
 loadsgf games/trevor/trevor_48.sgf
-480 gg_genmove black
+480 reg_genmove black
 #? [C9]
 
 #CATEGORY=owl_tuning
@@ -669,13 +669,13 @@ loadsgf games/trevor/trevor_20.sgf  14
 
 
 loadsgf games/nngs/theDoor-gnugo-3.3.11-200211130142.sgf 72
-1100 gg_genmove black
+1100 reg_genmove black
 #? [D15]*
 
 #Bad pattern Shape55
 #Fixed with revised constraint:
 #   ;weak(a) && oplay_defend(*,B)
 loadsgf games/nngs/theDoor-gnugo-3.3.11-200211130142.sgf 208
-1110 gg_genmove black
+1110 reg_genmove black
 #? [O12]
 

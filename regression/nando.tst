@@ -4,7 +4,7 @@
 # reducing move.
 #CATEGORY=STRATEGY
 loadsgf games/nando/auto001.sgf
-1 gg_genmove white
+1 reg_genmove white
 #? [M12|N11]*
 
 # Uh ?!
@@ -33,9 +33,9 @@ loadsgf games/nando/auto005.sgf
 
 #CATEGORY=ATARI_ATARI
 loadsgf games/nando/auto006.sgf
-7 gg_genmove black
+7 reg_genmove black
 #? [N16]
-8 gg_genmove white
+8 reg_genmove white
 #? [M16|N16]
 
 # Beware of the double snapback.
@@ -43,7 +43,7 @@ loadsgf games/nando/auto006.sgf
 loadsgf games/nando/auto007.sgf
 white A1
 black B5
-9 gg_genmove white
+9 reg_genmove white
 #? [E1|E2|F1|G1|G2]
 
 # GG (as of 3.3.15) doesn't even try a single move. On the other
@@ -74,20 +74,20 @@ loadsgf games/nando/auto011.sgf
 # W should better counter-attack
 #CATEGORY=CONNECTION
 loadsgf games/nando/auto012.sgf 90
-14 gg_genmove white
+14 reg_genmove white
 #? [P7]*
 
 # Still the better choice, S7 only strengthens B.
 #CATEGORY=CONNECTION
 loadsgf games/nando/auto012.sgf 92
-15 gg_genmove white
+15 reg_genmove white
 #? [P7]*
 
 # D5 is just stupid
 # (but A5 doesn't work. /ab)
 #CATEGORY=OWL
 loadsgf games/nando/auto012.sgf 124
-17 gg_genmove white
+17 reg_genmove white
 #? [B4|B5]*
 
 # Non-transitivity problem.
@@ -103,14 +103,14 @@ loadsgf games/nando/auto013.sgf
 #CATEGORY=ATARI_ATARI
 loadsgf games/nando/auto014.sgf
 black S16
-20 gg_genmove white
+20 reg_genmove white
 #? [S8|S9|T12]
 # With another move ordering
 loadsgf games/nando/auto014.sgf
 black S8
 white T9
 black S16
-21 gg_genmove white
+21 reg_genmove white
 #? [S9|T12]
 
 # Another non-transitivity problem.
@@ -130,7 +130,7 @@ loadsgf games/nando/auto016.sgf
 loadsgf games/nando/auto017.sgf
 white A8
 black A10
-25 gg_genmove white
+25 reg_genmove white
 #? [!P16]
 
 # Another lunch "mirage" at N16/O15.
@@ -142,7 +142,7 @@ loadsgf games/nando/auto018.sgf
 # Move valuation looks way off. No idea what is happening here.
 #CATEGORY=?
 loadsgf games/nando/auto019.sgf
-27 gg_genmove white
+27 reg_genmove white
 #? [D6]*
 
 # Non-transitivity problem (or is it ok to amalgamate by ko ?)
@@ -178,7 +178,7 @@ loadsgf games/nando/meijin27_g1.sgf 105
 # connect to strong dragons, so it isn't urgent to do it now.
 #CATEGORY=STRATEGY
 loadsgf games/nando/meijin27_g1.sgf 186
-112 gg_genmove white
+112 reg_genmove white
 #? [!P7]
 
 #--------------------------------------------------------------
@@ -218,19 +218,19 @@ black P4
 # C4 should be played only when W already has a stone around D10
 #CATEGORY=FUSEKI
 loadsgf games/nando/kisei27_g1.sgf 14
-210 gg_genmove white
+210 reg_genmove white
 #? [D3]*
 
 # D5 is exceedingly urgent. GG should _never_ tenuki !
 #CATEGORY=FUSEKI
 loadsgf games/nando/kisei27_g1.sgf 16
-211 gg_genmove white
+211 reg_genmove white
 #? [D5]*
 
 # Connection is mandatory.
 #CATEGORY=FUSEKI
 loadsgf games/nando/kisei27_g1.sgf 20
-212 gg_genmove white
+212 reg_genmove white
 #? [E3]*
 
 #CATEGORY=CONNECTION

@@ -2,5 +2,5 @@
 
 orientation 1
 loadsgf games/nicklas/nicklas8.sgf 72
-34 gg_genmove black
+34 reg_genmove black
 #? [E17]*

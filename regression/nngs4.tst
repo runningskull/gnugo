@@ -6,28 +6,28 @@ reset_trymove_counter
 
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 10
-10 gg_genmove white
+10 reg_genmove white
 #? [E18]
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 26
-20 gg_genmove white
+20 reg_genmove white
 #? [Q4|Q6]
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 36
-30 gg_genmove white
+30 reg_genmove white
 #? [C5|C6]
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 46
-40 gg_genmove white
+40 reg_genmove white
 #? [H3|F4]*
 
 # upper left needs attention
 loadsgf games/nngs/evand-gnugo-3.3.11-200211151742.sgf 12
-50 gg_genmove black
+50 reg_genmove black
 #? [J17|E14|F15|C18|B18]*
 
 loadsgf games/nngs/evand-gnugo-3.3.11-200211151742.sgf 16
-60 gg_genmove black
+60 reg_genmove black
 #? [E14|B18|C18|G18]*
 
 loadsgf games/nngs/evand-gnugo-3.3.11-200211151742.sgf 142
@@ -39,23 +39,23 @@ loadsgf games/nngs/gnugo-3.3.12-jimm-200211261724.sgf 20
 #? [J6]*
 
 loadsgf games/nngs/gnugo-3.3.12-jimm-200211261724.sgf 170
-90 gg_genmove white
+90 reg_genmove white
 #? [D12|C11|E14|B12]
 
 loadsgf games/nngs/leftd-gnugo-3.3.12-200211292017.sgf 184
-100 gg_genmove black
+100 reg_genmove black
 #? [F18|G18]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 24
-110 gg_genmove black
+110 reg_genmove black
 #? [D17]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 38
-120 gg_genmove black
+120 reg_genmove black
 #? [C13]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 40
-130 gg_genmove black
+130 reg_genmove black
 #? [E14]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 60
@@ -63,53 +63,53 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 60
 #? [R5|R4]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 94
-150 gg_genmove black
+150 reg_genmove black
 #? [N3|M3]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 100
-160 gg_genmove black
+160 reg_genmove black
 #? [K8|L8]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 168
-170 gg_genmove black
+170 reg_genmove black
 #? [S6]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 184
-190 gg_genmove black
+190 reg_genmove black
 #? [T8]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 192
-200 gg_genmove black
+200 reg_genmove black
 #? [T6]
 
 # Make a ko threat. How about T8 or T10?
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 202
-210 gg_genmove black
+210 reg_genmove black
 #? [!S5]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 204
-220 gg_genmove black
+220 reg_genmove black
 #? [!T2]
 
 # Kill the whole thing, not just a piece.
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 222
-230 gg_genmove black
+230 reg_genmove black
 #? [Q18]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 242
-240 gg_genmove black
+240 reg_genmove black
 #? [B4]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 246
-250 gg_genmove black
+250 reg_genmove black
 #? [F7]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 258
-260 gg_genmove black
+260 reg_genmove black
 #? [A4]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 292
-270 gg_genmove black
+270 reg_genmove black
 #? [!P5]
 
 loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 32
@@ -137,11 +137,11 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 76
 #? [D2]
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 102
-350 gg_genmove black
+350 reg_genmove black
 #? [H10]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 110
-360 gg_genmove black
+360 reg_genmove black
 #? [M10]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 120
@@ -149,7 +149,7 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 120
 #? [0]
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 128
-380 gg_genmove black
+380 reg_genmove black
 #? [J7|K8]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 138
@@ -165,12 +165,12 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 174
 #? [E1]*
 
 loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 65
-420 gg_genmove black
+420 reg_genmove black
 #? [G6]*
 
 # G12 allows white to live.
 loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 185
-430 gg_genmove black
+430 reg_genmove black
 #? [H10|G9|G10|G11|M6|L7|K7]*
 
 loadsgf games/nngs/juka-gnugo-3.3.16-200303031959.sgf 20
@@ -178,15 +178,15 @@ loadsgf games/nngs/juka-gnugo-3.3.16-200303031959.sgf 20
 #? [E6]
 
 loadsgf games/nngs/juka-gnugo-3.3.16-200303031959.sgf 92
-450 gg_genmove black
+450 reg_genmove black
 #? [O8]*
 
 loadsgf games/nngs/juka-gnugo-3.3.16-200303031959.sgf 204
-460 gg_genmove black
+460 reg_genmove black
 #? [N10]*
 
 loadsgf games/nngs/looknglass-ggl-200302271041.sgf 99
-470 gg_genmove black
+470 reg_genmove black
 #? [R8]
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 6
@@ -198,11 +198,11 @@ loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 12
 #? [D17]*
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 28
-487 gg_genmove black
+487 reg_genmove black
 #? [P12]*
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 38
-490 gg_genmove black
+490 reg_genmove black
 #? [M14|N17|M16]*
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 52
@@ -215,11 +215,11 @@ loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 54
 #? [!J8|J9]
 
 loadsgf games/nngs/gnugo-3.3.17-ylamaki-200303262305.sgf 9
-530 gg_genmove white
+530 reg_genmove white
 #? [Q2]*
 
 loadsgf games/nngs/gnugo-3.3.17-ylamaki-200303262305.sgf 11
-540 gg_genmove white
+540 reg_genmove white
 #? [Q2]*
 
 # New failure (3.3.18)
@@ -234,46 +234,46 @@ loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 66
 
 # New failure (3.3.18)
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 86
-570 gg_genmove white
+570 reg_genmove white
 #? [F6]
 
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 88
-580 gg_genmove white
+580 reg_genmove white
 #? [E5]*
 
 loadsgf games/nngs/qly-gnugo-3.3.18-200305022134.sgf 70
-590 gg_genmove black
+590 reg_genmove black
 #? [E2]*
 
 #New failure (3.3.20)
 #gnugo should do something about the O11 dragon
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 124
-600 gg_genmove white
+600 reg_genmove white
 #? [L9|L12|L10]*
 
 #New failure (3.3.20)
 #C13 looks correct here /evand
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 144
-610 gg_genmove white
+610 reg_genmove white
 #? [C13|D13]
 
 #New failure (3.3.20)
 #pull out the stones /evand
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 152
-620 gg_genmove white
+620 reg_genmove white
 #? [G13|G14]*
 
 loadsgf games/nngs/evand-gnugo-3.3.21-200306130638.sgf 156
-630 gg_genmove black
+630 reg_genmove black
 #? [B6]*
 
 #unneeded.  Take a big point somewhere.
 loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 16
-640 gg_genmove black
+640 reg_genmove black
 #? [!R7]*
 
 loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 42
-650 gg_genmove black
+650 reg_genmove black
 #? [Q2]*
 
 

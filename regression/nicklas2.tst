@@ -22,7 +22,7 @@ reset_trymove_counter
 #    perhaps see it, but we are still far from that.  I think this test
 #    should be in nicklas3.tst (harder problems).
 loadsgf games/nicklas/nicklas1.sgf 29
-102 gg_genmove black
+102 reg_genmove black
 #? [D4]*
 
 #CATEGORY=PATTERN_TUNING
@@ -34,7 +34,7 @@ loadsgf games/nicklas/nicklas1.sgf 29
 #    a sacrifice and the capture happens through a chain of threats.
 #Added E6, still not thinking G9 is so bad. -trevor
 loadsgf games/nicklas/nicklas6.sgf 23
-601 gg_genmove black
+601 reg_genmove black
 #? [D8|C8|D6|D4|E6]
 
 #CATEGORY=SEMEAI_MODULE
@@ -45,7 +45,7 @@ loadsgf games/nicklas/nicklas6.sgf 23
 #I disagree; this it tough; a more clear-cut test case would be helpful
 #to better isolate the inherent problem. - trevor
 loadsgf games/nicklas/nicklas7.sgf 29
-701 gg_genmove black
+701 reg_genmove black
 #? [F1]*
 
 
@@ -68,15 +68,15 @@ loadsgf games/nicklas/nicklas9.sgf 28
 # but it saves the group. It could be regarded as acceptable at this 
 # point.
 loadsgf games/nicklas/nicklas9.sgf 50
-904 gg_genmove black
+904 reg_genmove black
 #? [B1|E1]
 
 loadsgf games/nicklas/nicklas10.sgf 18
-1001 gg_genmove black
+1001 reg_genmove black
 #? [H8]
 
 loadsgf games/nicklas/nicklas13.sgf 49
-1301 gg_genmove black
+1301 reg_genmove black
 #? [B8|B9]
 
 #CATEGORY=TACTICAL_READING
@@ -84,14 +84,14 @@ loadsgf games/nicklas/nicklas13.sgf 49
 #SEVERITY=0
 #I would delete this regression test. -trevor
 loadsgf games/nicklas/nicklas14.sgf 31
-1401 gg_genmove black
+1401 reg_genmove black
 #? [B3]
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=Black must protect his group.  H9 is thinkable also.
 #SEVERITY=9
 loadsgf games/nicklas/nicklas14.sgf 43
-1402 gg_genmove black
+1402 reg_genmove black
 #? [J8|J6]
 
 #CATEGORY=SEMEAI
@@ -103,7 +103,7 @@ loadsgf games/nicklas/nicklas14.sgf 43
 #  Dragon status for all of the B stones is Dead.  Can a Critical
 #  group kill another group???
 loadsgf games/nicklas/nicklas14.sgf 61
-1407 gg_genmove black
+1407 reg_genmove black
 #? [A6]
 
 
@@ -115,12 +115,12 @@ loadsgf games/nicklas/nicklas14.sgf 61
 # solidly done with C9, but I think A5 and maybe some other moves
 # work as well. /gf
 loadsgf games/nicklas/nicklas17.sgf 47
-1701 gg_genmove black
+1701 reg_genmove black
 #? [C9|A8]
 
 # Owl reading problem. See also owl:228.
 loadsgf games/nicklas/nicklas18.sgf 17
-1802 gg_genmove black
+1802 reg_genmove black
 #? [E2]
 
 
@@ -129,7 +129,7 @@ loadsgf games/nicklas/nicklas18.sgf 17
 #SEVERITY=1
 #SEE_ALSO=trevor.tst?310
 loadsgf games/nicklas/nicklas18.sgf 45
-1803 gg_genmove black
+1803 reg_genmove black
 #? [A6|A8]
 
 
@@ -137,7 +137,7 @@ loadsgf games/nicklas/nicklas18.sgf 45
 #DESCRIPTION=OWL & Dragon status for W is all dead.  Why does B play?
 #SEVERITY=5
 loadsgf games/nicklas/nicklas21.sgf 72
-2102 gg_genmove black
+2102 reg_genmove black
 #? [PASS]*
 
 
@@ -146,26 +146,26 @@ loadsgf games/nicklas/nicklas21.sgf 72
 #SEVERITY=5
 #See also nicklas2.tst?2102
 loadsgf games/nicklas/nicklas21.sgf 74
-2103 gg_genmove black
+2103 reg_genmove black
 #? [PASS]*
 
 loadsgf games/nicklas/nicklas21.sgf 76
-2104 gg_genmove black
+2104 reg_genmove black
 #? [PASS]
 
 loadsgf games/nicklas/nicklas22.sgf 42
-2201 gg_genmove black
+2201 reg_genmove black
 #? [C2]
 
 loadsgf games/nicklas/nicklas22.sgf 50
-2202 gg_genmove black
+2202 reg_genmove black
 #? [B1]
 
 #CATEGORY=ATARI_ATARI
 #DESCRIPTION=Black must defend here - yikes!
 #SEVERITY=10
 loadsgf games/nicklas/nicklas24.sgf 41
-2401 gg_genmove black
+2401 reg_genmove black
 #? [G3|G2]
 
 

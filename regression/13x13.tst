@@ -13,93 +13,93 @@
 #CATEGORY=STRATEGY
 #DESCRIPTION=M2 has the huge follow up of rescueing H3, not seen by GNU Go.
 loadsgf games/mertin13x13/goliath-gnugo1.B+11.sgf 22
-1 gg_genmove white
+1 reg_genmove white
 #? [M2]*
 
 # E10 is a little better but the difference might not be worth regressing
 # for now. 
 loadsgf games/mertin13x13/goliath-gnugo1.B+11.sgf 36
-2 gg_genmove white
+2 reg_genmove white
 #? [E9|E10]
 
 loadsgf games/mertin13x13/goliath-gnugo1.B+11.sgf 58
-3 gg_genmove white
+3 reg_genmove white
 #? [!E2]
 
 #CATEGORY=OWL_TUNING
 # Of course it is nice if you can get away with J11 as GNU Go did in the
 # game, but I think L9 is urgent.
 loadsgf games/mertin13x13/goliath-gnugo2.W+9.sgf 30
-4 gg_genmove white
+4 reg_genmove white
 #? [L9]*
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 42
-5 gg_genmove white
+5 reg_genmove white
 #? [N10|N9|M1]
 
 #CATEGORY=BLUNDER
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 44
-6 gg_genmove white
+6 reg_genmove white
 #? [M8]
 
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 48
-7 gg_genmove white
+7 reg_genmove white
 #? [L7|M7|M6]*
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 54
-8 gg_genmove white
+8 reg_genmove white
 #? [!K6]
 
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 72
-9 gg_genmove white
+9 reg_genmove white
 #? [C4]*
 
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 12
-10 gg_genmove white
+10 reg_genmove white
 #? [C2]
 
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 20
-11 gg_genmove white
+11 reg_genmove white
 #? [L11|H7|G7|F6]*
 
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 24
-12 gg_genmove white
+12 reg_genmove white
 #? [G7|F7|G8]
 
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 22
-13 gg_genmove white
+13 reg_genmove white
 #? [!G7]*
 
 #CATEGORY=STRATEGY
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 28
-14 gg_genmove white
+14 reg_genmove white
 #? [!C11]
 
 #CATEGORY=STRATEGY
 # New failure (comparing 3.1.15 and 3.0.0)
 # See also owl:262.
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
-15 gg_genmove white
+15 reg_genmove white
 #? [C7|B7|C6|B6|B5|C5]
 
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24
-16 gg_genmove white
+16 reg_genmove white
 #? [C6|C5]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 32
-17 gg_genmove white
+17 reg_genmove white
 #? [L5|L3]
 
 #CATEGORY=OWL_TUNING
@@ -109,119 +109,119 @@ loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 42
 #? [0]
 
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 48
-19 gg_genmove white
+19 reg_genmove white
 #? [!N3]
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 60
-20 gg_genmove white
+20 reg_genmove white
 #? [M8]
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 66
-21 gg_genmove white
+21 reg_genmove white
 #? [N8]
 
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 94
-22 gg_genmove white
+22 reg_genmove white
 #? [C9]
 
 # E12 is too small.
 loadsgf games/mertin13x13/katsunari-gnugo3.B+14.sgf 16
-23 gg_genmove white
+23 reg_genmove white
 #? [B7|M10|H2]*
 
 # At least try to connect.
 loadsgf games/mertin13x13/katsunari-gnugo3.B+14.sgf 34
-24 gg_genmove white
+24 reg_genmove white
 #? [G5|H5|G4]*
 
 loadsgf games/mertin13x13/katsunari-gnugo3.B+14.sgf 64
-25 gg_genmove white
+25 reg_genmove white
 #? [J5]
 
 loadsgf games/mertin13x13/katsunari-gnugo3.B+14.sgf 66
-26 gg_genmove white
+26 reg_genmove white
 #? [J5]
 
 #CATEGORY=FUSEKI_STRATEGY
 # Too early for 3-3 invasion at L11 with both UL and LR corner open
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 10
-27 gg_genmove white
+27 reg_genmove white
 #? [C11|E3|E4]
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 12
-28 gg_genmove white
+28 reg_genmove white
 #? [L10]*
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 20
-29 gg_genmove white
+29 reg_genmove white
 #? [C8]
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 32
-30 gg_genmove white
+30 reg_genmove white
 #? [!C11]
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 64
-31 gg_genmove white
+31 reg_genmove white
 #? [M4|N4]*
 
 # A nice tesuji by GNU Go worth remembering!
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 74
-33 gg_genmove white
+33 reg_genmove white
 #? [E7]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 82
-34 gg_genmove white
+34 reg_genmove white
 #? [K13]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 102
-35 gg_genmove white
+35 reg_genmove white
 #? [D2]*
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 110
-36 gg_genmove white
+36 reg_genmove white
 #? [C5]*
 
 #CATEGORY=STRATEGY
 #SEVERITY=8
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 12
-37 gg_genmove white
+37 reg_genmove white
 #? [E10]
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
-38 gg_genmove white
+38 reg_genmove white
 #? [G11]*
 
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
-39 gg_genmove white
+39 reg_genmove white
 #? [H4|J4]
 
 # CATEGORY=FOLLOWUP
 # The followup of K13 is undervalued.
 # In fact, there is none at all (3.3.8)
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
-40 gg_genmove white
+40 reg_genmove white
 #? [K13]*
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
-41 gg_genmove white
+41 reg_genmove white
 #? [!C8]
 
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
-42 gg_genmove white
+42 reg_genmove white
 #? [N3|N2|L4|L3|L2|L1|M1|N1|M4]*
 
 #CATEGORY=ENDGAME_TUNING
 # A correction in this shape would need subtle tuning, as leaving
 # the gap at D7 (by playing D6) should often be bad.
 loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 25
-43 gg_genmove black
+43 reg_genmove black
 #? [D6]
 
 #CATEGORY=ENDGAME_TUNING
@@ -233,57 +233,57 @@ loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 25
 # Part of the overvaluation of M11 is due to the huge shape factor (+8.00)
 # by pattern CC77, which does not make too much sense here.
 loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 27
-44 gg_genmove black
+44 reg_genmove black
 #? [B6]
 
 #CATEGORY=ENDGAME_TUNING
 # B4 is really huge here, appr. 20 pts.
 loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 31
-45 gg_genmove black
+45 reg_genmove black
 #? [B4]
 
 #CATEGORY=ENDGAME_TUNING
 # L3 is 2pt double sente.
 loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 85
-46 gg_genmove black
+46 reg_genmove black
 #? [L3]
 
 #CATEGORY=FUSEKI_STRATEGY
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 7
-47 gg_genmove black
+47 reg_genmove black
 #? [!G11]
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 11
-48 gg_genmove black
+48 reg_genmove black
 #? [K7]
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 13
-49 gg_genmove black
+49 reg_genmove black
 #? [K7]
 
 # Renumbered since there were 2 test 49's
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 19
-149 gg_genmove black
+149 reg_genmove black
 #? [L7]*
 
 # Here N11 is generated as an "additional attack/defense move", although
 # the black dragon is still dead after black connects at N11.
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 27
-50 gg_genmove black
+50 reg_genmove black
 #? [!N11|M8]
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 33
-51 gg_genmove black
+51 reg_genmove black
 #? [L5]*
 
 # GNU Go 3.1.15 wants to play F10 here (although 3.0.0 got H10)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 35
-52 gg_genmove black
+52 reg_genmove black
 #? [H10]*
 
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
-53 gg_genmove black
+53 reg_genmove black
 #? [C6]*
 
 #CATEGORY=SEMEAI
@@ -291,22 +291,22 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
 # most of them due to Stefan Mertin. Of course J13 (played by GNU Go)
 # is an annoying blunder.
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 67
-54 gg_genmove black
+54 reg_genmove black
 #? [G10]*
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 83
-55 gg_genmove black
+55 reg_genmove black
 #? [F5]*
 
 #CATEGORY=CONNECTION
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 99
-56 gg_genmove black
+56 reg_genmove black
 #? [H3]*
 
 #CATEGORY=ENDGAME_TUNING
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 111
-57 gg_genmove black
+57 reg_genmove black
 #? [C5|D5]
 
 #CATEGORY=OWL_TUNING
@@ -317,135 +317,135 @@ loadsgf games/mertin13x13/gnugo-goliath3.B+16.sgf 55
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 13
-59 gg_genmove black
+59 reg_genmove black
 #? [!J12]
 
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 15
-60 gg_genmove black
+60 reg_genmove black
 #? [K5|L5]*
 
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 75
-61 gg_genmove black
+61 reg_genmove black
 #? [K8]
 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 13
-62 gg_genmove black
+62 reg_genmove black
 #? [M5]*
 
 # New failure (comparing 3.0.0 and 3.1.15)
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 25
-63 gg_genmove black
+63 reg_genmove black
 #? [K4]
 
 #CATEGORY=OWL_TUNING
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 33
-64 gg_genmove black
+64 reg_genmove black
 #? [L2|M3|L4|M5]
 
 # New failure (comparing 3.0.0 and 3.1.15)
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 35
-65 gg_genmove black
+65 reg_genmove black
 #? [H4]*
 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 47
-66 gg_genmove black
+66 reg_genmove black
 #? [G8|G7|H9|J9]*
 
 #CATEGORY=ATARI_ATARI + ENDGAME_TUNING
 # New failure (comparing 3.0.0 and 3.1.15)
 # EB1404b produces nonsense here. 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 77
-67 gg_genmove black
+67 reg_genmove black
 #? [B9]
 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 79
-68 gg_genmove black
+68 reg_genmove black
 #? [A8]
 
 #CATEGORY=TERRITORIAL_EVALUATION
 # There is s.th. odd in the influence function in comparison between
 # D4 and D5.
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 89
-69 gg_genmove black
+69 reg_genmove black
 #? [!D4]
 
 #CATEGORY=FUSEKI_STRATEGY
 # I think that securing the corner is larger.
 loadsgf games/mertin13x13/gnugo-gointellect1.W+28.sgf 11
-70 gg_genmove black
+70 reg_genmove black
 #? [L10|L9|L11]
 
 loadsgf games/mertin13x13/gnugo-gointellect1.W+28.sgf 19
-71 gg_genmove black
+71 reg_genmove black
 #? [J11]
 
 loadsgf games/mertin13x13/gnugo-gointellect1.W+28.sgf 29
-72 gg_genmove black
+72 reg_genmove black
 #? [J10]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 # The "attack last move played, although it seems bad" heuristic sometimes
 # produces very bad choices.
 loadsgf games/mertin13x13/gnugo-gointellect1.W+28.sgf 31
-73 gg_genmove black
+73 reg_genmove black
 #? [J8]*
 
 #CATEGORY=OWL_TUNING, SEMEAI
 # The "attack last move played, although it seems bad" heuristic sometimes
 # produces very bad choices. Also, owl is wrong here.
 loadsgf games/mertin13x13/gnugo-gointellect1.W+28.sgf 33
-74 gg_genmove black
+74 reg_genmove black
 #? [G10]*
 
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 13
-75 gg_genmove black
+75 reg_genmove black
 #? [!D11]
 
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 17
-76 gg_genmove black
+76 reg_genmove black
 #? [K6|L6|J3]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 19
-77 gg_genmove black
+77 reg_genmove black
 #? [L6|K5]*
 
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 21
-78 gg_genmove black
+78 reg_genmove black
 #? [L5]*
 
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 23
-79 gg_genmove black
+79 reg_genmove black
 #? [M5]
 
 # M2 is better for eye shape here.
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 41
-80 gg_genmove black
+80 reg_genmove black
 #? [M2]
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 55
-81 gg_genmove black
+81 reg_genmove black
 #? [M8]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 11
-82 gg_genmove black
+82 reg_genmove black
 #? [K4]
 
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 23
-83 gg_genmove black
+83 reg_genmove black
 #? [L9]*
 
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 25
-84 gg_genmove black
+84 reg_genmove black
 #? [L9]*
 
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 29
-85 gg_genmove black
+85 reg_genmove black
 #? [D2]
 
 #CATEGORY=OWL_TUNING
@@ -457,13 +457,13 @@ loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 45
 #CATEGORY=TACTICAL_READING
 # GNU Go claims that D6 defends the worms D9 and F9
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 65
-87 gg_genmove black
+87 reg_genmove black
 #? [E6]*
 
 #CATEGORY=BLUNDER
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 69
-88 gg_genmove black
+88 reg_genmove black
 #? [!A9]
 
 #CATEGORY=OWL_TUNING
@@ -475,10 +475,10 @@ loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 83
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 99
-90 gg_genmove black
+90 reg_genmove black
 #? [A5]
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 109
-91 gg_genmove black
+91 reg_genmove black
 #? [K6]*

@@ -288,6 +288,6 @@ loadsgf games/reading41.sgf 130
 # A6 gives an unfavorable ko while F10 gives seki.
 # Since there are no ko threats, and F10 is enough to win, it is preferred.
 loadsgf games/semeai/semeaiko1.sgf
-29 gg_genmove black
+29 reg_genmove black
 #? [F10]*
 

@@ -4,13 +4,13 @@
 
 # An extension to K4 or K3 is urgent here.
 loadsgf games/ego.sgf 12
-1 gg_genmove white
+1 reg_genmove white
 #? [K4|K3]
 
 # G3 looks good here but is maybe not the only move. E5 is clearly
 # suboptimal, however.
 loadsgf games/ego.sgf 30
-2 gg_genmove white
+2 reg_genmove white
 #? [!E5]
 
 #CATEGORY=PATTERN_TUNING
@@ -18,7 +18,7 @@ loadsgf games/ego.sgf 30
 #SEVERITY=8
 # K18 is unreasonable. H18 is the only move locally.
 loadsgf games/ego.sgf 52
-3 gg_genmove white
+3 reg_genmove white
 #? [H18]
 
 #CATEGORY=PATTERN_TUNING
@@ -27,7 +27,7 @@ loadsgf games/ego.sgf 52
 # The descent at G19 is bad shape because it leaves much aji around
 # E18 and gives black an endgame sente move at H19.
 loadsgf games/ego.sgf 54
-4 gg_genmove white
+4 reg_genmove white
 #? [!(G19|H19|K17)]*
 
 #CATEGORY=
@@ -35,31 +35,31 @@ loadsgf games/ego.sgf 54
 #SEVERITY=0
 # D7 is a good move.
 loadsgf games/ego.sgf 68
-5 gg_genmove white
+5 reg_genmove white
 #? [!B15]
 
 loadsgf games/ego.sgf 86
-6 gg_genmove white
+6 reg_genmove white
 #? [!N5]
 
 # Unreasonable monkey jump
 loadsgf games/ego.sgf 96
-7 gg_genmove white
+7 reg_genmove white
 #? [!Q1]
 
 #CATEGORY=BORDER_PROTECTION
 #DESCRIPTION=Tough moyo protection.
 #SEVERITY=5
 loadsgf games/ego.sgf 112
-8 gg_genmove white
+8 reg_genmove white
 #? [F12]*
 
 loadsgf games/ego.sgf 180
-9 gg_genmove white
+9 reg_genmove white
 #? [S19]
 
 loadsgf games/ego.sgf 190
-10 gg_genmove white
+10 reg_genmove white
 #? [S18]
 
 
@@ -67,12 +67,12 @@ loadsgf games/ego.sgf 190
 #DESCRIPTION=Tough - Black pushthrough is troublesome.
 #SEVERITY=3
 loadsgf games/ego.sgf 198
-11 gg_genmove white
+11 reg_genmove white
 #? [T18]*
 
 # The correct move is the double sente at R10, but for the time being
 # we also accept C12.
 loadsgf games/ego.sgf 252
-12 gg_genmove white
+12 reg_genmove white
 #? [R10|C12]
 

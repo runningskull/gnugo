@@ -12,11 +12,11 @@ reset_reading_node_counter
 reset_trymove_counter
 
 loadsgf games/nicklas/nicklas4.sgf 73
-401 gg_genmove black
+401 reg_genmove black
 #? [A5]*
 
 loadsgf games/nicklas/nicklas6.sgf 25
-602 gg_genmove black
+602 reg_genmove black
 #? [C6]
 
 # J6 gives a gote seki.
@@ -24,7 +24,7 @@ loadsgf games/nicklas/nicklas6.sgf 25
 # and then taking gote at H1 gives the same end result. Thus H9 is
 # also okay.
 loadsgf games/nicklas/nicklas14.sgf 48
-1403 gg_genmove white
+1403 reg_genmove white
 #? [J6|H9]*
 
 ############ End of Tests #################

@@ -5,7 +5,7 @@ reset_reading_node_counter
 reset_trymove_counter
 
 loadsgf games/rosebud.sgf 10
-1 gg_genmove black
+1 reg_genmove black
 #? [E16]*
 
 ############ End of Tests #################
