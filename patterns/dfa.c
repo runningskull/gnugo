@@ -27,6 +27,8 @@
 #include "liberty.h"
 #include "patterns.h"
 #include "dfa.h"
+#include "random.h"
+
 #include <assert.h>
 #include <stdlib.h>
 
@@ -1045,41 +1047,9 @@ dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll)
   dfa_t *new_dfa = &(aux_dfa[aux_count % DFA_BINS]);
   dfa_t *old_dfa = &(aux_dfa[(aux_count+1) % DFA_BINS]);
   float ratio;
-  char strrot[MAX_ORDER+1];
-
-  if (ll == 0)
-    strcpy(strrot, str);
-  else {
-    int i, j;
-    char strdollar[MAX_ORDER+1];
-    memset(strdollar, '$', sizeof(char) * (MAX_ORDER + 1));
-    strcpy(strdollar, str);
-    strdollar[strlen(str)] = '$';
-    memset(strrot, '$', sizeof(char) * (MAX_ORDER + 1));
-    for (i = 0; i < MAX_ORDER/2; i++) {
-      for (j = 0; j < MAX_ORDER+1; j++) {
-        if (spiral[i][0] == spiral[j][ll]) {
-          if (0 && (spiral[i][0] == 84 || spiral[i][0] == -84
-              || spiral[i][0]== 1   || spiral[i][0] == -1
-              || spiral[j][ll] == 84 || spiral[j][ll] == -84
-              || spiral[j][ll] == 1  || spiral[j][ll] == -1 ) )
-            fprintf(stderr, "i: %d  j: %d\n", i, j);
-          assert(strrot[i] == '$');
-          strrot[i] = strdollar[j];
-          break;
-        }
-      }
-      assert(j < MAX_ORDER+1);
-    }
-    j = MAX_ORDER;
-    while (strrot[j] == '$') {
-      j--;
-    }
-    strrot[j+1] = 0;
-  }
 
   if (dfa_verbose > 1) {
-    fprintf(stderr, "Adding to dfa %s the string: %s\n", pdfa->name, strrot);
+    fprintf(stderr, "Adding to dfa %s the string: %s\n", pdfa->name, str);
     fprintf(stderr, "  pat_ind: %d; rotation: %d at bin: %d\n",
 	    pattern_index, ll, aux_count);
   }
@@ -1090,7 +1060,7 @@ dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll)
   if (pdfa->pre_rotated)
     pattern_index = pattern_index * 8 + ll;
 
-  create_dfa(&aux_temp, strrot, pattern_index);
+  create_dfa(&aux_temp, str, pattern_index);
 
   /* then we do the synchronization product with dfa */
   sync_product(new_dfa, old_dfa, &aux_temp);
@@ -1104,13 +1074,55 @@ dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll)
 }
 
 
+/* Create a transformation of `str' and store it in `strrot'. */
+void
+dfa_rotate_string(char *strrot, const char *str, int ll)
+{
+  int i, j;
+  char strdollar[MAX_ORDER+1];
+
+  if (ll == 0) {
+    strcpy(strrot, str);
+    return;
+  }
+
+  memset(strdollar, '$', sizeof(char) * (MAX_ORDER + 1));
+  strcpy(strdollar, str);
+  strdollar[strlen(str)] = '$';
+  memset(strrot, '$', sizeof(char) * (MAX_ORDER + 1));
+
+  for (i = 0; i < MAX_ORDER/2; i++) {
+    for (j = 0; j < MAX_ORDER+1; j++) {
+      if (spiral[i][0] == spiral[j][ll]) {
+	if (0 && (spiral[i][0] == 84 || spiral[i][0] == -84
+	    || spiral[i][0]== 1   || spiral[i][0] == -1
+	    || spiral[j][ll] == 84 || spiral[j][ll] == -84
+	    || spiral[j][ll] == 1  || spiral[j][ll] == -1 ) )
+	  fprintf(stderr, "i: %d  j: %d\n", i, j);
+
+	assert(strrot[i] == '$');
+	strrot[i] = strdollar[j];
+	break;
+      }
+    }
+
+    assert(j < MAX_ORDER+1);
+  }
+
+  j = MAX_ORDER;
+  while (strrot[j] == '$')
+    j--;
+  strrot[j+1] = 0;
+}
+
+
 /*
  * Build a pattern string from a pattern.
  * str must refer a buffer of size greater than MAX_ORDER.
  */
 void
 pattern_2_string(struct pattern *pat, struct patval_b *elements,
-		 char *str, int trans, int ci, int cj)
+		 char *str, int ci, int cj)
 {
   char work_space[DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
   int m, n;			/* anchor position */
@@ -1230,12 +1242,12 @@ pattern_2_string(struct pattern *pat, struct patval_b *elements,
   for (k = 0;
        (k != MAX_ORDER - 1) && ((borders > 0) || edges || to_test > 0);
        k++) {
-    j = spiral[k][trans] % (4 * DFA_MAX_BOARD);
+    j = spiral[k][0] % (4 * DFA_MAX_BOARD);
     if (j >= 2 * DFA_MAX_BOARD)
       j -= 4 * DFA_MAX_BOARD;
     if (j <  - 2 * DFA_MAX_BOARD)
       j += 4 * DFA_MAX_BOARD;
-    i = (spiral[k][trans] - j) / (4 * DFA_MAX_BOARD);
+    i = (spiral[k][0] - j) / (4 * DFA_MAX_BOARD);
 
     if (i == pat->maxi)
       borders &= ~SOUTH_EDGE;
@@ -1269,6 +1281,687 @@ pattern_2_string(struct pattern *pat, struct patval_b *elements,
 
   if (0 && dfa_verbose > 0)
     fprintf(stderr, "converted pattern %s into string: %s\n", pat->name, str);
+}
+
+
+/**************************************
+ *	Experimental dfa builder      *
+ **************************************/
+
+/* This builder differs from the one above in that it builds the whole dfa
+ * at once. That is, it must have all the patterns to build and cannot add
+ * pattern by pattern. Currently, it is only used in dfa size optimization
+ * (it seems to be significantly faster).
+ */
+
+
+/* Allocate a new dfa_attrib structure from a dynamic array. */
+static dfa_attrib *
+dfa_attrib_new(dfa_attrib_array *array, int string_index)
+{
+  dfa_attrib *attribute;
+
+  if (array->allocated == DFA_ATTRIB_BLOCK_SIZE) {
+    dfa_attrib_block *new_block = malloc(sizeof(dfa_attrib_block));
+    assert(new_block);
+
+    new_block->previous = array->last_block;
+    array->last_block = new_block;
+    array->allocated = 0;
+  }
+
+  attribute = &(array->last_block->attrib[array->allocated++]);
+  attribute->next = NULL;
+  attribute->string_index = string_index;
+
+  return attribute;
+}
+
+
+/* Initialize dfa_attrib_array structure. */
+static void
+dfa_attrib_array_reset(dfa_attrib_array *array)
+{
+  array->last_block = NULL;
+  array->allocated = DFA_ATTRIB_BLOCK_SIZE;
+}
+
+
+/* Clear a dynamic array by freeing all blocks befor `cutoff_point'. */
+static void
+dfa_attrib_array_partially_clear(dfa_attrib_block *cutoff_point)
+{
+  if (cutoff_point) {
+    dfa_attrib_block *block = cutoff_point->previous;
+
+    while (block) {
+      dfa_attrib_block *previous = block->previous;
+      free(block);
+      block = previous;
+    }
+
+    cutoff_point->previous = NULL;
+  }
+}
+
+
+/* Clear a dynamic array completely. All blocks are freed. */
+static void
+dfa_attrib_array_clear(dfa_attrib_array *array)
+{
+  if (array->last_block) {
+    dfa_attrib_array_partially_clear(array->last_block);
+    free(array->last_block);
+    array->last_block = NULL;
+  }
+
+  array->allocated = DFA_ATTRIB_BLOCK_SIZE;
+}
+
+
+/* Allocate a new dfa_node structure in a dfa graph. */
+static dfa_node *
+dfa_node_new(dfa_graph *graph)
+{
+  dfa_node *node;
+
+  if (graph->allocated == DFA_NODE_BLOCK_SIZE) {
+    dfa_node_block *new_block = malloc(sizeof(dfa_node_block));
+    assert(new_block);
+
+    new_block->previous = graph->last_block;
+    graph->last_block = new_block;
+    graph->allocated = 0;
+  }
+
+  graph->num_nodes++;
+  node = &(graph->last_block->node[graph->allocated++]);
+  memset(node, 0, sizeof(dfa_node));
+
+  return node;
+}
+
+
+/* This is a hash table used to quickly find a dfa node using a linked list
+ * of its attributes as a key.
+ */
+static dfa_hash_entry *dfa_hash_table[DFA_HASH_TABLE_SIZE];
+static dfa_hash_block *dfa_hash_last_block = NULL;
+static int dfa_hash_allocated;
+
+
+/* Allocate a dfa_entry structure dynamically. */
+static dfa_hash_entry *
+dfa_hash_entry_new(void)
+{
+  if (dfa_hash_allocated == DFA_HASH_BLOCK_SIZE) {
+    dfa_hash_block *new_block = malloc(sizeof(dfa_hash_block));
+    assert(new_block);
+
+    new_block->previous = dfa_hash_last_block;
+    dfa_hash_last_block = new_block;
+    dfa_hash_allocated = 0;
+  }
+
+  return &(dfa_hash_last_block->entry[dfa_hash_allocated++]);
+}
+
+
+/* Clear the hash table completely. Used after having finished a graph level. */
+static void
+dfa_hash_clear(void)
+{
+  memset(dfa_hash_table, 0, DFA_HASH_TABLE_SIZE * sizeof(dfa_hash_entry *));
+
+  if (dfa_hash_last_block) {
+    dfa_hash_block *block = dfa_hash_last_block->previous;
+
+    while (block) {
+      dfa_hash_block *previous = block->previous;
+      free(block);
+      block = previous;
+    }
+
+    dfa_hash_last_block->previous = NULL;
+    dfa_hash_allocated = 0;
+  }
+  else
+    dfa_hash_allocated = DFA_HASH_BLOCK_SIZE;
+}
+
+
+/* Compute the hash value of a key (linked list of attributes). */
+static int
+dfa_hash_value(dfa_attrib *key)
+{
+  int hash_value = DFA_HASH_VALUE_1 * key->string_index;
+  if (key->next) {
+    hash_value += DFA_HASH_VALUE_2 * key->next->string_index;
+    if (key->next->next)
+      hash_value += DFA_HASH_VALUE_3 * key->next->next->string_index;
+  }
+
+  return hash_value % DFA_HASH_TABLE_SIZE;
+}
+
+
+/* Search for a node with a given key in the hash table. */
+static dfa_node *
+dfa_hash_search(dfa_attrib *key)
+{
+  int hash_value = dfa_hash_value(key);
+  dfa_hash_entry *entry;
+
+  for (entry = dfa_hash_table[hash_value]; entry; entry = entry->next) {
+    dfa_attrib *left = key;
+    dfa_attrib *right = entry->key;
+
+    while (left && right) {
+      if (left->string_index != right->string_index)
+	break;
+
+      left = left->next;
+      right = right->next;
+    }
+
+    if (!left && !right)
+      return entry->value;
+  }
+
+  return NULL;
+}
+
+
+/* Add a node to the table. The list of strings which pass through it is used
+ * as a key.
+ */
+static void
+dfa_hash_add_node(dfa_node *node)
+{
+  int hash_value = dfa_hash_value(node->passing_strings);
+  dfa_hash_entry *entry;
+
+  entry = dfa_hash_entry_new();
+  entry->next = dfa_hash_table[hash_value];
+  dfa_hash_table[hash_value] = entry;
+
+  entry->key = node->passing_strings;
+  entry->value = node;
+}
+
+
+/* Dfa iterator. Used to walk the array of nodes in backward direction. */
+static dfa_node_block *dfa_iterator_block;
+static int dfa_iterator_node_num;
+
+
+/* Reset the iterator. The last added node of the specified graph becomes
+ * the current node.
+ */
+static dfa_node*
+dfa_iterator_reset(dfa_graph *graph)
+{
+  assert(graph->last_block);
+
+  if (graph->allocated > 0) {
+    dfa_iterator_block = graph->last_block;
+    dfa_iterator_node_num = graph->allocated - 1;
+  }
+  else {
+    dfa_iterator_block = graph->last_block->previous;
+    assert(dfa_iterator_block);
+    dfa_iterator_node_num = DFA_NODE_BLOCK_SIZE - 1;
+  }
+
+  return &(dfa_iterator_block->node[dfa_iterator_node_num]);
+}
+
+
+/* Shift the current node pointer one node backwards. */
+static dfa_node*
+dfa_iterate(void)
+{
+  dfa_iterator_node_num--;
+  if (dfa_iterator_node_num < 0) {
+    dfa_iterator_block = dfa_iterator_block->previous;
+    assert(dfa_iterator_block);
+    dfa_iterator_node_num = DFA_NODE_BLOCK_SIZE - 1;
+  }
+
+  return &(dfa_iterator_block->node[dfa_iterator_node_num]);
+}
+
+
+/* Initialize a dfa_graph structure. */
+void
+dfa_graph_reset(dfa_graph *graph)
+{
+  graph->num_nodes = 0;
+  graph->root = NULL;
+
+  graph->last_block = NULL;
+  graph->allocated = DFA_NODE_BLOCK_SIZE;
+  dfa_attrib_array_reset(&(graph->attributes));
+}
+
+
+/* Free all resources associated with the specified dfa graph. */
+static void
+dfa_graph_clear(dfa_graph *graph)
+{
+  dfa_node_block *block = graph->last_block;
+  graph->num_nodes = 0;
+  graph->root = NULL;
+
+  while (block) {
+    dfa_node_block *previous = block->previous;
+    free(block);
+    block = previous;
+  }
+
+  graph->last_block = NULL;
+  graph->allocated = DFA_NODE_BLOCK_SIZE;
+
+  dfa_attrib_array_clear(&(graph->attributes));
+}
+
+
+/* dfa_graph_build_level() builds a level of a graph. Level `n' is a set of
+ * nodes which correspond to n's element of a string. When matching using a
+ * dfa, nodes of level `n' are only checked at (n + 1)'s iteration (root node
+ * is considered to be level -1, but is matched at iteration 0).
+ */
+static void
+dfa_graph_build_level(dfa_graph *graph, char **strings, int level,
+		      dfa_node *terminal_node,
+		      dfa_attrib_array *passing_strings_array)
+{
+  int save_num_nodes = graph->num_nodes;
+  dfa_attrib_block *cutoff_point;
+  dfa_node *node;
+  dfa_node *this_terminal_node = dfa_iterator_reset(graph);
+
+  cutoff_point = passing_strings_array->last_block;
+  dfa_hash_clear();
+
+  /* Walk through all nodes of the previous level (backwards, but that doesn't
+   * matter - it's just because iterator works that way).
+   */
+  for (node = this_terminal_node; node != terminal_node; node = dfa_iterate()) {
+    int k;
+    int num_masks = 0;
+    char mask[4];
+    dfa_attrib *passing_string;
+    dfa_attrib **link = &(node->attributes);
+    dfa_attrib *new_passing_strings[4];
+    dfa_attrib **new_link[4];
+
+    /* Calculate all different masks for subnodes. For instance, if there are
+     * three strings passing through a node of level 1, say "X$...", "Xx..."
+     * and "XO...", there will be three masks: 8 (stands for '#'), 5 ('X' and
+     * '.') and 2 ('O'). String "X$..." will pass further through all three
+     * subnodes, "Xx..." - through subnode corresponding to mask 5 and string
+     * "XO..." - through subnode corresponding to mask 2.
+     */
+    for (passing_string = node->passing_strings;
+	 passing_string && num_masks < 4;
+	 passing_string = passing_string->next) {
+      int index = passing_string->string_index;
+      char string_mask = strings[index][level];
+
+      if (string_mask) {
+	int limit = num_masks;
+
+	for (k = 0; k < limit; k++) {
+	  char common_branches = string_mask & mask[k];
+
+	  if (common_branches && common_branches != mask[k]) {
+	    /* Split a mask, since the string passes through a "part" of it. */
+	    mask[k] ^= common_branches;
+	    mask[num_masks++] = common_branches;
+	  }
+	  
+	  string_mask ^= common_branches;
+	}
+
+	if (string_mask) {
+	  /* If there is no mask corresponding to a (part) of the string's
+	   * mask, add it now.
+	   */
+	  mask[num_masks++] = string_mask;
+	}
+      }
+      else {
+	/* If the string ends at this level, add its index to the list of
+	 * matched strings of the current node. Not used at the moment,
+	 * since this builder isn't used for actual dfa building.
+	 */
+	*link = dfa_attrib_new(&(graph->attributes), index);
+	link = &((*link)->next);
+      }
+    }
+    
+    for (k = 0; k < num_masks; k++)
+      new_link[k] = &(new_passing_strings[k]);
+
+    /* Now, for each mask, create a list of all strings which will follow it
+     * (pass through a node corresponding to it). It is possible to merge this
+     * loop with the previous one, but it is simplier to keep them separated.
+     */
+    for (passing_string = node->passing_strings; passing_string;
+	 passing_string = passing_string->next) {
+      int index = passing_string->string_index;
+
+      for (k = 0; k < num_masks; k++) {
+	if (strings[index][level] & mask[k]) {
+	  *(new_link[k]) = dfa_attrib_new(passing_strings_array, index);
+	  new_link[k] = &((*(new_link[k]))->next);
+	}
+      }
+    }
+
+    /* Finally, create new nodes for the masks when necessary. */
+    for (k = 0; k < num_masks; k++) {
+      int i;
+
+      /* Maybe we have already added such a node? */
+      dfa_node *new_node = dfa_hash_search(new_passing_strings[k]);
+
+      if (!new_node) {
+	/* If not, create it, save the list of passing strings and add the
+	 * new node to hash table.
+	 */
+	new_node = dfa_node_new(graph);
+	new_node->passing_strings = new_passing_strings[k];
+
+	dfa_hash_add_node(new_node);
+      }
+ 
+      /* At this moment we convert the masks to actual transitions. These are
+       * also unused till we use this builder for actual dfa creation.
+       */
+      for (i = 0; i < 4; i++) {
+	if (mask[k] & (1 << i))
+	  node->branch[i] = new_node;
+      }
+    }
+  }
+
+  /* Free the lists of passing strings for the previous level. Useful if we
+   * building an exceptionally huge dfa (e.g. a pre-rotated one).
+   */
+  dfa_attrib_array_partially_clear(cutoff_point);
+
+  if (graph->num_nodes != save_num_nodes) {
+    /* If we have added any nodes, this level is not the last one. */
+    dfa_graph_build_level(graph, strings, level + 1, this_terminal_node,
+			  passing_strings_array);
+  }
+}
+
+
+/* Convert a pattern to a string of masks. */
+static char *
+dfa_prepare_string(const char *string)
+{
+  int k;
+  int l = strlen(string);
+  char *dfa_string = malloc(l + 1);
+  assert(dfa_string);
+
+  for (k = 0; k < l; k++) {
+    switch (string[k]) {
+    case '$': dfa_string[k] = 15; break;	/* 1111 */
+    case '-':
+    case '|':
+    case '+':
+    case '#': dfa_string[k] =  8; break;	/* 1000 */
+    case '.':
+    case ',':
+    case '!':
+    case 'a': dfa_string[k] =  1; break;	/* 0001 */
+    case '?': dfa_string[k] =  7; break;	/* 0111 */
+    case 'O': dfa_string[k] =  2; break;	/* 0010 */
+    case 'X': dfa_string[k] =  4; break;	/* 0100 */
+    case 'o': dfa_string[k] =  3; break;	/* 0011 */
+    case 'x': dfa_string[k] =  5; break;	/* 0101 */
+
+    default: assert(0); 			/* Shouldn't happen. */
+    }
+  }
+
+  dfa_string[l] = 0;
+  return dfa_string;
+}
+
+
+/* Initialize a dfa_patterns structure. */
+void
+dfa_patterns_reset(dfa_patterns *patterns)
+{
+  patterns->num_patterns = 0;
+  patterns->patterns = NULL;
+  patterns->last_pattern = NULL;
+
+  dfa_graph_reset(&(patterns->graph));
+}
+
+
+/* Clear the graph and reset all fields of a dfa_patterns structure. */
+void
+dfa_patterns_clear(dfa_patterns *patterns)
+{
+  dfa_pattern *pattern = patterns->patterns;
+
+  while (pattern) {
+    int k;
+    dfa_pattern *next = pattern->next;
+
+    for (k = 0; k < pattern->num_variations; k++)
+      free(pattern->variation[k]);
+
+    free(pattern);
+    pattern = next;
+  }
+
+  patterns->num_patterns = 0;
+  patterns->patterns = NULL;
+  patterns->last_pattern = NULL;
+
+  dfa_graph_clear(&(patterns->graph));
+}
+
+
+/* Add a pattern to a list. If `index' is equal to the index of the last
+ * added pattern, add a variation to that pattern instead.
+ */
+void
+dfa_patterns_add_pattern(dfa_patterns *patterns, const char *string, int index)
+{
+  dfa_pattern *pattern;
+
+  if (index == patterns->num_patterns - 1) {
+    assert(patterns->last_pattern);
+    assert(patterns->last_pattern->num_variations < 8);
+
+    pattern = patterns->last_pattern;
+  }
+  else {
+    assert(patterns->num_patterns <= index);
+
+    while (patterns->num_patterns <= index) {
+      patterns->num_patterns++;
+      pattern = malloc(sizeof(dfa_pattern));
+      pattern->num_variations = 0;
+
+      if (patterns->last_pattern)
+        patterns->last_pattern->next = pattern;
+      else
+        patterns->patterns = pattern;
+      patterns->last_pattern = pattern;
+    }
+
+    pattern->current_variation = 0;
+    pattern->next = NULL;
+  }
+
+  pattern->variation[pattern->num_variations++] = dfa_prepare_string(string);
+}
+
+
+/* Set the variation of the last pattern. Can be used in actual dfa building
+ * or to set a hint (results of the previous optimization) for optimization.
+ */
+void
+dfa_patterns_set_last_pattern_variation(dfa_patterns *patterns, int variation)
+{
+  assert(patterns->last_pattern);
+  assert(patterns->last_pattern->num_variations > variation);
+
+  patterns->last_pattern->current_variation = variation;
+}
+
+
+/* Build a dfa graph for a list of patterns. */
+void
+dfa_patterns_build_graph(dfa_patterns *patterns)
+{
+  int k = 0;
+  char **strings;
+  dfa_attrib_array passing_strings_array;
+  dfa_attrib **link;
+  dfa_node *error_state;
+  dfa_graph *graph = &(patterns->graph);
+  dfa_pattern *pattern;
+  
+  strings = malloc(patterns->num_patterns * sizeof(char *));
+  assert(strings);
+
+  dfa_graph_clear(graph);
+  dfa_attrib_array_reset(&passing_strings_array);
+
+  /* Error state node is used as a terminator for level -1 (root node). */
+  error_state = dfa_node_new(graph);
+  graph->root = dfa_node_new(graph);
+  
+  /* Add all strings as passing through root node (level -1). */
+  link = &(graph->root->passing_strings);
+  for (pattern = patterns->patterns; pattern; pattern = pattern->next, k++) {
+    if (pattern->num_variations > 0) {
+      assert(pattern->current_variation < pattern->num_variations);
+      strings[k] = pattern->variation[pattern->current_variation];
+
+      *link = dfa_attrib_new(&passing_strings_array, k);
+      link = &((*link)->next);
+    }
+    else
+      strings[k] = NULL;
+  }
+
+  dfa_graph_build_level(graph, strings, 0, error_state, &passing_strings_array);
+
+  free(strings);
+  dfa_attrib_array_clear(&passing_strings_array);
+}
+
+
+/* dfa_patterns_optimize_variations() tries to reduce the size of dfa by
+ * altering pattern variations (in fact, transformations). The algorithm
+ * is to change several patterns' variations and if this happens to give
+ * size reduction, to keep the change, otherwise, revert.
+ *
+ * This function contains many heuristically chosen values for variation
+ * changing probability etc. They have been chosen by observing algorithm
+ * effectiveness and seem to be very good.
+ *
+ * Note that we subtract 1 from the number of nodes to be consistent with
+ * the standard builder, which doesn't count error state.
+ */
+int *
+dfa_patterns_optimize_variations(dfa_patterns *patterns, int iterations)
+{
+  int k = 0;
+  int failed_iterations = 0;
+  int min_nodes_so_far;
+  int num_nodes_original;
+  int *best_variations;
+  double lower_limit = 2.0 / patterns->num_patterns;
+  double upper_limit = 6.0 / patterns->num_patterns;
+  double change_probability = 4.0 / patterns->num_patterns;
+  dfa_pattern *pattern;
+
+  best_variations = malloc(patterns->num_patterns * sizeof(int));
+  assert(best_variations);
+  for (pattern = patterns->patterns; pattern; pattern = pattern->next, k++)
+    best_variations[k] = pattern->current_variation;
+
+  dfa_patterns_build_graph(patterns);
+  num_nodes_original = patterns->graph.num_nodes;
+  min_nodes_so_far = num_nodes_original;
+
+  fprintf(stderr, "Original number of dfa states: %d\n", min_nodes_so_far - 1);
+  fprintf(stderr, "Trying to optimize in %d iterations\n", iterations);
+
+  gg_srand(num_nodes_original + patterns->num_patterns);
+
+  while (iterations--) {
+    int changed_variations = 0;
+    int k = 0;
+    
+    /* Randomly change some variations. */
+    for (pattern = patterns->patterns; pattern; pattern = pattern->next, k++) {
+      if (gg_drand() < change_probability && pattern->num_variations != 1) {
+	int new_variation = gg_rand() % (pattern->num_variations - 1);
+	if (new_variation >= pattern->current_variation)
+	  new_variation++;
+	pattern->current_variation = new_variation;
+	changed_variations++;
+      }
+      else
+	pattern->current_variation = best_variations[k];
+    }
+
+    if (changed_variations == 0) {
+      iterations++;
+      continue;
+    }
+
+    fprintf(stderr, ".");
+    dfa_patterns_build_graph(patterns);
+
+    if (patterns->graph.num_nodes < min_nodes_so_far) {
+      /* If the new set of variations produces smaller dfa, save it. */
+      int k = 0;
+      for (pattern = patterns->patterns; pattern; pattern = pattern->next, k++)
+	best_variations[k] = pattern->current_variation;
+
+      fprintf(stderr, "\nOptimized: %d => %d states (%d iterations left)\n",
+	      min_nodes_so_far - 1, patterns->graph.num_nodes - 1, iterations);
+      min_nodes_so_far = patterns->graph.num_nodes;
+      failed_iterations = 0;
+    }
+    else
+      failed_iterations++;
+
+    if (failed_iterations >= 30) {
+      /* If haven't succeded in 30 last iterations, try to alter variation
+       * change probability.
+       */
+      double delta = gg_drand() / patterns->num_patterns;
+      if (change_probability > upper_limit
+	  || (change_probability >= lower_limit && gg_rand() % 2 == 0))
+	delta = -delta;
+
+      change_probability += delta;
+      failed_iterations = 0;
+    }
+  }
+
+  fprintf(stderr, "\nTotal optimization result: %d => %d states\n",
+	  num_nodes_original - 1, min_nodes_so_far - 1);
+
+  dfa_graph_clear(&(patterns->graph));
+  return best_variations;
 }
 
 

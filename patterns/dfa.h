@@ -160,7 +160,8 @@ struct pattern;
 
 /* conversion between a gnugo pattern struct into a dfa string. */
 void pattern_2_string(struct pattern *pat, struct patval_b *elements,
-		      char *str, int trans, int ci, int cj);
+		      char *str, int ci, int cj);
+void dfa_rotate_string(char *strrot, const char *str, int ll);
 
 /* add a string with attribute att_val into a dfa */
 float dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll);
@@ -182,6 +183,109 @@ float dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll);
  ********************************/
 
 extern int dfa_verbose;		/* the verbose level */
+
+
+/**************************************
+ *	Experimental dfa builder      *
+ **************************************/
+
+#define DFA_ATTRIB_BLOCK_SIZE	150000
+#define DFA_NODE_BLOCK_SIZE	 50000
+
+typedef struct _dfa_attrib	 dfa_attrib;
+typedef struct _dfa_attrib_block dfa_attrib_block;
+typedef struct _dfa_attrib_array dfa_attrib_array;
+typedef struct _dfa_node	 dfa_node;
+typedef struct _dfa_node_block	 dfa_node_block;
+typedef struct _dfa_graph	 dfa_graph;
+
+struct _dfa_attrib {
+  dfa_attrib	   *next;
+  int		    string_index;
+};
+
+struct _dfa_attrib_block {
+  dfa_attrib_block *previous;
+  dfa_attrib	    attrib[DFA_ATTRIB_BLOCK_SIZE];
+};
+
+struct _dfa_attrib_array {
+  dfa_attrib_block *last_block;
+  int		    allocated;
+};
+
+struct _dfa_node {
+  dfa_node	   *branch[4];
+  dfa_attrib	   *attributes;
+  dfa_attrib	   *passing_strings;
+};
+
+struct _dfa_node_block {
+  dfa_node_block   *previous;
+  dfa_node	    node[DFA_NODE_BLOCK_SIZE];
+};
+
+struct _dfa_graph {
+  int		    num_nodes;
+  dfa_node	   *root;
+  dfa_node_block   *last_block;
+  int		    allocated;
+  dfa_attrib_array  attributes;
+};
+
+
+#define DFA_HASH_BLOCK_SIZE	 10000
+
+#define DFA_HASH_TABLE_SIZE	  4096
+#define DFA_HASH_VALUE_1	     1
+#define DFA_HASH_VALUE_2	    79
+#define DFA_HASH_VALUE_3	  2971
+
+typedef struct _dfa_hash_entry	 dfa_hash_entry;
+typedef struct _dfa_hash_block	 dfa_hash_block;
+
+struct _dfa_hash_entry {
+  dfa_hash_entry   *next;
+  dfa_attrib	   *key;
+  dfa_node	   *value;
+};
+
+struct _dfa_hash_block {
+  dfa_hash_block   *previous;
+  dfa_hash_entry    entry[DFA_HASH_BLOCK_SIZE];
+};
+
+
+typedef struct _dfa_pattern	 dfa_pattern;
+typedef struct _dfa_patterns	 dfa_patterns;
+
+struct _dfa_pattern {
+  dfa_pattern	   *next;
+  int		    num_variations;
+  int		    current_variation;
+  char		   *variation[8];
+};
+
+struct _dfa_patterns {
+  int		    num_patterns;
+  dfa_pattern	   *patterns;
+  dfa_pattern	   *last_pattern;
+  dfa_graph	    graph;
+};
+
+
+void		dfa_graph_reset(dfa_graph *graph);
+
+void		dfa_patterns_reset(dfa_patterns *patterns);
+void		dfa_patterns_clear(dfa_patterns *patterns);
+void		dfa_patterns_add_pattern(dfa_patterns *patterns,
+					 const char *string, int index);
+void		dfa_patterns_set_last_pattern_variation(dfa_patterns *patterns,
+							int variation);
+void		dfa_patterns_build_graph(dfa_patterns *patterns);
+int *		dfa_patterns_optimize_variations(dfa_patterns *patterns,
+						 int iterations);
+
 
 #endif /* _DFA_H_ */
 

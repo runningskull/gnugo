@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new dfa builder implemented in dfa.c
+- dfa size reduction algorithm implemented
+- dfa transformation hints (.dtr) files added to repository
 - speed optimizations in cache.c
 - hashtable_unlink_closed_results() renamed hashnode_unlink_closed_results()
 - check for snapback/oiotoshi reactivated in check_self_atari()

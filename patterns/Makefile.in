@@ -525,20 +525,24 @@ influence.c : $(srcdir)/influence.db mkpat$(EXEEXT)
 barriers.c : $(srcdir)/barriers.db mkpat$(EXEEXT)
 	./mkpat -c -b barrierspat < $(srcdir)/barriers.db >barriers.c
 
-aa_attackpat.c : $(srcdir)/aa_attackpats.db mkpat$(EXEEXT)
-	./mkpat $(DFAFLAGS) -b aa_attackpat < $(srcdir)/aa_attackpats.db >aa_attackpat.c
+aa_attackpat.c : $(srcdir)/aa_attackpats.db $(srcdir)/aa_attackpats.dtr mkpat$(EXEEXT)
+	./mkpat $(DFAFLAGS) -b -t $(srcdir)/aa_attackpats.dtr aa_attackpat \
+		< $(srcdir)/aa_attackpats.db >aa_attackpat.c
 
-owl_attackpat.c : $(srcdir)/owl_attackpats.db mkpat$(EXEEXT)
-	./mkpat $(DFAFLAGS) -b owl_attackpat < $(srcdir)/owl_attackpats.db >owl_attackpat.c
+owl_attackpat.c : $(srcdir)/owl_attackpats.db $(srcdir)/owl_attackpats.dtr mkpat$(EXEEXT)
+	./mkpat $(DFAFLAGS) -b -t $(srcdir)/owl_attackpats.dtr owl_attackpat \
+		< $(srcdir)/owl_attackpats.db >owl_attackpat.c
 
 oraclepat.c : $(srcdir)/oracle.db mkpat$(EXEEXT)
 	./mkpat -b oracle < $(srcdir)/oracle.db >oraclepat.c
 
-owl_vital_apat.c : $(srcdir)/owl_vital_apats.db mkpat$(EXEEXT)
-	./mkpat $(DFAFLAGS) -b owl_vital_apat < $(srcdir)/owl_vital_apats.db >owl_vital_apat.c
+owl_vital_apat.c : $(srcdir)/owl_vital_apats.db $(srcdir)/owl_vital_apats.dtr mkpat$(EXEEXT)
+	./mkpat $(DFAFLAGS) -b -t $(srcdir)/owl_vital_apats.dtr owl_vital_apat \
+		< $(srcdir)/owl_vital_apats.db >owl_vital_apat.c
 
-owl_defendpat.c : $(srcdir)/owl_defendpats.db mkpat$(EXEEXT)
-	./mkpat $(DFAFLAGS) -b owl_defendpat < $(srcdir)/owl_defendpats.db >owl_defendpat.c
+owl_defendpat.c : $(srcdir)/owl_defendpats.db $(srcdir)/owl_defendpats.dtr mkpat$(EXEEXT)
+	./mkpat $(DFAFLAGS) -b -t $(srcdir)/owl_defendpats.dtr owl_defendpat \
+		< $(srcdir)/owl_defendpats.db >owl_defendpat.c
 
 fusekipat.c : $(srcdir)/fuseki.db mkpat$(EXEEXT)
 	./mkpat -b fusekipat < $(srcdir)/fuseki.db >fusekipat.c
