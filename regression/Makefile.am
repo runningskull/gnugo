@@ -24,9 +24,6 @@ test: all_batches
 reading: reading.tst
 	$(srcdir)/eval.sh reading.tst
 
-reading_rot: reading_rot.tst
-	$(srcdir)/eval.sh reading_rot.tst
-
 owl: owl.tst
 	$(srcdir)/eval.sh owl.tst
 
@@ -63,9 +60,6 @@ cutstone: cutstone.tst
 ld_owl: ld_owl.tst
 	$(srcdir)/eval.sh ld_owl.tst
 
-ld_owl_rot: ld_owl_rot.tst
-	$(srcdir)/eval.sh ld_owl_rot.tst
-
 ld_owl_life: ld_owl_life.tst
 	$(srcdir)/eval.sh ld_owl_life.tst --life
 
@@ -74,9 +68,6 @@ connection: connection.tst
 
 endgame: endgame.tst
 	$(srcdir)/eval.sh endgame.tst
-
-endgame_rot: endgame_rot.tst
-	$(srcdir)/eval.sh endgame_rot.tst
 
 blunder: blunder.tst
 	$(srcdir)/eval.sh blunder.tst

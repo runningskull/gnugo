@@ -31,6 +31,10 @@
 - owl tuning
 - eye tuning
 - one new test case in reading.tst
+- new regression/games/trevor/* and unsorted tests mv'ed to trevor
+- new tests xxlin.tst
+- strategy4 target in regression/Makefile.am corrected
+- rotated tests revised
 
 3.1.7 released September 24, 2001
 
