@@ -3109,7 +3109,7 @@ Pattern A1336
 ;!oplay_attack(*,a,b,b) && oplay_defend(*,c,d)
 
 
-Pattern A1334
+Pattern A1337
 
 |XXx?       kill without ko
 |.OXx
@@ -3120,7 +3120,7 @@ Pattern A1334
 :8,s,value(35)
 
 
-Pattern A1335
+Pattern A1338
 
 |OOo
 |OXO       kill without ko
@@ -3132,7 +3132,7 @@ Pattern A1335
 :8,s,value(35)
 
 
-Pattern A1336
+Pattern A1339
 
 |xXx      strange things happen at the 1-2 point
 |X.X
