@@ -604,15 +604,27 @@
 
 @end example
 
-@cindex owl_analyze_semeai
-@item owl_analyze_semeai
+@cindex analyze_semeai
+@item analyze_semeai
 
 @example
 
  Function:  Analyze a semeai
  Arguments: dragona, dragonb
  Fails:     invalid vertices, empty vertices
- Returns:   status of dragona, dragonb assuming dragona moves first
+ Returns:   semeai defense result, semeai attack result, semeai move
+
+@end example
+
+@cindex analyze_semeai_after_move
+@item analyze_semeai_after_move
+
+@example
+
+ Function:  Analyze a semeai after a move have been made.
+ Arguments: color, vertex, dragona, dragonb
+ Fails:     invalid vertices
+ Returns:   semeai defense result, semeai attack result, semeai move
 
 @end example
 

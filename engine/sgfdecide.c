@@ -335,24 +335,27 @@ decide_semeai(int apos, int bpos)
   if (*outfilename)
     sgffile_begindump(&tree);
 
+  gprintf("Analyzing semeai between %1m and %1m, %C moves first\n",
+	  apos, bpos, board[apos]);
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 1,
 		     &result_certain);
-  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)%s\n",
-	  color == BLACK ? "black" : "white",
-	  move,
-	  apos, safety_to_string(resulta),
-  	  bpos, safety_to_string(resultb),
-	  count_variations,
-	  result_certain ? "" : ", uncertain");
+  gprintf("Semeai defense of %1m: result %s %1m\n",
+	  apos, result_to_string(resulta), move);
+  gprintf("Semeai attack of %1m: result %s %1m\n",
+	  bpos, result_to_string(resultb), move);
+  gprintf("%d nodes%s\n\n", count_variations,
+	  result_certain ? "" : ", uncertain result");
+  
+  gprintf("Analyzing semeai between %1m and %1m, %C moves first\n",
+	  bpos, apos, board[bpos]);
   owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 1,
 		     &result_certain);
-  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)%s\n",
-	  color == BLACK ? "white" : "black",
-	  move,
-	  apos, safety_to_string(resulta),
-  	  bpos, safety_to_string(resultb),
-	  count_variations,
-	  result_certain ? "" : ", uncertain");
+  gprintf("Semeai defense of %1m: result %s %1m\n",
+	  bpos, result_to_string(resultb), move);
+  gprintf("Semeai attack of %1m: result %s %1m\n",
+	  apos, result_to_string(resulta), move);
+  gprintf("%d nodes%s\n", count_variations,
+	  result_certain ? "" : ", uncertain result");
 
   sgffile_enddump(outfilename);
   count_variations = 0;

@@ -1087,20 +1087,44 @@ detect_tactical_blunder(int move, int color, int *defense_point,
        * the trymove().
        */
       int owl_attacks;
+      int defense_effective = 0;
       
       popgo();
       decrease_depth_values();
       owl_attacks = owl_does_attack(move, pos, NULL);
       if (owl_attacks != WIN) {
 	*return_value += worm[pos].effective_size;
+	defense_effective = 1;
 	verbose = save_verbose;
 	TRACE("After %1m worm at %1m becomes defendable.\n", move, pos);
 	verbose = current_verbose;
       }
+      else {
+	/* Before redoing the trymove we also check whether the worm now
+	 * has a semeai defense. See blunder:26 for an example.
+	 */
+	int k;
+	for (k = 0; k < DRAGON2(pos).neighbors; k++) {
+	  int neighbor = dragon2[DRAGON2(pos).adjacent[k]].origin;
+	  int resulta;
+	  if (board[neighbor] != color)
+	    continue;
+	  owl_analyze_semeai_after_move(move, color, pos, neighbor,
+					&resulta, NULL, NULL, 1, NULL);
+	  if (resulta != 0) {
+	    *return_value += worm[pos].effective_size;
+	    defense_effective = 1;
+	    verbose = save_verbose;
+	    TRACE("After %1m worm at %1m becomes defendable.\n", move, pos);
+	    verbose = current_verbose;
+	  }
+	}
+      }
+      
       trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE);
       increase_depth_values();
       
-      if (owl_attacks != WIN && defense_point) {
+      if (defense_effective && defense_point) {
 	int dpos;
 	if (attack(pos, &dpos))
 	  *defense_point = dpos;

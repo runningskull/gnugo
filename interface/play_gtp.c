@@ -113,7 +113,8 @@ DECLARE(gtp_loadsgf);
 DECLARE(gtp_name);
 DECLARE(gtp_estimate_score);
 DECLARE(gtp_experimental_score);
-DECLARE(gtp_owl_analyze_semeai);
+DECLARE(gtp_analyze_semeai);
+DECLARE(gtp_analyze_semeai_after_move);
 DECLARE(gtp_tactical_analyze_semeai);
 DECLARE(gtp_owl_attack);
 DECLARE(gtp_owl_connection_defends);
@@ -243,7 +244,8 @@ static struct gtp_command commands[] = {
   {"loadsgf",          	      gtp_loadsgf},
   {"name",                    gtp_name},
   {"new_score",               gtp_estimate_score},
-  {"owl_analyze_semeai",      gtp_owl_analyze_semeai},
+  {"analyze_semeai",          gtp_analyze_semeai},
+  {"analyze_semeai_after_move", gtp_analyze_semeai_after_move},
   {"tactical_analyze_semeai", gtp_tactical_analyze_semeai},
   {"owl_attack",     	      gtp_owl_attack},
   {"owl_connection_defends",  gtp_owl_connection_defends},
@@ -1648,10 +1650,10 @@ gtp_owl_substantial(char *s)
 /* Function:  Analyze a semeai
  * Arguments: dragona, dragonb
  * Fails:     invalid vertices, empty vertices
- * Returns:   status of dragona, dragonb assuming dragona moves first
+ * Returns:   semeai defense result, semeai attack result, semeai move
  */
 static int
-gtp_owl_analyze_semeai(char *s)
+gtp_analyze_semeai(char *s)
 {
   int i, j;
   int k;
@@ -1680,10 +1682,67 @@ gtp_owl_analyze_semeai(char *s)
   owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 1,
   		     &result_certain);
   gtp_start_response(GTP_SUCCESS);
-  gtp_mprintf("%s %s %m", 
-	      safety_to_string(resulta),
-	      safety_to_string(resultb),
-	      I(move), J(move));
+  gtp_print_code(resulta);
+  gtp_printf(" ");
+  gtp_print_code(resultb);
+  gtp_mprintf(" %m", I(move), J(move));
+  if (!result_certain && report_uncertainty)
+    gtp_printf(" uncertain");
+
+  return gtp_finish_response();
+}  
+
+
+/* Function:  Analyze a semeai after a move have been made.
+ * Arguments: color, vertex, dragona, dragonb
+ * Fails:     invalid vertices
+ * Returns:   semeai defense result, semeai attack result, semeai move
+ */
+static int
+gtp_analyze_semeai_after_move(char *s)
+{
+  int i, j;
+  int color;
+  int move;
+  int k;
+  int dragona, dragonb;
+  int resulta, resultb, semeai_move, result_certain;
+  
+  k = gtp_decode_move(s, &color, &i, &j);
+  move = POS(i, j);
+  if (k == 0 || move == NO_MOVE)
+    return gtp_failure("invalid color or coordinate");
+  if (board[move] != EMPTY)
+    return gtp_failure("move vertex is not empty");
+  s += k;
+  
+  k = gtp_decode_coord(s, &i, &j);
+  if (k == 0)
+    return gtp_failure("invalid coordinate");
+  dragona = POS(i, j);
+  if (board[dragona] == EMPTY)
+    return gtp_failure("dragon vertex must not be empty");
+  s += k;
+
+  if (!gtp_decode_coord(s, &i, &j))
+    return gtp_failure("invalid coordinate");
+  dragonb = POS(i, j);
+  if (board[dragonb] == EMPTY)
+    return gtp_failure("dragon vertex must not be empty");
+
+  silent_examine_position(board[dragona], EXAMINE_DRAGONS_WITHOUT_OWL);
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+    reading_cache_clear();
+
+  owl_analyze_semeai_after_move(move, color, dragona, dragonb,
+				&resulta, &resultb, &semeai_move, 1,
+				&result_certain);
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_code(resulta);
+  gtp_printf(" ");
+  gtp_print_code(resultb);
+  gtp_mprintf(" %m", I(semeai_move), J(semeai_move));
   if (!result_certain && report_uncertainty)
     gtp_printf(" uncertain");
 

@@ -204,6 +204,14 @@ static void do_owl_analyze_semeai(int apos, int bpos,
 				  int komaster, int kom_pos,
 				  int *resulta, int *resultb,
 				  int *move, int pass, int owl_phase);
+static int semeai_trymove_and_recurse(int apos, int bpos,
+				      struct local_owl_data *owla,
+				      struct local_owl_data *owlb,
+				      int komaster, int kom_pos, int owl_phase,
+				      int move, int color, int ko_allowed,
+				      int move_value, const char *move_name,
+				      int same_dragon, int *semeai_move,
+				      int *this_resulta, int *this_resultb);
 static void semeai_add_sgf_comment(int value, int owl_phase);
 static int semeai_trust_tactical_attack(int str);
 static void semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
@@ -276,18 +284,37 @@ static int important_semeai_worms[MAX_SEMEAI_WORMS];
  */
 
 void
-owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
-		   int owl, int *semeai_result_certain)
+owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb,
+		   int *semeai_move, int owl, int *semeai_result_certain)
+{
+  owl_analyze_semeai_after_move(PASS_MOVE, EMPTY, apos, bpos, resulta, resultb,
+				semeai_move, owl, semeai_result_certain);
+}
+
+/* Same as the function above with the addition that an arbitrary move
+ * may be made before the analysis is performed.
+ */
+void
+owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
+			      int *resulta, int *resultb, int *semeai_move, 
+			      int owl, int *semeai_result_certain)
 {
   char ms[BOARDMAX];
   int w1, w2;
   int str;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_verbose = verbose;
+  int dummy_resulta;
+  int dummy_resultb;
 
   struct local_owl_data *owla;
   struct local_owl_data *owlb;
   
+  if (!resulta)
+    resulta = &dummy_resulta;
+  if (!resultb)
+    resultb = &dummy_resultb;
+
   /* Look for owl substantial worms of either dragon adjoining
    * the other dragon. Capturing such a worm wins the semeai.
    * These are the semeai_worms. This code must come before
@@ -334,7 +361,12 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
 
   ASSERT1(board[apos] == OTHER_COLOR(board[bpos]), apos);
   count_variations = 1;
-  TRACE("owl_analyze_semeai: %1m vs. %1m\n", apos, bpos);
+  if (move == PASS_MOVE)
+    TRACE("owl_analyze_semeai: %1m vs. %1m\n", apos, bpos);
+  else
+    TRACE("owl_analyze_semeai_after_move %C %1m: %1m vs. %1m\n",
+	  color, move, apos, bpos);
+  
   if (owl) {
     init_owl(&owla, apos, NO_MOVE, NO_MOVE, 1);
     init_owl(&owlb, bpos, NO_MOVE, NO_MOVE, 0);
@@ -350,30 +382,21 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
 
   result_certain = 1;
 
-  do_owl_analyze_semeai(apos, bpos, owla, owlb, EMPTY, NO_MOVE,
-			resulta, resultb, move, 0, owl);
+  if (move == PASS_MOVE)
+    do_owl_analyze_semeai(apos, bpos, owla, owlb, EMPTY, NO_MOVE,
+			  resulta, resultb, semeai_move, 0, owl);
+  else {
+    semeai_trymove_and_recurse(bpos, apos, owlb, owla, EMPTY, NO_MOVE, owl,
+			       move, color, 1, 0, "mandatory move", 1,
+			       semeai_move, resultb, resulta);
+    *resulta = REVERSE_RESULT(*resulta);
+    *resultb = REVERSE_RESULT(*resultb);
+  }
 
   if (semeai_result_certain)
     *semeai_result_certain = result_certain;
-
-  /* FIXME: We throw away information about ko results here. We need
-   * to do this until the callers are prepared to deal with ko
-   * results.
-   */
-  if (resulta) {
-    if (*resulta != 0)
-      *resulta = ALIVE;
-    else
-      *resulta = DEAD;
-  }
-
-  if (resultb) {
-    if (*resultb != 0)
-      *resultb = DEAD;
-    else
-      *resultb = ALIVE;
-  }
 }
+
 
 /* It is assumed that the 'a' player moves first, and
  * determines the best result for both players. The
@@ -423,9 +446,6 @@ do_owl_analyze_semeai(int apos, int bpos,
   const char *best_move_name = NULL;
   int this_resulta = -1;
   int this_resultb = -1;
-  int new_komaster = EMPTY;
-  int new_kom_pos = NO_MOVE;
-  int ko_move = 0;
   Read_result *read_result = NULL;
   int this_variation_number = count_variations - 1;
   int you_look_alive = 0;
@@ -803,67 +823,21 @@ do_owl_analyze_semeai(int apos, int bpos,
       }
       continue;
     }
-    if (count_variations < semeai_node_limit
-	&& stackp < MAX_SEMEAI_DEPTH
-	&& komaster_trymove(mpos, color, moves[k].name, apos,
-			    komaster, kom_pos,
-			    &new_komaster, &new_kom_pos, &ko_move,
-			    best_resulta == 0 || best_resultb == 0)) {
-      semeai_add_sgf_comment(moves[k].value, owl_phase);
+    
+    if (count_variations >= semeai_node_limit
+	|| stackp >= MAX_SEMEAI_DEPTH)
+      continue;
+
+    /* Try playing the move at mpos and call ourselves recursively to
+     * determine the result obtained by this move.
+     */
+    if (semeai_trymove_and_recurse(apos, bpos, owla, owlb, komaster,
+				   kom_pos, owl_phase, mpos, color,
+				   best_resulta == 0 || best_resultb == 0,
+				   moves[k].value, moves[k].name,
+				   moves[k].same_dragon, NULL,
+				   &this_resulta, &this_resultb)) {
       tested_moves++;
-      TRACE("Trying %C %1m. Current stack: ", color, mpos);
-      if (verbose)
-	dump_stack();
-      TRACE("%s, value %d, same_dragon %d\n", moves[k].name, moves[k].value,
-	    moves[k].same_dragon);
-
-      push_owl(&owla, &owlb);
-      
-      owl_update_goal(mpos, moves[k].same_dragon, owla, 1);
-      owl_update_boundary_marks(mpos, owlb);
-
-      /* Do a recursive call to read the semeai after the move we just
-       * tried. If dragon b was captured by the move, call
-       * do_owl_attack() to see whether it sufficed for us to live.
-       */
-      if (board[bpos] == EMPTY) {
-	/* FIXME: Are all owl_data fields and relevant static
-         * variables properly set up for a call to do_owl_attack()?
-	 */
-	this_resulta = REVERSE_RESULT(do_owl_attack(apos, NULL, NULL, owla,
-						    new_komaster, new_kom_pos,
-						    0));
-	this_resultb = this_resulta;
-      }
-      else {
-	do_owl_analyze_semeai(bpos, apos, owlb, owla,
-			      new_komaster, new_kom_pos,
-			      &this_resultb, &this_resulta,
-			      NULL, 0, owl_phase);
-	this_resulta = REVERSE_RESULT(this_resulta);
-	this_resultb = REVERSE_RESULT(this_resultb);
-      }
-
-      pop_owl(&owlb);
-      pop_owl(&owla);
-      
-      popgo();
-
-      /* Does success require ko? */
-      if (ko_move) {
-	if (this_resulta != 0)
-	  this_resulta = KO_B;
-	if (this_resultb != 0)
-	  this_resultb = KO_B;
-      }
-
-      if (count_variations >= semeai_node_limit) {
-	TRACE("Out of nodes, claiming win.\n");
-	result_certain = 0;
-	this_resulta = WIN;
-	this_resultb = WIN;
-      }
-      
       if (this_resultb == WIN && this_resulta == WIN) {
 	/* Ideal result, no need to try any more moves. */
 	*resulta = WIN;
@@ -938,6 +912,94 @@ do_owl_analyze_semeai(int apos, int bpos,
   READ_RETURN_SEMEAI(read_result, move, best_move, best_resulta, best_resultb);
 }
 
+/* Play a move, update goal and boundaries appropriately, and call
+ * do_owl_analyze_semeai() recursively to determine the result of this
+ * move.
+ */
+static int
+semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
+			   struct local_owl_data *owlb,
+			   int komaster, int kom_pos, int owl_phase,
+			   int move, int color, int ko_allowed,
+			   int move_value, const char *move_name,
+			   int same_dragon, int *semeai_move,
+			   int *this_resulta, int *this_resultb)
+{
+  int new_komaster = EMPTY;
+  int new_kom_pos = NO_MOVE;
+  int ko_move = 0;
+  
+  gg_assert(this_resulta != NULL && this_resultb != NULL);
+  *this_resulta = 0;
+  *this_resultb = 0;
+  if (!komaster_trymove(move, color, move_name, apos, komaster, kom_pos,
+			&new_komaster, &new_kom_pos, &ko_move, ko_allowed))
+    return 0;
+  
+  semeai_add_sgf_comment(move_value, owl_phase);
+  TRACE("Trying %C %1m. Current stack: ", color, move);
+  if (verbose) {
+    dump_stack();
+    goaldump(owla->goal);
+    gprintf("\n");
+    goaldump(owlb->goal);
+    gprintf("\n");
+  }
+  TRACE("%s, value %d, same_dragon %d\n", move_name, move_value, same_dragon);
+    
+  push_owl(&owla, &owlb);
+
+  if (owla->color == color) {
+    owl_update_goal(move, same_dragon, owla, 1);
+    owl_update_boundary_marks(move, owlb);
+  }
+  else {
+    owl_update_goal(move, same_dragon, owlb, 1);
+    owl_update_boundary_marks(move, owla);
+  }
+    
+  /* Do a recursive call to read the semeai after the move we just
+   * tried. If dragon b was captured by the move, call
+   * do_owl_attack() to see whether it sufficed for us to live.
+   */
+  if (board[bpos] == EMPTY) {
+    /* FIXME: Are all owl_data fields and relevant static
+     * variables properly set up for a call to do_owl_attack()?
+     */
+    *this_resulta = REVERSE_RESULT(do_owl_attack(apos, NULL, NULL, owla,
+						new_komaster, new_kom_pos,
+						0));
+    *this_resultb = *this_resulta;
+  }
+  else {
+    do_owl_analyze_semeai(bpos, apos, owlb, owla, new_komaster, new_kom_pos,
+			  this_resultb, this_resulta, semeai_move, 0,
+			  owl_phase);
+    *this_resulta = REVERSE_RESULT(*this_resulta);
+    *this_resultb = REVERSE_RESULT(*this_resultb);
+  }
+    
+  pop_owl(&owlb);
+  pop_owl(&owla);
+    
+  popgo();
+    
+  /* Does success require ko? */
+  if (ko_move) {
+    if (*this_resulta != 0)
+      *this_resulta = KO_B;
+    if (*this_resultb != 0)
+      *this_resultb = KO_B;
+  }
+    
+  if (count_variations >= semeai_node_limit) {
+    TRACE("Out of nodes, claiming win.\n");
+    result_certain = 0;
+    *this_resulta = WIN;
+    *this_resultb = WIN;
+  }
+  return 1;
+}
 
 /* Add details in sgf file about move value and whether owl_phase is active. */
 static void

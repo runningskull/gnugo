@@ -37,6 +37,6 @@ loadsgf games/auto_gen/auto006.sgf 94
 
 # This is a difficult semeai problem.
 loadsgf games/auto_gen/auto006.sgf 99
-15 owl_analyze_semeai S9 S10
-#? [ALIVE DEAD S6]*
+15 analyze_semeai S9 S10
+#? [1 1 S6]*
 

@@ -2,21 +2,21 @@
 
 orientation 1
 loadsgf games/semeai/semeai6.sgf
-6 owl_analyze_semeai A12 A14
-#? [ALIVE DEAD (A15|B15|C15|D15)]*
+6 analyze_semeai A12 A14
+#? [1 1 (A15|B15|C15|D15)]*
 
 orientation 1
 loadsgf games/semeai/semeai8.sgf
-18 owl_analyze_semeai A12 A14
-#? [ALIVE DEAD (A15|B15|D15|PASS)]*
+18 analyze_semeai A12 A14
+#? [1 1 (A15|B15|D15|PASS)]*
 
 orientation 2
 loadsgf games/semeai/semeai9.sgf
-22 owl_analyze_semeai O19 N19
-#? [ALIVE DEAD (L15|L17|L18)]*
+22 analyze_semeai O19 N19
+#? [1 1 (L15|L17|L18)]*
 
 orientation 1
 loadsgf games/nicklas/nicklas14.sgf 55
-32 owl_analyze_semeai B8 D9
-#? [ALIVE ALIVE B6]*
+32 analyze_semeai B8 D9
+#? [1 0 B6]*
 

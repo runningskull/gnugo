@@ -176,20 +176,20 @@ new_semeai()
 	    apos, bpos);
       owl_analyze_semeai(apos, bpos,
 			 &(semeai_results_first[d1][d2]), 
-			 &(semeai_results_second[d2][d1]),
+			 &(semeai_results_second[d1][d2]),
 			 &(semeai_move[d1][d2]), 1, &result_certain);
       DEBUG(DEBUG_SEMEAI, "results if %s moves first: %s %s, %1m%s\n",
 	    board[apos] == BLACK ? "black" : "white",
-	    safety_to_string(semeai_results_first[d1][d2]),
-	    safety_to_string(semeai_results_second[d2][d1]),
+	    result_to_string(semeai_results_first[d1][d2]),
+	    result_to_string(semeai_results_second[d1][d2]),
 	    semeai_move[d1][d2], result_certain ? "" : " (uncertain)");
       semeai_certain[d1][d2] = result_certain;
     }
   
   for (d1 = 0; d1 < num_dragons; d1++) {
     int semeai_found = 0;
-    int best_result = UNKNOWN;
-    int worst_result = UNKNOWN;
+    int best_defense = 0;
+    int best_attack = 0;
     int defense_move = PASS_MOVE;
     int attack_move = PASS_MOVE;
     int defense_certain = 0;
@@ -201,40 +201,33 @@ new_semeai()
       gg_assert(semeai_results_second[d1][d2] != -1);
       semeai_found = 1;
 
-      if (best_result == DEAD
-	  || best_result == UNKNOWN
-	  || (best_result == ALIVE_IN_SEKI 
-	      && semeai_results_first[d1][d2] != DEAD)
-	  || (best_result == semeai_results_first[d1][d2]
-	      && semeai_certain[d1][d2] > attack_certain)) {
-	best_result = semeai_results_first[d1][d2];
+      if (best_defense < semeai_results_first[d1][d2]
+	  || (best_defense == semeai_results_first[d1][d2]
+	      && defense_certain < semeai_certain[d1][d2])) {
+	best_defense = semeai_results_first[d1][d2];
 	defense_move = semeai_move[d1][d2];
-	attack_certain = semeai_certain[d1][d2];
+	defense_certain = semeai_certain[d1][d2];
       }
-      if (worst_result == ALIVE
-	  || worst_result == UNKNOWN
-	  || (worst_result == ALIVE_IN_SEKI 
-	      && semeai_results_second[d1][d2] != ALIVE)
-	  || (worst_result == semeai_results_second[d1][d2]
-	      && semeai_certain[d2][d1] > defense_certain)) {
-	worst_result = semeai_results_second[d1][d2];
+      if (best_attack < semeai_results_second[d2][d1]
+	  || (best_attack == semeai_results_second[d2][d1]
+	      && attack_certain < semeai_certain[d2][d1])) {
+	best_attack = semeai_results_second[d2][d1];
 	attack_move = semeai_move[d2][d1];
-	defense_certain = semeai_certain[d2][d1];
+	attack_certain = semeai_certain[d2][d1];
       }
     }
+    
     if (semeai_found) {
       dragon2[d1].semeai = 1;
-      if (best_result != DEAD && worst_result == DEAD) {
+      if (best_defense != 0 && best_attack != 0) {
 	update_status(DRAGON(d1).origin, CRITICAL, CRITICAL);
 	dragon2[d1].semeai_defense_point = defense_move;
 	dragon2[d1].semeai_defense_certain = defense_certain;
 	dragon2[d1].semeai_attack_point = attack_move;
 	dragon2[d1].semeai_attack_certain = attack_certain;
       }
-      else if (worst_result == ALIVE_IN_SEKI)
-	update_status(DRAGON(d1).origin, ALIVE, ALIVE_IN_SEKI);
-      else if (worst_result != UNKNOWN)
-	update_status(DRAGON(d1).origin, worst_result, worst_result);
+      else if (best_attack == 0 && attack_certain)
+	update_status(DRAGON(d1).origin, ALIVE, ALIVE);
     }
   }
 }
@@ -262,12 +255,13 @@ semeai_move_reasons(int color)
 	DEBUG(DEBUG_SEMEAI, "Adding semeai defense move for %1m at %1m\n",
 	      DRAGON(d).origin, dragon2[d].semeai_defense_point);
       }
-      else if (DRAGON(d).color == other && dragon2[d].semeai_attack_point
+      else if (DRAGON(d).color == other
+	       && dragon2[d].semeai_attack_point
 	       && (dragon2[d].owl_attack_point == NO_MOVE
 		   || dragon2[d].semeai_attack_certain >= 
 		      dragon2[d].owl_attack_certain)) {
 	add_semeai_move(dragon2[d].semeai_attack_point, dragon2[d].origin);
-	DEBUG(DEBUG_SEMEAI, "Adding owl attack move for %1m at %1m\n",
+	DEBUG(DEBUG_SEMEAI, "Adding semeai attack move for %1m at %1m\n",
 	      DRAGON(d).origin, dragon2[d].semeai_attack_point);
       }
     }
@@ -877,7 +871,7 @@ small_semeai_analyzer(int apos, int bpos, int save_verbose)
    */
 
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0, &dummy);
-  if (resulta != DEAD
+  if (resulta != 0
       && worm[apos].defense_codes[0] == 0
       && move != NO_MOVE) {
     if (save_verbose)

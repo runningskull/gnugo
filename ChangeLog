@@ -2,6 +2,17 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- detect_tactical_blunder() revised
+- ko result codes no longer discarded in owl_analyze_semeai()
+- new_semeai() revised
+- decide_semeai() in sgfdecide.c revised
+- GTP command owl_analyze_semeai renamed to analyze_semeai
+- new function owl_analyze_semeai_after_move() and corresponding GTP
+  command analyze_semeai_after_move
+- gtp_owl_analyze_semeai() revised
+- new static function semeai_trymove_and_recurse() in owl.c
+- all owl_analyze_semeai regression test cases changed to analyze_semeai
+  and revised for new result format
 - bugfixes in breakin.c and block_off()
 - new helper functions goal_to_hashvalue(), xor_hashvalues()
 - new function get_read_result_hash_modified to enable calling functions

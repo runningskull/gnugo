@@ -607,14 +607,14 @@ induce_secondary_move_reasons(int color)
 	}
       }
       else if (move_reasons[r].type == CONNECT_MOVE
-	      && cut_possible(pos, OTHER_COLOR(color))) {
+	       && cut_possible(pos, OTHER_COLOR(color))) {
 	int worm1 = conn_worm1[move_reasons[r].what];
 	int worm2 = conn_worm2[move_reasons[r].what];
 	int pos2;
-	for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
+	for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
 	  if (ON_BOARD(pos2) && board[pos2] == EMPTY
 	      && cut_possible(pos2, OTHER_COLOR(color))
-	      && square_dist(pos, pos2) <= 5)
+	      && square_dist(pos, pos2) <= 5) {
 	    for (j = 0; j < 8; j++) {
 	      int pos3 = pos2 + delta[j];
 	      if (ON_BOARD(pos3) && board[pos3] == color
@@ -624,18 +624,20 @@ induce_secondary_move_reasons(int color)
 			    worm1, EMPTY, NO_MOVE)) {
 		  if (!disconnect(pos3, worm1, NULL)) {
 		    add_connection_move(pos, pos3, worm1);
-		    DEBUG(DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m",
+		    DEBUG(DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m\n",
 			  pos, worm1, worm2, pos3, worm1);
 		  }
 		  if (!disconnect(pos3, worm2, NULL)) {
 		    add_connection_move(pos, pos3, worm2);
-		    DEBUG(DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m",
+		    DEBUG(DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m\n",
 			  pos, worm1, worm2, pos3, worm2);
 		  }
 		  popgo();
 		}
 	      }
 	    }
+	  }
+	}
       }
     }
   }

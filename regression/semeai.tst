@@ -85,89 +85,89 @@ reset_reading_node_counter
 # These tests do not call genmove. Genmove tests below node counts.
 
 loadsgf games/semeai/semeai6.sgf
-1 owl_analyze_semeai C1 E1
-#? [ALIVE ALIVE (F1|F2|F3|F4|F5|PASS)]
+1 analyze_semeai C1 E1
+#? [1 0 (F1|F2|F3|F4|F5|PASS)]
 
-2 owl_analyze_semeai E1 C1
-#? [ALIVE ALIVE (B5|B4|B3|PASS)]
+2 analyze_semeai E1 C1
+#? [1 0 (B5|B4|B3|PASS)]
 
-3 owl_analyze_semeai L1 N1
-#? [ALIVE ALIVE (O5|O4|O3|P3|Q2|Q1|PASS)]
+3 analyze_semeai L1 N1
+#? [1 0 (O5|O4|O3|P3|Q2|Q1|PASS)]
 
-4 owl_analyze_semeai N1 L1
-#? [ALIVE ALIVE (H2|J3|K3|PASS)]
+4 analyze_semeai N1 L1
+#? [1 0 (H2|J3|K3|PASS)]
 
-5 owl_analyze_semeai A14 A12
-#? [ALIVE DEAD (A13|B13|C13|D13)]
+5 analyze_semeai A14 A12
+#? [1 1 (A13|B13|C13|D13)]
 
-6 owl_analyze_semeai A12 A14
-#? [ALIVE DEAD (A15|B15|C15|D15|E15)]
+6 analyze_semeai A12 A14
+#? [1 1 (A15|B15|C15|D15|E15)]
 
 loadsgf games/semeai/semeai7.sgf
-7 owl_analyze_semeai C1 E1
-#? [ALIVE ALIVE (F1|F2|F3|F4|F5|PASS)]
+7 analyze_semeai C1 E1
+#? [1 0 (F1|F2|F3|F4|F5|PASS)]
 
-8 owl_analyze_semeai E1 C1
-#? [ALIVE DEAD (B2|B3)]
+8 analyze_semeai E1 C1
+#? [1 1 (B2|B3)]
 
-9 owl_analyze_semeai L1 N1
-#? [ALIVE ALIVE (O5|O4|O3|P3|Q2|Q1)]
+9 analyze_semeai L1 N1
+#? [1 0 (O5|O4|O3|P3|Q2|Q1)]
 
-10 owl_analyze_semeai N1 L1
-#? [ALIVE DEAD (H2|K3)]
+10 analyze_semeai N1 L1
+#? [1 1 (H2|K3)]
 
-11 owl_analyze_semeai A14 A12
-#? [ALIVE DEAD (A13|B13|D13|PASS)]
+11 analyze_semeai A14 A12
+#? [1 1 (A13|B13|D13|PASS)]
 
-12 owl_analyze_semeai A12 A14
-#? [DEAD ALIVE PASS]
+12 analyze_semeai A12 A14
+#? [0 0 PASS]
 
 loadsgf games/semeai/semeai8.sgf
-13 owl_analyze_semeai C1 E1
-#? [DEAD ALIVE PASS]
+13 analyze_semeai C1 E1
+#? [0 0 PASS]
 
-14 owl_analyze_semeai E1 C1
-#? [ALIVE DEAD (B5|PASS)]
+14 analyze_semeai E1 C1
+#? [1 1 (B5|PASS)]
 
-15 owl_analyze_semeai L1 N1
-#? [DEAD ALIVE PASS]
+15 analyze_semeai L1 N1
+#? [0 0 PASS]
 
-16 owl_analyze_semeai N1 L1
-#? [ALIVE DEAD (K5|PASS)]
+16 analyze_semeai N1 L1
+#? [1 1 (K5|PASS)]
 
-17 owl_analyze_semeai A14 A12
-#? [DEAD ALIVE PASS]
+17 analyze_semeai A14 A12
+#? [0 0 PASS]
 
-18 owl_analyze_semeai A12 A14
-#? [ALIVE DEAD (A15|B15|D15|E15|PASS)]
+18 analyze_semeai A12 A14
+#? [1 1 (A15|B15|D15|E15|PASS)]
 
 loadsgf games/semeai/semeai9.sgf
 
-19 owl_analyze_semeai J1 L1
-#? [ALIVE DEAD (M3|N3|O3|P3|Q1)]
+19 analyze_semeai J1 L1
+#? [1 1 (M3|N3|O3|P3|Q1)]
 
-20 owl_analyze_semeai L1 J1
-#? [ALIVE DEAD (H1|H2|H3|H4|H5|H6|H7|H8)]
+20 analyze_semeai L1 J1
+#? [1 1 (H1|H2|H3|H4|H5|H6|H7|H8)]
 
-21 owl_analyze_semeai N19 O19
-#? [ALIVE DEAD (T17|T19)]
+21 analyze_semeai N19 O19
+#? [1 1 (T17|T19)]
 
-22 owl_analyze_semeai O19 N19
-#? [ALIVE DEAD (L16|L17|L18|M19)]
+22 analyze_semeai O19 N19
+#? [1 1 (L16|L17|L18|M19)]
 
 loadsgf golois/Goemate990902-1.sgf
 
-23 owl_analyze_semeai G12 G13
-#? [ALIVE DEAD (F15|G15|H15|E13|F13|PASS)]
+23 analyze_semeai G12 G13
+#? [1 1 (F15|G15|H15|E13|F13|PASS)]
 
-24 owl_analyze_semeai G13 G12
-#? [DEAD ALIVE PASS]
+24 analyze_semeai G13 G12
+#? [0 0 PASS]
 
-25 owl_analyze_semeai S8 R8
-#? [ALIVE DEAD S9]
+25 analyze_semeai S8 R8
+#? [1 1 S9]
 
-26 owl_analyze_semeai R8 S8
-#? [ALIVE DEAD S9]
+26 analyze_semeai R8 S8
+#? [1 1 S9]
 
 # If this semeai is treated as a strictly local
 # problem (ignoring the R8 dragon) then R7 can't live.
@@ -175,84 +175,83 @@ loadsgf golois/Goemate990902-1.sgf
 # design!  So it's unclear what the correct answer
 # should be.  A similar remark holds with problem 28.
 
-27 owl_analyze_semeai Q7 R7
-#? [ALIVE DEAD S9]
+27 analyze_semeai Q7 R7
+#? [1 1 S9]
 
-28 owl_analyze_semeai R7 Q7
-#? [ALIVE DEAD S9]
-
-loadsgf games/strategy11.sgf 127
-30 owl_analyze_semeai B3 G4
-#? [ALIVE DEAD C1]
+28 analyze_semeai R7 Q7
+#? [1 1 S9]
 
 loadsgf games/strategy11.sgf 127
-31 owl_analyze_semeai G4 B3
-#? [ALIVE DEAD C1]
+30 analyze_semeai B3 G4
+#? [1 1 C1]
+
+loadsgf games/strategy11.sgf 127
+31 analyze_semeai G4 B3
+#? [1 1 C1]
 
 loadsgf games/nicklas/nicklas14.sgf 55
-32 owl_analyze_semeai B8 D9
-#? [ALIVE ALIVE B6]*
+32 analyze_semeai B8 D9
+#? [1 0 B6]*
 
 loadsgf games/nicklas/nicklas14.sgf 55
-33 owl_analyze_semeai D9 B8
-#? [ALIVE DEAD B7]
+33 analyze_semeai D9 B8
+#? [1 1 B7]
 
 # S18 produces a favorable ko. T18 makes seki.
 loadsgf games/bretz.sgf 130
-34 owl_analyze_semeai N18 Q18
-#? [ALIVE DEAD S18]
+34 analyze_semeai N18 Q18
+#? [1 1 S18]
 
 # ab added (3.1.22)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
-35 owl_analyze_semeai M13 M11
-#? [ALIVE DEAD (PASS|N13|N10|H11)]
+35 analyze_semeai M13 M11
+#? [1 1 (PASS|N13|N10|H11)]
 
 # See also reading:166
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
-36 owl_analyze_semeai S9 R11
-#? [ALIVE DEAD R12]*
+36 analyze_semeai S9 R11
+#? [1 1 R12]*
 
 loadsgf games/semeai/semeai10.sgf
-37 owl_analyze_semeai B11 L7
-#? [ALIVE DEAD B12]
+37 analyze_semeai B11 L7
+#? [1 1 B12]
 
 loadsgf games/semeai/semeai11.sgf
-38 owl_analyze_semeai B9 B8
-#? [ALIVE DEAD (PASS|B1|A9)]
+38 analyze_semeai B9 B8
+#? [1 1 (PASS|B1|A9)]
 
 # See also global:3.
 loadsgf golois/Aya991113-13.sgf
-# Correct answer is ko dependent (2 2 H4).
-39 owl_analyze_semeai R12 H9
-#? [!ALIVE DEAD J4]
+39 analyze_semeai R12 H9
+#? [2 2 H4]
 
-40 owl_analyze_semeai H9 R12
-#? [ALIVE DEAD (J4|H4)]
+40 analyze_semeai H9 R12
+#? [1 1 (J4|H4)]
 
 loadsgf games/semeai/semeai9.sgf
-41 owl_analyze_semeai A3 A5
-#? [ALIVE DEAD (PASS|B3|A6|B6|C5|D4|E3|E2|E1)]
-42 owl_analyze_semeai A5 A3
-#? [DEAD ALIVE PASS]
-43 owl_analyze_semeai A16 A12
-#? [ALIVE DEAD (A15|A11|B11|C14|C13|D12|D11|D10|D9|B9|A9)]
-44 owl_analyze_semeai A12 A16
-#? [ALIVE DEAD (A17|B17|C16|D16|E15|E14|F13|F12|F11|F10|F9|F8|B9|A9)]
+41 analyze_semeai A3 A5
+#? [1 1 (PASS|B3|A6|B6|C5|D4|E3|E2|E1)]
+42 analyze_semeai A5 A3
+#? [0 0 PASS]
+43 analyze_semeai A16 A12
+#? [1 1 (A15|A11|B11|C14|C13|D12|D11|D10|D9|B9|A9)]
+44 analyze_semeai A12 A16
+#? [1 1 (A17|B17|C16|D16|E15|E14|F13|F12|F11|F10|F9|F8|B9|A9)]
 
 loadsgf games/semeai/semeai12.sgf
-45 owl_analyze_semeai B5 A9
-#? [ALIVE DEAD C1]*
+45 analyze_semeai B5 A9
+#? [1 1 C1]*
 
 loadsgf games/semeai/semeai9.sgf
-46 owl_analyze_semeai Q12 S11
-#? [ALIVE ALIVE (PASS|R8|R9|T11|T9|R11|R10)]
-47 owl_analyze_semeai S11 Q12
-#? [ALIVE ALIVE (PASS|T11|T9|R9|T10|R10|R11)]*
+46 analyze_semeai Q12 S11
+#? [1 0 (PASS|R8|R9|T11|T9|R11|R10)]
+47 analyze_semeai S11 Q12
+#? [1 0 (PASS|T11|T9|R9|T10|R10|R11)]*
 
 # The opposite semeai is not very interesting (black clearly can kill white).
 loadsgf games/nngs/jypower-gnugo-3.3.17-200304150031.sgf 166
-50 owl_analyze_semeai O7 L7
-#? [ALIVE DEAD (J5|J6|K7|J4|G5|G6|H7)]
+50 analyze_semeai O7 L7
+#? [1 1 (J5|J6|K7|J4|G5|G6|H7)]
 
 
 ########### end of semeai tests #################
