@@ -2617,6 +2617,24 @@ Pattern D831
 :8,s,value(35)
 
 
+Pattern D832
+# gf New pattern. (3.1.9)
+
+|O??        throw in to improve eye potential
+|.Oo
+|*XX
++---
+
+:8,s,value(35)
+
+|O??
+|.Oo
+|*AX
++---
+
+;oplay_defend(*,A) != WIN
+
+
 #########################################################
 #                                                       #
 #                  Prevent intrusion                    #

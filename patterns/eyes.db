@@ -1042,6 +1042,17 @@ Pattern 601
 
 
 Pattern 602
+# Bent four in the corner.
+
+ !
+|.
+|.XX.
++---
+
+:1,1
+
+
+Pattern 603
 # Special corner shape
 
 |*X.
@@ -1051,98 +1062,98 @@ Pattern 602
 :2,1
 
 
-Pattern 603
+Pattern 604
 
 xxxxxx
 
 :2,2
 
 
-Pattern 604
+Pattern 605
 
 !....x
 
 :2,2
 
 
-Pattern 605
+Pattern 606
 
 @..xXx
 
 :2,1
 
 
-Pattern 606
+Pattern 607
 
 @.XX>.
 
 :2,1
 
 
-Pattern 607
+Pattern 608
 
 !..X.X
 
 :2,2
 
 
-Pattern 608
+Pattern 609
 
 !.X...
 
 :2,2
 
 
-Pattern 609
+Pattern 610
 
 !.XxxX
 
 :2,2
 
 
-Pattern 610
+Pattern 611
 
 @.XxX.
 
 :2,1
 
 
-Pattern 611
+Pattern 612
 
 @X.xxx
 
 :2,1
 
 
-Pattern 612
+Pattern 613
 
 @Xx.xx
 
 :2,1
 
 
-Pattern 613
+Pattern 614
 
 @Xxx.x
 
 :2,1
 
 
-Pattern 614
+Pattern 615
 
 @XXXXx
 
 :2,0
 
 
-Pattern 615
+Pattern 616
 
 !.xx.!
 
 :1,1
 
 
-Pattern 616
+Pattern 617
 
 (.@x.x
 
@@ -1153,21 +1164,21 @@ Pattern 616
 #                points.
 
 
-Pattern 617
+Pattern 618
 
 @XX>X!
 
 :1,0
 
 
-Pattern 618
+Pattern 619
 
 @XXX.!
 
 :1,0
 
 
-Pattern 619
+Pattern 620
 
 .@.).!
 

@@ -605,6 +605,10 @@ loadsgf games/trevor/trevor_03.sgf 29
 154 attack E4
 #? [1 G4]*
 
+loadsgf games/reading32.sgf
+155 attack G9
+#? [0]*
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

@@ -4381,9 +4381,10 @@ o...X
 
 
 Pattern EB617
+# gf Revised pattern. (3.1.9)
 
 oO.?           Prevent monkey jump or other incursion
-..*X
+o.*X
 ....
 ----
 
@@ -12645,6 +12646,7 @@ oa.
 
 
 Pattern LE4
+# gf Revised constraint. (3.1.9)
 
 ...      hane to prevent incursion
 .*o

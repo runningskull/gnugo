@@ -119,6 +119,8 @@ loadsgf games/incident156.sgf 232
 125 gg_genmove black
 #? [K17|J17|K18|L18|K19|L19|M19|H16]
 
+# The move valuation must become aware of the distinction between
+# attack and defense with or without ko.
 loadsgf games/strategy29.sgf 138
 126 gg_genmove white
 #? [B19]*
@@ -223,6 +225,7 @@ loadsgf games/gwe.sgf 225
 149 gg_genmove white
 #? [!O1]
 
+# Owl reading mistake, eyespace related.
 loadsgf games/gwe.sgf 203
 150 gg_genmove white
 #? [Q1]*

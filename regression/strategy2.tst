@@ -165,9 +165,9 @@ loadsgf games/heikki/heikki01.sgf 17
 #? [P14]*
 
 loadsgf games/heikki/heikki01.sgf 35
-# J2 makes ko
+# J18 makes ko
 84 gg_genmove black
-#? [J2]*
+#? [J18]*
 
 loadsgf games/strategy24.sgf
 85 gg_genmove white

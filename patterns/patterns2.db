@@ -2731,6 +2731,7 @@ O*.
 
 
 Pattern DD12
+# gf Revised. (3.1.9)
 
 OX?        double attack
 X*.
@@ -2740,18 +2741,20 @@ X..
 
 :8,-
 
-OB?
+EB?
 A*d
-Ace
+Ac.
 A..
 ---
 
-;lib(A)==3 && oplay_attack(*,B) && oplay_attack(*,c,d,e,B)
+;lib(A)==3 && !oplay_attack(*,E) && oplay_attack(*,d,A)
+;&& !oplay_defend_both(*,c,d,A,B)
 
 >add_attack_either_move(A,B)
 
 
 Pattern DD13
+# gf Revised. (3.1.9)
 
 XO?        double defense
 O*.
@@ -2761,13 +2764,14 @@ O..
 
 :8,-
 
-Xb?
+eb?
 a*d
-ace
+ac.
 a..
 ---
 
-;lib(a)==3 && xplay_attack(*,b) && xplay_attack(*,c,d,e,b)
+;lib(a)==3 && !attack(e) && xplay_attack(*,d,a)
+;&& !xplay_defend_both(*,c,d,a,b)
 
 >add_defend_both_move(a,b)
 

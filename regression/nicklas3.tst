@@ -20,9 +20,12 @@ loadsgf games/nicklas/nicklas6.sgf 25
 #? [C6]*
 
 # J6 gives a gote seki.
+# However, playing sente moves against the group, starting with H9,
+# and then taking gote at H1 gives the same end result. Thus H9 is
+# also okay.
 loadsgf games/nicklas/nicklas14.sgf 48
 1403 gg_genmove white
-#? [J6]*
+#? [J6|H9]*
 
 ############ End of Tests #################
 

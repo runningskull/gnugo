@@ -2474,10 +2474,27 @@ XO
 
 :/,-,value(95)
 
+a*
+Xb
+
+; !xplay_defend_both(*,a,b) && vital_chain(a) && vital_chain(b)
+
+
+Pattern A1107b
+# gf New pattern. (3.1.9)
+
+*.
+O.          defend the surrounding chain
+XO
+
+:8,-,value(96)
+
+*.
 ba
 Xc
 
-; !xplay_defend_both(a,b,c) && vital_chain(b) && vital_chain(c)
+;lib(c)>2 && !xplay_defend_both(a,b,c) && vital_chain(b)
+;&& vital_chain(c) && oplay_attack(*,a,a)
 
 
 Pattern A1108

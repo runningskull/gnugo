@@ -168,6 +168,12 @@ loadsgf games/xxlin.sgf 106
 184 gg_genmove black
 #? [H13]*
 
+# We may want to move this to a dedicated seki or semeai test suite in
+# the future.
+loadsgf games/seki02.sgf
+185 gg_genmove black
+#? [E7]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

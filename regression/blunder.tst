@@ -78,4 +78,7 @@ loadsgf games/blunder12.sgf 258
 17 gg_genmove white
 #? [R7]*
 
-
+# A simplification of incident 136. Black E6 is a bad blunder.
+loadsgf games/blunder13.sgf
+18 gg_genmove black
+#? [F5]
