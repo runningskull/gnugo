@@ -95,3 +95,10 @@ loadsgf golois/Goemate990902-1.sgf
 # A similar remark holds with problem 27.
 28 owl_analyze_semeai R7 Q7
 #? [ALIVE DEAD S9]
+
+# A6 gives an unfavorable ko while F10 gives seki.
+# Since there are no ko threats, and F10 is enough to win, it is preferred.
+loadsgf games/semeaiko1.sgf
+29 gg_genmove black
+#? F10
+
