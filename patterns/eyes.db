@@ -2540,6 +2540,15 @@ xXX
 
 Pattern 7202
 
+ X
+XX*
+ XX>
+
+:2,1
+
+
+Pattern 7203
+
  x
 xX*
  XX.
@@ -2547,7 +2556,7 @@ xX*
 :2,1
 
 
-Pattern 7203
+Pattern 7204
 
  x
 xXX

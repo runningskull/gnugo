@@ -1244,8 +1244,19 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	}
 	
 	gg_assert(num_attacks > 0 && num_defenses > 0);
+
 	*attack_point = attack_points[0];
+	/* If possible, choose a non-sacrificial defense point.
+         * Compare white T8 and T6 in lazarus:21.
+	 */
 	*defense_point = defense_points[0];
+	for (k = 0; k < num_defenses; k++) {
+	  if (safe_move(defense_points[k], eye_color) == WIN) {
+	    *defense_point = defense_points[k];
+	    break;
+	  }
+	}
+	
 	DEBUG(DEBUG_EYES, "  vital points: %1m (attack) %1m (defense)\n",
 	      *attack_point, *defense_point);
 	DEBUG(DEBUG_EYES, "  pattern matched:  %s\n", graphs[graph].patname);
