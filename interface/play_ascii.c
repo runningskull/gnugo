@@ -52,8 +52,6 @@ showterri        display territory\n\
 static int opt_showboard = 1;
 static int showdead = 0;
 static SGFTree sgftree;
-static int last_move_i;      /* The position of the last move */
-static int last_move_j;      /* -""-                          */
 static int resignation_allowed;
 
 /* Unreasonable score used to detect missing information. */
@@ -194,6 +192,7 @@ ascii_showboard(void)
   int last_pos_was_move;
   int pos_is_move;
   int dead;
+  int last_move = get_last_move();
   
   make_letterbar(board_size, letterbar);
   set_handicap_spots(board_size);
@@ -217,14 +216,22 @@ ascii_showboard(void)
   printf("\n");
 
   fflush(stdout);
-  printf("%s\n", letterbar);
+  printf("%s", letterbar);
+
+  if (get_last_player() != EMPTY) {
+    gfprintf(stdout, "        Last move: %s %1m",
+	     get_last_player() == WHITE ? "White" : "Black",
+	     last_move);
+  }
+
+  printf("\n");
   fflush(stdout);
   
   for (i = 0; i < board_size; i++) {
     printf(" %2d", board_size - i);
     last_pos_was_move = 0;
     for (j = 0; j < board_size; j++) {
-      if (last_move_i == i && last_move_j == j)
+      if (POS(i, j) == last_move)
 	pos_is_move = 128;
       else
 	pos_is_move = 0;
@@ -471,9 +478,6 @@ computer_move(Gameinfo *gameinfo, int *passes)
     gnugo_estimate_score(&upper_bound, &lower_bound);
     current_score_estimate = (int) ((lower_bound + upper_bound) / 2.0);
   }
-    
-  last_move_i = i;
-  last_move_j = j;
   
   mprintf("%s(%d): %m\n", color_to_string(gameinfo->to_move),
 	  movenum+1, i, j);
@@ -520,9 +524,6 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
   sgffile_add_debuginfo(sgftree.lastnode, 0.0);
   sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
   sgffile_output(&sgftree);
-
-  last_move_i = i;
-  last_move_j = j;
   
   if (opt_showboard) {
     ascii_showboard();
