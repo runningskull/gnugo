@@ -244,7 +244,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, move, color, 0))
+    if (!pattern->autohelper(ll, move, color, 0))
       return;
   }
 
@@ -273,9 +273,8 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   }
   
   /* does the pattern have an action? */
-  if (pattern->autohelper_flag & HAVE_ACTION) {
-    pattern->autohelper(pattern, ll, move, color, 1);
-  }
+  if (pattern->autohelper_flag & HAVE_ACTION)
+    pattern->autohelper(ll, move, color, 1);
 
   /* Pattern class B, try to cut all combinations of opponent strings. */
   if (class & CLASS_B) {

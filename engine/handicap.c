@@ -383,7 +383,7 @@ free_handicap_callback(int anchor, int color, struct pattern *pattern,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, move, color, 0))
+    if (!pattern->autohelper(ll, move, color, 0))
       return;
   }
   

@@ -42,27 +42,30 @@
  * the top, then 'j' across from the left
  */
 
-#define MAX_BOARD 19
 #define USAGE "\
-Usage : mkpat [-cvh] <prefix>\n\
- options : -v = verbose\n\
-           -c = compile connections database (default is pattern database)\n\
-           -b = allow both colors to be anchor (default is only O)\n\
-           -X = allow only X to be anchor (default is only O)\n\
-           -f = compile a fullboard pattern database\n\
-           -m = try to place the anchor in the center of the pattern\n\
-                (reduce dfa size)\n\
-	   -i = one or more input files (typically *.db).\n\
-	   -o = output file (typically *.c).\n\
-           -p = pre-rotate patterns before storing in database.\n\
-           -a = require anchor in all patterns.  Sets fixed_anchor flag in db.\n\
-\n\
- If compiled with --enable-dfa the following options also work:\n\n\
-           -D = generate a dfa and save it as a C file.\n\
-           -V <level>  = dfa verbose level\n\
-\n\
- There is a third (experimental) pattern matcher created with:\n\
-           -T = generate a tree based pattern matching data-structure.\n\
+Usage : mkpat [options] <prefix>\n\
+  General options:\n\
+	-i = one or more input files (typically *.db)\n\
+	-o = output file (typically *.c)\n\
+	-v = verbose\n\
+	-V <level> = dfa verbiage level\n\
+  Database type:\n\
+	-p = compile general pattern database (the default)\n\
+	-c = compile connections database\n\
+	-f = compile a fullboard pattern database\n\
+	-C = compile a corner pattern database\n\
+	-D = compile a dfa database (allows fast matching)\n\
+	-T = compile a tree based pattern database (even faster)\n\
+  Pattern generation options:\n\
+	-O = allow only O to be anchor (the default)\n\
+	-X = allow only X to be anchor\n\
+	-b = allow both colors to be anchor\n\
+	-m = try to place the anchor in the center of the pattern\n\
+	     (works best with dfa databases)\n\
+	-a = require anchor in all patterns. Sets fixed_anchor flag in db\n\
+	-r = pre-rotate patterns before storing in database\n\
+If no input files specified, reads from stdin.\n\
+If outpuf file is not specified, writes to stdout.\n\
 "
 
 
@@ -83,15 +86,20 @@ Usage : mkpat [-cvh] <prefix>\n\
 
 #include "dfa.h"
 
-#define PATTERNS    0
-#define CONNECTIONS 1
+
+#define DB_GENERAL	((int) 'p')
+#define DB_CONNECTIONS	((int) 'c')
+#define DB_FULLBOARD	((int) 'f')
+#define DB_CORNER	((int) 'C')
+#define DB_DFA		((int) 'D')
+#define DB_TREE 	((int) 'T')
 
 /* code assumes that ATT_O and ATT_X are 1 and 2 (in either order)
  * An attribute is a candidate for anchor if  (att & anchor) != 0
  */
 #define ANCHOR_O    ATT_O
 #define ANCHOR_X    ATT_X
-#define ANCHOR_BOTH 3
+#define ANCHOR_BOTH (ATT_O | ATT_X)
 
 #define MAXLINE 500
 #define MAXCONSTRAINT 10000
@@ -150,6 +158,7 @@ static char constraint_diagram[MAX_BOARD+2][MAX_BOARD+3];
 				/* store pattern constraint diagram */
 
 /* stuff to maintain info about patterns while reading */
+char *prefix;
 struct pattern pattern[MAXPATNO];  /* accumulate the patterns into here */
 char pattern_names[MAXPATNO][80];  /* with optional names here, */
 char helper_fn_names[MAXPATNO][80]; /* helper fn names here */
@@ -159,6 +168,10 @@ char *code_pos;                     /* current position in code buffer */
 struct autohelper_func {
   const char *name;
   int params;
+  int type;	/* 0 - just copy the parameters,
+		 * 1 - add parameter count,
+		 * 2 - add address of the current pattern.
+		 */
   float cost;
   const char *code;
 };
@@ -182,161 +195,161 @@ int current_line_number = 0;
  * by "lib2", "lib3", and "lib4".
  */
 static struct autohelper_func autohelper_functions[] = {
-  {"lib2",            		1, 0.01, "worm[%s].liberties2"},
-  {"lib3",            		1, 0.01, "worm[%s].liberties3"},
-  {"lib4",            		1, 0.01, "worm[%s].liberties4"},
-  {"goallib",         		0, 0.01, "goallib"},
-  {"lib",             		1, 0.01, "countlib(%s)"},
-  {"alive",           		1, 0.01,
+  {"lib2",			1, 0, 0.01, "worm[%s].liberties2"},
+  {"lib3",			1, 0, 0.01, "worm[%s].liberties3"},
+  {"lib4",			1, 0, 0.01, "worm[%s].liberties4"},
+  {"goallib",			0, 0, 0.01, "goallib"},
+  {"lib",			1, 0, 0.01, "countlib(%s)"},
+  {"alive",			1, 0, 0.01,
 		"(dragon[%s].status == ALIVE)"},
-  {"unknown",         		1, 0.01,
+  {"unknown",			1, 0, 0.01,
 		"(dragon[%s].status == UNKNOWN)"},
-  {"critical",        		1, 0.01,
+  {"critical",			1, 0, 0.01,
 		"(dragon[%s].status == CRITICAL)"},
-  {"dead",            		1, 0.01, "(dragon[%s].status == DEAD)"},
-  {"status",          		1, 0.01, "dragon[%s].status"},
-  {"ko",              		1, 0.01, "is_ko_point(%s)"},
-  {"xdefend_against", 		2, 1.00,
-		"defend_against(%s,OTHER_COLOR(color),%s)"},
-  {"odefend_against", 		2, 1.00, "defend_against(%s,color,%s)"},
-  {"defend_against_atari", 	1, 1.00,
-		"defend_against_atari_helper(move,%s)"},
-  {"does_defend",     		2, 1.00, "does_defend(%s,%s)"},
-  {"does_attack",     		2, 1.00, "does_attack(%s,%s)"},
-  {"attack",          		1, 1.00, "ATTACK_MACRO(%s)"},
-  {"defend",          		1, 1.00, "DEFEND_MACRO(%s)"},
-  {"weak",            		1, 0.01, "DRAGON_WEAK(%s)"},
-  {"safe_xmove",      		1, 1.00, "safe_move(%s,OTHER_COLOR(color))"},
-  {"safe_omove",      		1, 1.00, "safe_move(%s,color)"},
-  {"legal_xmove",     		1, 0.05, "is_legal(%s,OTHER_COLOR(color))"},
-  {"legal_omove",     		1, 0.05, "is_legal(%s,color)"},
-  {"x_suicide",                 1, 0.05, "is_suicide(%s, OTHER_COLOR(color))"},
-  {"o_suicide",	                1, 0.05, "is_suicide(%s, color)"},
-  {"x_alive_somewhere",	       -1, 0.01,
-                "somewhere(OTHER_COLOR(color), 1, 1+%d"},
-  {"o_alive_somewhere",	       -1, 0.01, "somewhere(color, 1, 1+%d"},
-  {"x_somewhere",	       -1, 0.01,
-                "somewhere(OTHER_COLOR(color), 0, 1+%d"},
-  {"o_somewhere",	       -1, 0.01, "somewhere(color, 0, 1+%d"},
-  {"xmoyo_opposite",   		1, 0.01,
+  {"dead",			1, 0, 0.01, "(dragon[%s].status == DEAD)"},
+  {"status",			1, 0, 0.01, "dragon[%s].status"},
+  {"ko", 			1, 0, 0.01, "is_ko_point(%s)"},
+  {"xdefend_against",		2, 0, 1.00,
+		"defend_against(%s, OTHER_COLOR(color), %s)"},
+  {"odefend_against",		2, 0, 1.00, "defend_against(%s, color, %s)"},
+  {"defend_against_atari",	1, 0, 1.00,
+		"defend_against_atari_helper(move, %s)"},
+  {"does_defend",		2, 0, 1.00, "does_defend(%s, %s)"},
+  {"does_attack",		2, 0, 1.00, "does_attack(%s, %s)"},
+  {"attack",			1, 0, 1.00, "ATTACK_MACRO(%s)"},
+  {"defend",			1, 0, 1.00, "DEFEND_MACRO(%s)"},
+  {"weak",			1, 0, 0.01, "DRAGON_WEAK(%s)"},
+  {"safe_xmove", 		1, 0, 1.00, "safe_move(%s, OTHER_COLOR(color))"},
+  {"safe_omove", 		1, 0, 1.00, "safe_move(%s, color)"},
+  {"legal_xmove",		1, 0, 0.05, "is_legal(%s, OTHER_COLOR(color))"},
+  {"legal_omove",		1, 0, 0.05, "is_legal(%s, color)"},
+  {"x_suicide",			1, 0, 0.05, "is_suicide(%s, OTHER_COLOR(color))"},
+  {"o_suicide",			1, 0, 0.05, "is_suicide(%s, color)"},
+  {"x_alive_somewhere",		0, 1, 0.01,
+		"somewhere(OTHER_COLOR(color), 1, %d"},
+  {"o_alive_somewhere",		0, 1, 0.01, "somewhere(color, 1, %d"},
+  {"x_somewhere",		0, 1, 0.01,
+		"somewhere(OTHER_COLOR(color), 0, %d"},
+  {"o_somewhere",		0, 1, 0.01, "somewhere(color, 0, %d"},
+  {"xmoyo_opposite",		1, 0, 0.01,
 		"(influence_moyo_color_opposite(%s) == OTHER_COLOR(color))"},
-  {"omoyo_opposite",   		1, 0.01,
+  {"omoyo_opposite",		1, 0, 0.01,
 		"(influence_moyo_color_opposite(%s) == color)"},
-  {"xmoyo",           		1, 0.01,
+  {"xmoyo",			1, 0, 0.01,
 		"(influence_moyo_color(%s) == OTHER_COLOR(color))"},
-  {"omoyo",           		1, 0.01,
+  {"omoyo",			1, 0, 0.01,
 		"(influence_moyo_color(%s) == color)"},
-  {"xarea",           		1, 0.01,
+  {"xarea",			1, 0, 0.01,
 		"(influence_area_color(%s) == OTHER_COLOR(color))"},
-  {"oarea",           		1, 0.01, "(influence_area_color(%s) == color)"},
-  {"xterri",          		1, 0.01,
+  {"oarea",			1, 0, 0.01, "(influence_area_color(%s) == color)"},
+  {"xterri",			1, 0, 0.01,
 		"(influence_territory_color(%s) == OTHER_COLOR(color))"},
-  {"oterri",          		1, 0.01,
+  {"oterri",			1, 0, 0.01,
 		"(influence_territory_color(%s) == color)"},
-  {"genus",           		1, 0.01, "dragon[%s].genus"},
-  {"approx_xlib",     		1, 0.03,
+  {"genus",			1, 0, 0.01, "dragon[%s].genus"},
+  {"approx_xlib",		1, 0, 0.03,
 		"approxlib(%s, OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
-  {"approx_olib",     		1, 0.03,
+  {"approx_olib",		1, 0, 0.03,
 		"approxlib(%s, color, MAX_LIBERTIES, NULL)"},
-  {"xlib",            		1, 0.05,
+  {"xlib",			1, 0, 0.05,
 	"accuratelib(%s, OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
-  {"olib",            		1, 0.05,
-	"accuratelib(%s,color, MAX_LIBERTIES, NULL)"},
-  {"xcut",            		1, 0.01, "cut_possible(%s,OTHER_COLOR(color))"},
-  {"ocut",            		1, 0.05, "cut_possible(%s,color)"},
-  {"edge_double_sente", 	4, 3.00,
+  {"olib",			1, 0, 0.05,
+	"accuratelib(%s, color, MAX_LIBERTIES, NULL)"},
+  {"xcut",			1, 0, 0.01, "cut_possible(%s, OTHER_COLOR(color))"},
+  {"ocut",			1, 0, 0.05, "cut_possible(%s, color)"},
+  {"edge_double_sente", 	4, 1, 3.00,
 		"edge_double_sente_helper(%s, %s, %s, %s)"},
-  {"xplay_defend_both",        -2, 3.00,
+  {"xplay_defend_both",		2, 1, 3.00,
 		"play_attack_defend2_n(OTHER_COLOR(color), 0, %d"},
-  {"oplay_defend_both",        -2, 3.00, "play_attack_defend2_n(color, 0, %d"},
-  {"xplay_attack_either",      -2, 3.00,
+  {"oplay_defend_both",		2, 1, 3.00, "play_attack_defend2_n(color, 0, %d"},
+  {"xplay_attack_either",	2, 1, 3.00,
 		"play_attack_defend2_n(OTHER_COLOR(color), 1, %d"},
-  {"oplay_attack_either",      -2, 3.00, "play_attack_defend2_n(color, 1, %d"},
-  {"xplay_defend",             -1, 1.00,
+  {"oplay_attack_either",	2, 1, 3.00, "play_attack_defend2_n(color, 1, %d"},
+  {"xplay_defend",		1, 1, 1.00,
 		"play_attack_defend_n(OTHER_COLOR(color), 0, %d"},
-  {"oplay_defend",             -1, 1.00, "play_attack_defend_n(color, 0, %d"},
-  {"xplay_attack",             -1, 1.00,
+  {"oplay_defend",		1, 1, 1.00, "play_attack_defend_n(color, 0, %d"},
+  {"xplay_attack",		1, 1, 1.00,
 		"play_attack_defend_n(OTHER_COLOR(color), 1, %d"},
-  {"oplay_attack",             -1, 1.00, "play_attack_defend_n(color, 1, %d"},
-  {"xplay_break_through",      -3, 5.00,
+  {"oplay_attack",		1, 1, 1.00, "play_attack_defend_n(color, 1, %d"},
+  {"xplay_break_through",	3, 1, 5.00,
 		"play_break_through_n(OTHER_COLOR(color), %d"},
-  {"oplay_break_through",      -3, 5.00, "play_break_through_n(color, %d"},
-  {"oplay_connect",            -2,10.00, "play_connect_n(color, 1, %d"},
-  {"xplay_connect",            -2,10.00,
+  {"oplay_break_through",	3, 1, 5.00, "play_break_through_n(color, %d"},
+  {"oplay_connect",		2, 1,10.00, "play_connect_n(color, 1, %d"},
+  {"xplay_connect",		2, 1,10.00,
 		"play_connect_n(OTHER_COLOR(color), 1, %d"},
-  {"oplay_disconnect",         -2,10.00, "play_connect_n(color, 0, %d"},
-  {"xplay_disconnect",         -2,10.00,
+  {"oplay_disconnect",		2, 1,10.00, "play_connect_n(color, 0, %d"},
+  {"xplay_disconnect",		2, 1,10.00,
 		"play_connect_n(OTHER_COLOR(color), 0, %d"},
-  {"seki_helper",     		1, 0.0, "seki_helper(%s)"},
-  {"threaten_to_save",		1, 0.0, "threaten_to_save_helper(move,%s)"},
-  {"threaten_to_capture",	1, 0.0, "threaten_to_capture_helper(move,%s)"},
-  {"not_lunch",       		2, 0.0, "not_lunch_helper(%s,%s)"},
-  {"eye",             		1, 0.01, "is_eye_space(%s)"},
-  {"proper_eye",      		1, 0.01, "is_proper_eye_space(%s)"},
-  {"marginal_eye",    		1, 0.01, "is_marginal_eye_space(%s)"},
-  {"halfeye",         		1, 0.01, "is_halfeye(half_eye,%s)"},
-  {"max_eye_value",   		1, 0.01, "max_eye_value(%s)"},
-  {"owl_topological_eye", 	2, 0.01, "owl_topological_eye(%s,board[%s])"},
-  {"obvious_false_oeye", 	1, 0.01, "obvious_false_eye(%s,color)"},
-  {"obvious_false_xeye", 	1, 0.01,
-		"obvious_false_eye(%s,OTHER_COLOR(color))"},
-  {"antisuji",        		1, 0.0, "add_antisuji_move(%s)"},
-  {"add_connect_move",		2, 0.0, "add_connection_move(move,%s,%s)"},
-  {"add_cut_move",    		2, 0.0, "add_cut_move(move,%s,%s)"},
-  {"test_attack_either_move",2, 0.0,
-		"test_attack_either_move(move,color,%s,%s)"},
-  {"add_defend_both_move",	2, 0.0,
-		"add_all_move(move,DEFEND_STRING,%s,DEFEND_STRING,%s)"},
-  {"same_dragon",     		2, 0.01, "is_same_dragon(%s,%s)"},
-  {"same_string",     		2, 0.01, "same_string(%s,%s)"},
-  {"dragonsize",     		1, 0.01, "dragon[%s].size"},
-  {"wormsize",        		1, 0.01, "countstones(%s)"},
-  {"effective_size",  		1, 0.01, "dragon[%s].effective_size"},
-  {"vital_chain",     		1, 0.05, "vital_chain(%s)"},
-  {"potential_cutstone",	1, 0.01, "worm[%s].cutstone2>1"},
-  {"amalgamate_most_valuable_helper", 3, 0.0,
-   		"amalgamate_most_valuable_helper(%s,%s,%s)"},
-  {"amalgamate",      		2, 0.0, "join_dragons(%s,%s)"},
-  {"owl_escape_value",		1, 0.01, "owl_escape_value(%s)"},
-  {"owl_goal_dragon", 		1, 0.01, "owl_goal_dragon(%s)"},
-  {"owl_eyespace",    		1, 0.01, "owl_eyespace(%s)"},
-  {"owl_big_eyespace",		1, 0.01, "owl_big_eyespace(%s)"},
-  {"owl_proper_eye",  		1, 0.01, "owl_proper_eye(%s)"},
-  {"owl_strong_dragon",		1, 0.01, "owl_strong_dragon(%s)"},
-  {"has_aji",         		1, 0.01,
-		"(dragon[%s].owl_threat_status==CAN_THREATEN_DEFENSE)"},
-  {"finish_ko_helper",		1, 0.05, "finish_ko_helper(%s)"},
-  {"squeeze_ko_helper",		1, 0.03, "squeeze_ko_helper(%s)"},
-  {"backfill_helper", 		3, 1.50, "backfill_helper(%s, %s, %s)"},
-  {"connect_and_cut_helper2", 	3, 3.00,
-                "connect_and_cut_helper2(%s, %s, %s, color)"},
-  {"connect_and_cut_helper", 	3, 3.00, "connect_and_cut_helper(%s, %s, %s)"},
-  {"owl_threatens",   		2, 0.01, "owl_threatens_attack(%s,%s)"},
-  {"replace",         		2, 0.0, "add_replacement_move(%s,%s)"},
-  {"non_oterritory",  		1, 0.0,
+  {"seki_helper",		1, 0, 0.0, "seki_helper(%s)"},
+  {"threaten_to_save",		1, 0, 0.0, "threaten_to_save_helper(move,%s)"},
+  {"threaten_to_capture",	1, 0, 0.0, "threaten_to_capture_helper(move,%s)"},
+  {"not_lunch",			2, 0, 0.0, "not_lunch_helper(%s, %s)"},
+  {"eye",			1, 0, 0.01, "is_eye_space(%s)"},
+  {"proper_eye", 		1, 0, 0.01, "is_proper_eye_space(%s)"},
+  {"marginal_eye",		1, 0, 0.01, "is_marginal_eye_space(%s)"},
+  {"halfeye",			1, 0, 0.01, "is_halfeye(half_eye,%s)"},
+  {"max_eye_value",		1, 0, 0.01, "max_eye_value(%s)"},
+  {"owl_topological_eye",	2, 0, 0.01, "owl_topological_eye(%s, board[%s])"},
+  {"obvious_false_oeye",	1, 0, 0.01, "obvious_false_eye(%s, color)"},
+  {"obvious_false_xeye",	1, 0, 0.01,
+		"obvious_false_eye(%s, OTHER_COLOR(color))"},
+  {"antisuji",			1, 0, 0.0, "add_antisuji_move(%s)"},
+  {"add_connect_move",		2, 0, 0.0, "add_connection_move(move,%s, %s)"},
+  {"add_cut_move",		2, 0, 0.0, "add_cut_move(move, %s, %s)"},
+  {"test_attack_either_move",	2, 0, 0.0,
+		"test_attack_either_move(move, color, %s, %s)"},
+  {"add_defend_both_move",	2, 0, 0.0,
+		"add_all_move(move, DEFEND_STRING, %s, DEFEND_STRING, %s)"},
+  {"same_dragon",		2, 0, 0.01, "is_same_dragon(%s, %s)"},
+  {"same_string",		2, 0, 0.01, "same_string(%s, %s)"},
+  {"dragonsize", 		1, 0, 0.01, "dragon[%s].size"},
+  {"wormsize",			1, 0, 0.01, "countstones(%s)"},
+  {"effective_size",		1, 0, 0.01, "dragon[%s].effective_size"},
+  {"vital_chain",		1, 0, 0.05, "vital_chain(%s)"},
+  {"potential_cutstone",	1, 0, 0.01, "worm[%s].cutstone2 > 1"},
+  {"amalgamate_most_valuable_helper", 3, 0, 0.0,
+   		"amalgamate_most_valuable_helper(%s, %s, %s)"},
+  {"amalgamate", 		2, 0, 0.0, "join_dragons(%s, %s)"},
+  {"owl_escape_value",		1, 0, 0.01, "owl_escape_value(%s)"},
+  {"owl_goal_dragon",		1, 0, 0.01, "owl_goal_dragon(%s)"},
+  {"owl_eyespace",		1, 0, 0.01, "owl_eyespace(%s)"},
+  {"owl_big_eyespace",		1, 0, 0.01, "owl_big_eyespace(%s)"},
+  {"owl_proper_eye",		1, 0, 0.01, "owl_proper_eye(%s)"},
+  {"owl_strong_dragon",		1, 0, 0.01, "owl_strong_dragon(%s)"},
+  {"has_aji",			1, 0, 0.01,
+		"(dragon[%s].owl_threat_status == CAN_THREATEN_DEFENSE)"},
+  {"finish_ko_helper",		1, 0, 0.05, "finish_ko_helper(%s)"},
+  {"squeeze_ko_helper",		1, 0, 0.03, "squeeze_ko_helper(%s)"},
+  {"backfill_helper",		3, 0, 1.50, "backfill_helper(%s, %s, %s)"},
+  {"connect_and_cut_helper2",	3, 0, 3.00,
+		"connect_and_cut_helper2(%s, %s, %s, color)"},
+  {"connect_and_cut_helper",	3, 0, 3.00, "connect_and_cut_helper(%s, %s, %s)"},
+  {"owl_threatens",		2, 0, 0.01, "owl_threatens_attack(%s, %s)"},
+  {"replace",			2, 0, 0.0,  "add_replacement_move(%s, %s)"},
+  {"non_oterritory",		1, 0, 0.0,
 		"influence_mark_non_territory(%s, color)"},
-  {"non_xterritory",  		1, 0.0,
+  {"non_xterritory",		1, 0, 0.0,
 		"influence_mark_non_territory(%s, OTHER_COLOR(color))"},
-  {"remaining_handicap_stones",	0, 0.0, "free_handicap_remaining_stones()"},
-  {"total_handicap_stones",	0, 0.0, "free_handicap_total_stones()"},
-  {"o_captures_something", 	1, 0.02, "does_capture_something(%s, color)"},
-  {"x_captures_something", 	1, 0.02,
-                "does_capture_something(%s, OTHER_COLOR(color))"},
-  {"false_eye_territory",	1, 0.0, "false_eye_territory[%s]"},
-  {"false_eye",        		1, 0.01, "is_false_eye(half_eye,%s)"},
-  {"is_surrounded",             1, 0.01, "is_surrounded(%s)"},
-  {"does_surround",             2, 1.00, "does_surround(%s, %s)"},
-  {"surround_map",              2, 0.01, "surround_map(%s, %s)"},
-  {"oracle_threatens",          2, 0.01, "oracle_threatens(%s, %s)"}
+  {"remaining_handicap_stones",	0, 0, 0.0,  "free_handicap_remaining_stones()"},
+  {"total_handicap_stones",	0, 0, 0.0,  "free_handicap_total_stones()"},
+  {"o_captures_something", 	1, 0, 0.02, "does_capture_something(%s, color)"},
+  {"x_captures_something", 	1, 0, 0.02,
+		"does_capture_something(%s, OTHER_COLOR(color))"},
+  {"false_eye_territory",	1, 0, 0.0, "false_eye_territory[%s]"},
+  {"false_eye",			1, 0, 0.01, "is_false_eye(half_eye, %s)"},
+  {"is_surrounded",		1, 0, 0.01, "is_surrounded(%s)"},
+  {"does_surround",		2, 0, 1.00, "does_surround(%s, %s)"},
+  {"surround_map",		2, 0, 0.01, "surround_map(%s, %s)"},
+  {"oracle_threatens",		2, 0, 0.01, "oracle_threatens(%s, %s)"},
+  {"value",			0, 2, 0.0,  "(%s->value)"}
 };
 
 
 /* To get a valid function pointer different from NULL. */
 static int
-dummyhelper(struct pattern *patt, int transformation,
-	    int move, int color, int action)
+dummyhelper(int transformation, int move, int color, int action)
 {
-  UNUSED(patt); UNUSED(transformation); UNUSED(move); UNUSED(color);
+  UNUSED(transformation); UNUSED(move); UNUSED(color);
   UNUSED(action);
   return 0;
 }
@@ -371,9 +384,9 @@ dummyhelper(struct pattern *patt, int transformation,
 int fatal_errors = 0;
 
 /* options */
-int verbose = 0;  /* -v */
-int pattern_type = PATTERNS;  /* -c for CONNECTIONS */
-int anchor = ANCHOR_O; /* Whether both O and/or X may be anchors.
+int verbose = 0;	/* -v */
+int database_type = 0;  /* -p (default), -c, -f, -C, -D or -T */
+int anchor = 0; 	/* Whether both O and/or X may be anchors.
 			* -b for both. -X for only X.
 			*/
 
@@ -381,13 +394,7 @@ int choose_best_anchor = 0;  /* -m */
 int fixed_anchor = 0;        /* -a */
 int pre_rotate = 0;          /* -p */
 
-int fullboard = 0;   /* Whether this is a database of fullboard patterns. */
-int dfa_generate = 0; /* if 1 a dfa is created. */
-int dfa_c_output = 0; /* if 1 the dfa is saved as a c file */
 dfa_t dfa;
-#if EXPERIMENTAL_READING
-int tree_output = 0;  /* if 1, the tree data structure is output */
-#endif
 
 /**************************
  *
@@ -741,8 +748,8 @@ read_pattern_line(char *p)
       pattern[patno].anchored_at_X = (off == ATT_X) ? 3 : 0;
     }
 
-    /* Special limitations for fullboard pattern. */
-    if (fullboard) {
+    /* Special limitations for fullboard patterns. */
+    if (database_type == DB_FULLBOARD) {
       if (off == ATT_dot)
 	continue;
       assert(off == ATT_X || off == ATT_O);
@@ -882,13 +889,13 @@ finish_pattern(char *line)
   
   mini = minj = 0; /* initially : can change with edge-constraints */
 
-  if (num_stars > 1 || (pattern_type == PATTERNS && num_stars == 0)) {
+  if (num_stars > 1 || (database_type != DB_CONNECTIONS && num_stars == 0)) {
     fprintf(stderr, "%s(%d) : error : No or too many *'s in pattern %s\n",
 	    current_file, current_line_number, pattern_names[patno]);
     fatal_errors = 1;
   }
 
-  if (fullboard) {
+  if (database_type == DB_FULLBOARD) {
     /* For fullboard patterns, the "anchor" is always at the mid point. */
     ci = (maxi-1)/2;
     cj = (maxj-1)/2;
@@ -1166,16 +1173,24 @@ static void
 generate_autohelper_code(int funcno, int number_of_params, int *labels)
 {
   int i;
-  char varnames[MAXPARAMS][5];
-  
+  char varnames[MAXPARAMS][8];
+  char pattern[MAXLINE];
+
   for (i = 0; i < number_of_params; i++) {
-    if (labels[i] == (int) 't')
+    if (labels[i] == (int) '*')
       sprintf(varnames[i], "move");
+    /* The special label '?' represents a tenuki. We replace this
+     * with NO_MOVE value.
+     */
+    else if (labels[i] == (int) '?')
+      sprintf(varnames[i], "NO_MOVE");
     else
       sprintf(varnames[i], "%c", labels[i]);
   }
-  
-  if (autohelper_functions[funcno].params >= 0) {
+
+  switch (autohelper_functions[funcno].type) {
+  case 0:
+    /* A common case. Just use the labels as parameters. */
     switch (number_of_params) {
     case 0:
       code_pos += sprintf(code_pos, autohelper_functions[funcno].code);
@@ -1202,35 +1217,57 @@ generate_autohelper_code(int funcno, int number_of_params, int *labels)
 	      current_file, current_line_number, pattern_names[patno]);
       fatal_errors++;
     }
-    return;
-  }
-  
-  /* This is a very special case where there is assumed to be a
-   * variable number of parameters and these constitute a series of
-   * moves to make followed by a final attack or defense test.
-   */
-  if (autohelper_functions[funcno].params == -1)
-    code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
-			number_of_params-1);
-  else if (autohelper_functions[funcno].params == -2)
-    code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
-			number_of_params-2);
-  else
-    code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
-			number_of_params-3);
-    
-  for (i = 0; i < number_of_params; i++) {
-    /* The special label '?' represents a tenuki. We replace this with
-     * the coordinate pair (-1, -1).
+    break;
+  case 1:
+    /* This is a very special case where there is assumed to be a
+     * variable number of parameters and these constitute a series of
+     * moves to make followed by a final attack or defense test.
      */
-    if (labels[i] == (int) '?')
-      code_pos += sprintf(code_pos, ", NO_MOVE");
-    else if (labels[i] == (int) 't')
-      code_pos += sprintf(code_pos, ", move");
-    else
-      code_pos += sprintf(code_pos, ", %c", labels[i]);
+    if (number_of_params < autohelper_functions[funcno].params) {
+      fprintf(stderr, "%s(%d) : error : too few parameters (pattern %s)",
+	      current_file, current_line_number, pattern_names[patno]);
+      fatal_errors++;
+      return;
+    }
+
+    code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
+		number_of_params - autohelper_functions[funcno].params);
+
+    for (i = 0; i < number_of_params; i++)
+	code_pos += sprintf(code_pos, ", %s", varnames[i]);
+
+    *code_pos++ = ')'; /* Close parenthesis. */
+    break;
+
+  default: /* 2 */
+    /* A very special case. We add the address of the current pattern
+     * before the actual parameters. So far, used only by `value'.
+     */
+    sprintf(pattern, "(%s + %d)", prefix, patno);
+
+    switch(number_of_params) {
+    case 0:
+      code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
+			  pattern);
+      break;
+    case 1:
+      code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
+			  pattern, varnames[0]);
+      break;
+    case 2:
+      code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
+			  pattern, varnames[0], varnames[1]);
+      break;
+    case 3:
+      code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
+			  pattern, varnames[0], varnames[1], varnames[2]);
+      break;
+    default:
+      fprintf(stderr, "%s(%d) : error : unknown number of parameters (pattern %s)",
+	      current_file, current_line_number, pattern_names[patno]);
+      fatal_errors++;
+    }
   }
-  code_pos += sprintf(code_pos, ")");
 }
 
 
@@ -1270,6 +1307,16 @@ parse_constraint_or_action(char *line, float *cost)
 	
       case 1: /* Token found, now expect a '('. */
 	if (*p != '(') {
+	  if (autohelper_functions[n].params == 0) {
+	    /* We allow to omit parenthesis when using functions which
+	     * have no parameters. In any case, you may still place them,
+	     * but having to write `value() = 50' is disgusting.
+	     */
+	    generate_autohelper_code(n, 0, NULL);
+	    p--;
+	    state = 0;
+	    break;
+	  }
 	  fprintf(stderr,
 		  "%s(%d) : error : Syntax error in constraint or action, '(' expected (pattern %s).\n", 
 		  current_file, current_line_number, pattern_names[patno]);
@@ -1279,7 +1326,8 @@ parse_constraint_or_action(char *line, float *cost)
 	else {
 	  assert(autohelper_functions[n].params <= MAXPARAMS);
 	  number_of_params = 0;
-	  if (autohelper_functions[n].params != 0)
+	  if (autohelper_functions[n].params != 0
+	      || autohelper_functions[n].type == 1)
 	    state = 2;
 	  else
 	    state = 3;
@@ -1305,21 +1353,15 @@ parse_constraint_or_action(char *line, float *cost)
 		    "mkpat: tenuki (?) cannot be the first label (pattern %s)\n", pattern_names[patno]);
 	    return;
 	  }
-	  if (*p == '*')
-	    label = (int) 't';
+
+	  label = (int) *p;
 	  /* The special label '?' represents a tenuki. */
-	  else if (*p == '?')
-	    label = (int) *p;
-	  else {
-	    label = (int) *p;
-	    if (label_coords[label][0] == -1) {
-	      fprintf(stderr,
-		      "%s(%d) : error : The constraint or action uses a label (%c) that wasn't specified in the diagram (pattern %s).\n", 
-		      current_file, current_line_number, label,
-		      pattern_names[patno]);
-	      fatal_errors++;
-	      return;
-	    }
+	  if (*p != '*' && *p != '?' && label_coords[label][0] == -1) {
+	    fprintf(stderr,
+		    "%s(%d) : error : The constraint or action uses a label (%c) that wasn't specified in the diagram (pattern %s).\n", 
+		    current_file, current_line_number, label, pattern_names[patno]);
+	    fatal_errors++;
+	    return;
 	  }
 	  labels[number_of_params] = label;
 	  number_of_params++;
@@ -1329,7 +1371,7 @@ parse_constraint_or_action(char *line, float *cost)
 
       case 3: /* A ',' or a ')'. */
 	if (*p == ',') {
-	  if (autohelper_functions[n].params >= 0
+	  if (autohelper_functions[n].type != 1
 	      && number_of_params == autohelper_functions[n].params) {
 	    fprintf(stderr,
 		    "%s(%d) : error : Syntax error in constraint or action, ')' expected (pattern %s).\n",
@@ -1352,7 +1394,7 @@ parse_constraint_or_action(char *line, float *cost)
 	  return;
 	}
 	else { /* a closing parenthesis */
-	  if ((autohelper_functions[n].params >= 0)
+	  if ((autohelper_functions[n].type != 1)
 	      && (number_of_params < autohelper_functions[n].params)) {
 	    fprintf(stderr,
 		    "%s(%d) : error : Syntax error in constraint or action, %s() requires %d parameters.\n",
@@ -1381,7 +1423,7 @@ parse_constraint_or_action(char *line, float *cost)
  * constraint. */
 
 static void
-finish_constraint_and_action(char *name)
+finish_constraint_and_action(void)
 {
   unsigned int i;
   float cost;
@@ -1394,8 +1436,8 @@ finish_constraint_and_action(char *name)
   
   /* Generate autohelper function declaration. */
   code_pos += sprintf(code_pos, 
-		      "static int\nautohelper%s%d(struct pattern *patt, int trans, int move, int color, int action)\n{\n  int",
-		      name, patno);
+		      "static int\nautohelper%s%d(int trans, int move, int color, int action)\n{\n  int",
+		      prefix, patno);
 
   /* Generate variable declarations. */
   for (i = 0; i < sizeof(VALID_CONSTRAINT_LABELS); i++) {
@@ -1414,7 +1456,7 @@ finish_constraint_and_action(char *name)
   }
 
   /* Include UNUSED statements for two parameters */
-  code_pos += sprintf(code_pos, "\n  UNUSED(patt);\n  UNUSED(color);\n");
+  code_pos += sprintf(code_pos, "\n  UNUSED(color);\n");
   if (!have_constraint || !have_action)
     code_pos += sprintf(code_pos, "  UNUSED(action);\n");
   
@@ -1525,7 +1567,7 @@ struct element_node {
  */
 
 static void
-write_elements(FILE *outfile, char *name)
+write_elements(FILE *outfile)
 {
   int node;
 
@@ -1534,7 +1576,7 @@ write_elements(FILE *outfile, char *name)
   /* sort the elements so that least-likely elements are tested first. */
   gg_sort(elements, el, sizeof(struct patval_b), compare_elements);
 
-  fprintf(outfile, "static struct patval %s%d[] = {\n", name, patno);
+  fprintf(outfile, "static struct patval %s%d[] = {\n", prefix, patno);
 
   /* This may happen for fullboard patterns. */
   if (el == 0) {
@@ -1547,7 +1589,7 @@ write_elements(FILE *outfile, char *name)
     if (!(elements[node].x <= maxi && elements[node].y <= maxj)) {
       fprintf(stderr, 
 	      "%s(%d) : error : Maximum number of elements exceeded in %s.\n",
-	      current_file, current_line_number, name);
+	      current_file, current_line_number, prefix);
       fatal_errors++;
     }
 
@@ -1558,7 +1600,7 @@ write_elements(FILE *outfile, char *name)
   }
 
 #if EXPERIMENTAL_READING
-  if (tree_output)
+  if (database_type == DB_TREE)
     tree_push_pattern();
 #endif
 }
@@ -1949,7 +1991,7 @@ dump_tree_node(FILE *outfile, struct tree_node *gn, int depth, int pass)
  * Outputs the tree data structure data as C code for GNU Go.
  */
 static void
-tree_write_patterns(FILE *outfile, char *name)
+tree_write_patterns(FILE *outfile)
 {
   int oanchor_index = 0;
   int i;
@@ -1979,7 +2021,7 @@ tree_write_patterns(FILE *outfile, char *name)
   dump_tree_node(outfile, &graph[0], 0, PASS_FILL);
   dump_tree_node(outfile, &graph[1], 0, PASS_FILL);
 
-  fprintf(outfile, "struct tree_node_list tnl_%s[] =\n{\n", name);
+  fprintf(outfile, "struct tree_node_list tnl_%s[] =\n{\n", prefix);
   for (i = 0; i < tnl_count+1; i++) {
     fprintf(outfile,
 	    "  { {(void*)%d, %d, %d, %d, (void*)%d}, (void*)%d}, /*#%d*/\n",
@@ -1993,7 +2035,7 @@ tree_write_patterns(FILE *outfile, char *name)
   }
   fprintf(outfile, "};\n\n");
 
-  fprintf(outfile, "struct match_node matches_%s[] = \n{\n", name);
+  fprintf(outfile, "struct match_node matches_%s[] = \n{\n", prefix);
   for (i = 0; i < mn_count; i++) {
     fprintf(outfile, "  {%d, %d, (void*)%d}, /*#%d*/\n",
 	    matches_dump[i].patnum,
@@ -2003,14 +2045,14 @@ tree_write_patterns(FILE *outfile, char *name)
   }
   fprintf(outfile, "};\n\n");
 
-  fprintf(outfile, "void\ninit_tree_%s(void)\n{\n", name);
+  fprintf(outfile, "void\ninit_tree_%s(void)\n{\n", prefix);
   fprintf(outfile, "  gg_assert(sizeof(tnl_%s) / sizeof(struct tree_node_list) == %d);\n", 
-	  name, tnl_count+1);
+	  prefix, tnl_count+1);
   fprintf(outfile, "  gg_assert(sizeof(matches_%s) / sizeof(struct match_node) == %d);\n",
-	  name, mn_count);
+	  prefix, mn_count);
   fprintf(outfile,
 	  "  tree_initialize_pointers(tnl_%s, matches_%s, %d, %d);\n",
-	  name, name, tnl_count+1, mn_count+1);
+	  prefix, prefix, tnl_count+1, mn_count+1);
   fprintf(outfile, "}\n\n");
 }
 
@@ -2018,13 +2060,13 @@ tree_write_patterns(FILE *outfile, char *name)
 
 /* sort and write out the patterns */
 static void
-write_patterns(FILE *outfile, char *name)
+write_patterns(FILE *outfile)
 {
   int j;
 
 #if EXPERIMENTAL_READING
-  if (tree_output)
-    tree_write_patterns(outfile, name);
+  if (database_type == DB_TREE)
+    tree_write_patterns(outfile, prefix);
   else
     fprintf(outfile, "\nvoid\ninit_tree_%s(void)\n{\n"
 	    "  /* nothing to do - tree option not compiled */\n"
@@ -2032,16 +2074,16 @@ write_patterns(FILE *outfile, char *name)
 #endif
 
   /* Write out the patterns. */
-  if (fullboard)
-    fprintf(outfile, "struct fullboard_pattern %s[] = {\n", name);
+  if (database_type == DB_FULLBOARD)
+    fprintf(outfile, "struct fullboard_pattern %s[] = {\n", prefix);
   else
-    fprintf(outfile, "struct pattern %s[] = {\n", name);
+    fprintf(outfile, "struct pattern %s[] = {\n", prefix);
 
   for (j = 0; j < patno; ++j) {
     struct pattern *p = pattern + j;
 
-    if (fullboard) {
-      fprintf(outfile, "  {%s%d,%d,\"%s\",%d,%f},\n", name, j, p->patlen,
+    if (database_type == DB_FULLBOARD) {
+      fprintf(outfile, "  {%s%d,%d,\"%s\",%d,%f},\n", prefix, j, p->patlen,
 	      pattern_names[j], p->move_offset, p->value);
       continue;
     }
@@ -2054,7 +2096,7 @@ write_patterns(FILE *outfile, char *name)
      */
     
     fprintf(outfile, "  {%s%d,%d,%d, \"%s\",%d,%d,%d,%d,%d,%d,0x%x,%d",
-	    name, j,
+	    prefix, j,
 	    p->patlen,
 	    p->trfno,
 	    pattern_names[j],
@@ -2092,7 +2134,7 @@ write_patterns(FILE *outfile, char *name)
 	    p->autohelper_flag,
 	    helper_fn_names[j]);
     if (p->autohelper)
-      fprintf(outfile, "autohelper%s%d", name, j);
+      fprintf(outfile, "autohelper%s%d", prefix, j);
     else
       fprintf(outfile, "NULL");
     fprintf(outfile, ",%d", p->anchored_at_X);
@@ -2105,7 +2147,7 @@ write_patterns(FILE *outfile, char *name)
     fprintf(outfile, "},\n");
   }
 
-  if (fullboard) {
+  if (database_type == DB_FULLBOARD) {
     fprintf(outfile, "  {NULL,0,NULL,0,0.0}\n};\n");
     return;
   }
@@ -2125,25 +2167,25 @@ write_patterns(FILE *outfile, char *name)
 
 /* Write out the pattern db */
 static void
-write_pattern_db(FILE *outfile, char *name)
+write_pattern_db(FILE *outfile)
 {
   /* Don't want this for fullboard patterns. */
-  if (fullboard)
+  if (database_type == DB_FULLBOARD)
     return;
   
   /* Write out the pattern database. */
   fprintf(outfile, "\n");
-  fprintf(outfile, "struct pattern_db %s_db = {\n", name);
+  fprintf(outfile, "struct pattern_db %s_db = {\n", prefix);
   fprintf(outfile, "  -1,\n");  /* fixed_for_size */
   fprintf(outfile, "  %d,\n", fixed_anchor);
-  fprintf(outfile, "  %s\n", name);
-  if (dfa_c_output)
-    fprintf(outfile, " ,& dfa_%s\n", name); /* pointer to the wired dfa */
+  fprintf(outfile, "  %s\n", prefix);
+  if (database_type == DB_DFA)
+    fprintf(outfile, " ,& dfa_%s\n", prefix); /* pointer to the wired dfa */
   else
     fprintf(outfile, " , NULL\n"); /* pointer to a possible dfa */
 #if EXPERIMENTAL_READING
-  if (tree_output)
-    fprintf(outfile, " , tnl_%s", name);
+  if (database_type == DB_TREE)
+    fprintf(outfile, " , tnl_%s", prefix);
   else
     fprintf(outfile, " , NULL\n");
 #endif
@@ -2155,84 +2197,122 @@ write_pattern_db(FILE *outfile, char *name)
 int
 main(int argc, char *argv[])
 {
-  char line[MAXLINE];  /* current line from file */
+  static char stdin_name[] = "<stdin>";
+  int input_files = 0;
+  int ifc;
   char *input_file_names[MAX_INPUT_FILE_NAMES];
   char *output_file_name = NULL;
-  FILE *input_FILE = NULL;
-  FILE *output_FILE = NULL;
+  FILE *input_FILE = stdin;
+  FILE *output_FILE = stdout;
   int state = 0;
-  int ifc = 0;
-  int i;
 
   transformation_init();
 
-  input_file_names[0] = 0;
-  input_file_names[1] = 0;
-
   {
-    /* parse command-line args */
-    while ((i = gg_getopt(argc, argv, "i:o:V:abcfmptvDTX")) != EOF) {
+    int i;
+    int multiple_anchor_options = 0;
+
+    /* Parse command-line options */
+    while ((i = gg_getopt(argc, argv, "i:o:vV:pcfCDTOXbmar")) != EOF) {
       switch (i) {
+      case 'i': 
+	if (input_files == MAX_INPUT_FILE_NAMES) {
+	  fprintf(stderr, "Error : Too many input files (maximum %d supported)\n",
+	    MAX_INPUT_FILE_NAMES);
+	  return 1;
+        }
+	input_file_names[input_files++] = gg_optarg;
+	break;
+
+      case 'o': output_file_name = gg_optarg; break;
       case 'v': verbose = 1; break;
-      case 'c': pattern_type = CONNECTIONS; break;
-      case 'b': anchor = ANCHOR_BOTH; break;
-      case 'X': anchor = ANCHOR_X; break;
-      case 'f': fullboard = 1; break;
+      case 'V': dfa_verbose = strtol(gg_optarg, NULL, 10); break;
+
+      case 'p':
+      case 'c':
+      case 'f':
+      case 'C':
+      case 'D':
+      case 'T':
+	if (database_type) {
+	  fprintf(stderr, "Error : More than one database type specified (-%c and -%c)\n",
+		  database_type, i);
+	  return 1;
+	}
+	database_type = i;
+#if EXPERIMENTAL_READING == 0
+	if (i == 'T') {
+	  fprintf(stderr, "Error : Tree based matcher is unsupported in this configuration\n");
+	  fprintf(stderr, "        Try `configure --enable-experimental-reading'\n");
+	  return 1;
+	}
+#endif
+	break;
+
+      case 'O':
+	if (anchor)
+	  multiple_anchor_options = 1;
+	anchor = ANCHOR_O;
+	break;
+      case 'X':
+	if (anchor)
+	  multiple_anchor_options = 1;
+	anchor = ANCHOR_X;
+	break;
+      case 'b':
+	if (anchor)
+	  multiple_anchor_options = 1;
+	anchor = ANCHOR_BOTH;
+	break;
+
       case 'm': 
         choose_best_anchor = 1;
         if (fixed_anchor)
           fprintf(stderr, "Warning : -m and -a are mutually exclusive.\n");
-         break;
-      case 'p': pre_rotate = 1; break;
+	break;
       case 'a': 
         fixed_anchor = 1; 
         if (choose_best_anchor)
           fprintf(stderr, "Warning : -m and -a are mutually exclusive.\n");
         break;
-      case 'i': 
-	if (ifc == MAX_INPUT_FILE_NAMES) {
-	  fprintf(stderr, "Error : Too many input files; %s", gg_optarg);
-	  exit(1);
-        }
-	else {
-	  input_file_names[ifc++] = gg_optarg;
-	  input_file_names[ifc] = 0;
-	}
-	break;
-      case 'o': output_file_name = gg_optarg; break;
-      case 'D':
-	dfa_generate = 1; dfa_c_output = 1; 
-	break;
-      case 'V': dfa_verbose = strtol(gg_optarg, NULL, 10); break;
-#if EXPERIMENTAL_READING
-      case 'T': tree_output = 1; break;
-#endif
+
+      case 'r': pre_rotate = 1; break;
+      
       default:
-	fprintf(stderr, "Invalid argument ignored\n");
+	fprintf(stderr, "\b ; ignored\n");
       }
     }
-  }
 
-  if (output_file_name == NULL) {
-    output_FILE = stdout;
-  }
-  else {
-    if ((output_FILE = fopen(output_file_name, "wb")) == NULL) {
-      fprintf(stderr, "Cannot write to file %s\n", output_file_name);
-      exit(1);
+    if (!database_type)
+      database_type = DB_GENERAL;
+    if (!anchor)
+      anchor = ANCHOR_O;
+
+    if (!input_files)
+      input_file_names[input_files++] = stdin_name;
+    if (output_file_name) {
+      output_FILE = fopen(output_file_name, "wb");
+      if (output_FILE == NULL) {
+	fprintf(stderr, "Error : Cannot write to file %s\n", output_file_name);
+	return 1;
+      }
     }
-  }
 
-
-  if (dfa_generate) {
-    dfa_init();
-    new_dfa(&dfa, "mkpat's dfa");
-    dfa.pre_rotated = pre_rotate;
+    if (multiple_anchor_options)
+      fprintf(stderr, "Warning : Multiple anchor options encountered. The last took precedence\n");
   }
 
   if (gg_optind >= argc) {
     fputs(USAGE, stderr);
     exit(EXIT_FAILURE);
+  }
+
+  prefix = argv[gg_optind];
+
+  if (database_type == DB_DFA) {
+    dfa_init();
+    new_dfa(&dfa, "mkpat's dfa");
+    dfa.pre_rotated = pre_rotate;
   }
 
   fprintf(output_FILE, PREAMBLE);
@@ -2264,42 +2344,36 @@ main(int argc, char *argv[])
    *
    */
 
-  for (ifc = 0; ifc < MAX_INPUT_FILE_NAMES; ifc++) {
-    if (input_file_names[ifc] == 0 && ifc == 0) {
-      input_FILE = stdin;
-      current_file = "<stdin>";
-    }
-    else {
-      if (input_file_names[ifc] == 0)
-	break;
-      else {
-	if ((input_FILE = fopen(input_file_names[ifc], "r")) == NULL) {
-	  fprintf(stderr, "Error: Cannot open file %s\n", 
-		  input_file_names[ifc]);
-	  exit(1);
-	  break;
-	}
+  for (ifc = 0; ifc < input_files && !fatal_errors; ifc++) {
+    char line[MAXLINE];  /* current line from file */
+
+    if (input_file_names[ifc] != stdin_name) {
+      input_FILE = fopen(input_file_names[ifc], "r");
+      if (input_FILE == NULL) {
+	fprintf(stderr, "Error: Cannot open file %s\n", input_file_names[ifc]);
+	return 1;
       }
-      current_file = input_file_names[ifc];  
     }
+ 
+    current_file = input_file_names[ifc];
     current_line_number = 0;
+
     while (fgets(line, MAXLINE, input_FILE)) {
       current_line_number++;
       if (line[strlen(line)-1] != '\n') {
-	fprintf(stderr, "mkpat: line truncated: %s, length %d\n", line,
-		(int) strlen(line));
-	
+	fprintf(stderr, "%s(%d) : Error : line truncated (longer than %d characters)\n",
+		current_file, current_line_number, MAXLINE - 1);
+
 	fatal_errors++;
       }
       
-      /* remove trailing white space from line */
-      
-      i = strlen(line)-2;  /* start removing backwards just before newline */
-      while (i >= 0 
-	     && (line[i] == ' ' || line[i] == '\t' || line[i] == '\r')) {
-	line[i]   = '\n';
-	line[i+1] = '\0';
-	i--;
+      /* Remove trailing white space from `line' */
+      {
+	int i = strlen(line) - 2;  /* Start removing backwards just before newline */
+	while (i >= 0 && isspace(line[i]))
+	  i--;
+	line[i+1]   = '\n';
+	line[i+2] = '\0';
       }
       
       /* FIXME: We risk overruning a buffer here. */
@@ -2328,7 +2402,7 @@ main(int argc, char *argv[])
 	    break;
 	  case 7:
 	  case 8:
-	    finish_constraint_and_action(argv[gg_optind]);
+	    finish_constraint_and_action();
 							/* fall through */
 	  case 0:
 	  case 4:
@@ -2383,8 +2457,8 @@ main(int argc, char *argv[])
 	if (state == 2 || state == 3) {
 	  finish_pattern(line);
 	  
-	  write_elements(output_FILE, argv[gg_optind]);
-	  if (dfa_generate)
+	  write_elements(output_FILE);
+	  if (database_type == DB_DFA)
 	    write_to_dfa(patno);
 	  state = 4;
 	}
@@ -2452,7 +2526,7 @@ main(int argc, char *argv[])
       break;
     case 7:
     case 8:
-      finish_constraint_and_action(argv[gg_optind]); /* fall through */
+      finish_constraint_and_action(); /* fall through */
     case 0:
     case 4:
       check_constraint_diagram();
@@ -2465,19 +2539,22 @@ main(int argc, char *argv[])
     fprintf(stderr, "%d / %d patterns have edge-constraints\n",
 	    pats_with_constraints, patno);
 
+  /* Forward declaration, which autohelpers might need. */
+  if (database_type != DB_FULLBOARD && database_type != DB_CORNER)
+    fprintf(output_FILE, "struct pattern %s[];\n\n", prefix);
+
   /* Write the autohelper code. */
   fprintf(output_FILE, "%s", autohelper_code);
 
-  write_patterns(output_FILE, argv[gg_optind]);
+  write_patterns(output_FILE);
 
-  if (dfa_generate) {
+  if (database_type == DB_DFA) {
     fprintf(stderr, "---------------------------\n");
 
-    dfa.pre_rotated = pre_rotate;
     dfa_finalize(&dfa);
     dfa_shuffle(&dfa);
 
-    fprintf(stderr, "dfa for %s\n", argv[gg_optind]);
+    fprintf(stderr, "dfa for %s\n", prefix);
     fprintf(stderr, "size: %d kB for ", dfa_size(&dfa));
     fprintf(stderr, "%d patterns", patno);
     fprintf(stderr, "(%d states)\n", dfa.lastState);
@@ -2485,8 +2562,8 @@ main(int argc, char *argv[])
     if (0 && dfa.pre_rotated)
       dump_dfa(stderr, &dfa);
 
-    strcpy(dfa.name, argv[gg_optind]);
-    print_c_dfa(output_FILE, argv[gg_optind], &dfa);
+    strcpy(dfa.name, prefix);
+    print_c_dfa(output_FILE, prefix, &dfa);
     fprintf(stderr, "---------------------------\n");
 
     if (DFA_MAX_MATCHED/8 < patno)
@@ -2497,7 +2574,7 @@ main(int argc, char *argv[])
   }
 
 
-  write_pattern_db(output_FILE, argv[gg_optind]);
+  write_pattern_db(output_FILE);
 
   if (fatal_errors) {
     fprintf(output_FILE, "\n#error: One or more fatal errors compiling %s\n",

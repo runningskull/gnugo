@@ -107,7 +107,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, move, color, 0))
+    if (!pattern->autohelper(ll, move, color, 0))
       return;
   }
 
@@ -150,7 +150,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
 
   /* does the pattern have an action? */
   if (pattern->autohelper_flag & HAVE_ACTION) {
-    pattern->autohelper(pattern, ll, move, color, 1);
+    pattern->autohelper(ll, move, color, 1);
   }
 
   /* If it is a B pattern, set cutting point in eye data and make eye

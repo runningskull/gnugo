@@ -770,13 +770,6 @@ test_attack_either_move(int move, int color, int worma, int wormb)
 }
 
 
-void
-set_value_helper(struct pattern *patt, int value)
-{
-  patt->value = value;
-}
-
-
 /*
  * LOCAL Variables:
  * tab-width: 8

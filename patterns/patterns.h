@@ -87,8 +87,8 @@ struct pattern; /* forward reference to keep gcc happy */
 typedef int (*pattern_helper_fn_ptr)(struct pattern *, int rotation,
 				     int move, int color);
 
-typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
-				 int move, int color, int action);
+typedef int (*autohelper_fn_ptr)(int rotation, int move,
+				 int color, int action);
 
 
 /* each pattern is compiled into a sequence of these elements.
@@ -297,10 +297,6 @@ int connect_and_cut_helper2(int Apos, int bpos, int cpos, int color);
 int edge_double_sente_helper(int move, int apos, int bpos, int cpos);
 int dragon_weak(int pos);
 void test_attack_either_move(int move, int color, int worma, int wormb);
-void set_value_helper(struct pattern *patt, int value);
-
-/* FIXME: Can this be set up inside of the mkpat.c function helper list? */
-#define set_value(x) set_value_helper(patt, x)
 
 
 void init_tree_conn(void);
@@ -375,7 +371,40 @@ struct tree_node_list {
 };
 
 
-#endif
+struct corner_db;
+struct corner_variation;
+struct corner_pattern;
+
+struct corner_db {
+  int num_top_variations;
+  struct corner_variation *variations;
+};
+
+struct corner_variation {
+  int att;
+  int move_offset;
+
+  int num_variations;
+  struct corner_variation *subvariations;
+
+  struct corner_pattern *pattern;
+};
+
+struct corner_pattern {
+  int second_corner_offset;
+
+  unsigned int class;
+  const char *name;
+
+  float value;
+
+  int autohelper_flag;
+  autohelper_fn_ptr autohelper;
+  float constraint_cost;
+};
+
+
+#endif /* __PATTERN_H__ */
 
 
 /*

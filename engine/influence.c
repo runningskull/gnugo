@@ -771,7 +771,7 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, pos, color, 0))
+    if (!pattern->autohelper(ll, pos, color, 0))
       return;
   }
 
@@ -793,7 +793,7 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
   /* For t patterns, everything happens in the action. */
   if ((pattern->class & CLASS_t)
       && (pattern->autohelper_flag & HAVE_ACTION)) {
-    pattern->autohelper(pattern, ll, pos, color, INFLUENCE_CALLBACK);
+    pattern->autohelper(ll, pos, color, INFLUENCE_CALLBACK);
   }
   
   
@@ -915,7 +915,7 @@ followup_influence_callback(int anchor, int color, struct pattern *pattern,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, t, color, 0))
+    if (!pattern->autohelper(ll, t, color, 0))
       return;
   }
 
@@ -933,7 +933,7 @@ followup_influence_callback(int anchor, int color, struct pattern *pattern,
  
  /* Actions in B patterns are used as followup specific constraints. */
  if ((pattern->autohelper_flag & HAVE_ACTION)
-     && !pattern->autohelper(pattern, ll, t, color,
+     && !pattern->autohelper(ll, t, color,
                              FOLLOWUP_INFLUENCE_CALLBACK))
     return;
 

@@ -2902,7 +2902,7 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
   /* If the constraint is cheap to check, we do this first. */
   if ((pattern->autohelper_flag & HAVE_CONSTRAINT)
       && pattern->constraint_cost < 0.45) {
-    if (!pattern->autohelper(pattern, ll, move, color, 0))
+    if (!pattern->autohelper(ll, move, color, 0))
       return 0;
     constraint_checked = 1;
   }
@@ -2941,7 +2941,7 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
    * if the pattern must be rejected.
    */
   if ((pattern->autohelper_flag & HAVE_CONSTRAINT) && !constraint_checked)
-    if (!pattern->autohelper(pattern, ll, move, color, 0))
+    if (!pattern->autohelper(ll, move, color, 0))
       return 0;
   return 1;
 }

@@ -75,41 +75,41 @@ a*
 > int ostar = olib(*);
 > int xstar = xlib(*);
 > if (lib(a) == 2 && ostar > 1 && xstar >=4)
->   set_value(80);
+>   value = 80;
 > else if (lib(a) == 2 && ostar > 1 && xstar > 2)
->   set_value(72);
+>   value = 72;
 > else if (lib(a) == 2 && ostar > 1)
->   set_value(70);
+>   value = 70;
 > else if ((lib(a) == 1 || xstar > lib(a)+4))
->   set_value(97);
+>   value = 97;
 > else if (xstar > lib(a)+3 && ostar > 1)
->   set_value(96);
+>   value = 96;
 > else if (xstar > lib(a)+2 && ostar > 1)
->   set_value(95);
+>   value = 95;
 > else if (xstar > lib(a)+1 && ostar > 2)
->   set_value(64);
+>   value = 64;
 > else if (xstar > lib(a)+1 && ostar > 1)
->   set_value(63);
+>   value = 63;
 > else if (xstar > lib(a)+1  && ostar > 1)
->   set_value(62);
+>   value = 62;
 > else if (xstar > lib(a) && ostar > 2)
->   set_value(61);
+>   value = 61;
 > else if (xstar > lib(a) && ostar > 1)
->   set_value(60);
+>   value = 60;
 > else if (xstar == lib(a)
 >	   && ostar > 1
 >          && (ostar == xstar || ostar >= lib(a)))
->   set_value(60);
+>   value = 60;
 > else if (lib(a) == 3 && ostar >= 5)
->   set_value(53);
+>   value = 53;
 > else if (lib(a) == 3 && ostar >= 4)
->   set_value(52);
+>   value = 52;
 > else if (lib(a) == 3 && ostar >= 3)
->   set_value(51);
+>   value = 51;
 > else if (xstar >= lib(a) && ostar > 1)
->   set_value(15);
+>   value = 15;
 > else
->   set_value(2);
+>   value = 2;
 >}
 
 
@@ -158,9 +158,9 @@ Xb
 ; rgoal[a] == 1 && xlib(b)==1
 
 > if (goallib() == 2)
->   set_value(71);
+>   value = 71;
 > else
->   set_value(55);
+>   value = 55;
 
 
 Pattern RA008
@@ -196,11 +196,11 @@ ab
 ; lib(a) == 1  && lib(b) <=2
 
 > if (goallib() <= lib(b))
->   set_value(10);
+>   value = 10;
 > else if (!ko(*))
->   set_value(73);
+>   value = 73;
 > else
->   set_value(10);
+>   value = 10;
 
 
 Pattern RA101a
@@ -214,13 +214,13 @@ Pattern RA101a
 ; lib(a) == 1  && lib(b) <=2
 
 > if (ko(*))
->   set_value(10);
+>   value = 10;
 > if (lib(b) >= goallib())
->   set_value(60);
+>   value = 60;
 > else if (lib(b) == 1)
->   set_value(76);
+>   value = 76;
 > else
->   set_value(72);
+>   value = 72;
 
 
 Pattern RA102
@@ -236,14 +236,14 @@ A*
 > {
 > int ostar = olib(*);
 > if (lib(A) == 1 && ostar >= 3)
->   set_value(78);
+>   value = 78;
 > else if (lib(A) == 1)
->   set_value(72);
+>   value = 72;
 > else if (lib(A) == 2 && ostar > 2)
 >   /* FIXME: i.e. backfill hack; causes explosion; see reading:35*/
->   set_value(10);
+>   value = 10;
 > else
->   set_value(0);
+>   value = 0;
 >}
 
 
@@ -422,16 +422,16 @@ Pattern RA302
 ; (lib(a) <= 3 && olib(*) >= 2)
 
 > if (lib(a) == 2)
->   set_value(49);
+>   value = 49;
 > else if (lib(a) == 1 && wormsize(a) > 1)
->   set_value(79);
+>   value = 79;
 > else if (lib(a) == 1)
->   set_value(48);
+>   value = 48;
 > else if (stackp <= backfill_depth
 >          && stackp <= superstring_depth /* || !atari_possible*/)
->   set_value(12);
+>   value = 12;
 > else
->   set_value(0)
+>   value = 0;
 
 
 Pattern RA303
@@ -479,9 +479,9 @@ ab*
 ; rgoal[a] == 1 && goallib() < 3
 
 > if (olib(b) <= 1)
->   set_value(49);
+>   value = 49;
 > else
->   set_value(9);
+>   value = 9;
 
 
 Pattern RA998
@@ -498,9 +498,9 @@ ab
 ; rgoal[a] == 1
 
 > if (olib(b) <= 1)
->   set_value(49);
+>   value = 49;
 > else
->   set_value(0);
+>   value = 0;
 
 
 Pattern RA999

@@ -1571,7 +1571,7 @@ attack_callback(int anchor, int color, struct pattern *pattern, int ll,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, move, color, 0))
+    if (!pattern->autohelper(ll, move, color, 0))
       return;
   }
 
@@ -1659,7 +1659,7 @@ defense_callback(int anchor, int color, struct pattern *pattern, int ll,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, move, color, 0))
+    if (!pattern->autohelper(ll, move, color, 0))
       return;
   }
 
