@@ -632,6 +632,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
    */
   for (str = BOARDMIN; str < BOARDMAX; str++) {
     if (ON_BOARD(str)
+	&& board[str] != EMPTY
 	&& dragon[str].origin == str
 	&& DRAGON2(str).safety == CRITICAL) {
       int w;
