@@ -70,9 +70,7 @@ Usage : mkpat [-cvh] <prefix>\n\
 #include "patterns.h"
 #include "gg-getopt.h"
 
-#if DFA_ENABLED
 #include "dfa.h"
-#endif
 
 #define PATTERNS    0
 #define CONNECTIONS 1
@@ -308,11 +306,9 @@ int anchor = ANCHOR_O; /* Whether both O and/or X may be anchors.
 int choose_best_anchor = 0;  /* -m */
 
 int fullboard = 0;   /* Whether this is a database of fullboard patterns. */
-#if DFA_ENABLED
 int dfa_generate = 0; /* if 1 a dfa is created. */
 int dfa_c_output = 0; /* if 1 the dfa is saved as a c file */
 dfa_t dfa;
-#endif
 
 
 /**************************
@@ -387,7 +383,6 @@ find_extents(void)
   pattern[patno].maxj = maxj - cj;
 }
 
-#if DFA_ENABLED
 
 /*
  * Here we build the dfa.
@@ -422,8 +417,6 @@ write_to_dfa(int index)
     dump_dfa(stderr, &dfa);
 }
 
-
-#endif
 
 /* For good performance, we want to reject patterns as quickly as
  * possible. For each pattern, this combines 16 positions around
@@ -1366,9 +1359,7 @@ write_patterns(FILE *outfile, char *name)
     fprintf(outfile, ",%d", p->anchored_at_X);
 #if PROFILE_PATTERNS
     fprintf(outfile, ",0,0");
-#if DFA_ENABLED
     fprintf(outfile, ",0");
-#endif /* DFA_ENABLED */
 #endif
 
     fprintf(outfile, "},\n");
@@ -1387,9 +1378,7 @@ write_patterns(FILE *outfile, char *name)
   fprintf(outfile, ",0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,NULL,NULL,0");
 #if PROFILE_PATTERNS
   fprintf(outfile, ",0,0");
-#if DFA_ENABLED
     fprintf(outfile, ",0");
-#endif /* DFA_ENABLED */
 #endif
   fprintf(outfile, "}\n};\n");
 }
@@ -1407,12 +1396,10 @@ write_pattern_db(FILE *outfile, char *name)
   fprintf(outfile, "struct pattern_db %s_db = {\n", name);
   fprintf(outfile, "  -1,\n");
   fprintf(outfile, "  %s\n", name);
-#if DFA_ENABLED
   if (dfa_c_output)
     fprintf(outfile, " ,& dfa_%s\n", name); /* pointer to the wired dfa */
   else
     fprintf(outfile, " , NULL\n"); /* pointer to a possible dfa */
-#endif
   fprintf(outfile, "};\n");
 }
 
@@ -1430,11 +1417,7 @@ main(int argc, char *argv[])
   
   {
     /* parse command-line args */
-#if DFA_ENABLED
     while ((i = gg_getopt(argc, argv, "i:o:V:vcbXfmtD")) != EOF) {
-#else
-    while ((i = gg_getopt(argc, argv, "i:o:vcbXfm")) != EOF) {
-#endif
       switch(i) {
       case 'v': verbose = 1; break;
       case 'c': pattern_type = CONNECTIONS; break;
@@ -1444,13 +1427,11 @@ main(int argc, char *argv[])
       case 'm': choose_best_anchor = 1; break;
       case 'i': input_file_name = gg_optarg; break;
       case 'o': output_file_name = gg_optarg; break;
-#if DFA_ENABLED
       case 'D':
 	dfa_generate = 1; dfa_c_output = 1; 
 	break;
       case 'V': dfa_verbose = strtol(gg_optarg, NULL, 10); break;
 
-#endif
       default:
 	fprintf(stderr, "Invalid argument ignored\n");
       }
@@ -1480,12 +1461,10 @@ main(int argc, char *argv[])
   }
 
 
-#if DFA_ENABLED
   if (dfa_generate) {
     dfa_init();
     new_dfa(&dfa, "mkpat's dfa");
   }
-#endif 
 
   if (gg_optind >= argc) {
     fputs(USAGE, stderr);
@@ -1613,10 +1592,8 @@ main(int argc, char *argv[])
       if (state == 2 || state == 3) {
 	finish_pattern(line);
 	write_elements(output_FILE, argv[gg_optind]);
-#if DFA_ENABLED
 	if (dfa_generate)
 	  write_to_dfa(patno);
-#endif
 	state = 4;
       }
       else {
@@ -1693,7 +1670,6 @@ main(int argc, char *argv[])
 
   write_patterns(output_FILE, argv[gg_optind]);
 
-#if DFA_ENABLED
   if (dfa_generate) {
     fprintf(stderr, "---------------------------\n");
     fprintf(stderr, "dfa for %s\n", argv[gg_optind]);
@@ -1710,7 +1686,6 @@ main(int argc, char *argv[])
     kill_dfa(&dfa);
     dfa_end();
   }
-#endif
 
 
   write_pattern_db(output_FILE, argv[gg_optind]);

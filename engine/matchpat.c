@@ -57,9 +57,7 @@ clear_profile(struct pattern *pattern)
   for (; pattern->patn; ++pattern) {
     pattern->hits = 0;
     pattern->reading_nodes = 0;
-#if DFA_ENABLED
     pattern->dfa_hits = 0;
-#endif
   }
 }
 #endif
@@ -74,12 +72,8 @@ print_profile(struct pattern *pattern, int *total_hits,
     if (pattern->hits > 0) {
       *total_hits += pattern->hits;
       *total_nodes += pattern->reading_nodes;
-#if DFA_ENABLED 
       *total_dfa_hits += pattern->dfa_hits;
       fprintf(stderr, "%6d ", pattern->dfa_hits);
-#else
-      *total_dfa_hits = 0;
-#endif
       fprintf(stderr, "%6d %9d %8.1f %s\n", 
 	      pattern->hits,
 	      pattern->reading_nodes,
@@ -635,7 +629,6 @@ matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 /* DFA matcher:                                                           */
 /**************************************************************************/
 
-#if DFA_ENABLED
 /* If DFA_SORT, all matched patterns are sorted and checked 
  * in the same order as the standard scheme */
 #define DFA_SORT 1
@@ -993,9 +986,6 @@ dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 }
 
 
-#endif /* DFA_ENABLED */
-
-
 
 /**************************************************************************/
 /* Main functions:                                                        */
@@ -1061,13 +1051,11 @@ matchpat(matchpat_callback_fn_ptr callback, int color,
   }
 
   /* select pattern matching strategy */
-#if DFA_ENABLED > 0
   if (pdb->pdfa != NULL)
     { 
       loop = dfa_matchpat_loop;
       prepare = dfa_prepare_for_match;
     }
-#endif
 
   /* select strategy */
   switch(color)

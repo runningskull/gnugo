@@ -39,9 +39,7 @@
  * once only.
  */
 
-#if DFA_ENABLED
 extern void dfa_match_init(void);
-#endif
 
 void
 init_gnugo(float memory)
@@ -49,9 +47,7 @@ init_gnugo(float memory)
   reading_cache_init(memory * 1024 * 1024);
   clear_board();
 
-#if DFA_ENABLED
   dfa_match_init();
-#endif
 }
 
 

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- DFA_ENABLE ifdefs removed
 - bugfix in find_double_threats()
 - global_matchpat() renamed matchpat()
 - regression view includes node counts, SGF link, and -t output.

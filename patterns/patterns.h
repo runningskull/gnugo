@@ -30,10 +30,8 @@
 #ifndef __PATTERN_H__
 #define __PATTERN_H__
 
-#if DFA_ENABLED
 #ifndef _DFA_H_
 #include "dfa.h"
-#endif
 #endif
 
 /* local versions of absolute value, min and max */
@@ -240,9 +238,7 @@ struct pattern {
   int anchored_at_X;    /* 3 if the pattern has 'X' at the anchor posn */
 #if PROFILE_PATTERNS
   int hits;
-#if DFA_ENABLED
   int dfa_hits;
-#endif
   int reading_nodes;
 #endif
 };
@@ -250,9 +246,7 @@ struct pattern {
 struct pattern_db {
   int  fixed_for_size;
   struct pattern *patterns;
-#if DFA_ENABLED
   struct dfa *pdfa;
-#endif
 };
 
 
