@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "board"=".\engine\board.dsp" - Package Owner=<4>
+Project: "board"=.\engine\board.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -18,7 +18,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dfa"=".\patterns\dfa.dsp" - Package Owner=<4>
+Project: "dfa"=.\patterns\dfa.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -30,7 +30,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "engine"=".\engine\engine.dsp" - Package Owner=<4>
+Project: "engine"=.\engine\engine.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -45,7 +45,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "fuseki"=".\patterns\fuseki.dsp" - Package Owner=<4>
+Project: "fuseki"=.\patterns\fuseki.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -75,7 +75,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "gnugo"=".\interface\gnugo.dsp" - Package Owner=<4>
+Project: "gnugo"=.\interface\gnugo.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -120,7 +120,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "joseki"=".\patterns\joseki.dsp" - Package Owner=<4>
+Project: "joseki"=.\patterns\joseki.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -141,7 +141,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "mkeyes"=".\patterns\mkeyes.dsp" - Package Owner=<4>
+Project: "mkeyes"=.\patterns\mkeyes.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -153,7 +153,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "mkpat"=".\patterns\mkpat.dsp" - Package Owner=<4>
+Project: "mkpat"=.\patterns\mkpat.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -171,7 +171,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "patterns"=".\patterns\patterns.dsp" - Package Owner=<4>
+Project: "patterns"=.\patterns\patterns.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -192,7 +192,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "sgf"=".\sgf\sgf.dsp" - Package Owner=<4>
+Project: "sgf"=.\sgf\sgf.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -203,11 +203,14 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name sgfgen
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name utils
+    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "sgfgen"=".\sgf\sgfgen.dsp" - Package Owner=<4>
+Project: "sgfgen"=.\sgf\sgfgen.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -215,11 +218,14 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name utils
+    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "utils"=".\utils\utils.dsp" - Package Owner=<4>
+Project: "utils"=.\utils\utils.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

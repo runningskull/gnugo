@@ -44,6 +44,7 @@
 - new function in reading.c: attack_threats
 - handling of tactical moves in worm.c no longer static
 - replaced abort() in mkeyes with fatal error messages
+- patterns.dsp and gnugo.dsw revised
 - tuning
 - influence tuning
 - connection_tuning
