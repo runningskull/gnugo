@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.19 released April 28, 2003
+
 - change USE_BDIST to 1 in owl.c
 - who_wins() invokes silent_examine_position()
 - bugfix in do_owl_analyze_semeai()

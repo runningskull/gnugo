@@ -186,7 +186,7 @@ play black A4
 play white D1
 play black A2
 68 owl_attack C4
-#? [1 B1]
+#? [1 B1]*
 
 loadsgf games/life_and_death/lunches.sgf
 101 dragon_status A17

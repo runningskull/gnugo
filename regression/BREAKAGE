@@ -1,3 +1,17 @@
+============================= 3.3.19 =====================================
+
+./regress.sh . ld_owl.tst 
+68 unexpected FAIL: Correct '1 B1', got '2 B2'
+./regress.sh . semeai.tst 
+45 unexpected FAIL: Correct 'ALIVE DEAD C1', got 'DEAD ALIVE PASS'
+./regress.sh . gunnar.tst 
+29 unexpected FAIL: Correct 'H5', got 'J13'
+30 unexpected FAIL: Correct 'F18', got 'B18'
+31 unexpected FAIL: Correct 'F18', got 'E17'
+32 unexpected FAIL: Correct 'C18', got 'C19'
+33 unexpected FAIL: Correct 'M11', got 'P10'
+34 unexpected FAIL: Correct 'M4|M5', got 'P7'
+
 ============================= 3.3.18 =====================================
 ============================= 3.3.18 pre 5 ===============================
 
