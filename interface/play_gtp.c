@@ -107,6 +107,7 @@ DECLARE(gtp_new_game);
 DECLARE(gtp_estimate_score);
 DECLARE(gtp_owl_attack);
 DECLARE(gtp_owl_defend);
+DECLARE(gtp_owl_analyze_semeai);
 DECLARE(gtp_playblack);
 DECLARE(gtp_playwhite);
 DECLARE(gtp_popgo);
@@ -188,6 +189,7 @@ static struct gtp_command commands[] = {
   {"new_score",               gtp_estimate_score},
   {"owl_attack",     	      gtp_owl_attack},
   {"owl_defend",     	      gtp_owl_defend},
+  {"owl_analyze_semeai",      gtp_owl_analyze_semeai},
   {"popgo",            	      gtp_popgo},
   {"orientation",     	      gtp_set_orientation},
   {"protocol_version",        gtp_protocol_version},
@@ -926,6 +928,51 @@ gtp_owl_defend(char *s, int id)
     gtp_printf(" uncertain");
   return gtp_finish_response();
 }  
+
+
+/* Function:  Analyze a semeai
+ * Arguments: vertex1, vertex2
+ * Fails:     invalid vertices, empty vertices
+ * Returns:   
+ */
+static int
+gtp_owl_analyze_semeai(char *s, int id)
+{
+  int i, j;
+  int k;
+  int dragona, dragonb;
+  int save_verbose = verbose;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  
+  k = gtp_decode_coord(s, &i, &j);
+
+  if (k == 0)
+    return gtp_failure(id, "invalid coordinate");
+  dragona = POS(i, j);
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "vertex must not be empty");
+
+  if (!gtp_decode_coord(s+k, &i, &j))
+    return gtp_failure(id, "invalid coordinate");
+  dragonb = POS(i, j);
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "vertex must not be empty");
+
+  verbose = 0;
+  sgf_dumptree = NULL;
+  examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  verbose = save_verbose;
+  sgf_dumptree = save_sgf_dumptree;
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+      reading_cache_clear();
+
+  owl_analyze_semeai(dragona, dragonb);
+  return gtp_finish_response();
+}  
+
+
+
 
 
 /***********************

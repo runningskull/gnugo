@@ -1,0 +1,106 @@
+#! /usr/bin/perl -w
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This program is distributed with GNU GO, a Go program.        #
+#                                                               #
+# Write gnugo@gnu.org or see http://www.gnu.org/software/gnugo/ #
+# for more information.                                         #
+#                                                               #
+# Copyright 1999, 2000, 2001 by the Free Software Foundation.   #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA.                                        #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
+# This is a script which converts a game record annotated with test cases to
+# the *.tst format.
+# 
+# 
+# The script currently only processes SGF files without variations, but that's
+# quite useful enough when annotating games.
+#
+# All GTP commands are put into the SGF comment field.  The comment field is
+# interpretted in order:
+# 
+#  1) Lines starting with "#" are copied into the tst file.
+#  2) owl_attack or owl_defend commands can be put in such as:
+#         owl_attack A1
+#         1 G2
+#  3) Otherwise, a single line is interpreted as the correct answer, with
+#     the appropriate "gg_genmove" directive added automatically.
+# 
+
+use strict;
+use warnings;
+
+local $/;
+undef $/;
+
+my $probnum = 100;
+my $increment = 10;
+
+while (<>) {
+  my $content = $_;
+  if ($content !~ /C\[/) {
+    warn "$ARGV: No comments.";
+    next;
+  }
+
+  print "\n\n# $ARGV problems:\n\n";
+
+  $content =~ s/^\(;//;
+
+  my $i=0;
+  while ($content =~ /(.*?);/sg) {  # for each node.
+    $i++;
+    my $node = $1;
+    next if $node !~ /C\[(.*)\]/s;
+    my $comments = "";
+    my $command = "";
+    my $comment = $1;
+    my ($othercolor) = $node =~ /(W|B)\[/       or die "No W or B move
+here: $ARGV($i): $node";
+    while ($comment =~ /^(.*)$/mg) { # i.e. for each line of comment
+      my $line = $1;
+      $line =~ s/\s*$//;
+      $line =~ s/^\s*//;
+      if ($line =~ /^#/) {
+        $comments .= "$line\n";
+        next;
+      }
+      $command .= "loadsgf $ARGV $i\n";
+      #$command .= "showboard\n" if 0;
+      if ($line =~ /owl_attack|owl_defend/) {
+        $command .= "$probnum $line\n";  #ah, this line is a specific gtp
+command.
+        $comment =~ /^(.*)$/mg;          #read next line for answer.
+        $line = $1;
+        $line =~ s/\s*$//;
+        $line =~ s/^\s*//;
+      } else {
+        $command .= "$probnum gg_genmove " . ($othercolor eq 'B' ? 'white'
+: 'black') . "\n";
+      }
+      $probnum += $increment;
+      $command .= "#? [$line]\n";
+
+    }
+    print "$comments$command\n\n";# print "\t$i: $1\n";
+  }
+
+}
+

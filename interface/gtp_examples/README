@@ -23,6 +23,7 @@ metamachine.c : This program sits between a gtp controller and an
             alternative move generation scheme (though a weaker
             engine).
 
+sgf2tst   : A perl script that produces a gtp test script from an sgf file
 
                 
 
