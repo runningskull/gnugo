@@ -5,6 +5,7 @@
 - pre-rotated pattern generation in mkpat. (-p option) implemented.
 - %2m added as valid syntax for gprintf
 - relabel rotation matrices in transform.c
+- bugfix in atari_atari_blunder_size: don't crash on inconsistent defense
 
 3.3.11 released October 29, 2002
 
