@@ -1393,11 +1393,19 @@ xXX@
 :1,0
 
 
+Pattern 658
+
+@X
+xXX.
+
+:1,0
+
+
 #           ...
 # Topology: ...
 #
 
-Pattern 658
+Pattern 660
 
 xXx
 x*x
@@ -1405,7 +1413,7 @@ x*x
 :2,1
 
 
-Pattern 659
+Pattern 661
 
 XX*
 .XX
@@ -1413,7 +1421,7 @@ XX*
 :2,1
 
 
-Pattern 660
+Pattern 662
 
 xXx
 xXx
