@@ -648,6 +648,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     moves[k].value = -1;
     moves[k].name = NULL;
     moves[k].same_dragon = 2;
+    moves[k].lunch = NO_MOVE;
   }
   ASSERT1(other == board[bpos], bpos);
   memset(mw, 0, sizeof(mw));
@@ -1651,6 +1652,7 @@ set_single_owl_move(struct owl_move_data moves[MAX_MOVES],
   moves[0].name        = name;
   moves[0].same_dragon = 1;
   moves[0].escape      = 0;
+  moves[0].lunch       = NO_MOVE;
   moves[1].value       = 0;
 }
 
