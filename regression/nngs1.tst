@@ -71,4 +71,26 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 38
 18 gg_genmove white
 #? [!L2]
 
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 16
+19 gg_genmove white
+#? [Q14]
 
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 36
+20 gg_genmove white
+#? [F17]
+
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 40
+21 gg_genmove white
+#? [!M6]
+
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 92
+22 gg_genmove white
+#? [E3]
+
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 130
+23 gg_genmove white
+#? [M8]
+
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203121818.sgf 88
+24 gg_genmove white
+#? [L7|J5|M6]
