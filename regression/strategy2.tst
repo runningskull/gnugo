@@ -125,7 +125,7 @@ loadsgf games/semeai2.sgf 118
 loadsgf games/semeai2.sgf 150
 # If Q11 is not undervalued F7 is acceptable (though not correct)
 75 gg_genmove white
-#? [Q11]*
+#? [Q11]
 
 loadsgf games/semeai2.sgf 152
 # If Q11 is not undervalued F7 is acceptable (though not correct)

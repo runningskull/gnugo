@@ -22,5 +22,5 @@ loadsgf games/arion.sgf 213
 
 loadsgf games/arion.sgf 225
 6 gg_genmove black
-#? [E19]
+#? [E19]*
 

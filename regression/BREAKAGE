@@ -1,3 +1,35 @@
+./regress.sh . blunder.tst
+15 unexpected FAIL: Correct 'H3', got 'J1'
+./regress.sh . strategy.tst
+32 unexpected PASS!
+./regress.sh . strategy2.tst
+75 unexpected PASS!
+./regress.sh . endgame.tst
+211 unexpected PASS!
+401 unexpected FAIL: Correct 'C4', got 'E5'
+./regress.sh . rosebud.tst
+1 unexpected FAIL: Correct 'E16', got 'F18'
+./regress.sh . golife.tst
+7 unexpected PASS!
+./regress.sh . arion.tst
+6 unexpected FAIL: Correct 'E19', got 'H19'
+./regress.sh . viking.tst
+3 unexpected PASS!
+./regress.sh . ego.tst
+3 unexpected FAIL: Correct 'H18', got 'K16'
+4 unexpected FAIL: Correct '!G19', got 'G19'
+./regress.sh . nicklas1.tst
+1206 unexpected PASS!
+1213 unexpected PASS!
+2001 unexpected PASS!
+./regress.sh . nicklas2.tst
+904 unexpected PASS!
+./regress.sh . nicklas3.tst
+
+./regress.sh . nicklas4.tst
+./regress.sh . nicklas5.tst
+./regress.sh . strategy3.tst
+
 ========================== 3.1.3  =========================
 
 ./regress.sh . endgame.tst

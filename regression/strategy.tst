@@ -160,7 +160,7 @@ loadsgf games/strategy6.sgf 274
 
 loadsgf games/strategy7.sgf 23
 32 gg_genmove black
-#? [A4]*
+#? [A4]
 
 loadsgf games/strategy8.sgf 283
 33 gg_genmove white
