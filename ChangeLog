@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- least significant bit of move reason now denotes a threat
+- bugfix in add_attack_either_move
+- new move reason: EITHER_MOVE
+- disabled add_attack_either_move
+- some cleanup in move_reasons.c
+- renamed some move reasons for name consistency
 - new function special_rescue6() in reading.c
 - defend3() revised
 - avoid giving followup values to non-sente threats in

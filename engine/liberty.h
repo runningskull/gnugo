@@ -331,9 +331,7 @@ void add_owl_uncertain_attack_move(int pos, int dr);
 void add_my_atari_atari_move(int pos, int size);
 void add_your_atari_atari_move(int pos, int size);
 void add_vital_eye_move(int pos, int eyespace, int color);
-#if 0
 void add_attack_either_move(int pos, int str1, int str2);
-#endif
 void add_defend_both_move(int pos, int str1, int str2);
 void add_block_territory_move(int pos);
 void add_expand_territory_move(int pos);
