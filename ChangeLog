@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- active area for persistent breakin cache shrinked
+- new HIGH_LIBERTY_BIT2 in persistent caches, used by breakin cache
 - new function break_chain4_moves()
 - owl moves for non-critical dragons discarded
 - do_owl_analyze_semeai() revised

@@ -636,7 +636,7 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
 #define CONNECT_DEPTH2       20
 
 #define BREAKIN_NODE_LIMIT  400
-#define BREAKIN_DEPTH	     15
+#define BREAKIN_DEPTH	     14
 
 /* Set the various reading depth parameters. If mandated_depth_value
  * is not -1 that value is used; otherwise the depth values are

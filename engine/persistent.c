@@ -61,7 +61,8 @@
 /* ================================================================ */
 
 /* Used in active area. */
-#define HIGH_LIBERTY_BIT 4
+#define HIGH_LIBERTY_BIT  4
+#define HIGH_LIBERTY_BIT2 8
 
 /* Tactical reading cache. */
 
@@ -214,11 +215,11 @@ draw_active_area(char board[BOARDMAX], int apos)
 	c = '.';
       else if (board[pos] == WHITE)
 	c = cw;
-      else if (board[pos] == (WHITE | HIGH_LIBERTY_BIT))
+      else if (board[pos] & 3 == WHITE)
 	c = 'O';
       else if (board[pos] == BLACK)
 	c = cb;
-      else if (board[pos] == (BLACK | HIGH_LIBERTY_BIT))
+      else if (board[pos] & 3 == BLACK)
 	c = 'X';
       if (board[pos] == GRAY)
 	c = '?';
@@ -252,9 +253,10 @@ verify_stored_board(char p[BOARDMAX])
       continue;
     else if ((p[pos] & 3) != board[pos])
       return 0;
-    else if (!(p[pos] & HIGH_LIBERTY_BIT))
+    else if (!(p[pos] & (HIGH_LIBERTY_BIT | HIGH_LIBERTY_BIT2)))
       continue;
-    else if (countlib(pos) <= 4)
+    else if (((p[pos] & HIGH_LIBERTY_BIT) && countlib(pos) <= 4)
+             || (p[pos] & HIGH_LIBERTY_BIT2 && countlib(pos) <= 3))
       return 0;
   }
   
@@ -1037,6 +1039,7 @@ print_persistent_connection_cache_entry(int k)
 /*                   Break-in reading functions                     */
 /* ================================================================ */
 
+
 /* Remove persistent cache entries which are no longer current. */
 void
 purge_persistent_breakin_cache()
@@ -1114,6 +1117,7 @@ find_persistent_breakin_cache_entry(int routine, int str,
     				    Hash_data goal_hash)
 {
   int k;
+  int color;
   ASSERT1(str == find_origin(str), str);
 
   for (k = 0; k < persistent_breakin_cache_size; k++) {
@@ -1233,8 +1237,8 @@ store_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
   }
   
   /* Remains to set the board. We let the active area be
-   * the two strings to connect +
-   * the breakin shadow +
+   * the string to connect +
+   * the breakin shadow (which contains the goal) +
    * distance two expansion through empty intersections and own stones +
    * adjacent opponent strings +
    * liberties of adjacent opponent strings with less than five liberties +
@@ -1273,21 +1277,23 @@ store_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
       continue;
     for (r = 0; r < 4; r++) {
       int pos2 = pos + delta[r];
-      if (ON_BOARD(pos2) && board[pos2] != other && active[pos2] != 0) {
+      if (ON_BOARD(pos2)
+	  && board[pos2] != other
+	  && active[pos2] && active[pos2] <= 2) {
 	mark_string(pos, active, (char) 1);
 	break;
       }
     }
   }
   
-  /* Liberties of adjacent opponent strings with less than five liberties +
+  /* Liberties of adjacent opponent strings with less than four liberties +
    * liberties of low liberty neighbors of adjacent opponent strings
    * with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == other && active[pos] != 0 && countlib(pos) < 5) {
+    if (board[pos] == other && active[pos] != 0 && countlib(pos) < 4) {
       int libs[4];
-      int liberties = findlib(pos, 4, libs);
+      int liberties = findlib(pos, 3, libs);
       int adjs[MAXCHAIN];
       int adj;
       for (r = 0; r < liberties; r++)
@@ -1309,13 +1315,13 @@ store_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
   }
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    int value = board[pos];
+    char value = board[pos];
     if (!ON_BOARD(pos))
       continue;
     if (!active[pos])
       value = GRAY;
-    else if (IS_STONE(board[pos]) && countlib(pos) > 4)
-      value |= HIGH_LIBERTY_BIT;
+    else if (IS_STONE(board[pos]) && countlib(pos) > 3)
+      value |= HIGH_LIBERTY_BIT2;
     
     persistent_breakin_cache[persistent_breakin_cache_size].board[pos] =
       value;
