@@ -2,7 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- temporary workaround for a bug in do_corner_matchpat()
+- bugfix in corner_add_pattern() (mkpat.c): labels must be rotated too
 - spread_connection_distances() now delays expensive constraint evaluation,
   storing pending evaluation on a heap
 - new function signed_mark_string()
