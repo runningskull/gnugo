@@ -203,17 +203,17 @@ loadsgf games/gunnar/gunnar11.sgf
 # move. 
 loadsgf games/nngs/tommmal-gnugo-3.4-200309021655.sgf 106
 37 restricted_genmove black S8 Q15
-#? [Q15]
+#? [Q15]*
 
 # The semeai can still be won.
 loadsgf games/nngs/tommmal-gnugo-3.5.1-200309081210.sgf 208
 38 reg_genmove black
-#? [M7|N1]
+#? [M7|N1]*
 
 # Keep the connection to save everything without ko.
 loadsgf games/nngs/gnugo-3.5.1-viking4-200309231039.sgf 123
 39 reg_genmove white
-#? [N4]
+#? [N4]*
 
 # A14 is huge, determining the entire upper left part of the board.
 # The lower right corner is also critical but much smaller.

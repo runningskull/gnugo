@@ -207,7 +207,7 @@ loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 38
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 52
 510 owl_attack R8
-#? [0]*
+#? [0]
 
 #do something to help the C16 group
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 54

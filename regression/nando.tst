@@ -225,13 +225,13 @@ loadsgf games/nando/kisei27_g1.sgf 14
 #CATEGORY=FUSEKI
 loadsgf games/nando/kisei27_g1.sgf 16
 211 reg_genmove white
-#? [D5]*
+#? [D5]
 
 # Connection is mandatory.
 #CATEGORY=FUSEKI
 loadsgf games/nando/kisei27_g1.sgf 20
 212 reg_genmove white
-#? [E3]*
+#? [E3]
 
 #CATEGORY=CONNECTION
 loadsgf games/nando/kisei27_g1.sgf 26

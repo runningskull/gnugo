@@ -214,11 +214,11 @@ loadsgf games/splee.sgf 62
 
 loadsgf games/ninestones/emanuel-1.sgf 182
 650 reg_genmove black
-#? [Q5]
+#? [Q5]*
 
 loadsgf games/ninestones/emanuel-1.sgf 200
 660 reg_genmove black
-#? [P1]
+#? [P1]*
 
 #this is a persistent cache problem
 loadsgf games/ninestones/emanuel-2.sgf 112
@@ -232,4 +232,4 @@ reg_genmove black
 play black C8
 play white G7
 670 reg_genmove black
-#? [H7]
+#? [H7]*

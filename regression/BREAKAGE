@@ -1,3 +1,30 @@
+========================== 3.5.2 pre 1 =====================================
+
+./regress.sh . connection.tst 
+109 unexpected FAIL: Correct '0', got '1'
+./regress.sh . strategy3.tst 
+114 unexpected PASS!
+./regress.sh . owl1.tst 
+327 unexpected FAIL: Correct '1 (O19|P19|Q19|Q17|N19)', got '0'
+329 unexpected FAIL: Correct '1 T4', got '0'
+330 unexpected FAIL: Correct '1 R1', got '0'
+331 unexpected FAIL: Correct '1 (R1|S1|T2)', got '1 PASS'
+./regress.sh . nngs3.tst 
+390 unexpected PASS!
+./regress.sh . nngs4.tst 
+510 unexpected PASS!
+./regress.sh . ninestones.tst 
+650 unexpected FAIL: Correct 'Q5', got 'N11'
+660 unexpected FAIL: Correct 'P1', got 'Q2'
+670 unexpected FAIL: Correct 'H7', got 'J16'
+./regress.sh . gunnar.tst 
+37 unexpected FAIL: Correct 'Q15', got 'S8'
+38 unexpected FAIL: Correct 'M7|N1', got 'B3'
+39 unexpected FAIL: Correct 'N4', got 'R1'
+./regress.sh . nando.tst 
+211 unexpected PASS!
+212 unexpected PASS!
+
 ========================== 3.5.1 =====================================
 
 This huge and mostly negative regression data is caused by

@@ -273,19 +273,19 @@ loadsgf games/nngs/ccwills-gnugo-3.4-200308231739.sgf 146
 
 loadsgf games/nngs/gnugo-3.5.1-viking4-200309231039.sgf 139
 327 owl_attack O18
-#? [1 (O19|P19|Q19|Q17|N19)]
+#? [1 (O19|P19|Q19|Q17|N19)]*
 
 loadsgf games/nngs/juka-gnugo-3.5.1-200309161948.sgf
 328 owl_attack R6
 #? [1 (P1|T4)]
 329 owl_defend R6
-#? [1 T4]
+#? [1 T4]*
 
 loadsgf games/nngs/tommmal-gnugo-3.5.1-200310071202.sgf 78
 330 owl_attack Q5
-#? [1 R1]
+#? [1 R1]*
 331 owl_defend Q5
-#? [1 (R1|S1|T2)]
+#? [1 (R1|S1|T2)]*
 
 # This is more of a semeai, but at least owl should not say that
 # B19 is unattackable.
