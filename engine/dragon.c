@@ -1173,7 +1173,7 @@ identify_thrashing_dragons()
 	  DEBUG(DEBUG_DRAGONS,
 		"neighbor at distance %d of thrashing dragon found at %1m\n",
 		dist + 1, DRAGON(d).origin);
-	  mark_dragon(DRAGON(d).origin, thrashing_stone, dist + 1);
+	  mark_dragon(DRAGON(d).origin, thrashing_stone, (char)(dist + 1));
 	}
       }
     }
