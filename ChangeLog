@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- capture_non_invincible_strings() and unconditional_life() moved from
+  utils.c to unconditional.c
 - resignation option reverted from GTP commands genmove_black and
   genmove_white
 - new heuristic to reduce branching factor in connection reading.
