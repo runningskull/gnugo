@@ -3211,6 +3211,25 @@ oc*A
 ;     || (!x_somewhere(d) && !xplay_defend_both(*,c,d,c,e)))
 
 
+Pattern A1016a
+# gf New pattern. (3.1.22)
+# Converse to D1376. See lazarus:114 for an example.
+
+XxO?
+o.*Y
+----
+
+:8,-,value(75)
+
+Bde?
+oc*A
+----
+
+; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
+; && ((x_somewhere(d) && xplay_attack_either(*,c,c,e))
+;     || (!x_somewhere(d) && !xplay_defend_both(*,c,d,c,e)))
+
+
 Pattern A1017
 # nn New pattern (3.3.11)
 
@@ -3276,26 +3295,6 @@ abcde
 ;+(owl_escape_value(e)>0) + (owl_escape_value(f)>0)
 ;+(owl_escape_value(g)>0) + (owl_escape_value(h)>0)
 ;+(owl_escape_value(i)>0) < 2
-
-
-
-Pattern A1016a
-# gf New pattern. (3.1.22)
-# Converse to D1376. See lazarus:114 for an example.
-
-XxO?
-o.*Y
-----
-
-:8,-,value(75)
-
-Bde?
-oc*A
-----
-
-; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
-; && ((x_somewhere(d) && xplay_attack_either(*,c,c,e))
-;     || (!x_somewhere(d) && !xplay_defend_both(*,c,d,c,e)))
 
 
 #########################################################
@@ -4806,6 +4805,7 @@ Pattern A1348
 
 
 Pattern A1401
+# nn Increased value a bit (3.3.12)
 
 Y...|       don't let opponent live easily in the corner
 .*..|
@@ -4813,7 +4813,7 @@ Y...|       don't let opponent live easily in the corner
 ....|
 ----+
 
-:8,-,value(45)
+:8,-,value(46)
 
 
 Pattern A1402

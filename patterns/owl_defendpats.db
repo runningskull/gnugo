@@ -1677,6 +1677,8 @@ Xaa.O
 
 Pattern D509
 # FIXME: (see trevor:360)
+# nn Fixed constraint (3.3.12)
+#   does_defend() doesn't return WIN
 
 XO?      capture to defend
 *XO
@@ -1688,7 +1690,7 @@ Xa?
 *XO
 ---
 
-;does_defend(*,a) == WIN
+;does_defend(*,a)
 
 
 Pattern D510
