@@ -739,6 +739,42 @@ dragon_weak(int pos)
 	 && DRAGON2(pos).safety != INVINCIBLE;
 }
 
+
+void
+test_attack_either_move(int move, int color, int worma, int wormb)
+{
+  ASSERT_ON_BOARD1(move);
+  ASSERT1(board[move] == EMPTY, move);
+  ASSERT1(board[worma] == OTHER_COLOR(color)
+          && board[wormb] == OTHER_COLOR(color), move);
+
+  if (!defend_both(worma, wormb)) {
+    if (0)
+      gprintf("%1m: Rej. attack_either_move for %1m & %1m (can't defend both anyway)\n",
+	      move, worma, wormb);
+    return;
+  }
+  if (trymove(move, color, "suggest_attack_either_move", worma,
+      	     EMPTY, NO_MOVE)) {
+    if (board[worma] == OTHER_COLOR(color)
+	&& board[wormb] == OTHER_COLOR(color)) {
+      if (!defend_both(worma, wormb))
+        add_either_move(move, ATTACK_STRING, worma, ATTACK_STRING, wormb);
+      else {
+	if (0)
+	  gprintf("%1m: Rej. attack_either_move for %1m & %1m (doesn't work)\n",
+		  move, worma, wormb);
+      }
+    }
+    else
+      if (0)
+	gprintf("%1m: Rej. attack_either_move for %1m & %1m (captured directly)\n",
+		move, worma, wormb);
+    popgo();
+  }
+}
+
+
 /*
  * LOCAL Variables:
  * tab-width: 8

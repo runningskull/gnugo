@@ -2951,9 +2951,7 @@ XO
 *A
 BO
 
-;!oplay_defend_both(*,A,B)
-
->add_attack_either_move(A,B);
+>test_attack_either_move(A,B)
 
 
 Pattern DD2
@@ -3002,7 +3000,7 @@ Dba
 ;oplay_attack(*,D) && oplay_attack_either(*,a,D,E)
 ;&& !oplay_defend_both(*,b,c,D,E)
 
->add_attack_either_move(D,E);
+>test_attack_either_move(D,E)
 
 
 Pattern DD4
@@ -3054,9 +3052,7 @@ X*X
 A*B
 ?o?
 
-;!oplay_defend_both(*,A,B)
-
->add_attack_either_move(A,B);
+>test_attack_either_move(A,B)
 
 
 Pattern DD7
@@ -3072,9 +3068,9 @@ Pattern DD7
 
 ;lib(d)<4 && (xlib(*)>1 || lib(d)<3)
 ;&& oplay_defend(*,A) && oplay_defend(*,B)
-;&& !oplay_defend_both(*,A,B) && !oplay_attack(*,c)
+;&& !oplay_attack(*,c)
 
->add_attack_either_move(A,B);
+>test_attack_either_move(A,B)
 
 
 Pattern DD8
@@ -3146,7 +3142,7 @@ O*.
 
 ; !attack(A) && !attack(B) && oplay_attack(*,A) && oplay_attack(*,B)
 
->add_attack_either_move(A,B)
+>test_attack_either_move(A,B)
 
 
 Pattern DD12
@@ -3169,7 +3165,7 @@ A..
 ;lib(A)==3 && !oplay_attack(*,E) && oplay_attack(*,d,A)
 ;&& !oplay_defend_both(*,c,d,A,B)
 
->add_attack_either_move(A,B)
+>test_attack_either_move(A,B)
 
 
 Pattern DD13

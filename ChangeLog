@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- Apply "B" cutting pattern from shapes.db only when connection code
+  confirms it is working
+- new function test_attack_either_move; gets invoked by patterns
+  instead of directly adding the attack-either move reason
 - new function mark_changed_dragon() in move_reasons.c
 - only mark owl defended stones as safe if also sufficiently tactically safe
 - matcher_check can analyze existing sgf files

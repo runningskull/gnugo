@@ -274,26 +274,8 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     pattern->autohelper(pattern, ll, move, color, 1);
   }
 
-  /* Pattern class B, cut all combinations of opponent dragons. */
-  if ((class & CLASS_B) && !experimental_connections) {
-    for (k = 0; k < your_ndragons; k++)
-      for (l = k+1; l < your_ndragons; l++) {
-	add_cut_move(move, your_dragons[k], your_dragons[l]);
-	TRACE("...cuts dragons %1m, %1m\n", your_dragons[k], your_dragons[l]);
-      }
-  }
-
-  /* Pattern class C, connect all combinations of our dragons. */
-  if ((class & CLASS_C) && !experimental_connections) {
-    for (k = 0; k < my_ndragons; k++)
-      for (l = k+1; l < my_ndragons; l++) {
-	add_connection_move(move, my_dragons[k], my_dragons[l]);
-	TRACE("...connects dragons %1m, %1m\n", my_dragons[k], my_dragons[l]);
-      }
-  }
-
   /* Pattern class B, try to cut all combinations of opponent strings. */
-  if ((class & CLASS_B) && experimental_connections) {
+  if (class & CLASS_B) {
     for (k = 0; k < your_nstrings; k++)
       for (l = k+1; l < your_nstrings; l++) {
 	if (string_connect(your_strings[k], your_strings[l], NULL)
@@ -303,6 +285,15 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	  TRACE("...cuts strings %1m, %1m\n",
 		your_strings[k], your_strings[l]);
 	}
+      }
+  }
+
+  /* Pattern class C, connect all combinations of our dragons. */
+  if ((class & CLASS_C) && !experimental_connections) {
+    for (k = 0; k < my_ndragons; k++)
+      for (l = k+1; l < my_ndragons; l++) {
+	add_connection_move(move, my_dragons[k], my_dragons[l]);
+	TRACE("...connects dragons %1m, %1m\n", my_dragons[k], my_dragons[l]);
       }
   }
 
