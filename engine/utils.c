@@ -465,7 +465,7 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
 #define KO_DEPTH              8
 
 #define AA_DEPTH              6
-#define AA_THREAT_DEPTH       1
+#define AA_THREAT_DEPTH       3
 
 /* Pattern based reading */
 #define OWL_DISTRUST_DEPTH    6

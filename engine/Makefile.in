@@ -89,7 +89,7 @@ noinst_HEADERS = cache.h gnugo.h hash.h clock.h                  influence.h lib
 # preconfigured settings for various configurations
 noinst_LIBRARIES = libengine.a libboard.a
 
-libengine_a_SOURCES =        aftermath.c       board.c       cache.c       clock.c       combination.c       dragon.c       filllib.c       fuseki.c       genmove.c       globals.c       hash.c       influence.c       interface.c       life.c       matchpat.c       move_reasons.c       optics.c       owl.c       printutils.c       readconnect.c       reading.c       score.c       semeai.c       sgfdecide.c       sgffile.c       shapes.c       showbord.c       utils.c       worm.c
+libengine_a_SOURCES =        aftermath.c       board.c       cache.c       clock.c       combination.c       dragon.c       filllib.c       fuseki.c       genmove.c       globals.c       hash.c       influence.c       interface.c       life.c       matchpat.c       move_reasons.c       movelist.c       optics.c       owl.c       printutils.c       readconnect.c       reading.c       score.c       semeai.c       sgfdecide.c       sgffile.c       shapes.c       showbord.c       utils.c       worm.c
 
 
 libboard_a_SOURCES =        board.c       cache.c       globals.c       hash.c       printutils.c       sgffile.c       showbord.c
@@ -107,7 +107,7 @@ LIBS = @LIBS@
 libengine_a_LIBADD = 
 libengine_a_OBJECTS =  aftermath.o board.o cache.o clock.o combination.o \
 dragon.o filllib.o fuseki.o genmove.o globals.o hash.o influence.o \
-interface.o life.o matchpat.o move_reasons.o optics.o owl.o \
+interface.o life.o matchpat.o move_reasons.o movelist.o optics.o owl.o \
 printutils.o readconnect.o reading.o score.o semeai.o sgfdecide.o \
 sgffile.o shapes.o showbord.o utils.o worm.o
 libboard_a_LIBADD = 
@@ -131,7 +131,7 @@ DEP_FILES =  .deps/aftermath.P .deps/board.P .deps/cache.P .deps/clock.P \
 .deps/combination.P .deps/dragon.P .deps/filllib.P .deps/fuseki.P \
 .deps/genmove.P .deps/globals.P .deps/hash.P .deps/influence.P \
 .deps/interface.P .deps/life.P .deps/matchpat.P .deps/move_reasons.P \
-.deps/optics.P .deps/owl.P .deps/printutils.P .deps/readconnect.P \
+.deps/movelist.P .deps/optics.P .deps/owl.P .deps/printutils.P .deps/readconnect.P \
 .deps/reading.P .deps/score.P .deps/semeai.P .deps/sgfdecide.P \
 .deps/sgffile.P .deps/shapes.P .deps/showbord.P .deps/utils.P \
 .deps/worm.P

@@ -104,19 +104,22 @@ extern Hash_data    hashdata;
 		      
 #define BOARD(i, j)   board[POS(i, j)]
 
-/* board utility functions */
 
+/* board utility functions */
 int find_origin(int str);
 int chainlinks(int str, int adj[MAXCHAIN]);
 int chainlinks2(int str, int adj[MAXCHAIN], int lib);
+
 
 /* This is increased by one anytime a move is (permanently) played or
  * the board is cleared.
  */
 extern int position_number;
 
+
 /* Detect vertex on edge. */
 int is_edge_vertex(int pos);
+
 
 /* Count and/or find liberties at (pos). */
 int countlib(int str);
@@ -126,9 +129,11 @@ int count_common_libs(int str1, int str2);
 int find_common_libs(int str1, int str2, int maxlib, int *libs);
 int have_common_lib(int str1, int str2, int *lib);
 
+
 void start_timer(int n);
 double time_report(int n, const char *occupation, int i, int j, 
 		   double mintime);
+
 
 /* Play at (pos) and then count the liberties. */
 int accurate_approxlib(int pos, int color, int maxlib, int *libs);
@@ -200,6 +205,7 @@ struct pattern;
 struct pattern_db;
 struct fullboard_pattern;
 struct half_eye_data;
+struct movelist;
 
 /*
  * Try to match a pattern in the database to the board. Callback for
@@ -219,8 +225,6 @@ void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 
 void reading_cache_init(int bytes);
 void reading_cache_clear(void);
-/* FIXME: Remove it from here and put it back near worm.c */
-#define MAX_TACTICAL_POINTS 10
 
 /* reading.c */
 int attack(int str, int *move);
@@ -231,8 +235,7 @@ int attack_and_defend(int str,
 int attack_either(int astr, int bstr);
 int defend_both(int astr, int bstr);
 int break_through(int apos, int bpos, int cpos);
-int attack_threats(int pos, int moves[MAX_TACTICAL_POINTS], 
-		   int codes[MAX_TACTICAL_POINTS]);
+int attack_threats(int pos, int max_points, int moves[], int codes[]);
 
 int restricted_defend1(int str, int *move, int komaster, int kom_pos,
 		       int num_forbidden_moves, int *forbidden_moves);
@@ -293,14 +296,11 @@ void find_cuts(void);
 void find_connections(void);
 void modify_eye_spaces(void);
 
-/* FIXME: Move these from worm.c */
-int  tactical_move_known(int move, int points[MAX_TACTICAL_POINTS],
-			 int codes[MAX_TACTICAL_POINTS]);
-void change_tactical_point(int str, int move, int code,
-			   int points[MAX_TACTICAL_POINTS],
-			   int codes[MAX_TACTICAL_POINTS]);
-void sort_tactical_points(int points[MAX_TACTICAL_POINTS],
-			  int codes[MAX_TACTICAL_POINTS]);
+/* movelist.c */
+int  movelist_move_known(int move, int max_points, int points[], int codes[]);
+void movelist_change_point(int move, int code, int max_points, 
+			   int points[], int codes[]);
+void movelist_sort_points(int max_points, int points[], int codes[]);
 
 
 /* functions to add (or remove) move reasons */
@@ -574,11 +574,7 @@ extern struct half_eye_data half_eye[BOARDMAX];
  * data concerning a worm. A copy is kept at each vertex of the worm.
  */
 
-#if 0
-FIXME: Reinstate it here once the functions handling these arrays
-       are moved to their own file.
 #define MAX_TACTICAL_POINTS 10
-#endif
 
 struct worm_data {
   int color;         /* its color */
@@ -608,12 +604,12 @@ struct worm_data {
    */
   int attack_points[MAX_TACTICAL_POINTS];
   int attack_codes[MAX_TACTICAL_POINTS];
-  int defend_codes[MAX_TACTICAL_POINTS];
   int defense_points[MAX_TACTICAL_POINTS];
-  int attack_threat_codes[MAX_TACTICAL_POINTS];
+  int defend_codes[MAX_TACTICAL_POINTS];
   int attack_threat_points[MAX_TACTICAL_POINTS];
-  int defense_threat_codes[MAX_TACTICAL_POINTS];
+  int attack_threat_codes[MAX_TACTICAL_POINTS]; 
   int defense_threat_points[MAX_TACTICAL_POINTS];
+  int defense_threat_codes[MAX_TACTICAL_POINTS];
 };
 
 extern struct worm_data worm[BOARDMAX];

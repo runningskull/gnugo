@@ -40,6 +40,7 @@ static int atari_atari_find_defense_moves(int str,
 					  int moves[MAX_BOARD * MAX_BOARD]);
 static int is_atari(int pos, int color);
 
+
 /* Generate move reasons for combination attacks and defenses against
  * them.
  *
@@ -685,7 +686,10 @@ atari_atari_find_attack_moves(int color, int minsize,
 
     /* Pick up general threat moves or simple ataris. */
     if (stackp < aa_threat_depth) {
-      num_threat_moves = attack_threats(pos, threat_moves, threat_codes);
+      memset(threat_moves, 0, sizeof(threat_moves));
+      memset(threat_codes, 0, sizeof(threat_codes));
+      num_threat_moves = attack_threats(pos, MAX_THREAT_MOVES,
+					threat_moves, threat_codes);
       if ((debug & DEBUG_ATARI_ATARI)
 	  && num_moves > 0) {
 	int i;

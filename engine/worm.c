@@ -32,23 +32,14 @@ static void compute_effective_worm_sizes(void);
 static void compute_unconditional_status(void);
 static void find_worm_attacks_and_defenses(void);
 static void find_worm_threats(void);
-static int find_lunch(int str, int *lunch);
-#if 0
-static int tactical_move_known(int move, int points[MAX_TACTICAL_POINTS],
-			       int codes[MAX_TACTICAL_POINTS]);
+static int  find_lunch(int str, int *lunch);
 static void change_tactical_point(int str, int move, int code,
 				  int points[MAX_TACTICAL_POINTS],
 				  int codes[MAX_TACTICAL_POINTS]);
-static void sort_tactical_points(int points[MAX_TACTICAL_POINTS],
-				 int codes[MAX_TACTICAL_POINTS]);
-#endif
-static void swap_points_and_codes(int points[MAX_TACTICAL_POINTS],
-				  int codes[MAX_TACTICAL_POINTS],
-				  int m, int n);
 static void propagate_worm2(int str);
-static int genus(int str);
+static int  genus(int str);
 static void markcomponent(int str, int pos, int mg[BOARDMAX]);
-static int examine_cavity(int pos, int *edge);
+static int  examine_cavity(int pos, int *edge);
 static void cavity_recurse(int pos, int mx[BOARDMAX], 
 			   int *border_color, int *edge, int str);
 static void ping_cave(int str, int *result1,  int *result2,
@@ -56,7 +47,7 @@ static void ping_cave(int str, int *result1,  int *result2,
 static void ping_recurse(int pos, int *counter, 
 			 int mx[BOARDMAX], 
 			 int mr[BOARDMAX], int color);
-static int touching(int pos, int color);
+static int  touching(int pos, int color);
 static void find_attack_patterns(void);
 static void attack_callback(int m, int n, int color,
 			    struct pattern *pattern, int ll, void *data);
@@ -959,12 +950,9 @@ find_worm_threats()
       int pos = POS(m, n);
       int liberties;
       static int libs[MAXLIBS];
-      int adj;
-      int adjs[MAXCHAIN];
 
       int k;
       int l;
-      int r;
       int color;
       int other;
 
@@ -978,54 +966,18 @@ find_worm_threats()
       /* 1. Start with finding attack threats. */
       /* Only try those worms that have no attack. */
       if (worm[pos].attack_codes[0] == 0) {
-
-	liberties = findlib(pos, MAXLIBS, libs);
-
-	/* This test would seem to be unnecessary since we only attack
-	 * strings with attack_code == 0, but it turns out that single
-	 * stones with one liberty that can be captured, but come to
-	 * live again in a snap-back get attack_code == 0. 
-	 *
-	 * The test against 6 liberties is just an optimization.
-	 */
-	if (liberties > 1 && liberties < 6) {
-	  for (k = 0; k < liberties; k++) {
-	    int aa = libs[k];
-
-	    /* Try to threaten on the liberty. */
-	    if (trymove(aa, other, "threaten attack", pos, EMPTY, NO_MOVE)) {
-	      int acode = attack(pos, NULL);
-	      if (acode != 0)
-		change_attack_threat(pos, aa, acode);
-	      popgo();
-	    }
-
-	    /* Try to threaten on second order liberties. */
-	    for (l = 0; l < 4; l++) {
-	      int bb = libs[k] + delta[l];
-
-	      if (!ON_BOARD(bb)
-		  || IS_STONE(board[bb])
-		  || liberty_of_string(bb, pos))
-		continue;
-
-	      if (trymove(bb, other, "threaten attack", pos, EMPTY, NO_MOVE)) {
-		int acode = attack(pos, NULL);
-		if (acode != 0)
-		  change_attack_threat(pos, bb, acode);
-		popgo();
-	      }
-	    }
-	  }
-	}
-
+	attack_threats(pos, MAX_TACTICAL_POINTS,
+		       worm[pos].attack_threat_points,
+		       worm[pos].attack_threat_codes);
+#if 0
 	/* Threaten to attack by saving weak neighbors. */
-	adj = chainlinks(pos, adjs);
-	for (k = 0; k < adj; k++)
+	num_adj = chainlinks(pos, adjs);
+	for (k = 0; k < num_adj; k++) {
 	  if (worm[adjs[k]].attack_codes[0] != 0
 	      && worm[adjs[k]].defend_codes[0] != 0)
 	    for (r = 0; r < MAX_TACTICAL_POINTS; r++) {
 	      int bb;
+
 	      if (worm[adjs[k]].defend_codes[r] == 0)
 		break;
 	      bb = worm[adjs[k]].defense_points[r];
@@ -1041,7 +993,8 @@ find_worm_threats()
 		popgo();
 	      }
 	    }
-	
+	}
+#endif
 	/* FIXME: Try other moves also (patterns?). */
       }
 
@@ -1251,7 +1204,8 @@ change_attack_threat(int str, int move, int acode)
  */
 int attack_move_known(int move, int str)
 {
-  return tactical_move_known(move, worm[str].attack_points,
+  return movelist_move_known(move, MAX_TACTICAL_POINTS,
+			     worm[str].attack_points,
 			     worm[str].attack_codes);
 }
 
@@ -1260,7 +1214,8 @@ int attack_move_known(int move, int str)
  */
 int defense_move_known(int move, int str)
 {
-  return tactical_move_known(move, worm[str].defense_points,
+  return movelist_move_known(move, MAX_TACTICAL_POINTS,
+			     worm[str].defense_points,
 			     worm[str].defend_codes);
 }
 
@@ -1271,7 +1226,8 @@ int defense_move_known(int move, int str)
 int
 attack_threat_move_known(int move, int str)
 {
-  return tactical_move_known(move, worm[str].attack_threat_points,
+  return movelist_move_known(move, MAX_TACTICAL_POINTS,
+			     worm[str].attack_threat_points,
 			     worm[str].attack_threat_codes);
 }
 
@@ -1282,23 +1238,9 @@ attack_threat_move_known(int move, int str)
 int
 defense_threat_move_known(int move, int str)
 {
-  return tactical_move_known(move, worm[str].defense_threat_points,
+  return movelist_move_known(move, MAX_TACTICAL_POINTS,
+			     worm[str].defense_threat_points,
 			     worm[str].defense_threat_codes);
-}
-
-/* Do the real work for the functions above. */
-int
-tactical_move_known(int move, int points[MAX_TACTICAL_POINTS],
-		    int codes[MAX_TACTICAL_POINTS])
-{
-  int k;
-  for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
-    if (codes[k] == 0)
-      return 0;
-    if (points[k] == move)
-      return codes[k];
-  }
-  return 0;
 }
 
 
@@ -1308,89 +1250,16 @@ tactical_move_known(int move, int points[MAX_TACTICAL_POINTS],
  * change_defense_threat().
  */
 
-void
+static void
 change_tactical_point(int str, int move, int code,
 		      int points[MAX_TACTICAL_POINTS],
 		      int codes[MAX_TACTICAL_POINTS])
 {
-  int k;
-
   gg_assert(ON_BOARD(str));
   gg_assert(str == worm[str].origin);
   
-  /* First see if we already knew about this defense point. */
-  for (k = 0; k < MAX_TACTICAL_POINTS; k++)
-    if (points[k] == move)
-      break;
-
-  /* Yes, we did. */
-  if (k < MAX_TACTICAL_POINTS) {
-    if (codes[k] == code)
-      return; /* Old news. */
-
-    codes[k] = code;
-    sort_tactical_points(points, codes);
-    propagate_worm2(str);
-    return;
-  }
-
-  /* This defense point is news to us. */
-  if (code > codes[MAX_TACTICAL_POINTS-1]) {
-    points[MAX_TACTICAL_POINTS - 1] = move;
-    codes[MAX_TACTICAL_POINTS - 1] = code;
-    sort_tactical_points(points, codes);
-    propagate_worm2(str);
-  }
-}
-
-
-/* Sort the tactical points so we have it sorted in falling order on
- * the code values.
- *
- * We use shaker sort because we prefer a stable sort and in all use
- * cases we can expect it to suffice with one turn through the outer
- * loop.
- */
-
-void
-sort_tactical_points(int points[MAX_TACTICAL_POINTS],
-		     int codes[MAX_TACTICAL_POINTS])
-{
-  int start = 0;
-  int end = MAX_TACTICAL_POINTS - 1;
-  int new_start;
-  int new_end;
-  int k;
-  
-  while (start < end) {
-    new_start = end;
-    for (k = end; k > start; k--)
-      if (codes[k] > codes[k-1]) {
-	swap_points_and_codes(points, codes, k, k-1);
-	new_start = k;
-      }
-    start = new_start;
-    new_end = start;
-    for (k = start; k < end - 1; k++)
-      if (codes[k] < codes[k+1]) {
-	swap_points_and_codes(points, codes, k, k+1);
-	new_end = k;
-      }
-    end = new_end;
-  }
-}
-
-static void
-swap_points_and_codes(int points[MAX_TACTICAL_POINTS],
-		      int codes[MAX_TACTICAL_POINTS],
-		      int m, int n)
-{
-  int tmp = points[m];
-  points[m] = points[n];
-  points[n] = tmp;
-  tmp = codes[m];
-  codes[m] = codes[n];
-  codes[n] = tmp;
+  movelist_change_point(move, code, MAX_TACTICAL_POINTS, points, codes);
+  propagate_worm2(str);
 }
 
 

@@ -153,10 +153,10 @@ struct reading_cache {
   int nodes;
   int score;
   int remaining_depth;
-  int routine; /* ATTACK or FIND_DEFENSE */
-  int str;  /* contested string (origin) */
+  int routine;			/* ATTACK or FIND_DEFENSE */
+  int str;			/* contested string (origin) */
   int result;
-  int move;    /* attack/defense point */
+  int move;			/* attack/defense point */
   int stack[MAX_CACHE_DEPTH];
   int move_color[MAX_CACHE_DEPTH];
 };
@@ -771,20 +771,27 @@ break_through_helper(int apos, int bpos, int cpos,
  * If the string is directly attackable the number of threats
  * is reported to be 0.
  *
+ * NOTE:  You can call attack_threats with moves[] and codes[] 
+ *        already partly filled in. So if you want to get the
+ *        threats from scratch, you have to set them to 0
+ *        yourself.
+ *
  * FIXME: Shall we report upgrades, like we can capture in ko but
  *        have a threat to capture unconditionally.
  */
 
 int
-attack_threats(int pos, int moves[MAX_TACTICAL_POINTS],
-	       int codes[MAX_TACTICAL_POINTS])
+attack_threats(int pos, int max_points, int moves[], int codes[])
 {
   int  other;
   int  num_threats;
   int  liberties;
   int  libs[MAXLIBS];
+  int  num_adj;
+  int  adjs[MAXCHAIN];
   int  k;
   int  l;
+  int  r;
 
   ASSERT1(IS_STONE(board[pos]), pos);
   other = OTHER_COLOR(board[pos]);
@@ -794,9 +801,7 @@ attack_threats(int pos, int moves[MAX_TACTICAL_POINTS],
   if (attack(pos, NULL) != 0)
     return 0;
 
-  num_threats = 0;
-
-  /* This test would seem to be unnecessary since we only attack
+  /* This test would seem to be unnecessary since we only threaten
    * strings with attack_code == 0, but it turns out that single
    * stones with one liberty that can be captured, but come to
    * live again in a snap-back get attack_code == 0.
@@ -805,21 +810,16 @@ attack_threats(int pos, int moves[MAX_TACTICAL_POINTS],
    */
   liberties = findlib(pos, MAXLIBS, libs);
   if (liberties > 1 && liberties < 6) {
-    for (k = 0; k < liberties && num_threats < MAX_TACTICAL_POINTS; k++) {
+    for (k = 0; k < liberties; k++) {
       int aa = libs[k];
 
       /* Try to threaten on the liberty. */
-      if (trymove(aa, other, "threaten attack", pos, EMPTY, NO_MOVE)) {
+      if (trymove(aa, other, "attack_threats-A", pos, EMPTY, NO_MOVE)) {
        int acode = attack(pos, NULL);
-       if (acode != 0 && !tactical_move_known(aa, moves, codes)) {
-         moves[num_threats] = aa;
-         codes[num_threats] = acode;
-         num_threats++;
-       }
+       if (acode != 0)
+	 movelist_change_point(aa, acode, max_points, moves, codes);
        popgo();
       }
-      if (num_threats == MAX_TACTICAL_POINTS)
-       break;
 
       /* Try to threaten on second order liberties. */
       for (l = 0; l < 4; l++) {
@@ -830,23 +830,66 @@ attack_threats(int pos, int moves[MAX_TACTICAL_POINTS],
            || liberty_of_string(bb, pos))
          continue;
 
-       if (trymove(bb, other, "threaten attack", pos, EMPTY, NO_MOVE)) {
+       if (trymove(bb, other, "attack_threats-B", pos, EMPTY, NO_MOVE)) {
          int acode = attack(pos, NULL);
-         if (acode != 0 && !tactical_move_known(bb, moves, codes)) {
-           moves[num_threats] = bb;
-           codes[num_threats] = acode;
-           num_threats++;
-         }
+         if (acode != 0)
+	   movelist_change_point(bb, acode, max_points, moves, codes);
          popgo();
        }
       }
     }
   }
 
+  /* Threaten to attack by saving weak neighbors. */
+  num_adj = chainlinks(pos, adjs);
+  for (k = 0; k < num_adj; k++) {
+    int bb;
+    int dd;  /* Defense point of weak neighbor. */
+
+    if (attack(adjs[k], NULL) != 0
+	&& find_defense(adjs[k], &dd) != 0) {
+
+	for (r = -1; r < max_points; r++) {
+	  /* -1 is used only when stackp > 0. */
+	  if (stackp > 0) {
+	    if (r == -1)
+	      bb = dd;
+	    else
+	      break;
+	  }
+	  else {
+	    if (worm[adjs[k]].defend_codes[r] == 0)
+	      break;
+	    bb = worm[adjs[k]].defense_points[r];
+	  }
+
+	  if (trymove(bb, other, "attack_threats-C", pos, EMPTY, NO_MOVE)) {
+	    int acode;
+	    if (board[pos] == EMPTY)
+	      acode = WIN;
+	    else
+	      acode = attack(pos, NULL);
+	    if (acode != 0)
+	      movelist_change_point(bb, acode, max_points, moves, codes);
+	    popgo();
+	  }
+	}
+    }
+  }
+  movelist_sort_points(max_points, moves, codes);
+
 
   /* FIXME: Threaten to attack by saving weak neighbors.
-   *        Get it from worm.c. */
+   *        Get it from worm.c.
+   */
 
+
+  /* Return actual number of threats found regardless of attack code. */
+  if (codes[max_points - 1] > 0)
+    return max_points;
+  for (num_threats = 0; num_threats < max_points; num_threats++)
+    if (codes[num_threats] == 0)
+      break;
   return num_threats;
 }
 

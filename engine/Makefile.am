@@ -32,6 +32,7 @@ libengine_a_SOURCES = \
       life.c \
       matchpat.c \
       move_reasons.c \
+      movelist.c \
       optics.c \
       owl.c \
       printutils.c \

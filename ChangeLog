@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new file: engine/movelist.c
+- generalized handling of move lists and moved from worm.c
+- attack_threats() enhanced
+- AA_THREAT_DEPTH set to 3
+- find_worm_threats() uses attack_threats more
 - pessimistic_compute_eyes() tries harder to find a vital point
 - new atari_atari_find_attack_moves() and atari_atari_find_defense_moves()
 - do_atari_atari() restructured
