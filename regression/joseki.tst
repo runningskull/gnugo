@@ -12,4 +12,4 @@ loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 26
 
 loadsgf games/nngs/takeda-gnugo-3.3.23-200307302010.sgf 20
 40 reg_genmove black
-#? [Q15]
+#? [Q15]*

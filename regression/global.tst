@@ -170,7 +170,7 @@ loadsgf golois/MeilleurCoup0006.sgf
 
 loadsgf golois/MeilleurCoup0007.sgf
 41 reg_genmove black
-#? [B4]*
+#? [B4]
 
 loadsgf golois/MeilleurCoup0008.sgf
 42 reg_genmove black

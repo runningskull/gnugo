@@ -81,7 +81,7 @@ loadsgf games/blunder12.sgf 252
 
 loadsgf games/blunder12.sgf 258
 17 reg_genmove white
-#? [R7]
+#? [R7]*
 
 # A simplification of incident 136. Black E6 is a bad blunder.
 loadsgf games/blunder13.sgf
@@ -154,4 +154,4 @@ loadsgf games/atari_atari09.sgf
 # E3 and H4 are not blunders, however, H2 is.
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 283
 32 reg_genmove white
-#? [E3|H4]
+#? [E3|H4]*

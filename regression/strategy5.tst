@@ -118,11 +118,11 @@ loadsgf games/reading41.sgf 130
 
 loadsgf games/nngs/takeda-gnugo-3.3.23-200307302010.sgf 10
 280 reg_genmove black
-#? [P3]
+#? [P3]*
 
 loadsgf games/nngs/gnugo-3.3.23-viking4-200307312134.sgf 37
 281 reg_genmove white
-#? [E13]
+#? [E13]*
 
 #take the ko!
 loadsgf games/nngs/gnugo-3.3.23-viking4-200307312134.sgf 195

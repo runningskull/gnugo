@@ -312,7 +312,7 @@ loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 194
 
 loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 220
 740 reg_genmove black
-#? [D2]*
+#? [D2]
 
 
 ############ End of Tests #################

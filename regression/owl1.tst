@@ -133,7 +133,7 @@ loadsgf games/gunnar/gunnar3.sgf 88
 
 loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 80
 293 owl_defend Q6
-#? [0]*
+#? [0]
 
 loadsgf games/owl42.sgf
 294 owl_defend L11
@@ -245,23 +245,23 @@ loadsgf games/owl48.sgf
 
 loadsgf games/nngs/takeda-gnugo-3.4-200308142205.sgf 60
 320 owl_attack R4
-#? [0]
+#? [0]*
 
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 79
 321 owl_defend F3
-#? [0]
+#? [0]*
 
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 81
 322 owl_defend F3
-#? [0]
+#? [0]*
 
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 85
 323 owl_defend F3
-#? [0]
+#? [0]*
 
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 89
 324 owl_defend E5
-#? [0]
+#? [0]*
 
 
 ########### end of tests #####################

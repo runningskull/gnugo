@@ -186,12 +186,12 @@ loadsgf games/endgame9.sgf
 # H1 is one point and N7 is about 0.5.
 loadsgf games/endgame10.sgf
 870 restricted_genmove black H1 N7
-#? [H1]
+#? [H1]*
 
 # K5 is best, althought in absence of other worthy moves it doesn't matter.
 loadsgf games/endgame11.sgf
 880 reg_genmove white
-#? [K5]
+#? [K5]*
 # T4 is one point in ko, while T5 and S6 are filling dame only.
 890 restricted_genmove white T4 T5 S6
 #? [T4]

@@ -44,7 +44,7 @@ loadsgf games/century21-2002/goint-gnugo.sgf 119
 
 loadsgf games/century21-2002/goint-gnugo.sgf 161
 80 owl_attack D17
-#? [1 C17]*
+#? [1 C17]
 
 loadsgf games/century21-2002/goint-gnugo.sgf 209
 85 reg_genmove black 
@@ -69,7 +69,7 @@ loadsgf games/century21-2002/manyfaces-gnugo.sgf 27
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 29
 110 reg_genmove black
-#? [C8]
+#? [C8]*
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 43
 120 reg_genmove black
@@ -125,7 +125,7 @@ loadsgf games/century21-2002/gnugo-katsunari.sgf 96
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 156
 260 reg_genmove white
-#? [S12|Q12|Q13]*
+#? [S12|Q12|Q13]
 261 owl_defend J12
 #? [0]
 

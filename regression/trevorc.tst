@@ -95,7 +95,7 @@ loadsgf games/trevor/auto/c14.sgf 18
 
 loadsgf games/trevor/auto/c14.sgf 20
 240 reg_genmove white
-#? [K2]*
+#? [K2]
 
 
 loadsgf games/trevor/auto/c14.sgf 22
@@ -849,7 +849,7 @@ loadsgf games/trevor/auto/c81.sgf 32
 
 loadsgf games/trevor/auto/c81.sgf 34
 1440 reg_genmove white
-#? [E12|F11]*
+#? [E12|F11]
 
 
 
