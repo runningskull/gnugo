@@ -68,7 +68,8 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX], int color)
     if (!ON_BOARD(ii))
       continue;
 
-    if (board[ii] && dragon[ii].status == CRITICAL)
+    if (board[ii] && dragon[ii].status == CRITICAL
+	&& DRAGON2(ii).safety != INESSENTIAL)
       critical_found = 1;
     if (board[ii] == WHITE && !captured_territory(ii, color))
       gb[ii] = 128;
