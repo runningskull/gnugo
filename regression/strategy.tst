@@ -102,17 +102,14 @@ loadsgf games/incident165.sgf 108
 #? [N11|H10]
 
 
-#CATEGORY=DYNAMIC_READING
-#DESCRIPTION=Atari is certainly better.
-#SEVERITY=4
-#PREDICESSOR=reading.tst#124
 # incident 166a
-# E5 is an overplay
-# See reading test 124
+# Original move was N3, which is pointless.
+# E5 is an overplay, see reading test 124.
 # F3 seems fine to protect the two cuts -arend
+# N11 may well be biggest but is already tested above.
 loadsgf games/incident165.sgf 142
-18 gg_genmove black
-#? [E4|F3]*
+18 restricted_genmove black E4 E5 F3 N3
+#? [E4|F3]
 
 loadsgf games/strategy4.sgf
 19 gg_genmove black
