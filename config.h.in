@@ -21,6 +21,9 @@
 /* Semeai module. Default standard. */
 #undef EXPERIMENTAL_SEMEAI
 
+/* Max variations to consider reading semeai. */
+#undef DEFAULT_SEMEAI_VARIATIONS
+
 /* Give the directory where gnugo was compiled */
 #undef GNUGO_PATH
 

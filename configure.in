@@ -45,12 +45,16 @@ AC_ARG_ENABLE(grid-opt,
 
 default_cache_size=16
 default_level=10
+default_semeai_variations=250
 
 AC_ARG_ENABLE(cache-size,
   [  --enable-cache-size=n     reserve n Mb RAM for caching (16 default)])
 
 AC_ARG_ENABLE(level,
   [  --enable-level=n          n = default level (8 standard, up to 10 supported)])
+
+AC_ARG_ENABLE(semeai-variations,
+  [  --enable-semeai-variations=n          n = semeai variations (250 standard)])
 
 AC_ARG_ENABLE(dfa,
   [  --enable-dfa                use new dfa pattern matcher (not default)],
@@ -306,6 +310,17 @@ if test "$enable_level" ; then
    AC_DEFINE_UNQUOTED(DEFAULT_LEVEL, $enable_level)
 else
    AC_DEFINE_UNQUOTED(DEFAULT_LEVEL, $default_level)
+fi
+
+dnl ------------ set semeai variations  ----------
+
+AH_TEMPLATE([DEFAULT_LEVEL],
+[Semeai Variations. 250 default])
+
+if test "$enable_semeai_variations" ; then
+   AC_DEFINE_UNQUOTED(DEFAULT_SEMEAI_VARIATIONS, $enable_semeai_variations)
+else
+   AC_DEFINE_UNQUOTED(DEFAULT_SEMEAI_VARIATIONS, $default_semeai_variations)
 fi
 
 dnl ------------ dfa -------------------

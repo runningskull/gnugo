@@ -87,6 +87,7 @@ enum {OPT_BOARDSIZE=2,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_TACTICAL_SEMEAI,
       OPT_EXPERIMENTAL_SEMEAI,
+      OPT_SEMEAI_VARIATIONS,
       OPT_EXPERIMENTAL_CONNECTIONS,
       OPT_STANDARD_SEMEAI,
       OPT_STANDARD_CONNECTIONS,
@@ -195,6 +196,7 @@ static struct gg_option const long_options[] =
   {"chinese-rules",  no_argument,       0, OPT_CHINESE_RULES},
   {"japanese-rules", no_argument,       0, OPT_JAPANESE_RULES},
   {"experimental_semeai",  no_argument, 0, OPT_EXPERIMENTAL_SEMEAI},
+  {"semeai-variations",   required_argument, 0, OPT_SEMEAI_VARIATIONS},
   {"experimental_connections",  no_argument, 0, OPT_EXPERIMENTAL_CONNECTIONS},
   {"standard_semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
   {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
@@ -274,6 +276,7 @@ main(int argc, char *argv[])
   signal(SIGTERM, sigterm_handler);
 
   level = DEFAULT_LEVEL;
+  semeai_variations = DEFAULT_SEMEAI_VARIATIONS;
 
   mandated_depth               = -1;
   mandated_backfill_depth      = -1;
@@ -426,6 +429,10 @@ main(int argc, char *argv[])
 
       case OPT_EXPERIMENTAL_SEMEAI:
 	experimental_semeai = 1;
+	break;
+
+      case OPT_SEMEAI_VARIATIONS:
+	semeai_variations = atoi(gg_optarg);
 	break;
 
       case OPT_STANDARD_SEMEAI: 

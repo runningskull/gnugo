@@ -298,17 +298,19 @@ decide_semeai(int apos, int bpos, const char *sgf_output)
   if (sgf_output)
     begin_sgftreedump(&tree);
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 1);
-  gprintf("If %s moves first (at %1m), %1m is %s, %1m is %s\n",
+  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
 	  color == BLACK ? "black" : "white",
 	  move,
 	  apos, safety_to_string(resulta),
-  	  bpos, safety_to_string(resultb));
+  	  bpos, safety_to_string(resultb),
+	  count_variations);
   owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 1);
-  gprintf("If %s moves first (at %1m), %1m is %s, %1m is %s\n",
+  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
 	  color == BLACK ? "white" : "black",
 	  move,
 	  apos, safety_to_string(resulta),
-  	  bpos, safety_to_string(resultb));
+  	  bpos, safety_to_string(resultb),
+	  count_variations);
 
   if (sgf_output) {
     end_sgftreedump(sgf_output);

@@ -147,6 +147,20 @@ new_semeai(int color)
 	apos = DRAGON(d1).origin;
 	bpos = DRAGON(d2).origin;
 	
+	/* The following is something we want to do but
+	 * better wait until we have the semeai stuff working
+	 * with ko. See nicklas2 test 1401.
+	 */
+#if 0
+	if (DRAGON(d1).matcher_status == CRITICAL
+	    && DRAGON(d2).matcher_status == DEAD) {
+	  update_status(bpos, CRITICAL, CRITICAL);
+	  add_owl_attack_move(dragon[apos].owl_attack_point,
+			      bpos, WIN);
+	  continue;
+	}
+#endif
+
 	/* Ignore inessential worms or dragons */
 	if (worm[apos].inessential 
 	    || DRAGON2(apos).safety == INESSENTIAL

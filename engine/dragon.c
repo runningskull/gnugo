@@ -610,7 +610,7 @@ make_dragons(int color, int stop_before_owl)
   else 
     semeai(color);
   time_report(2, "  semeai module", NO_MOVE, 1.0);
-
+  
   /* The matcher_status is now correct at the origin of each dragon
    * but we need to copy it to every vertex.
    */

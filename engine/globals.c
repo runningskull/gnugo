@@ -116,6 +116,7 @@ int doing_scoring              = 0;
 int chinese_rules       = 0;    /* ruleset choice for GMP connection */
 /* use experimental semeai module */
 int experimental_semeai = EXPERIMENTAL_SEMEAI;
+int semeai_variations = DEFAULT_SEMEAI_VARIATIONS;
 /* use experimental connection module */
 int experimental_connections = EXPERIMENTAL_CONNECTIONS;
 

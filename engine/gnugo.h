@@ -263,6 +263,7 @@ extern int fusekidb;            /* use fuseki database */
 extern int disable_fuseki;      /* do not generate fuseki moves */
 extern int josekidb;            /* use joseki database */
 extern int level;		/* controls depth of reading */
+extern int semeai_variations;   /* max variations considered reading semeai */
 extern int urgent;              /* urgent move on board */
 extern int showtime;		/* print genmove time */
 extern int showscore;		/* print score */
@@ -322,6 +323,7 @@ void gprintf(const char *fmt, ...);
 void mprintf(const char *fmt, ...);
 const char *color_to_string(int color);
 const char *location_to_string(int pos);
+void location_to_buffer(int pos, char *buf);
 const char *status_to_string(int status);
 const char *safety_to_string(int status);
 const char *result_to_string(int result);
@@ -409,6 +411,8 @@ int is_suicide(int pos, int color);
 int is_illegal_ko_capture(int pos, int color);
 int trymove(int pos, int color, const char *message, int str, 
 	    int komaster, int kom_pos);
+int semeai_trymove(int pos, int color, const char *message, 
+		   int str1, int str2, int owl_phase, int value);
 int tryko(int pos, int color, const char *message, 
 	  int komaster, int kom_pos);
 void popgo(void);

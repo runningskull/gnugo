@@ -310,13 +310,24 @@ color_to_string(int color)
 const char *
 location_to_string(int pos)
 {
-  static char buf[4];
-  char *bufp = &buf[0];
+  static char buf[5];
+  location_to_buffer(pos, buf);
+  return buf;
+}
+
+/* Convert a location to a string. */
+
+void
+location_to_buffer(int pos, char *buf)
+{
+  char *bufp = buf;
   int i = I(pos);
   int j = J(pos);
 
-  if (is_pass(pos))
-    return "Pass";
+  if (pos == NO_MOVE) {
+    strcpy(buf, "Pass");
+    return;
+  }
 
   *bufp = 'A'+j;
   if (*bufp >= 'I')
@@ -329,8 +340,6 @@ location_to_string(int pos)
   *bufp++ = '0' + i%10;
 
   *bufp = 0;
-
-  return buf;
 }
 
 /* Convert a status value to a string. */
@@ -406,6 +415,8 @@ result_to_string(int result)
     return "KO_B";
   else if (result == WIN)
     return "WIN";
+  else if (result == ALIVE_IN_SEKI)
+    return "SEKI";
   else
     return "ERROR";
 }

@@ -103,7 +103,6 @@ struct owl_move_data {
   int same_dragon;  /* whether the move extends the dragon or not */
 };
 
-
 /* Persistent owl result cache to reuse owl results between moves. */
 struct owl_cache {
   char board[BOARDMAX];
@@ -193,6 +192,9 @@ static void do_owl_analyze_semeai(int apos, int bpos,
 		      struct local_owl_data *owlb, int komaster,
 		      int *resulta, int *resultb,
 		      int *move, int pass);
+static int semeai_move_value(int move, struct local_owl_data *owla,
+			     struct local_owl_data *owlb,
+			     int raw_value);
 static int find_backfilling_move(int worm, int liberty);
 static int liberty_of_goal(int pos, struct local_owl_data *owl);
 static int matches_found;
@@ -210,6 +212,13 @@ static int catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS]);
  * of the opposite color, both with matcher_status DEAD or
  * CRITICAL, analyzes the semeai, assuming that the player
  * of the (apos) dragon moves first.
+ *
+ * owl_phase determines whether owl moves are being generated
+ * or simple liberty filling is taking place.
+ *
+ * semeai_focus can be either owla, owlb or EMPTY. If it is an owl,
+ * then owl attack and defense moves for that owl are given
+ * priority.
  */
 
 static int owl_phase;
@@ -218,6 +227,8 @@ void
 owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
 		   int owl)
 {
+  int semeai_focus;
+
   static struct local_owl_data owla;
   static struct local_owl_data owlb;
   
@@ -230,14 +241,23 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
   if (owl) {
     owl_mark_dragon(apos, NO_MOVE, &owla);
     owl_mark_dragon(bpos, NO_MOVE, &owlb);
-  compute_owl_escape_values(&owla);
-  compute_owl_escape_values(&owlb);
-  owl_make_domains(&owla, &owlb);
+    compute_owl_escape_values(&owla);
+    compute_owl_escape_values(&owlb);
+    owl_make_domains(&owla, &owlb);
   }
   else {
     owl_mark_worm(apos, NO_MOVE, &owla);
     owl_mark_worm(bpos, NO_MOVE, &owlb);
   }
+  if (stackp > 0)
+    semeai_focus = NO_MOVE;
+  else if (dragon[bpos].matcher_status == CRITICAL)
+    semeai_focus = bpos;
+  else if (dragon[apos].matcher_status == CRITICAL)
+    semeai_focus = apos;
+  else
+    semeai_focus = NO_MOVE;
+  
   do_owl_analyze_semeai(apos, bpos, &owla, &owlb, EMPTY,
 			resulta, resultb, move, 0);
 }
@@ -250,6 +270,10 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
  *
  * If a move is needed to get this result, then (*move) is
  * the location, otherwise this field returns PASS.
+ *
+ * semeai_focus can be either owla, owlb or EMPTY. If it is an owl,
+ * then owl attack and defense moves for that owl are given
+ * priority.
  */
 
 static void
@@ -277,11 +301,6 @@ do_owl_analyze_semeai(int apos, int bpos,
   int safe_common_liberty_found = 0;
   int unsafe_common_liberty_found = 0;
   int backfilling_move_found = 0;
-  int best_resulta = UNKNOWN;
-  int best_resultb = UNKNOWN;
-  int best_move = 0;
-  int this_resulta = UNKNOWN;
-  int this_resultb = UNKNOWN;
   char mw[BOARDMAX];  
   int k;
   int m, n;
@@ -289,12 +308,19 @@ do_owl_analyze_semeai(int apos, int bpos,
   int save_owl_phase = owl_phase;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
-
+  int move_value;
+  int best_resulta = UNKNOWN;
+  int best_resultb = UNKNOWN;
+  int best_move = 0;
+  int this_resulta = UNKNOWN;
+  int this_resultb = UNKNOWN;
+  int best_move_k = -1;
+  
+  SETUP_TRACE_INFO2("do_owl_analyze_semeai", apos, bpos);
+  
   wormsa = catalog_goal(owla, goal_wormsa);
   wormsb = catalog_goal(owlb, goal_wormsb);
-
-  if (count_variations > 100)
-    return;
+  
   outside_liberty.pos = 0;
   common_liberty.pos = 0;
   backfilling_move.pos = 0;
@@ -323,7 +349,7 @@ do_owl_analyze_semeai(int apos, int bpos,
      * number of eyes) or moves to capture a lunch. 
      */
     int probable_mina, probable_maxa, probable_minb, probable_maxb;
-
+    
     /* We do not wish for any string of the 'b' dragon to be 
      * counted as a lunch of the 'a' dragon since owl_determine_life 
      * can give a wrong result in the case of a semeai. So we eliminate 
@@ -338,6 +364,14 @@ do_owl_analyze_semeai(int apos, int bpos,
 	owla->lunch[k] = NO_MOVE;
       }
     }
+#if 0
+    for (k = 0; k < MAX_LUNCHES; k++) {
+      if (owlb->lunch[k] != NO_MOVE 
+	  && owla->goal[owlb->lunch[k]]) {
+	owlb->lunch[k] = NO_MOVE;
+      }
+    }
+#endif
     if (color == BLACK)
       owl_determine_life(owla, owlb, owla->black_eye,
 			 BLACK, komaster, 1, 
@@ -348,7 +382,6 @@ do_owl_analyze_semeai(int apos, int bpos,
 			 WHITE, komaster, 1, 
 			 vital_defensive_moves,
 			 &probable_mina, &probable_maxa);
-    
     if (other == BLACK)
       owl_determine_life(owlb, owla, owlb->black_eye,
 			 BLACK, komaster, 1,
@@ -369,10 +402,15 @@ do_owl_analyze_semeai(int apos, int bpos,
 	*move = PASS_MOVE;
       sgf_dumptree = save_sgf_dumptree;
       count_variations =   save_count_variations;
+      if (probable_maxb == 0) {
+	SGFTRACE2(PASS_MOVE, WIN, "Two eyes versus none");
+      }
+      else
+	SGFTRACE2(PASS_MOVE, WIN, "Two eyes versus one");
       return;
     }
     /* I am alive */
-    if ((probable_mina >= 2) ||
+    if (probable_mina >= 2 ||
 	(stackp > 2 && owl_escape_route(owla) >= 5)) {
       if (probable_maxb < 2) {
 	/* you are already dead */
@@ -381,6 +419,11 @@ do_owl_analyze_semeai(int apos, int bpos,
 	if (move) *move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
+	if (probable_maxb == 0) {
+	  SGFTRACE2(PASS_MOVE, WIN, "Two eyes or escape versus none");
+	}
+	else
+	  SGFTRACE2(PASS_MOVE, WIN, "Two eyes or escape versus one");
 	return;
       }
       else if (probable_minb < 2) {
@@ -392,16 +435,24 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  *move = vital_offensive_moves[0].pos;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
+	if (probable_minb == 0) {
+	  SGFTRACE2(vital_offensive_moves[0].pos,
+		    WIN, "Two eyes or escape versus none");
+	}
+	else
+	  SGFTRACE2(vital_offensive_moves[0].pos, 
+		    WIN, "Two eyes or escape versus one");
 	return;
       }
       else {
 	/* both live */
-	 *resulta = ALIVE;
-	 *resultb = ALIVE;
-	 if (move) *move = PASS_MOVE;
-	 sgf_dumptree = save_sgf_dumptree;
-	 count_variations = save_count_variations;
-	 return;
+	*resulta = ALIVE;
+	*resultb = ALIVE;
+	if (move) *move = PASS_MOVE;
+	sgf_dumptree = save_sgf_dumptree;
+	count_variations = save_count_variations;
+	/* SGFTRACE2(PASS_MOVE, WIN, "Both live"); */
+	return;
       }
     }
     if ((probable_minb >= 2) || owl_escape_route(owlb) >= 5) {
@@ -413,9 +464,10 @@ do_owl_analyze_semeai(int apos, int bpos,
 	if (move) *move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
+	SGFTRACE2(PASS_MOVE, 0, "You live, I die");
 	return;
       }
-      else if (probable_mina <2) {
+      else if (probable_mina < 2) {
 	/* I can live */
 	gg_assert(vital_defensive_moves[0].pos != NO_MOVE);
 	*resulta = ALIVE;
@@ -423,15 +475,18 @@ do_owl_analyze_semeai(int apos, int bpos,
 	if (move) *move = vital_defensive_moves[0].pos;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
+	SGFTRACE2(vital_defensive_moves[0].pos, WIN, 
+		  "Both live");
 	return;
       }
       else {
-	/* I die */
-	*resulta = DEAD;
+	/* I am already alive */
+	*resulta = ALIVE;
 	*resultb = ALIVE;
 	if (move) *move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
+	SGFTRACE2(PASS_MOVE, WIN, "Both live");
 	return;
       }
     }
@@ -444,14 +499,14 @@ do_owl_analyze_semeai(int apos, int bpos,
 	       &owl_defendpat_db);
     owl_shapes(shape_offensive_moves, color, owlb, 
 	       &owl_attackpat_db);
-
+    
     /* Now we review the moves already considered, while collecting
      * them into a single list. If no owl moves are found, we end the owl
      * phase. If no owl move of value > 30 is found, we want to be sure that we
      * have included a move that fills a liberty. If no such move is found, we
      * will have to add it later.
      */
-  
+    
     for (k = 0; 
 	 k < MAX_SEMEAI_MOVES && vital_defensive_moves[k].pos != NO_MOVE;
 	 k++) {
@@ -470,9 +525,11 @@ do_owl_analyze_semeai(int apos, int bpos,
 	}
       }
       mw[vital_defensive_moves[k].pos] = 1;
+      move_value = semeai_move_value(vital_defensive_moves[k].pos,
+				     owla, owlb,
+				     vital_defensive_moves[k].value);
       owl_add_move(moves, vital_defensive_moves[k].pos,
-		   vital_defensive_moves[k].value,
-		   "vital defensive move", 
+		   move_value,"vital defensive move", 
 		   vital_defensive_moves[k].same_dragon);
     }
     for (k = 0; 
@@ -497,9 +554,11 @@ do_owl_analyze_semeai(int apos, int bpos,
 	same_dragon = 2;
       else
 	same_dragon = 0;
+      move_value = semeai_move_value(vital_offensive_moves[k].pos,
+				     owla, owlb,
+				     vital_offensive_moves[k].value);
       owl_add_move(moves, vital_offensive_moves[k].pos,
-		   vital_offensive_moves[k].value,
-		   vital_offensive_moves[k].name, same_dragon);
+		      move_value, vital_offensive_moves[k].name, same_dragon);
     }
     for (k = 0; 
 	 k < MAX_SEMEAI_MOVES && shape_defensive_moves[k].pos != NO_MOVE;
@@ -518,11 +577,14 @@ do_owl_analyze_semeai(int apos, int bpos,
 	    unsafe_common_liberty_found = 1;
 	}
       }
-      mw[shape_offensive_moves[k].pos] = 1;
+      mw[shape_defensive_moves[k].pos] = 1;
+      move_value = semeai_move_value(shape_defensive_moves[k].pos,
+				     owla, owlb,
+				     shape_defensive_moves[k].value);
       owl_add_move(moves, shape_defensive_moves[k].pos,
-		   shape_defensive_moves[k].value,
-		   shape_defensive_moves[k].name,
-		   shape_defensive_moves[k].same_dragon);
+		      move_value,
+		      shape_defensive_moves[k].name,
+		      shape_defensive_moves[k].same_dragon);
     }
     for (k = 0; 
 	 k < MAX_SEMEAI_MOVES && shape_offensive_moves[k].pos != NO_MOVE;
@@ -546,19 +608,22 @@ do_owl_analyze_semeai(int apos, int bpos,
 	same_dragon = 2;
       else
 	same_dragon = 0;
+      move_value = semeai_move_value(shape_offensive_moves[k].pos,
+				     owla, owlb,
+				     shape_offensive_moves[k].value);
       owl_add_move(moves, shape_offensive_moves[k].pos,
-		   shape_offensive_moves[k].value,
-		   shape_offensive_moves[k].name,
-		   same_dragon);
+		      move_value,
+		      shape_offensive_moves[k].name,
+		      same_dragon);
     }
     /* If no owl moves were found, turn off the owl phase */
     if (moves[0].pos == 0)
       owl_phase = 0;
   }
-  /* now we look for a move to fill a liberty. There may
-   * already be such a move on the list.
+  /* now we look for a move to fill a liberty.
    */
-  if (!safe_outside_liberty_found) {
+
+  if (!safe_outside_liberty_found && moves[0].value < 100) {
     for (m = 0; !safe_outside_liberty_found && m < board_size; m++)
       for (n = 0; !safe_outside_liberty_found && n < board_size; n++) {
 	int pos = POS(m, n);
@@ -576,9 +641,9 @@ do_owl_analyze_semeai(int apos, int bpos,
 		    find_backfilling_move(bpos, pos);
 		  if (backfilling_move.pos)
 		    backfilling_move_found = 1;
-		
-		unsafe_outside_liberty_found = 1;
-		outside_liberty.pos = pos;
+		  
+		  unsafe_outside_liberty_found = 1;
+		  outside_liberty.pos = pos;
 		}
 	      }
 	    }
@@ -604,7 +669,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     int ma[BOARDMAX];
     int origin;
     int upos;
-
+    
     memset(ma, 0, sizeof(ma));
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
@@ -622,6 +687,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	      if (move) *move = upos;
 	      sgf_dumptree = save_sgf_dumptree;
 	      count_variations = save_count_variations;
+	      SGFTRACE2(upos, WIN, "tactical win found");
 	      return;
 	    }
 	    /* we mark the strings we've tried and failed to prevent 
@@ -635,21 +701,36 @@ do_owl_analyze_semeai(int apos, int bpos,
   }
   
   if (safe_outside_liberty_found
-      && outside_liberty.pos != NO_MOVE)
-    owl_add_move(moves, outside_liberty.pos, 50, "safe outside liberty", 0);
+      && outside_liberty.pos != NO_MOVE) {
+    move_value = semeai_move_value(outside_liberty.pos,
+				   owla, owlb, 50);
+    owl_add_move(moves, outside_liberty.pos, move_value,
+		 "safe outside liberty", 0);
+  }
   else {
     if (unsafe_outside_liberty_found 
 	&& outside_liberty.pos != NO_MOVE
 	&& is_legal(outside_liberty.pos, color)) {
-      if (backfilling_move_found && backfilling_move.pos != NO_MOVE)
-	owl_add_move(moves, backfilling_move.pos, 30, "backfilling move", 0);
-      else 
-	owl_add_move(moves, outside_liberty.pos, 30,
-		     "unsafe outside liberty", 0);
+      if (backfilling_move_found && backfilling_move.pos != NO_MOVE) {
+	move_value = semeai_move_value(backfilling_move.pos,
+				       owla, owlb, 50);
+	owl_add_move(moves, backfilling_move.pos, move_value,
+			"backfilling move", 0);
+      }
+      else {
+	move_value = semeai_move_value(outside_liberty.pos,
+				       owla, owlb, 30);
+	owl_add_move(moves, outside_liberty.pos, move_value,
+			"unsafe outside liberty", 0);
+      }
     }
     else if (safe_common_liberty_found
-	     && common_liberty.pos != NO_MOVE)
-      owl_add_move(moves, common_liberty.pos, 20, "safe common liberty", 1);
+	     && common_liberty.pos != NO_MOVE) {
+	move_value = semeai_move_value(common_liberty.pos,
+				       owla, owlb, 10);
+	owl_add_move(moves, common_liberty.pos, move_value,
+		   "safe common liberty", 1);
+    }
   }
   /* Now we are ready to try moves. Turn on the sgf output ... */
   sgf_dumptree = save_sgf_dumptree;
@@ -658,8 +739,15 @@ do_owl_analyze_semeai(int apos, int bpos,
   for (k = 0; k < 2*MAX_SEMEAI_MOVES+2; k++) {
     int mpos = moves[k].pos;
 
-    if (mpos != NO_MOVE
-	&& trymove(mpos, color, moves[k].name, apos, EMPTY, 0)) {
+    if (k > 2
+	|| (stackp > 6 && k > 1)
+	|| (stackp > 12 && k > 0))
+      continue;
+
+    if (mpos != NO_MOVE 
+	&& count_variations < semeai_variations
+	&& semeai_trymove(mpos, color, moves[k].name, apos, bpos,
+			  owl_phase, moves[k].value)) {
       if (debug & DEBUG_SEMEAI)
 	dump_stack();
       if (board[bpos] == EMPTY) {
@@ -684,6 +772,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	*resulta = ALIVE;
 	*resultb = DEAD;
 	if (move) *move = mpos;
+	SGFTRACE2(mpos, WIN, moves[k].name);
 	return;
       }
       if (this_resulta == ALIVE_IN_SEKI
@@ -692,6 +781,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	best_resulta = ALIVE_IN_SEKI;
 	best_resultb = ALIVE_IN_SEKI;
 	best_move = mpos;
+	best_move_k = k;
       }
       if (this_resulta == DEAD
 	  && this_resultb == ALIVE
@@ -699,6 +789,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	best_resulta = DEAD;
 	best_resultb = ALIVE;
 	best_move = mpos;
+	best_move_k = k;
       }
       memcpy(owla->goal, saved_goal, sizeof(saved_goal));
       popgo();
@@ -710,28 +801,92 @@ do_owl_analyze_semeai(int apos, int bpos,
     *resulta = ALIVE_IN_SEKI;
     *resultb = ALIVE_IN_SEKI;
     if (move) *move = PASS_MOVE;
+    SGFTRACE2(PASS_MOVE, WIN, "Seki");
     return;
   }
   /* If no move was found, then pass */
   if (best_resulta == UNKNOWN) {
     do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
 			  resultb, resulta, NULL, 1);
+    SGFTRACE2(PASS_MOVE, WIN, "No move found");
     if (move) *move = PASS_MOVE;
     return;
   }
 
   *resulta = best_resulta;
   *resultb = best_resultb;
-  if (move) {
-    if (best_resulta == DEAD)
-      *move = PASS_MOVE;
-    else
-      *move = best_move;
-  }
+  if (best_resulta == DEAD)
+    best_move = PASS_MOVE;
+  if (move) *move = best_move;
+  SGFTRACE2(best_move, best_resulta, moves[best_move_k].name);
   return;
 }
 
 				   
+/* Returns the number of liberties gained by the first goal minus the
+ * number of liberties lost by the second goal when a move is played
+ * at move (if positive, zero otherwise). Used for sorting the moves.
+ */
+
+static int
+semeai_move_value(int move, struct local_owl_data *owla,
+		  struct local_owl_data *owlb,
+		  int raw_value)
+{
+  int pos;
+  int net = 0;
+  int color = owla->color;
+  int save_verbose = verbose;
+
+  gg_assert(board[move] == EMPTY);
+  verbose = 0;
+  if (safe_move(move, color)) {
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (ON_BOARD(pos)
+	  && board[pos] != EMPTY) {
+	int origin = find_origin(pos);
+	
+	if (origin != pos)
+	  continue;
+	if (owla->goal[pos])
+	  net -= 75*countlib(pos);
+	if (owlb->goal[pos])
+	  net += 100*countlib(pos);	  
+      }
+    }
+    if (!trymove(move, color, NULL, 0, 0, NO_MOVE)) {
+      verbose = save_verbose;
+      return 0;
+    }
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (ON_BOARD(pos)
+	  && board[pos] != EMPTY) {
+	int origin = find_origin(pos);
+	
+	if (origin != pos)
+	  continue;
+	if (owla->goal[pos]
+	    || (pos == move && liberty_of_goal(move, owla)))
+	  net += 75*countlib(pos);
+	if (owlb->goal[pos])
+	  net -= 100*countlib(pos);
+      }
+    }
+    popgo();
+    verbose = save_verbose;
+  }
+  if (net < 0)
+    net = 0;
+#if 0
+  if (semeai_focus != EMPTY 
+      && move_focus == semeai_focus)
+    return raw_value + net + 50;
+#endif
+  return raw_value + net;
+}
+
+
+
 /* If (pos) points to an empty intersection, returns true if
  * this spot is adjacent to an element of the owl goal.
  */
@@ -2546,6 +2701,11 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
   }
 }  
 
+
+
+
+
+
 /* Marks the dragons at (apos) and (bpos). If only one dragon
  * needs marking, (bpos) should be passed as (0). 
  */
@@ -4283,27 +4443,21 @@ owl_hotspots(float values[BOARDMAX])
 static int
 catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS])
 {
-  int m, n;
+  int pos;
   int worms = 0;
   int k;
 
   for (k = 0; k < MAX_WORMS; k++)
     goal_worm[k] = NO_MOVE;
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (owl->goal[pos] && board[pos]) {
-	int origin = find_origin(pos);
-	int found_one = 1;
-
-	if (pos != origin)
-	  break;
-	for (k = 0; found_one && k < worms; k++)
-	  if (goal_worm[k] == pos)
-	    found_one = 0;
-	if (found_one)
-	  goal_worm[worms++] = pos;
+  for (pos = BOARDMIN; pos < BOARDMAX && worms < MAX_WORMS; pos++)
+    if (ON_BOARD(pos)
+	&& board[pos]
+	&& (owl->goal)[pos]) {
+      int origin = find_origin(pos);
+      if (pos == origin) {
+	DEBUG(DEBUG_SEMEAI, "goal worm: %1m\n", pos);
+	goal_worm[worms++] = pos;
       }
     }
   return worms;

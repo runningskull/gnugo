@@ -137,10 +137,10 @@ loadsgf games/semeai/semeai9.sgf
 loadsgf golois/Goemate990902-1.sgf
 
 23 owl_analyze_semeai G12 G13
-#? [ALIVE DEAD (F15|G16|H16|PASS)]*
+#? [ALIVE DEAD (F15|G15|H15|PASS)]*
 
 24 owl_analyze_semeai G13 G12
-#? [DEAD DEAD PASS]*
+#? [DEAD ALIVE PASS]*
 
 25 owl_analyze_semeai S8 R8
 #? [ALIVE DEAD S9]
@@ -148,14 +148,15 @@ loadsgf golois/Goemate990902-1.sgf
 26 owl_analyze_semeai R8 S8
 #? [ALIVE DEAD S9]
 
-27 owl_analyze_semeai Q7 R7
-#? [ALIVE DEAD S9]*
-
 # If this semeai is treated as a strictly local
 # problem (ignoring the R8 dragon) then R7 can't live.
 # But the semeai code treats it as a local problem by
 # design!  So it's unclear what the correct answer
-# should be.  A similar remark holds with problem 27.
+# should be.  A similar remark holds with problem 28.
+
+27 owl_analyze_semeai Q7 R7
+#? [ALIVE DEAD S9]*
+
 28 owl_analyze_semeai R7 Q7
 #? [ALIVE DEAD S9]*
 
@@ -165,3 +166,10 @@ loadsgf games/semeaiko1.sgf
 29 gg_genmove black
 #? [F10]*
 
+loadsgf games/strategy11.sgf 127
+30 owl_analyze_semeai B3 G4
+#? [ALIVE DEAD C1]
+
+loadsgf games/strategy11.sgf 127
+30 owl_analyze_semeai G4 B3
+#? [ALIVE DEAD C1]
