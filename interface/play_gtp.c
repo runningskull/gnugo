@@ -3463,9 +3463,13 @@ static int
 gtp_known_command(char *s)
 {
   int k;
-  for (k = 0; commands[k].name != NULL; k++)
-    if (strcmp(s, commands[k].name) == 0)
-      return gtp_success("true");
+  char command[GTP_BUFSIZE];
+
+  if (sscanf(s, "%s", command) == 1) {
+    for (k = 0; commands[k].name != NULL; k++)
+      if (strcmp(command, commands[k].name) == 0)
+	return gtp_success("true");
+  }
 
   return gtp_success("false");
 }

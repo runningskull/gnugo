@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in gtp_known_command
 - new visible_along_edge() and autohelpers
 - tuning
 - eye tuning
