@@ -1,18 +1,22 @@
-TST =  13x13.tst arb.tst arend.tst arion.tst atari_atari.tst auto01.tst \
-       auto02.tst auto03.tst auto04.tst auto_handtalk.tst blunder.tst \
-       buzco.tst capture.tst century2002.tst connect.tst connect_rot.tst \
-       connection.tst connection_rot.tst cutstone.tst dniwog.tst \
-       ego.tst endgame.tst endgame_rot.tst filllib.tst global.tst \
-       golife.tst handtalk.tst heikki.tst lazarus.tst ld_owl.tst \
-       ld_owl_rot.tst manyfaces.tst neurogo.tst newscore.tst nicklas1.tst \
-       nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst niki.tst \
-       ninestones.tst nngs.tst nngs1.tst nngs2.tst nngs3.tst nngs4.tst\
-       optics.tst optics_rot.tst owl.tst owl1.tst owl_rot.tst reading.tst \
-       reading_rot.tst rosebud.tst safety.tst score.tst score2.tst \
-       score_rot.tst semeai.tst semeai2.tst strategy.tst strategy2.tst \
-       strategy3.tst strategy4.tst strategy5.tst strategy_rot.tst tactics.tst \
-       tactics1.tst trevor.tst trevora.tst trevorb.tst trevorc.tst \
-       trevord.tst vie.tst viking.tst
+TST =  13x13.tst arb.tst arend.tst arion.tst atari_atari.tst \
+       auto01.tst auto02.tst auto03.tst auto04.tst \
+       auto_handtalk.tst blunder.tst buzco.tst capture.tst \
+       century2002.tst connect.tst connect_rot.tst \
+       connection.tst connection_rot.tst cutstone.tst \
+       dniwog.tst ego.tst endgame.tst endgame_rot.tst \
+       filllib.tst global.tst golife.tst handtalk.tst \
+       heikki.tst lazarus.tst ld_owl.tst ld_owl_rot.tst \
+       manyfaces.tst manyfaces1.tst neurogo.tst newscore.tst \
+       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst \
+       nicklas5.tst niki.tst ninestones.tst nngs.tst \
+       nngs1.tst nngs2.tst nngs3.tst nngs4.ts optics.tst \
+       optics_rot.tst owl.tst owl1.tst owl_rot.tst \
+       reading.tst reading_rot.tst rosebud.tst safety.tst \
+       score.tst score2.tst score_rot.tst semeai.tst \
+       semeai2.tst strategy.tst strategy2.tst strategy3.tst \
+       strategy4.tst strategy5.tst strategy_rot.tst \
+       tactics.tst tactics1.tst trevor.tst trevora.tst \
+       trevorb.tst trevorc.tst trevord.tst vie.tst viking.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
 
@@ -116,6 +120,9 @@ ld_owl_rot: ld_owl_rot.tst
 	$(srcdir)/eval.sh ld_owl_rot.tst $(GG_OPTIONS)
 
 manyfaces: manyfaces.tst
+	$(srcdir)/eval.sh manyfaces.tst $(GG_OPTIONS)
+
+manyfaces1: manyfaces1.tst
 	$(srcdir)/eval.sh manyfaces.tst $(GG_OPTIONS)
 
 neurogo: neurogo.tst
@@ -338,3 +345,4 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) safety.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) ninestones.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) tactics1.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) manyfaces1.tst $(GG_OPTIONS)

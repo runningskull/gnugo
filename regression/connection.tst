@@ -318,6 +318,10 @@ loadsgf games/handtalk/handtalk1.sgf 31
 96 same_dragon C16 C13
 #? [0]
 
+loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 201
+97 disconnect P8 O9
+#? [1 O5]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
