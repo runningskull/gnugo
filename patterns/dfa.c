@@ -99,11 +99,11 @@ static const char att2val[8] =
 /************************************************
  *   forward declaration of private functions   *
  ************************************************/
-static void clean_dfa (dfa_t * pdfa);
-static void resize_dfa (dfa_t * pdfa, int maxStates, int maxIndexes);
-static void create_dfa (dfa_t * pdfa, const char *str, int att_val);
-static void do_sync_product (int l, int r);
-static void sync_product (dfa_t * pout, dfa_t * pleft, dfa_t * pright);
+static void clean_dfa(dfa_t *pdfa);
+static void resize_dfa(dfa_t *pdfa, int maxStates, int maxIndexes);
+static void create_dfa(dfa_t *pdfa, const char *str, int att_val);
+static void do_sync_product(int l, int r);
+static void sync_product(dfa_t *pout, dfa_t *pleft, dfa_t *pright);
 
 
 /********************************
@@ -146,7 +146,7 @@ static const order_t generator[4] =
   { { 1, 0}, { 0,  1}, {-1, 0}, {0, -1}  };
 
 void
-buildSpiralOrder (order_t order[8][MAX_ORDER])
+buildSpiralOrder(order_t order[8][MAX_ORDER])
 {
   int Mark[DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
   order_t fifo[8 * MAX_ORDER];
@@ -158,19 +158,18 @@ buildSpiralOrder (order_t order[8][MAX_ORDER])
   
 
   if (dfa_verbose > 1)
-    fprintf (stderr, "Building spiral order\n");
+    fprintf(stderr, "Building spiral order\n");
 
   /* First we build the basic (pseudo)spiral order */
 
   /* initialization */
 
-  for(i = 0; i != DFA_MAX_BOARD * 4; i++)
-    for(j = 0; j != DFA_MAX_BOARD * 4; j++)
-      {
-	for(ll = 0; ll != 8; ll++)
-	  reverse_spiral[ll][i][j] = MAX_ORDER;
-	Mark[i][j] = 1;
-      }
+  for (i = 0; i != DFA_MAX_BOARD * 4; i++)
+    for (j = 0; j != DFA_MAX_BOARD * 4; j++) {
+      for (ll = 0; ll != 8; ll++)
+	reverse_spiral[ll][i][j] = MAX_ORDER;
+      Mark[i][j] = 1;
+    }
 
   for (i = DFA_MAX_BOARD; i != DFA_MAX_BOARD * 3; i++)
     for (j = DFA_MAX_BOARD; j != DFA_MAX_BOARD * 3; j++)
@@ -183,40 +182,36 @@ buildSpiralOrder (order_t order[8][MAX_ORDER])
   Mark[fifo[end].i][fifo[end].j] = 1;
 
   /* generation */
-  while (end < MAX_ORDER)
-    {
-      i = fifo[end].i;
-      j = fifo[end].j;
-      order[0][end].i = i - DFA_MAX_BOARD * 2;
-      order[0][end].j = j - DFA_MAX_BOARD * 2;
-      reverse_spiral[0][i][j] = end;
-      end++;
-
-      for (k = 0; k != 4; k++)
-	{
-	  di = generator[k].i;
-	  dj = generator[k].j;
-
-	  if (!Mark[i + di][j + dj])
-	    {
-	      fifo[top].i = i + di;
-	      fifo[top].j = j + dj;
-	      Mark[i + di][j + dj] = 1;
-	      top++;
-	    }
-	}
+  while (end < MAX_ORDER) {
+    i = fifo[end].i;
+    j = fifo[end].j;
+    order[0][end].i = i - DFA_MAX_BOARD * 2;
+    order[0][end].j = j - DFA_MAX_BOARD * 2;
+    reverse_spiral[0][i][j] = end;
+    end++;
+    
+    for (k = 0; k != 4; k++) {
+      di = generator[k].i;
+      dj = generator[k].j;
+      
+      if (!Mark[i + di][j + dj]) {
+	fifo[top].i = i + di;
+	fifo[top].j = j + dj;
+	Mark[i + di][j + dj] = 1;
+	top++;
+      }
     }
+  }
 
   /* Then we compute all the geometric transformations
      on this order */
   for (ll = 1; ll != 8; ll++)
-    for (k = 0; k != MAX_ORDER; k++)
-      {
-	delta = DFA_MAX_BOARD * 2;
-	TRANSFORM (order[0][k].i, order[0][k].j,
-		   &(order[ll][k].i), &(order[ll][k].j), ll);
-	reverse_spiral[ll][order[ll][k].i + delta][order[ll][k].j + delta] = k;
-      }
+    for (k = 0; k != MAX_ORDER; k++) {
+      delta = DFA_MAX_BOARD * 2;
+      TRANSFORM(order[0][k].i, order[0][k].j,
+		&(order[ll][k].i), &(order[ll][k].j), ll);
+      reverse_spiral[ll][order[ll][k].i + delta][order[ll][k].j + delta] = k;
+    }
 
 }
 
@@ -229,16 +224,15 @@ buildSpiralOrder (order_t order[8][MAX_ORDER])
  */
 
 static int
-member_att (dfa_t * pdfa, int att, int val)
+member_att(dfa_t *pdfa, int att, int val)
 {
   int res;
 
   res = 0;
-  while (!res && att != 0)
-    {
-      res = (pdfa->indexes[att].val == val);
-      att = pdfa->indexes[att].next;
-    }
+  while (!res && att != 0) {
+    res = (pdfa->indexes[att].val == val);
+    att = pdfa->indexes[att].next;
+  }
   return res;
 }
 
@@ -249,45 +243,40 @@ member_att (dfa_t * pdfa, int att, int val)
  */
 
 static int
-union_att (dfa_t * pdfa, dfa_t * pdfa1, int att1, dfa_t * pdfa2,
-	   int att2)
+union_att(dfa_t *pdfa, dfa_t *pdfa1, int att1, dfa_t *pdfa2, int att2)
 {
   int att;
   int att_aux;
 
   /* copy att1 in att */
   att = 0;
-  while (att1 != 0)
-    {
-      pdfa->lastIndex++;
-      if (pdfa->lastIndex >= pdfa->maxIndexes)
-	resize_dfa (pdfa, pdfa->maxStates,
-		    pdfa->maxIndexes + DFA_RESIZE_STEP);
-      att_aux = pdfa->lastIndex;
-
-      pdfa->indexes[att_aux].val = pdfa1->indexes[att1].val;
-      pdfa->indexes[att_aux].next = att;
-      att = att_aux;
-      att1 = pdfa1->indexes[att1].next;
-    }
+  while (att1 != 0) {
+    pdfa->lastIndex++;
+    if (pdfa->lastIndex >= pdfa->maxIndexes)
+      resize_dfa(pdfa, pdfa->maxStates,
+		 pdfa->maxIndexes + DFA_RESIZE_STEP);
+    att_aux = pdfa->lastIndex;
+    
+    pdfa->indexes[att_aux].val = pdfa1->indexes[att1].val;
+    pdfa->indexes[att_aux].next = att;
+    att = att_aux;
+    att1 = pdfa1->indexes[att1].next;
+  }
 
   /* add to att the new elements of att2 */
-  while (att2 != 0)
-    {
-      if (!member_att (pdfa, att, pdfa2->indexes[att2].val))
-	{
-	  pdfa->lastIndex++;
-	  if (pdfa->lastIndex >= pdfa->maxIndexes)
-	    resize_dfa (pdfa, pdfa->maxStates,
-			pdfa->maxIndexes + DFA_RESIZE_STEP);
-	  att_aux = pdfa->lastIndex;
+  while (att2 != 0) {
+    if (!member_att(pdfa, att, pdfa2->indexes[att2].val)) {
+      pdfa->lastIndex++;
+      if (pdfa->lastIndex >= pdfa->maxIndexes)
+	resize_dfa(pdfa, pdfa->maxStates, pdfa->maxIndexes + DFA_RESIZE_STEP);
+      att_aux = pdfa->lastIndex;
 
-	  pdfa->indexes[att_aux].val = pdfa2->indexes[att2].val;
-	  pdfa->indexes[att_aux].next = att;
-	  att = att_aux;
-	}
-      att2 = pdfa2->indexes[att2].next;
+      pdfa->indexes[att_aux].val = pdfa2->indexes[att2].val;
+      pdfa->indexes[att_aux].next = att;
+      att = att_aux;
     }
+    att2 = pdfa2->indexes[att2].next;
+  }
 
   return att;
 }
@@ -302,14 +291,14 @@ union_att (dfa_t * pdfa, dfa_t * pdfa1, int att1, dfa_t * pdfa2,
  */
 
 int
-dfa_size (dfa_t * pdfa)
+dfa_size(dfa_t *pdfa)
 {
   int states_size, indexes_size;
 
-  states_size = (pdfa->lastState + 1) * sizeof (state_t);
-  indexes_size = (pdfa->lastIndex + 1) * sizeof (attrib_t);
+  states_size = (pdfa->lastState + 1) * sizeof(state_t);
+  indexes_size = (pdfa->lastIndex + 1) * sizeof(attrib_t);
 
-  return (states_size + indexes_size + sizeof (dfa_t)) / 1024;
+  return (states_size + indexes_size + sizeof(dfa_t)) / 1024;
 }
 
 
@@ -318,30 +307,29 @@ dfa_size (dfa_t * pdfa)
  */
 
 static void
-resize_dfa (dfa_t * pdfa, int maxStates, int maxIndexes)
+resize_dfa(dfa_t *pdfa, int maxStates, int maxIndexes)
 {
   state_t *pBuf;
   attrib_t *pBuf2;
   int i;
 
   if (dfa_verbose > 1)
-    fprintf (stderr, "Resizing dfa %s\n", pdfa->name);
+    fprintf(stderr, "Resizing dfa %s\n", pdfa->name);
 
-  gg_assert (pdfa->lastState <= pdfa->maxStates);
-  gg_assert (pdfa->lastIndex <= pdfa->maxIndexes);
+  gg_assert(pdfa->lastState <= pdfa->maxStates);
+  gg_assert(pdfa->lastIndex <= pdfa->maxIndexes);
 
-  pBuf = realloc (pdfa->states, maxStates * sizeof (state_t));
-  pBuf2 = realloc (pdfa->indexes, maxIndexes * sizeof (attrib_t));
-  if (pBuf == NULL || pBuf2 == NULL)
-    {
-      fprintf (stderr, "No memory left for dfa: %s", pdfa->name);
-      exit (1);
-    }
+  pBuf = realloc(pdfa->states, maxStates * sizeof(state_t));
+  pBuf2 = realloc(pdfa->indexes, maxIndexes * sizeof(attrib_t));
+  if (pBuf == NULL || pBuf2 == NULL) {
+    fprintf(stderr, "No memory left for dfa: %s", pdfa->name);
+    exit(1);
+  }
 
   for (i = pdfa->maxStates; i < maxStates; i++)
-    memset (pBuf + i, 0, sizeof (state_t));
+    memset(pBuf + i, 0, sizeof(state_t));
   for (i = pdfa->maxIndexes; i < maxIndexes; i++)
-    memset (pBuf2 + i, 0, sizeof (attrib_t));
+    memset(pBuf2 + i, 0, sizeof(attrib_t));
 
   pdfa->states = pBuf;
   pdfa->maxStates = maxStates;
@@ -360,45 +348,43 @@ static const char *line =
   "----------------------------------------------------\n";
 
 void
-dump_dfa (FILE * f, dfa_t * pdfa)
+dump_dfa(FILE *f, dfa_t *pdfa)
 {
   int i;
   int att, k;
 
-  fprintf (f, line);
-  fprintf (f, " name : %s\n", pdfa->name);
-  fprintf (f, " Nb states :  %7d, max= %d\n", pdfa->lastState + 1,
-	   pdfa->maxStates);
-  fprintf (f, " Nb Indexes : %7d, max= %d\n", pdfa->lastIndex,
-	   pdfa->maxIndexes);
-  fprintf (f, " memory needed : %d Mb\n", dfa_size (pdfa) / 1024);
-  fprintf (f, line);
+  fprintf(f, line);
+  fprintf(f, " name : %s\n", pdfa->name);
+  fprintf(f, " Nb states :  %7d, max= %d\n", pdfa->lastState + 1,
+	  pdfa->maxStates);
+  fprintf(f, " Nb Indexes : %7d, max= %d\n", pdfa->lastIndex,
+	  pdfa->maxIndexes);
+  fprintf(f, " memory needed : %d Mb\n", dfa_size(pdfa) / 1024);
+  fprintf(f, line);
 
-  if (dfa_size (pdfa) > 10000) /* change this value if needed */
+  if (dfa_size(pdfa) > 10000) /* change this value if needed */
     return;
-  fprintf (f, " state  |   .    |   O    |   X    |   #    |  att \n");
-  fprintf (f, line);
-  for (i = 1; i != pdfa->lastState + 1; i++)
-    {
-      int *pnext = pdfa->states[i].next;
-      fprintf (f, " %6d |", i);
-      fprintf (f, " %6d | %6d | %6d |", pnext[0], pnext[1], pnext[2]);
-      fprintf (f, " %6d |", pnext[OUT_BOARD]);
-      att = pdfa->states[i].att;
-      k = 0;
-      fprintf (f, " %5d:", att);
-      while (att != 0 && k < 10)
-	{
-	  fprintf (f, " %4d", pdfa->indexes[att].val);
-	  att = pdfa->indexes[att].next;
-	  k++;
-	}
-      if (att != 0)
-	fprintf (f, " ...");
-      fprintf (f, "\n");
+  fprintf(f, " state  |   .    |   O    |   X    |   #    |  att \n");
+  fprintf(f, line);
+  for (i = 1; i != pdfa->lastState + 1; i++) {
+    int *pnext = pdfa->states[i].next;
+    fprintf(f, " %6d |", i);
+    fprintf(f, " %6d | %6d | %6d |", pnext[0], pnext[1], pnext[2]);
+    fprintf(f, " %6d |", pnext[OUT_BOARD]);
+    att = pdfa->states[i].att;
+    k = 0;
+    fprintf(f, " %5d:", att);
+    while (att != 0 && k < 10) {
+      fprintf(f, " %4d", pdfa->indexes[att].val);
+      att = pdfa->indexes[att].next;
+      k++;
     }
-  fprintf (f, line);
-  fflush (f);
+    if (att != 0)
+      fprintf(f, " ...");
+    fprintf(f, "\n");
+  }
+  fprintf(f, line);
+  fflush(f);
 }
 
 
@@ -407,10 +393,10 @@ dump_dfa (FILE * f, dfa_t * pdfa)
  */
 
 static void
-clean_dfa (dfa_t * pdfa)
+clean_dfa(dfa_t *pdfa)
 {
-  memset (pdfa->states, 0, pdfa->maxStates * sizeof (state_t));
-  memset (pdfa->indexes, 0, pdfa->maxIndexes * sizeof (attrib_t));
+  memset(pdfa->states, 0, pdfa->maxStates * sizeof(state_t));
+  memset(pdfa->indexes, 0, pdfa->maxIndexes * sizeof(attrib_t));
   pdfa->lastState = 1;		/* initial state */
   pdfa->lastIndex = 0;
   pdfa->indexes[0].val = -1;
@@ -422,18 +408,18 @@ clean_dfa (dfa_t * pdfa)
  */
 
 void
-new_dfa (dfa_t * pdfa, const char *name)
+new_dfa(dfa_t *pdfa, const char *name)
 {
-  memset (pdfa, 0, sizeof (dfa_t));
-  resize_dfa (pdfa, DFA_INIT_SIZE, DFA_INIT_SIZE);
-  clean_dfa (pdfa);
+  memset(pdfa, 0, sizeof(dfa_t));
+  resize_dfa(pdfa, DFA_INIT_SIZE, DFA_INIT_SIZE);
+  clean_dfa(pdfa);
   if (name != NULL)
-    strcpy (pdfa->name, name);
+    strcpy(pdfa->name, name);
   else
-    strcpy (pdfa->name, "noname ");
+    strcpy(pdfa->name, "noname ");
 
   if (dfa_verbose > 1)
-    fprintf (stderr, "dfa %s is born :)\n", pdfa->name);
+    fprintf(stderr, "dfa %s is born :)\n", pdfa->name);
 
 }
 
@@ -442,14 +428,14 @@ new_dfa (dfa_t * pdfa, const char *name)
  */
 
 void
-kill_dfa (dfa_t * pdfa)
+kill_dfa(dfa_t *pdfa)
 {
-  free (pdfa->states);
-  free (pdfa->indexes);
+  free(pdfa->states);
+  free(pdfa->indexes);
   if (dfa_verbose > 1)
-    fprintf (stderr, "dfa %s is dead :(\n", pdfa->name);
+    fprintf(stderr, "dfa %s is dead :(\n", pdfa->name);
 
-  memset (pdfa, 0, sizeof (dfa_t));
+  memset(pdfa, 0, sizeof(dfa_t));
 }
 
 
@@ -459,29 +445,26 @@ kill_dfa (dfa_t * pdfa)
  */
 
 void
-copy_dfa (dfa_t * p_to, dfa_t * p_from)
+copy_dfa(dfa_t *p_to, dfa_t *p_from)
 {
-  gg_assert (p_to != p_from);
+  gg_assert(p_to != p_from);
 
   if (p_to->maxStates < p_from->lastState)
-    resize_dfa (p_to, p_from->maxStates, p_to->maxIndexes);
+    resize_dfa(p_to, p_from->maxStates, p_to->maxIndexes);
 
   if (p_to->maxIndexes < p_from->lastIndex)
-    resize_dfa (p_to, p_to->maxStates, p_from->maxIndexes);
+    resize_dfa(p_to, p_to->maxStates, p_from->maxIndexes);
 
-  clean_dfa (p_to);
+  clean_dfa(p_to);
 
-  memcpy (p_to->states, p_from->states,
-	  sizeof (state_t) * (p_from->lastState + 1));
-  memcpy (p_to->indexes, p_from->indexes,
-	  sizeof (attrib_t) * (p_from->lastIndex + 1));
+  memcpy(p_to->states, p_from->states,
+	 sizeof(state_t) * (p_from->lastState + 1));
+  memcpy(p_to->indexes, p_from->indexes,
+	 sizeof(attrib_t) * (p_from->lastIndex + 1));
 
   p_to->lastState = p_from->lastState;
   p_to->lastIndex = p_from->lastIndex;
 }
-
-
-
 
 
 
@@ -491,34 +474,34 @@ copy_dfa (dfa_t * p_to, dfa_t * p_from)
  */
 
 void
-print_c_dfa (FILE *of, const char *name, dfa_t * pdfa)
+print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
 {
   int i;
 
-  fprintf(of,"\n#include \"dfa.h\"\n");
+  fprintf(of, "\n#include \"dfa.h\"\n");
 
-  fprintf(of,"static state_t state_%s[%d] = {\n",name,pdfa->lastState + 1);
-  for (i = 0; i != pdfa->lastState + 1; i++)
-    {
-      fprintf(of,"{%d,",pdfa->states[i].att);
-      fprintf(of,"{%d,",pdfa->states[i].next[0]);
-      fprintf(of,"%d,",pdfa->states[i].next[1]);
-      fprintf(of,"%d,",pdfa->states[i].next[2]);
-      fprintf(of,"%d}},\n",pdfa->states[i].next[3]);
-    }
-  fprintf(of,"};\n\n");
+  fprintf(of, "static state_t state_%s[%d] = {\n", name, pdfa->lastState + 1);
+  for (i = 0; i != pdfa->lastState + 1; i++) {
+    fprintf(of, "{%d,", pdfa->states[i].att);
+    fprintf(of, "{%d,", pdfa->states[i].next[0]);
+    fprintf(of, "%d,", pdfa->states[i].next[1]);
+    fprintf(of, "%d,", pdfa->states[i].next[2]);
+    fprintf(of, "%d}},\n", pdfa->states[i].next[3]);
+  }
+  fprintf(of, "};\n\n");
 
 
-  fprintf(of,"static attrib_t idx_%s[%d] = {\n",name,pdfa->lastIndex + 1);
+  fprintf(of, "static attrib_t idx_%s[%d] = {\n", name, pdfa->lastIndex + 1);
   for (i = 0; i != pdfa->lastIndex + 1; i++)
-    fprintf(of,"{%d,%d},\n",pdfa->indexes[i].val,pdfa->indexes[i].next);
-  fprintf(of,"};\n\n");
+    fprintf(of, "{%d,%d},\n", pdfa->indexes[i].val, pdfa->indexes[i].next);
+  fprintf(of, "};\n\n");
 
-  fprintf(of,"static struct dfa dfa_%s = {\n",name);
-  fprintf(of," \"%s\",\n", name);
-  fprintf(of,"state_%s, %d, %d,\n",name, pdfa->lastState + 1, pdfa->lastState);
-  fprintf(of,"idx_%s, %d, %d",name, pdfa->lastIndex + 1, pdfa->lastIndex);
-  fprintf(of,"};\n");
+  fprintf(of, "static struct dfa dfa_%s = {\n", name);
+  fprintf(of, " \"%s\",\n", name);
+  fprintf(of, "state_%s, %d, %d,\n", name,
+	  pdfa->lastState + 1, pdfa->lastState);
+  fprintf(of, "idx_%s, %d, %d", name, pdfa->lastIndex + 1, pdfa->lastIndex);
+  fprintf(of, "};\n");
 
 }
 
@@ -550,44 +533,42 @@ print_c_dfa (FILE *of, const char *name, dfa_t * pdfa)
  */
 
 static void
-create_dfa (dfa_t * pdfa, const char *str, int att_val)
+create_dfa(dfa_t *pdfa, const char *str, int att_val)
 {
   int new_state;
 
   if (dfa_verbose > 1)
-    fprintf (stderr, "linear dfa in %s with string\n%s\n", pdfa->name,
-	     str);
+    fprintf(stderr, "linear dfa in %s with string\n%s\n", pdfa->name, str);
 
-  gg_assert (str != NULL);
-  gg_assert (pdfa->maxStates > 1);
-  gg_assert (pdfa->maxIndexes > 1);
+  gg_assert(str != NULL);
+  gg_assert(pdfa->maxStates > 1);
+  gg_assert(pdfa->maxIndexes > 1);
 
-  clean_dfa (pdfa);
+  clean_dfa(pdfa);
   new_state = 1;
-  for (; *str != '\0' && strchr ("$#+-|OoXx.?,!a*", *str); str++)
-    {
-      memset (pdfa->states[new_state].next, 0, 4 * sizeof (int));
-      if (strchr ("$?.ox,a!*", *str))
-	pdfa->states[new_state].next[0] = new_state + 1;
-      if (strchr ("$?Oo", *str))
-	pdfa->states[new_state].next[1] = new_state + 1;
-      if (strchr ("$?Xx", *str))
-	pdfa->states[new_state].next[2] = new_state + 1;
-      if (strchr ("$#+-|", *str))
-	pdfa->states[new_state].next[OUT_BOARD] = new_state + 1;
-      new_state++;
-      if (new_state >= pdfa->maxStates)
-	resize_dfa (pdfa, pdfa->maxStates + DFA_RESIZE_STEP,
-		    pdfa->maxIndexes);
-    }
-  memset (pdfa->states[new_state].next, 0, 4 * sizeof (int));
+  for (; *str != '\0' && strchr("$#+-|OoXx.?,!a*", *str); str++) {
+    memset(pdfa->states[new_state].next, 0, 4 * sizeof(int));
+    if (strchr("$?.ox,a!*", *str))
+      pdfa->states[new_state].next[0] = new_state + 1;
+    if (strchr("$?Oo", *str))
+      pdfa->states[new_state].next[1] = new_state + 1;
+    if (strchr("$?Xx", *str))
+      pdfa->states[new_state].next[2] = new_state + 1;
+    if (strchr("$#+-|", *str))
+      pdfa->states[new_state].next[OUT_BOARD] = new_state + 1;
+    new_state++;
+    if (new_state >= pdfa->maxStates)
+      resize_dfa(pdfa, pdfa->maxStates + DFA_RESIZE_STEP,
+		 pdfa->maxIndexes);
+  }
+  memset(pdfa->states[new_state].next, 0, 4 * sizeof(int));
 
   pdfa->lastIndex++;
   if (pdfa->lastIndex >= pdfa->maxIndexes)
-    resize_dfa (pdfa, pdfa->maxStates,
-		pdfa->maxIndexes + DFA_RESIZE_STEP);
+    resize_dfa(pdfa, pdfa->maxStates,
+	       pdfa->maxIndexes + DFA_RESIZE_STEP);
 
-  memset (&(pdfa->indexes[pdfa->lastIndex]), 0, sizeof (attrib_t));
+  memset(&(pdfa->indexes[pdfa->lastIndex]), 0, sizeof(attrib_t));
   pdfa->states[new_state].att = pdfa->lastIndex;
 
   pdfa->indexes[pdfa->states[new_state].att].val = att_val;
@@ -607,7 +588,7 @@ create_dfa (dfa_t * pdfa, const char *str, int att_val)
 #define MAX_HASH_VALUE 4096
 
 typedef struct entry {
-  int l,r; /* key */
+  int l, r; /* key */
   int val; /* value */
   struct entry *pnext; /* NULL if end of list */
 } entry_t;
@@ -627,7 +608,7 @@ new_test_array(test_array_t *pta)
     pta->hash[h] = NULL;
 }
 
-/* Searh for (l,r) in the linked list plist */
+/* Searh for (l, r) in the linked list plist */
 static int 
 get_from_entry_list(entry_t *plist, int l, int r)
 {
@@ -641,7 +622,7 @@ get_from_entry_list(entry_t *plist, int l, int r)
   return val;
 }
 
-/* get the value associated with (l,r) or 0 if none */
+/* get the value associated with (l, r) or 0 if none */
 static int
 get_from_test_array(test_array_t *pta, int l, int r)
 {
@@ -661,8 +642,8 @@ add_to_entry_list(entry_t **pplist, int l, int r, int val)
 
   new_entry = malloc(sizeof(entry_t));
   if (new_entry == NULL) {
-    fprintf (stderr, "No memory left for new entry\n");
-    exit (1);
+    fprintf(stderr, "No memory left for new entry\n");
+    exit(1);
   }
   new_entry->pnext = *pplist;
   new_entry->l = l;
@@ -672,7 +653,7 @@ add_to_entry_list(entry_t **pplist, int l, int r, int val)
 }
 
 
-/* add a value at (l,r) */
+/* add a value at (l, r) */
 static void
 add_to_test_array(test_array_t *pta, int l, int r, int val)
 {
@@ -730,7 +711,7 @@ static dfa_t *gpout, *gpleft, *gpright;
 static test_array_t gtest;
 
 static void
-do_sync_product (int l, int r)
+do_sync_product(int l, int r)
 {
   int c;
   int nextl, nextr;
@@ -739,64 +720,57 @@ do_sync_product (int l, int r)
   state = gpout->lastState;
 
   /* unify the attributes of states l and r */
-  gpout->states[state].att =
-    union_att (gpout, gpleft, gpleft->states[l].att,
-	       gpright, gpright->states[r].att);
+  gpout->states[state].att = union_att(gpout, gpleft, gpleft->states[l].att,
+				       gpright, gpright->states[r].att);
 
   /* scan each possible out-transition */
-  for (c = 0; c != 4; c++)
-    {
-      nextl = gpleft->states[l].next[c];
-      nextr = gpright->states[r].next[c];
-      gg_assert (nextl < gpleft->lastState + 1);
-      gg_assert (nextr < gpright->lastState + 1);
-
-      /* transition to (0,0) mean no transition at all */
-      if (nextl != 0 || nextr != 0)
-	{
-	  /* if the out-state doesn't already exist */
-	  if (get_from_test_array(&gtest, nextl, nextr) == 0)
-	    {
-	      /* create it! */
-	      gpout->lastState++;
-	      if (gpout->lastState >= gpout->maxStates)
-		resize_dfa (gpout, gpout->maxStates + DFA_RESIZE_STEP,
-			    gpout->maxIndexes);
-
-	      add_to_test_array(&gtest, nextl, nextr, gpout->lastState);
-
-	      /* link it */
-	      gpout->states[state].next[c] = gpout->lastState;
-
-	      /* create also its sub-automaton */
-	      do_sync_product (nextl, nextr);
-	    }
-	  else
-	    {
-	      /* link it */
-	      gpout->states[state].next[c] =
-		get_from_test_array(&gtest, nextl, nextr);
-	    }
-	}
-      else
-	{
-	  /* no output by c from the actual state */
-	  gpout->states[state].next[c] = 0;
-	}
+  for (c = 0; c != 4; c++) {
+    nextl = gpleft->states[l].next[c];
+    nextr = gpright->states[r].next[c];
+    gg_assert(nextl < gpleft->lastState + 1);
+    gg_assert(nextr < gpright->lastState + 1);
+    
+    /* transition to (0,0) mean no transition at all */
+    if (nextl != 0 || nextr != 0) {
+      /* if the out-state doesn't already exist */
+      if (get_from_test_array(&gtest, nextl, nextr) == 0) {
+	/* create it! */
+	gpout->lastState++;
+	if (gpout->lastState >= gpout->maxStates)
+	  resize_dfa(gpout, gpout->maxStates + DFA_RESIZE_STEP,
+		     gpout->maxIndexes);
+	
+	add_to_test_array(&gtest, nextl, nextr, gpout->lastState);
+	
+	/* link it */
+	gpout->states[state].next[c] = gpout->lastState;
+	
+	/* create also its sub-automaton */
+	do_sync_product(nextl, nextr);
+      }
+      else {
+	/* link it */
+	gpout->states[state].next[c] =
+	  get_from_test_array(&gtest, nextl, nextr);
+      }
     }
+    else {
+      /* no output by c from the actual state */
+      gpout->states[state].next[c] = 0;
+    }
+  }
 }
 
 static void
-sync_product (dfa_t * pout, dfa_t * pleft, dfa_t * pright)
+sync_product(dfa_t *pout, dfa_t *pleft, dfa_t *pright)
 {
   pout->lastIndex = 0;
 
-  if (dfa_verbose > 2)
-    {
-      fprintf (stderr, "Product between %s and %s\n", pleft->name,
-	       pright->name);
-      fprintf (stderr, "result in %s\n", pout->name);
-    }
+  if (dfa_verbose > 2) {
+    fprintf(stderr, "Product between %s and %s\n", pleft->name,
+	    pright->name);
+    fprintf(stderr, "result in %s\n", pout->name);
+  }
 
 
   gpout = pout;
@@ -806,7 +780,7 @@ sync_product (dfa_t * pout, dfa_t * pleft, dfa_t * pright)
   add_to_test_array(&gtest, 1, 1, 1);
   pout->lastState = 1;
 
-  do_sync_product (1, 1);
+  do_sync_product(1, 1);
 
   free_test_array(&gtest);
 }
@@ -816,16 +790,16 @@ sync_product (dfa_t * pout, dfa_t * pleft, dfa_t * pright)
  */
 
 void
-dfa_init (void)
+dfa_init(void)
 {
-  int i,j;
+  int i, j;
 
   if (dfa_verbose > 1)
-    fprintf (stderr, "dfa: init\n");
+    fprintf(stderr, "dfa: init\n");
   dfa_was_initialized++;
-  buildSpiralOrder (spiral);
-  new_dfa (&aux_dfa1, "stringAux ");
-  new_dfa (&aux_dfa2, "copyAux ");
+  buildSpiralOrder(spiral);
+  new_dfa(&aux_dfa1, "stringAux ");
+  new_dfa(&aux_dfa2, "copyAux ");
 
   /* set the private board to OUT_BOARD */
   for (i =0; i!= DFA_MAX_BOARD*4; i++)
@@ -834,13 +808,13 @@ dfa_init (void)
 }
 
 void
-dfa_end (void)
+dfa_end(void)
 {
   if (dfa_verbose > 1)
-    fprintf (stderr, "dfa: end\n");
+    fprintf(stderr, "dfa: end\n");
 
-  kill_dfa (&aux_dfa1);
-  kill_dfa (&aux_dfa2);
+  kill_dfa(&aux_dfa1);
+  kill_dfa(&aux_dfa2);
   dfa_was_initialized--;
 }
 
@@ -853,28 +827,28 @@ dfa_end (void)
  */
 
 float
-dfa_add_string (dfa_t * pdfa, const char *str, int pattern_index)
+dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index)
 {
   float ratio;
 
   if (dfa_verbose > 1)
-    fprintf (stderr, "Adding %s\n to dfa %s\n", str, pdfa->name);
+    fprintf(stderr, "Adding %s\n to dfa %s\n", str, pdfa->name);
 
-  gg_assert (dfa_was_initialized > 0);
-  gg_assert (pdfa != NULL);
+  gg_assert(dfa_was_initialized > 0);
+  gg_assert(pdfa != NULL);
 
   /* We first create a dfa in aux_dfa1 from the string. */
-  create_dfa (&aux_dfa1, str, pattern_index);
+  create_dfa(&aux_dfa1, str, pattern_index);
 
   /* then we do the synchronization product with dfa */
-  sync_product (&aux_dfa2, &aux_dfa1, pdfa);
+  sync_product(&aux_dfa2, &aux_dfa1, pdfa);
 
   ratio = 1;
   if (dfa_size(pdfa) > 0)
     ratio = (float) (dfa_size(&aux_dfa2) / dfa_size(pdfa));
 
   /* the result is copied in dfa */
-  copy_dfa (pdfa, &aux_dfa2);
+  copy_dfa(pdfa, &aux_dfa2);
 
   return ratio;
 }
@@ -885,8 +859,7 @@ dfa_add_string (dfa_t * pdfa, const char *str, int pattern_index)
  * str must refer a buffer of size greater than MAX_ORDER.
  */
 void
-pattern_2_string (struct pattern *pat, char *str, int trans, int ci,
-		  int cj)
+pattern_2_string(struct pattern *pat, char *str, int trans, int ci, int cj)
 {
   char work_space[DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
   int m, n;			/* anchor position */
@@ -897,12 +870,12 @@ pattern_2_string (struct pattern *pat, char *str, int trans, int ci,
   m = DFA_MAX_BOARD * 2 + ci;
   n = DFA_MAX_BOARD * 2 + cj;	/* position of the anchor */
 
-  gg_assert (dfa_was_initialized);
-  memset (str, 0, MAX_ORDER);
-  memset (work_space, '#', sizeof (work_space));
+  gg_assert(dfa_was_initialized);
+  memset(str, 0, MAX_ORDER);
+  memset(work_space, '#', sizeof(work_space));
 
   if (dfa_verbose > 0)
-    fprintf (stderr, "converting pattern into string.\n");
+    fprintf(stderr, "converting pattern into string.\n");
 
   /* basic edge constraints */
   for (i = DFA_MAX_BOARD; i != DFA_MAX_BOARD * 3; i++)
@@ -917,89 +890,76 @@ pattern_2_string (struct pattern *pat, char *str, int trans, int ci,
   /* more advanced edge constraints */
 
   /* South constraint */
-  if (pat->edge_constraints & SOUTH_EDGE)
-    {
-      for (i = m + pat->maxi + 1; i != DFA_MAX_BOARD * 3; i++)
-	for (j = 0; j != DFA_MAX_BOARD * 3; j++)
-	  work_space[i][j] = '-';
-    }
+  if (pat->edge_constraints & SOUTH_EDGE) {
+    for (i = m + pat->maxi + 1; i != DFA_MAX_BOARD * 3; i++)
+      for (j = 0; j != DFA_MAX_BOARD * 3; j++)
+	work_space[i][j] = '-';
+  }
 
   /* East constraint */
-  if (pat->edge_constraints & EAST_EDGE)
-    {
-      for (i = 0; i != DFA_MAX_BOARD * 3; i++)
-	for (j = n + pat->maxj + 1; j != DFA_MAX_BOARD * 3; j++)
-	  work_space[i][j] = '|';
-    }
-
+  if (pat->edge_constraints & EAST_EDGE) {
+    for (i = 0; i != DFA_MAX_BOARD * 3; i++)
+      for (j = n + pat->maxj + 1; j != DFA_MAX_BOARD * 3; j++)
+	work_space[i][j] = '|';
+  }
+  
   /* North constraint */
-  if (pat->edge_constraints & NORTH_EDGE)
-    {
-      for (i = 0; i != m + pat->mini; i++)
-	for (j = 0; j != DFA_MAX_BOARD * 4; j++)
-	  work_space[i][j] = '-';
-    }
+  if (pat->edge_constraints & NORTH_EDGE) {
+    for (i = 0; i != m + pat->mini; i++)
+      for (j = 0; j != DFA_MAX_BOARD * 4; j++)
+	work_space[i][j] = '-';
+  }
 
   /* West constraint */
-  if (pat->edge_constraints & WEST_EDGE)
-    {
-      /* take care not to erase the south edge constraint */
-      for (i = 0; i != m + pat->maxi + 1; i++)
+  if (pat->edge_constraints & WEST_EDGE) {
+    /* take care not to erase the south edge constraint */
+    for (i = 0; i != m + pat->maxi + 1; i++)
+      for (j = 0; j != n + pat->minj; j++)
+	work_space[i][j] = '|';
+
+    /* complete the last corner only if necessary */
+    if (!(pat->edge_constraints & SOUTH_EDGE)) {
+      for (i = m + pat->maxi + 1; i != DFA_MAX_BOARD * 3; i++)
 	for (j = 0; j != n + pat->minj; j++)
 	  work_space[i][j] = '|';
-
-      /* complete the last corner only if necessary */
-      if (!(pat->edge_constraints & SOUTH_EDGE))
-	{
-	  for (i = m + pat->maxi + 1; i != DFA_MAX_BOARD * 3; i++)
-	    for (j = 0; j != n + pat->minj; j++)
-	      work_space[i][j] = '|';
-	}
-
     }
+  }
 
   /* dump */
-  if (dfa_verbose > 4)
-    {
-      for (i = DFA_MAX_BOARD - 1; i != DFA_MAX_BOARD * 3 + 1; i++)
-	{
-	  for (j = DFA_MAX_BOARD - 1; j != DFA_MAX_BOARD * 3 + 1; j++)
-	    {
-	      if (i == m && j == n)
-		fprintf (stderr, "s");	/* mark the anchor */
-	      else
-		fprintf (stderr, "%c", work_space[i][j]);
-	    }
-	  fprintf (stderr, "\n");
-	}
-      fprintf (stderr, "\n");
+  if (dfa_verbose > 4) {
+    for (i = DFA_MAX_BOARD - 1; i != DFA_MAX_BOARD * 3 + 1; i++) {
+      for (j = DFA_MAX_BOARD - 1; j != DFA_MAX_BOARD * 3 + 1; j++) {
+	if (i == m && j == n)
+	  fprintf(stderr, "s");	/* mark the anchor */
+	else
+	  fprintf(stderr, "%c", work_space[i][j]);
+      }
+      fprintf(stderr, "\n");
     }
+    fprintf(stderr, "\n");
+  }
 
   /* pattern representation on the work space */
-  for (k = 0; k != pat->patlen; k++)
-    {
-      c = EXPECTED_VAL (pat->patn[k].att);
-      gg_assert (work_space[m + pat->patn[k].x - ci]
+  for (k = 0; k != pat->patlen; k++) {
+    c = EXPECTED_VAL(pat->patn[k].att);
+    gg_assert(work_space[m + pat->patn[k].x - ci]
 	      [n + pat->patn[k].y - cj] == '?');
-      work_space[m + pat->patn[k].x - ci][n + pat->patn[k].y - cj] = c;
-    }
+    work_space[m + pat->patn[k].x - ci][n + pat->patn[k].y - cj] = c;
+  }
 
   /* dump */
-  if (dfa_verbose > 3)
-    {
-      for (i = DFA_MAX_BOARD - 1; i != DFA_MAX_BOARD * 3 + 1; i++)
-	{
-	  for (j = DFA_MAX_BOARD - 1; j != DFA_MAX_BOARD * 3 + 1; j++)
-	    {
-	      if (i == m && j == n)
-		fprintf (stderr, "s");	/* mark the anchor */
-	      else
-		fprintf (stderr, "%c", work_space[i][j]);
-	    }
-	  fprintf (stderr, "\n");
-	}
-      fprintf (stderr, "\n");
+  if (dfa_verbose > 3) {
+    for (i = DFA_MAX_BOARD - 1; i != DFA_MAX_BOARD * 3 + 1; i++) {
+      for (j = DFA_MAX_BOARD - 1; j != DFA_MAX_BOARD * 3 + 1; j++) {
+	if (i == m && j == n)
+	  fprintf(stderr, "s");	/* mark the anchor */
+	else
+	  fprintf(stderr, "%c", work_space[i][j]);
+      }
+      fprintf(stderr, "\n");
     }
+    fprintf(stderr, "\n");
+  }
 
   /* Now we can build the smaller pattern string as possible 
    * from the anchor */
@@ -1008,58 +968,56 @@ pattern_2_string (struct pattern *pat, char *str, int trans, int ci,
   edges = pat->edge_constraints;	/* how many constraint tested ? */
   borders = 0xF; 
   /* we must test at least one intersection by border for 
-     patterns like
-     
-     ???
-     O.O
-     ???
-     
-     To ensure edge position.
-  */
+   * patterns like
+   * 
+   * ???
+   * O.O
+   * ???
+   * 
+   * To ensure edge position.
+   */
 
-  for (k = 0; (k != MAX_ORDER - 1) && 
-	 ((borders > 0) || edges || to_test > 0); k++)
-    {
-      i = spiral[trans][k].i;
-      j = spiral[trans][k].j;
+  for (k = 0;
+       (k != MAX_ORDER - 1) && ((borders > 0) || edges || to_test > 0);
+       k++) {
+    i = spiral[trans][k].i;
+    j = spiral[trans][k].j;
 
-      if (i == pat->maxi)
-	borders &= ~SOUTH_EDGE;
-      if (i == pat->mini)
-	borders &= ~NORTH_EDGE;
-      if (j == pat->maxj)
-	borders &= ~EAST_EDGE;
-      if (j == pat->minj)
-	borders &= ~WEST_EDGE;
-
-      gg_assert (m + i < DFA_MAX_BOARD * 3 && m + i < DFA_MAX_BOARD * 3);
-      str[k] = work_space[m + i][n + j];
-      gg_assert (strchr ("XOxo.,a!?$#|-+", str[k]));
-
-      if (strchr ("XOxo.,a!", str[k]))
-	to_test--;
-      if (strchr ("#|-+", str[k]))
-	{
-	  if (i > pat->maxi)
-	    edges &= ~SOUTH_EDGE;
-	  if (i < pat->mini)
-	    edges &= ~NORTH_EDGE;
-	  if (j > pat->maxj)
-	    edges &= ~EAST_EDGE;
-	  if (j < pat->minj)
-	    edges &= ~WEST_EDGE;
-	}
+    if (i == pat->maxi)
+      borders &= ~SOUTH_EDGE;
+    if (i == pat->mini)
+      borders &= ~NORTH_EDGE;
+    if (j == pat->maxj)
+      borders &= ~EAST_EDGE;
+    if (j == pat->minj)
+      borders &= ~WEST_EDGE;
+    
+    gg_assert(m + i < DFA_MAX_BOARD * 3 && m + i < DFA_MAX_BOARD * 3);
+    str[k] = work_space[m + i][n + j];
+    gg_assert(strchr("XOxo.,a!?$#|-+", str[k]));
+    
+    if (strchr("XOxo.,a!", str[k]))
+      to_test--;
+    if (strchr("#|-+", str[k])) {
+      if (i > pat->maxi)
+	edges &= ~SOUTH_EDGE;
+      if (i < pat->mini)
+	edges &= ~NORTH_EDGE;
+      if (j > pat->maxj)
+	edges &= ~EAST_EDGE;
+      if (j < pat->minj)
+	edges &= ~WEST_EDGE;
     }
-
-  gg_assert (k < MAX_ORDER);
+  }
+  
+  gg_assert(k < MAX_ORDER);
   str[k] = '\0';		/* end of string */
 }
 
 
-
-
-
-
-
-
-
+/*
+ * Local Variables:
+ * tab-width: 8
+ * c-basic-offset: 2
+ * End:
+ */
