@@ -308,7 +308,11 @@ sub eat_move {
 # ignore empty lines
     my $line = "";
     while ($line eq "") {
-	defined($line = <$h>) or die "No response!";
+	if (!defined($line = <$h>)) {
+	    print SGFFILEHANDLE ")";
+	    close SGFFILEHANDLE;
+	    die "Engine crashed!\n";
+	}
         $line =~ s/(\s|\n)*$//smg;
     }
     my ($equals, $move) = split(' ', $line, 2);
@@ -363,7 +367,7 @@ sub standard_to_sgf {
     }
     $first = chr($first);
     $second = chr($size+1-$2+96);
-    return "$second$first";
+    return "$first$second";
 }
 
 sub rename_sgffile {
