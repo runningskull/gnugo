@@ -104,7 +104,7 @@ loadsgf games/endgame2.sgf 7
 
 loadsgf games/endgame2.sgf 8
 208 gg_genmove black
-#? [N1]
+#? [N1]*
 
 loadsgf games/endgame2.sgf 9
 209 gg_genmove white

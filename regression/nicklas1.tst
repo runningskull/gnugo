@@ -123,7 +123,7 @@ loadsgf games/nicklas/nicklas11.sgf 180
 
 loadsgf games/nicklas/nicklas11.sgf 208
 1106 gg_genmove black
-#? [!F6]
+#? [!F6]*
 
 #CATEGORY=WASTED_MOVE
 #DESCRIPTION=GnuGo 3.1.8 gets N2 on next move;  R3 benign ko threat loss.
@@ -186,7 +186,7 @@ loadsgf games/nicklas/nicklas12.sgf 203
 # Added A6 among the correct moves. /gf (2.7.203)
 loadsgf games/nicklas/nicklas12.sgf 215
 1214 gg_genmove black
-#? [A1|A6]*
+#? [A1|A6]
 
 # H3 doesn't seem critical. /gf
 loadsgf games/nicklas/nicklas12.sgf 259
@@ -220,7 +220,7 @@ loadsgf games/nicklas/nicklas14.sgf 57
 
 loadsgf games/nicklas/nicklas14.sgf 61
 1408 dragon_status A8
-#? [!dead]
+#? [!dead]*
 
 loadsgf games/nicklas/nicklas15.sgf 196
 1502 gg_genmove black

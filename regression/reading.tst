@@ -482,7 +482,7 @@ loadsgf games/reading18.sgf
 # Small scale semeai.
 loadsgf games/reading18.sgf
 122 defend J9
-#? [1 (F7|F9)]*
+#? [1 (F7|F9)]
 
 # based on test 12 (incident79.sgf)
 loadsgf games/reading19.sgf
@@ -607,7 +607,7 @@ loadsgf games/trevor/trevor_03.sgf 29
 
 loadsgf games/reading32.sgf
 155 attack G9
-#? [0]*
+#? [0]
 
 loadsgf games/reading33.sgf
 156 attack B3

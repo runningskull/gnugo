@@ -8,7 +8,7 @@
 #must not give up ponuki, no matter what!
 loadsgf games/trevor/auto/a001.sgf 8
 100 gg_genmove white
-#? [D6]*
+#? [D6]
 
 
 
@@ -17,7 +17,7 @@ loadsgf games/trevor/auto/a001.sgf 8
 
 loadsgf games/trevor/auto/a003.sgf 28
 120 gg_genmove white
-#? [E7|D8|E8]*
+#? [E7|D8|E8]
 
 
 
@@ -58,7 +58,7 @@ loadsgf games/trevor/auto/a006.sgf 12
 #B9 kills.
 loadsgf games/trevor/auto/a007.sgf 25
 170 gg_genmove black
-#? [B9]*
+#? [B9]
 
 
 
@@ -68,7 +68,7 @@ loadsgf games/trevor/auto/a007.sgf 25
 #Quite passive.
 loadsgf games/trevor/auto/a008.sgf 10
 180 gg_genmove white
-#? [!F3]*
+#? [!F3]
 
 
 
@@ -85,7 +85,7 @@ loadsgf games/trevor/auto/a009.sgf 8
 #Full point before ko!
 loadsgf games/trevor/auto/a009.sgf 66
 210 gg_genmove white
-#? [J8]*
+#? [J8]
 
 
 
@@ -95,7 +95,7 @@ loadsgf games/trevor/auto/a009.sgf 66
 #B6 is an overplay.  E7 may be best.
 loadsgf games/trevor/auto/a010.sgf 10
 220 gg_genmove white
-#? [!B6]*
+#? [!B6]
 
 
 
@@ -105,7 +105,7 @@ loadsgf games/trevor/auto/a010.sgf 10
 #F2 is bad overplay.
 loadsgf games/trevor/auto/a011.sgf 14
 230 gg_genmove white
-#? [G2]*
+#? [G2]
 
 
 
@@ -148,7 +148,7 @@ loadsgf games/trevor/auto/a015.sgf 20
 #Locally, E5 better than E4.
 loadsgf games/trevor/auto/a016.sgf 18
 280 gg_genmove white
-#? [!E4]*
+#? [!E4]
 
 
 
@@ -157,7 +157,7 @@ loadsgf games/trevor/auto/a016.sgf 18
 
 loadsgf games/trevor/auto/a017.sgf 20
 290 gg_genmove white
-#? [!C8]*
+#? [!C8]
 
 
 #B8 makes better eye space, at least one point better here, in reverse sente.
@@ -175,7 +175,7 @@ loadsgf games/trevor/auto/a017.sgf 34
 #Full point here!
 loadsgf games/trevor/auto/a017.sgf 56
 320 gg_genmove white
-#? [F9]*
+#? [F9]
 
 
 
@@ -185,7 +185,7 @@ loadsgf games/trevor/auto/a017.sgf 56
 #Must defend H4 group.
 loadsgf games/trevor/auto/a018.sgf 14
 330 gg_genmove white
-#? [G5|H5]*
+#? [G5|H5]
 
 
 #In this shape, G5 is best, not J6.
@@ -201,7 +201,7 @@ loadsgf games/trevor/auto/a018.sgf 18
 #H3 is terrible.
 loadsgf games/trevor/auto/a019.sgf 6
 350 gg_genmove white
-#? [!H3]*
+#? [!H3]
 
 
 
@@ -240,7 +240,7 @@ loadsgf games/trevor/auto/a023.sgf 50
 #Must defend H5 worm.  G6 prob. best.
 loadsgf games/trevor/auto/a024.sgf 12
 400 gg_genmove white
-#? [!E2]*
+#? [!E2]
 
 
 
@@ -260,7 +260,7 @@ loadsgf games/trevor/auto/a025.sgf 12
 #Once you've haned, you've gotta connect.  (Or you shouldn't have haned.)
 loadsgf games/trevor/auto/a026.sgf 16
 420 gg_genmove white
-#? [J5]*
+#? [J5]
 
 
 
@@ -300,7 +300,7 @@ loadsgf games/trevor/auto/a030.sgf 22
 #For a ko threat, D3 is better.
 loadsgf games/trevor/auto/a031.sgf 28
 470 gg_genmove white
-#? [!E2]*
+#? [!E2]
 
 
 #Sacrificing these two for the rest seems best.
@@ -364,7 +364,7 @@ loadsgf games/trevor/auto/a035.sgf 51
 #D4 is huge.  Other moves possible.
 loadsgf games/trevor/auto/a036.sgf 6
 560 gg_genmove white
-#? [!B4]*
+#? [!B4]
 
 
 #Breaking into black's area is required.
@@ -376,7 +376,7 @@ loadsgf games/trevor/auto/a036.sgf 10
 #E6 is bigger, and enough to win.
 loadsgf games/trevor/auto/a036.sgf 26
 580 gg_genmove white
-#? [E6]*
+#? [E6]
 
 
 
@@ -406,13 +406,13 @@ loadsgf games/trevor/auto/a038.sgf 34
 #Kill black corner first.
 loadsgf games/trevor/auto/a039.sgf 12
 620 gg_genmove white
-#? [H6]*
+#? [H6]
 
 
 #H7 is just terrible.
 loadsgf games/trevor/auto/a039.sgf 18
 630 gg_genmove white
-#? [H6]*
+#? [H6]
 
 
 
@@ -422,6 +422,6 @@ loadsgf games/trevor/auto/a039.sgf 18
 #C8 is an overplay.
 loadsgf games/trevor/auto/a041.sgf 12
 660 gg_genmove white
-#? [!C8]*
+#? [!C8]
 
 

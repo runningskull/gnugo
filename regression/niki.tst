@@ -25,7 +25,7 @@ loadsgf games/niki.sgf 68
 
 loadsgf games/niki.sgf 92
 4 gg_genmove white
-#? [Q8]
+#? [Q8]*
 
 #S10 seems OK, much better than game move of S14. Added it -trevor
 #S14 is thought to owl attack the corner. If this is correct the move

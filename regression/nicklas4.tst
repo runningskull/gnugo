@@ -24,7 +24,7 @@ loadsgf games/nicklas/nicklas8.sgf 212
 # point worse than J12. K12 loses the tail.
 loadsgf games/nicklas/nicklas8.sgf 242
 812 gg_genmove black
-#? [J12]
+#? [J12]*
 
 # O9 does leave a ko but is not out of the question. /gf
 loadsgf games/nicklas/nicklas11.sgf 56

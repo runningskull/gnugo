@@ -39,7 +39,7 @@ loadsgf games/strategy27.sgf 190
 
 loadsgf games/strategy27.sgf 208
 108 gg_genmove white
-#? [C15]
+#? [C15]*
 
 # Important semeai example.
 loadsgf games/strategy27.sgf 216
@@ -209,12 +209,12 @@ loadsgf games/strategy34.sgf 61
 # Incident 209. Semeai mistake.
 loadsgf games/incident209.sgf 193
 145 gg_genmove white
-#? [S14|T14]*
+#? [S14|T14]
 
 # Incident 210. Semeai mistake.
 loadsgf games/incident209.sgf 259
 146 gg_genmove white
-#? [R11]*
+#? [R11]
 
 # G3 is necessary here.
 loadsgf games/strategy35.sgf 112

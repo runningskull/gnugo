@@ -47,7 +47,7 @@ loadsgf games/strategy38.sgf 117
 
 loadsgf games/strategy38.sgf 133
 160 gg_genmove black
-#? [K2|L2|L3]*
+#? [K2|L2|L3]
 
 loadsgf games/strategy38.sgf 197
 161 gg_genmove black
@@ -155,7 +155,7 @@ loadsgf games/xxlin.sgf 16
 #Added E2 (3.1.14) -trevor
 loadsgf games/xxlin.sgf 20
 179 gg_genmove black
-#? [P3|O2|P2|O4|E2]*
+#? [P3|O2|P2|O4|E2]
 
 #The point of this problem is that Q8 is locally better than M7.
 #However, GNU Go reasonably tenukis.
@@ -194,7 +194,7 @@ loadsgf games/owl29.sgf 134
 
 loadsgf games/pooo.sgf 16
 187 gg_genmove black
-#? [!C1]
+#? [!C1]*
 
 loadsgf games/pooo.sgf 24
 188 gg_genmove black
@@ -244,17 +244,17 @@ loadsgf games/bretz.sgf 130
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 148
 198 gg_genmove black
-#? [C10|S18]*
+#? [C10|S18]
 
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 164
 199 gg_genmove black
-#? [N5|S18]*
+#? [N5|S18]
 
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 212
 200 gg_genmove black
-#? [P6|P7|Q7|S18]*
+#? [P6|P7|Q7|S18]
 
 loadsgf games/juka1.sgf 8
 201 gg_genmove black

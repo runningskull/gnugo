@@ -284,7 +284,7 @@ loadsgf games/trevor/trevor_28.sgf 36
 # Yikes, short of liberties!
 loadsgf games/trevor/trevor_29.sgf 54
 290 gg_genmove white
-#? [!A9]*
+#? [!A9]
 
 
 # Black A7 is a serious threat.  Also, white should at least 
@@ -337,7 +337,7 @@ loadsgf games/trevor/trevor_34.sgf
 #SEE_ALSO=owl.tst#226
 loadsgf games/trevor/trevor_35.sgf
 350 owl_defend J10
-#? [(2|3) L8]*
+#? [(2|3) L8]
 
 #CATEGORY=
 #DESCRIPTION=
@@ -521,7 +521,7 @@ loadsgf games/trevor/trevor_48.sgf
 #SEVERITY=7
 loadsgf games/trevor/trevor_59.sgf
 590 attack A18
-#? [0]*
+#? [0]
 
 loadsgf games/trevor/trevor_60.sgf 2
 600 owl_attack E3

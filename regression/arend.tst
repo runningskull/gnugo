@@ -17,7 +17,7 @@ loadsgf games/arend/gnugo-gnugo1.sgf 139
 #? [P6|Q5]*
 
 # These kind of fights might be very difficult to do well
-# with current GnuGo methods (How should it choose between the different
+# with current GNU Go methods (How should it choose between the different
 # 'correct' alternatives here? - R14 seems clearly best to me).
 # But certainly it should not tenuki.
 loadsgf games/arend/exper1.sgf 7
@@ -25,13 +25,13 @@ loadsgf games/arend/exper1.sgf 7
 #? [R14|S15|R17]
 
 #CATEGORY=STRATEGY
-#DESCRIPTION=GnuGo should escape with its cutting stone.
+#DESCRIPTION=GNU Go should escape with its cutting stone.
 loadsgf games/arend/exper1.sgf 25
 5 gg_genmove black
 #? [D7|E7|E6]
 
 #CATEGORY=STRATEGY
-#DESCRIPTION=In this position, GnuGo plays L10 because of an enormous assumed strategic effect on the M16 dragon, which is quite safe.
+#DESCRIPTION=In this position, GNU Go plays L10 because of an enormous assumed strategic effect on the M16 dragon, which is quite safe.
 loadsgf games/arend/gnugo-gnugo2.sgf 57
 7 gg_genmove black
 #? [C3]
@@ -44,7 +44,7 @@ loadsgf games/arend/gnugo-gnugo2.sgf 60
 #? [!S16]
 
 #CATEGORY=TACTICAL_READING
-# Gnugo rejects S17 because it is "strategically or tactically unsafe".
+# GNU Go rejects S17 because it is "strategically or tactically unsafe".
 # Must be a misread.
 loadsgf games/arend/gnugo-gnugo2.sgf 61
 9 gg_genmove black
@@ -57,7 +57,7 @@ loadsgf games/arend/gnugo-gnugo2.sgf 73
 #? [!J7]*
 
 #CATEGORY=STRATEGY
-# K6 is overvalued by GnuGo 3.0.0.
+# K6 is overvalued by GNU Go 3.0.0.
 loadsgf games/arend/gnugo-gnugo2.sgf 91
 11 gg_genmove black
 #? [!K6]
@@ -68,7 +68,7 @@ loadsgf games/arend/gnugo-gnugo2.sgf 163
 #? [C16|B16]
 
 #CATEGORY=STRATEGY
-# GnuGo does not see that P17 helps his group as well, and plays O13.
+# GNU Go does not see that P17 helps his group as well, and plays O13.
 loadsgf games/arend/gnugo-gnugo4.sgf 27
 14 gg_genmove black
 #? [P17]*
@@ -77,11 +77,11 @@ loadsgf games/arend/gnugo-gnugo4.sgf 27
 # C6 is clearly the wrong side for approaching LL corner.
 loadsgf games/arend/gnugo-gnugo4.sgf 31
 15 gg_genmove black 1
-#? [F3]
+#? [F3]*
 
 
-# GnuGo loves this move! (H2 is the point to play here.) It is impossible
-# to teach GnuGo not to play there with minor pattern tuning. Problem is
+# GNU Go loves this move! (H2 is the point to play here.) It is impossible
+# to teach GNU Go not to play there with minor pattern tuning. Problem is
 # huge follow_up value; there is no check at all in the move valuation 
 # whether a sente move is actually worth something if opponent answers
 # (here it is aji-keshi).
@@ -91,20 +91,20 @@ loadsgf games/arend/gnugo-gnugo4.sgf 45
 #? [!G3]
 
 #CATEGORY=TACTICAL_READING
-# GnuGo moves at C9. I do not know what it is afraid of.
+# GNU Go moves at C9. I do not know what it is afraid of.
 loadsgf games/arend/gnugo-gnugo4.sgf 153
 17 gg_genmove black
-#? [C7]*
+#? [C7]
 
 # Maybe this problem is suboptimal, because there is a ko involved, and
-# GnuGo gets it wrong even without the ko.
+# GNU Go gets it wrong even without the ko.
 loadsgf games/arend/gnugo-gnugo4.sgf 168
 18 gg_genmove white
 #? [P18|P19|R18|R19|S18|S17|S16|S14|S13|T14|T16]
 
 #CATEGORY=PATTERN_TUNING
-# GnuGo often plays this inefficient shape. Should be correctable with an
-# additional pattern. Core of the problem is however that GnuGo does not
+# GNU Go often plays this inefficient shape. Should be correctable with an
+# additional pattern. Core of the problem is however that GNU Go does not
 # understand the essence of the iken tobi -- it can be cut, but Black does
 # not mind that, since a cut only strengthens Black.
 loadsgf games/arend/gnugo-gnugo5.sgf 39
@@ -135,7 +135,7 @@ loadsgf games/arend/gnugo-gnugo6.sgf 20
 
 #CATEGORY=ENDGAME_TUNING
 # C19 is either double sente, or worth at least 5 pts in reverse sente,
-# which is 10 pts. T14 (chosen by GnuGo) is dame.
+# which is 10 pts. T14 (chosen by GNU Go) is dame.
 loadsgf games/arend/gnugo-gnugo6.sgf 174
 25 gg_genmove white
 #? [C19]
@@ -153,7 +153,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 24
 #? [B14|C14]*
 
 #CATEGORY=BLUNDER
-# GnuGo played F8.
+# GNU Go played F8.
 loadsgf games/arend/gnugo-gnugo7.sgf 79
 30 gg_genmove black
 #? [C13]
@@ -204,7 +204,7 @@ loadsgf games/arend/constructed2.sgf
 # oppoents moyo--need to have a fixed minimum value, which often leads
 # bad moves)
 # 2. O5 considerably weakens the influence of N5. Maybe this is not weighted
-# highly enough by GnuGo?
+# highly enough by GNU Go?
 loadsgf games/arend/constructed3.sgf
 38 gg_genmove white
 #? [O5]*
@@ -214,10 +214,10 @@ loadsgf games/arend/constructed3.sgf
 # This slightly adapted from a game (to make the problem more specific).
 loadsgf games/arend/constructed4.sgf
 39 gg_genmove black 3
-#? [G10|H10|F13]*
+#? [G10|H10|F13]
 
 #CATEGORY=ENDGAME_TUNING
-# EB714 is necessary here; without it, GnuGo played B6, only for the
+# EB714 is necessary here; without it, GNU Go played B6, only for the
 # reason of filling a liberty
 loadsgf games/arend/constructed5.sgf
 40 gg_genmove white

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.14 released November 30, 2001
+
 - new field value in struct half_eye_data
 - topological_eye() and evaluate_diagonal_intersection() take ko into account
 - improved debug output in compute_eyes() and compute_eyes_pessimistic()

@@ -38,7 +38,7 @@ loadsgf games/incident104.sgf 215
 # incident 107
 loadsgf games/incident107.sgf 216
 8 gg_genmove black
-#? [N1]
+#? [N1]*
 
 # incident 109
 loadsgf games/incident108b.sgf 172
@@ -201,7 +201,7 @@ loadsgf games/strategy8.sgf 283
 
 loadsgf games/nicklas/nicklas8.sgf 72
 34 gg_genmove black
-#? [E17]
+#? [E17]*
 
 loadsgf games/nicklas/nicklas8.sgf 80
 35 gg_genmove black
@@ -309,7 +309,7 @@ loadsgf games/strategy12.sgf 19
 loadsgf games/strategy12.sgf 21
 # D16 is the strongest but these are acceptable
 49 gg_genmove black
-#? [C17|D16|B17]*
+#? [C17|D16|B17]
 
 
 #CATEGORY=OWL_TUNING

@@ -57,7 +57,7 @@ loadsgf games/FSF-neurogo.sgf 148
 
 loadsgf games/FSF-neurogo.sgf 152
 12 gg_genmove white
-#? [B10]*
+#? [B10]
 
 loadsgf games/FSF-neurogo.sgf 176
 # This may be hard to fix at this point but since we
@@ -79,7 +79,7 @@ loadsgf games/FSF-neurogo.sgf 230
 # This test may be at the wrong move number.
 loadsgf games/FSF-neurogo.sgf 275
 16 gg_genmove white
-#? [H17|K17|H15|L16]*
+#? [H17|K17|H15|L16]
 
 loadsgf games/FSF-neurogo.sgf 286
 # K19 makes ko. H18 kills right out.
