@@ -28,7 +28,7 @@ loadsgf games/mfgg1.sgf 97
 #SEVERITY=2
 loadsgf games/mfgg2.sgf 19
 5 gg_genmove black
-#? [M5|M15|R3|R17]*
+#? [M5|M15|R3|R17]
 
 
 #CATEGORY=FUSEKI_STRATEGY

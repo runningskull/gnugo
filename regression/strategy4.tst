@@ -144,7 +144,7 @@ loadsgf games/xxlin.sgf 8
 # should be added. /gf
 loadsgf games/xxlin.sgf 16
 178 gg_genmove black
-#? [P4|P3]
+#? [P4|P3]*
 
 loadsgf games/xxlin.sgf 20
 179 gg_genmove black
@@ -152,7 +152,7 @@ loadsgf games/xxlin.sgf 20
 
 loadsgf games/xxlin.sgf 30
 180 gg_genmove black
-#? [Q8]
+#? [Q8]*
 
 loadsgf games/xxlin.sgf 38
 181 gg_genmove black
@@ -241,7 +241,7 @@ loadsgf games/bretz.sgf 164
 
 loadsgf games/bretz.sgf 212
 200 gg_genmove black
-#? [P6|P7|Q7]
+#? [P6|P7|Q7]*
 
 loadsgf games/juka1.sgf 8
 201 gg_genmove black
@@ -274,16 +274,16 @@ loadsgf games/owl30.sgf 84
 
 loadsgf games/lordofpi.sgf 32
 208 gg_genmove black
-#? [A5|A2|B1]
+#? [A5|A2|B1]*
 
 # A4 allows W to make seki
 loadsgf games/lordofpi.sgf 46
 209 gg_genmove black
-#? [!A4]
+#? [!A4]*
 
 loadsgf games/lordofpi.sgf 52
 210 gg_genmove black
-#? [H7]
+#? [H7]*
 
 loadsgf games/lordofpi.sgf 56
 211 gg_genmove black

@@ -75,7 +75,7 @@ loadsgf games/poka.sgf 52
 # M4 and N5 are okay. O5 is a bad mistake.
 loadsgf games/incident278.sgf 212
 116 gg_genmove black
-#? [M4|N5]*
+#? [M4|N5]
 
 # incident 282
 loadsgf games/incident278.sgf 252
@@ -126,7 +126,7 @@ loadsgf games/incident156.sgf 232
 # attack and defense with or without ko.
 loadsgf games/strategy29.sgf 138
 126 gg_genmove white
-#? [B19]*
+#? [B19]
 
 # incident 74
 loadsgf games/incident74.sgf 236

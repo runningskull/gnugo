@@ -66,7 +66,7 @@ loadsgf games/FSF-neurogo.sgf 176
 
 loadsgf games/FSF-neurogo.sgf 178
 14 gg_genmove white
-#? [Q4]*
+#? [Q4]
 
 loadsgf games/FSF-neurogo.sgf 230
 # double sente
@@ -81,7 +81,7 @@ loadsgf games/FSF-neurogo.sgf 275
 loadsgf games/FSF-neurogo.sgf 286
 # K19 makes ko. H18 kills right out.
 17 gg_genmove white
-#? [H18]*
+#? [H18]
 
 loadsgf games/FSF-neurogo.sgf 288
 18 gg_genmove white
@@ -119,7 +119,7 @@ loadsgf games/FSF-neurogo.sgf 34
 # The C15 stones can be saved by a move at F16.
 loadsgf games/FSF-neurogo.sgf 88
 24 owl_attack C15
-#? [1 (F16|E16|F14)]*
+#? [1 (F16|E16|F14)]
 25 owl_defend C15
 #? [1 F16]
 

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.12 released October 28, 2001
+
 - break_chain2_efficient_moves() and break_chain2_moves() revised
 - add_array() in readconnect.c simplified
 - bugfix in moves_to_connect_in_two_moves()
@@ -14,13 +16,11 @@
 - new move reasons ATTACK_MOVE_GOOD_KO, ATTACK_MOVE_BAD_KO, and so on
 - move valuation distinguishes between attacks, defenses, owl attacks
   and owl defenses with or without ko
-- connection moves tested whether they work as owl defenses when
-  connecting an owl critical dragon to something else
+- connections tested as owl defenses when connecting out a critical dragon
 - revised valuation of threats and strategical attacks
 - compute_eyes_pessimistic() revised
 - owl_determine_life() revised
-- new static function compute_aa_status() broken out of three
-  atari_atari functions
+- new static compute_aa_status() broken out of three atari_atari functions
 - tuning
 - connection tuning
 - owl tuning
@@ -30,6 +30,7 @@
 - remove rot* subdirs from EXTRA_DIST
 - bugfix in score.c (typo from 1D conversion)
 - revisions to extract_fuseki: make partial board patterns
+- revised fuseki9.db
 - Corrected VC build error converting unsigned 64-bit long to double
 - regress.pl split into regress.pl & regress.plx
 - added -all, to have regress.pl parse Makefile.in for tstfile list.

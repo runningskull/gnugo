@@ -79,7 +79,7 @@ loadsgf games/incident169.sgf 60
 # Also see connection:23-25.
 loadsgf games/incident169.sgf 110
 65 gg_genmove white
-#? [M17]
+#? [M17]*
 
 # incident 174 (from the disastrous Indigo game)
 loadsgf games/incident169.sgf 132
@@ -116,7 +116,7 @@ loadsgf games/strategy18.sgf
 # Semeai problem.
 loadsgf games/strategy19.sgf 94
 72 gg_genmove white
-#? [A8]
+#? [A8]*
 
 loadsgf games/semeai2.sgf 116
 73 gg_genmove white
@@ -159,7 +159,7 @@ loadsgf games/strategy22.sgf
 # complicated. /gf
 loadsgf games/strategy23.sgf
 81 gg_genmove white
-#? [E13|D13]
+#? [E13|D13]*
 
 loadsgf games/dragon1.sgf 206
 82 gg_genmove black

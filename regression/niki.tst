@@ -21,7 +21,7 @@ loadsgf games/niki.sgf 40
 #SEVERITY=10
 loadsgf games/niki.sgf 68
 3 gg_genmove white
-#? [E12]*
+#? [E12]
 
 loadsgf games/niki.sgf 92
 4 gg_genmove white
@@ -32,7 +32,7 @@ loadsgf games/niki.sgf 92
 #looks okay. Otherwise we need to fix the owl reading. /gf
 loadsgf games/niki.sgf 94
 5 gg_genmove white
-#? [S9|S10]
+#? [S9|S10]*
 
 loadsgf games/niki.sgf 106
 6 gg_genmove white

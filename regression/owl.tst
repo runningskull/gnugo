@@ -201,7 +201,7 @@ loadsgf games/incident201.sgf 297
 57 owl_defend M19
 #? [1 T13]*
 58 owl_attack T19
-#? [1 (T13|N19)]*
+#? [1 (T13|N19)]
 59 owl_defend T19
 #? [1 (Q19|T13)]
 
@@ -425,7 +425,7 @@ loadsgf games/incident169.sgf 210
 113 owl_attack L2
 #? [1 K2]
 114 owl_defend L2
-#? [1 K2]*
+#? [1 K2]
 
 loadsgf games/ko1.sgf
 115 owl_attack L5
@@ -784,7 +784,7 @@ loadsgf games/owl27.sgf
 # K19 only gives ko.
 loadsgf games/FSF-neurogo.sgf 286
 215 owl_attack J15
-#? [1 H18]*
+#? [1 H18]
 216 owl_defend J15
 #? [1 (H18|K19)]
 

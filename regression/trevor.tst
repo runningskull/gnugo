@@ -39,7 +39,7 @@ loadsgf games/trevor/trevor_02.sgf
 #PREDECESSOR=reading.tst.154
 loadsgf games/trevor/trevor_03.sgf 28
 3 gg_genmove white
-#? [!E3]*
+#? [!E3]
 
 #simple edge block missed.
 loadsgf games/trevor/trevor_04.sgf 30
@@ -100,7 +100,7 @@ loadsgf games/trevor/trevor_06.sgf 22
 #DIFFICULTY=6
 loadsgf games/trevor/trevor_07.sgf 32
 7 gg_genmove white
-#? [!C5]*
+#? [!C5]
 
 #Pattern missing here?  B8 is almost always better than B9.
 loadsgf games/trevor/trevor_08.sgf 24
@@ -144,7 +144,7 @@ loadsgf games/trevor/trevor_14.sgf
 #protecting at E7 is very necessary.
 loadsgf games/trevor/trevor_15.sgf 
 15 gg_genmove white
-#? [E7]
+#? [E7]*
 
 # C1 looks best here.  A7 very unorthodox, and at least
 # worse for ko threats.
@@ -182,17 +182,17 @@ loadsgf games/trevor/trevor_17.sgf 22
 # C8 is terrible.
 loadsgf games/trevor/trevor_17.sgf 28
 171 gg_genmove white
-#? [!C8]*
+#? [!C8]
 
 # Snapback!
 loadsgf games/trevor/trevor_18.sgf 32
 180 gg_genmove white
-#? [!A8]*
+#? [!A8]
 
 # Whoops, don't let go of the dragon's tail!
 loadsgf games/trevor/trevor_19.sgf 12
 190 gg_genmove white
-#? [B7]*
+#? [B7]
 
 # W should connect his two dragons.
 loadsgf games/trevor/trevor_20.sgf 14
@@ -224,7 +224,7 @@ loadsgf games/trevor/trevor_22.sgf 23
 # F2 is not really sente, nor useful if it were!
 loadsgf games/trevor/trevor_23.sgf 27
 230 gg_genmove black
-#? [C2|B2]*
+#? [C2|B2]
 
 
 # Connect the dragons!  One eye is not enough, anyway.

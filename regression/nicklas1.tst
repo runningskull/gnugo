@@ -26,7 +26,7 @@ loadsgf games/nicklas/nicklas2.sgf 9
 #SEVERITY=4
 loadsgf games/nicklas/nicklas2.sgf 23
 203 gg_genmove black
-#? [J5]*
+#? [J5]
 
 loadsgf games/nicklas/nicklas2.sgf 39
 204 gg_genmove black
@@ -42,7 +42,7 @@ loadsgf games/nicklas/nicklas3.sgf 49
 
 loadsgf games/nicklas/nicklas5.sgf 23
 501 gg_genmove black
-#? [G7]*
+#? [G7]
 
 loadsgf games/nicklas/nicklas5.sgf 27
 502 gg_genmove black
@@ -83,7 +83,7 @@ loadsgf games/nicklas/nicklas8.sgf 224
 #DESCRIPTION=Is GnuGo misreading the cut?
 loadsgf games/nicklas/nicklas8.sgf 240
 811 gg_genmove black
-#? [K14|K15]*
+#? [K14|K15]
 
 loadsgf games/nicklas/nicklas9.sgf 28
 901 gg_genmove black
@@ -191,7 +191,7 @@ loadsgf games/nicklas/nicklas12.sgf 215
 # H3 doesn't seem critical. /gf
 loadsgf games/nicklas/nicklas12.sgf 259
 1216 gg_genmove black
-#? [H3]*
+#? [H3]
 
 loadsgf games/nicklas/nicklas13.sgf 57
 1302 gg_genmove black
@@ -216,7 +216,7 @@ loadsgf games/nicklas/nicklas14.sgf 55
 # Semeai problem
 loadsgf games/nicklas/nicklas14.sgf 57
 1406 gg_genmove black
-#? [B6]*
+#? [B6]
 
 loadsgf games/nicklas/nicklas14.sgf 61
 1408 dragon_status A8
@@ -273,7 +273,7 @@ loadsgf games/nicklas/nicklas16.sgf 28
 # Missed connection. See also connection:26,27
 loadsgf games/nicklas/nicklas16.sgf 38
 1603 gg_genmove black
-#? [B4]
+#? [B4]*
 
 loadsgf games/nicklas/nicklas16.sgf 62
 1604 gg_genmove black

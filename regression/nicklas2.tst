@@ -83,7 +83,7 @@ loadsgf games/nicklas/nicklas13.sgf 49
 #I would delete this regression test. -trevor
 loadsgf games/nicklas/nicklas14.sgf 31
 1401 gg_genmove black
-#? [B3]*
+#? [B3]
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=Black must protect his group.  H9 is thinkable also.
@@ -119,7 +119,7 @@ loadsgf games/nicklas/nicklas17.sgf 47
 # Owl reading problem. See also owl:228.
 loadsgf games/nicklas/nicklas18.sgf 17
 1802 gg_genmove black
-#? [E2]
+#? [E2]*
 
 
 #CATEGORY=WASTED_MOVE
