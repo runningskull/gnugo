@@ -1,0 +1,66 @@
+(;GM[1]FF[3]
+VW[]AP[Many Faces of Go:10.0]SZ[13]HA[0]ST[1]
+PB[GnuGo 3.0.0]
+PW[Goliath 3.5]
+DT[2001-09-27]
+PC[OS]KM[5.5]RU[Japanese]
+RE[W+38.5]
+AN[Mertin]US[Mertin]
+EV[CGoT]
+GN[GNU Go 3.0.0 Random Seed 1001542052 level 10]
+;B[kd];W[dc];B[cj];W[ce];B[jk];W[ic];B[gc];W[ie];B[jf];W[if];B[jh];
+W[ig];B[ej];W[ge];B[ib];W[jb];B[hi];W[jg];B[lb];W[je];B[cg];W[kh];
+B[gk];W[lc];B[ld];W[kc];B[lf];W[ih];B[jd];W[jc];B[lh];W[md];B[id];
+W[li];B[hd];W[fd];B[fc];W[ed];B[hb];W[mb];B[la];W[ja];B[bf];W[be];
+B[eb];W[db];B[gg];W[lg];B[me];W[kf];B[he];W[hf];B[gf];W[dg];B[df];
+W[cf];B[ef];W[bg];B[mc];W[lk];B[bh];W[ch];B[bi];W[md];B[eh]
+C[ I think B leads by ca. 30 points...];W[mc]C[ ... but ...]
+(;B[ia]C[ ??];W[hc]C[ !];B[gd]C[... and now ...];W[gb]
+C[ W leads by ca. 10 points!];B[fe];W[eg];B[kl];W[fb];B[ec];W[ea];
+B[dd];W[cd];B[ee];W[fg];B[ji];W[fh]
+(;B[gh]C[ ?];W[fi];B[ei];W[ll];B[lm];W[kj];B[gi];W[fj];B[fk];W[ii];
+B[jj];W[ij];B[ag];W[af];B[ah];W[gj]
+(;B[hj]C[ ?];W[ik];B[hk];W[il];B[hl];W[hm];B[gm];W[im];B[de];W[ke];
+B[le]
+(;W[dh];B[di];W[mg];B[ff];W[cg];B[ci];;B[hg];;B[mf];;B[hh];;C[W+38.5])
+
+(;W[ci];B[bj])
+)
+
+(;B[hk];W[ik];B[il];W[hj];B[ff])
+)
+
+(;B[fi]C[ !];W[gh];B[ff];W[gi];B[gj];W[ii];B[ij])
+)
+
+(;B[ga]C[ ?];W[fb];B[ia];W[ea]
+(;B[hc];W[ec];B[ka];W[ke];B[kb];W[ma];B[le];W[mg];B[la];W[mf];B[ka];
+W[gb];B[lb];W[kb];B[la];W[gd])
+
+(;B[ec];W[fa];B[ke];W[mg];B[ka];W[mf];B[kb];W[ma];B[la];W[gd];B[hc];
+W[da];B[ka];W[gb];B[lb];W[kb];B[la];W[le])
+)
+
+(;B[gd]C[ !];W[fe];B[ia]
+(;W[ga];B[fa]
+(;W[gb];B[hc];W[ec];B[ka];W[ke];B[kb];W[ma];B[le];W[mg];B[la];W[mf];
+B[lb];W[da];B[kb];W[ka];B[lb];W[ea];B[kb];W[fb];B[la]C[ ca. B+12])
+
+(;W[ec];B[hc];W[da];B[ka];W[ea];B[kb];W[ma];B[la];W[fb];B[lb];W[ke];
+B[le];W[mg];B[ka];W[kb];B[la];W[ha];B[ka])
+)
+
+(;W[fb];B[fa])
+
+(;W[fa];B[ga]
+(;W[ea];B[fb];W[da];B[hc])
+
+(;W[ec];B[fb])
+)
+
+(;W[hc];B[ga])
+)
+
+(;B[hc];W[ke];B[le];W[ia];B[ha];W[ec])
+
+)

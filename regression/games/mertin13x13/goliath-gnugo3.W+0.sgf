@@ -1,0 +1,86 @@
+(;
+GM[1]FF[4]VW[]AP[Many Faces of Go:10.0]
+SZ[13]
+HA[0]
+ST[1]
+PB[Goliath 3.5]
+PW[GnuGo 3.0.0]
+DT[2001-09-23]
+PC[OS]
+KM[5.5]
+RU[Japanese]
+RE[W+0.5]
+AN[Mertin]
+US[Mertin]
+EV[CGoT]
+GN[GNU Go 3.0.0 Random Seed 1001274836 level 10];B[kc]
+C[ (preset - vorgegeben)]
+;W[cd];B[ec];W[kk];B[cc];W[ck];B[dd];W[ce]
+;B[bc];W[jd];B[jc];W[id];B[hb];W[cg];B[ef];W[le];B[hk];W[ci]
+;B[eh];W[fk];B[gh];W[ig];B[ii];W[kh];B[ej];W[fl];B[hl];W[ge]
+;B[jl];W[kj];B[kl];W[ll];B[fj];W[bd];B[ad];W[ae];B[ac];W[af]
+C[ (?)]
+
+;B[ld];W[kd];B[lc];W[jk];B[me];W[lf];B[mf];W[mg];B[md];W[ij]
+C[(?)]
+
+;B[hj]
+C[(?)]
+;W[ji]
+C[ ?]
+
+(;B[ih]
+C[ ?]
+;W[lg];B[hg];W[if];B[lm];W[ml];B[df]
+(;W[ik]
+C[ ?]
+;B[il];W[ic];B[ib];W[gl]
+C[ ?]
+;B[cf]
+(;W[bg]
+C[ !]
+;B[hf]
+C[ (?)]
+;W[he];B[dg];W[bf];B[dh];W[jh];B[di]
+(;W[be]
+C[ ???]
+;B[ch]
+(;W[bi]
+(;B[fg]
+C[ ???]
+;W[bh]
+(;B[gk];W[dk];B[ek];W[el];B[dj];W[gf];B[hc];W[gg];B[hh]
+;W[gm]
+(;B[hm];W[cj];B[gd];W[de];B[ee];W[fe];B[fd];W[hd];B[km]
+;W[ff];;W[lk];;W[mm];;
+C[ W+0.5]
+)
+(;B[cj];W[bj];B[gd];W[fd];B[fc];W[hd];B[gc];W[hm];B[im]
+;W[ee];B[de];W[fe];B[ed];W[ff];B[km];W[lk]
+C[W+3.5]
+))
+(;B[dk];W[dl];B[gd];W[gc];B[hc];W[fd];B[hd];W[fe];B[fc]
+;W[ek];B[dj];W[cj];B[gk];W[gf];B[gg];W[hi];B[hh];W[km];B[jm]
+;W[hm];B[de]
+C[W+2.5]
+))
+(;B[bh]
+C[ !]
+;W[ah];B[de]))
+(;W[bh]
+(;B[cj]
+C[ !]
+
+(;W[bi];B[bj])
+(;W[bj];B[bi];W[ai];B[ci];W[bk];B[ah]))
+(;B[bi]
+C[ ?]
+;W[cj])))
+(;W[ch]))
+(;W[bf]
+C[ ?]
+;B[de];W[bg];B[be]))
+(;W[cf]))
+(;B[lg]
+C[ !]
+;W[kg];B[mh];W[li];B[mi];W[mj];B[ih]))
