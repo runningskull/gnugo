@@ -1034,7 +1034,7 @@ int is_false_eye(struct half_eye_data heye[BOARDMAX], int pos);
  * (i, j) is a "relevant" board position for info. */
 void abortgo(const char *file, int line, const char *msg, int i, int j);
 
-#if 1
+#if GG_TURN_OFF_ASSERTS
 #define ASSERT2(x, i, j)
 #define ASSERT1(x, pos)
 #else
