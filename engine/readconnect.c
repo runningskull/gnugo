@@ -2597,16 +2597,28 @@ find_connection_moves(int str1, int str2, int color_to_move,
 
   /* Filter out moves with distance at least 1.5 more than the best
    * move, or with distance higher than the cutoff specified.
+   *
+   * In order to further reduce the branching factor, a decreasing
+   * cutoff is applied between candidates. For instance, in this case
+   *   1. d    2. d+0.5   3. d+1.0   4. d+1.5
+   * the 4th candidate will be tested, while in following one
+   *   1. d    2. d+0.1   3. d+0.2   4. d+1.5
+   * it will be discarded.
    */
   if (num_moves <= 1 || !is_ko(moves[0], color_to_move, NULL))
     distance_limit = distances[0] + FP(1.5);
   else
     distance_limit = distances[1] + FP(1.5);
 
-  for (r = 0; r < num_moves; r++)
+  for (r = 0; r < num_moves; r++) {
+    if (r > 0
+	&& distances[r] > distances[r-1]
+	&& distances[r] - distances[r-1] > (8 - r) * FP(0.2))
+      break;
     if (distances[r] > distance_limit
 	|| distances[r] > cutoff)
       break;
+  }
   num_moves = r;
 
   return num_moves;

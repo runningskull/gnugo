@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new heuristic to reduce branching factor in connection reading.
 - resign rather than pass when all own stones seem dead
 - lively_dragon_exists() based on status rather than crude_status
 - potential_moves[] array converted to 1D
