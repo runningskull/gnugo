@@ -33,9 +33,6 @@
  * (Reading/Hashing) for more information.  
  */
 
-/* Dump (almost) all read results. */
-#define TRACE_READ_RESULTS 0
-
 /* Hash values and the compact board representation should use the
  * longest integer type that the platform can handle efficiently.
  * Typically this would be a 32 bit integer on a 32 bit platform and a

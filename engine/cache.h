@@ -354,13 +354,12 @@ int get_read_result2(enum routine_id routine, int komaster, int kom_pos,
  * return a result from a reading function and where we want to
  * store the result in the hash table at the same time.
  */
-#if !TRACE_READ_RESULTS
 
 #define READ_RETURN0_NG(komaster, kom_pos, routine, str, remaining_depth) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, NULL,\
-              0, 0, NO_MOVE);\
-    return 0; \
+    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, \
+	      NULL, 0, 0, NO_MOVE);\
+   return 0; \
   } while (0)
 
 #define READ_RETURN_NG(komaster, kom_pos, routine, str, remaining_depth, point, move, value) \
@@ -379,7 +378,7 @@ int get_read_result2(enum routine_id routine, int komaster, int kom_pos,
     return (value1); \
   } while (0)
 
-/* ---------------- */
+#if !TRACE_READ_RESULTS
 
 #define READ_RETURN0(read_result) \
   do { \
@@ -397,7 +396,6 @@ int get_read_result2(enum routine_id routine, int komaster, int kom_pos,
     } \
     return (value); \
   } while (0)
-
 
 #define READ_RETURN_SEMEAI(read_result, point, move, value_a, value_b) \
   do { \
