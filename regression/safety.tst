@@ -10,7 +10,7 @@ loadsgf games/nngs/gnugo-3.3.6-xtc-200208301619.sgf 16
 
 loadsgf games/nngs/gnugo-3.3.6-xtc-200208301619.sgf 20
 2 gg_genmove white
-#? [Q7|P6|R7|S1|S5|R6|O5]*
+#? [Q7|P6|R7|S1|S5|R6|O5]
 
 loadsgf games/cgf2002/gnu-har.sgf 19
 3 gg_genmove black
@@ -22,7 +22,7 @@ loadsgf games/cgf2002/gnu-har.sgf 21
 
 loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203080451.sgf 42
 5 gg_genmove white
-#? [K8|L9|L7]*
+#? [K8|L9|L7]
 
 # K6 is probably best.
 loadsgf games/nngs/abcd-gnugo-3.3.8-200209202043.sgf 12

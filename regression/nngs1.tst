@@ -37,7 +37,7 @@ loadsgf games/nngs/gnugo-3.1.26-journeyman-200203020154.sgf 24
 
 loadsgf games/nngs/gnugo-3.1.26-journeyman-200203020154.sgf 32
 8 gg_genmove white
-#? [M10|L9]*
+#? [M10|L9]
 
 loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 44
 9 gg_genmove black
@@ -147,7 +147,7 @@ loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 30
 
 loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 44
 35 gg_genmove white
-#? [D13]*
+#? [D13]
 
 loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 64
 36 gg_genmove white

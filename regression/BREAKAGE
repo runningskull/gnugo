@@ -1,4 +1,44 @@
-======================= 3.3.10 pre 1  =========================   
+======================= 3.3.10 pre 2  =========================
+
+./regress.sh . owl.tst 
+23 unexpected PASS!
+180 unexpected PASS!
+262 unexpected FAIL: Correct '0', got '1 E8'
+./regress.sh . nngs1.tst 
+8 unexpected PASS!
+35 unexpected PASS!
+./regress.sh . neurogo.tst 
+12 unexpected FAIL: Correct 'B10', got 'S8'
+./regress.sh . viking.tst 
+10 unexpected PASS!
+./regress.sh . trevorb.tst 
+690 unexpected PASS!
+./regress.sh . nicklas1.tst 
+1213 unexpected FAIL: Correct 'N4', got 'F12'
+./regress.sh . nngs.tst 
+300 unexpected PASS!
+./regress.sh . 13x13.tst 
+15 unexpected FAIL: Correct 'C7|B7|C6|B6|B5|C5', got 'E8'
+16 unexpected PASS!
+21 unexpected PASS!
+149 unexpected FAIL: Correct 'L7', got 'L9'
+./regress.sh . semeai.tst 
+./regress.sh . trevord.tst 
+./regress.sh . strategy4.tst 
+./regress.sh . owl1.tst 
+283 unexpected PASS!
+./regress.sh . nngs3.tst 
+670 unexpected PASS!
+680 unexpected PASS!
+750 unexpected FAIL: Correct 'L17|L18', got 'K18'
+./regress.sh . century2002.tst 
+200 unexpected PASS!
+261 unexpected PASS!
+./regress.sh . safety.tst 
+2 unexpected PASS!
+5 unexpected PASS!
+
+======================= 3.3.10 pre 1  =========================
 
 ./regress.sh . reading.tst 
 37 unexpected PASS!

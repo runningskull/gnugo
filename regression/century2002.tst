@@ -108,7 +108,7 @@ loadsgf games/century21-2002/gnugo-katsunari.sgf 26
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 36
 200 gg_genmove white
-#? [F6]*
+#? [F6]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 58
 210 gg_genmove white
@@ -127,7 +127,7 @@ loadsgf games/century21-2002/gnugo-katsunari.sgf 156
 260 gg_genmove white
 #? [S12|Q12|Q13]
 261 owl_defend J12
-#? [0]*
+#? [0]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 202
 270 gg_genmove white

@@ -43,7 +43,7 @@ loadsgf games/viking3.sgf 103
 # K15 leaves too many cutting points.
 loadsgf games/viking3.sgf 113
 10 gg_genmove white
-#? [K16]*
+#? [K16]
 
 loadsgf games/viking3.sgf 113
 11 gg_genmove white

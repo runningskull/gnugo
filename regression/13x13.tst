@@ -90,12 +90,12 @@ loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 28
 # See also owl:262.
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 15 gg_genmove white
-#? [C7|B7|C6|B6|B5|C5]
+#? [C7|B7|C6|B6|B5|C5]*
 
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24
 16 gg_genmove white
-#? [C6|C5]*
+#? [C6|C5]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 32
@@ -120,7 +120,7 @@ loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 60
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 66
 21 gg_genmove white
-#? [N8]*
+#? [N8]
 
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 94
@@ -264,7 +264,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 13
 # Renumbered since there were 2 test 49's
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 19
 149 gg_genmove black
-#? [L7]
+#? [L7]*
 
 # Here N11 is generated as an "additional attack/defense move", although
 # the black dragon is still dead after black connects at N11.

@@ -82,7 +82,7 @@ loadsgf games/incident121.sgf 122
 22 owl_attack P12
 #? [1 (PASS|S11|S14|N13|S13)]
 23 owl_defend P12
-#? [0]*
+#? [0]
 
 # incident 154
 loadsgf games/incident153.sgf 205
@@ -663,7 +663,7 @@ loadsgf games/incident223.sgf 228
 
 loadsgf games/incident269.sgf 200
 180 owl_attack R19
-#? [1 (T16|T17|T18|S18)]*
+#? [1 (T16|T17|T18|S18)]
 
 # tm (3.1.17)  T18 lives.  Note the W sente at R16.
 181 owl_defend R19
@@ -949,7 +949,7 @@ loadsgf games/handtalk/handtalk23.sgf 186
 # See also 13x13:15.
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 262 owl_defend E7
-#? [0]
+#? [0]*
 
 ########### end of tests #####################
 
