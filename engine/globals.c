@@ -32,42 +32,14 @@
  * Define all global variables used within the engine.
  */
 
-
-/* The go board and position. */
-int          board_size = DEFAULT_BOARD_SIZE; /* board size */
-Intersection board[BOARDSIZE];
-int          board_ko_pos;
-int          white_captured;    /* number of black and white stones captured */
-int          black_captured;
-
-Intersection initial_board[BOARDSIZE];
-int          initial_board_ko_pos;
-int          initial_white_captured;
-int          initial_black_captured;
-int          move_history_color[MAX_MOVE_HISTORY];
-int          move_history_pos[MAX_MOVE_HISTORY];
-int          move_history_pointer;
-
-
 int thrashing_dragon = NO_MOVE; /* Dead opponent's dragon trying to live. */
 char thrashing_stone[BOARDMAX]; /* All thrashing stones. */
-
-float        komi;
-int          movenum;
-
-Intersection shadow[BOARDMAX];
-
-/* Hashing of positions. */
-Hash_data            hashdata;
-Transposition_table  ttable;
 
 int hashflags = HASH_DEFAULT;
 
 float potential_moves[MAX_BOARD][MAX_BOARD];
 
 /* Used by reading. */
-int stackp;             /* stack pointer */
-int position_number;    /* position number */
 int depth;              /* deep reading cut off */
 int backfill_depth;     /* deep reading cut off */
 int backfill2_depth;    /* deep reading cut off */
@@ -112,9 +84,6 @@ int allpats           = 0;  /* generate all patterns, even small ones */
 int printworms        = 0;  /* print full data on each string */
 int printmoyo         = 0;  /* print moyo board each move */
 int printboard        = 0;  /* print board each move */
-int count_variations  = 0;  /* used by decide_string */
-int sgf_dump          = 0;  /* used by decide_string */
-SGFTree *sgf_dumptree = NULL;
 int loading           = 0;  /* TRUE if last loaded move comes from file */
 int fusekidb          = 1;  /* use fuseki database */
 int disable_fuseki    = 0;  /* do not generate fuseki moves */
@@ -153,7 +122,6 @@ int experimental_owl_ext = EXPERIMENTAL_OWL_EXT;
 /* use experimental territory break-in module */
 int experimental_break_in = USE_BREAK_IN;
 
-int allow_suicide       = 0;    /* allow opponent to make suicide moves */
 int capture_all_dead    = 0;    /* capture all dead opponent stones */
 int play_out_aftermath  = 0;    /* make everything unconditionally settled */
 int resign_allowed      = 0;    /* resign hopeless games */
@@ -175,9 +143,6 @@ int number_close_white_worms[BOARDMAX];
 
 int false_eye_territory[BOARDMAX];
 int forced_backfilling_moves[BOARDMAX];
-
-/* Various statistics are collected here. */
-struct stats_data stats;
 
 struct worm_data      worm[BOARDMAX];
 struct dragon_data    dragon[BOARDMAX];

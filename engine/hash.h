@@ -20,8 +20,8 @@
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include <stdio.h>
-#include "gnugo.h"
+
+#include "config.h"
 
 /*
  * This file, together with engine/hash.c implements hashing of go positions
@@ -136,6 +136,7 @@ typedef struct {
 #endif
 } Hash_data;
 
+extern Hash_data hashdata;
 
 Hash_data xor_hashvalues(Hash_data *key1, Hash_data *key2);
 Hash_data goal_to_hashvalue(const char *goal);
@@ -230,12 +231,7 @@ char *hashdata_to_string(Hash_data *hashdata);
 
 #endif
 
-
-
-extern void          hash_ng_init(void);
-extern void          calculate_hashval_for_tt(int komaster, int kom_pos,
-					      int routine, int target,
-					      Hash_data *hashdata);
+extern void hash_ng_init(void);
 
 
 #endif

@@ -390,17 +390,17 @@ decide_tactical_semeai(int apos, int bpos)
 
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0, &dummy);
   gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
-	  color == BLACK ? "black" : "white",
+	  color_to_string(color),
 	  move,
-	  apos, safety_to_string(resulta),
-  	  bpos, safety_to_string(resultb),
+	  apos, status_to_string(resulta),
+  	  bpos, status_to_string(resultb),
 	  count_variations);
   owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 0, &dummy);
   gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
-	  color == BLACK ? "white" : "black",
+	  color_to_string(color),
 	  move,
-	  apos, safety_to_string(resulta),
-  	  bpos, safety_to_string(resultb),
+	  apos, status_to_string(resulta),
+  	  bpos, status_to_string(resultb),
 	  count_variations);
 
   sgffile_enddump(outfilename);
@@ -527,11 +527,8 @@ decide_eye(int pos)
   reset_engine();
   silent_examine_position(BLACK, EXAMINE_DRAGONS_WITHOUT_OWL);
   
-  if (black_eye[pos].color == BLACK_BORDER) 
-    color = BLACK;
-  else if (white_eye[pos].color == WHITE_BORDER) 
-    color = WHITE;
-  else {
+  color = black_eye[pos].color;
+  if (!IS_STONE(color)) {
     gprintf("The eye at %1m is not of a single color.\n", pos);
     return;
   }
@@ -544,7 +541,7 @@ decide_eye(int pos)
     sgffile_begindump(&tree);
   count_variations = 1;
   
-  if (black_eye[pos].color == BLACK_BORDER) {
+  if (black_eye[pos].color == BLACK) {
     eyepos = black_eye[pos].origin;
     compute_eyes(eyepos, &value, &attack_point, &defense_point,
 		 black_eye, half_eye, 0, EMPTY);
@@ -555,7 +552,7 @@ decide_eye(int pos)
     }
   }
   
-  if (white_eye[pos].color == WHITE_BORDER) {
+  if (white_eye[pos].color == WHITE) {
     eyepos = white_eye[pos].origin;
     compute_eyes(eyepos, &value, &attack_point, &defense_point,
 		 white_eye, half_eye, 0, EMPTY);

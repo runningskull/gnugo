@@ -29,6 +29,7 @@
 #ifndef _GNUGO_H_
 #define _GNUGO_H_
 
+#include "board.h"
 
 #include <stdio.h>
 
@@ -53,25 +54,9 @@ void init_gnugo(float memory, unsigned int random_seed);
 /* ================================================================ */
 
 
-/* Board size */
-
-#define DEFAULT_BOARD_SIZE 19
-
-/* Colors */
-#define EMPTY        0
-#define WHITE        1
-#define BLACK        2
-#define GRAY         3
-#define GRAY_BORDER  3
-#define WHITE_BORDER 4
-#define BLACK_BORDER 5
+/* Used in matchpat.c. Have to be different from WHITE, BLACK. */
 #define ANCHOR_COLOR 6
 #define ANCHOR_OTHER 7
-
-
-#define OTHER_COLOR(color)  	(WHITE+BLACK-(color))
-#define IS_STONE(arg)   	((arg) == WHITE || (arg) == BLACK)
-#define BORDER_COLOR(color)	(color + WHITE_BORDER - WHITE)
 
 /* Return codes for reading functions */
 
@@ -82,26 +67,11 @@ void init_gnugo(float memory, unsigned int random_seed);
 #define KO_B 1
 #define LOSE 0
 
+const char *result_to_string(int result);
+
 /* Used by break_through(). Must be different from 0 and WIN. */
 #define CUT  2
 
-/* Group statuses */
-#define DEAD        0
-#define ALIVE       1
-#define CRITICAL    2 
-#define UNKNOWN     3
-#define UNCHECKED   4
-#define MAX_DRAGON_STATUS 4	/* used to size an array in matchpat.c */
-
-/* Dragon safety values. DEAD, ALIVE, and CRITICAL are reused. */
-#define INESSENTIAL     5
-#define TACTICALLY_DEAD 6
-#define ALIVE_IN_SEKI   7
-#define STRONGLY_ALIVE  8
-#define INVINCIBLE      9
-#define INSUBSTANTIAL   10
-#define CAN_THREATEN_ATTACK  11
-#define CAN_THREATEN_DEFENSE 12
 
 /* Surrounded */
 
@@ -116,23 +86,6 @@ void init_gnugo(float memory, unsigned int random_seed);
 /* ================================================================ */
 /*                        Board manipulation                        */
 /* ================================================================ */
-
-
-/* Board sizes */
-#define MIN_BOARD          5	   /* Minimum supported board size.   */
-#define MAX_BOARD         19       /* Maximum supported board size.   */
-#define MAX_HANDICAP       9	   /* Maximum supported handicap.     */
-#define MAX_MOVE_HISTORY 500       /* Max number of moves remembered. */
-
-/* This type is used to store each intersection on the board.
- *
- * On a 486, char is best, since the time taken to push and pop
- * becomes significant otherwise. On other platforms, an int may
- * be better, e.g. if memcpy() is particularly fast, or if
- * character access is very slow.
- */
-
-typedef unsigned char Intersection;
 
 
 void gnugo_clear_board(int boardsize);
@@ -282,7 +235,6 @@ extern int experimental_semeai;      /* use experimental semeai module */
 extern int experimental_connections; /* use experimental connection module */
 extern int alternate_connections;    /* use alternate connection module */
 extern int owl_threats;              /* compute owl threats */
-extern int allow_suicide;            /* allow opponent to make suicide moves */
 extern int capture_all_dead;         /* capture all dead opponent stones */
 extern int play_out_aftermath; /* make everything unconditionally settled */
 extern int resign_allowed;           /* allows GG to resign hopeless games */
@@ -340,18 +292,6 @@ void end_draw_board(void);
 void showboard(int xo);  /* ascii rep. of board to stderr */
 void simple_showboard(FILE *outfile);  /* ascii rep. of board to outfile */
 
-/* printutils.c */
-int gprintf(const char *fmt, ...);
-void mprintf(const char *fmt, ...);
-void gfprintf(FILE *outfile, const char *fmt, ...);
-const char *color_to_string(int color);
-const char *location_to_string(int pos);
-void        location_to_buffer(int pos, char *buf);
-const char *status_to_string(int status);
-const char *safety_to_string(int status);
-const char *result_to_string(int result);
-const char *routine_to_string(int routine);
-int string_to_location(int boardsize, char *str, int *m, int *n);
 double gg_gettimeofday(void);
 
 
@@ -402,8 +342,6 @@ void reset_owl_node_counter(void);
 int get_owl_node_counter(void);
 void reset_reading_node_counter(void);
 int get_reading_node_counter(void);
-void reset_trymove_counter(void);
-int get_trymove_counter(void);
 void reset_connection_node_counter(void);
 int get_connection_node_counter(void);
 
@@ -411,33 +349,6 @@ int get_connection_node_counter(void);
 /* ================================================================ */
 /*                         Low level functions                      */
 /* ================================================================ */
-
-
-/* board.c */
-/* General board handling. */
-void clear_board(void);
-int test_gray_border(void);
-void setup_board(Intersection new_board[MAX_BOARD][MAX_BOARD], int ko_pos,
-		 int *last, float new_komi, int w_captured, int b_captured);
-
-
-/* Putting stones on the board.. */
-void add_stone(int pos, int color);
-void remove_stone(int pos);
-void play_move(int pos, int color);
-int undo_move(int n);
-int get_last_move(void);
-int get_last_player(void);
-int get_last_opponent_move(int color);
-int is_pass(int pos);
-int is_legal(int pos, int color);
-int is_suicide(int pos, int color);
-int is_illegal_ko_capture(int pos, int color);
-int trymove(int pos, int color, const char *message, int str, 
-	    int komaster, int kom_pos);
-int tryko(int pos, int color, const char *message, 
-	  int komaster, int kom_pos);
-void popgo(void);
 
 /* utils.c */
 void change_dragon_status(int dr, int status);

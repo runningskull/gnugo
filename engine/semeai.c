@@ -29,7 +29,8 @@
 
 #define INFINITY 1000
 
-static void update_status(int dr, int new_status, int new_safety);
+static void update_status(int dr, enum dragon_status new_status, 
+   			  enum dragon_status new_safety);
 
 
 /* new_semeai() searches for pairs of dragons of opposite color which
@@ -220,7 +221,8 @@ semeai_move_reasons(int color)
 /* Change the status and safety of a dragon */
 
 static void
-update_status(int dr, int new_status, int new_safety)
+update_status(int dr, enum dragon_status new_status,
+    	      enum dragon_status new_safety)
 {
   int pos;
 
@@ -237,7 +239,7 @@ update_status(int dr, int new_status, int new_safety)
   if (DRAGON2(dr).safety != new_safety
       && (DRAGON2(dr).safety != CRITICAL || new_safety != DEAD)) {
     DEBUG(DEBUG_SEMEAI, "Changing safety of %1m from %s to %s.\n", dr,
-	  safety_to_string(DRAGON2(dr).safety), safety_to_string(new_safety));
+	  status_to_string(DRAGON2(dr).safety), status_to_string(new_safety));
     DRAGON2(dr).safety = new_safety;
   }
 }

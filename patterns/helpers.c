@@ -53,10 +53,7 @@ jump_out_helper(ARGS)
 
   UNUSED(trans); UNUSED(pattern);
 
-  if (color == WHITE)
-    own_eyespace = (white_eye[move].color == WHITE_BORDER);
-  else
-    own_eyespace = (black_eye[move].color == BLACK_BORDER);
+  own_eyespace = (white_eye[move].color == color);
   
   if (whose_area(OPPOSITE_INFLUENCE(color), move) != color && !own_eyespace)
     return 1;

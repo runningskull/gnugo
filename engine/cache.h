@@ -91,16 +91,56 @@ typedef struct {
 } Transposition_table;
 
 
+enum routine_id {
+  OWL_ATTACK,
+  OWL_DEFEND,
+  SEMEAI,
+  FIND_DEFENSE,
+  ATTACK,
+  CONNECT,
+  DISCONNECT,
+  BREAK_IN,
+  BLOCK_OFF,
+  OWL_THREATEN_ATTACK,
+  OWL_THREATEN_DEFENSE,
+  OWL_DOES_DEFEND,
+  OWL_DOES_ATTACK,
+  OWL_CONNECTION_DEFENDS,
+  OWL_SUBSTANTIAL,
+  OWL_CONFIRM_SAFETY,
+  NUM_CACHE_ROUTINES
+};
+
+#define ROUTINE_NAMES \
+  "owl_attack", \
+  "owl_defend", \
+  "semeai", \
+  "find_defense", \
+  "attack", \
+  "connect", \
+  "disconnect", \
+  "break_in", \
+  "block_off" \
+  "owl_threaten_attack" \
+  "owl_threatend_defense" \
+  "owl_does_defend" \
+  "owl_does_attack" \
+  "owl_connection_defends" \
+  "owl_substantial" \
+  "owl_confirm_safety"
+
+const char *routine_id_to_string(enum routine_id routine);
+
 extern void  tt_init(Transposition_table *table, int memsize);
 extern void  tt_clear(Transposition_table *table);
 extern void  tt_free(Transposition_table *table);
 extern int   tt_get(Transposition_table *table, 
-		    int komaster, int kom_pos, int routine, int target,
-		    int remaining_depth,
+		    int komaster, int kom_pos, enum routine_id routine,
+		    int target, int remaining_depth,
 		    int *result, int *move);
 extern void  tt_update(Transposition_table *table,
-		       int komaster, int kom_pos, int routine, int target, 
-		       int remaining_depth,
+		       int komaster, int kom_pos, enum routine_id routine,
+		       int target, int remaining_depth,
 		       int result, int move);
 
 
@@ -126,7 +166,7 @@ extern void  tt_update(Transposition_table *table,
  * The data1 field packs into 32 bits the following
  * fields:
  *
- * komaster	   :  3 bits (EMPTY, BLACK, WHITE, or GRAY)
+ * komaster	   :  3 bits (EMPTY, BLACK, WHITE, GRAY, GRAY_WHITE, ...)
  * kom_pos	   : 10 bits (allows MAX_BOARD up to 31)
  * routine	   :  4 bits (currently 10 different choices)
  * str1 	   : 10 bits
@@ -331,12 +371,13 @@ void sgf_trace_semeai(const char *func, int str1, int str2, int move,
 	             result1, result2, message)
 
 
-int get_read_result(int routine, int komaster, int kom_pos,
+int get_read_result(enum routine_id routine, int komaster, int kom_pos,
 		    int *str, Read_result **read_result);
-int get_read_result_hash_modified(int routine, int komaster, int kom_pos,
+int get_read_result_hash_modified(enum routine_id routine,
+				  int komaster, int kom_pos,
 		    		  int *str, Hash_data *hash_modifier,
 				  Read_result **read_result);
-int get_read_result2(int routine, int komaster, int kom_pos,
+int get_read_result2(enum routine_id routine, int komaster, int kom_pos,
 		     int *str1, int *str2, Read_result **read_result);
 
 
@@ -470,38 +511,6 @@ int get_read_result2(int routine, int komaster, int kom_pos,
 
 #endif
 
-/* ================================================================ */
-/* Routine numbers. */
-
-#define OWL_ATTACK      0
-#define OWL_DEFEND      1
-#define SEMEAI          2
-
-#define FIND_DEFENSE    3
-#define ATTACK          4
-
-#define CONNECT         5
-#define DISCONNECT      6
-
-#define BREAK_IN	7
-#define BLOCK_OFF	8
-
-#define MAX_ROUTINE     BLOCK_OFF
-#define NUM_ROUTINES    (MAX_ROUTINE + 1)
-  
-
-/* Routine numbers for the persistent owl cache, in addition to
- * OWL_ATTACK and OWL_DEFEND defined above.
- */
-#define OWL_THREATEN_ATTACK    2
-#define OWL_THREATEN_DEFENSE   3
-#define OWL_DOES_DEFEND        4
-#define OWL_DOES_ATTACK        5
-#define OWL_CONNECTION_DEFENDS 6
-#define OWL_SUBSTANTIAL        7
-#define OWL_CONFIRM_SAFETY     8
-
- 
 
 /* ================================================================ */
 /* This has actually nothing to do with caching, but is useful in

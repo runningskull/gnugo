@@ -1807,8 +1807,8 @@ gtp_tactical_analyze_semeai(char *s)
                      &result_certain);
   gtp_start_response(GTP_SUCCESS);
   gtp_mprintf("%s %s %m", 
-	      safety_to_string(resulta),
-	      safety_to_string(resultb),
+	      status_to_string(resulta),
+	      status_to_string(resultb),
 	      I(move), J(move));
   if (!result_certain && report_uncertainty)
     gtp_printf(" uncertain");
@@ -2018,12 +2018,12 @@ gtp_eval_eye(char *s)
 
   silent_examine_position(BLACK, EXAMINE_DRAGONS_WITHOUT_OWL);
   
-  if (black_eye[POS(m, n)].color == BLACK_BORDER) {
+  if (black_eye[POS(m, n)].color == BLACK) {
     pos = black_eye[POS(m, n)].origin;
     compute_eyes(pos, &value, &attack_point, &defense_point,
 		 black_eye, half_eye, 0, EMPTY);
   }
-  else if (white_eye[POS(m, n)].color == WHITE_BORDER) {
+  else if (white_eye[POS(m, n)].color == WHITE) {
     pos = white_eye[POS(m, n)].origin;
     compute_eyes(pos, &value, &attack_point, &defense_point,
 		 white_eye, half_eye, 0, EMPTY);

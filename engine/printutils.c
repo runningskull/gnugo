@@ -20,18 +20,15 @@
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "gnugo.h"
+#include "board.h"
+#include "hash.h"
+#include "gg_utils.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
-
-#include "liberty.h"
-#include "gnugo.h"
-#include "gg_utils.h"
-#include "cache.h"
 
 /*
  * This function underpins all the TRACE and DEBUG stuff.
@@ -40,7 +37,6 @@
  * Other accepted formats are
  * %H: Print a hashvalue.
  * %C: Print a color as a string.
- * %r: Print a result as a string.
  * Nasty bodge: %o at the start means outdent, i.e. cancel indent.
  */
 
@@ -158,12 +154,6 @@ vgprintf(FILE *outputfile, const char *fmt, va_list ap)
 	fputs(color_to_string(color), outputfile);
 	break;
       }
-      case 'r':
-      {
-	int result = va_arg(ap, int);
-	fputs(result_to_string(result), outputfile);
-	break;
-      }
       default:
 	fprintf(outputfile, "\n\nUnknown format character '%c'\n", *fmt);
 	break;
@@ -249,16 +239,15 @@ DEBUG_func(int flag, const char *fmt, ...)
 void 
 abortgo(const char *file, int line, const char *msg, int pos)
 {
-  verbose = 4;
-  TRACE("%o\n\n***assertion failure:\n%s:%d - %s near %1m***\n\n",
-	file, line, msg, pos);
+  gprintf("%o\n\n***assertion failure:\n%s:%d - %s near %1m***\n\n",
+	  file, line, msg, pos);
   dump_stack();
 
   /* Dump the stack as board images. */
-  showboard(0);
+  simple_showboard(stderr);
   while (stackp > 0) {
     popgo();
-    showboard(0);
+    simple_showboard(stderr);
   }
 
 #if 0
@@ -284,25 +273,16 @@ If you can, please also include the debug output above this message.\n");
   abort();  /* cause core dump */
 }
 
+static const char* color_names[] = {
+  COLOR_NAMES
+};
 
 /* Convert a color value to a string. */
 const char *
 color_to_string(int color)
 {
-  if (color == EMPTY)
-    return "empty";
-  else if (color == WHITE)
-    return "white";
-  else if (color == BLACK)
-    return "black";
-  else if (color == GRAY)
-    return "gray";
-  else if (color == WHITE_BORDER)
-    return "white border";
-  else if (color == BLACK_BORDER)
-    return "black border";
-  else
-    return "purple?";
+  gg_assert(color < NUM_KOMASTER_STATES);
+  return color_names[color];
 }
 
 /* Convert a location to a string. */
@@ -348,104 +328,6 @@ location_to_buffer(int pos, char *buf)
   *bufp = 0;
 }
 
-/* Convert a status value to a string. */
-const char *
-status_to_string(int status)
-{
-  if (status == DEAD)
-    return "DEAD";
-  else if (status == ALIVE)
-    return "ALIVE";
-  else if (status == CRITICAL)
-    return "CRITICAL";
-  else if (status == UNKNOWN)
-    return "UNKNOWN";
-  else if (status == UNCHECKED)
-    return "UNCHECKED";
-  else if (status == CAN_THREATEN_ATTACK)
-    return "CAN_THREATEN_ATTACK";
-  else if (status == CAN_THREATEN_DEFENSE)
-    return "CAN_THREATEN_DEFENSE";
-  else
-    return "ERROR";
-}
-
-
-/* Convert a safety value to a string. */
-const char *
-safety_to_string(int status)
-{
-  if (status == DEAD)
-    return "DEAD";
-  else if (status == ALIVE)
-    return "ALIVE";
-  else if (status == CRITICAL)
-    return "CRITICAL";
-  else if (status == INESSENTIAL)
-    return "INESSENTIAL";
-  else if (status == TACTICALLY_DEAD)
-    return "TACTICALLY_DEAD";
-  else if (status == ALIVE_IN_SEKI)
-    return "ALIVE_IN_SEKI";
-  else if (status == STRONGLY_ALIVE)
-    return "STRONGLY_ALIVE";
-  else if (status == INVINCIBLE)
-    return "INVINCIBLE";
-  else if (status == INSUBSTANTIAL)
-    return "INSUBSTANTIAL";
-  else if (status == CAN_THREATEN_ATTACK)
-    return "CAN_THREATEN_ATTACK";
-  else if (status == CAN_THREATEN_DEFENSE)
-    return "CAN_THREATEN_DEFENSE";
-  else
-    return "ERROR";
-}
-
-/* Convert a routine to a string. */
-const char *
-routine_to_string(int routine)
-{
-  if (routine == FIND_DEFENSE)
-    return "FIND_DEFENSE";
-  else if (routine == ATTACK)
-    return "ATTACK";
-  else if (routine == OWL_ATTACK)
-    return "OWL_ATTACK";
-  else if (routine == OWL_DEFEND)
-    return "OWL_DEFEND";
-  else if (routine == SEMEAI)
-    return "SEMEAI";
-  else if (routine == CONNECT)
-    return "CONNECT";
-  else if (routine == DISCONNECT)
-    return "DISCONNECT";
-  else if (routine == BREAK_IN)
-    return "BREAK_IN";
-  else if (routine == BLOCK_OFF)
-    return "BLOCK_OFF";
-  else
-    return "ERROR";
-}
-
-/* Convert a read result to a string */
-const char *
-result_to_string(int result)
-{
-  switch (result) {
-  case 0:             return "0";
-  case KO_B:          return "KO_B";
-  case LOSS:          return "LOSS";
-  case GAIN:          return "GAIN";
-  case KO_A:          return "KO_A";
-  case WIN:           return "WIN";
-
-  /* ALIVE_IN_SEKI is not defined as a return code, but is used here anyhow. */
-  case ALIVE_IN_SEKI: return "SEKI";
-  default:            return "ERROR";
-  }
-}
-
-
 
 /*
  * Get the (m, n) coordinates in the standard GNU Go coordinate system
@@ -478,6 +360,132 @@ string_to_location(int boardsize, char *str, int *m, int *n)
 
   return 1;
 }
+
+
+/* Some simple functions to draw an ASCII board. */
+
+/* True if the coordinate is a hoshi point. */
+int
+is_hoshi_point(int m, int n)
+{
+  int hoshi;
+  int middle;
+
+  /* No hoshi points on these boards. */
+  if (board_size == 2 || board_size == 4)
+    return 0;
+
+  /* In the middle of a 3x3 board. */
+  if (board_size == 3) {
+    if (m == 1 && n == 1)
+      return 1;
+
+    return 0;
+  }
+
+  if (board_size == 5) {
+    if (m == 1 && (n == 1 || n == 3))
+      return 1;
+    if (m == 2 && n == 2)
+      return 1;
+    if (m == 3 && (n == 1 || n == 3))
+      return 1;
+
+    return 0;
+  }
+
+  /* 3-3 points are hoshi on sizes 7--11, 4-4 on larger. */
+  if (board_size <= 11)
+    hoshi = 2;
+  else
+    hoshi = 3;
+
+  /* Coordinate for midpoint. */
+  middle = board_size/2;
+    
+  /* Normalize the coordinates by mirroring to the lower numbers. */
+  if (m >= middle)
+    m = board_size - 1 - m;
+  if (n >= middle)
+    n = board_size - 1 - n;
+  
+  /* Is this a corner hoshi? */
+  if (m == hoshi && n == hoshi)
+    return 1;
+
+  /* If even sized board, only hoshi points in the corner. */
+  if (board_size%2 == 0)
+    return 0;
+
+  /* Less then 12 in board size only middle point. */
+  if (board_size < 12) {
+    if (m == middle && n == middle)
+      return 1;
+
+    return 0;
+  }
+
+  /* Is this a midpoint hoshi? */
+  if ((m == hoshi || m == middle)
+      && (n == hoshi || n == middle))
+    return 1;
+
+  /* No more chances. */
+  return 0;
+}
+
+
+/* Print a line with coordinate letters above the board. */
+void
+draw_letter_coordinates(FILE *outfile)
+{
+  int i;
+  int ch;
+  
+  fprintf(outfile, "  ");
+  for (i = 0, ch = 'A'; i < board_size; i++, ch++) {
+    if (ch == 'I')
+      ch++;
+    fprintf(outfile, " %c", ch);
+  }
+}
+
+
+/* Bare bones version of showboard(0). No fancy options, no hint of
+ * color, and you can choose where to write it.
+ */
+void
+simple_showboard(FILE *outfile)
+{
+  int i, j;
+
+  draw_letter_coordinates(outfile);
+  
+  for (i = 0; i < board_size; i++) {
+    fprintf(outfile, "\n%2d", board_size - i);
+    
+    for (j = 0; j < board_size; j++) {
+      if (BOARD(i, j) == EMPTY)
+	fprintf(outfile, " %c", is_hoshi_point(i, j) ? '+' : '.');
+      else
+	fprintf(outfile, " %c", BOARD(i, j) == BLACK ? 'X' : 'O');
+    }
+
+    fprintf(outfile, " %d", board_size - i);
+    
+    if ((board_size < 10 && i == board_size-2)
+	|| (board_size >= 10 && i == 8))
+      fprintf(outfile, "     WHITE (O) has captured %d stones", black_captured);
+    
+    if ((board_size < 10 && i == board_size-1)
+	|| (board_size >= 10 && i == 9))
+      fprintf(outfile, "     BLACK (X) has captured %d stones", white_captured);
+  }
+  
+  fprintf(outfile, "\n");
+  draw_letter_coordinates(outfile);
+}
+
 
 
 /*

@@ -22,13 +22,12 @@
 
 /* Convert joseki from sgf format to patterns.db format. */
 
+#include "board.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-#include "../sgf/sgftree.h"
-#include "liberty.h"
 
 #define USAGE "\
 Usage : joseki prefix filename\n\

@@ -23,17 +23,8 @@
 #ifndef _LIBERTY_H_
 #define _LIBERTY_H_
 
+#include "board.h"
 #include "gnugo.h"
-
-/* local versions of absolute value, min and max */
-
-#define gg_abs(x) ((x) < 0 ? -(x) : (x))
-#define gg_min(a, b) ((a)<(b) ? (a) : (b))
-#define gg_max(a, b) ((a)<(b) ? (b) : (a))
-
-/* Avoid compiler warnings with unused parameters */
-#define UNUSED(x)  (void)x
-
 
 /* ================================================================ */
 /*                           public variables                       */
@@ -41,16 +32,8 @@
 
 
 /* We need the defintion of type Hash_data here. */
-#include "hash.h"
 #include "cache.h"
-
-/* Other modules get read-only access to this variable. */
-extern Hash_data            hashdata;
 extern Transposition_table  ttable;
-
-/* Define if you want the new transposition table. */
-#define USE_HASHTABLE_NG
-
 
 /* ================================================================ */
 
@@ -60,161 +43,14 @@ extern Transposition_table  ttable;
 #define INHIBIT_CONNECTION 4
 
 
-/* A string with n stones can have at most 2(n+1) liberties. From this
- * follows that an upper bound on the number of liberties of a string
- * on a board of size N^2 is 2/3 (N^2+1).
- */
-#define MAXLIBS   (2*(MAX_BOARD*MAX_BOARD + 1)/3)
-/* This is a smaller, practical number of liberties that we care to keep track of. */
-#define MAX_LIBERTIES 20
-
-
-/* This is an upper bound of the number of strings that can exist on
- * the board simultaneously.  
- * FIXME: This is not sufficiently large;  above stackp==0, the incremental 
- *   board code doesn't necessarily re-use all indices.  This is a problem
- *   only in very pathological cases, and is extremely unlikely to occur in
- *   practice.
- */
-#define MAX_STRINGS (2 * MAX_BOARD * MAX_BOARD / 3)
-
-/* Per gf: Unconditional_life() can get very close to filling the 
- * entire board under certain circumstances. This was discussed in 
- * the list around August 21, 2001, in a thread with the subject 
- * "gnugo bug logs".
- */
-#define MAXSTACK  MAX_BOARD * MAX_BOARD
-#define MAXCHAIN  160
-
-/* 1D board macros.
- * Note that POS(-1, -1) == 0
- * DELTA() is defined so that POS(i+di, j+dj) = POS(i, j) + DELTA(di, dj).
- */
-#define BOARDSIZE     ((MAX_BOARD + 2) * (MAX_BOARD + 1) + 1)
-#define BOARDMIN      (MAX_BOARD + 2)
-#define BOARDMAX      (MAX_BOARD + 1) * (MAX_BOARD + 1)
-#define POS(i, j)     ((MAX_BOARD + 2) + (i) * (MAX_BOARD + 1) + (j))
-#define DELTA(di, dj) ((di) * (MAX_BOARD + 1) + (dj))
-#define I(pos)        ((pos) / (MAX_BOARD + 1) - 1)
-#define J(pos)        ((pos) % (MAX_BOARD + 1) - 1)
-#define PASS_MOVE     0
-#define NO_MOVE       PASS_MOVE
-#define NS            (MAX_BOARD + 1)
-#define WE            1
-#define SOUTH(pos)    ((pos) + NS)
-#define WEST(pos)     ((pos) - 1)
-#define NORTH(pos)    ((pos) - NS)
-#define EAST(pos)     ((pos) + 1)
-#define SW(pos)       ((pos) + NS - 1)
-#define NW(pos)       ((pos) - NS - 1)
-#define NE(pos)       ((pos) - NS + 1)
-#define SE(pos)       ((pos) + NS + 1)
-#define SS(pos)       ((pos) + 2 * NS)
-#define WW(pos)       ((pos) - 2)
-#define NN(pos)       ((pos) - 2 * NS)
-#define EE(pos)       ((pos) + 2)
-
-#define BOARD(i, j)   board[POS(i, j)]
-
 #define REVERSE_RESULT(result)		(WIN - result)
-
-/* Transformation stuff. */
-#define MAX_OFFSET			(2*MAX_BOARD - 1) * (2*MAX_BOARD - 1)
-#define OFFSET(dx, dy)\
-  ((dy + MAX_BOARD - 1) * (2*MAX_BOARD - 1) + (dx + MAX_BOARD - 1))
-#define OFFSET_DELTA(dx, dy)		(OFFSET(dx, dy) - OFFSET(0, 0))
-#define CENTER_OFFSET(offset)		(offset - OFFSET(0, 0))
-#define TRANSFORM(offset, trans)	(transformation[offset][trans])
-#define AFFINE_TRANSFORM(offset, trans, delta)\
-  (transformation[offset][trans] + delta)
-#define TRANSFORM2(x, y, tx, ty, trans)\
-  do {\
-    *tx = transformation2[trans][0][0] * (x) + transformation2[trans][0][1] * (y);\
-    *ty = transformation2[trans][1][0] * (x) + transformation2[trans][1][1] * (y);\
-  } while (0)
-
-
-/* This struct holds the internal board state.
- */
-struct board_state {
-  int board_size;
-
-  Intersection board[BOARDSIZE];
-  int board_ko_pos;
-  int black_captured;
-  int white_captured;
-
-  Intersection initial_board[BOARDSIZE];
-  int initial_board_ko_pos;
-  int initial_white_captured;
-  int initial_black_captured;
-  int move_history_color[MAX_MOVE_HISTORY];
-  int move_history_pos[MAX_MOVE_HISTORY];
-  int move_history_pointer;
-
-  float komi;
-  int move_number;
-};
-
-
-/* board utility functions */
-int find_origin(int str);
-int chainlinks(int str, int adj[MAXCHAIN]);
-int chainlinks2(int str, int adj[MAXCHAIN], int lib);
-int chainlinks3(int str, int adj[MAXCHAIN], int lib);
-int extended_chainlinks(int str, int adj[MAXCHAIN], int both_colors);
-
-
-/* This is increased by one anytime a move is (permanently) played or
- * the board is cleared.
- */
-extern int position_number;
-
-
-/* Detect vertex on edge or corner. */
-int is_edge_vertex(int pos);
-int is_corner_vertex(int pos);
-int edge_distance(int pos);
-
-
-/* Count and/or find liberties at (pos). */
-int countlib(int str);
-int findlib(int str, int maxlib, int *libs);
-int fastlib(int pos, int color, int ignore_captures);
-int approxlib(int pos, int color, int maxlib, int *libs);
-int accuratelib(int pos, int color, int maxlib, int *libs);
-int count_common_libs(int str1, int str2);
-int find_common_libs(int str1, int str2, int maxlib, int *libs);
-int have_common_lib(int str1, int str2, int *lib);
 
 
 void start_timer(int n);
 double time_report(int n, const char *occupation, int move, double mintime);
 
-
-/* Check for self atari. */
-int is_self_atari(int pos, int color);
-
-/* Count the number of stones in a string. */
-int countstones(int str);
-int findstones(int str, int maxstones, int *stones);
-
-/* Exported from incremental_board.c so that reading.c can use it. */
-void incremental_order_moves(int move, int color, int string,
-			     int *number_edges, int *number_same_string,
-			     int *number_own, int *number_opponent,
-			     int *captured_stones, int *threatened_stones,
-			     int *saved_stones, int *number_open);
-
-/* Board caches initialization functions. */
-void clear_approxlib_cache(void);
-void clear_accuratelib_cache(void);
-
-
 void transformation_init(void);
 
-  
-void dump_stack(void);
 void report_worm(int m, int n);
 void ascii_report_worm(char *string);
 void report_dragon(FILE *outfile, int pos);
@@ -227,42 +63,6 @@ void rotate2(int i, int j, int *ri, int *rj, int rot);
 void inv_rotate2(int i, int j, int *ri, int *rj, int rot);
 int rotate1(int pos, int rot);
 int inv_rotate1(int pos, int rot);
-
-int square_dist(int pos1, int pos2);
-
-/* Is this point inside the board? */
-#if 0
-#define ON_BOARD2(i, j) ((i)>=0 && (j)>=0 && (i)<board_size && (j)<board_size)
-#else
-/*
- * For the case when expr can only be slightly negative,
- *    if (expr < 0 || expr > something)
- * is equivalent to
- *    if ((unsigned) expr > something)
- *
- * (I think gcc knows this trick, but it does no harm to
- *  encode it explicitly since it saves typing !)
- */
-#define ON_BOARD2(i, j) ((unsigned) (i) < (unsigned) board_size &&\
-		         (unsigned) (j) < (unsigned) board_size)
-#endif
-
-#define ASSERT_ON_BOARD2(i, j) ASSERT2(ON_BOARD2((i), (j)), (i), (j))
-
-#define ON_BOARD1(pos) (((unsigned) (pos) < BOARDSIZE) && board[pos] != GRAY)
-#define ON_BOARD(pos) (board[pos] != GRAY)
-#define ASSERT_ON_BOARD1(pos) ASSERT1(ON_BOARD1(pos), (pos))
-
-/* Coordinates for the eight directions, ordered
- * south, west, north, east, southwest, northwest, northeast, southeast.
- * Defined in utils.c.
- */
-extern int deltai[8]; /* = { 1,  0, -1,  0,  1, -1, -1, 1}; */
-extern int deltaj[8]; /* = { 0, -1,  0,  1, -1, -1,  1, 1}; */
-extern int delta[8];  /* = { NS, -1, -NS, 1, NS-1, -NS-1, -NS+1, NS+1}; */
-
-void store_board(struct board_state *state);
-void restore_board(struct board_state *state);
 
 /* Forward struct declarations. */
 struct pattern;
@@ -333,23 +133,27 @@ void draw_reading_shadow(void);
 /* persistent.c */
 void purge_persistent_reading_cache(void);
 void clear_persistent_reading_cache(void);
-int search_persistent_reading_cache(int routine, int str, int *result,
-				    int *move);
-void store_persistent_reading_cache(int routine, int str, int result,
-				    int move, int nodes);
-void delete_persistent_reading_cache_entry(int routine, int str);
+int search_persistent_reading_cache(enum routine_id routine, int str,
+				    int *result, int *move);
+void store_persistent_reading_cache(enum routine_id routine, int str,
+				    int result, int move, int nodes);
+void delete_persistent_reading_cache_entry(enum routine_id routine, int str);
 void reading_hotspots(float values[BOARDMAX]);
 void purge_persistent_connection_cache(void);
 void clear_persistent_connection_cache(void);
-int search_persistent_connection_cache(int routine, int str1, int str2,
+int search_persistent_connection_cache(enum routine_id routine,
+				       int str1, int str2,
 				       int *result, int *move);
-void store_persistent_connection_cache(int routine, int str1, int str2,
+void store_persistent_connection_cache(enum routine_id routine,
+				       int str1, int str2,
 				       int result, int move,
 				       int tactical_nodes,
 				       char connection_shadow[BOARDMAX]);
-int search_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
+int search_persistent_breakin_cache(enum routine_id routine,
+				    int str, Hash_data goal_hash,
 				    int *result, int *move);
-void store_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
+void store_persistent_breakin_cache(enum routine_id routine,
+				    int str, Hash_data goal_hash,
 				    int result, int move,
 				    int tactical_nodes,
 				    char breakin_shadow[BOARDMAX]);
@@ -358,10 +162,12 @@ void clear_persistent_breakin_cache(void);
 void print_persistent_breakin_cache(void);
 void purge_persistent_owl_cache(void);
 void clear_persistent_owl_cache(void);
-int search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
+int search_persistent_owl_cache(enum routine_id routine,
+				int apos, int bpos, int cpos,
 				int *result, int *move, int *move2,
 				int *certain);
-void store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
+void store_persistent_owl_cache(enum routine_id routine,
+				int apos, int bpos, int cpos,
 				int result, int move, int move2, int certain,
 				int tactical_nodes, char goal[BOARDMAX],
 				int goal_color);
@@ -374,26 +180,6 @@ int non_transitivity(int str1, int str2, int str3, int *move);
 
 int break_in(int str, const char goal[BOARDMAX], int *move);
 int block_off(int str1, const char goal[BOARDMAX], int *move);
-
-/* board.c */
-int liberty_of_string(int pos, int str);
-int second_order_liberty_of_string(int pos, int str);
-int neighbor_of_string(int pos, int str);
-int has_neighbor(int pos, int color);
-int same_string(int str1, int str2);
-int adjacent_strings(int str1, int str2);
-int is_ko(int pos, int color, int *ko_pos);
-int is_ko_point(int pos);
-int komaster_trymove(int pos, int color,
-		     const char *message, int str,
-		     int komaster, int kom_pos,
-		     int *new_komaster, int *new_kom_pos,
-		     int *is_conditional_ko, int consider_conditional_ko);
-int does_capture_something(int pos, int color);
-void mark_string(int str, char mx[BOARDMAX], char mark);
-int move_in_stack(int pos, int cutoff);
-void get_move_from_stack(int k, int *move, int *color);
-int stones_on_board(int color);
 
 int obvious_false_eye(int pos, int color);
 void estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
@@ -447,7 +233,7 @@ int movelist_move_known(int move, int max_points, int points[], int codes[]);
 void movelist_change_point(int move, int code, int max_points, 
 			   int points[], int codes[]);
 
-/* safety.c */
+/* surround.c */
 int compute_surroundings(int pos, int apos, int showboard,
 			 int *surround_size);
 int is_surrounded(int pos);
@@ -763,44 +549,29 @@ void goaldump(const char goal[BOARDMAX]);
 void move_considered(int move, float value);
 
 
-/* SGF routines for debugging purposes in sgffile.c */
-void sgffile_begindump(struct SGFTree_t *tree);
-void sgffile_enddump(const char *filename);
-
+/* Transformation stuff. */
+#define MAX_OFFSET			(2*MAX_BOARD - 1) * (2*MAX_BOARD - 1)
+#define OFFSET(dx, dy)\
+  ((dy + MAX_BOARD - 1) * (2*MAX_BOARD - 1) + (dx + MAX_BOARD - 1))
+#define OFFSET_DELTA(dx, dy)		(OFFSET(dx, dy) - OFFSET(0, 0))
+#define CENTER_OFFSET(offset)		(offset - OFFSET(0, 0))
+#define TRANSFORM(offset, trans)	(transformation[offset][trans])
+#define AFFINE_TRANSFORM(offset, trans, delta)\
+  (transformation[offset][trans] + delta)
+#define TRANSFORM2(x, y, tx, ty, trans)\
+  do {\
+    *tx = transformation2[trans][0][0] * (x) + transformation2[trans][0][1] * (y);\
+    *ty = transformation2[trans][1][0] * (x) + transformation2[trans][1][1] * (y);\
+  } while (0)
 
 
 /* ================================================================ */
 /*                         global variables                         */
 /* ================================================================ */
 
-/* The board and the other parameters deciding the current position. */
-extern int          board_size;             /* board size (usually 19) */
-extern Intersection board[BOARDSIZE];       /* go board */
-extern int          board_ko_pos;
-extern int          black_captured;   /* num. of black stones captured */
-extern int          white_captured;
-
-extern Intersection initial_board[BOARDSIZE];
-extern int          initial_board_ko_pos;
-extern int          initial_white_captured;
-extern int          initial_black_captured;
-extern int          move_history_color[MAX_MOVE_HISTORY];
-extern int          move_history_pos[MAX_MOVE_HISTORY];
-extern int          move_history_pointer;
-
-extern float        komi;
-extern int          movenum;      /* movenumber - used for debug output */
-		    
-extern Intersection shadow[BOARDMAX];      /* reading tree shadow */
-
-		    
 extern int          disable_threat_computation;
 extern int          disable_endgame_patterns;
 extern int          doing_scoring;
-
-/* Transformation arrays */
-extern int	    transformation[MAX_OFFSET][8];
-extern const int    transformation2[8][2][2];
 
 /* Reading parameters */
 extern int depth;               /* deep reading cutoff */
@@ -831,7 +602,6 @@ extern int semeai_variations;   /* max variations considered reading semeai */
 extern float best_move_values[10];
 extern int best_moves[10];
 
-extern int chinese_rules;
 extern int experimental_owl_ext;     /* use experimental owl (GAIN/LOSS) */
 extern int experimental_semeai;      /* use experimental semeai module */
 extern int experimental_connections; /* use experimental connection module */
@@ -840,16 +610,16 @@ extern int owl_threats;              /* compute owl threats */
 extern int experimental_break_in;    /* use experimental module breakin.c */
 
 
-extern int thrashing_dragon;                  /* Dead opponent's dragon trying to live */
+extern int thrashing_dragon;        /* Dead opponent's dragon trying to live */
 extern char thrashing_stone[BOARDMAX];        /* All thrashing stones. */
 
 /* Experimental reading */
 extern char *rgoal;
 extern int goallib;
 
-extern int stackp;                /* stack pointer */
-extern int count_variations;      /* count (decidestring) */
-extern SGFTree *sgf_dumptree;
+extern int          transformation[MAX_OFFSET][8];
+extern const int    transformation2[8][2][2];
+
 
 /* Arrays pointing out the closest worms from each vertex.  The first
  * one is the closest worms of either color, the last two ones ignore
@@ -872,17 +642,6 @@ extern int number_close_white_worms[BOARDMAX];
 
 extern int false_eye_territory[BOARDMAX];
 extern int forced_backfilling_moves[BOARDMAX];
-
-struct stats_data {
-  int nodes;                     /* Number of visited nodes while reading */
-  int position_entered;          /* Number of Positions entered. */
-  int position_hits;             /* Number of hits of Positions. */
-  int read_result_entered;       /* Number of Read_results entered. */
-  int read_result_hits;          /* Number of hits of Read_results. */
-  int hash_collisions;           /* Number of hash collisions. */
-};
-
-extern struct stats_data stats;
 
 extern double slowest_time;      /* Timing statistics */
 extern int    slowest_move;
@@ -975,6 +734,41 @@ extern int surround_pointer;
  * data concerning a dragon. A copy is kept at each stone of the string.
  */
 
+/* This is used for both the dragon status and safety fields. */
+enum dragon_status {
+  DEAD,
+  ALIVE,
+  CRITICAL,
+  UNKNOWN,
+  UNCHECKED,
+  CAN_THREATEN_ATTACK,
+  CAN_THREATEN_DEFENSE, 
+  INESSENTIAL,
+  TACTICALLY_DEAD,
+  ALIVE_IN_SEKI,
+  STRONGLY_ALIVE,
+  INVINCIBLE,
+  INSUBSTANTIAL,
+  NUM_DRAGON_STATUS
+};
+
+#define DRAGON_STATUS_NAMES \
+  "dead" \
+  "alive" \
+  "critical" \
+  "unknown" \
+  "unchecked" \
+  "can threaten attack" \
+  "can threaten defense" \
+  "inessential" \
+  "tactically dead" \
+  "alive in seki" \
+  "strongly alive" \
+  "invincible" \
+  "insubstantial"
+
+const char *status_to_string(enum dragon_status status);
+
 struct dragon_data {
   int color;    /* its color                                                 */
   int id;       /* the index into the dragon2 array                          */
@@ -982,8 +776,8 @@ struct dragon_data {
                 /* dragon iff they have same origin.                         */
   int size;     /* size of the dragon                                        */
   float effective_size; /* stones and surrounding spaces                     */
-  int crude_status;     /* (ALIVE, DEAD, UNKNOWN, CRITICAL)                  */
-  int status;           /* best trusted status                               */
+  enum dragon_status crude_status; /* (ALIVE, DEAD, UNKNOWN, CRITICAL)       */
+  enum dragon_status status;       /* best trusted status                    */
 };
 
 extern struct dragon_data dragon[BOARDMAX];
@@ -1002,7 +796,7 @@ struct dragon_data2 {
 
   int moyo_size;		      /* size of surrounding influence moyo, */
   float moyo_territorial_value;       /* ...and its territorial value        */
-  int safety;                         /* a more detailed status estimate     */
+  enum dragon_status safety;           /* a more detailed status estimate     */
   float weakness; /* A new (3.4) continuous estimate of the dragon's safety  */
   float weakness_pre_owl;     /* Dragon safety based on pre-owl computations */
   int escape_route; /* a measurement of likelihood of escape                 */
@@ -1019,8 +813,8 @@ struct dragon_data2 {
   int semeai_defense_certain;
   int semeai_attack_point; /* Move found by semeai code to kill dragon       */
   int semeai_attack_certain;
-  int owl_threat_status;   /* CAN_THREATEN_ATTACK or CAN_THREATEN_DEFENSE    */
-  int owl_status;          /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
+  enum dragon_status owl_threat_status; /* CAN_THREATEN_ATTACK/DEFENSE       */
+  enum dragon_status owl_status; /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
   int owl_attack_point;    /* vital point for attack                         */
   int owl_attack_code;     /* ko result code                                 */
   int owl_attack_certain;  /* 0 if owl reading node limit is reached         */
@@ -1140,23 +934,6 @@ char *eyevalue_to_string(struct eyevalue *e);
 
 int is_halfeye(struct half_eye_data heye[BOARDMAX], int pos);
 int is_false_eye(struct half_eye_data heye[BOARDMAX], int pos);
-
-/* Our own abort() which prints board state on the way out.
- * (pos) is a "relevant" board position for info.
- */
-void abortgo(const char *file, int line, const char *msg, int pos);
-
-#ifdef GG_TURN_OFF_ASSERTS
-#define ASSERT2(x, i, j)
-#define ASSERT1(x, pos)
-#else
-/* avoid dangling else */
-/* FIXME: Should probably re-write these using do {...} while (0) idiom. */
-#define ASSERT2(x, i, j) if (x) ; else abortgo(__FILE__, __LINE__, #x, POS(i, j))
-#define ASSERT1(x, pos) if (x) ; else abortgo(__FILE__, __LINE__, #x, pos)
-#endif
-
-#define gg_assert(x) ASSERT1(x, NO_MOVE);
 
 #endif  /* _LIBERTY_H_ */
 

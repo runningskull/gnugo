@@ -65,6 +65,8 @@ sgffile_add_debuginfo(SGFNode *node, int value)
 	case CRITICAL:
 	  sgfLabel(node, "!", m, n);
 	  break;
+	default:
+	  ;
 	}
       }
       

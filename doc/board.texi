@@ -12,13 +12,28 @@ basic go board but no AI capability. One such program is
 @file{patterns/joseki.c}, which compiles joseki pattern
 databases from SGF files.
 
+If you want to use the board library in your own program, you need all
+the .c-files listed under libboard_SOURCES in engine/Makefile.am, and
+the files in the directories sgf/ and utils/. Then you should include
+engine/board.h in your code.
+
 The library consists of the following files:
 
 @itemize
+@item @file{board.h}
+@quotation
+The public interface to the board library.
+@end quotation
+
 @item @file{board.c}
 @quotation
-The basic board code.  It uses incremental algorithms for keeping track
+The basic board code. It uses incremental algorithms for keeping track
 of strings and liberties on the go board.
+@end quotation
+
+@item @file{boardlib.c}
+@quotation
+This contains all global variable of the board library.
 @end quotation
 
 @item @file{hash.c}
@@ -26,20 +41,9 @@ of strings and liberties on the go board.
 Code for hashing go positions.
 @end quotation
 
-@item @file{globals.c}
-@quotation
-Global variables needed in the rest of the files.  This file also
-contains global variables needed in the rest of the engine.
-@end quotation
-
 @item @file{sgffile.c}
 @quotation
 Implementation of output file in SGF format.
-@end quotation
-
-@item @file{showbord.c}
-@quotation
-Print go boards.
 @end quotation
 
 @item @file{printutils.c}

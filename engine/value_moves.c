@@ -363,8 +363,8 @@ find_more_owl_attack_and_defense_moves(int color, int save_verbose)
 	    else
 	      add_owl_attack_move(pos, dd, acode);
 	    if (save_verbose)
-	      gprintf("Move at %1m upgraded to owl attack on %1m (%r).\n",
-	      	      pos, dd, acode);
+	      gprintf("Move at %1m upgraded to owl attack on %1m (%s).\n",
+	      	      pos, dd, result_to_string(acode));
 	  }
 	}
 	
@@ -385,8 +385,8 @@ find_more_owl_attack_and_defense_moves(int color, int save_verbose)
 	    else
 	      add_owl_defense_move(pos, dd, dcode);
 	    if (save_verbose)
-	      gprintf("Move at %1m upgraded to owl defense for %1m (%r).\n",
-	      	      pos, dd, dcode);
+	      gprintf("Move at %1m upgraded to owl defense for %1m (%s).\n",
+	      	      pos, dd, result_to_string(dcode));
 	  }
 	}
       }
@@ -437,8 +437,8 @@ find_more_owl_attack_and_defense_moves(int color, int save_verbose)
 	      else
 		add_owl_defense_move(pos2, pos, dcode);
 	      if (save_verbose)
-	        gprintf("Move at %1m also owl defends %1m (%r).\n",
-		        pos2, pos, dcode);
+	        gprintf("Move at %1m also owl defends %1m (%s).\n",
+		        pos2, pos, result_to_string(dcode));
 	    }
 
 	  }
@@ -452,8 +452,8 @@ find_more_owl_attack_and_defense_moves(int color, int save_verbose)
 	      else
 		add_owl_attack_move(pos2, pos, acode);
 	      if (save_verbose)
-	        gprintf("Move at %1m also owl attacks %1m (%r).\n",
-		        pos2, pos, acode);
+	        gprintf("Move at %1m also owl attacks %1m (%s).\n",
+		        pos2, pos, result_to_string(acode));
 	    }
 	  }
 	}

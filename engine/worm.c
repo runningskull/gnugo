@@ -491,7 +491,7 @@ make_worms(void)
 	&& worm[pos].lunch == NO_MOVE) {
       int edge;
       int border_color = examine_cavity(pos, &edge);
-      if (border_color != GRAY_BORDER && edge < 3) {
+      if (border_color != GRAY && edge < 3) {
 	DEBUG(DEBUG_WORMS, "Worm %1m identified as inessential.\n", pos);
 	worm[pos].inessential = 1;
 	propagate_worm(pos);
@@ -703,12 +703,8 @@ compute_unconditional_status()
 	if (unconditional_territory[pos] == 1)
 	  worm[pos].invincible = 1;
       }
-      else if (board[pos] == EMPTY) {
-	if (color == WHITE)
-	  worm[pos].unconditional_status = WHITE_BORDER;
-	else
-	  worm[pos].unconditional_status = BLACK_BORDER;
-      }
+      else if (board[pos] == EMPTY)
+	worm[pos].unconditional_status = WHITE;
       else
 	worm[pos].unconditional_status = DEAD;
     }
@@ -1434,8 +1430,8 @@ markcomponent(int str, int pos, int mg[BOARDMAX])
 
 /* examine_cavity(pos, *edge), if (pos) is EMPTY, examines the
  * cavity at (m, n) and returns its bordercolor,
- * which can be BLACK_BORDER, WHITE_BORDER or GRAY_BORDER. The edge
- * parameter is set to the number of edge vertices in the cavity.
+ * which can be BLACK, WHITE or GRAY. The edge parameter is set to the
+ * number of edge vertices in the cavity.
  *
  * If (pos) is nonempty, it returns the same result, imagining
  * that the string at (pos) is removed. The edge parameter is
@@ -1462,15 +1458,11 @@ examine_cavity(int pos, int *edge)
   
   cavity_recurse(pos, ml, &border_color, edge, origin);
 
-  if (border_color == (BLACK | WHITE))
-    return GRAY_BORDER;  
-  if (border_color == BLACK)
-    return BLACK_BORDER;
-  if (border_color == WHITE)
-    return WHITE_BORDER;
+  if (border_color != EMPTY)
+    return border_color;
 
   /* We should have returned now, unless the board is completely empty.
-   * Verify that this is the case and then return GRAY_BORDER.
+   * Verify that this is the case and then return GRAY.
    *
    * Notice that the board appears completely empty if there's only a
    * single string and pos points to it.
@@ -1481,7 +1473,7 @@ examine_cavity(int pos, int *edge)
 		|| (pos != NO_MOVE
 		    && stones_on_board(BLACK | WHITE) == countstones(pos))));
   
-  return GRAY_BORDER;
+  return GRAY;
 }
 
 
@@ -1863,10 +1855,6 @@ report_worm(int m, int n)
     gprintf("unconditional status ALIVE\n");
   else if (worm[pos].unconditional_status == DEAD)
     gprintf("unconditional status DEAD\n");
-  else if (worm[pos].unconditional_status == WHITE_BORDER)
-    gprintf("unconditional status WHITE_BORDER\n");
-  else if (worm[pos].unconditional_status == BLACK_BORDER)
-    gprintf("unconditional status BLACK_BORDER\n");
   else if (worm[pos].unconditional_status == UNKNOWN)
     gprintf("unconditional status UNKNOWN\n");
 }

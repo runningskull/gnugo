@@ -28,14 +28,14 @@
 #include "sgf_properties.h"
 
 
-#ifndef _GNUGO_H_
+#ifndef _BOARD_H_
 /*
  * NOTE: These MUST coincide with the definitions for the engine that we
  *       are using. In this case they are defined in engine/gnugo.h.
  *
  * The reason that we put them here within the #ifndef clause is because
  * we want to decouple the GNU Go engine from SGF library, but we don't 
- * want to redefine these symbols if we include this file into gnugo.h.
+ * want to redefine these symbols if we include this file into board.h.
  */
 
 #define EMPTY 0

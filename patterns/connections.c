@@ -139,9 +139,9 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
       black_eye[move].cut = 1;
       black_eye[move].type |= INHIBIT_CONNECTION;
     }
-    if (color == WHITE && white_eye[move].color == WHITE_BORDER)
+    if (color == WHITE && white_eye[move].color == WHITE)
       white_eye[move].marginal = 1;
-    else if (color == BLACK && black_eye[move].color == BLACK_BORDER)
+    else if (color == BLACK && black_eye[move].color == BLACK)
       black_eye[move].marginal = 1;
   }
   else if (!(pattern->class & CLASS_C))
@@ -186,11 +186,11 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
     if (pattern->class & CLASS_B) {
       if (pattern->patn[k].att != ATT_not)
 	break; /* The inhibition points are guaranteed to come first. */
-      if (color == WHITE && white_eye[pos].color == WHITE_BORDER) {
+      if (color == WHITE && white_eye[pos].color == WHITE) {
 	white_eye[pos].type |= INHIBIT_CONNECTION;
 	DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
       }
-      else if (color == BLACK && black_eye[pos].color == BLACK_BORDER) {
+      else if (color == BLACK && black_eye[pos].color == BLACK) {
 	black_eye[pos].type |= INHIBIT_CONNECTION;
 	DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
       }

@@ -2,6 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- WHITE_BORDER, BLACK_BORDER, GRAY_BORDER retired 
+- colors and komaster state, safety values and dragon status, cache routine
+  ids are now "enum"
+- board library: remove all stuff that is not directly related to board
+  (and move it to the engine)
+- board library: new file board.h as public interface, new file boardlib.c
+  to collect global variable of the board library;
+- board library documentation updated to reflect changes
 - new function: hashdata_to_string()
 - small_semeai() and small_semeai_analyzer() removed
 - support for !experimental_semeai removed

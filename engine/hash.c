@@ -20,15 +20,15 @@
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "gnugo.h"
+
+#include "board.h"
+#include "hash.h"
+#include "random.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
 
-#include "liberty.h"
-#include "hash.h"
-#include "random.h"
 
 
 /*
@@ -42,11 +42,6 @@
 static Hash_data  white_hash_ng[BOARDMAX];
 static Hash_data  black_hash_ng[BOARDMAX];
 static Hash_data  ko_hash_ng[BOARDMAX];
-static Hash_data  komaster_hash[7]; /* FIXME: Make it impossible to set wrong value here. */
-static Hash_data  kom_pos_hash[BOARDMAX];
-static Hash_data  target1_hash[BOARDMAX];
-static Hash_data  target2_hash[BOARDMAX];
-static Hash_data  routine_hash[NUM_ROUTINES];
 
 static struct init_struct {
   Hash_data  *array;
@@ -54,12 +49,7 @@ static struct init_struct {
 } hash_init_values[] = {
   {white_hash_ng, BOARDMAX},
   {black_hash_ng, BOARDMAX},
-  {ko_hash_ng,    BOARDMAX},
-  {komaster_hash, 7},
-  {kom_pos_hash,  BOARDMAX},
-  {target1_hash,  BOARDMAX},
-  {target2_hash,  BOARDMAX},
-  {routine_hash,  NUM_ROUTINES},
+  {ko_hash_ng,    BOARDMAX}
 };
 
 
@@ -79,7 +69,6 @@ hash_ng_init(void)
   unsigned    i;
   int         j;
   
-
   if (is_initialized)
     return;
   
@@ -100,19 +89,6 @@ hash_ng_init(void)
 
   is_initialized = 1;
 }
-
-
-void
-calculate_hashval_for_tt(int komaster, int kom_pos, int routine, int target,
-			 Hash_data *hashdata2)
-{
-  *hashdata2 = hashdata;		/* from globals.c */
-  hashdata_xor(*hashdata2, komaster_hash[komaster]);
-  hashdata_xor(*hashdata2, kom_pos_hash[kom_pos]);
-  hashdata_xor(*hashdata2, routine_hash[routine]);
-  hashdata_xor(*hashdata2, target1_hash[target]);
-}
-
 
 
 /* ================================================================ */

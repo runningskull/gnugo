@@ -173,7 +173,7 @@ make_dragons(int color, int stop_before_owl)
     if (!ON_BOARD(str))
       continue;
 
-    if (black_eye[str].color == BLACK_BORDER
+    if (black_eye[str].color == BLACK
 	&& black_eye[str].origin == str) {
       struct eyevalue value;
       int attack_point, defense_point;
@@ -188,7 +188,7 @@ make_dragons(int color, int stop_before_owl)
       propagate_eye(str, black_eye);
     }
     
-    if (white_eye[str].color == WHITE_BORDER
+    if (white_eye[str].color == WHITE
 	&& white_eye[str].origin == str) {
       struct eyevalue value;
       int attack_point, defense_point;
@@ -214,7 +214,7 @@ make_dragons(int color, int stop_before_owl)
     if (!ON_BOARD(str))
       continue;
     
-    if (black_eye[str].color == BLACK_BORDER
+    if (black_eye[str].color == BLACK
 	&& black_eye[str].origin == str
 	&& find_eye_dragons(black_eye[str].origin, black_eye,
 			    BLACK, &dr, 1) == 1) {
@@ -229,7 +229,7 @@ make_dragons(int color, int stop_before_owl)
 		    &DRAGON2(dr).genus);
     }
     
-    if (white_eye[str].color == WHITE_BORDER
+    if (white_eye[str].color == WHITE
 	&& white_eye[str].origin == str
 	&& find_eye_dragons(white_eye[str].origin, white_eye,
 			    WHITE, &dr, 1) == 1) {
@@ -982,11 +982,11 @@ dragon_invincible(int dr)
    */
   if (board[dr] == BLACK) {
     eye = black_eye;
-    eye_color = BLACK_BORDER;
+    eye_color = BLACK;
   }
   else {
     eye = white_eye;
-    eye_color = WHITE_BORDER;
+    eye_color = WHITE;
   }
 
   memset(mx, 0, sizeof(mx));
@@ -1256,14 +1256,14 @@ analyze_false_eye_territory(void)
       continue;
 
     /* Determine the color of the eye. */
-    if (white_eye[pos].color == WHITE_BORDER) {
+    if (white_eye[pos].color == WHITE) {
       color = WHITE;
-      eye_color = WHITE_BORDER;
+      eye_color = WHITE;
       eye = white_eye;
     }
-    else if (black_eye[pos].color == BLACK_BORDER) {
+    else if (black_eye[pos].color == BLACK) {
       color = BLACK;
-      eye_color = BLACK_BORDER;
+      eye_color = BLACK;
       eye = black_eye;
     }
     else
@@ -1408,13 +1408,6 @@ connected_to_eye_recurse(int pos, int str, int color, int eye_color,
 void 
 show_dragons(void)
 {
-  static const char *snames[] = 
-  {"dead", "alive", "critical", "unknown", "unchecked"};
-
-  static const char *safety_names[] =
-  {"dead", "alive", "critical", "[3]", "[4]", "inessential",
-   "tactically dead", "alive_in_seki", "strongly_alive", "invincible"};
-  
   int pos;
   int k;
 
@@ -1504,14 +1497,14 @@ show_dragons(void)
 	      dd->effective_size,
 	      eyevalue_to_string(&d2->genus),
 	      d2->escape_route,
-	      snames[dd->crude_status],
-	      snames[dd->status],
+	      status_to_string(dd->crude_status),
+	      status_to_string(dd->status),
 	      d2->moyo_size,
 	      d2->moyo_territorial_value,
-	      safety_names[d2->safety],
+	      status_to_string(d2->safety),
 	      d2->weakness_pre_owl,
 	      d2->weakness);
-      gprintf(", owl status %s\n", snames[d2->owl_status]);
+      gprintf(", owl status %s\n", status_to_string(d2->owl_status));
       if (d2->owl_status == CRITICAL) {
 	gprintf("... owl attackable at %1m, code %d\n",
 		d2->owl_attack_point, d2->owl_attack_code);
@@ -2333,7 +2326,7 @@ report_dragon(FILE *outfile, int pos)
   gfprintf(outfile, "moyo territorial value  %f\n",
 	   d2->moyo_territorial_value);
   gfprintf(outfile, "safety                  %s\n",
-	   safety_to_string(d2->safety));
+	   status_to_string(d2->safety));
   gfprintf(outfile, "weakness estimate       %f\n", d2->weakness);
   gfprintf(outfile, "strings                 ");
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)

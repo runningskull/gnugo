@@ -2919,7 +2919,7 @@ owl_determine_life(struct local_owl_data *owl,
 
 /* The eyespaces we want to evaluate are the ones which
  * are adjacent to the dragon (whose stones comprise the
- * support of goal) which are not GRAY_BORDERED. These
+ * support of goal) which are not GRAY bordered. These
  * are the eyespaces of the dragon. Now we find their
  * origins.
  *
@@ -2939,9 +2939,9 @@ owl_find_relevant_eyespaces(struct local_owl_data *owl,
   struct eye_data *eye = owl->my_eye;
   
   if (owl->color == WHITE)
-    eye_color = WHITE_BORDER;
+    eye_color = WHITE;
   else
-    eye_color = BLACK_BORDER;
+    eye_color = BLACK;
 
   memset(mw, 0, BOARDMAX * sizeof(mw[0]));
   memset(mz, 0, BOARDMAX * sizeof(mz[0]));
@@ -5228,7 +5228,7 @@ owl_eyespace(int pos)
   origin = current_owl_data->my_eye[pos].origin;
   return (ON_BOARD(origin)
 	  && (current_owl_data->my_eye[origin].color
-	      == BORDER_COLOR(current_owl_data->color))
+	      == current_owl_data->color)
 	  && max_eyes(&current_owl_data->my_eye[origin].value) > 0);
 }
 
@@ -5246,7 +5246,7 @@ owl_big_eyespace(int pos)
   origin = current_owl_data->my_eye[pos].origin;
   return (ON_BOARD(origin) 
 	  && (current_owl_data->my_eye[origin].color
-	      == BORDER_COLOR(current_owl_data->color))
+	      == current_owl_data->color)
 	  && max_eyes(&current_owl_data->my_eye[origin].value) >= 2);
 }
 
@@ -5264,7 +5264,7 @@ owl_mineye(int pos)
   origin = current_owl_data->my_eye[pos].origin;
   if (!ON_BOARD(origin)
       || (current_owl_data->my_eye[origin].color
-	  != BORDER_COLOR(current_owl_data->color)))
+	  != current_owl_data->color))
     return 0;
       
   return min_eyes(&current_owl_data->my_eye[origin].value);
@@ -5284,7 +5284,7 @@ owl_maxeye(int pos)
   origin = current_owl_data->my_eye[pos].origin;
   if (!ON_BOARD(origin)
       || (current_owl_data->my_eye[origin].color
-	  != BORDER_COLOR(current_owl_data->color)))
+	  != current_owl_data->color))
     return 0;
       
   return max_eyes(&current_owl_data->my_eye[origin].value);
@@ -5301,7 +5301,7 @@ owl_proper_eye(int pos)
   ASSERT_ON_BOARD1(pos);
 
   return ((current_owl_data->my_eye[pos].color
-	   == BORDER_COLOR(current_owl_data->color))
+	   == current_owl_data->color)
 	  && !current_owl_data->my_eye[pos].marginal);
 }
   

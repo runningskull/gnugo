@@ -28,17 +28,16 @@
  * for an introduction.
  */
 
-#include "gnugo.h"
+#include "board.h"
+#include "hash.h"
+#include "sgftree.h"
+#include "gg_utils.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "liberty.h"
-#include "hash.h"
-#include "sgftree.h"
-#include "gg_utils.h"
 
 /* This can be used for internal checks w/in board.c that should
  * typically not be necessary (for speed).
@@ -48,6 +47,7 @@
 #else
 #define PARANOID1(x, pos)
 #endif
+
 
 /* ================================================================ */
 /*                          data structures                         */
@@ -459,8 +459,6 @@ static int move_color[MAXSTACK];
 
 static Hash_data hashdata_stack[MAXSTACK];
 
-static const char *komaster_to_string(int komaster);
-
 /*
  * trymove pushes the position onto the stack, and makes a move
  * at pos of color. Returns one if the move is legal. The
@@ -497,7 +495,7 @@ trymove(int pos, int color, const char *message, int str,
       if (komaster != EMPTY)
 	gg_snprintf(buf, 100, "%s (variation %d, hash %s, komaster %s:%s)", 
 		    message, count_variations, hashdata_to_string(&hashdata),
-		    komaster_to_string(komaster), location_to_string(kom_pos));
+		    color_to_string(komaster), location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s (variation %d, hash %s)", 
 		    message, count_variations, hashdata_to_string(&hashdata));
@@ -508,7 +506,7 @@ trymove(int pos, int color, const char *message, int str,
 		    "%s at %s (variation %d, hash %s, komaster %s:%s)", 
 		    message, location_to_string(str), count_variations,
 		    hashdata_to_string(&hashdata),
-		    komaster_to_string(komaster),
+		    color_to_string(komaster),
 		    location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %s)", 
@@ -539,7 +537,8 @@ trymove(int pos, int color, const char *message, int str,
  */
 
 int 
-tryko(int pos, int color, const char *message, int komaster, int kom_pos)
+tryko(int pos, int color, const char *message, int komaster,
+      int kom_pos)
 {
   /* Do the real work elsewhere. */
   if (!do_trymove(pos, color, 1))
@@ -552,7 +551,7 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
     if (komaster != EMPTY)
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %s, komaster %s:%s)", 
 		  message, count_variations, hashdata_to_string(&hashdata),
-		  komaster_to_string(komaster), location_to_string(kom_pos));
+		  color_to_string(komaster), location_to_string(kom_pos));
     else
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %s)", 
 		  message, count_variations, hashdata_to_string(&hashdata));
@@ -624,10 +623,12 @@ do_trymove(int pos, int color, int ignore_ko)
     if (0) {
       ASSERT1(0 && "trymove stack overflow", pos);
     }
+#if 0
     if (verbose > 0) {
       showboard(0);
       dump_stack();
     }
+#endif
     fflush(stderr);
     return 0;
   }
@@ -668,9 +669,6 @@ do_trymove(int pos, int color, int ignore_ko)
   PUSH_VALUE(white_captured);
 
   ++stackp;
-
-  if (verbose == 4)
-    dump_stack();
 
   do_play_move(pos, color);
 
@@ -1144,10 +1142,6 @@ is_illegal_ko_capture(int pos, int color)
  * trymove()/tryko() code.
  */
 
-#define GRAY_WHITE 4
-#define GRAY_BLACK 5
-#define WEAK_KO    6
-
 /* V. Complex scheme, O to move.
  * 
  * 1. Komaster is EMPTY.
@@ -1291,28 +1285,6 @@ komaster_trymove(int pos, int color, const char *message, int str,
   
   return 1;
 }
-
-
-/* Convert a komaster value to a string. */
-static const char *
-komaster_to_string(int komaster)
-{
-  if (komaster == EMPTY)
-    return "empty";
-  else if (komaster == WHITE)
-    return "white";
-  else if (komaster == BLACK)
-    return "black";
-  else if (komaster == GRAY_WHITE)
-    return "gray_white";
-  else if (komaster == GRAY_BLACK)
-    return "gray_black";
-  else if (komaster == WEAK_KO)
-    return "weak_ko";
-  else
-    return "unknown";
-}
-
 
 /* Determine whether vertex is on the edge. */
 int
@@ -2926,6 +2898,9 @@ get_move_from_stack(int k, int *move, int *color)
  * This only counts stones in the permanent position, not stones placed
  * by trymove() or tryko(). Use stones_on_board(BLACK | WHITE) to get
  * the total number of stones on the board.
+ *
+ * FIXME: This seems wrong, it uses the modified board, not the permanent
+ * one. /ab
  */
 int
 stones_on_board(int color)

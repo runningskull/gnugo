@@ -76,7 +76,7 @@ struct reading_cache {
   int nodes;
   int score;
   int remaining_depth;
-  int routine;			/* ATTACK or FIND_DEFENSE */
+  enum routine_id routine;	/* ATTACK or FIND_DEFENSE */
   int str;			/* contested string (origin) */
   int result;
   int move;			/* attack/defense point */
@@ -100,7 +100,7 @@ struct connection_cache {
   int nodes;
   int score;
   int remaining_depth;
-  int routine;			/* CONNECT or DISCONNECT */
+  enum routine_id routine;   /* CONNECT or DISCONNECT */
   int str1;			/* first string to connect (origin) */
   int str2;			/* second string to connect (origin) */
   int result;
@@ -123,7 +123,7 @@ struct breakin_cache {
   int nodes;
   int score;
   int remaining_depth;
-  int routine;			/* BREAK_IN or BLOCK_OFF */
+  enum routine_id routine;	/* BREAK_IN or BLOCK_OFF */
   int str;			/* string to connect (origin) */
   Hash_data goal_hash;		/* hash of the goal to which to connect to */
   int result;
@@ -146,7 +146,7 @@ struct owl_cache {
   char board[BOARDMAX];
   int movenum;
   int tactical_nodes;
-  int routine;
+  enum routine_id routine;
   int apos;  /* first input coordinate */
   int bpos;  /* second input coordinate */
   int cpos;  /* third input coordinate */
@@ -168,19 +168,20 @@ static void draw_active_area(char board[BOARDMAX], int apos);
 static int verify_stored_board(char board[BOARDMAX]);
 
 /* Tactical reading functions. */
-static int find_persistent_reading_cache_entry(int routine, int str);
+static int find_persistent_reading_cache_entry(enum routine_id routine,
+    					       int str);
 static void print_persistent_reading_cache_entry(int k);
 static void mark_string_hotspot_values(float values[BOARDMAX],
 				       int m, int n, float contribution);
 
 /* Connection reading functions. */
-static int find_persistent_connection_cache_entry(int routine,
+static int find_persistent_connection_cache_entry(enum routine_id routine,
 						  int str1, int str2);
 static void print_persistent_connection_cache_entry(int k);
 
 /* Breakin reading functions. */
-static int find_persistent_breakin_cache_entry(int routine, int str, 
-    					       Hash_data goal_hash);
+static int find_persistent_breakin_cache_entry(enum routine_id routine,
+    					       int str, Hash_data goal_hash);
 static void print_persistent_breakin_cache_entry(int k);
 
 /* Owl functions. */
@@ -338,7 +339,7 @@ clear_persistent_reading_cache()
  * entry number or -1 if none found.
  */
 static int
-find_persistent_reading_cache_entry(int routine, int str)
+find_persistent_reading_cache_entry(enum routine_id routine, int str)
 {
   int k;
   int r;
@@ -378,7 +379,8 @@ find_persistent_reading_cache_entry(int routine, int str)
  * Return 1 if found, 0 otherwise.
  */
 int
-search_persistent_reading_cache(int routine, int str, int *result, int *move)
+search_persistent_reading_cache(enum routine_id routine, int str,
+    				int *result, int *move)
 {
   int k;
   struct reading_cache *entry;
@@ -418,8 +420,8 @@ search_persistent_reading_cache(int routine, int str, int *result, int *move)
 
 /* Store a new read result in the persistent cache. */
 void
-store_persistent_reading_cache(int routine, int str, int result, int move,
-			       int nodes)
+store_persistent_reading_cache(enum routine_id routine, int str,
+    			       int result, int move, int nodes)
 {
   char active[BOARDMAX];
   int k;
@@ -566,7 +568,7 @@ store_persistent_reading_cache(int routine, int str, int result, int move,
 
 /* Delete an entry from the cache, if it's there. */
 void
-delete_persistent_reading_cache_entry(int routine, int str)
+delete_persistent_reading_cache_entry(enum routine_id routine, int str)
 {
   int k = find_persistent_reading_cache_entry(routine, find_origin(str));
   while (k != -1) {
@@ -769,7 +771,8 @@ clear_persistent_connection_cache()
  * entry number or -1 if none found.
  */
 static int
-find_persistent_connection_cache_entry(int routine, int str1, int str2)
+find_persistent_connection_cache_entry(enum routine_id routine,
+    				       int str1, int str2)
 {
   int k;
   int r;
@@ -813,8 +816,8 @@ find_persistent_connection_cache_entry(int routine, int str1, int str2)
  * Return 1 if found, 0 otherwise.
  */
 int
-search_persistent_connection_cache(int routine, int str1, int str2,
-				   int *result, int *move)
+search_persistent_connection_cache(enum routine_id routine, int str1,
+    				   int str2, int *result, int *move)
 {
   int k;
   struct connection_cache *entry;
@@ -841,7 +844,8 @@ search_persistent_connection_cache(int routine, int str1, int str2,
 
 /* Store a new connection result in the persistent cache. */
 void
-store_persistent_connection_cache(int routine, int str1, int str2,
+store_persistent_connection_cache(enum routine_id routine,
+    				  int str1, int str2,
 				  int result, int move, int tactical_nodes,
 				  char connection_shadow[BOARDMAX])
 {
@@ -1113,7 +1117,7 @@ clear_persistent_breakin_cache()
  * entry number or -1 if none found.
  */
 static int
-find_persistent_breakin_cache_entry(int routine, int str,
+find_persistent_breakin_cache_entry(enum routine_id routine, int str,
     				    Hash_data goal_hash)
 {
   int k;
@@ -1148,8 +1152,8 @@ find_persistent_breakin_cache_entry(int routine, int str,
  * Return 1 if found, 0 otherwise.
  */
 int
-search_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
-				int *result, int *move)
+search_persistent_breakin_cache(enum routine_id routine, int str,
+    				Hash_data goal_hash, int *result, int *move)
 {
   int k;
   struct breakin_cache *entry;
@@ -1176,7 +1180,8 @@ search_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
 
 /* Store a new breakin result in the persistent cache. */
 void
-store_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
+store_persistent_breakin_cache(enum routine_id routine,
+    			       int str, Hash_data goal_hash,
 			       int result, int move, int tactical_nodes,
 			       char breakin_shadow[BOARDMAX])
 {
@@ -1415,7 +1420,8 @@ clear_persistent_owl_cache()
 }
 
 int
-search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
+search_persistent_owl_cache(enum routine_id routine,
+    			    int apos, int bpos, int cpos,
 			    int *result, int *move, int *move2, int *certain)
 {
   int k;
@@ -1437,7 +1443,7 @@ search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
 
       DEBUG(DEBUG_OWL_PERSISTENT_CACHE,
 	    "persistent owl cache hit: routine %s at %1m result %d\n",
-	    routine_to_string(routine), apos, bpos, cpos, 
+	    routine_id_to_string(routine), apos, bpos, cpos, 
 	    result_to_string(persistent_owl_cache[k].result));
       return 1;
     }
@@ -1446,7 +1452,8 @@ search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
 }
 
 void
-store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
+store_persistent_owl_cache(enum routine_id routine,
+    			   int apos, int bpos, int cpos,
 			   int result, int move, int move2, int certain,
 			   int tactical_nodes,
 			   char goal[BOARDMAX], int goal_color)
@@ -1587,7 +1594,7 @@ print_persistent_owl_cache_entry(int k)
   struct owl_cache *entry = &(persistent_owl_cache[k]);
   gprintf("%omovenum         = %d\n",  entry->movenum);
   gprintf("%otactical_nodes  = %d\n",  entry->tactical_nodes);
-  gprintf("%oroutine         = %s\n",  routine_to_string(entry->routine));
+  gprintf("%oroutine         = %s\n",  routine_id_to_string(entry->routine));
   gprintf("%o(apos)          = %1m\n", entry->apos);
   gprintf("%o(bpos)          = %1m\n", entry->bpos);
   gprintf("%o(cpos)          = %1m\n", entry->cpos);

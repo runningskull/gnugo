@@ -160,7 +160,7 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 	  b_eye[pos].color = GRAY;
       }
       else if (black_domain[pos] == 1 && white_domain[pos] == 0 && b_eye) {
-	b_eye[pos].color = BLACK_BORDER;
+	b_eye[pos].color = BLACK;
 	for (k = 0; k < 4; k++) {
 	  int apos = pos + delta[k];
 	  if (ON_BOARD(apos) && white_domain[apos] && !black_domain[apos]) {
@@ -170,7 +170,7 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 	}
       }
       else if (black_domain[pos] == 0 && white_domain[pos] == 1 && w_eye) {
-	w_eye[pos].color = WHITE_BORDER;
+	w_eye[pos].color = WHITE;
 	for (k = 0; k < 4; k++) {
 	  int apos = pos + delta[k];
 	  if (ON_BOARD(apos) && black_domain[apos] && !white_domain[apos]) {
@@ -186,7 +186,7 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 	    if (ON_BOARD(apos) && black_domain[apos]
 		&& !white_domain[apos]) {
 	      b_eye[pos].marginal = 1;
-	      b_eye[pos].color = BLACK_BORDER;
+	      b_eye[pos].color = BLACK;
 	      break;
 	    }
 	  }
@@ -200,7 +200,7 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 	    if (ON_BOARD(apos) && white_domain[apos]
 		&& !black_domain[apos]) {
 	      w_eye[pos].marginal = 1;
-	      w_eye[pos].color = WHITE_BORDER;
+	      w_eye[pos].color = WHITE;
 	      break;
 	    }
 	  }
@@ -236,9 +236,9 @@ partition_eyespaces(struct eye_data eye[BOARDMAX], int color)
     return;
 
   if (color == WHITE)
-    eye_color = WHITE_BORDER;
+    eye_color = WHITE;
   else
-    eye_color = BLACK_BORDER;
+    eye_color = BLACK;
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos))
@@ -859,7 +859,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 
     /* A single point eye which is part of a ko can't be trusted. */
     if (eye[pos].esize == 1
-	&& is_ko(pos, eye[pos].color == WHITE_BORDER ? BLACK : WHITE, NULL))
+	&& is_ko(pos, eye[pos].color, NULL))
       *pessimistic_min = 0;
 
     DEBUG(DEBUG_EYES, "  graph matching - %s, pessimistic_min=%d\n",
@@ -915,8 +915,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 	  this_attack_point = pos2;
 	  this_defense_point = pos2;
 
-	  if (is_self_atari(pos2,
-			    eye[pos].color == WHITE_BORDER ? BLACK : WHITE))
+	  if (is_self_atari(pos2, eye[pos].color))
 	    this_score -= 0.5;
 	  
 	  if (is_edge_vertex(pos2))
@@ -1225,10 +1224,6 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
     
   /* Set `eye_color' to the owner of the eye. */
   eye_color = eye[pos].color;
-  if (eye_color == BLACK_BORDER)
-    eye_color = BLACK;
-  if (eye_color == WHITE_BORDER)
-    eye_color = WHITE;
 
   if (eye[pos].esize-eye[pos].msize > 8)
     return 0;
@@ -1630,17 +1625,15 @@ add_false_eye(int pos, struct eye_data eye[BOARDMAX],
 int
 is_eye_space(int pos)
 {
-  return (white_eye[pos].color == WHITE_BORDER
-	  || black_eye[pos].color == BLACK_BORDER);
+  return (white_eye[pos].color == WHITE
+	  || black_eye[pos].color == BLACK);
 }
 
 int
 is_proper_eye_space(int pos)
 {
-  return ((white_eye[pos].color == WHITE_BORDER
-	   && !white_eye[pos].marginal)
-	  || (black_eye[pos].color == BLACK_BORDER
-	      && !black_eye[pos].marginal));
+  return ((white_eye[pos].color == WHITE && !white_eye[pos].marginal)
+	  || (black_eye[pos].color == BLACK && !black_eye[pos].marginal));
 }
 
 /* Return the maximum number of eyes that can be obtained from the
@@ -1654,10 +1647,10 @@ max_eye_value(int pos)
   int max_white = 0;
   int max_black = 0;
   
-  if (white_eye[pos].color == WHITE_BORDER)
+  if (white_eye[pos].color == WHITE)
     max_white = max_eyes(&white_eye[pos].value);
 
-  if (black_eye[pos].color == BLACK_BORDER)
+  if (black_eye[pos].color == BLACK)
     max_black = max_eyes(&black_eye[pos].value);
 
   return gg_max(max_white, max_black);
@@ -1691,7 +1684,7 @@ find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX],
 			 char find_mask[BOARDMAX])
 {
-  int eye_color = (color == WHITE ? WHITE_BORDER : BLACK_BORDER);
+  int eye_color = color;
   int pos;
   float sum;
   
@@ -1957,7 +1950,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
    * so we can clearly see why having two marginal vertices makes a
    * difference.)
    */
-   if (my_eye[pos].color == BORDER_COLOR(color)
+   if (my_eye[pos].color == color
        && !my_eye[pos].marginal
        && my_eye[pos].marginal_neighbors < 2
        && !(board[pos] == EMPTY && does_capture_something(pos, other)))

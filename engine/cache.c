@@ -30,21 +30,81 @@
 #include <string.h>
 
 #include "liberty.h"
-#include "hash.h"
 #include "cache.h"
 #include "sgftree.h"
 
 
 /* ================================================================ */
 /*                    The new transposition table                   */
-
-
-
 /* ---------------------------------------------------------------- */
 
+/* The transposition table itself. */
+Transposition_table  ttable;
 
-/* Initialize the transposition table.
+static Hash_data komaster_hash[NUM_KOMASTER_STATES];
+static Hash_data kom_pos_hash[BOARDMAX];
+static Hash_data target1_hash[BOARDMAX];
+static Hash_data target2_hash[BOARDMAX];
+static Hash_data routine_hash[NUM_CACHE_ROUTINES];
+
+static struct init_struct {
+  Hash_data *array;
+  int array_size;
+} hash_init_values[] = {
+  {komaster_hash, NUM_KOMASTER_STATES},
+  {kom_pos_hash,  BOARDMAX},
+  {target1_hash,  BOARDMAX},
+  {target2_hash,  BOARDMAX},
+  {routine_hash,  NUM_CACHE_ROUTINES}
+};
+
+/* Initialize random hash values identifying input data (other than the
+ * board position) in a cache entry.
  */
+static void
+keyhash_init(void)
+{
+  static int  is_initialized = 0;
+  Hash_data  *array;
+  int         size;
+  unsigned    i;
+  int         j;
+
+  if (is_initialized)
+    return;
+  
+#if TRACE_READ_RESULTS
+  /* We need consistent hash values when this option is enabled. */
+  gg_srand(1);
+#endif
+  
+  for (i = 0; 
+       i < sizeof(hash_init_values) / sizeof(struct init_struct);
+       i++) {
+    array = hash_init_values[i].array;
+    size  = hash_init_values[i].array_size;
+
+    for (j = 0; j < size; j++)
+      hashdata_init(array[j], gg_urand(), gg_urand()); 
+  }
+
+  is_initialized = 1;
+}
+
+static void
+calculate_hashval_for_tt(int komaster, int kom_pos, int routine, int target,
+			 Hash_data *hashdata2)
+{ 
+  *hashdata2 = hashdata;                /* from globals.c */
+  hashdata_xor(*hashdata2, komaster_hash[komaster]);
+  hashdata_xor(*hashdata2, kom_pos_hash[kom_pos]);
+  hashdata_xor(*hashdata2, routine_hash[routine]);
+  hashdata_xor(*hashdata2, target1_hash[target]);
+}
+
+
+
+/* Initialize the transposition table. */
  
 void
 tt_init(Transposition_table *table, int memsize)
@@ -53,6 +113,7 @@ tt_init(Transposition_table *table, int memsize)
  
   /* Make sure the hash system is initialized. */
   hash_ng_init();
+  keyhash_init();
 
   num_entries = memsize / sizeof(Hashentry_ng);
 
@@ -113,7 +174,7 @@ tt_free(Transposition_table *table)
  
 int
 tt_get(Transposition_table *table, 
-       int komaster, int kom_pos, int routine, int target, 
+       int komaster, int kom_pos, enum routine_id routine, int target, 
        int remaining_depth,
        int *result, int *move)
 {
@@ -161,20 +222,17 @@ tt_get(Transposition_table *table,
 
 void
 tt_update(Transposition_table *table,
-	  int komaster, int kom_pos, int routine, int target, 
-	  int remaining_depth,
-	  int result, int move)
+	  int komaster, int kom_pos, enum routine_id routine, int target, 
+	  int remaining_depth, int result, int move)
 {
-  Hash_data      hashval;
-  Hashentry_ng  *entry;
-  Hashnode_ng   *deepest;
-  Hashnode_ng   *newest;
-  int data;
+  Hash_data hashval;
+  Hashentry_ng *entry;
+  Hashnode_ng *deepest;
+  Hashnode_ng *newest;
+  unsigned int data;
 
-  /* Calculate the hash value. */
   /* Get the combined hash value. */
-  calculate_hashval_for_tt(komaster, kom_pos, routine, target,
-			   &hashval);
+  calculate_hashval_for_tt(komaster, kom_pos, routine, target, &hashval);
   data = hn_create_data(remaining_depth, result, 0, move, 0);
 
   /* Get the entry and nodes. */ 
@@ -224,6 +282,18 @@ tt_update(Transposition_table *table,
   table->is_clean = 0;
 }
 
+static const char* routine_names[] = {
+    ROUTINE_NAMES
+};
+
+/* Convert a routine as used in the cache table to a string. */
+const char *
+routine_id_to_string(enum routine_id routine)
+{
+    return routine_names[(int) routine];
+}
+
+
 
 /* ================================================================ */
 /*                    The old transposition table                   */
@@ -251,7 +321,8 @@ static void hashnode_unlink_closed_results(Hashnode *node,
 					   unsigned int remaining_depth_limit,
 					   int statistics[][20]);
 static void hashtable_partially_clear(Hashtable *table);
-static int do_get_read_result(int routine, int komaster, int kom_pos,
+static int do_get_read_result(enum routine_id routine,
+    			      int komaster, int kom_pos,
 			      int str1, int str2, Read_result **read_result,
 		   	      Hash_data *hashmodifier);
 
@@ -523,7 +594,7 @@ hashnode_unlink_closed_results(Hashnode *node,
   /* Traverse all node results. */
   do {
     unsigned int result_remaining_depth = rr_get_remaining_depth(*result);
-    int result_routine = rr_get_routine(*result);
+    enum routine_id result_routine = rr_get_routine(*result);
 
     if (debug & DEBUG_READING_PERFORMANCE) {
       int stat_stackp = depth - result_remaining_depth;
@@ -533,7 +604,6 @@ hashnode_unlink_closed_results(Hashnode *node,
       if (stat_stackp < 0)
 	stat_stackp = 0;
 
-      gg_assert(result_routine >= 0 && result_routine < NUM_ROUTINES);
       statistics[result_routine][stat_stackp]++;
     }
 
@@ -572,12 +642,12 @@ hashtable_partially_clear(Hashtable *table)
   Hashnode *node;
   const int remaining_depth_limit = depth - 3;
 
-  int statistics[NUM_ROUTINES][20];
+  int statistics[NUM_CACHE_ROUTINES][20];
 
   if (debug & DEBUG_READING_PERFORMANCE) {
     gprintf("Hashtable cleared because it became full.\n");
 
-    for (k = 0; k < NUM_ROUTINES; ++k)
+    for (k = 0; k < NUM_CACHE_ROUTINES; ++k)
       for (l = 0; l < 20; ++l)
 	statistics[k][l] = 0;
   }
@@ -631,7 +701,7 @@ hashtable_partially_clear(Hashtable *table)
 
     fprintf(stderr, "routine        total     0     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15    16    17    18    19\n");
 
-    for (k = 0; k < NUM_ROUTINES; ++k) {
+    for (k = 0; k < NUM_CACHE_ROUTINES; ++k) {
       total = 0; 
       for (l = 0; l < 20; ++l)
 	total += statistics[k][l];
@@ -887,7 +957,8 @@ reading_cache_clear()
 }
 
 int
-get_read_result_hash_modified(int routine, int komaster, int kom_pos,
+get_read_result_hash_modified(enum routine_id routine,
+    			      int komaster, int kom_pos,
     			      int *str, Hash_data *hashmodifier,
 			      Read_result **read_result)
 {
@@ -913,7 +984,7 @@ get_read_result_hash_modified(int routine, int komaster, int kom_pos,
  * For performance, the location is changed to the origin of the string.
  */
 int
-get_read_result(int routine, int komaster, int kom_pos, int *str,
+get_read_result(enum routine_id routine, int komaster, int kom_pos, int *str,
 		Read_result **read_result)
 {
   /* Only store the result if stackp <= depth. Above that, there
@@ -938,8 +1009,8 @@ get_read_result(int routine, int komaster, int kom_pos, int *str,
  * Variant with two calling strings.
  */
 int
-get_read_result2(int routine, int komaster, int kom_pos, int *str1, int *str2,
-		 Read_result **read_result)
+get_read_result2(enum routine_id routine, int komaster, int kom_pos,
+    		 int *str1, int *str2, Read_result **read_result)
 {
   /* Only store the result if stackp <= depth. Above that, there
    * is no branching, so we won't gain anything.
@@ -961,7 +1032,7 @@ get_read_result2(int routine, int komaster, int kom_pos, int *str1, int *str2,
 
 
 static int
-do_get_read_result(int routine, int komaster, int kom_pos,
+do_get_read_result(enum routine_id routine, int komaster, int kom_pos,
 		   int str1, int str2, Read_result **read_result,
 		   Hash_data *hashmodifier)
 {

@@ -206,7 +206,7 @@ static const int val_mask[2][8] = {
  * we care about each time.
  */
   
-static unsigned int class_mask[MAX_DRAGON_STATUS][3];
+static unsigned int class_mask[NUM_DRAGON_STATUS][3];
 
 
 /* In the current implementation, the edge constraints depend on

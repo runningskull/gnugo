@@ -378,21 +378,6 @@ board representation (@pxref{The Board Array})
 Takes 1 integers and writes a move, using the one dimensional
 board representation (@pxref{The Board Array})
 @end quotation
-@item @code{%r}
-@quotation
-Takes 1 integers and writes a move, using the one dimensional
-Print a read result as a string. Possible outcomes are:
-@itemize @minus
-@item 0
-@item KO_B
-@item LOSS
-@item GAIN
-@item KO_A
-@item WIN
-@item SEKI
-@item ERROR
-@end itemize
-@end quotation
 @end itemize
 
 We list the non statically declared functions in @file{printutils.c}.

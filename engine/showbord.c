@@ -77,93 +77,6 @@ static const int colors[3][5] = {
 static const int domain_colors[4] = {5, 1, 2, 3}; /* gray, black, white, both */
 
 
-/* True if the coordinate is a hoshi point.
- */
-static int
-is_hoshi_point(int m, int n)
-{
-  int hoshi;
-  int middle;
-
-  /* No hoshi points on these boards. */
-  if (board_size == 2 || board_size == 4)
-    return 0;
-
-  /* In the middle of a 3x3 board. */
-  if (board_size == 3) {
-    if (m == 1 && n == 1)
-      return 1;
-
-    return 0;
-  }
-
-  if (board_size == 5) {
-    if (m == 1 && (n == 1 || n == 3))
-      return 1;
-    if (m == 2 && n == 2)
-      return 1;
-    if (m == 3 && (n == 1 || n == 3))
-      return 1;
-
-    return 0;
-  }
-
-  /* 3-3 points are hoshi on sizes 7--11, 4-4 on larger. */
-  if (board_size <= 11)
-    hoshi = 2;
-  else
-    hoshi = 3;
-
-  /* Coordinate for midpoint. */
-  middle = board_size/2;
-    
-  /* Normalize the coordinates by mirroring to the lower numbers. */
-  if (m >= middle)
-    m = board_size - 1 - m;
-  if (n >= middle)
-    n = board_size - 1 - n;
-  
-  /* Is this a corner hoshi? */
-  if (m == hoshi && n == hoshi)
-    return 1;
-
-  /* If even sized board, only hoshi points in the corner. */
-  if (board_size%2 == 0)
-    return 0;
-
-  /* Less then 12 in board size only middle point. */
-  if (board_size < 12) {
-    if (m == middle && n == middle)
-      return 1;
-
-    return 0;
-  }
-
-  /* Is this a midpoint hoshi? */
-  if ((m == hoshi || m == middle)
-      && (n == hoshi || n == middle))
-    return 1;
-
-  /* No more chances. */
-  return 0;
-}
-
-/* Print a line with coordinate letters above the board. */
-static void
-draw_letter_coordinates(FILE *outfile)
-{
-  int i;
-  int ch;
-  
-  fprintf(outfile, "  ");
-  for (i = 0, ch = 'A'; i < board_size; i++, ch++) {
-    if (ch == 'I')
-      ch++;
-    fprintf(outfile, " %c", ch);
-  }
-}
-
-
 /* The following four functions define an API for drawing boards. The
  * typical use would be along the following lines:
  *
@@ -269,8 +182,8 @@ showchar(int i, int j, int empty, int xo)
       int empty_color;
       char empty_char;
       
-      if (black_eye[POS(i, j)].color == BLACK_BORDER) {
-	if (white_eye[POS(i, j)].color == WHITE_BORDER)
+      if (black_eye[POS(i, j)].color == BLACK) {
+	if (white_eye[POS(i, j)].color == WHITE)
 	  empty_color = domain_colors[3];
 	else
 	  empty_color = domain_colors[1];
@@ -280,7 +193,7 @@ showchar(int i, int j, int empty, int xo)
 	else
 	  empty_char = 'x';
       }
-      else if (white_eye[POS(i, j)].color == WHITE_BORDER) {
+      else if (white_eye[POS(i, j)].color == WHITE) {
 	empty_color = domain_colors[2];
 	if (white_eye[POS(i, j)].marginal)
 	  empty_char = '!';
@@ -397,40 +310,38 @@ showboard(int xo)
 }
 
 
-/* Bare bones version of showboard(0). No fancy options, no hint of
- * color, and you can choose where to write it.
+/* Some print utility function that don't really have a better place
+ * in the engine code than here.
  */
-void
-simple_showboard(FILE *outfile)
+
+static const char* status_names [] = {
+  DRAGON_STATUS_NAMES
+};
+
+/* Convert a status value to a string. */
+const char *
+status_to_string(enum dragon_status status)
 {
-  int i, j;
-
-  draw_letter_coordinates(outfile);
-  
-  for (i = 0; i < board_size; i++) {
-    fprintf(outfile, "\n%2d", board_size - i);
-    
-    for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == EMPTY)
-	fprintf(outfile, " %c", is_hoshi_point(i, j) ? '+' : '.');
-      else
-	fprintf(outfile, " %c", BOARD(i, j) == BLACK ? 'X' : 'O');
-    }
-
-    fprintf(outfile, " %d", board_size - i);
-    
-    if ((board_size < 10 && i == board_size-2)
-	|| (board_size >= 10 && i == 8))
-      fprintf(outfile, "     WHITE (O) has captured %d stones", black_captured);
-    
-    if ((board_size < 10 && i == board_size-1)
-	|| (board_size >= 10 && i == 9))
-      fprintf(outfile, "     BLACK (X) has captured %d stones", white_captured);
-  }
-  
-  fprintf(outfile, "\n");
-  draw_letter_coordinates(outfile);
+  return status_names[(int) status];
 }
+
+
+/* Convert a read result to a string */
+const char *
+result_to_string(int result)
+{
+  switch (result) {
+  case 0:             return "0";
+  case KO_B:          return "KO_B";
+  case LOSS:          return "LOSS";
+  case GAIN:          return "GAIN";
+  case KO_A:          return "KO_A";
+  case WIN:           return "WIN";
+
+  default:            return "ERROR";
+  }
+}
+
 
 /*
  * Local Variables:
