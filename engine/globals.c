@@ -152,6 +152,8 @@ int number_close_black_worms[BOARDMAX];
 int close_white_worms[BOARDMAX][4];
 int number_close_white_worms[BOARDMAX];
 
+int false_eye_territory[BOARDMAX];
+
 /* Various statistics are collected here. */
 struct stats_data stats;
 

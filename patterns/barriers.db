@@ -1621,6 +1621,7 @@ o!X
 
 
 Pattern Intrusion40
+# gf Revised constraint. (3.3.10)
 
 X!
 Q?
@@ -1630,7 +1631,7 @@ Q?
 A!
 Q?
 
-;lib(A)==1
+;lib(A)==1 && attack(A)
 
 
 Pattern Intrusion41
@@ -1896,6 +1897,7 @@ QB!
 
 
 Pattern Nonterritory1
+# gf Revised constraint. (3.3.10)
 
 OxO
 XoX
@@ -1905,11 +1907,42 @@ XoX
 OaO
 XbX
 
->non_oterritory(a);
->non_xterritory(b);
+>if (!false_eye_territory(a)) non_oterritory(a);
+>if (!false_eye_territory(b)) non_xterritory(b);
+
+
+Pattern Nonterritory1b
+# gf Revised constraint. (3.3.10)
+
+Ox.
+XoX
+
+:8,t
+
+Ox.
+XaX
+
+>if ((halfeye(a) || false_eye(a))
+>    && !false_eye_territory(a)) non_xterritory(a);
+
+
+Pattern Nonterritory1c
+# gf Revised constraint. (3.3.10)
+
+Xo.
+OxO
+
+:8,t
+
+Ox.
+XaX
+
+>if (false_eye(a)
+>    && !false_eye_territory(a)) non_oterritory(a);
 
 
 Pattern Nonterritory2
+# gf Revised constraint. (3.3.10)
 
 ?xO
 x.X
@@ -1921,10 +1954,11 @@ Ox?
 xaX
 Ox?
 
->non_xterritory(a);
+>if (!false_eye_territory(a)) non_xterritory(a);
 
 
 Pattern Nonterritory3
+# gf Revised constraint. (3.3.10)
 
 ?oX
 o.O
@@ -1936,10 +1970,11 @@ Xo?
 oaO
 Xo?
 
->non_oterritory(a);
+>if (!false_eye_territory(a)) non_oterritory(a);
 
 
 Pattern Nonterritory4
+# gf Revised constraint. (3.3.10)
 
 |xO
 |oX
@@ -1949,8 +1984,8 @@ Pattern Nonterritory4
 |aO
 |bX
 
->non_oterritory(a);
->non_xterritory(b);
+>if (!false_eye_territory(a)) non_oterritory(a);
+>if (!false_eye_territory(b)) non_xterritory(b);
 
 
 Pattern Nonterritory5
@@ -2603,22 +2638,82 @@ dbX
 
 Pattern Nonterritory36
 # gf New pattern. (3.3.7)
+# gf Revised constraint. (3.3.10)
 
 OX?
 .OX
-.ox
+.o?
 ---
 
 :8,t
 
 OX?
 baX
-.ox
+.o?
 ---
 
-;attack(a)
+;lib(a)==2 && attack(a)
 
 >non_oterritory(b);
+
+
+Pattern Nonterritory37
+# gf New pattern. (3.3.10)
+# See trevorb:270.
+
+X.?
+.XO
+.x?
+---
+
+:8,t
+
+Xa?
+cBO
+.x?
+---
+
+;lib(B)==3 && safe_omove(a) && oplay_attack(a,B)
+
+>non_xterritory(c);
+
+
+Pattern Nonterritory38
+# gf New pattern. (3.3.10)
+# See trevorc:930.
+
+OX?
+.OX
+..O
+
+:8,t
+
+OX?
+.cX
+.ab
+
+;!xplay_defend_both(a,b,c)
+
+>non_oterritory(a);
+
+
+Pattern Nonterritory39
+# gf New pattern. (3.3.10)
+# See trevorc:930.
+
+X.O
+.XO
+..X
+
+:8,t
+
+XaO
+.DO
+.bC
+
+;!oplay_defend_both(a,?,b,C,D)
+
+>non_xterritory(b);
 
 
 # END OF FILE

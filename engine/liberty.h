@@ -704,6 +704,7 @@ extern int number_close_black_worms[BOARDMAX];
 extern int close_white_worms[BOARDMAX][MAX_CLOSE_WORMS];
 extern int number_close_white_worms[BOARDMAX];
 
+extern int false_eye_territory[BOARDMAX];
 
 struct stats_data {
   int nodes;                     /* Number of visited nodes while reading */
@@ -934,6 +935,7 @@ int eye_move_urgency(struct eyevalue *e);
 char *eyevalue_to_string(struct eyevalue *e);
 
 int is_halfeye(struct half_eye_data heye[BOARDMAX], int pos);
+int is_false_eye(struct half_eye_data heye[BOARDMAX], int pos);
 
 /* Our own abort() which prints board state on the way out.
  * (i, j) is a "relevant" board position for info. */

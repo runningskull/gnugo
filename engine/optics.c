@@ -1402,6 +1402,12 @@ is_halfeye(struct half_eye_data heye[BOARDMAX], int pos)
   return heye[pos].type == HALF_EYE;
 }
 
+int
+is_false_eye(struct half_eye_data heye[BOARDMAX], int pos)
+{
+  return heye[pos].type == FALSE_EYE;
+}
+
 /* See Texinfo documentation (Eyes:Eye Topology). Returns:
  * - 2 or less if (pos) is a proper eye for (color);
  * - between 2 and 3 if the eye can be made false only by ko

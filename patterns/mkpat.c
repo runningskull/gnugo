@@ -303,7 +303,12 @@ static struct autohelper_func autohelper_functions[] = {
   {"non_xterritory",  		1, 0.0,
 		"influence_mark_non_territory(%s, OTHER_COLOR(color))"},
   {"remaining_handicap_stones",	0, 0.0, "free_handicap_remaining_stones()"},
-  {"total_handicap_stones",	0, 0.0, "free_handicap_total_stones()"}
+  {"total_handicap_stones",	0, 0.0, "free_handicap_total_stones()"},
+  {"o_captures_something", 	1, 0.02, "does_capture_something(%s, color)"},
+  {"x_captures_something", 	1, 0.02, "does_capture_something(%s,
+                                          OTHER_COLOR(color))"},
+  {"false_eye_territory",	1, 0.0, "false_eye_territory[%s]"},
+  {"false_eye",        		1, 0.01, "is_false_eye(half_eye,%s)"}
 };
 
 

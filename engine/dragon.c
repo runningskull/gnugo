@@ -55,6 +55,12 @@ static void add_adjacent_dragons(int a, int b);
 static void add_adjacent_dragon(int a, int b);
 static int dragon_invincible(int pos);
 static int dragon_looks_inessential(int origin);
+static void analyze_false_eye_territory(void);
+static int connected_to_eye(int pos, int str, int color, int eye_color,
+			    struct eye_data *eye);
+static void connected_to_eye_recurse(int pos, int str, int color,
+				     int eye_color, struct eye_data *eye,
+				     char *mx, char *me, int *halfeyes);
 static int compute_crude_status(int pos);
 static void dragon_eye(int pos, struct eye_data[BOARDMAX]);
 static int compute_escape(int pos, int dragon_status_known);
@@ -230,6 +236,12 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
     }
   }
   time_report(2, "  time to find eyes", NO_MOVE, 1.0);
+
+  /* Try to determine whether topologically false and half eye points
+   * contribute to territory even if the eye doesn't solidify.
+   */
+  analyze_false_eye_territory();
+  time_report(2, "  time to analyze false eye territory", NO_MOVE, 1.0);
 
   /* Now we compute the genus. */
   for (str = BOARDMIN; str < BOARDMAX; str++) {
@@ -612,7 +624,30 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	}
       }
     }
-  time_report(2, "  revise inessentiality", NO_MOVE, 1.0);
+  time_report(2, "  revise worm inessentiality", NO_MOVE, 1.0);
+
+  /* Revise essentiality of critical dragons. Specifically, a critical
+   * dragon consisting entirely of inessential worms is considered
+   * INESSENTIAL.
+   */
+  for (str = BOARDMIN; str < BOARDMAX; str++) {
+    if (ON_BOARD(str)
+	&& dragon[str].origin == str
+	&& DRAGON2(str).safety == CRITICAL) {
+      int w;
+      for (w = first_worm_in_dragon(str); w != NO_MOVE;
+	   w = next_worm_in_dragon(w)) {
+	if (!worm[w].inessential)
+	  break;
+      }
+
+      if (w == NO_MOVE) {
+	DEBUG(DEBUG_DRAGONS, "Dragon %1m revised to be inessential.\n", str);
+	DRAGON2(str).safety = INESSENTIAL;
+      }
+    }
+  }
+  time_report(2, "  revise dragon inessentiality", NO_MOVE, 1.0);
 
   /* Count the non-dead dragons. */
   lively_white_dragons = 0;
@@ -1030,6 +1065,191 @@ dragon_looks_inessential(int origin)
   return 1;
 }
 
+
+/* Try to determine whether topologically false and half eye points
+ * contribute to territory even if the eye doesn't solidify. The purpose
+ * is to be able to distinguish between, e.g., these positions:
+ *
+ * |.OOOOO       |.OOOOO
+ * |.O.XXO       |.O.OXO
+ * |OOX.XO       |OOX.XO
+ * |O*XXXO  and  |O*XXXO
+ * |OX.XOO       |OX.XOO
+ * |X.XOO.       |X.XOO.
+ * |.XXO..       |.XXO..
+ * +------       +------
+ * 
+ * In the left one the move at * is a pure dame point while in the
+ * right one it is worth one point of territory for either player.
+ *
+ * In general the question is whether a topologically false eye vertex
+ * counts as territory or not and the answer depends on whether each
+ * string adjoining the eye is externally connected to at least one
+ * proper eye.
+ *
+ * This function loops over the topologically false and half eye
+ * vertices and calls connected_to_eye() for each adjoining string to
+ * determine whether they all have external connection to an eye. The
+ * result is stored in the array false_eye_territory[] array.
+ */
+static void
+analyze_false_eye_territory(void)
+{
+  int pos;
+  int color;
+  int eye_color;
+  struct eye_data *eye;
+  int k;
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    
+    false_eye_territory[pos] = 0;
+
+    /* The analysis only applies to false and half eyes. */
+    if (half_eye[pos].type == 0)
+      continue;
+
+    /* Determine the color of the eye. */
+    if (white_eye[pos].color == WHITE_BORDER) {
+      color = WHITE;
+      eye_color = WHITE_BORDER;
+      eye = white_eye;
+    }
+    else if (black_eye[pos].color == BLACK_BORDER) {
+      color = BLACK;
+      eye_color = BLACK_BORDER;
+      eye = black_eye;
+    }
+    else
+      continue;
+
+    /* Make sure we have a "closed" position. Positions like
+     *
+     * |XXXXXX.
+     * |OOOOOXX
+     * |.O.O*..
+     * +-------
+     *
+     * disqualify without further analysis. (* is a false eye vertex)
+     */
+    for (k = 0; k < 4; k++)
+      if (ON_BOARD(pos + delta[k])
+	  && board[pos + delta[k]] != color
+	  && eye[pos + delta[k]].color != eye_color)
+	break;
+     
+    if (k < 4)
+      continue;
+
+    /* Check that all adjoining strings have external connection to an
+     * eye.
+     */
+    for (k = 0; k < 4; k++)
+      if (ON_BOARD(pos + delta[k])
+	  && board[pos + delta[k]] == color
+	  && !connected_to_eye(pos, pos + delta[k], color, eye_color, eye))
+	break;
+
+    if (k == 4) {
+      false_eye_territory[pos] = 1;
+      if (0)
+	gprintf("False eye territory at %1m\n", pos);
+    }
+  }
+}
+
+/* 
+ * This function (implicitly) finds the connected set of strings of a
+ * dragon, starting from (str) which is next to the analyzed halfeye
+ * at (pos). Strings are for this purpose considered connected if and
+ * only if they have a common liberty, which is not allowed to be the
+ * half eye itself or one of its diagonal neighbors. For these strings
+ * it is examined whether their liberties are parts of eyespaces worth
+ * at least two halfeyes (again not counting the eyespace at (pos)).
+ *
+ * The real work is done by the recursive function
+ * connected_to_eye_recurse() below.
+ */
+static int
+connected_to_eye(int pos, int str, int color, int eye_color,
+		 struct eye_data *eye)
+{
+  char mx[BOARDMAX];
+  char me[BOARDMAX];
+  int k;
+  int halfeyes;
+
+  /* mx marks strings and liberties which have already been investigated.
+   * me marks the origins of eyespaces which have already been counted.
+   * Start by marking (pos) and the surrounding vertices in mx.
+   */
+  memset(mx, 0, sizeof(mx));
+  memset(me, 0, sizeof(me));
+  mx[pos] = 1;
+  for (k = 0; k < 8; k++)
+    if (ON_BOARD(pos + delta[k]))
+      mx[pos + delta[k]] = 1;
+
+  halfeyes = 0;
+  connected_to_eye_recurse(pos, str, color, eye_color, eye, mx, me, &halfeyes);
+
+  if (halfeyes >= 2)
+    return 1;
+  
+  return 0;
+}
+
+/* Recursive helper for connected_to_eye(). Stop searching when we
+ * have found at least two halfeyes.
+ */
+static void
+connected_to_eye_recurse(int pos, int str, int color, int eye_color,
+			 struct eye_data *eye, char *mx, char *me,
+			 int *halfeyes)
+{
+  int liberties;
+  int libs[MAXLIBS];
+  int r;
+  int k;
+
+  mark_string(str, mx, 1);
+  liberties = findlib(str, MAXLIBS, libs);
+
+  /* Search the liberties of (str) for eyespaces. */
+  for (r = 0; r < liberties; r++) {
+    if (eye[libs[r]].color == eye_color
+	&& libs[r] != pos
+	&& !me[eye[libs[r]].origin]) {
+      me[eye[libs[r]].origin] = 1;
+      *halfeyes += (min_eyes(&eye[libs[r]].value)
+		    + max_eyes(&eye[libs[r]].value));
+    }
+  }
+
+  if (*halfeyes >= 2)
+    return;
+
+  /* Search for new strings in the same dragon with a liberty in
+   * common with (str), and recurse.
+   */
+  for (r = 0; r < liberties; r++) {
+    if (mx[libs[r]])
+      continue;
+    mx[libs[r]] = 1;
+    for (k = 0; k < 4; k++) {
+      if (ON_BOARD(libs[r] + delta[k])
+	  && board[libs[r] + delta[k]] == color
+	  && is_same_dragon(str, libs[r] + delta[k])
+	  && !mx[libs[r] + delta[k]])
+	connected_to_eye_recurse(pos, libs[r] + delta[k], color, eye_color,
+				 eye, mx, me, halfeyes);
+      if (*halfeyes >= 2)
+	return;
+    }
+  }
+}
 
 /* print status info on all dragons. (Can be invoked from gdb) 
  */

@@ -2,6 +2,16 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new static functions analyze_false_eye_territory(),
+  connected_to_eye(), and connected_to_eye_recurse() in dragon.c.
+- new global array false_eye_territory[]
+- critical dragons only consisting of inessential worms are revised
+  to be inessential
+- new function is_false_eye() in optics.c
+- new autohelper functions o_captures_something(),
+  x_captures_something(), false_eye_territory(), and false_eye()
+- influence tuning
+- tuning
 - new game records and regression tests
 
 3.3.9 released September 29, 2002
