@@ -2,7 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.7.1 released January 20, 2005
+3.7.2 released January 20, 2005
 
 - gnugo.el: Grid display implemented
 - gnugo.el: SGF handling improved
