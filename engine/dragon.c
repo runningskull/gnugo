@@ -1661,18 +1661,18 @@ struct interpolation_data genus2weakness =
 static float
 compute_dragon_weakness_value(int d)
 {
-  float true_genus = ((float) dragon2[d].genus)
-    		     + 0.5 * ((float) dragon2[d].heyes
-			      + (dragon2[d].lunch != NO_MOVE ? 1.0 : 0.0));
+  float true_genus = (((float) dragon2[d].genus)
+		      + 0.5 * ((float) dragon2[d].heyes
+			       + (dragon2[d].lunch != NO_MOVE ? 1.0 : 0.0)));
   int origin = dragon2[d].origin;
   float escape_route = (float) dragon2[d].escape_route;
   int dragon_safety = dragon2[d].safety;
-  int i,j;
+  int i, j;
 
   float weakness_value[3];
   float weakness;
 
-  if (dragon_safety == INVINCIBLE|| dragon_safety == INESSENTIAL)
+  if (dragon_safety == INVINCIBLE || dragon_safety == INESSENTIAL)
     return 0.0;
   if (dragon_safety == TACTICALLY_DEAD)
     return 1.0;
@@ -1705,7 +1705,8 @@ compute_dragon_weakness_value(int d)
   weakness_value[2] = gg_interpolate(&genus2weakness, true_genus);
 
   DEBUG(DEBUG_DRAGONS, "Computing weakness of dragon at %1m:\n", origin);
-  DEBUG(DEBUG_DRAGONS, "  moyo value %f -> %f, escape %f -> %f, eyes %f -> %f,",
+  DEBUG(DEBUG_DRAGONS,
+	"  moyo value %f -> %f, escape %f -> %f, eyes %f -> %f,",
 	dragon2[d].moyo_territorial_value, weakness_value[0],
 	escape_route, weakness_value[1], true_genus, weakness_value[2]);
 
@@ -1752,8 +1753,10 @@ compute_refined_dragon_weaknesses()
   /* Compute the surrounding moyo sizes. */
   for (d = 0; d < number_of_dragons; d++)
     dragon2[d].moyo_size_post_owl = 2 * BOARDMAX;
+  
   /* Set moyo sizes according to initial_influence. */
   compute_surrounding_moyo_sizes(0, 1);
+  
   /* Set moyo sizes according to initial_opposite_influence if
    * this yields smaller results.
    */
@@ -1876,52 +1879,54 @@ report_dragon(FILE *outfile, int pos)
     return;
   }
 
-  gfprintf(outfile,"color                   %s\n", color_to_string(d->color));
-  gfprintf(outfile,"origin                  %1m\n", d->origin);
-  gfprintf(outfile,"size                    %d\n", d->size);
-  gfprintf(outfile,"effective_size          %f\n", d->effective_size);
-  gfprintf(outfile,"heyes                   %d\n", d2->heyes);
-  gfprintf(outfile,"heye                    %1m\n", d2->heye);
-  gfprintf(outfile,"genus                   %d\n", d2->genus);
-  gfprintf(outfile,"escape_route            %d\n", d2->escape_route);
-  gfprintf(outfile,"lunch                   %1m\n", d2->lunch);
-  gfprintf(outfile,"status                  %s\n",
+  gfprintf(outfile, "color                   %s\n", color_to_string(d->color));
+  gfprintf(outfile, "origin                  %1m\n", d->origin);
+  gfprintf(outfile, "size                    %d\n", d->size);
+  gfprintf(outfile, "effective_size          %f\n", d->effective_size);
+  gfprintf(outfile, "heyes                   %d\n", d2->heyes);
+  gfprintf(outfile, "heye                    %1m\n", d2->heye);
+  gfprintf(outfile, "genus                   %d\n", d2->genus);
+  gfprintf(outfile, "escape_route            %d\n", d2->escape_route);
+  gfprintf(outfile, "lunch                   %1m\n", d2->lunch);
+  gfprintf(outfile, "status                  %s\n",
 	   status_to_string(d->crude_status));
-  gfprintf(outfile,"owl_status              %s\n",
+  gfprintf(outfile, "owl_status              %s\n",
 	   status_to_string(d->owl_status));
-  gfprintf(outfile,"status          %s\n",
+  gfprintf(outfile, "status          %s\n",
 	   status_to_string(d->status));
-  gfprintf(outfile,"owl_threat_status       %s\n",
+  gfprintf(outfile, "owl_threat_status       %s\n",
 	   status_to_string(d->owl_threat_status));
-  gfprintf(outfile,"owl_attack              %1m\n", d->owl_attack_point);
-  gfprintf(outfile,"owl_attack_certain      %s\n",
+  gfprintf(outfile, "owl_attack              %1m\n", d->owl_attack_point);
+  gfprintf(outfile, "owl_attack_certain      %s\n",
 	   (d->owl_attack_certain) ? "YES" : "NO");
-  gfprintf(outfile,"owl_2nd_attack          %1m\n", d->owl_second_attack_point);
-  gfprintf(outfile,"owl_defend              %1m\n", d->owl_defense_point);
-  gfprintf(outfile,"owl_defense_certain     %s\n",
+  gfprintf(outfile, "owl_2nd_attack          %1m\n",
+	   d->owl_second_attack_point);
+  gfprintf(outfile, "owl_defend              %1m\n", d->owl_defense_point);
+  gfprintf(outfile, "owl_defense_certain     %s\n",
 	   (d->owl_defense_certain) ? "YES" : "NO");
-  gfprintf(outfile,"owl_2nd_defend          %1m\n",
+  gfprintf(outfile, "owl_2nd_defend          %1m\n",
            d->owl_second_defense_point);
-  gfprintf(outfile,"semeai                  %d\n", d2->semeai);
-  gfprintf(outfile,"semeai_margin_of_safety %d\n",
+  gfprintf(outfile, "semeai                  %d\n", d2->semeai);
+  gfprintf(outfile, "semeai_margin_of_safety %d\n",
 	   d2->semeai_margin_of_safety);
-  gfprintf(outfile,"neighbors               ");
+  gfprintf(outfile, "neighbors               ");
   for (k = 0; k < d2->neighbors; k++)
-    gfprintf(outfile,"%1m ", DRAGON(d2->adjacent[k]).origin);
-  gfprintf(outfile,"\nhostile neighbors       %d\n", d2->hostile_neighbors);
-  gfprintf(outfile,"moyo size pre owl       %d\n", d2->moyo_size_pre_owl);
-  gfprintf(outfile,"moyo size post owl      %d\n", d2->moyo_size_post_owl);
-  gfprintf(outfile,"moyo territorial value  %f\n", d2->moyo_territorial_value);
-  gfprintf(outfile,"safety                  %s\n",
+    gfprintf(outfile, "%1m ", DRAGON(d2->adjacent[k]).origin);
+  gfprintf(outfile, "\nhostile neighbors       %d\n", d2->hostile_neighbors);
+  gfprintf(outfile, "moyo size pre owl       %d\n", d2->moyo_size_pre_owl);
+  gfprintf(outfile, "moyo size post owl      %d\n", d2->moyo_size_post_owl);
+  gfprintf(outfile, "moyo territorial value  %f\n",
+	   d2->moyo_territorial_value);
+  gfprintf(outfile, "safety                  %s\n",
 	   safety_to_string(d2->safety));
-  gfprintf(outfile,"weakness estimate       %f\n", d2->weakness);
-  gfprintf(outfile,"strings                 ");
+  gfprintf(outfile, "weakness estimate       %f\n", d2->weakness);
+  gfprintf(outfile, "strings                 ");
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)
 	&& worm[ii].origin == ii
 	&& is_same_dragon(ii, pos))
-	gfprintf(outfile,"%1m ", ii);
-  gfprintf(outfile,"\n");
+	gfprintf(outfile, "%1m ", ii);
+  gfprintf(outfile, "\n");
 }
 
 

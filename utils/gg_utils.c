@@ -395,7 +395,7 @@ gg_sort(void *base, size_t nel, size_t width,
   } while (gap > 1 || swap_made);
 }
 
-/* Linearly interpoloate f(x) from the data given in interpolation_data. */
+/* Linearly interpolate f(x) from the data given in interpolation_data. */
 float
 gg_interpolate(struct interpolation_data *f, float x)
 {
@@ -410,9 +410,11 @@ gg_interpolate(struct interpolation_data *f, float x)
     ratio = ((float) f->sections) * (x - f->range_lowerbound)
               /(f->range_upperbound - f->range_lowerbound);
     i = (int) ratio;
-    diff = ratio - ((float)i);
-     /* printf(stderr, "Floating point Ratio: %f, integer: %d, diff %f", ratio, i, diff); */
-    return ((1-diff)*f->values[i] + diff* f->values[i+1]);
+    diff = ratio - ((float) i);
+    if (0)
+      fprintf(stderr, "Floating point Ratio: %f, integer: %d, diff %f",
+	      ratio, i, diff);
+    return ((1 - diff) * f->values[i] + diff * f->values[i+1]);
   }
 }
 

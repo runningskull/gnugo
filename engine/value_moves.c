@@ -772,7 +772,7 @@ examine_move_safety(int color)
 
 /*
  * Returns the pre-computed weakness of a dragon, with corrections
- * according to ignore_dead_draggons.
+ * according to ignore_dead_dragons.
  *
  * FIXME: Important to test more exactly how effective a strategical
  *        attack or defense of a weak dragon is. This can be done by

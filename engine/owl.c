@@ -1351,7 +1351,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	shape_moves[0].value       = 25;
 	shape_moves[0].name        = "tactical attack";
 	shape_moves[0].same_dragon = 1;
-	shape_moves[0].escape = 0;
+	shape_moves[0].escape      = 0;
 	shape_moves[1].value       = 0;
 	moves = shape_moves;
       }
@@ -2700,7 +2700,7 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
   /* The very first check is whether we can disregard the pattern due
    * due to an owl safe_move_cache lookup.
    */
-  if (! (pattern->class & CLASS_s))
+  if (!(pattern->class & CLASS_s))
     if (current_owl_data->safe_move_cache[move]) {
       if (current_owl_data->safe_move_cache[move] == 1)
         return 0;
@@ -2710,7 +2710,7 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
 
   /* If the constraint is cheap to check, we do this first. */
   if ((pattern->autohelper_flag & HAVE_CONSTRAINT)
-      && (pattern->constraint_cost < 0.45)) {
+      && pattern->constraint_cost < 0.45) {
     if (!pattern->autohelper(pattern, ll, move, color, 0))
       return 0;
     constraint_checked = 1;
@@ -2720,7 +2720,7 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
    * not checked. Otherwise we discard moves which can be captured. 
    * Illegal ko captures are accepted for ko analysis.
    */
-  if ((!(pattern->class & CLASS_s)) && (!safe_move_checked)) {
+  if (!(pattern->class & CLASS_s) && !safe_move_checked) {
     if (!owl_safe_move(move, color)) {
       if (0)
 	TRACE("  move at %1m wasn't safe, discarded\n", move);
@@ -2749,7 +2749,7 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
   /* If the pattern has a constraint, call the autohelper to see
    * if the pattern must be rejected.
    */
-  if (pattern->autohelper_flag & HAVE_CONSTRAINT && (!constraint_checked))
+  if ((pattern->autohelper_flag & HAVE_CONSTRAINT) && !constraint_checked)
     if (!pattern->autohelper(pattern, ll, move, color, 0))
       return 0;
   return 1;

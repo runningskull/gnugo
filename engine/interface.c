@@ -605,7 +605,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	  }
 
 	rotate(i, j, &i, &j, board_size, orientation);
-	if ((ON_BOARD2(i,j) && board[POS(i, j)] == EMPTY)
+	if ((ON_BOARD2(i, j) && board[POS(i, j)] == EMPTY)
 	    || (i == -1 && j == -1)) {
 	  gnugo_play_move(i, j, next);
 	  sgffile_move_made(i, j, next, 0);

@@ -1357,7 +1357,7 @@ value_territory(struct influence_data *q, int m, int n, int color)
    * for the color playing it. Ideally this should never happen, but
    * currently we need this workaround.
    */
-  if (ON_BOARD2(m,n)) {
+  if (ON_BOARD2(m, n)) {
     if (color == BLACK && q->territory_value[m][n] < 0.0)
       q->territory_value[m][n] = 0.0;
     else if (color == WHITE && q->territory_value[m][n] > 0.0)
