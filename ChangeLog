@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- improved sgf trace in trymove: location of tried move noted
 - complete conversion to new cache
 - add priority to reading results in new cache
 - kill unused hash_ng_init()

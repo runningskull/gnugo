@@ -495,7 +495,7 @@ trymove(int pos, int color, const char *message, int str)
     if (message == NULL)
       message = "UNKNOWN";
 
-    if (str == NO_MOVE) {
+    if (pos == NO_MOVE) {
       if (komaster != EMPTY)
 	gg_snprintf(buf, 100, "%s (variation %d, hash %s, komaster %s:%s)", 
 		    message, count_variations, hashdata_to_string(&hashdata),
@@ -508,7 +508,7 @@ trymove(int pos, int color, const char *message, int str)
       if (komaster != EMPTY)
 	gg_snprintf(buf, 100, 
 		    "%s at %s (variation %d, hash %s, komaster %s:%s)", 
-		    message, location_to_string(str), count_variations,
+		    message, location_to_string(pos), count_variations,
 		    hashdata_to_string(&hashdata),
 		    color_to_string(komaster),
 		    location_to_string(kom_pos));
