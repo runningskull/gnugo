@@ -339,7 +339,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 241
 #J11 is terrible.
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 257
 820 reg_genmove white
-#? [J13|L9]*
+#? [J13|L9]
 
 
 

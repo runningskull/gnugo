@@ -191,7 +191,7 @@ loadsgf games/nicklas/nicklas12.sgf 123
 #SEVERITY=
 loadsgf games/nicklas/nicklas12.sgf 203
 1213 reg_genmove black
-#? [N4]*
+#? [N4]
 
 # Added A6 among the correct moves. /gf (2.7.203)
 loadsgf games/nicklas/nicklas12.sgf 215

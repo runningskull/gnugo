@@ -45,7 +45,7 @@ loadsgf games/nicklas/nicklas12.sgf 89
 # W L8 is alive in semeai. /ab
 loadsgf games/nicklas/nicklas12.sgf 182
 1211 dragon_status L8
-#? [alive]*
+#? [alive]
 
 # This is presumably a semeai problem.
 # As W L8 is alive in semeai with sufficiently many liberties ahead of

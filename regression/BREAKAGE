@@ -1,3 +1,32 @@
+========================== 3.5.1 pre 3 =====================================
+
+./regress.sh . reading.tst
+188 unexpected FAIL: Correct '1 A2', got '0'
+./regress.sh . connection.tst 
+108 unexpected FAIL: Correct '0', got '1'
+./regress.sh . endgame.tst 
+870 unexpected PASS!
+880 unexpected PASS!
+900 unexpected FAIL: Correct 'J19|K19|K18', got 'D16'
+./regress.sh . nicklas1.tst 
+1213 unexpected PASS!
+./regress.sh . nicklas5.tst 
+1211 unexpected PASS!
+./regress.sh . nngs.tst 
+820 unexpected PASS!
+./regress.sh . strategy4.tst 
+162 unexpected FAIL: Correct 'O7|Q7|N7', got 'M8'
+./regress.sh . owl1.tst 
+320 unexpected PASS!
+325 unexpected FAIL: Correct '1 (S18|T15)', got '1 T18'
+326 unexpected FAIL: Correct '3 S18', got '0'
+./regress.sh . nngs4.tst 
+210 unexpected PASS!
+./regress.sh . strategy5.tst 
+282 unexpected FAIL: Correct 'O13', got 'M14'
+
+========================== 3.5.1 pre 2 =====================================
+
 ./regress.sh . ld_owl.tst 
 21 unexpected PASS!
 22 unexpected PASS!

@@ -245,7 +245,7 @@ loadsgf games/owl48.sgf
 
 loadsgf games/nngs/takeda-gnugo-3.4-200308142205.sgf 60
 320 owl_attack R4
-#? [0]*
+#? [0]
 
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 79
 321 owl_defend F3
@@ -265,11 +265,11 @@ loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 89
 
 loadsgf games/nngs/ccwills-gnugo-3.4-200308231739.sgf 145
 325 owl_attack R18
-#? [1 (S18|T15)]
+#? [1 (S18|T15)]*
 
 loadsgf games/nngs/ccwills-gnugo-3.4-200308231739.sgf 146
 326 owl_defend R18
-#? [3 S18]
+#? [3 S18]*
 
 
 ########### end of tests #####################

@@ -56,7 +56,7 @@ loadsgf games/strategy38.sgf 197
 # First live then attack. This should probably be analyzed as a semeai.
 loadsgf games/strategy39.sgf 156
 162 reg_genmove white
-#? [O7|Q7|N7]
+#? [O7|Q7|N7]*
 
 # First live then attack. This should probably be analyzed as a semeai.
 # tm - P8, though not as clean, also kills all the B stones.
