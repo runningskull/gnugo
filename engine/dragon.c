@@ -466,7 +466,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	}
       }
     }
-  time_report(2, "  compute matcher status", NO_MOVE, 1.0);
+  time_report(2, "  compute status", NO_MOVE, 1.0);
 
   /* The dragon data is now correct at the origin of each dragon but
    * we need to copy it to every vertex.  
@@ -1157,7 +1157,7 @@ show_dragons(void)
     d2 = &(dragon2[dd->id]);
     
     if (dd->origin == pos) {
-      gprintf("%1m : %s dragon size %d (%f), genus %d, half eyes %d, escape factor %d, status %s, matcher status %s, moyo size %d safety %s",
+      gprintf("%1m : %s dragon size %d (%f), genus %d, half eyes %d, escape factor %d, crude status %s, status %s, moyo size pre owl %d, moyo size post owl %d, moyo territory value %f, safety %s, weakness %f",
 	      pos,
 	      board[pos] == BLACK ? "B" : "W",
 	      dd->size,
@@ -1168,7 +1168,10 @@ show_dragons(void)
 	      snames[dd->crude_status],
 	      snames[dd->status],
 	      d2->moyo_size_pre_owl,
-	      safety_names[d2->safety]);
+	      d2->moyo_size_post_owl,
+	      d2->moyo_territorial_value,
+	      safety_names[d2->safety],
+	      d2->weakness);
       gprintf(", owl status %s\n", snames[dd->owl_status]);
       if (dd->owl_status == CRITICAL) {
 	gprintf("... owl attackable at %1m, code %d\n",

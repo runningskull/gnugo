@@ -55,7 +55,7 @@ loadsgf games/blunder10.sgf 1
 11 gg_genmove black
 #? [D4|E4|E5|F4|C6]
 
-# White D4 kills at least five stones.
+# White D4 kills at least six stones.
 loadsgf games/blunder10.sgf 2
 12 gg_genmove white
 #? [D4]*
