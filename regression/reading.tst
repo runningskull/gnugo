@@ -839,6 +839,12 @@ loadsgf games/reading45.sgf
 199 defend D2
 #? [0]*
 
+# Ladder reading problem. See also kgs:290 and kgs:300
+loadsgf games/kgs/yagr-czarny.sgf 17
+200 attack B4
+#? [1 B2]
+
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

@@ -204,6 +204,11 @@ loadsgf games/kgs/yagr-eddyy.sgf 198
 910 reg_genmove white
 #? [T2]*
 
+loadsgf games/kgs/yagr-gab9.sgf 205
+920 reg_genmove white
+#? [C4]
+
+
 
 ############ End of Tests #################
 

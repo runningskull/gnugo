@@ -172,3 +172,4 @@ loadsgf games/kgs/2004-04-28-R-dokuganryu-GnuGoCVS.sgf 302
 loadsgf games/blunder24.sgf
 35 gg_genmove white
 #? [!G1]
+

@@ -64,23 +64,96 @@ loadsgf games/kgs/20040517-siRNA-GnuGoCVS.sgf 198
 
 # Awful tenuki.
 loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 56
-140 gg_genmove white
+140 reg_genmove white
 #? [P14|N15|G12]*
 
 # Another tenuki from same fight - lots of cutting points are opportunities
 # for escape.
 loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 64
-150 gg_genmove white
+150 reg_genmove white
 #? [M14|Q13]*
 
 # Later, ignores a fight and misreads a ladder - anything related to the
 # fight or the ladder is better than the move made in the game.
 loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 94
-160 gg_genmove white
+160 reg_genmove white
 #? [G12|H8|J7|G7]*
 
 # Again the move made in the game doesn't help the fight in the slightest
 # nor resolve the ladder.
 loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 96
-170 gg_genmove white
+170 reg_genmove white
 #? [G12|H8|G7]*
+
+loadsgf games/kgs/geluba-yagr.sgf 164
+180 reg_genmove black
+#? [C4|C3|D3]
+
+# Only way to control damage: sacrifice the three stones at E3
+loadsgf games/kgs/geluba-yagr.sgf 166
+190 reg_genmove black
+#? [C4]
+
+# Don't kill your own group.
+loadsgf games/kgs/yagr-ituyosi.sgf 160
+200 restricted_genmove white K4 M4 L4
+#? [!K4]
+
+# An "owl attack captures tail" problem
+loadsgf games/kgs/yagr-gab9.2.sgf 158
+210 reg_genmove white
+#? [Q13]
+
+# Connect the monkey jump instead of running nowhere!
+loadsgf games/kgs/yagr-Sapojnik.sgf 80
+220 reg_genmove white
+#? [T10]
+
+# Win the semeai!
+loadsgf games/kgs/yagr-Sapojnik.sgf 149
+230 reg_genmove white
+#? [J12|J11|L10|L9|J19]
+
+loadsgf games/kgs/yagr-yudeta.sgf 257
+240 reg_genmove white
+#? [B7]
+
+# In the game, GNU Go ran on the first line until the very end :((
+loadsgf games/kgs/yagr-yudeta.sgf 78
+250 reg_genmove white
+#? [P1]
+
+# Huge semeai.
+loadsgf games/kgs/malitourne-yagr.sgf 240
+260 reg_genmove black
+#? [T10|Q11|O11]
+
+# Same problem as test 250.
+loadsgf games/kgs/malitourne-yagr.sgf 80
+270 restricted_genmove white O1 T1
+#? [T1]
+
+loadsgf games/kgs/yagr-hasenhirn.sgf 71
+280 reg_genmove white
+#? [G1]
+
+# A ladder desaster.
+loadsgf games/kgs/yagr-czarny.sgf 16
+290 reg_genmove white
+#? [B2]
+
+loadsgf games/kgs/yagr-czarny.sgf 24
+300 restricted_genmove white H4 H5
+#? [H4]
+
+# N15 as played in the game is off-topic.
+loadsgf games/kgs/yagr-awf.sgf 191
+310 reg_genmove white
+#? [F11|H10|J15|K12|F19|D18]
+
+# Probably owl cut problem. At least have to try to win the semeai.
+loadsgf games/kgs/yagr-Mythenmetz.sgf 156
+320 reg_genmove white
+#? [K12]
+
+

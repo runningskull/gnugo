@@ -331,6 +331,16 @@ loadsgf games/kgs/20040507-GnuGoCVS-read.sgf 224
 341 owl_defend G13
 #? [1 K8]*
 
+loadsgf games/kgs/yagr-r08ert.sgf 139
+342 owl_attack S6
+#? [(2|3) T2]
+
+loadsgf games/kgs/yagr-r08ert.sgf 140
+343 owl_defend S6
+#? [(2|3) T3]
+
+
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
