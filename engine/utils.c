@@ -646,7 +646,7 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
  */
 
 void
-set_depth_values(int level)
+set_depth_values(int level, int report_levels)
 {
   static int node_limits[] = {500, 500, 450, 400, 400, 325, 275,
 			      200, 150, 100, 75, 50};
@@ -764,6 +764,38 @@ set_depth_values(int level)
     owl_reading_depth = mandated_owl_reading_depth;
   if (mandated_owl_node_limit != -1)
     owl_node_limit = mandated_owl_node_limit;
+
+  if (report_levels) {
+    fprintf(stderr, "at level %d:\n\n\
+depth: %d\n\
+branch_depth: %d\n\
+backfill_depth: %d\n\
+backfill2_depth: %d\n\
+break_chain_depth: %d\n\
+owl_distrust_depth: %d\n\
+owl_branch_depth: %d\n\
+owl_reading_depth: %d\n\
+aa_depth: %d\n\
+ko_depth: %d\n\
+fourlib_depth: %d\n\
+superstring_depth: %d\n\
+owl_node_limit: %d\n\
+semeai_branch_depth: %d\n\
+semeai_branch_depth2: %d\n\
+semeai_node_limit: %d\n\
+connect_depth: %d\n\
+connect_depth2: %d\n\
+connection_node_limit: %d\n\
+breakin_depth: %d\n\
+breakin_node_limit: %d\n\n",
+	    level, depth, branch_depth, backfill_depth, backfill2_depth,
+	    break_chain_depth, owl_distrust_depth, owl_branch_depth,
+	    owl_reading_depth, aa_depth, ko_depth, fourlib_depth,
+	    superstring_depth, owl_node_limit, semeai_branch_depth, 
+	    semeai_branch_depth2, semeai_node_limit, connect_depth, 
+            connect_depth2, connection_node_limit, breakin_depth, 
+	    breakin_node_limit);
+  }
 }
 
 

@@ -91,7 +91,7 @@ reset_engine()
   clear_break_in_list();
 
   /* Set up depth values (see comments there for details). */
-  set_depth_values(level);
+  set_depth_values(level, 0);
 }
 
 /*

@@ -401,7 +401,7 @@ int confirm_safety(int move, int color, int *defense_point,
 int dragon_weak(int pos);
 float blunder_size(int move, int color, int *defense_point,
 		   char safe_stones[BOARDMAX]);
-void set_depth_values(int level);
+void set_depth_values(int level, int report_levels);
 void modify_depth_values(int n);
 void increase_depth_values(void);
 void decrease_depth_values(void);

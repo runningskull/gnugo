@@ -98,6 +98,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_STANDARD_SEMEAI,
       OPT_STANDARD_CONNECTIONS,
       OPT_STANDARD_INFLUENCE,
+      OPT_PRINT_LEVELS,
       OPT_DECIDE_POSITION,
       OPT_DECIDE_EYE,
       OPT_DECIDE_COMBINATION,
@@ -215,6 +216,7 @@ static struct gg_option const long_options[] =
   {"owl-branch",     required_argument, 0, OPT_OWL_BRANCH},
   {"owl-reading",    required_argument, 0, OPT_OWL_READING},
   {"owl-node-limit", required_argument, 0, OPT_OWL_NODE_LIMIT},
+  {"print-levels",   no_argument,       0, OPT_PRINT_LEVELS},
   {"level",          required_argument, 0, OPT_LEVEL},
   {"min-level",      required_argument, 0, OPT_MIN_LEVEL},
   {"max-level",      required_argument, 0, OPT_MAX_LEVEL},
@@ -925,6 +927,16 @@ main(int argc, char *argv[])
 	break;
 
 	/* NOTE: getopt returns '?' if an illegal option is supplied. */
+
+      case OPT_PRINT_LEVELS:
+	{
+	  int lev;
+	  for(lev = 10; lev > 0; lev--)
+	    set_depth_values(lev, 1);
+	}
+	return EXIT_SUCCESS;
+	break;
+
       case '?':
       default:
 	fprintf(stderr, "Try `gnugo --help' for more information.\n");
@@ -1524,7 +1536,7 @@ DEBUG_ORACLE_STREAM         0x1000000\n\
 static void
 show_help(void)
 {
-  set_depth_values(DEFAULT_LEVEL);
+  set_depth_values(DEFAULT_LEVEL, 0);
   fprintf(stderr, USAGE,
 	  depth, backfill_depth, fourlib_depth, ko_depth, branch_depth,
 	  backfill2_depth, break_chain_depth, superstring_depth, aa_depth, 
