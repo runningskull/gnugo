@@ -4018,8 +4018,8 @@ pattern_list_prepare(struct matched_patterns_list_data *list)
     if (!(list->pattern_list[k].pattern->class & CLASS_c))
       list->pattern_heap[list->heap_num_patterns++] = &list->pattern_list[k];
     else {
-/*       list->pattern_list[k].next_pattern_index = list->first_pattern_index[move]; */
-/*       list->first_pattern_index[move] = k; */
+      list->pattern_list[k].next_pattern_index = list->first_pattern_index[move];
+      list->first_pattern_index[move] = k;
     }
   }
 
