@@ -156,7 +156,7 @@ Pattern F3h
 |..........
 +----------
 
-; x_somewhere(a,b)
+; x_alive_somewhere(a,b)
 
 
 #### High (ikken taka) kakari
@@ -208,7 +208,7 @@ Pattern F5d
 |..........
 +----------
 
-; x_somewhere(a,b)
+; x_alive_somewhere(a,b)
 
 
 #### Two space high (nikken taka) kakari
@@ -258,7 +258,7 @@ Pattern F5h
 |..........
 +----------
 
-; x_somewhere(a,b)
+; x_alive_somewhere(a,b)
 
 
 Pattern F6
@@ -884,7 +884,7 @@ ab.....x
 ........
 --------
 
-; o_somewhere(a,b)
+; o_alive_somewhere(a,b)
 
 
 Pattern F307
@@ -905,7 +905,7 @@ X.*..abc
 ........
 --------
 
-; o_somewhere(a,b,c,d,e,f)
+; o_alive_somewhere(a,b,c,d,e,f)
 
 
 #################
@@ -929,7 +929,7 @@ x.*..O.cd
 .......??
 ---------
 
-; x_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d)
 
 
 Pattern F402
@@ -1077,7 +1077,7 @@ Pattern F410a
 ?xx.......
 ----------
 
-; x_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d)
 
 
 Pattern F410b
@@ -1099,7 +1099,7 @@ x.........?
 x.........?
 -----------
 
-; x_somewhere(a,b)
+; x_alive_somewhere(a,b)
 
 
 Pattern F410c
@@ -1124,7 +1124,7 @@ x...........
 x...........
 ------------
 
-; x_somewhere(a,b,c,d,e,f)
+; x_alive_somewhere(a,b,c,d,e,f)
 
 
 Pattern F410d
@@ -1145,7 +1145,7 @@ O.....abx
 .........
 ---------
 
-; x_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d)
 
 
 Pattern F410e
@@ -1166,7 +1166,7 @@ O..*..cdx
 .........
 ---------
 
-; x_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d)
 
 
 Pattern F411
@@ -1331,7 +1331,7 @@ bd.*....O
 .........
 ---------
 
-; x_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d)
 
 
 Pattern F505
@@ -1403,7 +1403,7 @@ O.*.O
 .....
 -----
 
-;x_somewhere(a,b,c)
+;x_alive_somewhere(a,b,c)
 
 
 #####################################
@@ -1426,7 +1426,7 @@ x....*....cd
 ............
 ------------
 
-; x_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d)
 
 
 Pattern F702
@@ -1445,7 +1445,7 @@ X....*....cd
 ............
 ------------
 
-; x_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d)
 
 
 Pattern F703
@@ -1660,7 +1660,7 @@ Pattern F809
 |..............
 +--------------
 
-;x_somewhere(a,b,c,d,e,f) && o_somewhere(g,h)
+;x_alive_somewhere(a,b,c,d,e,f) && o_alive_somewhere(g,h)
 
 
 Pattern F810
@@ -1681,7 +1681,7 @@ Pattern F810
 |...............
 +---------------
 
-;x_somewhere(a,b,c,d,e,f) && o_somewhere(g,h)
+;x_alive_somewhere(a,b,c,d,e,f) && o_alive_somewhere(g,h)
 
 
 Pattern F811
@@ -1702,7 +1702,7 @@ Pattern F811
 |..............
 +--------------
 
-;x_somewhere(a,b,c,d,e,f) && x_somewhere(g,h)
+;x_alive_somewhere(a,b,c,d,e,f) && x_alive_somewhere(g,h)
 
 
 ################
@@ -1742,7 +1742,7 @@ b...OX.
 .......
 -------
 
-;o_somewhere(a,b)
+;o_alive_somewhere(a,b)
 
 
 ######################################################################
@@ -1910,7 +1910,7 @@ Pattern J10
 |...........
 +-----------
 
-;x_somewhere(a,b,c,d,e,f,g,h,i) && x_somewhere(j,k,l,m,n,p,q,r,s)
+;x_alive_somewhere(a,b,c,d,e,f,g,h,i) && x_alive_somewhere(j,k,l,m,n,p,q,r,s)
 
 
 Pattern J11
@@ -2146,7 +2146,7 @@ Pattern J27
 |.......
 +-------
 
-; x_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d)
 
 
 Pattern J28
@@ -2169,7 +2169,7 @@ Pattern J28
 |........
 +--------
 
-; x_somewhere(a,b,c,d,e,f)
+; x_alive_somewhere(a,b,c,d,e,f)
 
 
 Pattern J29
@@ -2265,7 +2265,7 @@ Pattern J33
 |.......
 +-------
 
-; o_somewhere(a,b)
+; o_alive_somewhere(a,b)
 
 
 Pattern J34
@@ -2441,7 +2441,7 @@ Pattern J43
 |...abcd
 |...efgh
 
-; x_somewhere(a,b,c,d,e,f,g,h)
+; x_alive_somewhere(a,b,c,d,e,f,g,h)
 
 > replace(c,*);
 > replace(d,*)

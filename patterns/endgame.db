@@ -183,7 +183,7 @@ OXX?
 ..ac
 ----
 
-;x_somewhere(b,c) && oplay_attack(a,a) && !oplay_attack(*,?,a,a)
+;x_alive_somewhere(b,c) && oplay_attack(a,a) && !oplay_attack(*,?,a,a)
 
 
 Pattern EE4
@@ -1472,7 +1472,7 @@ Pattern CE30
 d*A
 ??b
 
-; o_somewhere(c,d) && (!weak(c) || !weak(d))
+; o_alive_somewhere(c,d) && (!weak(c) || !weak(d))
 ; && proper_eye(b) && oplay_attack(*,A)
 
 

@@ -1450,8 +1450,8 @@ eOf
 .X.
 
 ; lib(e) > 1 && lib(f) > 1
-; && (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1)
-; && !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B)))
+; && (o_alive_somewhere(c) + o_alive_somewhere(C) + o_alive_somewhere(d) <= 1)
+; && !(o_alive_somewhere(d) && (o_alive_somewhere(b) || o_alive_somewhere(B)))
 
 
 Pattern Shape9b
@@ -1473,8 +1473,8 @@ c*C
 eOf
 .XX
 
-; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1)
-; && !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B)))
+; (o_alive_somewhere(c) + o_alive_somewhere(C) + o_alive_somewhere(d) <= 1)
+; && !(o_alive_somewhere(d) && (o_alive_somewhere(b) || o_alive_somewhere(B)))
 ; && !attack(e) && !attack(f)
 
 
@@ -1493,8 +1493,8 @@ c*C
 eOA
 .fO
 
-; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1)
-; && !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B)))
+; (o_alive_somewhere(c) + o_alive_somewhere(C) + o_alive_somewhere(d) <= 1)
+; && !(o_alive_somewhere(d) && (o_alive_somewhere(b) || o_alive_somewhere(B)))
 ; && !attack(A) && !attack(e) && !attack(f)
 
 
@@ -2051,7 +2051,7 @@ a..b
 ....
 ----
 
-;!same_dragon(a,b) || x_somewhere(C,D,E)
+;!same_dragon(a,b) || x_alive_somewhere(C,D,E)
 
 
 Pattern Shape46
@@ -2314,7 +2314,7 @@ O.*.
 aO..
 ----
 
-;o_somewhere(a,b)
+;o_alive_somewhere(a,b)
 
 
 Pattern Shape66
@@ -2483,7 +2483,7 @@ bOXx
 ....
 ----
 
-;(x_somewhere(D) || oplay_attack(*,?,D,D)) && !oplay_defend(*,a,b,c,*)
+;(x_alive_somewhere(D) || oplay_attack(*,?,D,D)) && !oplay_defend(*,a,b,c,*)
 
 
 Pattern Shape76
@@ -2939,7 +2939,7 @@ aBd
 eOC
 fg*
 
-;lib(a)>1 && o_somewhere(e,f,g) && !attack(B) && !attack(C)
+;lib(a)>1 && o_alive_somewhere(e,f,g) && !attack(B) && !attack(C)
 ;&& !oplay_defend_both(*,?,d,B,C)
 
 
@@ -3410,7 +3410,7 @@ OG*....
 .......
 -------
 
-;!weak(G) && x_somewhere(a,b,c,d,e,f)
+;!weak(G) && x_alive_somewhere(a,b,c,d,e,f)
 
 >antisuji(*);
 

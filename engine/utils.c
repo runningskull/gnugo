@@ -181,23 +181,26 @@ does_defend(int move, int str)
  * Example: somewhere(WHITE, 2, apos, bpos, cpos).
  * 
  * Returns true if one of the vertices listed
- * satisfies board[pos]==color. Here last_move is the
- * number of moves minus one.
+ * satisfies board[pos]==color. Here num_moves is the
+ * number of moves. If check_alive is true, the dragon is not allowed
+ * to be dead. This check is only valid if stackp==0.
  */
 
 int
-somewhere(int color, int last_move, ...)
+somewhere(int color, int check_alive, int num_moves, ...)
 {
   va_list ap;
   int pos;
   int k;
+
+  gg_assert(stackp == 0 || !check_alive);
   
-  va_start(ap, last_move);
-  for (k = 0; k <= last_move; k++) {
+  va_start(ap, num_moves);
+  for (k = 0; k < num_moves; k++) {
     pos = va_arg(ap, int);
 
     if (board[pos] == color
-	&& (stackp > 0 || dragon[pos].status != DEAD))
+	&& (!check_alive || dragon[pos].status != DEAD))
       return 1;
   }
 

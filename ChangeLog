@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- somewhere() revised
+- new autohelper functions [ox]_alive_somewhere
+- autohelper functions [ox]_somewhere revised
 - major revision of find_connection_distances()
 - other revisions and tuning in readconnect.c
 - bugfix in find_defense: compare against fourlib_depth when appropriate

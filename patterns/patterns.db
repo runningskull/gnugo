@@ -1436,7 +1436,7 @@ O.cd?
 .....
 -----
 
-; x_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d)
 
 
 Pattern EC9
@@ -3905,7 +3905,7 @@ O.*.b
 ....?
 -----
 
-; x_somewhere(a,b)
+; x_alive_somewhere(a,b)
 
 
 Pattern EB403
@@ -3924,7 +3924,7 @@ cb.*.
 .....
 -----
 
-;oplay_attack(*,a,b,c,c) && x_somewhere(d,e)
+;oplay_attack(*,a,b,c,c) && x_alive_somewhere(d,e)
 
 
 Pattern EB404
@@ -4028,7 +4028,7 @@ XXO..cd
 .....oo
 -------
 
-; o_somewhere(a,b,c,d)
+; o_alive_somewhere(a,b,c,d)
 
 
 Pattern EB412
@@ -5197,7 +5197,7 @@ Ehdea.
 ofcb*g
 ------
 
-;!weak(h) && x_somewhere(A,B) && o_somewhere(C,D,E)
+;!weak(h) && x_alive_somewhere(A,B) && o_alive_somewhere(C,D,E)
 ;&& xplay_attack(d,c,f,f) == WIN
 ;&& !oplay_attack_either(*,d,c,h,c)
 ;&& !oplay_attack(*,a,b,c,d,e,f,g,c,h)
@@ -7044,7 +7044,7 @@ ac*.
 xXO.
 xxXO
 
-; x_somewhere(a,b,c)
+; x_alive_somewhere(a,b,c)
 
 
 ######################################
@@ -7763,7 +7763,7 @@ cXe*F
 ; lib(c)>1
 ; && !oplay_attack(*,b)
 ; && oplay_defend_both(*,A,*,b)
-; && (oplay_attack(*,A,e) || !x_somewhere(D,F))
+; && (oplay_attack(*,A,e) || !x_alive_somewhere(D,F))
 
 
 Pattern CB246
@@ -8061,7 +8061,7 @@ Xecd
 ..*b
 ????
 
-; o_somewhere(a,b)
+; o_alive_somewhere(a,b)
 ; || oplay_attack(*,c,d,e,b,a)
 ; || oplay_attack(*,c,d,e,a,b)
 
@@ -8674,7 +8674,7 @@ xxA.*.?
 ??....?
 ??.ooo?
 
-;!xterri(*) && weak(A) && o_somewhere(b,c,d,e,f,g)
+;!xterri(*) && weak(A) && o_alive_somewhere(b,c,d,e,f,g)
 
 
 Pattern CB323
@@ -8884,7 +8884,7 @@ obO*a.
 ......
 ------
 
-; oplay_attack(a,b,*,c) || x_somewhere(d,e)
+; oplay_attack(a,b,*,c) || x_alive_somewhere(d,e)
 > replace(a,*)
 
 
@@ -8919,7 +8919,7 @@ def
 c*g
 abh
 
-;(x_somewhere(d,e,f,g,h) || xarea(f))
+;(x_alive_somewhere(d,e,f,g,h) || xarea(f))
 ;&& !oplay_disconnect(*,b,*,a) && !oplay_disconnect(*,c,*,a)
 
 
@@ -9001,7 +9001,7 @@ OO..*.b
 .......
 -------
 
-;x_somewhere(a,b)
+;x_alive_somewhere(a,b)
 
 
 Pattern ED6
@@ -9710,7 +9710,7 @@ de..*a.
 .......
 -------
 
-;weak(a) && o_somewhere(b,c,d,e)
+;weak(a) && o_alive_somewhere(b,c,d,e)
 
 
 Pattern ED50
@@ -11025,7 +11025,7 @@ X...????
 X...abcd
 ?.O..???
 
-; x_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d)
 
 
 Pattern CD95
@@ -11240,7 +11240,7 @@ bOX
 ; does_defend(*,A)
 
 > replace(a,*);
-> if (!o_somewhere(b)) replace(b,*)
+> if (!o_alive_somewhere(b)) replace(b,*)
 
 
 Pattern CD107
@@ -11973,7 +11973,7 @@ X...*....cd
 ...........
 -----------
 
-; x_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d)
 
 
 # Compare EJ42. This gives a bonus if there's additional empty
@@ -12014,7 +12014,7 @@ O*X.c
 .....
 -----
 
-;o_somewhere(c,d)
+;o_alive_somewhere(c,d)
 
 >replace(a,*);
 >replace(b,*)
@@ -12134,7 +12134,7 @@ Pattern EJ55
 .....c.
 -------
 
-; x_somewhere(a,b,c)
+; x_alive_somewhere(a,b,c)
 
 
 Pattern EJ56
@@ -12155,7 +12155,7 @@ Pattern EJ56
 ........
 --------
 
-; o_somewhere(a,b,c,d)
+; o_alive_somewhere(a,b,c,d)
 
 
 Pattern EJ57
@@ -12454,7 +12454,7 @@ O*.ab
 .....
 -----
 
-; o_somewhere(a,b)
+; o_alive_somewhere(a,b)
 
 
 Pattern EJ76
@@ -12487,7 +12487,7 @@ cdXO...
 e?.....
 -------
 
-; o_somewhere(a,b) && x_somewhere(c,d,e)
+; o_alive_somewhere(a,b) && x_alive_somewhere(c,d,e)
 
 
 Pattern EJ78
@@ -12525,7 +12525,7 @@ Pattern EJ79
 |......
 |..cdx?
 
-; x_somewhere(a,b) && x_somewhere(c,d)
+; x_alive_somewhere(a,b) && x_alive_somewhere(c,d)
 
 
 Pattern EJ80
@@ -12634,7 +12634,7 @@ XO*.cd
 ?.....
 ------
 
-; o_somewhere(a,b,c,d)
+; o_alive_somewhere(a,b,c,d)
 
 
 Pattern EJ87
@@ -12726,7 +12726,7 @@ def.....O.X
 ...........
 -----------
 
-; o_somewhere(a,b,c,d,e,f,g)
+; o_alive_somewhere(a,b,c,d,e,f,g)
 > replace(h,*);
 > replace(i,*)
 
@@ -12835,7 +12835,7 @@ cde.XX
 ......
 ------
 
-; o_somewhere(a,b,c,d,e)
+; o_alive_somewhere(a,b,c,d,e)
 
 
 Pattern EJ98
@@ -13439,7 +13439,7 @@ Pattern LE6
 ?a...X
 ?..O??
 
-; omoyo(a) && !(o_somewhere(b) && o_somewhere(c,d))
+; omoyo(a) && !(o_alive_somewhere(b) && o_alive_somewhere(c,d))
 
 
 Pattern LE8
