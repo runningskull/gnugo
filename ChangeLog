@@ -22,6 +22,8 @@
 - find_backfilling_move() in filllib.c revised
 - new debug flag DEBUG_TOP_MOVES
 - environment variables GG_OPTIONS and GNUGO when (make)ing tests
+- top moves list maintained when moves are rejected
+- bugfixes in metamachine
 - regression revisions
 	
 3.2 released April 25, 2002

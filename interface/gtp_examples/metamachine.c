@@ -104,8 +104,8 @@ main(int argc, char *const *argv)
     char *p;
     int n;
 
-    if (!fgets(client_line, GTP_BUFSIZE, stdin) 
-	|| strstr(client_line, "quit")) {
+    if (!fgets(client_line, GTP_BUFSIZE, stdin)
+	|| (strstr(client_line, "quit") == client_line)) {
       tell_gnugo("quit\n", "a");
 	return 1;
     }
@@ -181,6 +181,9 @@ main(int argc, char *const *argv)
 		  move_i[k], move_j[k], move_value[k]);
       }
       moves_considered = k;
+      if (debug)
+	fprintf(stderr, "moves considered: %d\n",
+		moves_considered);
       for (k = 0; k < 2 && k < moves_considered; k++) {
 	float upper, lower;
 	int n;
@@ -214,7 +217,7 @@ main(int argc, char *const *argv)
 	if (id == -1)
 	  gprintf(stdout, "= PASS\n\n");
 	else
-	  gprintf(stdout, "=%d PASS\n\n");
+	  gprintf(stdout, "=%d PASS\n\n", id);
 	fflush(stdout);
       }
       else if (moves_considered == 1 ||

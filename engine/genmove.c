@@ -476,6 +476,7 @@ do_genmove(int *move, int color, float pure_threat_value)
       && fill_liberty(move, color)) {
     val = 1.0;
     TRACE("Filling a liberty at %1m\n", *move);
+    record_top_move(*move, val);
     move_considered(*move, val);
     time_report(1, "fill liberty", NO_MOVE, 1.0);
   }
@@ -496,6 +497,7 @@ do_genmove(int *move, int color, float pure_threat_value)
     ASSERT1(is_legal(*move, color), *move);
     val = 1.0;
     TRACE("Aftermath move at %1m\n", *move);
+    record_top_move(*move, val);
     move_considered(*move, val);
     time_report(1, "aftermath_genmove", NO_MOVE, 1.0);
   }

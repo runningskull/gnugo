@@ -2454,24 +2454,16 @@ print_top_moves(void)
   int pos;
   float tval;
   
-  for (k = 0; k < 10; k++)
+  for (k = 0; k < 10; k++) {
+    best_moves[k] = NO_MOVE;
     best_move_values[k] = 0.0;
-
+  }
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!ON_BOARD(pos) || move[pos].final_value <= 0.0)
       continue;
       
     tval = move[pos].final_value;
-
-    for (k = 9; k >= 0; k--)
-      if (tval > best_move_values[k]) {
-	if (k < 9) {
-	  best_move_values[k+1] = best_move_values[k];
-	  best_moves[k+1] = best_moves[k];
-	}
-	best_move_values[k] = tval;
-	best_moves[k] = pos;
-      }
+    record_top_move(pos, tval);
   }
   
   if (verbose > 0 || (debug & DEBUG_TOP_MOVES)) {
@@ -2481,6 +2473,41 @@ print_top_moves(void)
   }
 }
 
+/* Add a move to the list of top moves (if it is among the top ten) */
+
+  void
+record_top_move(int move, float val)
+{
+  int k;
+  for (k = 9; k >= 0; k--)
+    if (val > best_move_values[k]) {
+      if (k < 9) {
+	best_move_values[k+1] = best_move_values[k];
+	best_moves[k+1] = best_moves[k];
+      }
+      best_move_values[k] = val;
+      best_moves[k] = move;
+    }
+}
+
+/* remove a rejected move from the list of top moves */
+
+void
+remove_top_move(int move)
+{
+  int k;
+  for (k = 0; k < 10; k++) {
+    if (best_moves[k] == move) {
+      int l;
+      for (l = k; l < 10; l++) {
+	best_moves[l] = best_moves[l+1];
+	best_move_values[l] = best_move_values[l+1];
+      }
+      best_moves[9] = NO_MOVE;
+      best_move_values[9] = 0.0;
+    }
+  }
+}
 
 /* This function is called if the biggest move on board was an illegal
  * ko capture.
@@ -2722,6 +2749,7 @@ review_move_reasons(int *the_move, float *val, int color,
 	}
 	else {
 	  TRACE("Move at %1m would be suicide.\n", pos);
+	  remove_top_move(pos);
 	  move[pos].value = 0.0;
 	  move[pos].final_value = 0.0;
 	}
@@ -2751,6 +2779,7 @@ review_move_reasons(int *the_move, float *val, int color,
       redistribute_points();
       time_report(2, "  reevaluate_ko_threats", NO_MOVE, 1.0);
       ko_values_have_been_added = 1;
+      remove_top_move(best_move);
       move[best_move].value = 0.0;
       move[best_move].final_value = 0.0;
       print_top_moves();
@@ -2764,6 +2793,7 @@ review_move_reasons(int *the_move, float *val, int color,
 	     && !value_moves_confirm_safety(best_move, color,
 					    allowed_blunder_size)) {
       TRACE("Move at %1m would be a blunder.\n", best_move);
+      remove_top_move(best_move);
       move[best_move].value = 0.0;
       move[best_move].final_value = 0.0;
       good_move_found = 0;
