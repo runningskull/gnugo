@@ -36,7 +36,7 @@ loadsgf games/century21-2002/goint-gnugo.sgf 55
 
 loadsgf games/century21-2002/goint-gnugo.sgf 111
 60 gg_genmove black 
-#? [Q14]*
+#? [Q14]
 
 loadsgf games/century21-2002/goint-gnugo.sgf 119
 70 gg_genmove black 

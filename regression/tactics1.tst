@@ -58,11 +58,11 @@ popgo
 # that C9 is strangely overvalued.
 loadsgf games/tactics07.sgf
 105 gg_genmove white
-[F7]
+#? [F7]
 
 loadsgf games/tactics08.sgf
 106 gg_genmove white
-[F8|F9]
+#? [F8|F9]
 
 
 ############ End of Tests #################
@@ -82,3 +82,4 @@ loadsgf games/tactics08.sgf
 # Report number of trymoves/trykos visited by the test
 10003 get_trymove_counter
 #? [0]&
+

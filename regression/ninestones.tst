@@ -94,4 +94,4 @@ loadsgf games/nngs/norate-ggl-200212301513.sgf 62
 
 loadsgf games/nngs/norate-ggl-200212301513.sgf 234
 290 gg_genmove black
-#? [B1]*
+#? [B1]

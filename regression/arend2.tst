@@ -29,6 +29,6 @@ loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 110
 
 loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 112
 70 gg_genmove white
-#? [N7|O9]*
+#? [N7|O9]
 
 

@@ -69,7 +69,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 172
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 194
 220 gg_genmove black
-#? [L1|E7|G13|K9]*
+#? [L1|E7|G13|K9]
 
 
 
@@ -83,7 +83,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 24
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 30
 240 gg_genmove black
-#? [!T6]*
+#? [!T6]
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 56

@@ -1,3 +1,5 @@
+========================== 3.3.15 ============================
+
 ./regress.sh . endgame.tst 
 219 unexpected PASS!
 ./regress.sh . golife.tst 
@@ -25,10 +27,6 @@
 60 unexpected PASS!
 ./regress.sh . ninestones.tst 
 290 unexpected PASS!
-./regress.sh . tactics1.tst 
-Possible crash!: expected 11 results, got 13. Last successful test was 10003.
-105 unexpected FAIL: Correct '', got 'F7'
-106 unexpected FAIL: Correct '', got 'F8'
 ./regress.sh . arend2.tst 
 70 unexpected PASS!
 

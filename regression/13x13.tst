@@ -199,7 +199,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 39 gg_genmove white
-#? [H4|J4]*
+#? [H4|J4]
 
 # CATEGORY=FOLLOWUP
 # The followup of K13 is undervalued.
@@ -309,7 +309,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 99
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 111
 57 gg_genmove black
-#? [C5|D5]*
+#? [C5|D5]
 
 #CATEGORY=OWL_TUNING
 # New failure (comparing 3.1.15 with 3.0.0)
@@ -324,7 +324,7 @@ loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 13
 
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 15
 60 gg_genmove black
-#? [K5|L5]*
+#? [K5|L5]
 
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 75
 61 gg_genmove black
