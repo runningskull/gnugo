@@ -6465,13 +6465,14 @@ Pattern D1360
 ;owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
 
 
-Pattern D1361
+Pattern D1361a
 # too generic; see resultant A1121, see also trevor:1050
 # gf Added constraint. (3.1.32)
+# gf Split pattern. (3.5.7)
 
 X.X         push to expose weakness
 O*.
-?X?
+?Xo
 
 :8,-,value(65)
 
@@ -6480,6 +6481,25 @@ O*.
 ?C?
 
 ;!same_string(A,B) && (lib(A) <= 4 || lib(B) <= 4 || lib(C) <= 4)
+
+
+Pattern D1361b
+# too generic; see resultant A1121, see also trevor:1050
+# gf Added constraint. (3.1.32)
+# gf Split pattern and revised constraint. (3.5.7)
+
+X.X         push to expose weakness
+O*.
+?XX
+
+:8,-,value(65)
+
+A.B
+O*.
+?C?
+
+;!same_string(A,B) && (lib(A) <= 4 || lib(B) <= 4 || lib(C) <= 4)
+;&& !oplay_connect(*,A,C)
 
 
 Pattern D1362
