@@ -647,9 +647,10 @@ loadsgf games/trevor/auto/c17.sgf 55
 1040 attack H13
 #? [(2|3) H12]*
 
+# gf B1 is also an effective attack.
 loadsgf games/trevor/auto/c30.sgf 62
 1050 owl_attack C3
-#? [1 C2]*
+#? [1 (C2|B1)]*
 
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44

@@ -619,6 +619,29 @@ loadsgf games/strategy11.sgf 77
 158 attack H2
 #? [1 G2]*
 
+loadsgf games/trevor/auto/d12.sgf 66
+159 attack B14
+#? [0]*
+
+loadsgf games/ssstator.sgf 133
+trymove black C1
+160 attack D1
+#? [0]*
+popgo
+
+loadsgf games/reading34.sgf
+161 attack C9
+#? [0]*
+
+loadsgf games/reading34.sgf
+162 attack D7
+#? [0]*
+
+# See also trevorb:840.
+loadsgf games/trevor/auto/b75.sgf 62
+163 attack E12
+#? [0]*
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

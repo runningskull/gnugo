@@ -512,6 +512,7 @@ loadsgf games/trevor/auto/b75.sgf 30
 #? [!H11]*
 
 
+# gf See also reading:163
 loadsgf games/trevor/auto/b75.sgf 62
 840 gg_genmove white
 #? [!D12]
