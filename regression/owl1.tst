@@ -353,7 +353,7 @@ loadsgf games/owl51.sgf
 347 owl_defend G16
 #? [1 D10]*
 
-loadsgf games/owl51.sgf
+loadsgf games/owl52.sgf
 348 owl_defend M11
 #? [0]*
 
@@ -384,7 +384,7 @@ loadsgf games/owl53.sgf
 353 owl_attack G6
 #? [0]
 
-loadsgf games/scoring/score14.sgf
+loadsgf games/scoring/score39.sgf
 354 owl_defend Q13
 #? [0]
 
