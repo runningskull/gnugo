@@ -406,12 +406,21 @@ add_move_reason(int pos, int type, int what)
   }
 
   /* Reason not found, add it if there is place left in both lists.
-   *
-   * FIXME: We should just drop the move reason silently in stable
-   *        releases if some list is full.
+   * Otherwise drop it.
    */
-  gg_assert(k < MAX_REASONS);
-  gg_assert(next_reason < MAX_MOVE_REASONS);
+  if (k >= MAX_REASONS) {
+    DEBUG(DEBUG_MOVE_REASONS,
+	  "Move reason at %1m (type=%d, what=%d) dropped because list full.\n",
+	  pos, type, what);
+    return;
+  }
+
+  if (next_reason >= MAX_MOVE_REASONS) {
+    DEBUG(DEBUG_MOVE_REASONS,
+	  "Move reason at %1m (type=%d, what=%d) dropped because global list full.\n",
+	  pos, type, what);
+    return;
+  }
 
   /* Add a new entry. */
   move[pos].reason[k] = next_reason;
