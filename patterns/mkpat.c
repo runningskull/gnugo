@@ -1058,12 +1058,13 @@ parse_constraint_or_action(char *line)
 	if ((*p != '*') && (*p != '?') && !strchr(VALID_CONSTRAINT_LABELS, *p)) {
 	  if (strchr("XxOo", *p))
 	    fprintf(stderr,
-		    "mkpat: '%c' is not allowed as a constraint label (pattern %s).\n",
-		    *p, pattern_names[patno]);
+		    "%s(%d) : error : '%c' is not allowed as a constraint label.\n",
+		    current_file, current_line_number, *p);
 	  else
 	    fprintf(stderr,
 		    "%s(%d) : error : Syntax error in constraint or action, label expected, found '%c'.\n", 
 		    current_file, current_line_number, *p);
+	  fatal_errors++;
 	  return;
 	}
 	else {

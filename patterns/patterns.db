@@ -4969,6 +4969,7 @@ o.bb
 
 Pattern EB712
 # Probably bigger reverse followup in reality
+# tm Modified (3.1.17)
 
 ?O..          block
 XO..
@@ -4977,20 +4978,31 @@ X*..
 
 :8,OXb,reverse_followup(6)
 
+?O..          block
+XOb.
+C*a.
+----
+
+;!owl_threatens(*,C) &&
+;!xplay_attack_either(*,a,b,*,b)
+
 
 Pattern EB713
+# tm modified (3.1.17)
 
 ?O..          block
 X*..
 ----
 
-:8,OXb,followup(3)
+:8,OXb,reverse_followup(3)
 
 ?Ob.
-X*a.
+C*a.
 ----
 
+;!owl_threatens(*,C) &&
 ;!xplay_attack_either(*,a,b,*,b)
+
 
 
 Pattern EB714

@@ -2226,6 +2226,9 @@ owl_determine_life(struct local_owl_data *owl,
 	if (owl->lunch_attack_code[lunch] != WIN)
 	  value -= 10;
 
+	if (value < 21  && countstones(owl->lunch[lunch]) == 1)
+	  continue;
+
 	if (does_attack) {
 	  TRACE("save lunch at %1m with %1m, score %d\n",
 		owl->lunch[lunch], owl->lunch_defense_point[lunch], value);

@@ -473,6 +473,18 @@ OOa..
 
 ; oplay_attack(*,a,a)
 
+
+Pattern D123
+# tm New Pattern (3.1.17)
+
+?*?	expand eye shape
+O.O
+...
+---
+
+:8,-,value(65)
+
+
 #########################################################
 #                                                       #
 #          Expanding moves on the second line           #
@@ -797,18 +809,19 @@ aA.
 
 
 Pattern D220
+# tm modified (3.1.17)
 
-?oo.       jump to enlarge eyespace
-oO.*
-....
-----
+?oo.x       jump to enlarge eyespace
+oO.*x
+....x
+-----
 
 :8,-,value(40)
 
-abo.
-cO.*
-....
-----
+abo.x
+cO.*x
+....x
+-----
 
 ; o_somewhere(a,b,c)
 
@@ -1078,11 +1091,12 @@ O.OD?
 
 
 Pattern D308
+# tm added b category (3.1.17)
 
 o.O         chimera
 .*X
 
-:8,ns,value(71)
+:8,nsb,value(71)
 
 ocO
 b*X
@@ -1750,18 +1764,21 @@ a*b
 
 
 Pattern D604
+# tm Modified (3.1.17)
 
-OOX         descend to close eyeshape
-.*.
----
+oOOX         descend to close eyeshape
+?.*x
+----
 
 :8,-,value(35)
 
-ccA
-b*.
----
+occA
+?b*x
+----
 
-;owl_eyespace(b,c) && !obvious_false_oeye(b) && !xplay_attack(*,A)
+#;owl_eyespace(b,c) && 
+;(!obvious_false_oeye(b) || oplay_attack(*,A)) && 
+;!xplay_attack(*,A)
 
 
 Pattern D604a
@@ -2647,6 +2664,20 @@ OA
 ; !ko(*) && !ko(C) && (oplay_attack(*,A) || oplay_attack(*,B))
 
 
+Pattern D720
+# tm New pattern (3.1.16)
+
+?O.o
+O.*o
+
+:8,-,value(55)
+
+?O.o
+Ba*o
+
+; owl_proper_eye(a,B)
+
+
 #########################################################
 #                                                       #
 #           Make eyeshape in the corner                 #
@@ -2757,7 +2788,7 @@ Pattern D805a
 |.*.o
 +----
 
-:8,-,value(65)
+:8,-,value(45)
 
 
 Pattern D805b
@@ -2859,8 +2890,8 @@ Pattern D811a
 # tm New Pattern (3.1.15) (see cho1:200)
 
 |oO??         miai eyes or better
-|o.Oo
-|.*..
+|o.O?
+|.*.?
 +----
 
 :8,-,value(60)
@@ -4269,6 +4300,24 @@ Oa??
 ;lib(B)<=4 && owl_escape_value(c) + owl_escape_value(d) > 0
 ;&& oplay_attack_either(*,a,a,B)
 
+Pattern D1138
+# tm New Pattern (3.1.17)
+
+????
+.X*?   breakout!
+XOX?
+
+:8,sb,value(85)
+
+e?f?
+.B*?   breakout!
+AOCd
+
+; (vital_chain(A) || owl_escape_value(e) > 0) &&  
+; (vital_chain(C) || owl_escape_value(f) > 0) &&
+; lib(C) == 2 &&
+; oplay_attack_either(*,d,B,A)
+
 
 ########################################################
 #                                                       #
@@ -4609,13 +4658,14 @@ O...a
 
 Pattern D1310
 #tm modified (3.1.15) (see trevora:400)
+#tm added b constraint (3.1.17)
 
 ?ooo
 ?ooo    try to escape
 X*oo
 ?OX?
 
-:8,-,value(80)
+:8,-b,value(80)
 
 dabo
 eooc
@@ -5699,6 +5749,61 @@ ec*a
 
 ; (owl_escape_value(a) > 0 || owl_escape_value(b) > 0) &&
 ; oplay_attack_either(*,c,d,c,F)
+
+
+Pattern D1377
+
+?????
+OX*.o    hane into the open.
+.O..o
+-----
+
+:8,-,value(50)
+
+?????
+OA*.o    hane into the open.
+.O..o
+-----
+
+;defend(A) && !oplay_attack(*,*)
+
+
+Pattern D1378
+
+X*X   breakout & attack
+?O?
+
+:8,-,value(75)
+
+A*B   breakout & attack
+?O?
+
+; vital_chain(A) && vital_chain(B) &&
+; oplay_attack_either(*,A,B)
+
+
+Pattern D1379
+# tm New Pattern (3.1.17)
+
+???     escape or attack.
+x..
+O*X
+?X?
+
+:8,-,value(65)
+
+?BC
+xeA
+O*X
+?d?
+
+; ( owl_escape_value(A) > 0 || 
+;   owl_escape_value(B) > 0 || 
+;   owl_escape_value(C) > 0 ) &&
+; !attack(d) &&
+; oplay_attack(*,A,d) &&
+; oplay_attack(*,e,d)
+
 
 #########################################################
 #                                                       #

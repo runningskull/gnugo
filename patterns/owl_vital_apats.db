@@ -777,4 +777,24 @@ OX
 ; !ko(*)
 
 
+Pattern VA45
+# tm New Pattern (3.1.17)
+#   see trevor:650
+
+?X???
+X.X??
+?X.O*
+
+:8,-,value(75)
+
+?X???
+CbX??
+?XAO*
+
+; xlib(A) == 1 &&
+; olib(A) == 1 &&
+; owl_topological_eye(b,C) < 4 && owl_topological_eye(b,C) > 0
+
+
+
 # END OF FILE

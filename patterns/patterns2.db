@@ -93,19 +93,22 @@ aXb
 ;!oplay_break_through(*,a,*,b)
 
 
-Pattern Conn106
-
-??.?        indirect connection
-*O.O
-....
-
-:8,C
-
-??e?
-*OaO
-.dbc
-
-;oplay_attack(*,a,b,e,c,d,d)
+#tm removed (3.1.17)
+#  this is a very strange way to connect.
+#  see, for example, buzco:8
+#Pattern Conn106
+#
+#??.?        indirect connection
+#*O.O
+#....
+#
+#:8,C
+#
+#??e?
+#*OaO
+#.dbc
+#
+#;oplay_attack(*,a,b,e,c,d,d)
 
 
 ########################

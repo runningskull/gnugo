@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- removed small valued lunch attacks and defenses in owl_determine_life()
 - new gtp commands owl_threaten_attack, owl_threaten_defense
 - better error reporting in mkpat.c
 - html regression view tweeks
