@@ -242,6 +242,7 @@ extern int output_flags;       /* amount of output to outfile */
 #define DEBUG_OWL_PERSISTENT_CACHE  0x200000
 #define DEBUG_TOP_MOVES             0x400000
 #define DEBUG_MISCELLANEOUS         0x800000
+#define DEBUG_ORACLE_STREAM         0x1000000
 
 /* hash flag bits 
  *
@@ -315,6 +316,9 @@ extern int mandated_owl_node_limit;
 extern float potential_moves[MAX_BOARD][MAX_BOARD];
 
 extern volatile int time_to_die;   /* set by signal handlers */
+
+extern int limit_search; /* limit move search to a portion of the board */
+extern int metamachine;  /* use metamachine_genmove                     */
 
 /* ================================================================ */
 /*                 tracing and debugging functions                  */
@@ -505,7 +509,7 @@ void decide_position(int color);
 void decide_eye(int pos);
 void decide_combination(int color);
 void decide_surrounded(int pos);
-
+void decide_oracle(Gameinfo *gameinfo, char *infilename, char *untilstring);
 
 #endif  /* _GNUGO_H_ */
 

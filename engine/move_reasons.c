@@ -437,6 +437,8 @@ add_move_reason(int pos, int type, int what)
   if (stackp == 0) {
     ASSERT1(board[pos] == EMPTY, pos);
   }
+  if (limit_search && !within_search_area(pos))
+    return;
 
   for (k = 0; k < MAX_REASONS; k++) {
     int r = move[pos].reason[k];

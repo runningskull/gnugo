@@ -510,6 +510,18 @@ void owl_analyze_semeai(int apos, int bpos,
 			int *resulta, int *resultb, int *move,
 			int owl);
 
+void set_search_diamond(int pos);
+void reset_search_mask(void);
+void set_search_limit(int pos, int value);
+void consult_oracle(int color);
+void summon_oracle(void);
+void oracle_loadsgf(char *infilename, char *untilstring);
+void dismiss_oracle(void);
+int oracle_threatens(int move, int target);
+int within_search_area(int pos);
+int metamachine_genmove(int *i, int *j, int color);
+void draw_search_area(void);
+
 void change_attack(int str, int move, int acode);
 void change_defense(int str, int move, int dcode);
 void change_attack_threat(int str, int move, int acode);
