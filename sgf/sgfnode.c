@@ -807,12 +807,28 @@ sgfWriteResult(SGFNode *node, float score, int overwrite)
 }
 
 
+static void
+sgf_write_header_reduced(SGFNode *root, int overwrite)
+{
+  time_t curtime = time(NULL);
+  struct tm *loctime = localtime(&curtime);
+  char str[128];
+  int dummy;
+
+  gg_snprintf(str, 128, "%4.4i-%2.2i-%2.2i",
+	      loctime->tm_year+1900, loctime->tm_mon+1, loctime->tm_mday);
+  if (overwrite || !sgfGetIntProperty(root, "DT", &dummy))
+    sgfOverwriteProperty(root, "DT", str);
+  if (overwrite || !sgfGetIntProperty(root, "AP", &dummy))
+    sgfOverwriteProperty(root, "AP", "GNU Go:"VERSION);
+  sgfOverwriteProperty(root, "FF", "4");
+}
+
+
 void
 sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
 		 int level, int rules)
 {
-  time_t curtime = time(NULL);
-  struct tm *loctime = localtime(&curtime);
   char str[128];
   int dummy;
 
@@ -820,16 +836,11 @@ sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
 	      VERSION, seed, level);
   if (overwrite || !sgfGetIntProperty(root, "GN", &dummy))
     sgfOverwriteProperty(root, "GN", str);
-  gg_snprintf(str, 128, "%4.4i-%2.2i-%2.2i",
-	      loctime->tm_year+1900, loctime->tm_mon+1, loctime->tm_mday);
-  if (overwrite || !sgfGetIntProperty(root, "DT", &dummy))
-    sgfOverwriteProperty(root, "DT", str);
-  if (overwrite || !sgfGetIntProperty(root, "AP", &dummy))
-    sgfOverwriteProperty(root, "AP", "GNU Go:"VERSION);
   if (overwrite || !sgfGetIntProperty(root, "RU", &dummy))
     sgfOverwriteProperty(root, "RU", rules ? "Chinese" : "Japanese");
-  sgfOverwriteProperty(root, "FF", "4");
   sgfOverwritePropertyFloat(root, "KM", komi);
+
+  sgf_write_header_reduced(root, overwrite);
 }
 
 
@@ -1486,6 +1497,8 @@ writesgf(SGFNode *root, const char *filename)
     fprintf(stderr, "Can not open %s\n", filename);
     return 0;
   }
+
+  sgf_write_header_reduced(root, 0);
 
   sgf_column = 0;
   unparse_game(outfile, root, 1);
