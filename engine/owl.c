@@ -4041,11 +4041,12 @@ owl_connection_defends(int move, int target1, int target2)
  * hold:
  *
  * 1. At least one neighbor of the liberty is the goal dragon.
- * 2. No neighbor of the liberty is the same color as the tested string.
+ * 2. No neighbor of the liberty is the same color as the tested string,
+ *    unless part of the same superstring.
  * 3. No neighbor of the liberty of the same color as the goal dragon
  *    does not belong to the goal dragon.
  * 4. No neighbor of the liberty belonging to the goal dragon can be
- *     tactically captured.
+ *    tactically captured.
  *
  * There is a weakness with this characterization though, which can be
  * seen in this position:
@@ -4064,7 +4065,23 @@ owl_connection_defends(int move, int target1, int target2)
  * themself:
  *
  * 5. No neighbor of the stones does not belong to the goal or can be
- * tactically captured.
+ *    tactically captured.
+ *
+ * A second weakness can be noticed in this position:
+ *
+ * |OOOO.
+ * |XXXO.
+ * |O.XOO
+ * |OXXXO
+ * |.O.XO
+ * +-----
+ *
+ * The white stones in the corner should qualify as inessential but
+ * the corner liberty doesn't satisfy requirement 1. Therefore we add
+ * an alternative requirement:
+ *
+ * 1b. The liberty is a topologically false eye with respect to the
+ *     goal dragon.
  */
 
 static void
@@ -4190,9 +4207,23 @@ owl_find_lunches(struct local_owl_data *owl)
 		  break;
 		}
 	      }
-	      if (!goal_found)
-		essential = 1;
-	      
+	      if (!goal_found) {
+		/* Requirement 1 not satisfied. Test requirement 1b.
+		 * N.B. This is a simplified topological eye test.
+		 * The simplification may be good, bad, or neutral.
+		 */
+		int off_board = 0;
+		int diagonal_goal = 0;
+		for (s = 4; s < 8; s++) {
+		  if (!ON_BOARD(bpos + delta[s]))
+		    off_board++;
+		  else if (owl->goal[bpos + delta[s]])
+		    diagonal_goal++;
+		}
+		if (diagonal_goal + (off_board >= 2) < 2)
+		  essential = 1;
+	      }
+
 	      if (essential)
 		break;
 	    }

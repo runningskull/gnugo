@@ -2017,20 +2017,6 @@ Pattern 6003
 :1122
 
 
-Pattern 6004
-# Bent four in the corner. The attack depends on a ko and sufficiently
-# few outer liberties. Both dots are defense points, but the marked
-# one is clearly better.
-
- .
-|X
-|X
-|.*X
-+---
-
-:1122
-
-
 Pattern 6011
 
 xxxxxx
