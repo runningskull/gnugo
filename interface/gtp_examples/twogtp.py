@@ -190,6 +190,12 @@ class GTP_player:
     def score(self):
         return self.final_score(self)
 
+    def cputime(self):
+	if (self.is_known_command("cputime")):
+	    return self.connection.exec_cmd("cputime")
+	else:
+	    return "0"
+
 
 class GTP_game:
 
@@ -417,6 +423,12 @@ class GTP_game:
 
     def result(self):
         return (self.resultw, self.resultb)
+
+    def cputime(self):
+	cputime = {}
+	cputime["white"] = self.whiteplayer.cputime()
+	cputime["black"] = self.blackplayer.cputime()
+	return cputime
     
     def quit(self):
         self.blackplayer.quit()
@@ -534,8 +546,9 @@ class GTP_match:
                 last_color = ""
                 last_streak = 0
 	    results.append(result)
+	cputime = game.cputime()
         game.quit()
-        return results
+        return results, cputime
 
 
 # ================================================================
@@ -664,7 +677,7 @@ if endgame_filelist != []:
          % (len(results), win_black, win_white)
 
 else:
-    results = match.play(games, sgfbase)
+    results, cputimes = match.play(games, sgfbase)
 
     i = 0
     for resw, resb in results:
@@ -673,3 +686,7 @@ else:
 	    print "Game %d: %s" % (i, resw)
 	else:
 	    print "Game %d: %s %s" % (i, resb, resw)
+    if (cputimes["white"] != "0"):
+	print "White: %ss CPU time" % cputimes["white"]
+    if (cputimes["black"] != "0"):
+	print "Black: %ss CPU time" % cputimes["black"]

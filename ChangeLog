@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- CPU time reported by twogtp.py
 - new static function endgame_find_backfilling_dame() in endgame.c
 - new static function endgame_find_liberties() broken out of
   endgame_analyze_worm_liberties()
