@@ -205,6 +205,7 @@ while ($games > 0) {
     #set autoflushing for sgf file
     select(SGFFILEHANDLE);
     $| = 1;
+    select(STDOUT);
 
     print $prog_in  "boardsize $size\n";
     eat_no_response($prog_out);
@@ -263,14 +264,19 @@ while ($games > 0) {
     while ($pass < 2) {
         if ($toplay eq 'B') {
 	    print $prog_in "genmove_black\n";
-	    print $stable_in "gg_genmove black\n" if defined($stable);
+	    print $stable_in "genmove_black\n" if defined($stable);
 	} else {
 	    print $prog_in "genmove_white\n";
-	    print $stable_in "gg_genmove white\n" if defined($stable);
+	    print $stable_in "genmove_white\n" if defined($stable);
 	}
 
 	$move = eat_move($prog_out);
-	$stable_move = eat_move($stable_out) if defined ($stable);
+	if (defined($stable)) {
+	    $stable_move = eat_move($stable_out);
+	    print $stable_in "undo\n";
+	    eat_no_response($stable_out);
+	}
+
 	if ($move ne $stable_move and defined ($stable)) {
 	    print "At move $movenum, $toplay\:\n";
 	    print "Test version played   $move\n";
