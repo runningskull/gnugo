@@ -1223,7 +1223,8 @@ propagate_worm2(int str)
   ASSERT1(IS_STONE(worm[str].color), str);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (board[pos] == board[str] && is_same_worm(pos, str))
+    if (board[pos] == board[str] && is_same_worm(pos, str)
+	&& pos != str)
       worm[pos] = worm[str];
 }
 

@@ -24,6 +24,7 @@
 #define _BOARD_H_
 
 #include "sgftree.h"
+#include "config.h"
 #include <stdarg.h>
 
 /* local versions of absolute value, min and max */
@@ -406,6 +407,13 @@ void abortgo(const char *file, int line, const char *msg, int pos);
 #endif
 
 #define gg_assert(x) ASSERT1(x, NO_MOVE);
+
+/* Are we using valgrind memory checking? */
+#if USE_VALGRIND
+#include <valgrind/memcheck.h>
+#else
+#define VALGRIND_MAKE_WRITABLE(a, b)
+#endif
 
 #endif  /* _BOARD_H_ */
 

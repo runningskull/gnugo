@@ -1150,6 +1150,7 @@ compute_influence(int color, const char safe_stones[BOARDMAX],
 		  int move, const char *trace_message)
 {
   int save_debug = debug;
+  VALGRIND_MAKE_WRITABLE(q, sizeof(*q));
 
   q->is_territorial_influence = 1;
   q->color_to_move = color;
@@ -1774,6 +1775,7 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
   int k;
   int ii;
   int save_debug = debug;
+  VALGRIND_MAKE_WRITABLE(&escape_influence, sizeof(escape_influence));
 
   /* IMPORTANT: The caching relies on the fact that safe_stones[] and
    * strength[] will currently always be identical for identical board[]

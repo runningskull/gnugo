@@ -6348,6 +6348,7 @@ reduced_init_owl(struct local_owl_data **owl, int at_bottom_of_stack)
 
   check_owl_stack_size();
   *owl = owl_stack[owl_stack_pointer];
+  VALGRIND_MAKE_WRITABLE(*owl, sizeof(struct local_owl_data));
 }
 
 
@@ -6393,6 +6394,8 @@ do_push_owl(struct local_owl_data **owl)
 {
   struct local_owl_data *new_owl = owl_stack[owl_stack_pointer];
 
+  /* Mark all the data in *new_owl as uninitialized. */
+  VALGRIND_MAKE_WRITABLE(new_owl, sizeof(struct local_owl_data));
   /* Copy the owl data. */
   memcpy(new_owl->goal, (*owl)->goal, sizeof(new_owl->goal));
   memcpy(new_owl->boundary, (*owl)->boundary, sizeof(new_owl->boundary));

@@ -133,6 +133,9 @@
 /* Break-in module. Enabled by default. */
 #undef USE_BREAK_IN
 
+/* Define special valgrind macros. */
+#undef USE_VALGRIND
+
 /* Version number of package */
 #undef VERSION
 

@@ -55,9 +55,11 @@
 /* Break-in module. Enabled by default. */
 #define USE_BREAK_IN 1
 
+/* Define special valgrind macros. */
+#define USE_VALGRIND 0
+
 /* Large scale captures. Disabled by default. */
 #define LARGE_SCALE 0
-
 
 /* Version number of package */
 #define PACKAGE "gnugo"

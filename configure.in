@@ -508,6 +508,17 @@ else
    AC_DEFINE(OWL_THREATS, 0)
 fi
 
+dnl ------------ additional valgrind macros ------
+
+AH_TEMPLATE([USE_VALGRIND],
+[Define special valgrind macros.])
+
+if test "$enable_valgrind" = "yes" ; then
+   AC_DEFINE(USE_VALGRIND, 1)
+else 
+   AC_DEFINE(USE_VALGRIND, 0)
+fi
+
 dnl  ----------- special-case use of gcc ---------
 
 dnl Not sure if we are supposed to be accessing this variable, but...

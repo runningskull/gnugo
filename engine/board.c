@@ -89,9 +89,12 @@ struct vertex_stack_entry {
 #define STACK_SIZE 80 * MAXSTACK
 
 
-#define CLEAR_STACKS()\
-(change_stack_pointer = change_stack, \
- vertex_stack_pointer = vertex_stack)
+#define CLEAR_STACKS() do { \
+  change_stack_pointer = change_stack; \
+  vertex_stack_pointer = vertex_stack; \
+  VALGRIND_MAKE_WRITABLE(change_stack, sizeof(change_stack)); \
+  VALGRIND_MAKE_WRITABLE(vertex_stack, sizeof(vertex_stack)); \
+} while (0)
 
 /* Begin a record : address == NULL */
 #define BEGIN_CHANGE_RECORD()\
@@ -3009,6 +3012,7 @@ new_position(void)
 
   memset(string, 0, sizeof(string));
   memset(ml, 0, sizeof(ml));
+  VALGRIND_MAKE_WRITABLE(next_stone, sizeof(next_stone));
 
   /* propagate_string relies on non-assigned stones to have
    * string_number -1.

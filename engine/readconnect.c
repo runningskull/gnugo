@@ -2752,6 +2752,7 @@ init_connection_data(int color, const char goal[BOARDMAX],
   char mark[BOARDMAX];
 
   memset(mark, 0, BOARDMAX);
+  VALGRIND_MAKE_WRITABLE(conn, sizeof(conn));
   clear_connection_data(conn);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -4143,7 +4144,6 @@ compute_connection_distances(int str, int target, float cutoff,
 
   spread_connection_distances(color, conn);
 }
-
 
 
 /* Print the connection distances in a struct connection_data. */

@@ -701,6 +701,7 @@ void
 initialize_dragon_data(void)
 {
   int str;
+  /* VALGRIND_MAKE_WRITABLE(dragon, BOARDMAX * sizeof(struct dragon_data)); */
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str)) {
 
