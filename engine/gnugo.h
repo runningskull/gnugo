@@ -477,7 +477,7 @@ void report_pattern_profiling(void);
 void sgffile_add_debuginfo(SGFNode *node, int value);
 void sgffile_output(SGFTree *tree);
 
-void sgffile_loadandprint(SGFTree *tree, int next);
+void sgffile_printsgf(int color_to_play, const char *filename);
 void sgffile_printboard(SGFTree *tree);
 void sgffile_recordboard(SGFNode *node);
 

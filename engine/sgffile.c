@@ -142,29 +142,45 @@ sgffile_enddump(const char *filename)
 
 
 /*
- * sgffile_loadandprint adds the current board position as well as
- * information about who is to play and illegal moves to the tree.
+ * sgffile_printsgf creates an sgf of the current board position
+ * (without any move history). It also adds information about who is
+ * to play and marks illegal moves with the private sgf property IL.
  */
 
 void
-sgffile_loadandprint(SGFTree *tree, int next)
+sgffile_printsgf(int color_to_play, const char *filename)
 {
+  SGFTree sgftree;
   int m, n;
   char pos[3];
+  char str[128];
+  float relative_komi;
+
+  relative_komi = komi + black_captured - white_captured;
   
-  sgffile_printboard(tree);
+  sgftree_clear(&sgftree);
+  sgftreeCreateHeaderNode(&sgftree, board_size, relative_komi);
+  sgf_write_header(sgftree.root, 1, random_seed, relative_komi,
+		   level, chinese_rules);
+  gg_snprintf(str, 128, "GNU Go %s load and print", gg_version());
+  sgfOverwriteProperty(sgftree.root, "GN", str);
   
-  if (next == EMPTY)
+  sgffile_printboard(&sgftree);
+  
+  if (color_to_play == EMPTY)
     return;
 
-  sgfAddProperty(tree->lastnode, "PL", (next == WHITE ? "W" : "B"));
+  sgfAddProperty(sgftree.lastnode, "PL", (color_to_play == WHITE ? "W" : "B"));
 
   for (m = 0; m < board_size; ++m)
     for (n = 0; n < board_size; ++n)
-      if (BOARD(m, n) == EMPTY && !is_legal(POS(m, n), next)) {
-       gg_snprintf(pos, 3, "%c%c", 'a' + n, 'a' + m);
-       sgfAddProperty(tree->lastnode, "IL", pos);
+      if (BOARD(m, n) == EMPTY && !is_legal(POS(m, n), color_to_play)) {
+	gg_snprintf(pos, 3, "%c%c", 'a' + n, 'a' + m);
+	sgfAddProperty(sgftree.lastnode, "IL", pos);
       }
+
+
+  writesgf(sgftree.root, filename);
 }
 
 

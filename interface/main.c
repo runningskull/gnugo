@@ -933,11 +933,7 @@ main(int argc, char *argv[])
       if (mandated_color != EMPTY)
         gameinfo.to_move = mandated_color;
 
-      sgftree.root->child = NULL;
-      sgftreeSetLastNode(&sgftree, sgftree.root);
-      sgffile_loadandprint(&sgftree, gameinfo.to_move);
-
-      writesgf(sgftree.root, printsgffile);
+      sgffile_printsgf(gameinfo.to_move, printsgffile);
     }
     break;
     
