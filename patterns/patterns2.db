@@ -2355,7 +2355,7 @@ bOXx
 ....
 ----
 
-;(o_somewhere(D) || oplay_attack(*,?,D,D)) && !oplay_defend(*,a,b,c,*)
+;(x_somewhere(D) || oplay_attack(*,?,D,D)) && !oplay_defend(*,a,b,c,*)
 
 
 ###########################
