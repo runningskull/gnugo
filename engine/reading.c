@@ -4403,6 +4403,8 @@ break_chain2_moves(int str, struct reading_moves *moves, int require_safe,
 
     if (unsafe[0] && unsafe[1]
 	&& (stackp <= backfill2_depth || have_common_lib(str, apos, NULL))) {
+      int lib;
+
       /* Find backfilling moves. */
       for (k = 0; k < 2; k++) {
 	int libs2[3];
@@ -4412,6 +4414,29 @@ break_chain2_moves(int str, struct reading_moves *moves, int require_safe,
 	  if (!is_self_atari(libs2[1], color))
 	    ADD_CANDIDATE_MOVE(libs2[1], 0, *moves, "break_chain2-B");
 	}
+      }
+
+      /* Consider this case (reading:188):
+       *
+       *   |.OOOXXX
+       *   |OXXXOOO
+       *   |.X.O...
+       *   +-------
+       *
+       * We cannot atari the corner X string immediatly, so we need to
+       * backfill.  However, to avoid generating too many variations,
+       * we require that the opponent string is well restrained.
+       * Otherwise it could just run away while we backfill.
+       */
+      if (approxlib(libs[0], other, 3, NULL) <= 2
+ 	  && approxlib(libs[1], other, 3, NULL) <= 2) {
+	if (approxlib(libs[0], color, 1, &lib) == 1
+	    && approxlib(lib, color, 3, NULL) >= 3)
+	  ADD_CANDIDATE_MOVE(lib, 0, *moves, "break_chain2-C");
+
+	if (approxlib(libs[1], color, 1, &lib) == 1
+	    && approxlib(lib, color, 3, NULL) >= 3)
+	  ADD_CANDIDATE_MOVE(lib, 0, *moves, "break_chain2-C");
       }
     }
   }
