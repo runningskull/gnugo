@@ -612,7 +612,7 @@ IntDir=.\Release
 InputPath=.\owl_defendpats.db
 
 "owl_defendpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_defendpat -i ..\owl_defendpats.db -o ..\owl_defendpat.c
+	$(IntDir)\mkpat -b owl_defendpat -i ..\patterns\owl_defendpats.db -o owl_defendpat.c
 
 # End Custom Build
 
