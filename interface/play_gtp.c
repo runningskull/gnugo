@@ -2904,6 +2904,10 @@ gtp_print_vertices2(int n, int *moves)
   gtp_print_vertices(n, movei, movej);
 }
 
+/*************
+ * transform *
+ *************/
+
 static void
 rotate_on_input(int ai, int aj, int *bi, int *bj)
 {
@@ -2917,6 +2921,10 @@ rotate_on_output(int ai, int aj, int *bi, int *bj)
 }
 
 
+/***************
+ * random seed *
+ ***************/
+
 /* Function:  Get the random seed
  * Arguments: none
  * Fails:     never
@@ -2929,6 +2937,21 @@ gtp_get_random_seed(char *s, int id)
   return gtp_success(id, "%d", random_seed);
 }
 
+/* Function:  Set the random seed
+ * Arguments: integer
+ * Fails:     invalid data
+ * Returns:   nothing
+ */
+static int
+gtp_set_random_seed(char *s, int id)
+{
+  int seed;
+  if (sscanf(s, "%d", &seed) < 1)
+    return gtp_failure(id, "invalid seed");
+  
+  random_seed = seed;
+  return gtp_success(id, "");
+}
 
 
 
