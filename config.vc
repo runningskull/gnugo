@@ -53,7 +53,7 @@
 #define SEMEAI_NODE_LIMIT 500
 
 /* Break-in module. Default not enabled. */
-#define USE_BREAK_IN 0
+#define USE_BREAK_IN 1
 
 
 /* Version number of package */

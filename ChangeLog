@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- made --enable-experimental-break-in the default
 - compute_smaller_goal() makes the goal even smaller in the block_off case
 - persistent caching for break_in()/block_off()
 - inessential dragons handled differently in estimate_territorial_value()

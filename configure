@@ -692,8 +692,8 @@ Optional Features:
   --disable-oracle                   don't enable oracle (default)
   --enable-experimental-semeai       use the semeai module (default)
   --disable-experimental-semeai      use old semeai module
-  --enable-experimental-break-in     use the breakin module
-  --disable-experimental-break-in    don't use the breakin module (default)
+  --enable-experimental-break-in     use the breakin module (default)
+  --disable-experimental-break-in    don't use the breakin module
   --enable-experimental-owl-ext      use the experimental GAIN/LOSS codes
   --disable-experimental-owl-ext     use standard owl module (default)
   --enable-experimental-reading      use experimental pattern-based reading
@@ -4847,14 +4847,14 @@ EOF
 
 fi
 
-if test "$enable_experimental_break_in" = "yes" ; then
+if test "$enable_experimental_break_in" = "no" ; then
    cat >>confdefs.h <<\EOF
-#define USE_BREAK_IN 1
+#define USE_BREAK_IN 0
 EOF
 
 else
    cat >>confdefs.h <<\EOF
-#define USE_BREAK_IN 0
+#define USE_BREAK_IN 1
 EOF
 
 fi

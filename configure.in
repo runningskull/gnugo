@@ -88,8 +88,8 @@ AC_ARG_ENABLE(experimental-semeai,
   --disable-experimental-semeai      use old semeai module])
 
 AC_ARG_ENABLE(experimental-break-in,
- [  --enable-experimental-break-in     use the breakin module 
-  --disable-experimental-break-in    don't use the breakin module (default)])
+ [  --enable-experimental-break-in     use the breakin module (default)
+  --disable-experimental-break-in    don't use the breakin module])
 
 AC_ARG_ENABLE(experimental-owl-ext,
  [  --enable-experimental-owl-ext      use the experimental GAIN/LOSS codes
@@ -430,10 +430,10 @@ dnl ------------ Experimental Breakin enabled-------------------
 AH_TEMPLATE([USE_BREAK_IN],
 [Break-in module. Default not enabled.])
 
-if test "$enable_experimental_break_in" = "yes" ; then
-   AC_DEFINE(USE_BREAK_IN, 1)
-else
+if test "$enable_experimental_break_in" = "no" ; then
    AC_DEFINE(USE_BREAK_IN, 0)
+else
+   AC_DEFINE(USE_BREAK_IN, 1)
 fi
 
 dnl ------------ Semeai -------------------

@@ -92,7 +92,8 @@ enum {OPT_BOARDSIZE=127,
       OPT_EXPERIMENTAL_CONNECTIONS,
       OPT_EXPERIMENTAL_INFLUENCE,
       OPT_ALTERNATE_CONNECTIONS,
-      OPT_EXPERIMENTAL_BREAK_IN,
+      OPT_WITH_BREAK_IN,
+      OPT_WITHOUT_BREAK_IN,
       OPT_OPTIONS,
       OPT_STANDARD_SEMEAI,
       OPT_STANDARD_CONNECTIONS,
@@ -227,7 +228,8 @@ static struct gg_option const long_options[] =
   {"standard-connections",  no_argument, 0, OPT_STANDARD_CONNECTIONS},
   {"standard-semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
   {"alternate-connections",  no_argument, 0, OPT_ALTERNATE_CONNECTIONS},
-  {"experimental-break-in",  no_argument, 0, OPT_EXPERIMENTAL_BREAK_IN},
+  {"with-break-in",  	no_argument, 0, OPT_WITH_BREAK_IN},
+  {"without-break-in",  no_argument, 0, OPT_WITHOUT_BREAK_IN},
   {"options",        no_argument, 0, OPT_OPTIONS},
   {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
   {"capture-all-dead",   no_argument,   0, OPT_CAPTURE_ALL_DEAD},
@@ -448,6 +450,9 @@ main(int argc, char *argv[])
 	if (EXPERIMENTAL_READING)
 	  fprintf(stderr,
 		  "configure option enabled: experimental reading\n");
+	if (USE_BREAK_IN)
+	  fprintf(stderr,
+		  "configure option enabled: experimental break-in\n");
 	if (HASHING_SCHEME != 2)
 	  fprintf(stderr, "hash scheme %d\n", HASHING_SCHEME);
 	if (OWL_THREATS)
@@ -551,8 +556,12 @@ main(int argc, char *argv[])
 	alternate_connections = !alternate_connections;
 	break;
 
-      case OPT_EXPERIMENTAL_BREAK_IN:
+      case OPT_WITH_BREAK_IN:
 	experimental_break_in = 1;
+	break;
+
+      case OPT_WITHOUT_BREAK_IN:
+	experimental_break_in = 0;
 	break;
 
       case OPT_ALLOW_SUICIDE:

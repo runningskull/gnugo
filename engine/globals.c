@@ -140,7 +140,8 @@ int experimental_semeai = EXPERIMENTAL_SEMEAI;
 int experimental_connections = EXPERIMENTAL_CONNECTIONS;
 /* use alternate connection reading algorithm */
 int alternate_connections = ALTERNATE_CONNECTIONS;
-int owl_threats = OWL_THREATS;          /* compute owl threats */
+/* compute owl threats */
+int owl_threats = OWL_THREATS; 
 /* use experimental owl extension (GAIN/LOSS) */
 int experimental_owl_ext = EXPERIMENTAL_OWL_EXT;
 /* use experimental territory break-in module */
