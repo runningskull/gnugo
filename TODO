@@ -45,13 +45,14 @@ member.  Some of them are bigger and demand a deeper knowledge of the
 engine internals.  The issues are presented here in an approximate
 order of perceived difficulty.
 
+ * GNU Go passes on the first move as white on small boards with high
+   handicap (e.g. 2 stones on 7x7 or 7 stones on 9x9). While it's hard
+   to argue that there's no way for white to live, it should be forced
+   to thrash around for a while. Presumably the opponent is taking the
+   handicap for a reason.
+
  * Add more checks in patterns/mkpat.c testing whether the main diagram and
    the constraint diagram are consistent.
-
- * Complete the conversion to 1-dimensional representation.
-   Check all comments before functions to make them agree with
-   the actual function header.  In some cases these comments were
-   missed when the function was converted to 1D.
 
  * Break out handling of movelists into its own file and generalize it.
    This is started in 3.1.16. Move lists are used, among other places, 
@@ -80,8 +81,6 @@ order of perceived difficulty.
 
  * Support for ko in eyes.db and optics.c.
 
- * Support for constraints in the eye patterns.
-
  * Implement handling of timing information through the GTP commands
    time_settings and time_left for real. Currently the information is
    received but then ignored. This may involve integration with the
@@ -92,10 +91,10 @@ order of perceived difficulty.
    multi-step ko, etc) and then write code that handles them. 
    (Difficult!)
 
- * GNU Go should be able to resign some games. This feature should be
-   able to be turned on or off since we don't want it during
-   tournament play. If all dragons are settled and GNU Go is behind by
-   a lot, it should be able to resign.
+ * Write a script which plays through the joseki databases and checks
+   that the engine really generates a joseki move for all positions in
+   the databases. This would also be interesting to run with the
+   --nojosekidb option.
 
 
 //--------------------------------------------------------------
@@ -124,11 +123,6 @@ playing strength of the program and/or enhance certain aspects of it.
    a semi-automatic way of doing this.
 
  * The semeai module is still in need of improvement. (This is underway.)
-
- * The connection analysis is today completely static and has a hard
-   time identifying mutually dependent connections or moves that
-   simultaneously threatens two or more connections. This could be
-   improved by writing a connection reader. (This is underway.)
 
  * GNU Go does not have a move generator that tries explicitly to build
    moyos, or reduce/invade opponent's moyos. Such a move generator could
@@ -161,15 +155,6 @@ playing strength of the program and/or enhance certain aspects of it.
    make a strategic estimation of how a move strengthens a friendly
    group and/or weakens an opponent group and how strong/weak groups
    influence each other.
-
- * In some positions GNU Go may report a group as alive or connected
-   with a living group.  But after the opponent has placed one stone
-   GNU Go may change the status to dead, without going through a
-   critical status.  It would be nice if these positions could be
-   identified and logged for later analysis of the GNU Go team.
-
- * Automatic search for missing patterns by analysing games from
-   NNGS.
 
 
 //--------------------------------------------------------------
