@@ -3243,6 +3243,7 @@ Dba
 
 
 Pattern DD4
+# gf Revised constraint. (3.5.2)
 
 XOO
 O..
@@ -3256,6 +3257,7 @@ db*
 
 ;xplay_attack(a,d) && xplay_attack_either(a,*,d,e)
 ;&& !xplay_defend_both(a,b,c,d,e) && !xplay_defend_both(a,c,b,d,e)
+;&& !xplay_connect(a,d,e) && oplay_connect(*,a,d,e)
 
 >add_defend_both_move(d,e);
 

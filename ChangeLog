@@ -7,12 +7,13 @@
 - slow sorting in get_next_move_from_list() is replaced with heap sorting
 - new static functions pattern_list_build_heap() and
   pattern_list_get_next_pattern() in `engine/owl.c'
-- owl tuning
 - new command line option --no-cosmic-gnugo
-- joseki tuning
 - remove global variables score, lower_bound, upper_bound
 - remove (level >= 8) condition for estimate_score() call
 - pass our_score instead of score to the move valuation functions
+- tuning	
+- owl tuning
+- joseki tuning
 
 3.5.1 released September 4, 2003
 
