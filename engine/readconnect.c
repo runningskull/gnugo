@@ -55,7 +55,7 @@ static int quiescence_capture(int str);
 /* static int capture_one_move(int str); */
 static int prevent_capture_one_move(int *moves, int str1);
 
-int nodes_connect=0,max_nodes_connect=500,max_connect_depth=64;
+int nodes_connect=0,max_nodes_connect=2000,max_connect_depth=64;
 
 static int add_array (int *array, int elt) {
   int r, add = 1;
@@ -367,8 +367,10 @@ int recursive_connect (int str1, int str2, int *move) {
 
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++) {
     if (trymove(Moves[i], board[str1], NULL, 0, EMPTY, 0)) {
-      if (!recursive_disconnect(str1, str2, move))
+      if (!recursive_disconnect(str1, str2, move)) {
+	*move = Moves[i];
 	res = 1;
+      }
       popgo();
     }
   }
@@ -409,8 +411,10 @@ int recursive_disconnect (int str1, int str2, int *move) {
   if (res == 0)
     for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
       if (trymove(Moves[i], OTHER_COLOR(board[str1]), NULL, 0, EMPTY, 0)) {
-	if (!recursive_connect(str1, str2, move))
-	  res=1;
+	if (!recursive_connect(str1, str2, move)) {
+	  *move = Moves[i];
+	  res = 1;
+	}
 	popgo();
       }
 
