@@ -349,6 +349,22 @@ loadsgf games/kgs/yagr-Mythenmetz.2.sgf 111
 346 owl_defend Q13
 #? [1 N13]*
 
+loadsgf games/owl51.sgf
+347 owl_defend G16
+#? [1 D10]
+
+loadsgf games/owl51.sgf
+348 owl_defend M11
+#? [0]
+
+# Eye space with a cutting point. 
+loadsgf games/olympiad2004/19x19/int-gnu.sgf 115
+349 owl_attack T19
+#? [1 R19]
+
+loadsgf games/olympiad2004/19x19/gnu-int.sgf 175
+350 owl_defend F11
+#? [0]
 
 ########### end of tests #####################
 

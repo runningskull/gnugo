@@ -244,7 +244,7 @@ loadsgf games/seki08.sgf
 402 reg_genmove black
 #? [C1|C2|B1]
 
-# C1 and C2 both secure seki, but C1 is one prisoner better.
+# C1 and C2 both secure seki in sente, but C1 is one prisoner better.
 # B2 leaves white the option to make ko.
 play white B1
 403 reg_genmove black
@@ -285,13 +285,18 @@ undo
 undo
 undo
 undo
+
+# D1 and A2 also give seki but are one point worse.
 play black C2
 411 reg_genmove white
 #? [C1]
 
+# D1 and A2 are miai to get seki. Black can also opt for a difficult
+# ko by playing B2, but this is usually not a good idea. Tenuki
+# suffices for seki and leaves a big mutual ko threat.
 play white C1
 412 reg_genmove black
-#? [D1]
+#? [D1|A2|C9]
 
 play black D1
 413 reg_genmove white

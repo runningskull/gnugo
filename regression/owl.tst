@@ -710,7 +710,7 @@ loadsgf games/reading25.sgf
 
 loadsgf games/nicklas/nicklas10.sgf 18
 191 owl_defend D8
-#? [0]*
+#? [1 B7]*
 
 # See also test case golife:7
 loadsgf games/golife.sgf 46

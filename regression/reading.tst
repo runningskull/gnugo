@@ -840,6 +840,7 @@ loadsgf games/reading45.sgf
 #? [0]*
 
 # Ladder reading problem. See also kgs:290 and kgs:300
+# This is more or less a duplicate of reading:156.
 loadsgf games/kgs/yagr-czarny.sgf 17
 200 attack B4
 #? [1 B2]*
@@ -851,6 +852,12 @@ trymove W E17
 #? [1 G17]*
 popgo
 
+# See also trevorc:880,890
+loadsgf games/trevor/auto/c51.sgf 82
+trymove W E12
+202 attack E13
+#? [2 F13]
+popgo
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

@@ -218,3 +218,58 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 202
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 242
 123 reg_genmove white
 #? [K3|L3|L1]*
+
+# More important to build towards center than closing off edge.
+loadsgf games/olympiad2004/19x19/gnu-int.sgf 67
+201 restricted_genmove black C11 E11 E12
+#? [E11]
+
+# Really bad shape at G7.
+loadsgf games/olympiad2004/19x19/gnu-int.sgf 113
+202 restricted_genmove black G7 G8
+#? [G8]
+
+# O10 protects against both cuts!
+loadsgf games/olympiad2004/19x19/gnu-int.sgf 205
+203 restricted_genmove black M13 O10
+#? [O10]
+
+# Black will break through somewhere after D4.
+loadsgf games/olympiad2004/9x9/gnu-int.sgf 9
+301 reg_genmove black
+#? [D4]
+
+# H6 is bigger than J7.
+loadsgf games/olympiad2004/9x9/int-gnu.sgf 42
+401 reg_genmove white
+#? [H6]
+
+# Better to allow G7 to get cut off than E3.
+loadsgf games/olympiad2004/9x9/gnu-mag.sgf 9
+501 reg_genmove black
+#? [F3]
+
+# Hane at A6 leads nowhere. The clamp at B5
+loadsgf games/olympiad2004/9x9/gnu-mag.sgf 25
+502 restricted_genmove black A6 B5
+#? [B5]
+
+# Wrong atari. F6 is better than E7.
+loadsgf games/olympiad2004/9x9/gnu-mag.sgf 35
+503 restricted_genmove black E7 F6
+#? [F6]
+
+# F6 really bad shape.
+loadsgf games/olympiad2004/9x9/gnu-mag.sgf 11
+601 restricted_genmove black F7 F6 H4 G3
+#? [!F6]
+
+# G6 about as bad shape as one can get. E6 has more promise.
+loadsgf games/olympiad2004/9x9/gnu-mag.sgf 23
+602 reg_genmove black
+#? [E6]
+
+# Always connect from the secure end. A1 goes before A4.
+loadsgf games/olympiad2004/9x9/gnu-mag.sgf 63
+603 reg_genmove black
+#? [A1]

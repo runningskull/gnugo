@@ -46,8 +46,14 @@ loadsgf games/century21-2002/goint-gnugo.sgf 161
 80 owl_attack D17
 #? [1 C17]
 
+# White can make seki in the upper left corner and preventing that is
+# the largest move on the board. B17 is the most natural move and the
+# one leaving the least aji. Except for the upper left corner, N9 is
+# the biggest move.
 loadsgf games/century21-2002/goint-gnugo.sgf 209
 85 reg_genmove black 
+#? [B17]
+86 restricted_genmove black N9 T15 A13 Q7 Q6 N10 N8 L13 G19 G15
 #? [N9]
 
 # A17 and A18 produce 10,000 year ko. But A17 is better

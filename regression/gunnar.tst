@@ -298,6 +298,12 @@ loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 290
 53 reg_genmove white
 #? [S17]
 
+# Playing J4 or F6 inside own territory clearly loses points. In 3.5.9
+# this is caused by some break-in confusion.
+loadsgf games/gunnar/gunnar13.sgf
+54 restricted_genmove white J4 F6 D9
+#? [D9]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

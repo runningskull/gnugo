@@ -489,12 +489,12 @@ loadsgf games/trevor/auto/c51.sgf 76
 870 reg_genmove white
 #? [E4|F5]
 
-
+# See also reading:202.
 loadsgf games/trevor/auto/c51.sgf 82
 880 reg_genmove white
 #? [J10]
 
-
+# See also reading:202.
 loadsgf games/trevor/auto/c51.sgf 84
 890 reg_genmove white
 #? [J10]

@@ -146,12 +146,12 @@ loadsgf games/trevor/trevor_15.sgf
 15 reg_genmove white
 #? [E7]
 
-# C1 looks best here.  A7 very unorthodox, and at least
-# worse for ko threats.
+# C1 looks best here. A7 very unorthodox, and at least worse for ko
+# threats. Since the lower left is the focus of the next test, this
+# test is restricted to the upper left corner.
 loadsgf games/trevor/trevor_16.sgf 53
-160 reg_genmove black
-#? [!A7]
-
+160 restricted_genmove black A7 A8 A9 B8 B9 C7 C8 C9 D8
+#? [B8|C8]
 
 # Protecting lower left group better.
 loadsgf games/trevor/trevor_16.sgf 54
