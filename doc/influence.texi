@@ -666,6 +666,39 @@ a sorting by angle algorithm has been implemented. If the distance
 between a pair enclosing stones is large, the surround status gets
 decreased to @code{WEAKLY_SURROUNDED}, or even 0 for very large ones.
 
+The sorting by angle must be explained. A small diagram will probably help :
+
+@example
+.O.O.
+O...O
+..X..
+O...O
+.O.O.
+@end example
+
+The sorting algorithm will generate this:
+
+@example
+.4.5.
+3...6
+..X..
+2...7
+.1.8.
+@end example
+
+That is, the points are sorted by ascending order of the measure of the
+angle S-G-O, where S is SOUTH, G the (approximated) gravity center of
+the goal, and O the position of the considered hostile stones.
+
+The necessity of such sorting appears when one tries to measure distances
+between enclosing stones without sorting them, just by using directly the
+existing left and right corners arrays. In some positions, the results will
+be inconsistent. Imagine, for example a position where for instance the points
+1,2,3,4,6 and 7 were in the left arrary, leaving only 5 and 8 in the right
+array. Because of the large distance between 5 and 8, the dragon would have
+declared weak surrounded or not surrounded at all. Such cases are rare but 
+frequent enough to require the angle sorting.
+
 The following position:
 
 @example
