@@ -118,9 +118,14 @@ struct owl_move_data {
   int defense_pos;  /* defense coordinate for vital owl attack patterns. */
 };
 
+#define USE_BDIST 1
+
 struct matched_pattern_data {
   int move;
   int ll;
+#if USE_BDIST
+  int bdist;
+#endif
   struct pattern *pattern;
 };
   
@@ -128,9 +133,13 @@ struct matched_patterns_list_data {
   int initialized;
   int counter; 		/* Number of patterns in the list. */
   int used;		/* How many patterns have already been used?*/
-  int ordered_up_to;	/* How far the list has been ordered. */
   int list_size;	
   struct matched_pattern_data *pattern_list;
+
+  int heap_num_patterns;
+  struct matched_pattern_data **pattern_heap;
+
+  struct matched_pattern_data *next_pattern;
 };
 
 void dump_pattern_list(struct matched_patterns_list_data *list);
@@ -148,6 +157,9 @@ static void owl_shapes(struct matched_patterns_list_data *list,
 static void collect_owl_shapes_callbacks(int anchor, int color,
 	  			         struct pattern *pattern_db,
 				         int ll, void *data);
+static void pattern_list_build_heap(struct matched_patterns_list_data *list);
+static void pattern_list_get_next_pattern(struct matched_patterns_list_data
+					  *list);
 static int get_next_move_from_list(struct matched_patterns_list_data *list,
                                    int color, struct owl_move_data *moves,
 				   int cutoff);
@@ -3156,17 +3168,23 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
 static void
 init_pattern_list(struct matched_patterns_list_data *list)
 {
+  gg_assert(!list->initialized);
+
   list->counter = 0;
   list->used = 0;
-  list->ordered_up_to = 0;
-  gg_assert(!list->initialized);
-  list->pattern_list = malloc(200*sizeof(list->pattern_list[0]));
+
+  list->pattern_list = malloc(200 * sizeof(list->pattern_list[0]));
+  list->list_size = 200;
+  gg_assert(list->pattern_list != NULL);
+  list->pattern_heap = NULL;
+
   if (0)
     gprintf("List at %x has new array at %x\n", list, list->pattern_list);
-  gg_assert(list->pattern_list != NULL);
-  list->list_size = 200;
+
+  list->next_pattern = NULL;
   list->initialized = 1;
 }
+
 
 /* This function has to get called before the memory of *list is freed
  * in the calling function.
@@ -3188,26 +3206,31 @@ close_pattern_list(int color, struct matched_patterns_list_data *list)
       int save_count_variations = count_variations;
       sgf_dumptree = NULL;
       count_variations = 0;
-      
-      for (i = list->used ; i < list->counter; i++)
-    	if (check_pattern_hard(list->pattern_list[i].move, color,
-	     		       list->pattern_list[i].pattern,
-			       list->pattern_list[i].ll)) {
+
+      if (!list->pattern_heap)
+	pattern_list_build_heap(list);
+
+      for (i = 0 ; i < list->heap_num_patterns; i++)
+	if (check_pattern_hard(list->pattern_heap[i]->move, color,
+	     		       list->pattern_heap[i]->pattern,
+			       list->pattern_heap[i]->ll)) {
 	  if (!found_one) {
 	    TRACE("Remaining valid (but unused) patterns at stack: ");
 	    dump_stack();
 	    found_one = 1;
 	  }
       	  TRACE("Pattern %s found at %1m with value %d\n",
-	        list->pattern_list[i].pattern->name,
-	        list->pattern_list[i].move,
-	        (int) list->pattern_list[i].pattern->value);
+	        list->pattern_heap[i]->pattern->name,
+	        list->pattern_heap[i]->move,
+	        (int) list->pattern_heap[i]->pattern->value);
 	}
       
       sgf_dumptree = save_sgf_dumptree;
       count_variations = save_count_variations;
     }
+
     free(list->pattern_list);
+    free(list->pattern_heap);
   }
   list->counter = -1;
 }
@@ -3223,9 +3246,8 @@ dump_pattern_list(struct matched_patterns_list_data *list)
   struct matched_pattern_data *matched_pattern;
   if (!list->initialized)
     return;
-  gprintf("%oList size %d. %d Patterns in list, "
-          "%d have been used, ordered up to %d.\n",
-          list->list_size, list->counter, list->used, list->ordered_up_to);
+  gprintf("%oList size %d. %d Patterns in list, %d have been used, .\n",
+	  list->list_size, list->counter, list->used);
   for (i = 0; i < list->counter; i++) {
     matched_pattern = &list->pattern_list[i];
     gprintf("%o  Pattern %s (orient. %d) at %1m, value %f.\n",
@@ -3253,143 +3275,184 @@ collect_owl_shapes_callbacks(int anchor, int color, struct pattern *pattern,
     matched_patterns->pattern_list
         = realloc(matched_patterns->pattern_list,
 	          matched_patterns->list_size
-	          * sizeof(matched_patterns->pattern_list[0]));
+	          * sizeof(struct matched_pattern_data));
   }
+
   next_pattern = &matched_patterns->pattern_list[matched_patterns->counter];
   next_pattern->move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
-  next_pattern->pattern = pattern;
   next_pattern->ll = ll;
+  next_pattern->pattern = pattern;
+
   matched_patterns->counter++;
 }
 
-#define USE_BDIST 1
+
 #if USE_BDIST
 
-/* compute the squared of the distance of a point on the board
- * to the center of the board
+/* Compute the squared of the distance of a point on the board to the
+ * center of the board.
  */
-
 static int
 bdist(int move)
 {
   /* i = 0:              idist = - (board_size - 1)
-     i = board_size -1 : idist =    board_size - 1
-     */
+   * i = board_size -1 : idist =    board_size - 1
+   */
   int idist = 2*I(move) - board_size + 1;
   int jdist = 2*J(move) - board_size + 1;
   return idist*idist + jdist*jdist;
 }
-#endif
 
-/* This function searches in the previously stored list of matched patterns
- * for the highest valued unused patterns that have a valid constraint.
- * It returns the moves at the next empty positions in the array (moves[]).
- * (Empty positions in the moves array are marked by having value <=0. There
- * must be enough empty positions in the list.)
- * If the highest valued pattern found has a value less than cutoff,
- * no move is returned.
- * Returns 1 if a move is found, 0 otherwise.
+
+/* NOTICE : In order to stabilize the regression test results,
+ * arbitrary parameters like pattern memory address and move position
+ * have been included in the sorting algorithm.
+ */
+
+#define BETTER_PATTERN(a, b)				\
+  ((a)->pattern->value > (b)->pattern->value		\
+   || ((a)->pattern->value == (b)->pattern->value	\
+       && ((a)->pattern < (b)->pattern			\
+	   || ((a)->pattern == (b)->pattern		\
+	       && ((a)->bdist < (b)->bdist		\
+		   || ((a)->bdist == (b)->bdist		\
+		       && (a)->move < (b)->move))))))
+
+#else	/* not USE_BDIST */
+
+#define BETTER_PATTERN(a, b)				\
+  ((a)->pattern->value > (b)->pattern->value		\
+   || ((a)->pattern->value == (b)->pattern->value	\
+       && ((a)->pattern < (b)->pattern			\
+	   || ((a)->pattern == (b)->pattern		\
+	       && (a)->move < (b)->move))))
+
+#endif	/* not USE_BDIST */
+
+
+/* Fast heap building.  Takes O(n) only. */
+static void
+pattern_list_build_heap(struct matched_patterns_list_data *list)
+{
+  int k;
+  int limit;
+  struct matched_pattern_data **heap;
+
+  list->pattern_heap = malloc(list->counter
+			      * sizeof(struct matched_pattern_data*));
+  gg_assert(list->pattern_heap != NULL);
+
+  for (k = 0; k < list->counter; k++) {
+#if USE_BDIST
+    list->pattern_list[k].bdist = bdist(list->pattern_list[k].move);
+#endif
+    list->pattern_heap[k] = &list->pattern_list[k];
+  }
+
+  heap = list->pattern_heap - 1;
+  list->heap_num_patterns = list->counter;
+  limit = list->heap_num_patterns / 2;
+
+  for (k = limit; k >= 1; k--) {
+    int parent;
+    int child;
+    struct matched_pattern_data *pattern_data = heap[k];
+
+    for (parent = k; parent <= limit; parent = child) {
+      child = 2 * parent;
+      if (child < list->heap_num_patterns
+	  && BETTER_PATTERN(heap[child + 1], heap[child]))
+	child++;
+
+      if (BETTER_PATTERN(pattern_data, heap[child]))
+	break;
+
+      heap[parent] = heap[child];
+    }
+
+    heap[parent] = pattern_data;
+  }
+}
+
+
+/* Pops patterns list's heap once and makes `list->next_pattern' point
+ * to the popped pattern.
+ */
+static void
+pattern_list_get_next_pattern(struct matched_patterns_list_data *list)
+{
+  int parent;
+  int child;
+  struct matched_pattern_data **heap = list->pattern_heap - 1;
+
+  list->next_pattern = heap[1];
+
+  for (parent = 1; 2 * parent < list->heap_num_patterns; parent = child) {
+    child = 2 * parent;
+    if (BETTER_PATTERN(heap[child + 1], heap[child]))
+      child++;
+
+    if (BETTER_PATTERN(heap[list->heap_num_patterns], heap[child]))
+      break;
+
+    heap[parent] = heap[child];
+  }
+
+  heap[parent] = heap[list->heap_num_patterns];
+  list->heap_num_patterns--;
+}
+
+
+/* This function searches in the previously stored list of matched
+ * patterns for the highest valued unused patterns that have a valid
+ * constraint.  It returns the moves at the next empty positions in
+ * the array moves[].  Empty positions in the moves array are marked
+ * by having value <= 0.  There must be enough empty positions in the
+ * list.
  *
- * One bubble sort-like iteration is used to find the next highest valued
- * pattern; then it is checked whether this move has not been tried before,
- * and if the pattern constraint is valid. This is repeated until enough
- * moves are found or the end of the list is reached.
+ * If the highest valued pattern found has a value less than cutoff,
+ * no move is returned.  Returns 1 if a move is found, 0 otherwise.
+ *
+ * pattern_list_get_next_pattern() is used to pop the next highest
+ * valued pattern from the list's heap.  Then it is checked whether
+ * this move has not been tried before, and if the pattern constraint
+ * is valid. This is repeated until enough moves are found or the end
+ * of the list is reached.
  */
 
 static int
 get_next_move_from_list(struct matched_patterns_list_data *list, int color,
-                        struct owl_move_data *moves, int cutoff)
+			struct owl_move_data *moves, int cutoff)
 {
-  int top, bottom;
-  int k;
-  int i;
-  int move;
-  struct matched_pattern_data matched_pattern;
   int move_found = 0;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
-    
+
   sgf_dumptree = NULL;
   count_variations = 0;
 
-  /* The patterns above list->used have already been either discarded or
-   * used by the calling function.
-   */
-  for (top = list->used; top < list->counter; top++) {
-    /*
-     * NOTICE : In order to stabilize the regression test results,
-     * arbitrary parameters like pattern memory address and move position
-     * have been included in the sorting algorithm.
-     */
-    float top_val = list->pattern_list[top].pattern->value;
-    struct pattern *top_pattern = list->pattern_list[top].pattern;
-    int top_move = list->pattern_list[top].move;
-#if USE_BDIST
-    int top_dist = bdist(list->pattern_list[top].move);
-#endif
+  if (!list->pattern_heap)
+    pattern_list_build_heap(list);
 
-    /* Maybe we already know the top entry (if previous call was ended
-     * by a value cutoff.
-     */
-    if (top >= list->ordered_up_to) {
-      /* One bubble sort iteration. */
-      for (bottom = list->counter-1; bottom > top; bottom--) {
-	float bot_val = list->pattern_list[bottom].pattern->value;
-	struct pattern *bot_pattern = NULL;
-	int bot_move = NO_MOVE;
-#if USE_BDIST
-	int bot_dist = 0;
-#endif
-	if (bot_val >= top_val) {
-	  bot_pattern = list->pattern_list[bottom].pattern;
-	  bot_move = list->pattern_list[bottom].move;
-#if USE_BDIST
-	  bot_dist = bdist(list->pattern_list[bottom].move);
-#endif
-	}
-#if USE_BDIST
-        if (bot_val > top_val
-           || (bot_val == top_val
-               && bot_pattern < top_pattern)
-           || (bot_val == top_val
-               && bot_pattern == top_pattern
-               && bot_dist < top_dist)
-           || (bot_val == top_val
-               && bot_pattern == top_pattern
-               && bot_dist == top_dist
-	       && bot_move < top_move)) {
-#else
-        if (bot_val > top_val
-           || (bot_val == top_val
-               && bot_pattern < top_pattern)
-           || (bot_val == top_val
-               && bot_pattern == top_pattern
-               && bot_move < top_move)) {
-#endif
+  while (list->heap_num_patterns > 0 || list->next_pattern) {
+    int k;
+    struct pattern *pattern;
+    int move;
+    int ll;
 
-	  matched_pattern = list->pattern_list[bottom];
-	  list->pattern_list[bottom] = list->pattern_list[top];
-	  list->pattern_list[top] = matched_pattern;
+    if (!list->next_pattern)
+      pattern_list_get_next_pattern(list);
 
-	  top_val = bot_val;
-          top_pattern = bot_pattern;
-          top_move = bot_move;
-#if USE_BDIST
-          top_dist = bot_dist;
-#endif
-	}
-      }
-      list->ordered_up_to++;
-    }
-    matched_pattern = list->pattern_list[top];
-    if (top_val < (float) cutoff) {
-      list->ordered_up_to = top + 1;
-      list->used = top;
-      sgf_dumptree = save_sgf_dumptree;
-      count_variations = save_count_variations;
-      return 0;
-    }
-    move = matched_pattern.move;
+    pattern = list->next_pattern->pattern;
+    if (pattern->value < (float) cutoff)
+      break;
+
+    move = list->next_pattern->move;
+    ll = list->next_pattern->ll;
+
+    list->next_pattern = NULL;
+    list->used++;
+
     ASSERT_ON_BOARD1(move);
     for (k = 0; k < MAX_MOVES; k++) {
       if (moves[k].pos == move || moves[k].value <= 0)
@@ -3397,54 +3460,61 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
     }
     if (moves[k].pos == move)
       continue;
+
     gg_assert(k < MAX_MOVES); /* There has to be an empty space. */
-    if (check_pattern_hard(move, color, matched_pattern.pattern,
-			   matched_pattern.ll)) {
+    if (check_pattern_hard(move, color, pattern, ll)) {
       moves[k].pos = move;
-      moves[k].value = (int) top_val;
-      moves[k].name = matched_pattern.pattern->name;
+      moves[k].value = pattern->value;
+      moves[k].name = pattern->name;
       move_found = 1;
       TRACE("Pattern %s found at %1m with value %d\n",
-	    matched_pattern.pattern->name, move, moves[k].value);
+	    pattern->name, move, moves[k].value);
 
-      if (matched_pattern.pattern->class & CLASS_B)
-        moves[k].same_dragon = 0;
-      else if (matched_pattern.pattern->class & CLASS_b) {
+      if (pattern->class & CLASS_B)
+	moves[k].same_dragon = 0;
+      else if (pattern->class & CLASS_b) {
+	int i;
 	int same_dragon = 1;
+
 	/* If we do not yet know whether the move belongs to the same dragon,
 	 * we see whether another pattern can clarify.
 	 */
-	for (i = top + 1; i < list->counter; i++)
-	  if ((list->pattern_list[i].move == move) 
-	      && ((list->pattern_list[i].pattern->class & CLASS_B)
-		  || !(list->pattern_list[i].pattern->class & CLASS_b))
-	      && check_pattern_hard(move, color, list->pattern_list[i].pattern,
-				    list->pattern_list[i].ll)) {
-	    TRACE("Additionally pattern %s found at %1m\n",
-		  list->pattern_list[i].pattern->name, move);
-	    if (list->pattern_list[i].pattern->class & CLASS_B)
-	      same_dragon = 0;
-	    else
-	      same_dragon = 2;
-	    break;
+	for (i = 0; i < list->heap_num_patterns; i++) {
+	  struct matched_pattern_data *pattern_data = list->pattern_heap[i];
+
+	  if (pattern_data->move == move
+	      && ((pattern_data->pattern->class & CLASS_B)
+		  || !(pattern_data->pattern->class & CLASS_b))) {
+	    if (check_pattern_hard(move, color, pattern_data->pattern,
+				   pattern_data->ll)) {
+	      TRACE("Additionally pattern %s found at %1m\n",
+		    pattern_data->pattern->name, move);
+	      if (pattern_data->pattern->class & CLASS_B)
+		same_dragon = 0;
+	      else
+		same_dragon = 2;
+
+	      break;
+	    }
 	  }
+	}
+
 	moves[k].same_dragon = same_dragon;
       }
       else
 	moves[k].same_dragon = 2;
-      if (matched_pattern.pattern->class & CLASS_E)
+      if (pattern->class & CLASS_E)
 	moves[k].escape = 1;
       else
 	moves[k].escape = 0;
       break;
-    } /* if check_pattern_hard */
+    } /* if (check_pattern_hard(...)) */
   }
 
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
-  list->ordered_up_to = top+1;
-  list->used = top+1;
-  return (move_found);
+
+  return move_found;
 }
 
 
