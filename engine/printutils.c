@@ -295,10 +295,13 @@ abortgo(const char *file, int line, const char *msg, int x, int y)
   }
 #endif
 
-  fprintf(stderr, "\n\
-gnugo %s: You stepped on a bug.\n\
-Please save this game as an sgf file \
-and mail it to gnugo@gnu.org\n\n", gg_version());
+  fprintf(stderr, "\ngnugo %s: You stepped on a bug.\n", gg_version());
+  if (board_size >= 9 && board_size <= 19) {
+    fprintf(stderr, "\
+Please save this game as an sgf file and mail it to gnugo@gnu.org\n\
+If you can, please also include the debug output above this message.\n");
+  }
+  fprintf(stderr, "\n");
 
   fflush(stderr);
   fflush(stdout);
