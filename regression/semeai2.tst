@@ -104,12 +104,6 @@ loadsgf games/strategy1.sgf
 1 gg_genmove white
 #? [Q13]*
 
-# Strategy 31
-# This is a problem with the semeai analyzer and revise_semeai().
-loadsgf games/strategy6.sgf 274
-31 gg_genmove black
-#? [!(K19|D17|E16|E15)]
-
 # Strategy 37
 loadsgf games/nicklas/nicklas8.sgf 84
 37 gg_genmove black

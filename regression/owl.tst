@@ -411,7 +411,7 @@ loadsgf games/jahy.sgf 36
 # incident 287
 loadsgf games/incident287.sgf 103
 110 owl_defend F3
-#? [1 (B2|D1)]
+#? [1 (B2|D1|C3)]
 
 # incident 177 (from the disastrous Indigo game)
 loadsgf games/incident169.sgf 184
@@ -663,8 +663,10 @@ loadsgf games/incident223.sgf 228
 loadsgf games/incident269.sgf 200
 180 owl_attack R19
 #? [1 (T16|T17|T18|S18)]
+
+# tm (3.1.17)  T18 lives.  Note the W sente at R16.
 181 owl_defend R19
-#? [2 (S18|T18)]*
+#? [1 T18]*
 
 # A17 is a better defense than B18 because B18 gives W two ko threats
 loadsgf games/incident144.sgf 242

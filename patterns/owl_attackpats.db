@@ -1632,17 +1632,18 @@ ao|
 
 Pattern A603
 
-XX.O       reduce eye space
-.*..
-----
+xXX.O       reduce eye space
+x.*..
+-----
 
 :8,s,value(35)
 
-XX.a
-.*..
-----
+xCX.a
+DB*..
+-----
 
-;!attack(a)
+;!attack(a) && owl_proper_eye(B,C) &&
+; (x_somewhere(D) || owl_proper_eye(D,C))
 
 
 Pattern A603b
@@ -1706,7 +1707,8 @@ xXa
 b*.
 ---
 
-;!oplay_attack(*,a) && !obvious_false_xeye(b)
+;  !oplay_attack(*,a) 
+;  && !obvious_false_xeye(b)
 
 
 Pattern A607b

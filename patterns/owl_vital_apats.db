@@ -179,7 +179,8 @@ X*           atari inside eyespace
 
 A*
 
-; lib(A)==2 && olib(*)>1 && owl_big_eyespace(*,A)
+; lib(A)==2 && olib(*)>1 && 
+;  (owl_big_eyespace(*,A))
 
 
 Pattern VA10
@@ -725,5 +726,55 @@ XAX
 DXX
 
 ;!attack(D) && oplay_attack(*,b) && oplay_attack(*,c)
+
+
+Pattern VA42
+# tm New Pattern (3.1.17)
+
+XXX.
+.O*.
+----
+
+:8,s,value(50)
+
+bXXd
+aO*c
+----
+
+; !oplay_attack(*,c,d,d) &&
+; !oplay_attack(*,d,c,c)
+
+
+Pattern VA43
+# tm New Pattern (3.1.17)
+
+XoX
+o*o
+
+:8,s,value(57)
+
+XBd
+A*C
+
+; owl_proper_eye(*,d) &&
+; (owl_proper_eye(A,d) + owl_proper_eye(B,d) + owl_proper_eye(C,d) > 2) &&
+; safe_xmove(*)
+
+
+Pattern VA44
+# tm New Pattern (3.1.17)
+
+X*     cut to create false eye
+OX
+--
+
+:8,-,value(75)
+
+X*     cut to create false eye
+OX
+--
+
+; !ko(*)
+
 
 # END OF FILE

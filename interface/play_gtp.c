@@ -113,6 +113,8 @@ DECLARE(gtp_owl_attack);
 DECLARE(gtp_owl_defend);
 DECLARE(gtp_owl_does_attack);
 DECLARE(gtp_owl_does_defend);
+DECLARE(gtp_owl_threaten_attack);
+DECLARE(gtp_owl_threaten_defense);
 DECLARE(gtp_playblack);
 DECLARE(gtp_playwhite);
 DECLARE(gtp_popgo);
@@ -200,6 +202,8 @@ static struct gtp_command commands[] = {
   {"owl_defend",     	      gtp_owl_defend},
   {"owl_does_attack", 	      gtp_owl_does_attack},
   {"owl_does_defend", 	      gtp_owl_does_defend},
+  {"owl_threaten_attack",     gtp_owl_threaten_attack},
+  {"owl_threaten_defense",    gtp_owl_threaten_defense},
   {"popgo",            	      gtp_popgo},
   {"orientation",     	      gtp_set_orientation},
   {"protocol_version",        gtp_protocol_version},
@@ -956,6 +960,81 @@ gtp_owl_defend(char *s, int id)
   }
   if (!result_certain && report_uncertainty)
     gtp_printf(" uncertain");
+  return gtp_finish_response();
+}  
+
+/* Function:  Try to attack a dragon in 2 moves.
+ * Arguments: vertex
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   attack code followed by the two attack points if attack code nonzero.
+ */
+static int
+gtp_owl_threaten_attack(char *s, int id)
+{
+  int i, j;
+  int attack_point1;
+  int attack_point2;
+  int attack_code;
+
+  if (!gtp_decode_coord(s, &i, &j))
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "vertex must not be empty");
+
+  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+    reading_cache_clear();
+  
+  attack_code = owl_threaten_attack(POS(i, j), &attack_point1, &attack_point2);
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_print_code(attack_code);
+  if (attack_code > 0) {
+    gtp_printf(" ");
+    gtp_print_vertex(I(attack_point1), J(attack_point1));
+    gtp_printf(" ");
+    gtp_print_vertex(I(attack_point2), J(attack_point2));
+  }
+  return gtp_finish_response();
+}  
+
+
+/* Function:  Try to defend a dragon with 2 moves.
+ * Arguments: vertex
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   defense code followed by the 2 defense points if defense code nonzero.
+ */
+static int
+gtp_owl_threaten_defense(char *s, int id)
+{
+  int i, j;
+  int defense_point1;
+  int defense_point2;
+  int defend_code;
+  
+  if (!gtp_decode_coord(s, &i, &j))
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "vertex must not be empty");
+
+  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+    reading_cache_clear();
+
+  defend_code = owl_defend(POS(i, j), &defense_point1, &defense_point2);
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_print_code(defend_code);
+  if (defend_code > 0) {
+    gtp_printf(" ");
+    gtp_print_vertex(I(defense_point1), J(defense_point1));
+    gtp_printf(" ");
+    gtp_print_vertex(I(defense_point2), J(defense_point2));
+  }
   return gtp_finish_response();
 }  
 

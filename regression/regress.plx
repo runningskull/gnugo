@@ -334,6 +334,9 @@ if ($num) {
   my %attribs = %{game_parse($content)};
 
   if ($sgf) {
+    foreach (sort keys %attribs) {
+    #  print "$_: $attribs{$_}\n";
+    }
     sgfFile(%attribs);
     exit;
   }
@@ -415,7 +418,7 @@ if ($num) {
   my $gtpall = $attribs{gtp_all};
   $gtpall  =~ s/<BR>//mg;
   $gtpall  =~ s/\s+$//mg;
-  $gtpall  =~ m@loadsgf\s+ ((?:\w|[-.\\/])+)  \s* (\d*) @xm 
+  $gtpall  =~ m@loadsgf\s+ ((?:\w|[-+.\\/])+)  [ \t]* (\d*) @x
     or $gtpall =~m/(.*?)/;  #Problems!!!!  
   
   my $cmdline = "gq -l $1 " . ($2 ? "-L $2 " : "");
@@ -790,7 +793,6 @@ sub printunexpected{
         }
     }
     }
-    
     
     foreach (@ufails) {
       print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>FAILED</TD></TR>\n@;

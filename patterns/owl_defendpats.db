@@ -708,13 +708,21 @@ O.*.     make eye on edge
 
 Pattern D217
 # tm Pattern revised. (3.1.13)
+# tm Pattern revised. (3.1.17)
 
 o...
 O.*.     expand eyespace
-.x..
+xx..
 ----
 
 :8,-,value(60)
+
+o...
+O.*.     expand eyespace
+AB..
+----
+
+; oplay_attack(*,A)
 
 
 Pattern D217a
@@ -773,6 +781,7 @@ xx...X.        slide (usually inferior to play on third line)
 
 
 Pattern D219
+# tm Modified (3.1.17)
 
 OO*        capture edge stone to maybe make eye
 .X.
@@ -781,7 +790,7 @@ OO*        capture edge stone to maybe make eye
 :8,-,value(50)
 
 OO*
-.Aa
+aA.
 ---
 
 ;does_attack(*,A) && !obvious_false_oeye(a)
@@ -4486,6 +4495,7 @@ X.*.o
 
 Pattern D1305
 
+????
 oooo
 ..*.    try to escape
 X.Ox
@@ -4493,6 +4503,7 @@ X.Ox
 
 :8,-,value(80)
 
+????
 oabc
 ..*.
 X.Ox
@@ -4807,7 +4818,7 @@ Pattern D1323
 
 O*O      connect to escape
 
-:+,n,value(80)
+:+,n,value(35)
 
 a*b
 

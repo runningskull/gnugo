@@ -140,7 +140,7 @@ my %counters;
 my $next_cmd = "";
 my $prev_cmd = "";
 my $problem_set;
-
+my $wantshelp;
 
 GetOptions(
            "goprog|g=s"         => \$goprog,
@@ -149,6 +149,7 @@ GetOptions(
            "all_batches|all-batches|a=i" => \$all_batches,
            "make_images|m=i"    => \$make_images,
            "problemset|ps|p=s"  => \$problem_set,
+           "help"               => \$wantshelp
 );
 
 if ($make_images) {
@@ -158,10 +159,20 @@ if ($make_images) {
 
 my $s = (lc ($^O) eq 'mswin32') ? '\\' : '/';
 if (!$goprog) {
-  $goprog = "..${s}interface${s}gnugo.exe --mode gtp --quiet -t -w -d0x1000";  
+  $goprog = "..${s}interface${s}gnugo.exe";
+}
+
+if ($goprog !~ / /) {
+  $goprog .=  " --mode gtp --quiet -t -w -d0x1000";  
 }
 
 die $helpstring unless defined $goprog;
+
+if ($wantshelp) {
+  print $helpstring;
+  exit;
+}
+  
 
 
 if (!-e "html") {
@@ -188,6 +199,7 @@ $pidg = open3($goprog_in, $goprog_out, $goprog_err, $goprog)
   or die "Couldn't launch GNU Go: $!";
 print "goprog pid: $pidg\n" if $verbose > 1;
 my ($goprog_exe) = split (" ", $goprog);
+-e $goprog_exe  or die "Couldn't locate go program: $goprog_exe";
 $goprog_timestamp = (stat $goprog_exe)->mtime;
 
 go_command("name");

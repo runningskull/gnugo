@@ -1039,8 +1039,9 @@ parse_constraint_or_action(char *line)
       case 1: /* Token found, now expect a '('. */
 	if (*p != '(') {
 	  fprintf(stderr,
-		  "Syntax error in constraint or action, '(' expected (pattern %s).\n", 
-		  pattern_names[patno]);
+		  "%s(%d) : error : Syntax error in constraint or action, '(' expected (pattern %s).\n", 
+		  current_file, current_line_number, pattern_names[patno]);
+	  fatal_errors++;
 	  return;
 	}
 	else {
@@ -1061,8 +1062,8 @@ parse_constraint_or_action(char *line)
 		    *p, pattern_names[patno]);
 	  else
 	    fprintf(stderr,
-		    "mkpat: Syntax error in constraint or action, label expected (pattern %s).\n", 
-		    pattern_names[patno]);
+		    "%s(%d) : error : Syntax error in constraint or action, label expected, found '%c'.\n", 
+		    current_file, current_line_number, *p);
 	  return;
 	}
 	else {
@@ -1098,8 +1099,8 @@ parse_constraint_or_action(char *line)
 	  if (autohelper_functions[n].params >= 0
 	      && number_of_params == autohelper_functions[n].params) {
 	    fprintf(stderr,
-		    "Syntax error in constraint or action, ')' expected (pattern %s).\n",
-		    pattern_names[patno]);
+		    "%s(%d) : error : Syntax error in constraint or action, ')' expected (pattern %s).\n",
+		    current_file, current_line_number, pattern_names[patno]);
 	    return;
 	  }
 	  if (number_of_params == MAXPARAMS) {
@@ -1113,16 +1114,17 @@ parse_constraint_or_action(char *line)
 	}
 	else if (*p != ')') {
 	  fprintf(stderr, 
-		  "Syntax error in constraint or action, ',' or ')' expected (pattern %s).\n", 
-		  pattern_names[patno]);
+		  "%s(%d) : error : Syntax error in constraint or action, ',' or ')' expected (pattern %s).\n", 
+		  current_file, current_line_number, pattern_names[patno]);
 	  return;
 	}
 	else { /* a closing parenthesis */
 	  if ((autohelper_functions[n].params >= 0)
 	      && (number_of_params < autohelper_functions[n].params)) {
 	    fprintf(stderr,
-		    "Syntax error in constraint or action, ',' expected (pattern %s).\n",
-		    pattern_names[patno]);
+		    "%s(%d) : error : Syntax error in constraint or action, %s() requires %d parameters.\n",
+		    current_file, current_line_number, autohelper_functions[n].name, autohelper_functions[n].params);
+	    fatal_errors++;
 	    return;
 	  }
 	  generate_autohelper_code(n, number_of_params, labels);
@@ -1132,8 +1134,11 @@ parse_constraint_or_action(char *line)
 	
       default:
 	fprintf(stderr,
-		"Internal error in parse_constraint_or_action(), unknown state.\n");
+		"%s(%d) : error : Internal error in parse_constraint_or_action(), unknown state.\n",
+		current_file, current_line_number);
+        fatal_errors++;
 	return;
+	       
     }
   }
 }

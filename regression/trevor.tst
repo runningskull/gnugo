@@ -554,3 +554,12 @@ loadsgf games/trevor/trevor_64.sgf
 loadsgf games/trevor/owl111a.sgf
 1001 owl_defend C6
 #? [1 (B8|K9)]
+
+
+#CATEGORY=OWL
+#DESCRIPTION=Escaping to no where.
+#SEVERITY=7
+loadsgf golois/Goemate990903-6.sgf
+1010 owl_does_defend O13 O11 
+#? [0]*
+

@@ -187,6 +187,7 @@ loadsgf games/strategy5.sgf 44
 #? [!T7]
 
 # This is a problem with the semeai analyzer and revise_semeai().
+# But there is no semeai.
 loadsgf games/strategy6.sgf 274
 31 gg_genmove black
 #? [!(K19|D17|E16|E15)]

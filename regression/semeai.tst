@@ -42,7 +42,6 @@
 # Here is a supplemental list of problems where a comment in the .tst
 # file indicates a semeai:
 # 
-# Strategy 31
 # Strategy 44
 # Strategy2 72
 # Strategy2 80
