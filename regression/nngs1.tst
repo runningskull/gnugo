@@ -196,7 +196,7 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 12
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 16
 48 gg_genmove white
-#? [R16]*
+#? [R16]
 
 # W is trying to live with S14 but B:T14 threatens the corner.
 # Meanwhile B17 is urgent.

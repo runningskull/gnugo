@@ -26,7 +26,7 @@ loadsgf games/strategy14.sgf 81
 
 loadsgf games/strategy14.sgf 125
 55 gg_genmove white
-#? [C12]
+#? [C12]*
 
 loadsgf games/strategy14.sgf 211
 56 gg_genmove white
@@ -153,7 +153,7 @@ loadsgf games/strategy21.sgf 96
 loadsgf games/strategy14a.sgf
 # see test 51
 79 gg_genmove black
-#? [N3]
+#? [N3]*
 
 
 #CATEGORY=SEMEAI
@@ -214,7 +214,7 @@ loadsgf games/strategy25.sgf 55
 # considered. B17 (game move) is inferior.
 loadsgf games/strategy25.sgf 61
 90 gg_genmove black
-#? [B14|D17]
+#? [B14|D17]*
 
 # Connecting with ko at B14 is still best. The game move at B13 is
 # nothing but horrible. G13 would of course be superior if it killed

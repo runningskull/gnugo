@@ -208,7 +208,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 86
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 90
 500 gg_genmove black
-#? [J17]*
+#? [J17]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 92
@@ -313,7 +313,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 57
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 59
 720 gg_genmove white
-#? [F16]*
+#? [F16]
 
 
 

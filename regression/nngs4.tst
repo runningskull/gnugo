@@ -7,7 +7,7 @@ reset_trymove_counter
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 10
 10 gg_genmove white
-#? [E18]*
+#? [E18]
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 26
 20 gg_genmove white

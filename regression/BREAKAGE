@@ -1,3 +1,46 @@
+========================== 3.3.14 pre 1 ============================
+
+./regress.sh . nngs1.tst 
+48 unexpected PASS!
+./regress.sh . lazarus.tst 
+4 unexpected PASS!
+./regress.sh . trevorb.tst 
+960 unexpected FAIL: Correct '!D5', got 'D5'
+./regress.sh . strategy2.tst 
+55 unexpected FAIL: Correct 'C12', got 'C14'
+79 unexpected FAIL: Correct 'N3', got 'S4'
+90 unexpected FAIL: Correct 'B14|D17', got 'G13'
+./regress.sh . trevor.tst 
+412 unexpected FAIL: Correct 'C4', got 'B3'
+./regress.sh . nngs.tst 
+500 unexpected PASS!
+720 unexpected PASS!
+./regress.sh . global.tst 
+26 unexpected FAIL: Correct 'D12', got 'M5'
+34 unexpected PASS!
+./regress.sh . 13x13.tst 
+7 unexpected FAIL: Correct 'L7|M7|M6', got 'M1'
+65 unexpected FAIL: Correct 'H4', got 'L2'
+./regress.sh . nngs3.tst 
+230 unexpected PASS!
+310 unexpected PASS!
+330 unexpected PASS!
+390 unexpected FAIL: Correct 'O11', got 'M5'
+400 unexpected PASS!
+1190 unexpected FAIL: Correct 'D17', got 'C17'
+./regress.sh . nngs4.tst 
+10 unexpected PASS!
+./regress.sh . strategy5.tst 
+221 unexpected PASS!
+230 unexpected PASS!
+232 unexpected PASS!
+./regress.sh . century2002.tst 
+260 unexpected FAIL: Correct 'S12|Q12|Q13', got 'R13'
+./regress.sh . safety.tst 
+7 unexpected FAIL: Correct 'L5|L6|K6|M5|M3|K7|K6', got 'D13'
+./regress.sh . manyfaces1.tst 
+90 unexpected PASS!
+
 ============================== 3.3.13 ==============================
 
 ./regress.sh . nngs.tst 
