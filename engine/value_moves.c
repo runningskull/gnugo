@@ -850,7 +850,7 @@ dragon_safety(int dr, int ignore_dead_dragons)
 
 /*
  * Strategical value of connecting (or cutting) the dragon at (dragona)
- * to the dragon at (dragonb). Notice that this function is assymetric.
+ * to the dragon at (dragonb). Notice that this function is asymmetric.
  * This is because connection_value(a, b) is intended to measure the
  * strategical value on the a dragon from a connection to the b dragon.
  * 
@@ -1147,7 +1147,7 @@ strategic_penalty(int pos, int color)
     }  
   }
 
-  /* We have to make a gues how much the point where we want to play
+  /* We have to make a guess how much the point where we want to play
    * is dominated by the opponent. The territorial valuation is a
    * good try here.
    */
@@ -1200,6 +1200,7 @@ estimate_territorial_value(int pos, int color, float score)
 	      "  %1m:   %f (secondary) - attack on %1m (defenseless)\n",
 	      pos, worm[aa].effective_size, aa);
 	secondary_value += worm[aa].effective_size;
+	does_block = 1;
 	break;
       }
 
@@ -1213,6 +1214,7 @@ estimate_territorial_value(int pos, int color, float score)
 	      "  %1m:   %f (secondary) - attack on %1m (dead)\n",
 	      pos, 0.2 * this_value, aa);
 	secondary_value += 0.2 * this_value;
+	does_block = 1;
 	break;
       }
 

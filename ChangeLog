@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- analyze_neighbor() in filllib.c revised
+- size of persistent owl cache increased from 100 to 150 entires
+- bugfix in owl_confirm_safety()
+- territorial value computed also for tactical attacks of dead or
+  defenseless stones
 - caching of recent compute_escape_influence() results
 - tuning
 - reading cache stores depth-stackp instead of stackp

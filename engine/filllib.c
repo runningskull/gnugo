@@ -70,7 +70,8 @@ analyze_neighbor(int pos, int *found_black, int *found_white)
 
     case BLACK:
       if (!worm[pos].inessential && DRAGON2(pos).safety != INESSENTIAL) {
-	if (dragon[pos].matcher_status == ALIVE)
+	if (dragon[pos].matcher_status == ALIVE
+	    || dragon[pos].matcher_status == UNKNOWN)
 	  *found_black = 1;
 	else
 	  *found_white = 1;
@@ -79,7 +80,8 @@ analyze_neighbor(int pos, int *found_black, int *found_white)
 
     case WHITE:
       if (!worm[pos].inessential && DRAGON2(pos).safety != INESSENTIAL) {
-	if (dragon[pos].matcher_status == ALIVE)
+	if (dragon[pos].matcher_status == ALIVE
+	    || dragon[pos].matcher_status == UNKNOWN)
 	  *found_white = 1;
 	else
 	  *found_black = 1;

@@ -144,7 +144,7 @@ struct owl_cache {
   int move2;  /* second result coordinate */
 };
 
-#define MAX_OWL_CACHE_SIZE 100
+#define MAX_OWL_CACHE_SIZE 150
 static struct owl_cache persistent_owl_cache[MAX_OWL_CACHE_SIZE];
 static int persistent_owl_cache_size = 0;
 
@@ -3607,8 +3607,8 @@ owl_does_defend(int move, int target)
 }
 
 
-/* Use the owl code to determine whether the dragon at (move) is owl
- * safe after an own move at (target). This is used to detect
+/* Use the owl code to determine whether the dragon at (target) is owl
+ * safe after an own move at (move). This is used to detect
  * blunders. In case the dragon is not safe, it also tries to find a
  * defense point making (target) safe in a later move.
  *
@@ -3640,7 +3640,7 @@ owl_confirm_safety(int move, int target, int *defense_point)
 				  &result, defense_point, NULL, NULL))
     return result;
 
-  if (trymove(move, color, "owl_confirm_safety", target, EMPTY, 0)) {
+  if (trymove(move, color, "owl_confirm_safety", target, EMPTY, NO_MOVE)) {
     /* Check if a compatible owl_attack() is cached. */
     if (search_persistent_owl_cache(OWL_ATTACK, origin, 0, 0,
 				    &result, defense_point, NULL, NULL)) {
@@ -3652,7 +3652,7 @@ owl_confirm_safety(int move, int target, int *defense_point)
     }
     
     init_owl(&owl, target, NO_MOVE, move, 1);
-    if (!do_owl_attack(target, &defense, owl, EMPTY, 0))
+    if (!do_owl_attack(target, &defense, owl, EMPTY, NO_MOVE))
       result = WIN;
     popgo();
   }
@@ -3667,7 +3667,7 @@ owl_confirm_safety(int move, int target, int *defense_point)
 	owl->local_owl_node_counter, tactical_nodes,
 	gg_cputime() - start);
 
-  store_persistent_owl_cache(OWL_DOES_DEFEND, move, target, 0,
+  store_persistent_owl_cache(OWL_CONFIRM_SAFETY, move, target, 0,
 			     result, defense, 0, 0,
 			     tactical_nodes, owl->goal, board[target]);
 
