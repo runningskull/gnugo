@@ -444,15 +444,16 @@ static int
 computer_move(Gameinfo *gameinfo, int *passes)
 {
   int i, j;
-  int move_val;
+  float move_value;
+  int resign;
   int resignation_declined = 0;
   float upper_bound, lower_bound;
 
   init_sgf(gameinfo);
 
   /* Generate computer move. */
-  move_val = gnugo_genmove(&i, &j, gameinfo->to_move);
-  if (resignation_allowed && move_val < 0.0 && ON_BOARD2(i, j)) {
+  move_value = gnugo_genmove(&i, &j, gameinfo->to_move, &resign);
+  if (resignation_allowed && resign) {
     int state = ascii_endgame(gameinfo, 2);
     if (state != -1)
       return state;
@@ -460,7 +461,6 @@ computer_move(Gameinfo *gameinfo, int *passes)
     /* The opponent declined resignation. Remember not to resign again. */
     resignation_allowed = 0;
     resignation_declined = 1;
-    move_val = -move_val;
   }
 
   if (showscore) {
@@ -479,7 +479,7 @@ computer_move(Gameinfo *gameinfo, int *passes)
     *passes = 0;
 
   gnugo_play_move(i, j, gameinfo->to_move);
-  sgffile_add_debuginfo(sgftree.lastnode, move_val);
+  sgffile_add_debuginfo(sgftree.lastnode, move_value);
   sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
   if (resignation_declined)
     sgftreeAddComment(&sgftree, "GNU Go resignation was declined");
@@ -513,7 +513,7 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
   TRACE("\nyour move: %m\n\n", i, j);
   init_sgf(gameinfo);
   gnugo_play_move(i, j, gameinfo->to_move);
-  sgffile_add_debuginfo(sgftree.lastnode, 0);
+  sgffile_add_debuginfo(sgftree.lastnode, 0.0);
   sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
   sgffile_output(&sgftree);
 
@@ -547,7 +547,7 @@ do_pass(Gameinfo *gameinfo, int *passes, int force)
   (*passes)++;
   init_sgf(gameinfo);
   gnugo_play_move(-1, -1, gameinfo->to_move);
-  sgffile_add_debuginfo(sgftree.lastnode, 0);
+  sgffile_add_debuginfo(sgftree.lastnode, 0.0);
   sgftreeAddPlay(&sgftree, gameinfo->to_move, -1, -1);
   sgffile_output(&sgftree);
 

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revised interface to all genmove() type functions
 - new global variable depth_offset
 - only cache safe_move() results when reading depth is unmodified
 - revision of interface/emacs.el

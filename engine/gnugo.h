@@ -99,7 +99,7 @@ int  gnugo_placehand(int handicap);
 int  gnugo_sethand(int handicap, SGFNode *root);
 void gnugo_recordboard(SGFNode *node);
 
-int  gnugo_genmove(int *i, int *j, int color);
+float gnugo_genmove(int *i, int *j, int color, int *resign);
 
 int  gnugo_attack(int m, int n, int *i, int *j);
 int  gnugo_find_defense(int m, int n, int *i, int *j);
@@ -351,8 +351,8 @@ void change_dragon_status(int dr, int status);
 void who_wins(int color, FILE *outfile);
 
 /* high-level routine to generate the best move for the given color */
-int genmove(int *i, int *j, int color);
-int genmove_conservative(int *i, int *j, int color);
+int genmove(int color, float *value, int *resign);
+int genmove_conservative(int color, float *value);
 
 /* Play through the aftermath. */
 float aftermath_compute_score(int color, float komi, SGFTree *tree);
@@ -378,7 +378,7 @@ void prepare_pattern_profiling(void);
 void report_pattern_profiling(void);
 
 /* sgffile.c */
-void sgffile_add_debuginfo(SGFNode *node, int value);
+void sgffile_add_debuginfo(SGFNode *node, float value);
 void sgffile_output(SGFTree *tree);
 
 void sgffile_printsgf(int color_to_play, const char *filename);

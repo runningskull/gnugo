@@ -2318,7 +2318,7 @@ gtp_aa_confirm_safety(char *s)
 
   sscanf(s + n, "%d", &minsize);
 
-  genmove(NULL, NULL, color);
+  genmove(color, NULL, NULL);
   get_saved_dragons(POS(i, j), saved_dragons);
   get_saved_worms(POS(i, j), saved_worms);
   
@@ -2349,23 +2349,22 @@ gtp_aa_confirm_safety(char *s)
 static int
 gtp_genmove_black(char *s)
 {
-  int i, j;
-  float val;
+  int move;
+  int resign;
   UNUSED(s);
 
   if (stackp > 0)
     return gtp_failure("genmove cannot be called when stackp > 0");
 
-  val = genmove(&i, &j, BLACK);
+  move = genmove(BLACK, NULL, &resign);
 
-  if (resign_allowed && val < 0.0 && ON_BOARD(POS(i, j))) {
+  if (resign)
     return gtp_success("resign");
-  }
 
-  play_move(POS(i, j), BLACK);
+  play_move(move, BLACK);
 
   gtp_start_response(GTP_SUCCESS);
-  gtp_print_vertex(i, j);
+  gtp_print_vertex(I(move), J(move));
   return gtp_finish_response();
 }
 
@@ -2379,23 +2378,22 @@ gtp_genmove_black(char *s)
 static int
 gtp_genmove_white(char *s)
 {
-  int i, j;
-  float val;
+  int move;
+  int resign;
   UNUSED(s);
 
   if (stackp > 0)
     return gtp_failure("genmove cannot be called when stackp > 0");
 
-  val = genmove(&i, &j, WHITE);
+  move = genmove(WHITE, NULL, &resign);
 
-  if (resign_allowed && val < 0.0 && ON_BOARD(POS(i, j))) {
+  if (resign)
     return gtp_success("resign");
-  }
 
-  play_move(POS(i, j), WHITE);
+  play_move(move, WHITE);
 
   gtp_start_response(GTP_SUCCESS);
-  gtp_print_vertex(i, j);
+  gtp_print_vertex(I(move), J(move));
   return gtp_finish_response();
 }
 
@@ -2409,10 +2407,10 @@ gtp_genmove_white(char *s)
 static int
 gtp_genmove(char *s)
 {
-  int i, j;
+  int move;
+  int resign;
   int color;
   int n;
-  float val;
 
   n = gtp_decode_color(s, &color);
   if (!n)
@@ -2423,17 +2421,16 @@ gtp_genmove(char *s)
 
   adjust_level_offset(color);
   level += level_offset;
-  val = genmove(&i, &j, color);
+  move = genmove(color, NULL, &resign);
   level -= level_offset;
 
-  if (resign_allowed && val < 0.0 && ON_BOARD(POS(i, j))) {
+  if (resign)
     return gtp_success("resign");
-  }
 
-  play_move(POS(i, j), color);
+  play_move(move, color);
 
   gtp_start_response(GTP_SUCCESS);
-  gtp_print_vertex(i, j);
+  gtp_print_vertex(I(move), J(move));
   return gtp_finish_response();
 }
 
@@ -2448,7 +2445,7 @@ gtp_genmove(char *s)
 static int
 gtp_reg_genmove(char *s)
 {
-  int i, j;
+  int move;
   int color;
   int n;
   unsigned int saved_random_seed = get_random_seed();
@@ -2467,11 +2464,11 @@ gtp_reg_genmove(char *s)
    */
   set_random_seed(0);
   
-  genmove_conservative(&i, &j, color);
+  move = genmove_conservative(color, NULL);
 
   set_random_seed(saved_random_seed);
   gtp_start_response(GTP_SUCCESS);
-  gtp_print_vertex(i, j);
+  gtp_print_vertex(I(move), J(move));
   return gtp_finish_response();
 }
 
@@ -2485,7 +2482,7 @@ gtp_reg_genmove(char *s)
 static int
 gtp_gg_genmove(char *s)
 {
-  int i, j;
+  int move;
   int color;
   int n;
   unsigned int saved_random_seed = get_random_seed();
@@ -2508,10 +2505,10 @@ gtp_gg_genmove(char *s)
   sscanf(s+n, "%u", &seed);
   set_random_seed(seed);
   
-  genmove_conservative(&i, &j, color);
+  move = genmove_conservative(color, NULL);
   set_random_seed(saved_random_seed);
   gtp_start_response(GTP_SUCCESS);
-  gtp_print_vertex(i, j);
+  gtp_print_vertex(I(move), J(move));
   return gtp_finish_response();
 }
 
@@ -2525,6 +2522,7 @@ gtp_gg_genmove(char *s)
 static int
 gtp_restricted_genmove(char *s)
 {
+  int move;
   int i, j;
   int color;
   int n;
@@ -2564,10 +2562,10 @@ gtp_restricted_genmove(char *s)
    */
   set_random_seed(0);
   
-  genmove_restricted(&i, &j, color, allowed_moves);
+  move = genmove_restricted(color, allowed_moves);
   set_random_seed(saved_random_seed);
   gtp_start_response(GTP_SUCCESS);
-  gtp_print_vertex(i, j);
+  gtp_print_vertex(I(move), J(move));
   return gtp_finish_response();
 }
 
@@ -2586,10 +2584,9 @@ gtp_restricted_genmove(char *s)
 static int
 gtp_kgs_genmove_cleanup(char *s)
 {
-  int i, j;
+  int move;
   int color;
   int n;
-  float val;
   int save_capture_all_dead = capture_all_dead;
 
   n = gtp_decode_color(s, &color);
@@ -2606,15 +2603,15 @@ gtp_kgs_genmove_cleanup(char *s)
   
   adjust_level_offset(color);
   level += level_offset;
-  val = genmove(&i, &j, color);
+  move = genmove(color, NULL, NULL);
   level -= level_offset;
 
   capture_all_dead = save_capture_all_dead;
   
-  play_move(POS(i, j), color);
+  play_move(move, color);
 
   gtp_start_response(GTP_SUCCESS);
-  gtp_print_vertex(i, j);
+  gtp_print_vertex(I(move), J(move));
   return gtp_finish_response();
 }
 
@@ -2695,9 +2692,9 @@ gtp_top_moves(char *s)
 static int
 gtp_top_moves_white(char *s)
 {
-  int i, j, k;
+  int k;
   UNUSED(s);
-  genmove(&i, &j, WHITE);
+  genmove(WHITE, NULL, NULL);
   gtp_start_response(GTP_SUCCESS);
   for (k = 0; k < 10; k++)
     if (best_move_values[k] > 0.0) {
@@ -2716,9 +2713,9 @@ gtp_top_moves_white(char *s)
 static int
 gtp_top_moves_black(char *s)
 {
-  int i, j, k;
+  int k;
   UNUSED(s);
-  genmove(&i, &j, BLACK);
+  genmove(BLACK, NULL, NULL);
   gtp_start_response(GTP_SUCCESS);
   for (k = 0; k < 10; k++)
     if (best_move_values[k] > 0.0) {
@@ -3001,7 +2998,7 @@ static const char *status_names[6] = {"alive", "dead", "seki",
 static void
 finish_and_score_game(int seed)
 {
-  int move_val;
+  int move;
   int i, j;
   int next;
   int pass = 0;
@@ -3042,9 +3039,9 @@ finish_and_score_game(int seed)
     next = OTHER_COLOR(get_last_player());
 
   do {
-    move_val = genmove_conservative(&i, &j, next);
-    play_move(POS(i, j), next);
-    if (move_val >= 0) {
+    move = genmove_conservative(next, NULL);
+    play_move(move, next);
+    if (move != PASS_MOVE) {
       pass = 0;
       moves++;
     }
@@ -3318,7 +3315,7 @@ gtp_experimental_score(char *s)
       || (color != BLACK && color != WHITE))
     return gtp_failure("invalid color");
 
-  genmove_conservative(NULL, NULL, color);
+  genmove_conservative(color, NULL);
   estimate_score(&upper_bound, &lower_bound);
 
   if (debug & DEBUG_SCORING)

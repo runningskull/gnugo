@@ -3527,33 +3527,33 @@ redistribute_points(void)
  * for the best move.
  */
 static int
-find_best_move(int *the_move, float *val, int color,
+find_best_move(int *the_move, float *value, int color,
 	       int allowed_moves[BOARDMAX])
 {
   int good_move_found = 0;
   int ko_values_have_been_added = 0;
   char blunder_tested[BOARDMAX];
-  float bestval = 0.0;
+  float best_value = 0.0;
   int best_move = NO_MOVE;
   int pos;
 
   memset(blunder_tested, 0, sizeof(blunder_tested));
 
   while (!good_move_found) {
-    bestval = 0.0;
+    best_value = 0.0;
     best_move = NO_MOVE;
 
     /* Search through all board positions for the highest valued move. */
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      float tval = move[pos].final_value;
+      float this_value = move[pos].final_value;
       if (allowed_moves && !allowed_moves[pos])
 	continue;
       if (!ON_BOARD(pos) || move[pos].final_value == 0.0)
 	continue;
 	
-      if (tval > bestval) {
+      if (this_value > best_value) {
 	if (is_legal(pos, color) || is_illegal_ko_capture(pos, color)) {
-	  bestval = tval;
+	  best_value = this_value;
 	  best_move = pos;
 	}
 	else {
@@ -3568,9 +3568,9 @@ find_best_move(int *the_move, float *val, int color,
     /* If the best move is an illegal ko capture, reevaluate ko
      * threats and search again.
      */
-    if (bestval > 0.0 && is_illegal_ko_capture(best_move, color)) {
+    if (best_value > 0.0 && is_illegal_ko_capture(best_move, color)) {
       TRACE("Move at %1m would be an illegal ko capture.\n", best_move);
-      reevaluate_ko_threats(best_move, color, bestval);
+      reevaluate_ko_threats(best_move, color, best_value);
       redistribute_points();
       time_report(2, "  reevaluate_ko_threats", NO_MOVE, 1.0);
       ko_values_have_been_added = 1;
@@ -3584,7 +3584,7 @@ find_best_move(int *the_move, float *val, int color,
      * blunder. Otherwise devalue this move and scan through all move
      * values once more.
      */
-    else if (bestval > 0.0) {
+    else if (best_value > 0.0) {
       if (!blunder_tested[best_move]) {
 	float blunder_size = value_moves_get_blunder_size(best_move, color);
 	if (blunder_size > 0.0) {
@@ -3609,10 +3609,10 @@ find_best_move(int *the_move, float *val, int color,
       good_move_found = 1; /* It's best to pass. */
   }
   
-  if (bestval > 0.0 
+  if (best_value > 0.0 
       && best_move != NO_MOVE) {
     *the_move = best_move;
-    *val = bestval;
+    *value = best_value;
     return 1;
   }
 
@@ -3632,7 +3632,7 @@ find_best_move(int *the_move, float *val, int color,
  * NULL any move is allowed.
  */
 int
-review_move_reasons(int *the_move, float *val, int color,
+review_move_reasons(int *the_move, float *value, int color,
 		    float pure_threat_value, float our_score,
 		    int allowed_moves[BOARDMAX])
 {
@@ -3684,7 +3684,7 @@ review_move_reasons(int *the_move, float *val, int color,
   print_top_moves();
 
   /* Select the highest valued move and return it. */
-  return find_best_move(the_move, val, color, allowed_moves);
+  return find_best_move(the_move, value, color, allowed_moves);
 }
 
 

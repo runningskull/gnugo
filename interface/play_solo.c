@@ -40,7 +40,7 @@ play_solo(Gameinfo *gameinfo, int moves)
 {
   SGFTree sgftree;
   int passes = 0; /* num. consecutive passes */
-  int move_val;
+  float move_value;
   double t1, t2;
   int save_moves = moves;
   int boardsize = gnugo_get_boardsize();
@@ -83,15 +83,15 @@ play_solo(Gameinfo *gameinfo, int moves)
   memset(&totalstats, '\0', sizeof(totalstats));
   while (passes < 2 && --moves >= 0) {
     reset_owl_node_counter();
-    move_val = gnugo_genmove(&i, &j, gameinfo->to_move);
+    move_value = gnugo_genmove(&i, &j, gameinfo->to_move, NULL);
 
     gnugo_play_move(i, j, gameinfo->to_move);
-    sgffile_add_debuginfo(sgftree.lastnode, move_val);
+    sgffile_add_debuginfo(sgftree.lastnode, move_value);
     sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
     sgffile_output(&sgftree);
     gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
 
-    if (move_val < 0) {
+    if (POS(i, j) == PASS_MOVE) {
       ++passes;
       printf("%s(%d): Pass\n", gameinfo->to_move == BLACK ? "Black" : "White",
 	     movenum);
@@ -145,7 +145,7 @@ load_and_analyze_sgf_file(Gameinfo *gameinfo)
   SGFTree sgftree;
   int i, j;
   int next;
-  int move_val;
+  float move_value;
   
   next = gameinfo->to_move;
   sgftree = gameinfo->game_record;
@@ -153,7 +153,7 @@ load_and_analyze_sgf_file(Gameinfo *gameinfo)
   if (metamachine)
     sgffile_begindump(&sgftree);
 
-  move_val = gnugo_genmove(&i, &j, next);
+  move_value = gnugo_genmove(&i, &j, next, NULL);
 
   if (is_pass(POS(i, j)))
     gprintf("%s move: PASS!\n", next == WHITE ? "white (O)" : "black (X)");
@@ -166,7 +166,7 @@ load_and_analyze_sgf_file(Gameinfo *gameinfo)
     gnugo_play_move(i, j, next);
     sgftreeAddPlay(&sgftree, next, i, j);
     sgftreeAddComment(&sgftree, "load and analyze mode");
-    sgffile_add_debuginfo(sgftree.lastnode, move_val);
+    sgffile_add_debuginfo(sgftree.lastnode, move_value);
     sgffile_output(&sgftree);
   }
 }
@@ -189,7 +189,8 @@ void
 load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo, 
 			const char *scoringmode)
 {
-  int i, j, move_val;
+  int move;
+  float move_value;
   char *tempc = NULL;
   char text[250];
   char winner;
@@ -235,20 +236,20 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
   if (method != ESTIMATE) {
     doing_scoring = 1;
     while (pass < 2) {
-      move_val = genmove_conservative(&i, &j, next);
-      if (move_val >= 0) {
+      move = genmove_conservative(next, &move_value);
+      if (move != PASS_MOVE) {
 	pass = 0;
-	gprintf("%d %s move %m\n", movenum,
-		next == WHITE ? "white (O)" : "black (X)", i, j);
+	gprintf("%d %s move %1m\n", movenum,
+		next == WHITE ? "white (O)" : "black (X)", move);
       }
       else {
 	pass++;
 	gprintf("%d %s move : PASS!\n", movenum, 
 		next == WHITE ? "white (O)" : "black (X)");
       }
-      play_move(POS(i, j), next);
-      sgffile_add_debuginfo(score_tree->lastnode, move_val);
-      sgftreeAddPlay(score_tree, next, i, j);
+      play_move(move, next);
+      sgffile_add_debuginfo(score_tree->lastnode, move_value);
+      sgftreeAddPlay(score_tree, next, I(move), J(move));
       sgffile_output(score_tree);
       next = OTHER_COLOR(next);
     }

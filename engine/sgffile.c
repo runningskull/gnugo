@@ -47,7 +47,7 @@
  */
 
 void
-sgffile_add_debuginfo(SGFNode *node, int value)
+sgffile_add_debuginfo(SGFNode *node, float value)
 {
   int m, n;
   char comment[24];
@@ -79,7 +79,7 @@ sgffile_add_debuginfo(SGFNode *node, int value)
     }
   
   if (value > 0 && (output_flags & OUTPUT_MOVEVALUES)) {
-    sprintf(comment, "Value of move: %d", value);
+    sprintf(comment, "Value of move: %.2f", value);
     sgfAddComment(node, comment);
   }
 }

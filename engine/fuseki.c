@@ -207,7 +207,7 @@ choose_corner_move(int corner, int *m, int *n)
 
 /* Announce move, but check for politeness first. */
 static void
-announce_move(int move, int val, int color)
+announce_move(int move, int value, int color)
 {
   int i, j;
   /* This shouldn't happen. */
@@ -238,8 +238,8 @@ announce_move(int move, int val, int color)
       move = POS(board_size - 1 - j, board_size - 1 - i);
   }
   
-  if (set_minimum_move_value(move, val))
-    TRACE("Fuseki Player suggests %1m with value %d\n", move, val);
+  if (set_minimum_move_value(move, value))
+    TRACE("Fuseki Player suggests %1m with value %d\n", move, value);
 }
 
 

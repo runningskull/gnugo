@@ -30,6 +30,30 @@
 
 static SGFTree *aftermath_sgftree;
 
+static int do_aftermath_genmove(int color,
+				int under_control[BOARDMAX],
+				int do_capture_dead_stones);
+
+/* External interface to do_aftermath_genmove().
+ *
+ * If the suggested move turn out not to be allowed we just return
+ * pass. This is not ideal but also not a big deal. If
+ * do_aftermath_genmove() is ever redesigned that would be a good time
+ * to integrate allowed_moves.
+ */
+
+int
+aftermath_genmove(int color, int do_capture_dead_stones,
+		  int allowed_moves[BOARDMAX])
+{
+  int move = do_aftermath_genmove(color, NULL, do_capture_dead_stones);
+  if (move != PASS_MOVE && allowed_moves && !allowed_moves[move])
+    move = PASS_MOVE;
+
+  return move;
+}
+
+
 /* Generate a move to definitely settle the position after the game
  * has been finished. The purpose of this is to robustly determine
  * life and death status and to distinguish between life in seki and
@@ -96,10 +120,10 @@ static SGFTree *aftermath_sgftree;
  * genmove_conservative(). For this function to be meaningful, the
  * genmove() call should return pass.
  */
-int
-aftermath_genmove(int *aftermath_move, int color,
-		  int under_control[BOARDMAX],
-		  int do_capture_dead_stones)
+static int
+do_aftermath_genmove(int color,
+		     int under_control[BOARDMAX],
+		     int do_capture_dead_stones)
 {
   int k;
   int other = OTHER_COLOR(color);
@@ -270,9 +294,8 @@ aftermath_genmove(int *aftermath_move, int color,
   
   if (best_scoring_move != NO_MOVE
       && safe_move(best_scoring_move, color) == WIN) {
-    *aftermath_move = best_scoring_move;
     DEBUG(DEBUG_AFTERMATH, "Closing edge at %1m\n", best_scoring_move);
-    return 1;
+    return best_scoring_move;
   }
 
   /* Case 1. */
@@ -288,8 +311,7 @@ aftermath_genmove(int *aftermath_move, int color,
       findlib(pos, 1, &lib);
       /* Make sure we don't play into a ko or a (proper) snapback. */
       if (countstones(pos) > 1 || !is_self_atari(lib, color)) {
-	*aftermath_move = lib;
-	return 1;
+	return lib;
       }
     }
   }
@@ -376,8 +398,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	}
       }
     }
-    *aftermath_move = move;
-    return 1;
+    return move;
   }
   
   /* Case 5.
@@ -610,9 +631,8 @@ aftermath_genmove(int *aftermath_move, int color,
       if (!move_ok)
 	score[move] = 0;
       else {
-	*aftermath_move = move;
 	DEBUG(DEBUG_AFTERMATH, "Splitting eyespace at %1m\n", move);
-	return 1;
+	return move;
       }
     }
   }
@@ -734,9 +754,8 @@ aftermath_genmove(int *aftermath_move, int color,
       if (!self_atari_ok && !confirm_safety(move, color, NULL, NULL))
 	continue;
 	  
-      *aftermath_move = move;
       DEBUG(DEBUG_AFTERMATH, "Filling opponent liberty at %1m\n", move);
-      return 1;
+      return move;
     }
   }
   
@@ -767,15 +786,14 @@ aftermath_genmove(int *aftermath_move, int color,
 	    || DRAGON2(pos).safety == TACTICALLY_DEAD)
 	&& worm[pos].attack_codes[0] != 0
 	&& !is_illegal_ko_capture(worm[pos].attack_points[0], color)) {
-      *aftermath_move = worm[pos].attack_points[0];
       DEBUG(DEBUG_AFTERMATH, "Tactically attack %1m at %1m\n",
-	    pos, *aftermath_move);
-      return 1;
+	    pos, worm[pos].attack_points[0]);
+      return worm[pos].attack_points[0];
     }
   }
   
   /* No move found. */
-  return -1;
+  return PASS_MOVE;
 }
 
 /* This is a substitute for genmove_conservative() which only does
@@ -785,16 +803,17 @@ aftermath_genmove(int *aftermath_move, int color,
  * important not to miss the move.
  */
 static int
-reduced_genmove(int *move, int color)
+reduced_genmove(int color)
 {
-  float val;
+  float value;
   int save_verbose;
   float upper_bound, lower_bound;
   float our_score;
+  int move;
 
   /* no move is found yet. */
-  *move = NO_MOVE;  
-  val = -1; 
+  move = PASS_MOVE;  
+  value = 0.0;
   
   /* Prepare pattern matcher and reading code. */
   reset_engine();
@@ -844,19 +863,17 @@ reduced_genmove(int *move, int color)
   gg_assert(stackp == 0);
 
   /* Review the move reasons and estimate move values. */
-  if (review_move_reasons(move, &val, color, 0.0, our_score, NULL))
-    TRACE("Move generation likes %1m with value %f\n", *move, val);
+  if (review_move_reasons(&move, &value, color, 0.0, our_score, NULL))
+    TRACE("Move generation likes %1m with value %f\n", move, value);
   gg_assert(stackp == 0);
 
   /* If no move is found then pass. */
-  if (val < 0.0) {
+  if (move == PASS_MOVE)
     TRACE("I pass.\n");
-    *move = NO_MOVE;
-  }
   else
-    TRACE("reduced_genmove() recommends %1m with value %f\n", *move, val);
+    TRACE("reduced_genmove() recommends %1m with value %f\n", move, value);
  
-  return val;
+  return move;
 }
 
 /* Preliminary function for playing through the aftermath. */
@@ -877,15 +894,15 @@ do_play_aftermath(int color, struct aftermath_data *a)
   while (pass < 2 && moves < board_size * board_size) {
     int reading_nodes = get_reading_node_counter();
     int owl_nodes = get_owl_node_counter();
-    int move_val = reduced_genmove(&move, color_to_play);
-    if (move_val < 0) {
+    move = reduced_genmove(color_to_play);
+    if (move == PASS_MOVE) {
       int save_verbose = verbose;
       if (verbose > 0)
 	verbose--;
-      move_val = aftermath_genmove(&move, color_to_play,
-				   (color_to_play == WHITE ?
-				    a->white_control : a->black_control),
-				   0);
+      move = do_aftermath_genmove(color_to_play,
+				  (color_to_play == WHITE ?
+				   a->white_control : a->black_control),
+				  0);
       verbose = save_verbose;
     }
     play_move(move, color_to_play);

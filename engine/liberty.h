@@ -483,14 +483,13 @@ int atari_atari_confirm_safety(int color, int tpos, int *move, int minsize,
 int atari_atari_blunder_size(int color, int tpos, char defense_moves[BOARDMAX],
 			     const char safe_stones[BOARDMAX]);
 
-int review_move_reasons(int *move, float *val, int color,
+int review_move_reasons(int *move, float *value, int color,
 			float pure_threat_value, float our_score,
 			int allowed_moves[BOARDMAX]);
 void prepare_move_influence_debugging(int pos, int color);
 int fill_liberty(int *move, int color);
-int aftermath_genmove(int *aftermath_move, int color,
-		      int under_control[BOARDMAX],
-		      int do_capture_dead_stones);
+int aftermath_genmove(int color, int do_capture_dead_stones,
+		      int allowed_moves[BOARDMAX]);
 enum dragon_status aftermath_final_status(int color, int pos);
 
 int owl_attack(int target, int *attack_point, int *certain, int *kworm);
@@ -520,10 +519,10 @@ void summon_oracle(void);
 void oracle_loadsgf(char *infilename, char *untilstring);
 int oracle_threatens(int move, int target);
 int within_search_area(int pos);
-int metamachine_genmove(int *i, int *j, int color);
+int metamachine_genmove(int color, float *value);
 void draw_search_area(void);
 
-int genmove_restricted(int *i, int *j, int color, int allowed_moves[BOARDMAX]);
+int genmove_restricted(int color, int allowed_moves[BOARDMAX]);
 
 void change_attack(int str, int move, int acode);
 void change_defense(int str, int move, int dcode);

@@ -45,7 +45,6 @@ play_gmp(Gameinfo *gameinfo, int simplified)
   const char *error;
   
   int i, j;
-  int moveval;
   int passes = 0; /* two passes and its over */
   int to_move;  /* who's turn is next ? */
 
@@ -142,7 +141,6 @@ play_gmp(Gameinfo *gameinfo, int simplified)
   while (passes < 2) {
 
     if (to_move == yourcolor) {
-      moveval = 0;
       /* Get opponent's move from gmp client. */
       message = gmp_check(ge, 1, &j, &i, &error);
 
@@ -188,11 +186,11 @@ play_gmp(Gameinfo *gameinfo, int simplified)
     }
     else {
       /* Generate my next move. */
-      moveval = gnugo_genmove(&i, &j, mycolor);
+      float move_value = gnugo_genmove(&i, &j, mycolor, NULL);
       gnugo_play_move(i, j, mycolor);
-      sgffile_add_debuginfo(sgftree.lastnode, moveval);
+      sgffile_add_debuginfo(sgftree.lastnode, move_value);
       
-      if (moveval < 0) {
+      if (gnugo_is_pass(i, j)) {
 	/* pass */
         sgftreeAddPlay(&sgftree, to_move, -1, -1);
 	gmp_sendPass(ge);
@@ -205,7 +203,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
 	passes = 0;
 	TRACE("\nmy move: %m\n\n", i, j);
       }
-      sgffile_add_debuginfo(sgftree.lastnode, 0);
+      sgffile_add_debuginfo(sgftree.lastnode, 0.0);
       sgffile_output(&sgftree);
     }
     

@@ -277,7 +277,7 @@ Interface to @code{sgffile_recordboard()}
 Interface to placehand. Sets up handicap stones and
 returns the number of placed handicap stones, updating the sgf file
 @end quotation
-@item @code{int gnugo_genmove(int *i, int *j, int color)}
+@item @code{float gnugo_genmove(int *i, int *j, int color, int *resign)}
 @findex gnugo_genmove
 @quotation
 Interface to @code{genmove()}.

@@ -286,10 +286,17 @@ gnugo_sethand(int handicap, SGFNode *node)
 
 
 /* Interface to genmove() */
-int
-gnugo_genmove(int *i, int *j, int color)
+float
+gnugo_genmove(int *i, int *j, int color, int *resign)
 {
-  return genmove(i, j, color);
+  float value;
+  int move = genmove(color, &value, resign);
+  if (i && j) {
+    *i = I(move);
+    *j = J(move);
+  }
+   
+  return value;
 }
 
 /* Interface to attack() */

@@ -254,8 +254,9 @@ place_free_handicap(int handicap)
     /* Call genmove_conservative() in order to prepare the engine for
      * an aftermath_genmove() call. We discard the genmove result.
      */
-    genmove_conservative(NULL, NULL, BLACK);
-    if (aftermath_genmove(&move, BLACK, NULL, 0) > 0) {
+    genmove_conservative(BLACK, NULL);
+    move = aftermath_genmove(BLACK, 0, NULL);
+    if (move != PASS_MOVE) {
       add_stone(move, BLACK);
       remaining_handicap_stones--;
     }

@@ -37,8 +37,8 @@
 #define NEEDS_UPDATE(x) (x != position_number ? (x = position_number, 1) : 0)
 
 static int get_level(int *level);
-static int do_genmove(int *move, int color, float pure_threat_value,
-		      int allowed_moves[BOARDMAX]);
+static int do_genmove(int color, float pure_threat_value,
+		      int allowed_moves[BOARDMAX], float *value, int *resign);
 
 /* Position numbers for which various examinations were last made. */
 static int worms_examined = -1;
@@ -220,33 +220,31 @@ silent_examine_position(int how_much)
 
 
 /* 
- * Generate computer move for COLOR.
+ * Generate computer move for color.
  *
- * Return the generated move in (*i, *j).
+ * Return the generated move.
  */
 
 int
-genmove(int *i, int *j, int color)
+genmove(int color, float *value, int *resign)
 {
-  int move;
-  int retval;
+  int move = PASS_MOVE;
+  if (resign)
+    *resign = 0;
 
 #if ORACLE
   if (metamachine) {
-    retval = metamachine_genmove(i, j, color);
+    move = metamachine_genmove(color, value);
     gg_assert(stackp == 0);
-    if (*i != -1)
-      return 1;
+    if (move != PASS_MOVE)
+      return move;
   }
 #endif
 
-  retval = do_genmove(&move, color, 0.4, NULL);
-  gg_assert(retval < 0 || ON_BOARD1(move));
+  move = do_genmove(color, 0.4, NULL, value, resign);
+  gg_assert(move == PASS_MOVE || ON_BOARD(move));
 
-  if (i) *i = I(move);
-  if (j) *j = J(move);
-
-  return retval;
+  return move;
 }
 
 
@@ -256,32 +254,16 @@ genmove(int *i, int *j, int color)
  */
 
 int
-genmove_conservative(int *i, int *j, int color)
+genmove_conservative(int color, float *value)
 {
-  int move;
-  int retval;
-
-  retval = do_genmove(&move, color, 0.0, NULL);
-
-  if (i) *i = I(move);
-  if (j) *j = J(move);
-
-  return retval;
+  return do_genmove(color, 0.0, NULL, value, NULL);
 }
 
 
 int
-genmove_restricted(int *i, int *j, int color, int allowed_moves[BOARDMAX])
+genmove_restricted(int color, int allowed_moves[BOARDMAX])
 {
-  int move;
-  int retval;
-
-  retval = do_genmove(&move, color, 0.0, allowed_moves);
-
-  if (i) *i = I(move);
-  if (j) *j = J(move);
-
-  return retval;
+  return do_genmove(color, 0.0, allowed_moves, NULL, NULL);
 }
 
 /* This function collects move reasons can be generated immediately from
@@ -309,24 +291,32 @@ collect_move_reasons(int color)
  */
   
 static int
-do_genmove(int *move, int color, float pure_threat_value,
-	   int allowed_moves[BOARDMAX])
+do_genmove(int color, float pure_threat_value,
+	   int allowed_moves[BOARDMAX], float *value, int *resign)
 {
-  float val;
   float upper_bound, lower_bound;
   float average_score, our_score;
   int save_verbose;
   int save_depth;
+  int move;
+  float dummy_value;
+
+  if (!value)
+    value = &dummy_value;
 
   start_timer(0);
   clearstats();
+
+  /* Usually we would not recommend resignation. */
+  if (resign)
+    *resign = 0;
   
   /* Prepare our table of moves considered. */
   memset(potential_moves, 0, sizeof(potential_moves));
   
   /* no move is found yet. */
-  *move = NO_MOVE;  
-  val = -1; 
+  move = PASS_MOVE;  
+  *value = 0.0; 
   if (get_level(&level))
     fprintf(stderr, "level = %d\n", level);
   
@@ -345,9 +335,10 @@ do_genmove(int *move, int color, float pure_threat_value,
   if (play_mirror_go
       && (mirror_stones_limit < 0
 	  || stones_on_board(WHITE | BLACK) <= mirror_stones_limit)
-      && find_mirror_move(move, color)) {
-    TRACE("genmove() recommends mirror move at %1m\n", *move);
-    return 1.0;
+      && find_mirror_move(&move, color)) {
+    TRACE("genmove() recommends mirror move at %1m\n", move);
+    *value = 1.0;
+    return move;
   }
 
   /* Find out information about the worms and dragons. */
@@ -442,9 +433,9 @@ do_genmove(int *move, int color, float pure_threat_value,
   gg_assert(stackp == 0);
 
   /* Review the move reasons and estimate move values. */
-  if (review_move_reasons(move, &val, color, 
+  if (review_move_reasons(&move, value, color, 
 			  pure_threat_value, our_score, allowed_moves))
-    TRACE("Move generation likes %1m with value %f\n", *move, val);
+    TRACE("Move generation likes %1m with value %f\n", move, *value);
   gg_assert(stackp == 0);
   time_report(1, "review move reasons", NO_MOVE, 1.0);
 
@@ -452,28 +443,28 @@ do_genmove(int *move, int color, float pure_threat_value,
    * dragon dangerous and change its status from DEAD to
    * UNKNOWN. This may generate a move.
    */
-  if (val < 0.4 * our_score && !doing_scoring && !limit_search) {
+  if (*value < 0.4 * our_score && !doing_scoring && !limit_search) {
     if (revise_thrashing_dragon(color, our_score, 15.0)) {
       shapes(color);
       if (!disable_endgame_patterns)
 	endgame_shapes(color);
-      if (review_move_reasons(move, &val, color, pure_threat_value, our_score,
-			      allowed_moves)) {
+      if (review_move_reasons(&move, value, color, pure_threat_value,
+			      our_score, allowed_moves)) {
 	TRACE("Upon reconsideration move generation likes %1m with value %f\n",
-	      *move, val); 
+	      move, *value); 
       }
     }
     time_report(1, "move reasons with revised thrashing status", NO_MOVE, 1.0);
   }
 
   /* If the move value is 6 or lower, we look for endgame patterns too. */
-  if (val <= 6.0 && !disable_endgame_patterns && !limit_search) {
+  if (*value <= 6.0 && !disable_endgame_patterns && !limit_search) {
     endgame_shapes(color);
     endgame(color);
     gg_assert(stackp == 0);
-    if (review_move_reasons(move, &val, color, pure_threat_value, our_score,
+    if (review_move_reasons(&move, value, color, pure_threat_value, our_score,
 			    allowed_moves))
-      TRACE("Move generation likes %1m with value %f\n", *move, val);
+      TRACE("Move generation likes %1m with value %f\n", move, *value);
     gg_assert(stackp == 0);
     time_report(1, "endgame", NO_MOVE, 1.0);
   }
@@ -482,15 +473,15 @@ do_genmove(int *move, int color, float pure_threat_value,
    * status of the opponent group from DEAD to UNKNOWN, then 
    * run shapes and endgame_shapes again. This may turn up a move.
    */
-  if (val < 0.0) {
+  if (move == PASS_MOVE) {
     if (revise_thrashing_dragon(color, our_score, 0.0)
 	|| revise_semeai(color)) {
       shapes(color);
       endgame_shapes(color);
-      if (review_move_reasons(move, &val, color, pure_threat_value, our_score,
-			      allowed_moves)) {
+      if (review_move_reasons(&move, value, color, pure_threat_value,
+			      our_score, allowed_moves)) {
 	TRACE("Upon reconsideration move generation likes %1m with value %f\n",
-	      *move, val); 
+	      move, *value); 
       }
     }
     time_report(1, "move reasons with revised semeai or thrashing status",
@@ -500,13 +491,13 @@ do_genmove(int *move, int color, float pure_threat_value,
   /* If still no move, fill a remaining liberty. This should pick up
    * all missing dame points.
    */
-  if (val < 0.0 
-      && fill_liberty(move, color)
-      && (!allowed_moves || allowed_moves[*move])) {
-    val = 1.0;
-    TRACE("Filling a liberty at %1m\n", *move);
-    record_top_move(*move, val);
-    move_considered(*move, val);
+  if (move == PASS_MOVE
+      && fill_liberty(&move, color)
+      && (!allowed_moves || allowed_moves[move])) {
+    *value = 1.0;
+    TRACE("Filling a liberty at %1m\n", move);
+    record_top_move(move, *value);
+    move_considered(move, *value);
     time_report(1, "fill liberty", NO_MOVE, 1.0);
   }
 
@@ -514,50 +505,40 @@ do_genmove(int *move, int color, float pure_threat_value,
    * opponent stones, or if the opponent is trying to live inside
    * our territory and we are clearly ahead, generate an aftermath move.
    */
+  if (move == PASS_MOVE && !doing_scoring) {
+    if (play_out_aftermath 
+	|| capture_all_dead 
+	|| (thrashing_dragon && our_score > 15.0))
+      move = aftermath_genmove(color, 0, allowed_moves);
+      
+    /* If we're instructed to capture all dead opponent stones, generate
+     * a capturing move.
+     */
+    if (move == PASS_MOVE && capture_all_dead) 
+      move = aftermath_genmove(color, 1, allowed_moves);
 
-  if (val < 0.0
-      && !doing_scoring
-      && (play_out_aftermath 
-	  || capture_all_dead 
-	  || (thrashing_dragon && our_score > 15.0))
-      && aftermath_genmove(move, color, NULL, 0) > 0
-      && (!allowed_moves || allowed_moves[*move])) {
-    ASSERT1(is_legal(*move, color), *move);
-    val = 1.0;
-    TRACE("Aftermath move at %1m\n", *move);
-    record_top_move(*move, val);
-    move_considered(*move, val);
-    time_report(1, "aftermath_genmove", NO_MOVE, 1.0);
-  }
-
-  /* If we're instructed to capture all dead opponent stones, generate
-   * a capturing move.
-   */
-  if (val < 0.0
-      && !doing_scoring
-      && capture_all_dead 
-      && aftermath_genmove(move, color, NULL, 1) > 0
-      && (!allowed_moves || allowed_moves[*move])) {
-    ASSERT1(is_legal(*move, color), *move);
-    val = 1.0;
-    TRACE("Aftermath move at %1m\n", *move);
-    move_considered(*move, val);
-    time_report(1, "aftermath_genmove", NO_MOVE, 1.0);
+    if (move != PASS_MOVE) {
+      ASSERT1(is_legal(move, color), move);
+      *value = 1.0;
+      TRACE("Aftermath move at %1m\n", move);
+      record_top_move(move, *value);
+      move_considered(move, *value);
+      time_report(1, "aftermath_genmove", NO_MOVE, 1.0);
+    }
   }
 
   /* If no move is found then pass. */
-  if (val < 0.0) {
+  if (move == PASS_MOVE) {
     TRACE("I pass.\n");
-    *move = NO_MOVE;
   }
   else {
-    TRACE("genmove() recommends %1m with value %f\n", *move, val);
+    TRACE("genmove() recommends %1m with value %f\n", move, *value);
     /* Maybe time to resign...
      */
-    if (resign_allowed && val < 10.0 && should_resign(color, our_score)) {
+    if (resign && resign_allowed
+	&& *value < 10.0 && should_resign(color, our_score)) {
       TRACE("... though, genmove() thinks the position is hopeless\n");
-      /* Signal resignation by negating the move value */
-      val = -val;
+      *resign = 1;
     }
   }
   
@@ -566,11 +547,11 @@ do_genmove(int *move, int color, float pure_threat_value,
     showstats();
 
   if (showtime) {
-    double spent = time_report(0, "TIME to generate move at ", *move, 1.0);
+    double spent = time_report(0, "TIME to generate move at ", move, 1.0);
     total_time += spent;
     if (spent > slowest_time) {
       slowest_time = spent;
-      slowest_move = *move;
+      slowest_move = move;
       slowest_movenum = movenum + 1;
     }
   }
@@ -582,7 +563,7 @@ do_genmove(int *move, int color, float pure_threat_value,
   gg_assert(test_gray_border() < 0);
   gg_assert(depth == save_depth);
 
-  return val;
+  return move;
 }
 
 
@@ -593,12 +574,12 @@ do_genmove(int *move, int color, float pure_threat_value,
  */
 
 void 
-move_considered(int move, float val)
+move_considered(int move, float value)
 {
   int i = I(move);
   int j = J(move);
-  if (val > potential_moves[i][j]) {
-    potential_moves[i][j] = val;
+  if (value > potential_moves[i][j]) {
+    potential_moves[i][j] = value;
   }
 }
 

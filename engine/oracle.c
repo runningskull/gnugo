@@ -338,13 +338,13 @@ oracle_add_move(struct oracle_move_data moves[MAX_ORACLE_MOVES],
 #define FIRST_LEVEL_MOVES 3
 #define SECOND_LEVEL_MOVES 2
 
-static float
-do_metamachine_genmove(int *i, int *j, int color, int width);
+static int
+do_metamachine_genmove(int color, int width, float *value);
 
 int
-metamachine_genmove(int *i, int *j, int color)
+metamachine_genmove(int color, float *value)
 {
-  float value;
+  int move;
   int pos;
 
   if (limit_search) {
@@ -360,34 +360,34 @@ metamachine_genmove(int *i, int *j, int color)
       }	
   }
   count_variations = 1;
-  value = do_metamachine_genmove(i, j, color, search_width());
+  move = do_metamachine_genmove(color, search_width(), value);
   sgffile_enddump(outfilename);
   count_variations = 0;
-  return value;
+  return move;
 }
 
-static float
-do_metamachine_genmove(int *i, int *j, int color, int width)
+static int
+do_metamachine_genmove(int color, int width, float *value)
 {
   int k, moves_considered;
   float move_value[10];
   float best_score = 0.;
   int best_move = -1;
   char *token;
-  int move_i[10], move_j[10];
+  int moves[10];
   float score[10];
   char delimiters[] = " \t\r\n";
   char buf[100];
+  int i, j;
 
-  if (color == BLACK) 
+  if (color == BLACK)
     TELL_ORACLE("top_moves_black\n");
   else
     TELL_ORACLE("top_moves_white\n");
   ask_oracle();
   token = strtok(gnugo_line, delimiters);
   for (k = 0; k < 10; k++) {
-    move_i[k] = -1;
-    move_j[k] = -1;
+    moves[k] = PASS_MOVE;
     move_value[k] = 0.0;
   }
   moves_considered = width;
@@ -397,39 +397,36 @@ do_metamachine_genmove(int *i, int *j, int color, int width)
     token = strtok(NULL, delimiters);
     if (!token)
       break;
-    string_to_location(board_size, token, move_i+k, move_j+k);
+    string_to_location(board_size, token, &i, &j);
+    moves[k] = POS(i, j);
     token = strtok(NULL, delimiters);
     if (!token)
       break;
-    sscanf(token, "%f", move_value+k);
-    TRACE("move %d: %m valued %f\n", k,
-	  move_i[k], move_j[k], move_value[k]);
+    sscanf(token, "%f", move_value + k);
+    TRACE("move %d: %1m valued %f\n", k, moves[k], move_value[k]);
   }
   /* if we left the loop early, k is the number of valid moves */
   moves_considered = k;
   if (moves_considered == 0) {
-    *i = -1;
-    *j = -1;
-    return 0;
+    *value = 0.0;
+    return PASS_MOVE;
   }
   if (moves_considered == 1) {
-    *i = move_i[0];
-    *j = move_j[0];
-    return 1;
+    *value = 1.0;
+    return moves[k];
   }
   for (k = 0; k < moves_considered; k++) {
-    if (oracle_trymove(POS(move_i[k], move_j[k]), color, "", 0, 0, NO_MOVE)) {
+    if (oracle_trymove(moves[k], color, "", 0, 0, NO_MOVE)) {
       int new_width = search_width();
 
       if (new_width == 0) {
 	TELL_ORACLE("experimental_score %s\n", 
 		    color == BLACK ? "black" : "white");
 	ask_oracle();
-	sscanf(gnugo_line, "= %f", score+k);
+	sscanf(gnugo_line, "= %f", score + k);
       }
       else {
-	score[k] =
-	  do_metamachine_genmove(i, j, OTHER_COLOR(color), new_width);
+	do_metamachine_genmove(OTHER_COLOR(color), new_width, &score[k]);
       }
       if (verbose)
 	dump_stack();
@@ -446,10 +443,9 @@ do_metamachine_genmove(int *i, int *j, int color, int width)
       best_score = score[k];
     }
   }
-  TRACE("best: %f at %2m\n", best_score, move_i[best_move], move_j[best_move]);
-  *i = move_i[best_move];
-  *j = move_j[best_move];
-  return score[best_move];
+  TRACE("best: %f at %1m\n", best_score, moves[best_move]);
+  *value = score[best_move];
+  return moves[best_move];
 }
 
 /* decide how wide to search */

@@ -163,12 +163,13 @@ replay_node(SGFNode *node, int color_to_replay)
 
   if (color == color_to_replay || color_to_replay == GRAY) {
     /* Get a move from the engine for color. */
-    float move_val = gnugo_genmove(&i, &j, color);
+    int resign;
+    gnugo_genmove(&i, &j, color, &resign);
     /* Now report on how well the computer generated the move. */
     if (i != m || j != n || !quiet) {
       mprintf("Move %d (%C): ", movenum + 1, color);
     
-      if (move_val < 0.0 && !gnugo_is_pass(i, j))
+      if (resign)
 	printf("GNU Go resigns ");
       else {
 	mprintf("GNU Go plays %m ", i, j);
@@ -186,7 +187,7 @@ replay_node(SGFNode *node, int color_to_replay)
       }
     }
     if (i != m || j != n) {
-      if (move_val < 0.0 && !gnugo_is_pass(i, j))
+      if (resign)
 	gg_snprintf(buf, 127, "GNU Go resigns - Game move %s (%.2f)",
 		    location_to_string(POS(m, n)),
 		    gnugo_is_pass(m, n)
@@ -208,7 +209,7 @@ replay_node(SGFNode *node, int color_to_replay)
                  location_to_string(POS(i, j)),
                  gnugo_is_pass(i, j) ? 0 : potential_moves[i][j]);
     sgfAddComment(node, buf);
-    sgffile_add_debuginfo(node, 0);
+    sgffile_add_debuginfo(node, 0.0);
   }
 
   /* Finally, do play the move from the file. */
