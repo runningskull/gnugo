@@ -2383,6 +2383,41 @@ findstones(int str, int maxstones, int *stones)
 }
 
 
+/* Counts how many stones in str1 are directly adjacent to str2.
+ * A limit can be given in the maxstones parameter so that the
+ * function returns immediately. See fast_defense() in reading.c
+ */
+
+int
+count_adjacent_stones(int str1, int str2, int maxstones)
+{
+  int s1, s2;
+  int size;
+  int pos;
+  int k;
+  int count = 0;
+
+  ASSERT_ON_BOARD1(str1);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT_ON_BOARD1(str2);
+  ASSERT1(IS_STONE(board[str2]), str2);
+
+  s1 = string_number[str1];
+  s2 = string_number[str2];
+  size = string[s1].size;
+
+  /* Traverse the stones of the string, by following the cyclic chain. */
+  pos = FIRST_STONE(s1);
+  for (k = 0; k < size && count < maxstones; k++) {
+    if (NEIGHBOR_OF_STRING(pos, s2, board[str2]))
+      count++;
+    pos = NEXT_STONE(pos);
+  }
+
+  return count;
+}
+
+
 /* chainlinks returns (in the (adj) array) the chains surrounding
  * the string at (str). The number of chains is returned.
  */

@@ -302,6 +302,7 @@ int have_common_lib(int str1, int str2, int *lib);
 /* Count the number of stones in a string. */
 int countstones(int str);
 int findstones(int str, int maxstones, int *stones);
+int count_adjacent_stones(int str1, int str2, int maxstones);
 
 /* Special function for reading.c */
 void incremental_order_moves(int move, int color, int string,

@@ -1241,8 +1241,11 @@ static int
 fast_defense(int str, int liberties, int *libs, int *move)
 {
   int color = board[str];
-  int k;
+  int j, k, l;
   int goal_liberties = (stackp < fourlib_depth ? 5 : 4);
+  int adj, adjs[MAXCHAIN];
+  static unsigned liberty_mark = -1;
+  static unsigned lm[BOARDMAX];
 
   ASSERT1(libs != NULL, str);
   ASSERT1(move != NULL, str);
@@ -1256,6 +1259,82 @@ fast_defense(int str, int liberties, int *libs, int *move)
       return 1;
     }
   }
+
+  /* Check the cases where an opponent neighbor string is in
+   * atari.
+   */
+  adj = chainlinks2(str, adjs, 1);
+  for (j = 0; j < adj; j++) {
+    int lib;
+    int missing = goal_liberties - liberties;
+    int total = 0;
+    int adj2, adjs2[MAXCHAIN];
+    int alib, alibs[MAXLIBS];
+    int num_adjacent_stones;
+
+    findlib(adjs[j], 1, &lib);
+    /* We aren't interested in ko (at this stage). And playing
+     * our own last liberty to capture is prone to snapbacks,
+     * so better let the 'normal' reading routines do the job.
+     */
+    if ((liberties == 1 && lib == libs[0]
+	 && countstones(adjs[j]) <= 2)
+	|| is_ko(lib, color, NULL))
+      continue;
+
+    /* Would the capture already gain enough liberties ?
+     * No need to test the case if the move is one of our liberties,
+     * it has already been done in the first loop of this function.
+     */
+    num_adjacent_stones = count_adjacent_stones(adjs[j], str, missing);
+    ASSERT1(num_adjacent_stones >= 1, str);
+    if (!liberty_of_string(lib, str)
+	&& num_adjacent_stones >= missing) {
+      *move = lib;
+      return 1;
+    }
+
+    /* What is the total number of liberties of the friendly strings around
+     * the lunch?
+     */
+    if (++liberty_mark == 0)
+      memset(lm, 0, sizeof(lm));
+    /* Loop over all neighbors of the lunch. */
+    adj2 = chainlinks(adjs[j], adjs2);
+    for (k = 0; k < adj2; k++) {
+      /* Loop over all liberties of the neighbor. */
+      alib = findlib(adjs2[k], MAXLIBS, alibs);
+      for (l = 0; l < alib; l++) {
+	if (lm[alibs[l]] != liberty_mark) {
+	  lm[alibs[l]] = liberty_mark;
+	  total++;
+	}
+      }
+    }
+
+    /* The captured string is treated as common liberties, and
+     * some adjustements are made :
+     * - we're adding a stone for capturing the lunch (-1)
+     * - opponent might be able to remove a liberty (-1)
+     * - and possibly force us to connect (-1)
+     * - reduce us by one more liberty with a throw-in; this
+     *   is only possible if there is only one adjacent stone in the
+     *   lunch to the string (-1)
+     * Probably there are more damezumari-type cases, but as a heuristic,
+     * it seems good enough.
+     */
+    total += countstones(adjs[j]) - 2;
+    if (lm[lib] == liberty_mark)
+      total--;
+    if (num_adjacent_stones == 1)
+      total--;
+
+    if (total >= goal_liberties) {
+      *move = lib;
+      return 1;
+    }
+  }
+
   return 0;
 }
 
