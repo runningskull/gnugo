@@ -3066,7 +3066,20 @@ neighbor_of_string(int pos, int str)
 
   return 0;
 }
+/*
+ * Returns true if (pos) has a neighbor of color (color).
+ */
 
+int has_neighbor(int pos, int color)
+{
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(IS_STONE(color), pos);
+
+  return (board[SOUTH(pos)] == color
+          || board[WEST(pos)] == color
+          || board[NORTH(pos)] == color
+          || board[EAST(pos)] == color);
+}
 
 /*
  * Returns true if str1 and str2 belong to the same string.

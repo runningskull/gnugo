@@ -318,6 +318,7 @@ int non_transitivity(int str1, int str2, int str3, int *move);
 int liberty_of_string(int pos, int str);
 int second_order_liberty_of_string(int pos, int str);
 int neighbor_of_string(int pos, int str);
+int has_neighbor(int pos, int color);
 int same_string(int str1, int str2);
 int adjacent_strings(int str1, int str2);
 int is_ko(int pos, int color, int *ko_pos);
