@@ -283,6 +283,7 @@ XO*.
 
 
 Pattern D109
+# gf Added b classification. (3.3.17)
 
 ?..x         extend
 .X.O
@@ -291,7 +292,7 @@ Pattern D109
 ....
 ----
 
-:8,-,value(95)
+:8,b,value(95)
 
 
 Pattern D110
@@ -2467,6 +2468,22 @@ O.O.
 :8,-,value(45)
 
 
+Pattern D639
+# gf New pattern. See owl1:285. (3.3.17)
+
+oO*X          eat lunch without getting a false eye
+XX..
+----
+
+:8,-,value(50)
+
+oO*X
+AA..
+----
+
+;!oplay_defend(*,A)
+
+
 #########################################################
 #                                                       #
 #            Make eyeshape in the center                #
@@ -4266,15 +4283,44 @@ X*X.
 :8,-,value(81)
 
 
-Pattern D1121
-# FIXME: If there is a X stone at "?", then this pattern is nonsense.
+Pattern D1121a
+# gf Split pattern. (3.3.17)
 
 OoXo       push into the open
-?*.o
+.*.o
 X..o
 oooo
 
 :8,-,value(70)
+
+
+Pattern D1121b
+# gf Split pattern. (3.3.17)
+
+OOXo       push into the open
+X*.o
+X..o
+oooo
+
+:8,-,value(70)
+
+
+Pattern D1121c
+# gf Split pattern. (3.3.17)
+
+O.Xo       push into the open
+X*.o
+X..o
+oooo
+
+:8,-,value(70)
+
+OaXo
+B*.o
+B..o
+oooo
+
+;oplay_attack_either(*,a,a,B)
 
 
 Pattern D1122
@@ -6046,13 +6092,14 @@ o...
 Pattern D1367
 # db added (3.1.11)
 # tm added b attribute.
+# gf Removed b class. (3.3.17)
 
 ...?
 .*.?       jump out
 ...X
 ?OO?
 
-:8,b,value(60)
+:8,-,value(60)
 
 
 Pattern D1368
@@ -6348,6 +6395,76 @@ e*
 
 ; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
 ; && (oplay_attack(*,c,d,f,e) && oplay_attack(*,c,d,f,f))
+
+
+Pattern D1386a
+# gf New pattern. (3.3.17)
+
+OX.x       connect along edge to strong dragon
+o*.O
+----
+
+:8,Eb,value(90)
+
+aX.x
+o*.b
+----
+
+;owl_strong_dragon(a) || owl_strong_dragon(b)
+
+
+Pattern D1386b
+# gf New pattern. (3.3.17)
+
+OX.x       connect along edge
+o*.O
+----
+
+:8,Eb,value(35)
+
+aX.x
+o*.b
+----
+
+;owl_escape_value(a)>0 || owl_escape_value(b)>0
+
+
+Pattern D1387
+# gf New pattern. (3.3.17)
+
+??o?       atari to break out
+o...
+*X.X
+XOo?
+
+:8,EB,value(75)
+
+?dce
+o...
+*X.X
+Bao?
+
+;(owl_escape_value(c)>0 || owl_escape_value(d)>0 || owl_escape_value(e)>0)
+;&& lib(B)==2 && olib(*)>=2 && !oplay_attack(*,a)
+
+
+Pattern D1388
+# gf New pattern. (3.3.17)
+
+??o?       atari to break out
+o...
+OX*X
+?Oo?
+
+:8,Eb,value(75)
+
+?cbd
+o...
+OX.X
+?ao?
+
+;(owl_escape_value(b)>0 || owl_escape_value(c)>0 || owl_escape_value(d)>0)
+;&& !oplay_attack(*,a)
 
 
 #########################################################

@@ -1924,6 +1924,22 @@ A*O|
 ; oplay_attack(*,W) && !oplay_attack(*,A,b,C,b)
 
 
+Pattern A515
+# gf New pattern. See owl1:286. (3.3.17)
+
+XXX*O          sacrifice lunch and falsify eye
+XOO..
+-----
+
+:8,-,value(35)
+
+XXX*O
+XOba.
+-----
+
+;!oplay_attack(*,a,b,*)
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves on the first line         #
@@ -3374,6 +3390,22 @@ abcde
 ;+(owl_escape_value(e)>0) + (owl_escape_value(f)>0)
 ;+(owl_escape_value(g)>0) + (owl_escape_value(h)>0)
 ;+(owl_escape_value(i)>0) < 2
+
+
+Pattern A1021
+# gf New pattern. (3.3.17)
+
+??O      cut off from friendly stone
+Y*X
+?O.
+
+:8,-,value(45)
+
+??O
+B*A
+?O.
+
+;!owl_goal_dragon(A) && !oplay_connect(*,A,B)
 
 
 #########################################################
