@@ -2360,6 +2360,25 @@ aXO
 ;!obvious_false_xeye(a)
 
 
+Pattern A621
+# spl added 3.3.22
+
+
+?XOo? threaten to make ko or nakade
+X..*.
+-----
+
+:8,s,value(10)
+
+?AOo? threaten to make ko or nakade
+X..*.
+-----
+
+;lib(A)<3
+
+
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves in the center             #

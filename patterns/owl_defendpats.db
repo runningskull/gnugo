@@ -2570,6 +2570,17 @@ C*O?
 ;&& oplay_attack(*,b,C)
 
 
+Pattern D643
+# spl added 3.3.22
+
+?oO try to make 2 eyes
+OO.
+o.*
+---
+
+:8,-,value(40)
+
+
 #########################################################
 #                                                       #
 #            Make eyeshape in the center                #
