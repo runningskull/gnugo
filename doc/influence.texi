@@ -741,15 +741,15 @@ breadth first propagation, implemented by means of an internal queue.
 @findex add_influence_source
 @quotation
 Adds an influence source at position pos with prescribed strength
-and attenuation. color can be BLACK, WHITE or both. If there
+and attenuation. color can be @code{BLACK}, @code{WHITE} or both. If there
 already exists an influence source of the respective color at pos
 that is stronger than the new one, we do nothing.
 @end quotation
 @item @code{void influence_mark_non_territory(int pos, int color)}
 @findex influence_mark_non_territory
 @quotation
-Called from actions for t patterns. Marks (pos) as not being
-territory for (color).
+Called from actions for t patterns. Marks @code{pos} as not being
+territory for @code{color}.
 @end quotation
 @item @code{int influence_get_moyo_size(int pos, int color)}
 @findex influence_get_moyo_size

@@ -135,8 +135,7 @@ typedef struct read_result_t {
 
 typedef struct hashnode_t {
   Hash_data            key;
-  Read_result         *results;	/* And here are the results of previous */
-				/*    readings */
+  Read_result         *results;	/* The results of previous readings */
 
   struct hashnode_t   *next;
 } Hashnode;
