@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.6 pre 2 released September 13, 2004
+
+- dtr files updated
 - missing files added to EXTRADIST in Makefile.* in doc/ and regression/
 - new file logo-36.pdf
 - compile fix for VC/Tru64
