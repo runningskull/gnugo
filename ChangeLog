@@ -4,6 +4,7 @@
 
 - ignore off board vertices in openregion() in fuseki.c
 - Revise diagonal value in topological_eye() to account for damezumari
+- owl tuning	
 - new and revised tests
 
 3.7.2 released January 20, 2005

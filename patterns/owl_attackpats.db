@@ -603,6 +603,24 @@ OaX
 ;!oplay_attack(*,a,*)
 
 
+Pattern A208e
+# gf New pattern. (3.7.3)
+
+O..
+.*Y
+.oo
+---
+
+:8,-,value(56)
+
+Oa.
+.*Y
+.oo
+---
+
+;oplay_attack(*,a,a)
+
+
 Pattern A209
 
 ?Ooo
@@ -2654,6 +2672,24 @@ Pattern A623
 :8,-,value(65)
 
 
+Pattern A626
+# gf New pattern. (3.7.3)
+
+??XXO?
+XX..XO       steal an eye
+.*.X.O
+------
+
+:8,s,value(75)
+
+??XXO?
+XX..XO
+a*.X.O
+------
+
+;owl_proper_eye(a)
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves in the center             #
@@ -3918,6 +3954,7 @@ oc*A
 
 Pattern A1017
 # nn New pattern (3.3.11)
+# gf Revised constraint, see owl1:354. (3.7.3)
 
 X.*o     threaten to cut and mess up opponent's shape
 xY.X
@@ -3925,10 +3962,11 @@ xY.X
 :8,C,value(65)
 
 X.*b
-xYaX
+xYaC
 
 ;!oplay_attack(*,a,*)
 ;&& (o_somewhere(b) || !oplay_attack(*,b,*))
+;&& !attack(C)
 
 
 Pattern A1018
@@ -4037,15 +4075,16 @@ xCxx
 
 Pattern A1024a
 # gf New pattern. (3.5.4)
+# gf Revised pattern. (3.7.3)
 # Converse to D1386a
 
-YO.o       connect along edge to strong dragon
+YO.?       connect along edge to strong dragon
 x*.X
 ----
 
 :8,CEb,value(90)
 
-AO.o
+AO.?
 x*.B
 ----
 
@@ -5950,6 +5989,46 @@ Pattern A1351
 +----
 
 :8,s,value(75)
+
+Pattern A1352a
+# gf New pattern. (3.7.3)
+
+|?X??     destroy eyespace
+|X.Y?
+|.*YX
+|...x
++----
+
+:8,s,value(55)
+
+|?X??
+|XaY?
+|.*YX
+|...x
++----
+
+;proper_eye(a)
+
+
+Pattern A1352b
+# gf New pattern. (3.7.3)
+
+|?X??     destroy eyespace
+|X.Y?
+|.*YX
+|...x
++----
+
+:8,s,value(75)
+
+|?X??
+|XaY?
+|c*YX
+|.b.x
++----
+
+;proper_eye(a) && oplay_defend(*,b,c,*)
+
 
 
 #########################################################
