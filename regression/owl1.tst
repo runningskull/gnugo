@@ -238,6 +238,11 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 258
 318 owl_does_defend F10 D10
 #? [0]*
 
+# Problem with bogus escape potential in GNU Go 3.3.22.
+loadsgf games/owl48.sgf
+319 owl_attack S10
+#? [1 S6]
+
 
 ########### end of tests #####################
 
