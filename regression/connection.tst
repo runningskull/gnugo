@@ -284,6 +284,23 @@ loadsgf games/trevor/auto/b64.sgf 44
 #? [0]*
 
 
+loadsgf games/ego.sgf 191
+89 same_dragon M12 Q11
+#? [1]
+
+loadsgf games/trevor/auto/b13.sgf 48
+90 same_dragon D4 F4
+#? [0]
+
+loadsgf games/trevor/auto/c18.sgf 82
+91 same_dragon J8 J10
+#? [1]
+
+loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 91
+92 same_dragon P15 Q14
+#? [1]
+
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

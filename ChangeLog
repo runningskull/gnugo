@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new DEBUG_MISCELLANEOUS used only in find_eye_dragons
+- connection tunning
+- B patterns matched by find_cuts inhibit C patterns found by find_connections
+- new connection tests
 - new GTP command matcher_status
 - strategic_penalty() adds negative strategical move value a bit more often
 - revise_thrashing_dragons() revised

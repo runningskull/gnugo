@@ -222,6 +222,7 @@ extern int profile_patterns;	/* print statistics of pattern usage */
 #define DEBUG_TERRITORY             0x100000
 #define DEBUG_OWL_PERSISTENT_CACHE  0x200000
 #define DEBUG_TOP_MOVES             0x400000
+#define DEBUG_MISCELLANEOUS         0x800000
 
 /* hash flag bits 
  *

@@ -1,3 +1,43 @@
+======================= 3.3.6 pre 1  =========================
+
+./regress.sh . owl.tst 
+18 unexpected FAIL: Correct '1 A2', got '1 B2'
+./regress.sh . connection.tst 
+19 unexpected PASS!
+90 unexpected FAIL: Correct '0', got '1'
+./regress.sh . nngs1.tst 
+39 unexpected PASS!
+./regress.sh . trevorb.tst 
+220 unexpected FAIL: Correct 'J3', got 'F3'
+380 unexpected PASS!
+390 unexpected PASS!
+./regress.sh . strategy2.tst 
+100 unexpected PASS!
+./regress.sh . nicklas4.tst 
+809 unexpected PASS!
+./regress.sh . nngs.tst 
+690 unexpected PASS!
+./regress.sh . strategy3.tst 
+101 unexpected PASS!
+./regress.sh . global.tst 
+10 unexpected FAIL: Correct 'A5', got 'H10'
+40 unexpected PASS!
+./regress.sh . vie.tst 
+37 unexpected PASS!
+50 unexpected FAIL: Correct '1 H15', got '1 G15'
+./regress.sh . arend.tst 
+33 unexpected PASS!
+./regress.sh . 13x13.tst 
+40 unexpected PASS!
+./regress.sh . trevord.tst 
+180 unexpected FAIL: Correct 'S9', got 'P5'
+1050 unexpected PASS!
+./regress.sh . strategy4.tst 
+166 unexpected FAIL: Correct 'D11', got 'D8'
+./regress.sh . strategy5.tst 
+228 unexpected PASS!
+
+
 ======================= 3.3.5 =========================
 
 ./regress.sh . reading.tst 

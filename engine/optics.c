@@ -599,6 +599,11 @@ propagate_eye(int origin, struct eye_data eye[BOARDMAX])
 }
 
 
+/* Find the dragon or dragons surrounding an eye space. Up to
+   max_dragons dragons adjacent to the eye space are added to
+   the dragon array, and the number of dragons found is returned.
+ */
+
 int
 find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
 		 int dragons[], int max_dragons)
@@ -608,8 +613,7 @@ find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
   int pos;
 
   memset(mx, 0, sizeof(mx));
-  if (debug & 0x800000)
-    gprintf("find_eye_dragons: %1m %C\n", origin, eye_color);
+  DEBUG(DEBUG_MISCELLANEOUS, "find_eye_dragons: %1m %C\n", origin, eye_color);
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] == eye_color
 	&& mx[dragon[pos].origin] == 0
@@ -625,8 +629,8 @@ find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
 	    || (ON_BOARD(EAST(pos))
 		&& eye[EAST(pos)].origin == origin
 		&& !eye[EAST(pos)].marginal))) {
-      if (debug & 0x800000)
-	gprintf("  dragon: %1m %1m\n", pos, dragon[pos].origin);
+      DEBUG(DEBUG_MISCELLANEOUS, 
+	    "  dragon: %1m %1m\n", pos, dragon[pos].origin);
       mx[dragon[pos].origin] = 1;
       if (dragons != NULL && num_dragons < max_dragons)
 	dragons[num_dragons] = dragon[pos].origin;

@@ -60,11 +60,32 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
   if ((pattern->class & CLASS_B) && !safe_move(move, other))
     return;
 
+  /* Reject C patterns in which an INHIBIT_CONNECTION was set
+   * previously during find_cuts.
+   */
+
+  if (!EXPERIMENTAL_CONNECTIONS && (pattern->class & CLASS_C)) {
+    for (k = 0; k < pattern->patlen; ++k) { /* match each point */
+      /* transform pattern real coordinate */
+      int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
+				 ll, m, n);
+      if (board[pos]==EMPTY
+	  && ((color == WHITE
+	       && (white_eye[pos].type & INHIBIT_CONNECTION))
+	      || (color == BLACK
+		  && (black_eye[pos].type & INHIBIT_CONNECTION)))) {
+	DEBUG(DEBUG_DRAGONS, 
+	      "Connection pattern of type %s inhibited at %1m\n",
+	      pattern->name, pos);
+	return;
+      }
+    }	
+
   /* If C pattern, test if there are more than one dragon in this
    * pattern so that there is something to connect, before doing any
    * expensive reading.
    */
-  if (pattern->class & CLASS_C) {
+
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
       /* transform pattern real coordinate */
       int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
@@ -121,15 +142,15 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 
   /* Get here => Pattern matches. */
   if (pattern->class & CLASS_B) {
-    TRACE("Cutting pattern %s+%d found at %1m\n",
+    DEBUG(DEBUG_DRAGONS, "Cutting pattern %s+%d found at %1m\n",
 	  pattern->name, ll, anchor);
-    TRACE("cutting point %1m\n", move);
+    DEBUG(DEBUG_DRAGONS, "cutting point %1m\n", move);
   }
   else if (pattern->class & CLASS_C)
-    TRACE("Connecting pattern %s+%d found at %1m\n",
+    DEBUG(DEBUG_DRAGONS, "Connecting pattern %s+%d found at %1m\n",
 	  pattern->name, ll, anchor);
   else if (pattern->class & CLASS_I)
-    TRACE("Lunch invalidating pattern %s+%d found at %1m\n",
+    DEBUG(DEBUG_DRAGONS, "Lunch invalidating pattern %s+%d found at %1m\n",
 	  pattern->name, ll, anchor);
 
   /* does the pattern have an action? */
@@ -193,7 +214,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 	first_dragon = dragon[pos].origin;
       }
     }
-
+    
     /* Inhibit connections */
     if (pattern->class & CLASS_B) {
       if (pattern->patn[k].att != ATT_not)

@@ -691,16 +691,35 @@ O!OX
 
 Pattern CB12
 # tm New pattern. (3.1.13)
+# db modified (3.3.6)
 
-O*.         another way to cut!
+?xx         another way to cut!
+O*.
 X!O
 
 :8,BW
 
+?xx
 O*.
 BaO
 
 ;xplay_defend_both(*,a,*,B)
+
+
+Pattern CB12a
+# db added (3.3.6)
+
+.!O         another way to cut!
+O*.
+X!O
+
+:8,BW
+
+baO
+O*.
+B!O
+
+;xplay_defend_both(*,a,b,*,b)
 
 
 Pattern CB13
@@ -825,6 +844,39 @@ OAd
 ?c*
 
 ;xplay_attack(*,A)<WIN && !xplay_connect(*,?,b,c,d)
+
+
+Pattern CB19
+# db added (3.3.6)
+
+OX?
+!OX
+*!O
+
+:8,BW
+
+OA?
+dOB
+*cO
+
+; !attack(A) && !attack(B) && !xplay_attack(*,c,d,*) && !xplay_attack(*,d,c,*)
+
+
+Pattern CB20
+# db added (3.3.6)
+
+X.o
+O*o
+X.?
+
+:8,BW
+
+A.a
+O*b
+B.?
+
+; !dead(A) && !dead(B) && o_somewhere(a,b)
+
 
 
 ########################
@@ -1183,6 +1235,19 @@ AO
 OB
 
 ;attack(A) && attack(B) && !oplay_defend_both(A,B)
+
+
+Pattern CC208
+
+OX
+.O
+
+:8,CW
+
+OB
+aO
+
+; xplay_attack_either(a,a,B)
 
 
 #############################################
