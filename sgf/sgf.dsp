@@ -31,8 +31,7 @@ RSC=rc.exe
 !IF  "$(CFG)" == "sgf - Win32 Release"
 
 # PROP Use_MFC 0
-# ADD CPP /W3 /GX /I ".." /I "..\interface" /I "..\engine" /I "..\utils" /D "NDEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "_CONSOLE" /D "HAVE_CONFIG_H" /FD /c
-# SUBTRACT CPP /nologo /YX
+# ADD CPP /W3 /GX /I ".." /I "..\interface" /I "..\engine" /I "..\utils" /D "NDEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "_CONSOLE" /D "HAVE_CONFIG_H" /Fo"Release/" /Fd"Release/" /FD /c
 # ADD BASE RSC /l 0x809
 # ADD RSC /l 0x809
 BSC32=bscmake.exe
