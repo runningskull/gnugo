@@ -259,6 +259,7 @@ loadsgf games/strategy26.sgf 251
 99 gg_genmove black
 #? [M13]
 
+# See also owl:254.
 loadsgf games/strategy26.sgf 257
 100 gg_genmove black
 #? [M16]

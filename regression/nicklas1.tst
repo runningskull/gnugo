@@ -121,9 +121,12 @@ loadsgf games/nicklas/nicklas11.sgf 180
 1105 gg_genmove black
 #? [!H14]
 
+# Q6 seems largest but we may want to accept some more moves. The
+# original formulation !F6 isn't very good since a one point reverse
+# sente move isn't all that bad in the position.
 loadsgf games/nicklas/nicklas11.sgf 208
 1106 gg_genmove black
-#? [!F6]*
+#? [Q6]*
 
 #CATEGORY=WASTED_MOVE
 #DESCRIPTION=GnuGo 3.1.8 gets N2 on next move;  R3 benign ko threat loss.

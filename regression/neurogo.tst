@@ -76,8 +76,9 @@ loadsgf games/FSF-neurogo.sgf 230
 15 gg_genmove white
 #? [A16|G19]
 
-# This test may be at the wrong move number.
-loadsgf games/FSF-neurogo.sgf 275
+# It doesn't look like black can live, so this would only be a
+# reinforcing move. It may not be worth regressing over.
+loadsgf games/FSF-neurogo.sgf 276
 16 gg_genmove white
 #? [H17|K17|H15|L16]
 

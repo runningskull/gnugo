@@ -364,9 +364,10 @@ loadsgf games/trevor/trevor_38.sgf 22
 #CATEGORY=READING
 #DESCRIPTION=C6 is wrong way to protect the cut.  Loses one point.
 #SEVERITY=3
+# Added E8. /gf
 loadsgf games/trevor/trevor_38.sgf 39
 381 gg_genmove black
-#? [D7|C7]
+#? [D7|C7|E8]
 
 #CATEGORY=KO_THREATS
 #DESCRIPTION=E9 is terrible for leaving Ko threats.

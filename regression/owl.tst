@@ -903,6 +903,10 @@ loadsgf games/marginal_ko.sgf
 253 owl_defend C2
 #? [1 B2]
 
+# See also strategy2:100.
+loadsgf games/strategy26.sgf 257
+254 owl_defend O13
+#? [1 (M16|O14|N16|N17)]
 
 ########### end of tests #####################
 

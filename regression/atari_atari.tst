@@ -1,7 +1,9 @@
-# N3 is ineffective
+# N3 is ineffective. N2 and N1 differ in that the latter move gives
+# white the option to defend with a (disadvantageous) ko. L3 is also
+# effective but misses the point and wastes a good ko threat.
 loadsgf games/incident107.sgf 216
 1 combination_attack black
-#? [N1]
+#? [N2|N1|L3]
 
 loadsgf games/atari_atari01.sgf 235
 2 combination_attack black
