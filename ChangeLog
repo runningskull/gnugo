@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- semeai() revised to better handle certain cases of multiple simultaneous
+  semeais 
 - find additional semeai moves in semeai_reasons()
 - added more robust handling of .dtr files
 - removed option to build pre-rotated DFAs

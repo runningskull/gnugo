@@ -33,7 +33,7 @@ static void update_status(int dr, enum dragon_status new_status,
    			  enum dragon_status new_safety);
 
 
-/* new_semeai() searches for pairs of dragons of opposite color which
+/* semeai() searches for pairs of dragons of opposite color which
  * have safety DEAD. If such a pair is found, owl_analyze_semeai is
  * called to read out which dragon will prevail in a semeai, and
  * whether a move now will make a difference in the outcome. The
@@ -135,6 +135,50 @@ semeai()
       semeai_certain[d1][d2] = result_certain;
     }
   
+  /* Look for dragons which lose all their semeais outright. The
+   * winners in those semeais are considered safe and further semeais
+   * they are involved in are disregarded. See semeai:81-86 and
+   * nicklas5:1211 for examples of where this is useful.
+   *
+   * Note: To handle multiple simultaneous semeais properly we would
+   * have to make simultaneous semeai reading. Lacking that we can
+   * only get rough guesses of the correct status of the involved
+   * dragons. This code is not guaranteed to be correct in all
+   * situations but should usually be an improvement.
+   */
+  for (d1 = 0; d1 < num_dragons; d1++) {
+    int involved_in_semeai = 0;
+    int all_lost = 1;
+    for (d2 = 0; d2 < num_dragons; d2++) {
+      if (semeai_results_first[d1][d2] != -1) {
+	involved_in_semeai = 1;
+	if (semeai_results_first[d1][d2] != 0) {
+	  all_lost = 0;
+	  break;
+	}
+      }
+    }
+    
+    if (involved_in_semeai && all_lost) {
+      /* Leave the status changes to the main loop below. Here we just
+       * remove the presumably irrelevant semeai results.
+       */
+      for (d2 = 0; d2 < num_dragons; d2++) {
+	if (semeai_results_first[d1][d2] == 0) {
+	  int d3;
+	  for (d3 = 0; d3 < num_dragons; d3++) {
+	    if (semeai_results_second[d3][d2] > 0) {
+	      semeai_results_first[d3][d2] = -1;
+	      semeai_results_second[d3][d2] = -1;
+	      semeai_results_first[d2][d3] = -1;
+	      semeai_results_second[d2][d3] = -1;
+	    }
+	  }
+	}
+      }
+    }
+  }
+
   for (d1 = 0; d1 < num_dragons; d1++) {
     int semeai_found = 0;
     int best_defense = 0;
