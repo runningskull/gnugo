@@ -3892,6 +3892,7 @@ do_remove_string(int s)
 {
   int pos;
   int k;
+  int size = string[s].size;
 
   /* Traverse the stones of the string, by following the cyclic chain. */
   pos = FIRST_STONE(s);
@@ -3904,22 +3905,61 @@ do_remove_string(int s)
   } while (!BACK_TO_FIRST_STONE(s, pos));
 
   /* The neighboring strings have obtained some new liberties and lost
-   * a neighbor.
+   * a neighbor.  For speed reasons we handle two most common cases
+   * when string size is 1 or 2 stones here instead of calling
+   * update_liberties().
    */
-  for (k = 0; k < string[s].neighbors; k++) {
-    remove_neighbor(string[s].neighborlist[k], s);
-    update_liberties(string[s].neighborlist[k]);
+  if (size == 1) {
+    for (k = 0; k < string[s].neighbors; k++) {
+      int neighbor = string[s].neighborlist[k];
+
+      remove_neighbor(neighbor, s);
+      PUSH_VALUE(string[neighbor].liberties);
+
+      if (string[neighbor].liberties < MAX_LIBERTIES)
+	string[neighbor].libs[string[neighbor].liberties] = pos;
+      string[neighbor].liberties++;
+    }
+  }
+  else if (size == 2) {
+    int other = OTHER_COLOR(string[s].color);
+    int pos2 = NEXT_STONE(pos);
+
+    for (k = 0; k < string[s].neighbors; k++) {
+      int neighbor = string[s].neighborlist[k];      
+
+      remove_neighbor(neighbor, s);
+      PUSH_VALUE(string[neighbor].liberties);
+
+      if (NEIGHBOR_OF_STRING(pos, neighbor, other)) {
+	if (string[neighbor].liberties < MAX_LIBERTIES)
+	  string[neighbor].libs[string[neighbor].liberties] = pos;
+	string[neighbor].liberties++;
+      }
+
+      if (NEIGHBOR_OF_STRING(pos2, neighbor, other)) {
+	if (string[neighbor].liberties < MAX_LIBERTIES)
+	  string[neighbor].libs[string[neighbor].liberties] = pos2;
+	string[neighbor].liberties++;
+      }
+    }
+  }
+  else {
+    for (k = 0; k < string[s].neighbors; k++) {
+      remove_neighbor(string[s].neighborlist[k], s);
+      update_liberties(string[s].neighborlist[k]);
+    }
   }
 
   /* Update the number of captured stones. These are assumed to
    * already have been pushed.
    */
   if (string[s].color == WHITE)
-    white_captured += string[s].size;
+    white_captured += size;
   else
-    black_captured += string[s].size;
-    
-  return string[s].size;
+    black_captured += size;
+
+  return size;
 }
 
 
@@ -4350,8 +4390,12 @@ do_play_move(int pos, int color)
   /* Clear string mark. */
   string_mark++;
 
-  /* Put down the stone. */
+  /* Put down the stone.  We also set its string number to -1 for a while
+   * so that NEIGHBOR_OF_STRING() and friends don't get confused with the
+   * stone.
+   */
   DO_ADD_STONE(pos, color);
+  string_number[pos] = -1;
 
   /* Look in all directions. Count the number of neighbor strings of the same
    * color, remove captured strings and remove `pos' as liberty for opponent
