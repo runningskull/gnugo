@@ -33,17 +33,6 @@
 #include <assert.h>
 
 
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# if HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif
-
 #include "sgftree.h"
 #include "gg_utils.h"
 
@@ -761,8 +750,6 @@ void
 sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
 		 int level, int rules)
 {
-  time_t curtime = time(NULL);
-  struct tm *loctime = localtime(&curtime);
   char str[128];
   int dummy;
 
@@ -770,10 +757,6 @@ sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
 	      VERSION, seed, level);
   if (overwrite || !sgfGetIntProperty(root, "GN", &dummy))
     sgfOverwriteProperty(root, "GN", str);
-  gg_snprintf(str, 128, "%4.4i-%2.2i-%2.2i",
-	      loctime->tm_year+1900, loctime->tm_mon+1, loctime->tm_mday);
-  if (overwrite || !sgfGetIntProperty(root, "DT", &dummy))
-    sgfOverwriteProperty(root, "DT", str);
   if (overwrite || !sgfGetIntProperty(root, "AP", &dummy))
     sgfOverwriteProperty(root, "AP", "GNU Go "VERSION);
   if (overwrite || !sgfGetIntProperty(root, "RU", &dummy))

@@ -81,8 +81,6 @@ AC_PROG_RANLIB
 dnl required since we use SUBDIRS in Makefile.am
 AC_PROG_MAKE_SET
 
-AC_HEADER_TIME
-
 AC_CHECK_SIZEOF(long,,[#include <stdio.h>])
 
 dnl ---------- grid optimisation ------------
