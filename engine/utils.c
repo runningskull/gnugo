@@ -807,13 +807,27 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
   return liberties;
 }
 
+/*******************
+ * Detect blunders *
+ *******************/
 
+static int detect_owl_blunder(int move, int color, int *defense_point,
+			      char safe_stones[BOARDMAX], int liberties,
+			      float *return_value, int save_verbose);
+
+static void detect_tactical_blunder(int move, int color, int *defense_point,
+				    char safe_stones[BOARDMAX],
+				    int liberties, int *libs,
+				    float *return_value, int save_verbose);
+
+/* Check that the move at color doesn't involve any kind of blunder,
+ * regardless of size.
+ */
 int
 confirm_safety(int move, int color, int *defense_point,
 	       char safe_stones[BOARDMAX])
 {
-  return (blunder_size(move, color, defense_point, safe_stones)
-      	  == 0.0);
+  return (blunder_size(move, color, defense_point, safe_stones) == 0.0);
 }
 
 /* This function will detect some blunders. If the move reduces the
@@ -840,15 +854,12 @@ blunder_size(int move, int color, int *defense_point,
 {
   int libs[5];
   int liberties = accurate_approxlib(move, color, 5, libs);
-  int other = OTHER_COLOR(color);
-  int pos;
   int apos;
   int trouble = 0;
-  int k;
-  int ii;
   int save_verbose = verbose;
   float return_value = 0.0;
-
+  int atari;
+  
   if (defense_point)
     *defense_point = NO_MOVE;
 
@@ -857,12 +868,65 @@ blunder_size(int move, int color, int *defense_point,
   if (verbose > 0)
     verbose--;
 
-  if (liberties > 4)
-    goto atari_atari;
-
-  /* We start by looking whether we have killed a dragon. If this happens,
-   * we mark its stones as no longer safe, and remember the dragon's size.
+  /* We start by checking whether we have accidentally killed an own
+   * dragon.
+   *
+   * FIXME: The liberties check isn't appropriate since the move may
+   * reduce own eyespace regardless of the number of outer liberties.
    */
+  if (liberties <= 4)
+    trouble = detect_owl_blunder(move, color, defense_point,
+				 safe_stones, liberties,
+				 &return_value, save_verbose);
+  
+
+  /* Next we see whether the move has caused tactical complications.
+   * The trouble variable is set if a string next to the move with few
+   * liberties has not gained liberties by the move.
+   */
+  if (trouble)
+    detect_tactical_blunder(move, color, defense_point, safe_stones,
+			    liberties, libs, &return_value, save_verbose);
+
+  /* FIXME: We would also need a detect_semeai_blunder() to check
+   * against moves which make the outcome of a semeai worse, e.g. by
+   * letting the opponent live in seki.
+   */
+
+  
+  /* Finally we call the atari-atari code to see whether the move has
+   * set up some combination attack that didn't exist before. We do
+   * this last to avoid duplicate blunder reports.
+   */
+  atari = atari_atari_blunder_size(color, move, &apos, safe_stones);
+  if (atari) {
+    ASSERT_ON_BOARD1(apos);
+    if (defense_point)
+      *defense_point = apos;
+    verbose = save_verbose;
+    TRACE("Combination attack appears at %1m.\n", apos);
+    return_value += (float) atari;
+  }
+
+  verbose = save_verbose;
+  return return_value;
+}
+
+/* Check whether we have accidentally killed an own dragon adjacent to
+ * move. If this happens, we mark its stones as no longer safe, and
+ * remember the dragon's size.
+ */
+
+static int
+detect_owl_blunder(int move, int color, int *defense_point,
+		   char safe_stones[BOARDMAX], int liberties,
+		   float *return_value, int save_verbose)
+{
+  int k;
+  int ii;
+  int trouble = 0;
+  int current_verbose = verbose;
+  
   for (k = 0; k < 4; k++) {
     int bpos = move + delta[k];
     if (board[bpos] == color
@@ -876,9 +940,8 @@ blunder_size(int move, int color, int *defense_point,
 	  && !owl_confirm_safety(move, bpos, defense_point)) {
 	verbose = save_verbose;
 	TRACE("Dragon at %1m becomes attackable.\n", bpos);
-	if (verbose > 0)
-	  verbose--;
-	return_value += 2.0 * dragon[bpos].effective_size;
+	verbose = current_verbose;
+	*return_value += 2.0 * dragon[bpos].effective_size;
 	if (safe_stones)
 	  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
 	    if (ON_BOARD(ii) && dragon[ii].origin == dragon[bpos].origin)
@@ -887,105 +950,121 @@ blunder_size(int move, int color, int *defense_point,
     }
   }
 
-  verbose = save_verbose;
+  return trouble;
+}
 
-  if (!trouble)
-    goto atari_atari;
+/* Check whether a move causes any unexpected and unwelcome changes in
+ * the tactical status of worms all over the board.
+ */
+static void
+detect_tactical_blunder(int move, int color, int *defense_point,
+			char safe_stones[BOARDMAX],
+			int liberties, int *libs,
+			float *return_value, int save_verbose)
+{
+  int other = OTHER_COLOR(color);
+  int pos;
+  int ii;
+  int current_verbose = save_verbose;
 
+  if (!trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE))
+    return;
+  
   /* Need to increase the depth values during this reading to avoid
    * horizon effects.
    */
   increase_depth_values();
   
-  if (trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-      if (IS_STONE(board[pos])
-	  && worm[pos].origin == pos
-	  && pos != move) {
-	/* First, we look for a new tactical attack. */
-	if (board[pos] == color
-	    && ((safe_stones && safe_stones[pos])
-	        || (!safe_stones && worm[pos].attack_codes[0] == 0))
-	    && attack(pos, NULL)) {
-	  /* A safe worm of ours has become attackable. */
-	  if (defense_point)
-	    find_defense(pos, defense_point);
-	  TRACE("After %1m Worm at %1m becomes attackable.\n", move, pos);
-	  return_value += worm[pos].effective_size;
-	  if (safe_stones) /* Can't use mark_string. */
-	    for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-	      if (worm[ii].origin == worm[pos].origin)
-		safe_stones[ii] = 0;
-	}
-	else if (board[pos] == other
-	    	 && worm[pos].origin == pos
-		 && worm[pos].attack_codes[0] != 0
-		 && worm[pos].defend_codes[0] == 0
-		 && find_defense(pos, NULL)) {
-	  /* A dead opponent's worm has become defendable.
-	   * Also ask the owl code whether the string can live
-	   * strategically. To do this we need to temporarily undo
-	   * the trymove().
-	   */
-	  int owl_attacks;
-
-	  popgo();
-	  decrease_depth_values();
-	  owl_attacks = owl_does_attack(move, pos);
-	  if (owl_attacks != WIN) {
-	    return_value += worm[pos].effective_size;
-	    TRACE("After %1m worm at %1m becomes defendable.\n",
-		  move, pos);
-	  }
-	  trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE);
-	  increase_depth_values();
-	  
-	  if (owl_attacks != WIN && defense_point) {
-	    int dpos;
-	    if (attack(pos, &dpos))
-	      *defense_point = dpos;
-	    else
-	      TRACE("No attack found (unexpectedly) on %1m after move at %1m.\n",
-		    pos, move);
-	  }
-	}
-      }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!IS_STONE(board[pos])
+	|| worm[pos].origin != pos
+	|| pos == move)
+      continue;
     
-    if (liberties == 2) {
-      float d_a_blunder_size;
-      if (double_atari(libs[0], other, &d_a_blunder_size, safe_stones)) {
-	if (defense_point && safe_move(libs[0], color) == WIN)
-	  *defense_point = libs[0];
-	return_value += d_a_blunder_size;
-	TRACE("Double threat appears at %1m.\n", libs[0]);
+    /* First, we look for a new tactical attack. */
+    if (board[pos] == color
+	&& ((safe_stones && safe_stones[pos])
+	    || (!safe_stones && worm[pos].attack_codes[0] == 0))
+	&& attack(pos, NULL)) {
+      /* A safe worm of ours has become attackable. */
+      if (defense_point)
+	find_defense(pos, defense_point);
+      verbose = save_verbose;
+      TRACE("After %1m Worm at %1m becomes attackable.\n", move, pos);
+      verbose = current_verbose;
+      *return_value += worm[pos].effective_size;
+      if (safe_stones) /* Can't use mark_string. */
+	for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+	  if (worm[ii].origin == worm[pos].origin)
+	    safe_stones[ii] = 0;
+    }
+    else if (board[pos] == other
+	     && worm[pos].origin == pos
+	     && worm[pos].attack_codes[0] != 0
+	     && worm[pos].defend_codes[0] == 0
+	     && find_defense(pos, NULL)) {
+      /* A dead opponent's worm has become defendable.
+       * Also ask the owl code whether the string can live
+       * strategically. To do this we need to temporarily undo
+       * the trymove().
+       */
+      int owl_attacks;
+      
+      popgo();
+      decrease_depth_values();
+      owl_attacks = owl_does_attack(move, pos);
+      if (owl_attacks != WIN) {
+	*return_value += worm[pos].effective_size;
+	verbose = save_verbose;
+	TRACE("After %1m worm at %1m becomes defendable.\n", move, pos);
+	verbose = current_verbose;
       }
-      else if (double_atari(libs[1], other, &d_a_blunder_size, safe_stones)) {
-	if (defense_point && safe_move(libs[1], color) == WIN)
-	  *defense_point = libs[1];
-	return_value += d_a_blunder_size;
-	TRACE("Double threat appears at %1m.\n", libs[1]);
+      trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE);
+      increase_depth_values();
+      
+      if (owl_attacks != WIN && defense_point) {
+	int dpos;
+	if (attack(pos, &dpos))
+	  *defense_point = dpos;
+	else {
+	  verbose = save_verbose;
+	  TRACE("No attack found (unexpectedly) on %1m after move at %1m.\n",
+		pos, move);
+	  verbose = current_verbose;
+	}
       }
     }
-    popgo();
+  }
+
+  /* Look for double atari style complications of the move.
+   *
+   * FIXME: Since we have an atari_atari check in blunder_size(), do
+   * we still need to do this step?
+   */
+  if (liberties == 2) {
+    float d_a_blunder_size;
+    if (double_atari(libs[0], other, &d_a_blunder_size, safe_stones)) {
+      if (defense_point && safe_move(libs[0], color) == WIN)
+	*defense_point = libs[0];
+      *return_value += d_a_blunder_size;
+      verbose = save_verbose;
+      TRACE("Double threat appears at %1m.\n", libs[0]);
+      verbose = current_verbose;
+    }
+    else if (double_atari(libs[1], other, &d_a_blunder_size, safe_stones)) {
+      if (defense_point && safe_move(libs[1], color) == WIN)
+	*defense_point = libs[1];
+      *return_value += d_a_blunder_size;
+      verbose = save_verbose;
+      TRACE("Double threat appears at %1m.\n", libs[1]);
+      verbose = current_verbose;
+    }
   }
   
   /* Reset the depth values. */
   decrease_depth_values();
 
-  /* We call the atari-atari code last to avoid duplicate blunder reports. */
-atari_atari:
-  {
-    int atari = atari_atari_blunder_size(color, move, &apos, safe_stones);
-    if (atari) {
-      ASSERT_ON_BOARD1(apos);
-      if (defense_point)
-	*defense_point = apos;
-      TRACE("Combination attack appears at %1m.\n", apos);
-      return_value += (float) atari;
-    }
-  }
-
-  return return_value;
+  popgo();
 }
 
 

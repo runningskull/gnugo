@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- blunder_size() code reorganized
+- new static functions detect_owl_blunder() and
+  detect_tactical_blunder() in utils.c
 - infrastructure for loops walking across a dragon: next_wormlist[],
   first_worm_in_dragon(), next_worm_in_dragon()
 - mark_changed_dragon() revised using dragon loop
