@@ -29,7 +29,6 @@
 #include "eyes.h"
 #include "gg_utils.h"
 
-
 #define MAXEYE 20
 
 
@@ -2412,7 +2411,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
  *
  * The basic idea is to embed the eyespace in a perfectly connected
  * group without additional eyes or eye potential. This is most easily
- * done by the somehwhat brutal trick to fill the entire board with
+ * done by the somewhat brutal trick to fill the entire board with
  * stones. We let the group consist of white stones (O) and get this
  * result, disregarding the two marginal eye vertices:
  *
@@ -2515,34 +2514,193 @@ test_eyeshape(int eyesize, int *eye_vertices)
  * 2 - result has been computed and was a failure (0)
  * 3 - result has been computed and was a success (1)
  */
- 
-/* Place a small invincible black group on the board, centered at pos.
+
+/* Like trymove() except that it does a superko check. This does,
+ * however, only disallow repetition (besides simple ko) if the move
+ * does not capture any stones.
+ */
+static int
+eyegraph_trymove(int pos, int color, const char *message, int str,
+		 int komaster, int kom_pos)
+{
+  static Hash_data remembered_board_hashes[MAXSTACK];
+  int k;
+  int does_capture = does_capture_something(pos, color);
+  
+  remembered_board_hashes[stackp] = hashdata;
+  
+  if (!trymove(pos, color, message, str, komaster, kom_pos))
+    return 0;
+
+  if (does_capture)
+    return 1;
+
+  for (k = 0; k < stackp; k++)
+    if (hashdata_compare(&hashdata, &remembered_board_hashes[k]) == 0) {
+      popgo();
+      return 0;
+    }
+
+  return 1;
+}
+
+static int
+eyegraph_is_margin_or_outer_liberty(int vertex)
+{
+  int k;
+  int r;
+  int num_libs;
+  int libs[MAXLIBS];
+  int eyes;
+  
+  for (k = 0; k < 4; k++) {
+    if (board[vertex + delta[k]] == BLACK) {
+      eyes = 0;
+      num_libs = findlib(vertex + delta[k], MAXLIBS, libs);
+      
+      for (r = 0; r < num_libs; r++)
+	if (is_suicide(libs[r], WHITE))
+	  eyes++;
+      
+      if (eyes >= 2)
+	return 1;
+    }
+  }
+  return 0;
+}
+
+static int
+eyegraph_order_moves(int num_vertices, int *vertices, int color_to_move, int *moves)
+{
+  int num_moves = 0;
+  int scores[BOARDMAX];
+  int move;
+  int score;
+  int k;
+  int r;
+
+  for (k = 0; k < num_vertices; k++) {
+    if (k >= num_vertices - 3) {
+      /* Never useful for white to fill in outer liberties or a second eye. */
+      if (color_to_move == WHITE)
+	break;
+      /* No use playing the second outer liberty before the first one. */
+      if (k == num_vertices - 2 && board[vertices[num_vertices - 3]] == EMPTY)
+	continue;
+    }
+    
+    move = vertices[k];
+    score = 0;
+
+    if (board[move] != EMPTY)
+      continue;
+    
+    if (eyegraph_is_margin_or_outer_liberty(move)) {
+      if (k < num_vertices - 3)
+	score = 5; /* margin */
+      else
+	score = -10; /* outer liberty */
+    }
+
+    if (accuratelib(move, color_to_move, 2, NULL) == 1)
+      score -= 3;
+    
+    for (r = 0; r < 4; r++) {
+      if (board[move + delta[r]] == EMPTY)
+	score += 2;
+      else if (board[move + delta[r]] == BLACK)
+	score += 3;
+    }
+    
+    moves[num_moves] = move;
+    scores[num_moves] = score;
+    num_moves++;
+  }
+
+  for (k = 0; k < num_moves; k++) {
+    int maxscore = scores[k];
+    int max_at = 0;
+
+    /* Find the move with the biggest score. */
+    for (r = k + 1; r < num_moves; r++) {
+      if (scores[r] > maxscore) {
+	maxscore = scores[r];
+	max_at = r;
+      }
+    }
+
+    /* Now exchange the move at k with the move at max_at.
+     * Don't forget to exchange the scores as well.
+     */
+    if (max_at != 0) {
+      int temp = moves[max_at];
+      moves[max_at] = moves[k];
+      moves[k] = temp;
+      temp = scores[max_at];
+      scores[max_at] = scores[k];
+      scores[k] = temp;
+    }
+  }
+  
+  return num_moves;
+}
+
+/* Place a small invincible black group on the board.
  * It is required that previously there were white stones at all
  * involved vertices and on the surrounding vertices.
  *
  * Returns 1 if a group was placed, 0 otherwise.
  */
 static int
-white_area(int mx[BOARDMAX], int pos)
+white_area(int mx[BOARDMAX], int pos, int up, int right, int marginpos,
+	   int distance)
 {
-  int i = I(pos);
-  int j = J(pos);
-  int m, n;
+  int u, v;
+  int k;
+  int edge = is_edge_vertex(marginpos);
 
-  for (m = i - 3; m <= i + 3; m++)
-    for (n = j - 2; n <= j + 2; n++)
-      if (!ON_BOARD(POS(m, n)) || mx[POS(m, n)] != WHITE)
+  for (k = 1; k < distance; k++)
+    if (!ON_BOARD(marginpos + k * up)
+	|| mx[marginpos + k * up] != WHITE)
+      return 0;
+
+  for (u = -1; u <= 4; u++)
+    for (v = -1; v <= 4; v++) {
+      int pos2 = pos + u * up + v * right;
+      if (!ON_BOARD(pos2)) {
+	if (!edge)
+	  return 0;
+	else if (u >= 0 && u <=3 && v >= 0 && v <= 3)
+	  return 0;
+	else if (I(pos2) != I(NORTH(marginpos))
+		 && I(pos2) != I(SOUTH(marginpos))
+		 && J(pos2) != J(WEST(marginpos))
+		 && J(pos2) != J(EAST(marginpos)))
+	  return 0;
+      }
+      else if (mx[pos2] != WHITE)
 	return 0;
+    }
+  
+  for (u = 0; u <= 3; u++)
+    for (v = 0; v <= 3; v++) {
+      int pos2 = pos + u * up + v * right;
+      mx[pos2] = BLACK;
+    }
 
-  for (m = i - 2; m <= i + 2; m++)
-    for (n = j - 1; n <= j + 1; n++)
-      mx[POS(m, n)] = BLACK;
-
-  mx[NORTH(pos)] = EMPTY;
-  mx[SOUTH(pos)] = EMPTY;
+  mx[pos + up + right] = EMPTY;
+  mx[pos + 2 * up + 2 * right] = EMPTY;
 
   return 1;
 }
+
+
+#define EYEGRAPH_RETURN(result, trace) \
+  do { \
+    if (sgf_dumptree) \
+      sgftreeAddComment(sgf_dumptree, (trace)); \
+    return (result); \
+  } while (0);
 
 static int tactical_life_defend(int str, int num_vertices, int *vertices,
 				unsigned char *results);
@@ -2556,31 +2714,42 @@ tactical_life_attack(int str, int num_vertices, int *vertices,
   int hash = 0;
   int cached_result;
   int result;
+  int num_moves;
+  int moves[BOARDMAX];
 
   /* Compute hash value to index the result cache with. */
   for (k = 0; k < num_vertices; k++) {
     hash *= 3;
     hash += board[vertices[k]];
   }
+  hash *= 2;
+  hash += (board_ko_pos != NO_MOVE);
 
   /* Is the result known from the cache? */
   cached_result = results[hash] & 3;
+
+  if (0) {
+    showboard(0);
+    gprintf("%d %d (%d)\n", hash, cached_result, results[hash]);
+  }
+  
   if (cached_result == 2)
-    return 0;
+    EYEGRAPH_RETURN(0, "tactical_life_attack: 0 (cached)");
   if (cached_result == 3)
-    return 1;
+    EYEGRAPH_RETURN(1, "tactical_life_attack: win (cached)");
   if (cached_result == 1)
-    return 1;
+    EYEGRAPH_RETURN(1, "tactical_life_attack: win (open node in cache)");
 
   /* Mark this entry in the cache as currently being computed. */
   results[hash] |= 1;
 
   /* Try to play on all relevant vertices. */
-  for (k = 0; k < num_vertices; k++) {
-    int move = vertices[k];
-    if (board[move] == EMPTY
-	&& trymove(move, OTHER_COLOR(board[str]), "tactical_life_attack", str,
-		   EMPTY, NO_MOVE)) {
+  num_moves = eyegraph_order_moves(num_vertices, vertices,
+				   OTHER_COLOR(board[str]), moves);
+  for (k = 0; k < num_moves; k++) {
+    int move = moves[k];
+    if (eyegraph_trymove(move, OTHER_COLOR(board[str]), "tactical_life_attack",
+			 str, EMPTY, NO_MOVE)) {
       /* We were successful if the white stones were captured or if no
        * defense can be found.
        */
@@ -2594,14 +2763,14 @@ tactical_life_attack(int str, int num_vertices, int *vertices,
       if (result == 1) {
 	/* Store the result (success) in the cache. */
 	results[hash] = (results[hash] & (~3)) | 3;
-	return 1;
+	EYEGRAPH_RETURN(1, "tactical_life_attack: win");
       }
     }
   }
   
   /* Store the result (failure) in the cache. */
   results[hash] = (results[hash] & (~3)) | 2;
-  return 0;
+  EYEGRAPH_RETURN(0, "tactical_life_attack: 0");
 }
 
 /* Determine whether white can live with all stones. */
@@ -2613,31 +2782,44 @@ tactical_life_defend(int str, int num_vertices, int *vertices,
   int hash = 0;
   int cached_result;
   int result;
+  int num_moves;
+  int moves[BOARDMAX];
   
   /* Compute hash value to index the result cache with. */
   for (k = 0; k < num_vertices; k++) {
     hash *= 3;
+    ASSERT1(board[vertices[k]] <= 2, vertices[k]);
     hash += board[vertices[k]];
   }
-
+  hash *= 2;
+  hash += (board_ko_pos != NO_MOVE);
+  
   /* Is the result known from the cache? */
   cached_result = (results[hash] >> 2) & 3;
+
+  if (0) {
+    showboard(0);
+    gprintf("%d %d (%d)\n", hash, cached_result, results[hash]);
+  }
+
   if (cached_result == 2)
-    return 0;
+    EYEGRAPH_RETURN(0, "tactical_life_defend: 0 (cached)");
   if (cached_result == 3)
-    return 1;
+    EYEGRAPH_RETURN(1, "tactical_life_defend: win (cached)");
   if (cached_result == 1)
-    return 1;
+    EYEGRAPH_RETURN(1, "tactical_life_defend: win (node open in cache)");
 
   /* Mark this entry in the cache as currently being computed. */
   results[hash] |= (1 << 2);
 
   /* Try to play on all relevant vertices. */
-  for (k = 0; k < num_vertices; k++) {
-    int move = vertices[k];
-    if (board[move] == EMPTY
-	&& trymove(move, board[str], "tactical_life_defend", str,
-		   EMPTY, NO_MOVE)) {
+  num_moves = eyegraph_order_moves(num_vertices, vertices, board[str], moves);
+  for (k = 0; k < num_moves; k++) {
+    int move = moves[k];
+    if ((!is_suicide(move, OTHER_COLOR(board[str]))
+	 || does_capture_something(move, board[str]))
+	&& eyegraph_trymove(move, board[str], "tactical_life_defend", str,
+			    EMPTY, NO_MOVE)) {
       /* We were successful if no attack can be found. */
       result = !tactical_life_attack(str, num_vertices, vertices, results);
       
@@ -2646,21 +2828,21 @@ tactical_life_defend(int str, int num_vertices, int *vertices,
       if (result == 1) {
 	/* Store the result (success) in the cache. */
 	results[hash] = (results[hash] & (~12)) | (3 << 2);
-	return 1;
+	EYEGRAPH_RETURN(1, "tactical_life_defend: win");
       }
     }
   }
 
-  /* If no move worked, also try passing. We may live in seki. */
+  /* If no move worked, also try passing. */
   if (!tactical_life_attack(str, num_vertices, vertices, results)) {
     /* Store the result (success) in the cache. */
     results[hash] = (results[hash] & (~12)) | (3 << 2);
-    return 1;
+    EYEGRAPH_RETURN(1, "tactical_life_defend: win");
   }
   
   /* Store the result (failure) in the cache. */
   results[hash] = (results[hash] & (~12)) | (2 << 2);
-  return 0;
+  EYEGRAPH_RETURN(0, "tactical_life_defend: 0");
 }
 
 /* Determine the tactical life and death status of all white stones.
@@ -2676,6 +2858,8 @@ tactical_life(int have_eye, int num_vertices, int *vertices,
 {
   int k;
   int str;
+  int num_moves;
+  int moves[BOARDMAX];
 
   gg_assert(attack_code != NULL && defense_code != NULL);
 
@@ -2696,8 +2880,8 @@ tactical_life(int have_eye, int num_vertices, int *vertices,
    * suicide the white stones can be considered dead.
    */
   if (!have_eye) {
-    if (!trymove(POS(0, 0), WHITE, "tactical_life-A", NO_MOVE,
-		 EMPTY, NO_MOVE)) {
+    if (!eyegraph_trymove(POS(0, 0), WHITE, "tactical_life-A", NO_MOVE,
+			  EMPTY, NO_MOVE)) {
       *attack_code = WIN;
       *defense_code = 0;
       return;
@@ -2726,11 +2910,12 @@ tactical_life(int have_eye, int num_vertices, int *vertices,
   if (*attack_code != 0 && *defense_code != 0) {
     if (num_attacks != NULL && attack_points != NULL) {
       *num_attacks = 0;
-      for (k = 0; k < num_vertices; k++) {
-	int move = vertices[k];
-	if (board[move] == EMPTY
-	    && trymove(move, OTHER_COLOR(board[str]), "tactical_life-B", str,
-		       EMPTY, NO_MOVE)) {
+      num_moves = eyegraph_order_moves(num_vertices, vertices,
+				       OTHER_COLOR(board[str]), moves);
+      for (k = 0; k < num_moves; k++) {
+	int move = moves[k];
+	if (eyegraph_trymove(move, OTHER_COLOR(board[str]), "tactical_life-B",
+			     str, EMPTY, NO_MOVE)) {
 	  if (board[str] == EMPTY
 	      || !tactical_life_defend(str, num_vertices, vertices, results))
 	    attack_points[(*num_attacks)++] = move;
@@ -2741,11 +2926,12 @@ tactical_life(int have_eye, int num_vertices, int *vertices,
 
     if (num_defenses != NULL && defense_points != NULL) {
       *num_defenses = 0;
-      for (k = 0; k < num_vertices; k++) {
-	int move = vertices[k];
-	if (board[move] == EMPTY
-	    && trymove(move, board[str], "tactical_life-C", str,
-		       EMPTY, NO_MOVE)) {
+      num_moves = eyegraph_order_moves(num_vertices, vertices, board[str],
+				       moves);
+      for (k = 0; k < num_moves; k++) {
+	int move = moves[k];
+	if (eyegraph_trymove(move, board[str], "tactical_life-C", str, EMPTY,
+			     NO_MOVE)) {
 	  if (!tactical_life_attack(str, num_vertices, vertices, results))
 	    defense_points[(*num_defenses)++] = move;
 	  popgo();
@@ -2792,6 +2978,8 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
   int vital_attacks2[BOARDMAX];
   int num_vital_defenses2;
   int vital_defenses2[BOARDMAX];
+  int num_moves;
+  int moves[BOARDMAX];
 
   *num_vital_attacks = 0;
   *num_vital_defenses = 0;
@@ -2809,12 +2997,16 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
      * Determine whether there are ko threats and how serious.
      */
     int a = 2;
-    for (k = 0; k < num_vertices - 2; k++) {
+
+    if (sgf_dumptree)
+      sgftreeAddComment(sgf_dumptree, "Alive without extra eye.\n");
+    
+    num_moves = eyegraph_order_moves(num_vertices, vertices, BLACK, moves);
+    for (k = 0; k < num_moves; k++) {
       int acode, dcode;
-      int move = vertices[k];
-      if (board[move] == EMPTY
-	  && trymove(move, BLACK, "evaluate_eyespace-A", NO_MOVE,
-		     EMPTY, NO_MOVE)) {
+      int move = moves[k];
+      if (eyegraph_trymove(move, BLACK, "evaluate_eyespace-A", NO_MOVE,
+			   EMPTY, NO_MOVE)) {
 	tactical_life(0, num_vertices, vertices, &acode, NULL, NULL,
 		      &dcode, NULL, NULL, tactical_life_results);
 	if (acode != 0) {
@@ -2825,22 +3017,38 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 	      *num_vital_attacks = 0;
 	    a = 0;
 	    vital_attacks[(*num_vital_attacks)++] = move;
+	    if (sgf_dumptree)
+	      sgftreeAddComment(sgf_dumptree,
+				"Ko threat to remove both eyes.\n");
 	  }
 	  else {
-	    if (a != 0)
+	    if (a != 0) {
 	      vital_attacks[(*num_vital_attacks)++] = move;
-	    a = 1;
+	      a = 1;
+	    }
+	    if (sgf_dumptree)
+	      sgftreeAddComment(sgf_dumptree, "Ko threat to remove one eye.\n");
 	  }
 	}
 	popgo();
       }
     }
     set_eyevalue(result, a, 2, 2, 2);
+    if (sgf_dumptree) {
+      if (a == 0)
+	sgftreeAddComment(sgf_dumptree, "Eyevalue 0222.\n");
+      else if (a == 1)
+	sgftreeAddComment(sgf_dumptree, "Eyevalue 1222.\n");
+      else
+	sgftreeAddComment(sgf_dumptree, "Eyevalue 2222.\n");
+    }
   }
   else if (defense_code != 0) {
     /* Critical without extra eye.
      * Possible results: 0022, 0122, 1122
      */
+    if (sgf_dumptree)
+      sgftreeAddComment(sgf_dumptree, "Critical without extra eye.\n");
     tactical_life(1, num_vertices, vertices,
 		  &attack_code2, &num_attacks2, attack_points2,
 		  &defense_code2, NULL, NULL, tactical_life_results);
@@ -2851,14 +3059,15 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
       set_eyevalue(result, 0, 0, 2, 2);
       for (k = 0; k < num_attacks2; k++)
 	vital_attacks[(*num_vital_attacks)++] = attack_points2[k];
+      if (sgf_dumptree)
+	sgftreeAddComment(sgf_dumptree, "Eyevalue: 0022.\n");
     }
     else {
       int a = 1;
       for (k = 0; k < num_attacks; k++) {
 	int move = attack_points[k];
-	if (board[move] == EMPTY
-	    && trymove(move, BLACK, "evaluate_eyespace-B", NO_MOVE,
-		       EMPTY, NO_MOVE)) {
+	if (eyegraph_trymove(move, BLACK, "evaluate_eyespace-B", NO_MOVE,
+			     EMPTY, NO_MOVE)) {
 	  evaluate_eyespace(&result2, num_vertices, vertices,
 			    &num_vital_attacks2, vital_attacks2,
 			    &num_vital_defenses2, vital_defenses2,
@@ -2872,12 +3081,20 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 	    if (a == 1)
 	      *num_vital_attacks = 0;
 	    a = 0;
+	    vital_attacks[(*num_vital_attacks)++] = move;
 	  }
-	  vital_attacks[(*num_vital_attacks)++] = move;
+	  else if (a == 1)
+	    vital_attacks[(*num_vital_attacks)++] = move;
 	  popgo();
 	}
       }
       set_eyevalue(result, a, 1, 2, 2);
+      if (sgf_dumptree) {
+	if (a == 0)
+	  sgftreeAddComment(sgf_dumptree, "Eyevalue: 0122.\n");
+	else
+	  sgftreeAddComment(sgf_dumptree, "Eyevalue: 1122.\n");
+      }	  
     }
   }
   else {
@@ -2886,6 +3103,8 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
      *
      * Now determine tactical life with an extra eye.
      */
+    if (sgf_dumptree)
+      sgftreeAddComment(sgf_dumptree, "Dead without extra eye.\n");
     tactical_life(1, num_vertices, vertices,
 		  &attack_code, &num_attacks, attack_points,
 		  &defense_code, &num_defenses, defense_points,
@@ -2896,12 +3115,14 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
        */
       int a = 1;
       int d = 1;
-      for (k = 0; k < num_vertices - 2; k++) {
+      if (sgf_dumptree)
+	sgftreeAddComment(sgf_dumptree, "Alive with extra eye.\n");
+      num_moves = eyegraph_order_moves(num_vertices, vertices, BLACK, moves);
+      for (k = 0; k < num_moves; k++) {
 	int acode, dcode;
-	int move = vertices[k];
-	if (board[move] == EMPTY
-	    && trymove(move, BLACK, "evaluate_eyespace-C", NO_MOVE,
-		       EMPTY, NO_MOVE)) {
+	int move = moves[k];
+	if (eyegraph_trymove(move, BLACK, "evaluate_eyespace-C", NO_MOVE,
+			     EMPTY, NO_MOVE)) {
 	  tactical_life(1, num_vertices, vertices, &acode, NULL, NULL,
 			&dcode, NULL, NULL, tactical_life_results);
 	  if (acode != 0) {
@@ -2913,17 +3134,20 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 	    if (max_eye_threat(&result2) == 1) {
 	      vital_attacks[(*num_vital_attacks)++] = move;
 	      a = 0;
+	      if (sgf_dumptree)
+		sgftreeAddComment(sgf_dumptree, "Attacking ko threat.\n");
 	    }
 	  }
 	  popgo();
 	}
       }
-      for (k = 0; k < num_vertices - 2; k++) {
+      
+      num_moves = eyegraph_order_moves(num_vertices, vertices, WHITE, moves);
+      for (k = 0; k < num_moves; k++) {
 	int acode, dcode;
-	int move = vertices[k];
-	if (board[move] == EMPTY
-	    && trymove(move, WHITE, "evaluate_eyespace-D", NO_MOVE,
-		       EMPTY, NO_MOVE)) {
+	int move = moves[k];
+	if (eyegraph_trymove(move, WHITE, "evaluate_eyespace-D", NO_MOVE,
+			     EMPTY, NO_MOVE)) {
 	  tactical_life(0, num_vertices, vertices, &acode, NULL, NULL,
 			&dcode, NULL, NULL, tactical_life_results);
 	  if (dcode != 0) {
@@ -2935,25 +3159,38 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 	    if (min_eye_threat(&result2) == 1) {
 	      vital_defenses[(*num_vital_defenses)++] = move;
 	      d = 2;
+	      if (sgf_dumptree)
+		sgftreeAddComment(sgf_dumptree, "Defending ko threat.\n");
 	    }
 	  }
 	  popgo();
 	}
       }
       set_eyevalue(result, a, 1, 1, d);
+      if (sgf_dumptree) {
+	if (a == 0 && d == 1)
+	  sgftreeAddComment(sgf_dumptree, "Eyevalue 0111.\n");
+	else if (a == 0 && d == 2)
+	  sgftreeAddComment(sgf_dumptree, "Eyevalue 0112.\n");
+	else if (a == 1 && d == 1)
+	  sgftreeAddComment(sgf_dumptree, "Eyevalue 1111.\n");
+	else
+	  sgftreeAddComment(sgf_dumptree, "Eyevalue 1112.\n");
+      }
     }
     else if (defense_code != 0) {
       /* Critical with extra eye.
        * Possible results: 0011, 0012
        */
       int d = 1;
+      if (sgf_dumptree)
+	sgftreeAddComment(sgf_dumptree, "Critical with extra eye.\n");
       for (k = 0; k < num_attacks; k++)
 	vital_attacks[(*num_vital_attacks)++] = attack_points[k];
       for (k = 0; k < num_defenses; k++) {
 	int move = defense_points[k];
-	if (board[move] == EMPTY
-	    && trymove(move, WHITE, "evaluate_eyespace-E", NO_MOVE,
-		       EMPTY, NO_MOVE)) {
+	if (eyegraph_trymove(move, WHITE, "evaluate_eyespace-E", NO_MOVE,
+			     EMPTY, NO_MOVE)) {
 	  evaluate_eyespace(&result2, num_vertices, vertices,
 			    &num_vital_attacks2, vital_attacks2,
 			    &num_vital_defenses2, vital_defenses2,
@@ -2967,12 +3204,20 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 	    if (d == 1)
 	      *num_vital_defenses = 0;
 	    d = 2;
+	    vital_defenses[(*num_vital_defenses)++] = move;
 	  }
-	  vital_defenses[(*num_vital_defenses)++] = move;
+	  else if (d == 1)
+	    vital_defenses[(*num_vital_defenses)++] = move;
 	  popgo();
 	}
       }
       set_eyevalue(result, 0, 0, 1, d);
+      if (sgf_dumptree) {
+	if (d == 1)
+	  sgftreeAddComment(sgf_dumptree, "Eyevalue: 0011.\n");
+	else
+	  sgftreeAddComment(sgf_dumptree, "Eyevalue: 0012.\n");
+      }	  
     }
     else {
       /* Dead with extra eye.
@@ -2981,12 +3226,14 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
        * Determine whether there are ko threats and how serious.
        */
       int d = 0;
-      for (k = 0; k < num_vertices - 2; k++) {
+      if (sgf_dumptree)
+	sgftreeAddComment(sgf_dumptree, "Dead with extra eye.\n");
+      num_moves = eyegraph_order_moves(num_vertices, vertices, WHITE, moves);
+      for (k = 0; k < num_moves; k++) {
 	int acode, dcode;
-	int move = vertices[k];
-	if (board[move] == EMPTY
-	    && trymove(move, WHITE, "evaluate_eyespace-F", NO_MOVE,
-		       EMPTY, NO_MOVE)) {
+	int move = moves[k];
+	if (eyegraph_trymove(move, WHITE, "evaluate_eyespace-F", NO_MOVE,
+			     EMPTY, NO_MOVE)) {
 	  tactical_life(1, num_vertices, vertices, &acode, NULL, NULL,
 			&dcode, NULL, NULL, tactical_life_results);
 	  if (dcode != 0) {
@@ -2997,19 +3244,84 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 		*num_vital_defenses = 0;
 	      d = 2;
 	      vital_defenses[(*num_vital_defenses)++] = move;
+	      if (sgf_dumptree)
+		sgftreeAddComment(sgf_dumptree,
+				  "Ko threat to make two eyes.\n");
 	    }
 	    else {
-	      if (d != 2)
+	      if (d != 2) {
 		vital_defenses[(*num_vital_defenses)++] = move;
-	      d = 1;
+		d = 1;
+	      }
+	      if (sgf_dumptree)
+		sgftreeAddComment(sgf_dumptree,
+				  "Ko threat to make one eye.\n");
 	    }
 	  }
 	  popgo();
 	}
       }
       set_eyevalue(result, 0, 0, 0, d);
+      if (sgf_dumptree) {
+	if (d == 0)
+	  sgftreeAddComment(sgf_dumptree, "Eyevalue 0000.\n");
+	else if (d == 1)
+	  sgftreeAddComment(sgf_dumptree, "Eyevalue 0001.\n");
+	else
+	  sgftreeAddComment(sgf_dumptree, "Eyevalue 0002.\n");
+      }
     }
   }
+}
+
+/* Add small invincible black groups in contact with the marginal
+ * vertices, without destroying the connectivity of the white stones.
+ *
+ */
+static int
+add_margins(int num_margins, int *margins, int mx[BOARDMAX])
+{
+  int k;
+  int i, j;
+  int old_mx[BOARDMAX];
+  int pos;
+
+  if (num_margins == 0)
+    return 1;
+  
+  memcpy(old_mx, mx, sizeof(old_mx));
+  
+  pos = margins[num_margins - 1];
+
+  for (k = 0; k < 4; k++) {
+    int up = delta[k];
+    int right = delta[(k + 1) % 4];
+    
+    if (!ON_BOARD(pos + up))
+      continue;
+    
+    if (mx[pos + up] == WHITE
+	&& (!ON_BOARD(pos + up + right) || mx[pos + up + right] == WHITE)
+	&& (!ON_BOARD(pos + up - right) || mx[pos + up - right] == WHITE)) {
+      for (i = -3; i <= 0; i++) {
+	for (j = 2; j < 6; j++) {
+	  if (white_area(mx, pos + j * up + i * right, up, right, pos, j)) {
+	    int s = 1;
+	    while (mx[pos + s * up] == WHITE) {
+	      mx[pos + s * up] = BLACK;
+	      s++;
+	    }
+	    if (add_margins(num_margins - 1, margins, mx))
+	      return 1;
+	    else
+	      memcpy(mx, old_mx, sizeof(old_mx));
+	  }
+	}
+      }
+    }
+  }
+
+  return 0;
 }
 
 /* Analyze an eye graph to determine the eye value and vital moves.
@@ -3039,7 +3351,6 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
 		 char *analyzed_eyegraph)
 {
   int k;
-  int r;
   int i, j;
   int mini, minj;
   int mx[BOARDMAX];
@@ -3054,6 +3365,8 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
   int maxwidth;
   int current_width;
   int num_rows;
+  int horizontal_edge;
+  int vertical_edge;
 
   int num_margins;
   int margins[BOARDMAX]; /* Way larger than necessary. */
@@ -3063,6 +3376,9 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
 
   int table_size;
   unsigned char *tactical_life_results;
+
+  if (0)
+    gprintf("Analyze eyegraph %s\n", coded_eyegraph);
   
   /* Mark the eyespace in the mx array. We construct the position in
    * the mx array and copy it to the actual board later.
@@ -3071,36 +3387,30 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
     if (ON_BOARD(pos))
       mx[pos] = WHITE;
 
-  /* Add an invincible black group in the lower left plus two outer
-   * liberties for the white string.
-   */
-  pos = POS(board_size - 1, 0);
-  mx[pos] = EMPTY;
-  mx[NORTH(pos)] = BLACK;
-  mx[NORTH(NORTH(pos))] = BLACK;
-  mx[EAST(pos)] = BLACK;
-  mx[EAST(NORTH(pos))] = EMPTY;
-  mx[EAST(NORTH(NORTH(pos)))] = BLACK;
-  mx[EAST(EAST(pos))] = BLACK;
-  mx[EAST(EAST(NORTH(pos)))] = BLACK;
-  mx[EAST(EAST(NORTH(NORTH(pos))))] = EMPTY;
-  mx[NORTH(NORTH(NORTH(pos)))] = EMPTY;
-
   /* Find out the size of the eye graph pattern so that we can center
    * it properly.
    */
   maxwidth = 0;
   current_width = 0;
   num_rows = 1;
+  horizontal_edge = -1;
+  vertical_edge = -1;
   for (k = 0; k < (int) strlen(coded_eyegraph); k++) {
+    if (coded_eyegraph[k] == '\n')
+      continue;
     if (coded_eyegraph[k] == '%') {
       num_rows++;
       if (current_width > maxwidth)
 	maxwidth = current_width;
       current_width = 0;
     }
-    else
+    else {
+      if (coded_eyegraph[k] == '-')
+	horizontal_edge = num_rows - 1;
+      else if (coded_eyegraph[k] == '|')
+	vertical_edge = current_width;
       current_width++;
+    }
   }
   if (current_width > maxwidth)
     maxwidth = current_width;
@@ -3108,12 +3418,27 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
   /* Cut out the eyespace from the solid white string. */
   num_margins = 0;
   num_vertices = 0;
-  mini = (board_size - num_rows) / 2 - 1;
-  minj = (board_size - maxwidth) / 2 - 1;
+  
+  if (horizontal_edge == 0)
+    mini = -1;
+  else if (horizontal_edge > 0)
+    mini = board_size - num_rows + 1;
+  else
+    mini = (board_size - num_rows) / 2;
+
+  if (vertical_edge == 0)
+    minj = -1;
+  else if (vertical_edge > 0)
+    minj = board_size - maxwidth + 1;
+  else
+    minj = (board_size - maxwidth) / 2;
+  
   i = mini;
   j = minj;
   for (k = 0; k < (int) strlen(coded_eyegraph); k++) {
     char c = coded_eyegraph[k];
+    if (c == '\n')
+      continue;
     if (c == '%') {
       i++;
       j = minj - 1;
@@ -3123,53 +3448,55 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
     else if (c == '.' || c == '*' || c == '<' || c == '>'
 	     || c == '!' || c == '@' || c == '(' || c == ')')
       mx[POS(i, j)] = EMPTY;
-    if (c == '!' || c == '@' || c == '(' || c == ')')
+    if (c == '!' || c == '@' || c == '(' || c == ')' || c == '$')
       margins[num_margins++] = POS(i, j);
-    if (mx[POS(i, j)] != WHITE)
+    if (c != '|' && c != '-' && c != '+' && c != '%'
+	&& ON_BOARD(POS(i, j)) && mx[POS(i, j)] != WHITE)
       vertices[num_vertices++] = POS(i, j);
     j++;
   }
 
-  /* Add the two outer liberties in the lower left to the list of
-   * vertices.
+  /* Add an invincible black group in the lower left plus two outer
+   * liberties for the white string. However, if the eyespace is
+   * placed in or near the lower left corner, we put this group in the
+   * upper right instead.
    */
-  vertices[num_vertices++] = POS(board_size - 3, 2);
-  vertices[num_vertices++] = POS(board_size - 4, 0);
+  pos = POS(board_size - 2, 1);
+  if ((vertical_edge == 0 && horizontal_edge != 0)
+      || (horizontal_edge > 0 && vertical_edge <= 0))
+    pos = POS(1, board_size - 2);
+  mx[pos] = EMPTY;
+  mx[NORTH(pos)] = BLACK;
+  mx[NW(pos)] = BLACK;
+  mx[NE(pos)] = EMPTY;
+  mx[WEST(pos)] = BLACK;
+  mx[EAST(pos)] = BLACK;
+  mx[SW(pos)] = EMPTY;
+  mx[SOUTH(pos)] = BLACK;
+  mx[SE(pos)] = BLACK;
+  if (ON_BOARD(NN(pos)))
+    mx[NN(pos)] = EMPTY;
+  else
+    mx[SS(pos)] = EMPTY;
+
+  /* Add the two outer liberties in the lower left or upper right to
+   * the list of vertices.
+   */
+  if (ON_BOARD(NN(pos))) {
+    vertices[num_vertices++] = NE(pos);
+    vertices[num_vertices++] = NN(pos);
+  }
+  else {
+    vertices[num_vertices++] = SW(pos);
+    vertices[num_vertices++] = SS(pos);
+  }
 
   /* Add an extra eye in the upper left corner. */
   mx[POS(0, 0)] = EMPTY;
   vertices[num_vertices++] = POS(0, 0);
 
-  /* Add small invincible black groups in contact with the marginal
-   * vertices, without destroying the connectivity of the white stones.
-   *
-   * FIXME: This algorithm is somewhat crude and may fail to add all
-   * black groups if unlucky.
-   */
-  for (r = 0; r < num_margins; r++) {
-    int up, right;
-    pos = margins[r];
-    for (k = 0; k < 4; k++) {
-      up = delta[k];
-      right = delta[(k + 1) % 4];
-      if (mx[pos + up] == WHITE
-	  && mx[pos + up + right] == WHITE
-	  && mx[pos + up - right] == WHITE) {
-	if (white_area(mx, pos + 4 * up + right)
-	    || white_area(mx, pos + 4 * up)
-	    || white_area(mx, pos + 4 * up - right)) {
-	  int s = 1;
-	  while (mx[pos + s * up] == WHITE) {
-	    mx[pos + s * up] = BLACK;
-	    s++;
-	  }
-	  break;
-	}
-      }
-    }
-    if (k == 4)
-      return 0;
-  }
+  if (!add_margins(num_margins, margins, mx))
+    return 0;
 
   /* Copy the mx array over to the board. */
   clear_board();
@@ -3184,6 +3511,26 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
   if (verbose)
     showboard(0);
 
+  /* If there are any isolated O stones, those should also be added to
+   * the playable vertices.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (board[pos] == WHITE && !same_string(pos, POS(1, 0))) {
+      vertices[num_vertices] = vertices[num_vertices - 1];
+      vertices[num_vertices - 1] = vertices[num_vertices - 2];
+      vertices[num_vertices - 2] = vertices[num_vertices - 3];
+      vertices[num_vertices - 3] = pos;
+      num_vertices++;
+    }
+
+  if (verbose) {
+    int k;
+    gprintf("\nPlayable vertices:\n");
+    for (k = 0; k < num_vertices; k++)
+      gprintf("%1m ", vertices[k]);
+    gprintf("\n\n");
+  }
+  
   /* Disable this test if you need to evaluate larger eyespaces, have
    * no shortage of memory, and know what you're doing.
    */
@@ -3193,8 +3540,8 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
     gg_assert(num_vertices <= 17);
   }
 
-  /* The cache must have 3^num_vertices entries. */
-  table_size = 1;
+  /* The cache must have 2*3^num_vertices entries. */
+  table_size = 2;
   for (k = 0; k < num_vertices; k++)
     table_size *= 3;
 
@@ -3206,10 +3553,14 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
   }
   memset(tactical_life_results, 0, table_size);
 
+  if (sgf_dumptree)
+    sgffile_printboard(sgf_dumptree);
+  
   /* Evaluate the eyespace on the board. */
   evaluate_eyespace(value, num_vertices, vertices,
 		    &num_vital_attacks, vital_attacks,
-		    &num_vital_defenses, vital_defenses, tactical_life_results);
+		    &num_vital_defenses, vital_defenses,
+		    tactical_life_results);
 
   /* Return the cache memory. */
   free(tactical_life_results);
@@ -3251,8 +3602,16 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
    */
   k = 0;
   for (i = mini; i < mini + num_rows; i++) {
-    for (j = minj; j < minj + maxwidth; j++)
-      analyzed_eyegraph[k++] = mg[POS(i, j)];
+    for (j = minj; j < minj + maxwidth; j++) {
+      if ((i < 0 || i >= board_size) && (j < 0 || j >= board_size))
+	analyzed_eyegraph[k++] = '+';
+      else if (i < 0 || i >= board_size)
+	analyzed_eyegraph[k++] = '-';
+      else if (j < 0 || j >= board_size)
+	analyzed_eyegraph[k++] = '|';
+      else
+	analyzed_eyegraph[k++] = mg[POS(i, j)];
+    }
     analyzed_eyegraph[k++] = '\n';
   }
   analyzed_eyegraph[k - 1] = 0;
