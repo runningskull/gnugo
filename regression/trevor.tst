@@ -450,3 +450,29 @@ loadsgf games/trevor/trevor_42.sgf 211
 loadsgf games/trevor/trevor_42.sgf 191
 421 gg_genmove black
 #? [!C2]*
+
+
+#CATEGORY=owl_tuning
+#DESCRIPTION=Very simple problem.
+#SEVERITY=10
+loadsgf games/trevor/trevor_43.sgf
+430 owl_attack F4
+#? [G4]*
+
+#CATEGORY=owl_tuning
+#DESCRIPTION=Simple double atari
+#SEVERITY=4
+#Note that owl_attack on E3 works, as these stones are treated
+#as separate dragons.  Strange.  Is this a valid test?
+#So, gg_genmove defends appropriately.
+loadsgf games/trevor/trevor_44.sgf
+440 owl_attack E6
+#? [F4]*
+
+#CATEGORY=owl_tuning
+#DESCRIPTION=Double-threat to eye-space missed.
+#SEVERITY=10
+loadsgf games/trevor/trevor_45.sgf
+450 owl_attack E4
+#? [D4]*
+

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I../interface
+#!/usr/bin/perl
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # This program is distributed with GNU GO, a Go program.        #
@@ -40,6 +40,9 @@ use IPC::Open2;
 use IPC::Open3;
 use Getopt::Long;
 use FileHandle;
+
+use FindBin;
+use lib "$FindBin::Bin/../interface";
 
 use GoImage::Stone;
 
