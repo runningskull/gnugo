@@ -534,10 +534,7 @@ find_large_scale_owl_attack_moves(int color)
                   
                   if ((acode >= DRAGON2(target).owl_attack_code) &&
 		      (acode == WIN)) {
-                    if (acode == GAIN)
-                      add_gain_move(pos, target, kworm);
-                    else
-                      add_owl_attack_move(pos, target, kworm, acode);
+		    add_owl_attack_move(pos, target, kworm, acode);
                     if (debug & DEBUG_LARGE_SCALE)
 		      gprintf("Move at %1m owl-attacks %1m on a large scale(%r).\n", 
 			      pos, target, acode);
