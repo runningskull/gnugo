@@ -110,6 +110,22 @@ AC_C_CONST
 AC_CHECK_HEADERS(unistd.h sys/time.h sys/times.h)
 AC_CHECK_HEADERS(curses.h term.h ncurses/curses.h ncurses/term.h)
 
+if test "$ac_cv_header_curses_h" = "yes";then
+   curses_header="curses.h"
+elif test "$ac_cv_header_ncurses_curses_h" = "yes";then
+   curses_header="ncurses/curses.h"
+else
+   curses_header="no"
+fi
+
+if test "$ac_cv_header_term_h" = "yes";then
+   term_header="term.h"
+elif test "$ac_cv_header_ncurses_term_h" = "yes";then
+   term_header="ncurses/term.h"
+else
+   term_header="no"
+fi
+
 AC_PATH_PROG(perl, perl)
 
 AC_CHECK_SIZEOF(int)
@@ -185,7 +201,7 @@ AH_TEMPLATE([CURSES],
 AH_TEMPLATE([HAVE_CURSES_ARROWS],
 [Define if the curses headers defines  KEY_{UP,DOWN,LEFT,RIGHT}])
 
-if test "$ac_cv_header_curses_h" = "yes" -a "$ac_cv_mingw32" = "no";then
+if test "$curses_header" != "no";then
   AC_SEARCH_LIBS(initscr,ncurses curses pdcurses termcap terminfo termlib)
   if test "$ac_cv_search_initscr" != "no";then
     AC_DEFINE(CURSES)
@@ -193,7 +209,7 @@ if test "$ac_cv_header_curses_h" = "yes" -a "$ac_cv_mingw32" = "no";then
     AC_CACHE_CHECK(
 	[for KEY_UP],
 	gnugo_cv_decl_key_up,
-	AC_TRY_COMPILE([#include <curses.h>],
+	AC_TRY_COMPILE([#include <$curses_header>],
 		[int c=KEY_UP],
 		gnugo_cv_decl_key_up="yes",
 		gnugo_cv_decl_key_up="no")
@@ -223,7 +239,7 @@ if test "$with_curses" != no -a "$enable_color" != no ; then
   dnl make sure that both curses.h and term.h are available
   dnl FIXME PRE3.0: better to actually figure out here what headers
   dnl are really required
-  if test "$ac_cv_header_term_h$ac_cv_header_curses_h" = "yesyes" ; then
+  if test "$term_header" != "no" -a "$curses_header" != "no" ; then
 
     dnl check for a working termcap library
     AC_SEARCH_LIBS(tparm,ncurses curses pdcurses termcap terminfo termlib)

@@ -61,6 +61,7 @@ void gg_snprintf(char *dest, unsigned long len, const char *fmt, ...);
 
 int gg_gettimeofday2(struct timeval *tv, void *p);
 double gg_gettimeofday(void);
+double gg_cputime(void);
 
 const char *gg_version(void);
 

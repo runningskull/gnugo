@@ -266,27 +266,30 @@ gg_version(void) {
   return VERSION;
 }
 
-/* return cputime used in mili secs */
+/* return cputime used in secs */
 
-int gg_cputime(void)
+double gg_cputime(void)
 {
 #if HAVE_SYS_TIMES_H && HAVE_TIMES
     struct tms t;
-    times(&t);
-    return t.tms_utime + t.tms_stime + t.tms_cutime + t.tms_cstime;
+    return times(&t) / ((double) CLOCKS_PER_SEC);
 #elif defined(WIN32)
     FILETIME creationTime, exitTime, kernelTime, userTime;
     ULARGE_INTEGER uKernelTime,uUserTime,uElapsedTime;
     unsigned long ulElapsedTime;
-    GetProcessTimes(GetCurrentProcess(), &creationTime, &exitTime, &kernelTime, &userTime);
+    GetProcessTimes(GetCurrentProcess(), &creationTime, &exitTime,
+                    &kernelTime, &userTime);
     uKernelTime.LowPart = kernelTime.dwLowDateTime;
     uKernelTime.HighPart = kernelTime.dwHighDateTime;
     uUserTime.LowPart = userTime.dwLowDateTime;
     uUserTime.HighPart = userTime.dwHighDateTime;
     uElapsedTime.QuadPart = uKernelTime.QuadPart + uUserTime.QuadPart;
-    ulElapsedTime = (unsigned long)(uElapsedTime.QuadPart / 10000); /* convert to milliseconds: */
     /*_ASSERTE(0 && "Debug Times");*/
-    return ulElapsedTime;
+    /* convert from multiples of 100nanosecs to seconds: */
+    return uElapsedTime.QuadPart * 1.e-7;
+#else
+    /* return wall clock seconds */
+    return gg_gettimeofday();
 #endif
 }
 
