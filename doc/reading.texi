@@ -827,7 +827,7 @@ We recommend studying this example by examining the variation file
 produced by the command:
 
 @example
-  gnugo -l tripod9.sgf --decidedragon C3 -o vars.sgf
+  gnugo -l tripod9.sgf --decide-dragon C3 -o vars.sgf
 @end example
 
 In the lower left hand corner, there are kos at A2 and B4.
