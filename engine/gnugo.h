@@ -460,6 +460,7 @@ void decide_semeai(int apos, int bpos, const char *sgf_output);
 void decide_tactical_semeai(int apos, int bpos, const char *sgf_output);
 void decide_position(int color, const char *sgf_output);
 void decide_eye(int pos, const char *sgf_output);
+void decide_combination(int color, const char *sgf_output);
 
 
 #endif  /* _GNUGO_H_ */

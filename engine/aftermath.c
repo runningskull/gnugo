@@ -528,7 +528,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	|| (DRAGON2(bb).safety != INVINCIBLE
 	    && DRAGON2(bb).safety != STRONGLY_ALIVE
 	    && owl_does_defend(move, bb) != WIN)
-	|| (!confirm_safety(move, color, 0, NULL))) {
+	|| (!confirm_safety(move, color, 0, NULL, NULL, NULL))) {
       score[move] = 0;
     }
     else {

@@ -15,6 +15,7 @@ EXTRA_DIST = $(DSP)\
 	attack.db\
 	defense.db\
 	endgame.db\
+	aa_attackpats.db\
 	owl_attackpats.db\
 	owl_vital_apats.db\
 	owl_defendpats.db\
@@ -56,7 +57,8 @@ extract_fuseki_INCLUDES = -I$(top_srcdir)/sgf
 noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h
 
 GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
-                 influence.c barriers.c endgame.c owl_attackpat.c\
+                 influence.c barriers.c endgame.c aa_attackpat.c\
+                 owl_attackpat.c\
 		 owl_vital_apat.c owl_defendpat.c fusekipat.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c
 
@@ -118,6 +120,9 @@ influence.c : $(srcdir)/influence.db mkpat$(EXEEXT)
 
 barriers.c : $(srcdir)/barriers.db mkpat$(EXEEXT)
 	./mkpat -c -b barrierspat < $(srcdir)/barriers.db >barriers.c
+
+aa_attackpat.c : $(srcdir)/aa_attackpats.db mkpat$(EXEEXT)
+	./mkpat $(DFAFLAGS) -b aa_attackpat < $(srcdir)/aa_attackpats.db >aa_attackpat.c
 
 owl_attackpat.c : $(srcdir)/owl_attackpats.db mkpat$(EXEEXT)
 	./mkpat $(DFAFLAGS) -b owl_attackpat < $(srcdir)/owl_attackpats.db >owl_attackpat.c

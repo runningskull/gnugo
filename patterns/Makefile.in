@@ -80,7 +80,7 @@ EXTRA_PROGRAMS = transpat
 
 DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
 
-EXTRA_DIST = $(DSP) 	dfa.c 	hoshi.sgf 	komoku.sgf 	mokuhazushi.sgf 	sansan.sgf 	takamoku.sgf 	patterns.db 	patterns2.db 	attack.db 	defense.db 	endgame.db 	owl_attackpats.db 	owl_vital_apats.db 	owl_defendpats.db 	eyes.db 	conn.db 	influence.db 	barriers.db 	fuseki.db 	fuseki9.db 	fuseki13.db 	fuseki19.db
+EXTRA_DIST = $(DSP) 	dfa.c 	hoshi.sgf 	komoku.sgf 	mokuhazushi.sgf 	sansan.sgf 	takamoku.sgf 	patterns.db 	patterns2.db 	attack.db 	defense.db 	endgame.db 	aa_attackpats.db 	owl_attackpats.db 	owl_vital_apats.db 	owl_defendpats.db 	eyes.db 	conn.db 	influence.db 	barriers.db 	fuseki.db 	fuseki9.db 	fuseki13.db 	fuseki19.db
 
 
 mkpat_SOURCES = mkpat.c transform.c
@@ -103,7 +103,7 @@ extract_fuseki_INCLUDES = -I$(top_srcdir)/sgf
 
 noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h
 
-GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c                  influence.c barriers.c endgame.c owl_attackpat.c 		 owl_vital_apat.c owl_defendpat.c fusekipat.c                  fuseki9.c fuseki13.c fuseki19.c josekidb.c
+GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c                  influence.c barriers.c endgame.c aa_attackpat.c                  owl_attackpat.c 		 owl_vital_apat.c owl_defendpat.c fusekipat.c                  fuseki9.c fuseki13.c fuseki19.c josekidb.c
 
 
 DBBUILT = hoshi.db komoku.db sansan.db mokuhazushi.db takamoku.db
@@ -131,8 +131,8 @@ LIBS = @LIBS@
 libpatterns_a_LIBADD = 
 libpatterns_a_OBJECTS =  connections.o helpers.o conn.o patterns.o \
 apatterns.o dpatterns.o eyes.o influence.o barriers.o endgame.o \
-owl_attackpat.o owl_vital_apat.o owl_defendpat.o fusekipat.o fuseki9.o \
-fuseki13.o fuseki19.o josekidb.o
+aa_attackpat.o owl_attackpat.o owl_vital_apat.o owl_defendpat.o \
+fusekipat.o fuseki9.o fuseki13.o fuseki19.o josekidb.o
 libdfa_a_LIBADD = 
 libdfa_a_OBJECTS =  dfa.o transform.o
 AR = ar
@@ -172,13 +172,14 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/apatterns.P .deps/barriers.P .deps/conn.P \
-.deps/connections.P .deps/dfa.P .deps/dpatterns.P .deps/endgame.P \
-.deps/extract_fuseki.P .deps/eyes.P .deps/fuseki13.P .deps/fuseki19.P \
-.deps/fuseki9.P .deps/fusekipat.P .deps/helpers.P .deps/influence.P \
-.deps/joseki.P .deps/josekidb.P .deps/mkeyes.P .deps/mkpat.P \
-.deps/owl_attackpat.P .deps/owl_defendpat.P .deps/owl_vital_apat.P \
-.deps/patlib.P .deps/patterns.P .deps/transform.P .deps/transpat.P
+DEP_FILES =  .deps/aa_attackpat.P .deps/apatterns.P .deps/barriers.P \
+.deps/conn.P .deps/connections.P .deps/dfa.P .deps/dpatterns.P \
+.deps/endgame.P .deps/extract_fuseki.P .deps/eyes.P .deps/fuseki13.P \
+.deps/fuseki19.P .deps/fuseki9.P .deps/fusekipat.P .deps/helpers.P \
+.deps/influence.P .deps/joseki.P .deps/josekidb.P .deps/mkeyes.P \
+.deps/mkpat.P .deps/owl_attackpat.P .deps/owl_defendpat.P \
+.deps/owl_vital_apat.P .deps/patlib.P .deps/patterns.P \
+.deps/transform.P .deps/transpat.P
 SOURCES = $(libpatterns_a_SOURCES) $(libdfa_a_SOURCES) $(transpat_SOURCES) $(mkpat_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) $(extract_fuseki_SOURCES)
 OBJECTS = $(libpatterns_a_OBJECTS) $(libdfa_a_OBJECTS) $(transpat_OBJECTS) $(mkpat_OBJECTS) $(joseki_OBJECTS) $(mkeyes_OBJECTS) $(extract_fuseki_OBJECTS)
 
@@ -462,6 +463,9 @@ influence.c : $(srcdir)/influence.db mkpat$(EXEEXT)
 
 barriers.c : $(srcdir)/barriers.db mkpat$(EXEEXT)
 	./mkpat -c -b barrierspat < $(srcdir)/barriers.db >barriers.c
+
+aa_attackpat.c : $(srcdir)/aa_attackpats.db mkpat$(EXEEXT)
+	./mkpat $(DFAFLAGS) -b aa_attackpat < $(srcdir)/aa_attackpats.db >aa_attackpat.c
 
 owl_attackpat.c : $(srcdir)/owl_attackpats.db mkpat$(EXEEXT)
 	./mkpat $(DFAFLAGS) -b owl_attackpat < $(srcdir)/owl_attackpats.db >owl_attackpat.c

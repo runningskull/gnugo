@@ -96,6 +96,7 @@ prepare_pattern_profiling()
   clear_profile(conn_db.patterns);
   clear_profile(influencepat_db.patterns);
   clear_profile(barrierspat_db.patterns);
+  clear_profile(aa_attackpat_db.patterns);
   clear_profile(owl_attackpat_db.patterns);
   clear_profile(owl_vital_apat_db.patterns);
   clear_profile(owl_defendpat_db.patterns);
@@ -125,6 +126,7 @@ report_pattern_profiling()
   print_profile(conn_db.patterns, &hits, &nodes, &dfa_hits);
   print_profile(influencepat_db.patterns, &hits, &nodes, &dfa_hits);
   print_profile(barrierspat_db.patterns, &hits, &nodes, &dfa_hits);
+  print_profile(aa_attackpat_db.patterns, &hits, &nodes, &dfa_hits);
   print_profile(owl_attackpat_db.patterns, &hits, &nodes, &dfa_hits);
   print_profile(owl_vital_apat_db.patterns, &hits, &nodes, &dfa_hits);
   print_profile(owl_defendpat_db.patterns, &hits, &nodes, &dfa_hits);

@@ -2,6 +2,22 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- confirm_safety() takes two new parameters telling which stones were
+  supposedly saved by this move
+- atari_atari_confirm_safety() revised
+- compute_aa_status() revised
+- new function is_vital_string() in combinations.c to keep track of
+  stones which may not be sacrificed in a combination attack
+- generation of attack moves in do_atari_atari uses patterns
+- new pattern database pattern/aa_attackpats.db
+- atari_atari_find_defense_moves() improved
+- new functions get_saved_worms() and get_saved_dragons() in
+  move_reasons.c
+- new function move_reasons_confirm_safety()
+- examine_move_safety() revised
+- new function decide_combination() in sgfdecide.c
+- new option --decide-combination
+- new gtp command aa_confirm_safety
 - bugfix in trymove()
 - 1D revisions and cleaning up
 - new file: engine/movelist.c

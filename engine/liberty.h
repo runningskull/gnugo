@@ -272,7 +272,8 @@ int stones_on_board(int color);
 int obvious_false_eye(int pos, int color);
 int owl_topological_eye(int pos, int color);
 int vital_chain(int pos);
-int confirm_safety(int move, int color, int size, int *defense_point);
+int confirm_safety(int move, int color, int size, int *defense_point,
+		   int saved_dragons[BOARDMAX], int saved_worms[BOARDMAX]);
 void set_depth_values(int level);
 void modify_depth_values(int n);
 void increase_depth_values(void);
@@ -310,8 +311,6 @@ void add_defense_move(int pos, int ww, int code);
 void add_attack_threat_move(int pos, int ww, int code);
 void remove_attack_threat_move(int pos, int ww);
 void add_defense_threat_move(int pos, int ww, int code);
-int  get_attack_threats(int pos, int max_strings, int strings[]);
-int  get_defense_threats(int pos, int max_strings, int strings[]);
 void add_connection_move(int pos, int dr1, int dr2);
 void add_cut_move(int pos, int dr1, int dr2);
 void add_antisuji_move(int pos);
@@ -345,6 +344,12 @@ void set_maximum_territorial_value(int pos, float value);
 void add_shape_value(int pos, float value);
 void add_followup_value(int pos, float value);
 void add_reverse_followup_value(int pos, float value);
+
+int get_attack_threats(int pos, int max_strings, int strings[]);
+int get_defense_threats(int pos, int max_strings, int strings[]);
+void get_saved_worms(int pos, int saved[BOARDMAX]);
+void get_saved_dragons(int pos, int saved[BOARDMAX]);
+
 
 int owl_lively(int pos);
 int owl_escape_value(int pos);
@@ -380,9 +385,11 @@ void shapes(int color);
 void endgame_shapes(int color);
 
 void combinations(int color);
-int atari_atari(int color, int *move, int save_verbose);
+int atari_atari(int color, int *attack_move, int *defense_move,
+		int save_verbose);
 int atari_atari_confirm_safety(int color, int tpos, int *move,
-			       int minsize);
+			       int minsize, int saved_dragons[BOARDMAX],
+			       int saved_worms[BOARDMAX]);
 int atari_atari_try_combination(int color, int apos, int bpos);
 
 int review_move_reasons(int *move, float *val, int color,

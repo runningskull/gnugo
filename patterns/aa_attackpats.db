@@ -1,0 +1,167 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 2000, 2001 by the Free Software Foundation.         #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  The atari_atari attack pattern database.
+#
+#  Further documentation may be found in the Texinfo documentation.
+#
+#  First there is a pattern title of the form: Pattern [string]. The
+#  string is used for identifying the pattern while tuning or debugging.
+#
+#  Then a block of the following characters representing the pattern
+#  itself.
+#  
+#  ?     : don't care
+#  .     : empty
+#  X     : your piece,
+#  O     : my piece,
+#  x     : your piece or empty
+#  o     : my piece or empty
+#  *     : my next move
+#  -, |  : edge of board
+#  +     : corner of board
+#
+#  If a pattern must not match at the edge of the board,
+#  an extra row of ?'s in the pattern may be added. (This
+#  will not add to the time taken to check the pattern.)
+#
+#################
+#
+#  In the second field (classification) the following pattern attributes
+#  are possible. Friendly stones are 'O', opponent stones are 'X'.
+# 
+# s  :  "Sacrifice" pattern. Allow sacrifice through self atari.
+# 
+#########################################################
+#                                                       #
+#          Limiting moves on the fourth line            #
+#                                                       #
+#########################################################
+
+
+Pattern A1
+
+X*
+
+:-,-
+
+A*
+
+;lib(A) == 2
+
+
+Pattern A2
+
+xXOXx
+..X*.
+.....
+-----
+
+:8,-
+
+
+Pattern A3
+
+OX
+X*
+X.
+xx
+--
+
+:8,-
+
+
+Pattern A4
+
+?X
+O*
+X.
+xx
+--
+
+:8,-
+
+
+Pattern A5
+
+?O?
+X*X
+...
+---
+
+:|,-
+
+
+# Pattern A6
+# 
+# *.X
+# oXO
+# 
+# :8,-
+# 
+# *.X
+# oXO
+# 
+# ;olib(*)>3
+
+
+Pattern A7
+
+X.X      reduce eyespace
+X*X
+OXO
+
+:|,s
+
+
+# Pattern A8
+# 
+# O..
+# ?X*
+# ??O
+# 
+# :8,-
+
+
+Pattern A9
+
+X*
+OX
+
+:/,-
+
+X*
+OX
+
+;safe_omove(*)
+
+
+Pattern A10
+
+?X?
+XOX
+.*.
+
+:|,-
+
+
+# END OF FILE

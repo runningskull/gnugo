@@ -68,6 +68,7 @@ static int move_stack_pointer = 0;
 
 #define DECLARE(func) static int func(char *s, int id)
 
+DECLARE(gtp_aa_confirm_safety);
 DECLARE(gtp_all_legal);
 DECLARE(gtp_attack);
 DECLARE(gtp_combination_attack);
@@ -147,6 +148,7 @@ DECLARE(gtp_worm_stones);
 
 /* List of known commands. */
 static struct gtp_command commands[] = {
+  {"aa_confirm_safety",       gtp_aa_confirm_safety},
   {"all_legal",        	      gtp_all_legal},
   {"attack",           	      gtp_attack},
   {"black",            	      gtp_playblack},
@@ -1367,7 +1369,7 @@ static int
 gtp_combination_attack(char *s, int id)
 {
   int color;
-  int pos;
+  int attack_point;
   int n;
 
   n = gtp_decode_color(s, &color);
@@ -1376,11 +1378,51 @@ gtp_combination_attack(char *s, int id)
 
   silent_examine_position(BLACK, EXAMINE_ALL);
 
-  if (!atari_atari(color, &pos, verbose))
-    pos = NO_MOVE;
+  if (!atari_atari(color, &attack_point, NULL, verbose))
+    attack_point = NO_MOVE;
   
   gtp_printid(id, GTP_SUCCESS);
-  gtp_print_vertex(I(pos), J(pos));
+  gtp_print_vertex(I(attack_point), J(attack_point));
+  return gtp_finish_response();
+}
+
+/* Function:  Run atari_atari_confirm_safety().
+ * Arguments: move, optional int
+ * Fails:     invalid move
+ * Returns:   success code, if failure also defending move
+ */
+
+static int
+gtp_aa_confirm_safety(char *s, int id)
+{
+  int color;
+  int i, j;
+  int n;
+  int minsize = 0;
+  int result;
+  int defense_point = NO_MOVE;
+  int saved_dragons[BOARDMAX];
+  int saved_worms[BOARDMAX];
+
+  n = gtp_decode_move(s, &color, &i, &j);
+  if (n == 0)
+    return gtp_failure(id, "invalid color or coordinate");
+
+  sscanf(s + n, "%d", &minsize);
+
+  genmove(NULL, NULL, color);
+  get_saved_dragons(POS(i, j), saved_dragons);
+  get_saved_worms(POS(i, j), saved_worms);
+  
+  result = atari_atari_confirm_safety(color, POS(i, j),
+				      &defense_point, minsize,
+				      saved_dragons, saved_worms);
+  
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_mprintf("%d", result);
+  if (result == 0)
+    gtp_mprintf(" %m", I(defense_point), J(defense_point));
+  
   return gtp_finish_response();
 }
 

@@ -1117,6 +1117,60 @@ add_replacement_move(int from, int to)
 }
 
 
+void
+get_saved_worms(int pos, int saved[BOARDMAX])
+{
+  int k;
+  memset(saved, 0, sizeof(saved[0]) * BOARDMAX);
+  
+  for (k = 0; k < MAX_REASONS; k++) {
+    int r = move[pos].reason[k];
+    int what;
+
+    if (r < 0)
+      break;
+    
+    what = move_reasons[r].what;
+    if (move_reasons[r].type == DEFEND_MOVE
+	|| move_reasons[r].type == DEFEND_MOVE_GOOD_KO
+	|| move_reasons[r].type == DEFEND_MOVE_BAD_KO) {
+      int origin = worm[worms[what]].origin;
+      int ii;
+      for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+	if (IS_STONE(board[ii]) && worm[ii].origin == origin)
+	  saved[ii] = 1;
+    }
+  }    
+}
+
+
+void
+get_saved_dragons(int pos, int saved[BOARDMAX])
+{
+  int k;
+  memset(saved, 0, sizeof(saved[0]) * BOARDMAX);
+  
+  for (k = 0; k < MAX_REASONS; k++) {
+    int r = move[pos].reason[k];
+    int what;
+
+    if (r < 0)
+      break;
+    
+    what = move_reasons[r].what;
+    if (move_reasons[r].type == OWL_DEFEND_MOVE
+	|| move_reasons[r].type == OWL_DEFEND_MOVE_GOOD_KO
+	|| move_reasons[r].type == OWL_DEFEND_MOVE_BAD_KO) {
+      int origin = dragon[dragons[what]].origin;
+      int ii;
+      for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+	if (IS_STONE(board[ii]) && dragon[ii].origin == origin)
+	  saved[ii] = 1;
+    }
+  }    
+}
+
+
 /* ---------------------------------------------------------------- */
 
 
@@ -1663,6 +1717,7 @@ examine_move_safety(int color)
 	case OWL_DEFEND_MOVE:
 	case OWL_DEFEND_MOVE_GOOD_KO:
 	case OWL_DEFEND_MOVE_BAD_KO:
+	case MY_ATARI_ATARI_MOVE:
 	  tactical_safety = 1;
 	  safety = 1;
 	  break;
@@ -2885,7 +2940,7 @@ estimate_territorial_value(int pos, int color, float score)
       break;
       
     case MY_ATARI_ATARI_MOVE:
-      this_value = 2 * move_reasons[r].what+3.;
+      this_value = 2 * move_reasons[r].what + 3.0;
       if (influence_territory_color(pos) == OTHER_COLOR(color))
 	does_block = 1;
       tot_value += this_value;
@@ -2894,9 +2949,9 @@ estimate_territorial_value(int pos, int color, float score)
       break;
       
     case YOUR_ATARI_ATARI_MOVE:
-      this_value = 2 * move_reasons[r].what+3.;
+      this_value = 2 * move_reasons[r].what + 3.0;
       if (influence_territory_color(pos) == color)
-	this_value += 7.;
+	this_value += 7.0;
       tot_value += this_value;
       TRACE("  %1m: %f - defends against combination attack on several worms\n",
 	    pos, this_value);
@@ -3442,6 +3497,22 @@ move_connects_strings(int pos, int color)
   return own_strings + fewlibs;
 }
 
+
+/* Find saved dragons and worms, then call confirm_safety(). */
+static int
+move_reasons_confirm_safety(int move, int color, int minsize)
+{
+  int saved_dragons[BOARDMAX];
+  int saved_worms[BOARDMAX];
+
+  get_saved_dragons(move, saved_dragons);
+  get_saved_worms(move, saved_worms);
+  
+  return confirm_safety(move, color, minsize, NULL,
+			saved_dragons, saved_worms);
+}
+
+
 /* Compare two move reasons, used for sorting before presentation. */
 static int
 compare_move_reasons(const void *p1, const void *p2)
@@ -3611,7 +3682,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
       && board[pos] == EMPTY
       && move[pos].additional_ko_value > 0.0
       && is_legal(pos, color)
-      && confirm_safety(pos, color, 0, NULL)) {
+      && move_reasons_confirm_safety(pos, color, 0)) {
     float new_tot_value = gg_min(pure_threat_value,
 				 tot_value
 				 + 0.25 * move[pos].additional_ko_value);
@@ -3914,8 +3985,8 @@ review_move_reasons(int *the_move, float *val, int color,
      * values once more.
      */
     else if (bestval > 0.0
-	     && !confirm_safety(best_move, 
-				color, allowed_blunder_size, NULL)) {
+	     && !move_reasons_confirm_safety(best_move, color,
+					     allowed_blunder_size)) {
       TRACE("Move at %1m would be a blunder.\n", best_move);
       move[best_move].value = 0.0;
       move[best_move].final_value = 0.0;

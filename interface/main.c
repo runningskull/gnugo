@@ -90,6 +90,7 @@ enum {OPT_BOARDSIZE=2,
       OPT_STANDARD_SEMEAI,
       OPT_DECIDE_POSITION,
       OPT_DECIDE_EYE,
+      OPT_DECIDE_COMBINATION,
       OPT_BRANCH_DEPTH,
       OPT_BACKFILL2_DEPTH,
       OPT_SUPERSTRING_DEPTH,
@@ -137,7 +138,8 @@ enum mode {
   MODE_DECIDE_SEMEAI,
   MODE_DECIDE_TACTICAL_SEMEAI,
   MODE_DECIDE_POSITION,
-  MODE_DECIDE_EYE
+  MODE_DECIDE_EYE,
+  MODE_DECIDE_COMBINATION
 };
 
 
@@ -211,6 +213,7 @@ static struct gg_option const long_options[] =
   {"decide-tactical-semeai", required_argument, 0, OPT_DECIDE_TACTICAL_SEMEAI},
   {"decide-position", no_argument,       0, OPT_DECIDE_POSITION},
   {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
+  {"decide-combination", no_argument,   0, OPT_DECIDE_COMBINATION},
   {"life",           no_argument,       0, OPT_LIFE},
   {"life-eyesize",   required_argument, 0, OPT_LIFE_EYESIZE},
   {"nofusekidb",     no_argument,       0, OPT_NOFUSEKIDB},
@@ -250,7 +253,7 @@ main(int argc, char *argv[])
   char *printsgffile = NULL;
   
   char decide_this[8];
-  char * decide_that = NULL;
+  char *decide_that = NULL;
   char debuginfluence_move[4] = "\0";
   
   int benchmark = 0;  /* benchmarking mode (-b) */
@@ -539,6 +542,10 @@ main(int argc, char *argv[])
 	playmode = MODE_DECIDE_EYE;
 	break;
 	
+      case OPT_DECIDE_COMBINATION:
+	playmode = MODE_DECIDE_COMBINATION;
+	break;
+	
       case OPT_BRANCH_DEPTH:
 	mandated_branch_depth = atoi(gg_optarg);
 	break;
@@ -757,7 +764,8 @@ main(int argc, char *argv[])
 	&& playmode != MODE_DECIDE_POSITION
 	&& playmode != MODE_DECIDE_SEMEAI
 	&& playmode != MODE_DECIDE_TACTICAL_SEMEAI
-	&& playmode != MODE_DECIDE_EYE)
+	&& playmode != MODE_DECIDE_EYE
+	&& playmode != MODE_DECIDE_COMBINATION)
       if (!sgffile_open_file(outfile)) {
 	fprintf(stderr, "Error: could not open '%s'\n", gg_optarg);
 	exit(EXIT_FAILURE);
@@ -973,6 +981,8 @@ main(int argc, char *argv[])
       }
       color = gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
       					untilstring, orientation);
+      if (mandated_color != EMPTY)
+	color = mandated_color;
       decide_position(color, outfile);
     }
     break;
@@ -1000,6 +1010,21 @@ main(int argc, char *argv[])
     }
     break;
   
+  case MODE_DECIDE_COMBINATION:
+    {
+      int color;
+      if (!infilename) {
+	fprintf(stderr, "gnugo: --decide-combination must be used with -l\n");
+	return (EXIT_FAILURE);
+      }
+      color = gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
+      					untilstring, orientation);
+      if (mandated_color != EMPTY)
+	color = mandated_color;
+      decide_combination(color, outfile);
+    }
+    break;
+    
   case MODE_GTP:  
     if (!sgftree.root)
       sgftreeCreateHeaderNode(&sgftree, boardsize, komi);
@@ -1216,6 +1241,7 @@ Debugging Options:\n\
        --decide-dragon <dragon>  can this dragon live? (try with -o or -t)\n\
        --decide-position         evaluate all dragons (try with -o or -t)\n\
        --decide-eye <string>     evaluate the eye\n\
+       --decide-combination      search for combination attack (try with -o)\n\
        --genmove <color>         generate a move for color\n\
        --life <eyesize>          use eye reading code\n\
        --nofusekidb              turn off fuseki database\n\

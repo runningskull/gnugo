@@ -720,13 +720,19 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
  * and it checks that no opposing worm which was not defendable
  * becomes defendable. Only worms with worm.size>size are checked.
  *
+ * The arrays saved_dragons[] and saved_worms[] should be one for
+ * stones belonging to dragons or worms respectively, which are
+ * supposedly saved by (move). These may be NULL if no stones are
+ * supposed to gaving been saved.
+ *
  * For use when called from fill_liberty, this function may optionally
  * return a point of defense, which, if taken, will presumably make
  * the move at (i, j) safe on a subsequent turn.
  */
 
 int
-confirm_safety(int move, int color, int size, int *defense_point)
+confirm_safety(int move, int color, int size, int *defense_point,
+	       int saved_dragons[BOARDMAX], int saved_worms[BOARDMAX])
 {
   int libs[5];
   int liberties = accurate_approxlib(move, color, 5, libs);
@@ -746,7 +752,8 @@ confirm_safety(int move, int color, int size, int *defense_point)
   if (verbose > 0)
     verbose--;
   
-  if (!atari_atari_confirm_safety(color, move, &apos, size)) {
+  if (!atari_atari_confirm_safety(color, move, &apos, size,
+				  saved_dragons, saved_worms)) {
     ASSERT_ON_BOARD1(apos);
     if (defense_point)
       *defense_point = apos;
@@ -765,7 +772,10 @@ confirm_safety(int move, int color, int size, int *defense_point)
     if (board[bpos] == color
 	&& liberties <= worm[bpos].liberties) {
       trouble = 1;
-      if (dragon[bpos].matcher_status == ALIVE
+      if ((dragon[bpos].matcher_status == ALIVE
+	   || (dragon[bpos].matcher_status == CRITICAL
+	       && saved_dragons != NULL
+	       && saved_dragons[bpos]))
 	  && DRAGON2(bpos).safety != INVINCIBLE
 	  && DRAGON2(bpos).safety != STRONGLY_ALIVE
 	  && dragon[bpos].size >= size

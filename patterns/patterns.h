@@ -292,6 +292,7 @@ int owl_threatens_attack(int apos, int bpos);
 /* pattern arrays themselves */
 extern struct pattern_db pat_db;
 extern struct pattern_db joseki_db;
+extern struct pattern_db aa_attackpat_db;
 extern struct pattern_db owl_attackpat_db;
 extern struct pattern_db owl_vital_apat_db;
 extern struct pattern_db owl_defendpat_db;

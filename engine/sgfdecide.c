@@ -528,6 +528,40 @@ decide_eye(int pos, const char *sgf_output)
 }
 
 
+/* 
+ * decide_connection tries to find a combination attack for (color) by
+ * calling atari_atari().
+ */
+
+void
+decide_combination(int color, const char *sgf_output)
+{
+  int attack_move;
+  int defense_move;
+  SGFTree tree;
+
+  /* Prepare pattern matcher and reading code. */
+  reset_engine();
+
+  silent_examine_position(color, EXAMINE_ALL);
+
+  if (sgf_output)
+    begin_sgftreedump(&tree);
+  count_variations = 1;
+
+  if (atari_atari(color, &attack_move, &defense_move, verbose))
+    gprintf("Combination attack for %C at %1m, defense at %1m\n", color,
+	    attack_move, defense_move);
+  else
+    gprintf("No Combination attack for %C\n", color);
+  
+  if (sgf_output) {
+    end_sgftreedump(sgf_output);
+    count_variations = 0;
+  }
+}
+
+
 /*
  * Local Variables:
  * tab-width: 8
