@@ -92,9 +92,10 @@ loadsgf games/incident153.sgf 205
 #? [1 F1]
 
 # incident 161
+# tm added C9 option to kill.
 loadsgf games/incident161.sgf 38
 26 owl_attack B8
-#? [1 (B7|C7|PASS)]
+#? [1 (B7|C7|C9|PASS)]
 27 owl_defend B8
 #? [0]
 

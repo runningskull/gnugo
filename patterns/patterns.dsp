@@ -518,7 +518,7 @@ InputPath=.\hoshi.db
 	copy hoshi.db + komoku.db + sansan.db + mokuhazushi.db + takamoku.db tmp.db 
 	$(IntDir)\mkpat -b joseki < tmp.db > josekidb.c 
 	del tmp.db 
-
+	
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
@@ -532,7 +532,7 @@ InputPath=.\hoshi.db
 	copy hoshi.db + komoku.db + sansan.db + mokuhazushi.db + takamoku.db tmp.db 
 	$(IntDir)\mkpat -b joseki < tmp.db > josekidb.c 
 	del tmp.db 
-
+	
 # End Custom Build
 
 !ENDIF 
@@ -551,7 +551,7 @@ InputPath=.\influence.db
 
 "influence.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\mkpat -c influencepat <influence.db >influence.c
-	
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
@@ -563,7 +563,7 @@ InputPath=.\influence.db
 
 "influence.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\mkpat -c influencepat <influence.db >influence.c
-	
+
 # End Custom Build
 
 !ENDIF 
@@ -595,7 +595,6 @@ InputPath=.\owl_attackpats.db
 "owl_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\mkpat -b owl_attackpat -i ..\patterns\owl_attackpats.db > owl_attackpat.c
 
-
 # End Custom Build
 
 !ENDIF 
@@ -613,7 +612,7 @@ IntDir=.\Release
 InputPath=.\owl_defendpats.db
 
 "owl_defendpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_defendpat -i owl_defendpats.db -o owl_defendpat.c
+	$(IntDir)\mkpat -b owl_defendpat -i ..\owl_defendpats.db -o ..\owl_defendpat.c
 
 # End Custom Build
 
@@ -625,7 +624,7 @@ IntDir=.\Debug
 InputPath=.\owl_defendpats.db
 
 "owl_defendpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_defendpat <owl_defendpats.db > owl_defendpat.c
+	$(IntDir)\mkpat -b owl_defendpat -i ..\patterns\owl_defendpats.db -o owl_defendpat.c
 
 # End Custom Build
 
@@ -656,7 +655,7 @@ IntDir=.\Debug
 InputPath=.\owl_vital_apats.db
 
 "owl_vital_apat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_vital_apat <owl_vital_apats.db > owl_vital_apat.c
+	$(IntDir)\mkpat -b owl_vital_apat -i ..\patterns\owl_vital_apats.db -o owl_vital_apat.c
 
 # End Custom Build
 

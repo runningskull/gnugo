@@ -2524,6 +2524,8 @@ static int
 gtp_echo_err(char *s, int id)
 {
   fprintf(stderr, "%s", s);
+  fflush(stdout);
+  fflush(stderr);
   return gtp_success(id, "%s", s);
 }
 

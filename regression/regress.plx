@@ -669,12 +669,24 @@ sub GTPtoSGF {
 
 
 sub printunexpected{
+    my (%breakage);
+    if (-e 'BREAKAGE.local') {
+      open (BF, 'BREAKAGE.local');
+      while (<BF>) {
+        if (my ($bfile, $bpf) = $_ =~ /^(\w+:\d+)\s+(FAILED|PASSED)/i) {
+          $breakage{lc $bfile} = $bpf;
+        }
+      }
+      close(BF);
+    }
+
+
     our $VAR1;
     do "html/one.perldata.new" or confess "can't do perldata";
     my %h = %{$VAR1->[0]};
 
-    my @fails;
-    my @passes; 
+    my @fails;  my @ufails;      
+    my @passes; my @upasses;     
 
     print "<HTML><HEAD><TITLE>Unexpected results - GNU Go</TITLE></HEAD>\n";
     print "<BODY><H4>Unexpected results</H4>";
@@ -683,19 +695,41 @@ sub printunexpected{
     print "<TR><TD><B>Problem</B></TD><TD><B>Status</B></TD>\n";
     foreach my $k (sort keys %h) {
       my $status = %{$h{$k}}->{status};
+      defined $status or do { warn "missing status for $k"; next;};
       if ($status eq 'FAILED') {
-        push @fails, $k;
+        unless (defined ($breakage{lc $k}) and $breakage{lc $k}eq 'FAILED') {
+          push @ufails, $k;
+        }
       } elsif ($status eq 'PASSED') {
+        unless (defined ($breakage{lc $k}) and $breakage{lc $k} eq 'PASSED') {
+          push @upasses, $k;
+        }
+      } elsif ($status eq 'passed') {
+        if (defined ($breakage{lc $k})) {
         push @passes, $k;
       }
+      } elsif ($status eq 'failed') {
+        if (defined ($breakage{lc $k})) {
+          push @fails, $k;
+        }
+    }
     }
     
-    foreach (@fails) {
+    foreach (@ufails) {
       print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>FAILED</TD>\n@;
     }
-    foreach (@passes) {
+
+    foreach (@upasses) {
       print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>PASSED</TD>\n@;
     }
+    foreach (@fails) {
+      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>failed</TD>\n@;
+    }
+
+    foreach (@passes) {
+      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>passed</TD>\n@;
+    }
+
     
     print "</TABLE>\n";
     print "</body></html>\n";

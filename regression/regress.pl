@@ -267,7 +267,7 @@ if (!$one_gg_process) {
   print "done waiting\n" if $verbose > 1;
 }
 
-readline(*STDIN);
+#readline(*STDIN);
 
 exit;
 
