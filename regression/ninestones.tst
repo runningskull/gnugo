@@ -171,11 +171,11 @@ loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 254
 # possible but the policy should be to play it out.
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 272
 560 gg_genmove black
-#? [A9|B10|C11|F11|J15|A16]*
+#? [A9|B10|D11|F11|J15|A16]*
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 274
 570 gg_genmove black
-#? [A9|B10|C11|F11|J15|A16]*
+#? [A9|B10|D11|F11|J15|A16]*
 
 # L3 just loses a point, as do K1 and H1.
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 300
@@ -197,7 +197,7 @@ loadsgf games/ninestones/ninestones1.sgf 34
 
 loadsgf games/ninestones/ninestones1.sgf 44
 615 gg_genmove black
-#? [K16]*
+#? [J16]*
 
 loadsgf games/ninestones/ninestones1.sgf 76
 620 gg_genmove black

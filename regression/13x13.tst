@@ -215,7 +215,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
 42 gg_genmove white
-#? [N3|N2|L4|L3|L2|L1|M1|N1|M3]*
+#? [N3|N2|L4|L3|L2|L1|M1|N1|M4]*
 
 #CATEGORY=ENDGAME_TUNING
 # A correction in this shape would need subtle tuning, as leaving
@@ -268,11 +268,9 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 19
 
 # Here N11 is generated as an "additional attack/defense move", although
 # the black dragon is still dead after black connects at N11.
-# 
-# The correct answer lists M10 which is occupied. Needs revision. /gf
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 27
 50 gg_genmove black
-#? [!N11|M10]
+#? [!N11|M8]
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 33
 51 gg_genmove black

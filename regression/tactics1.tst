@@ -62,7 +62,7 @@ loadsgf games/tactics07.sgf
 
 loadsgf games/tactics08.sgf
 106 gg_genmove white
-#? [F8|F9]
+#? [F8|F6]
 
 
 ############ End of Tests #################

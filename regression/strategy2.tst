@@ -259,7 +259,7 @@ loadsgf games/strategy26.sgf 209
 # Under no circumstances play the snapback at Q1!
 loadsgf games/strategy26.sgf 237
 98 gg_genmove black
-#? [!(Q1|S1|L5|N6)]
+#? [!(Q1|S1|L5|N7)]
 
 # It's pointless to play L5 in order to tactically save Q2. We need to
 # classify the Q2 dragon as inessential.

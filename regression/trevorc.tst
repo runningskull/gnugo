@@ -405,8 +405,8 @@ loadsgf games/trevor/auto/c42.sgf 72
 
 # games/trevor/auto/c43.sgf problems:
 
-loadsgf games/trevor/auto/c43.sgf 23
-740 gg_genmove black
+loadsgf games/trevor/auto/c43.sgf 22
+740 gg_genmove white
 #? [!J3]
 
 
@@ -492,7 +492,7 @@ loadsgf games/trevor/auto/c51.sgf 76
 
 loadsgf games/trevor/auto/c51.sgf 82
 880 gg_genmove white
-#? [!J4|H4]
+#? [J10]
 
 
 loadsgf games/trevor/auto/c51.sgf 84
