@@ -2377,8 +2377,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
             conn->queue[conn->queue_end++] = stones[r]; \
           conn->distances[stones[r]] = dist; \
           conn->deltas[stones[r]] = delta; \
-         if (stones[r] == target && dist < cutoff_distance) \
-           cutoff_distance = dist - 0.0001; \
+	  if (stones[r] == target && dist < cutoff_distance) \
+	    cutoff_distance = dist - 0.0001; \
 	} \
       } \
     } \

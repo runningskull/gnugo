@@ -1939,8 +1939,8 @@ estimate_strategical_value(int pos, int color, float score)
 	     * alone is not enough. The question is whether the dragon is
 	     * threatened or defended by the move or not.  
 	     */
-           this_value = (1.8 * strategic_effective_size(bb)
-                         * dragon_weakness(bb, 0));
+	    this_value = (1.8 * strategic_effective_size(bb)
+			  * dragon_weakness(bb, 0));
 
 	    /* If this dragon consists of only one worm and that worm
 	     * can be tactically captured or defended by this move, we
@@ -2209,8 +2209,8 @@ estimate_strategical_value(int pos, int color, float score)
 	 * dragon safety alone is not enough. The question is whether
 	 * the dragon is threatened by the move or not.
 	 */
-       this_value = (1.8 * strategic_effective_size(aa)
-                     * dragon_weakness(aa, 1));
+	this_value = (1.8 * strategic_effective_size(aa)
+		      * dragon_weakness(aa, 1));
 
 	/* No strategical attack value is awarded if the dragon at (aa)
 	 * has an adjacent (friendly) critical dragon, which is not
