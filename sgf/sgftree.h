@@ -70,6 +70,7 @@ typedef struct SGFNode_t {
 SGFNode *sgfPrev(SGFNode *node);
 SGFNode *sgfRoot(SGFNode *node);
 SGFNode *sgfNewNode(void);
+void sgfFreeNode(SGFNode *node);
 
 int sgfGetIntProperty(SGFNode *node, const char *name, int *value);
 int sgfGetFloatProperty(SGFNode *node, const char *name, float *value);
@@ -83,6 +84,7 @@ void sgfOverwritePropertyInt(SGFNode *node, const char *name, int val);
 void * xrealloc(void *pt, unsigned int size);
 SGFProperty *sgfMkProperty(const char *name, const  char *value,
 			   SGFNode *node, SGFProperty *last);
+void sgfFreeProperty(SGFProperty *prop);
 
 SGFNode *sgfAddStone(SGFNode *node, int color, int movex, int movey);
 SGFNode *sgfAddPlay(SGFNode *node, int who, int movex, int movey);

@@ -2,6 +2,19 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
+- do_atari_atari tries harder to find defenses
+- confirm_atari_atari checks to see if tried move really causes the combination
+- changing a group's status from CRITICAL to DEAD does not satisfy atari_atari
+- bugfix in find_more_owl_attack_and_defense_moves()
+- new function start_timer() and time_report() in utils.c
+- showtime code cleaned up in dragon.c, genmove.c, and move_reasons.c
+- move numbers printed correctly in ascii interface
+- minor changes and cleanup in ascii interface
+- prefix getopt_long and the options struct with gg_
+- new functions sgfFreeNode and sgfFreeProperty
+- tuning
+- influence tuning
+
 3.1.3 released September 6, 2001
 
 - bugfix in the atari_atari code

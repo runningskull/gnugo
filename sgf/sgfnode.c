@@ -99,7 +99,27 @@ xrealloc(void *pt, unsigned int size)
 SGFNode *
 sgfNewNode()
 {
-  return xalloc(sizeof(SGFNode));
+  SGFNode *newnode;
+  newnode = xalloc(sizeof(SGFNode));
+  newnode->next = NULL;
+  newnode->props = NULL;
+  newnode->parent = NULL;
+  newnode->child = NULL;
+  return newnode;
+}
+
+/*
+ * Recursively free an sgf node
+ */
+
+void sgfFreeNode(SGFNode *node) {
+  if (node->next)
+    sgfFreeNode(node->next);
+  if (node->child)
+    sgfFreeNode(node->child);
+  if (node->props)
+    sgfFreeProperty(node->props);
+  free(node);
 }
 
 
@@ -333,6 +353,7 @@ sgfMkProperty(const char *name, const  char *value,
 
   prop = (SGFProperty *) xalloc(sizeof(SGFProperty));
   prop->value = xalloc(strlen(value)+1);
+  prop->next = NULL;
   if (strlen(name) == 1) 
     prop->name = name[0] | (short) (' ' << 8);
   else
@@ -345,6 +366,18 @@ sgfMkProperty(const char *name, const  char *value,
     last->next = prop;
 
   return prop;
+}
+
+/*
+ * Recursively free an SGF property.
+ *
+ */
+
+void sgfFreeProperty(SGFProperty *prop) {
+  if (prop->next)
+    sgfFreeProperty(prop->next);
+  free(prop->value);
+  free(prop);
 }
 
 

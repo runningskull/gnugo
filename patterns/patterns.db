@@ -96,7 +96,7 @@
 #
 ##########################
 #
-# Center Connections
+# Center Cuts and Connections
 #
 ##########################
 
@@ -1162,7 +1162,7 @@ O*ba
 ;lib(a)>1 && xplay_attack(b,b)==3
 
 
-Pattern CC78
+Pattern CC79
 
 ?O.xx
 XO.*.
@@ -1171,13 +1171,42 @@ XXO..
 
 :8,XCeda,shape(5)
 
-
 ?a.xx
 Xa.*.
 XXO..
 .....
 
 ; lib(a)>=3 && !oarea(*)
+
+
+Pattern CC80
+# db added (3.1.4)
+
+O*X
+XO?
+
+:8,B
+
+a*X
+XO?
+
+; does_attack(*,a)
+
+
+Pattern CC81
+# db added (3.1.4)
+
+O*X
+XO?
+?O.
+
+:8,B,shape(3)
+
+a*X
+XO?
+?O?
+
+; does_attack(*,a)
 
 
 ##########################
@@ -12611,6 +12640,20 @@ Pattern J39
 :8,j
 
 
+Pattern J40
+# db added (3.1.4)
+
+|..Xx.....
+|..o....x.       seal the side      
+|..oO.O...
+|..o..*.X.
+|.........
+|.........
++---------
+
+:8,J
+
+
 ######################################################################
 #
 # Edge joseki patterns.
@@ -13856,6 +13899,38 @@ Pattern EJ80
 
 :8,J
 
+
+Pattern EJ81
+# db added (3.1.4)
+
+?....x.       seal the side      
+?O.O...
+o..*.X.
+.......
+.......
+-------
+
+:8,j
+
+
+Pattern EJ82
+# db added (3.1.4)
+
+?oO..       answer the peep!
+XXO..
+?O*X.
+.....
+-----
+
+:8,j
+
+?oA..
+XXA..
+?O*X.
+.....
+-----
+
+; !dead(A)
 
 
 ######################################################################
