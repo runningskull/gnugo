@@ -408,11 +408,11 @@ The preceeding options are documented with the reading code
 (@pxref{Reading Basics}).
 
 @itemize @bullet
-@item @option{owl-branch} Below this depth Owl only considers one move. Default 8.
-@item @option{owl-reading} Below this depth Owl assumes the dragon has escaped.
+@item @option{--owl-branch} Below this depth Owl only considers one move. Default 8.
+@item @option{--owl-reading} Below this depth Owl assumes the dragon has escaped.
 Default 20.
-@item @option{owl-node-limit} If the number of variations exceeds this limit,
-Owl assumes the dragon can make life. Default 10000.  We caution the user that
+@item @option{--owl-node-limit} If the number of variations exceeds this limit,
+Owl assumes the dragon can make life. Default 1000.  We caution the user that
 increasing @code{owl_node_limit} does not necessarily increase the strength of
 the program.
 @item @option{--level @var{amount}}
@@ -455,7 +455,7 @@ file the values of both moves are reported thus:
 Move 13 (white): GNU Go plays C6 (20.60) - Game move F4 (20.60) 
 @end example
 
-This option is useful if one wants to confirm that a change such as an
+This option is useful if one wants to confirm that a change such as a
 speedup or other optimization has not affected the behavior of the
 engine. Note that when the several moves have the same top value (or
 nearly equal) the move generated is not deterministic (though it can be

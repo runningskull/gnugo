@@ -354,12 +354,12 @@ zero.
 A wrapper around @code{abort()} which shows the state variables at the time
 of the problem. @code{(i, j)} are typically a related move, or @code{(-1, -1)}.
 @end quotation
-@item @code{const char * color_to_string(int color)}
+@item @code{const char *color_to_string(int color)}
 @findex color_to_string
 @quotation
 Convert a color value to a string.
 @end quotation
-@item @code{const char * location_to_string(int pos)}
+@item @code{const char *location_to_string(int pos)}
 @findex location_to_string
 @quotation
 Convert a location to a string.
@@ -369,22 +369,22 @@ Convert a location to a string.
 @quotation
 Convert a location to a string, writing to a buffer
 @end quotation
-@item @code{const char * status_to_string(int status)}
+@item @code{const char *status_to_string(int status)}
 @findex status_to_string
 @quotation
 Convert a status value to a string.
 @end quotation
-@item @code{const char * safety_to_string(int status)}
+@item @code{const char *safety_to_string(int status)}
 @findex safety_to_string
 @quotation
 Convert a safety value to a string.
 @end quotation
-@item @code{const char * routine_to_string(int routine)}
+@item @code{const char *routine_to_string(int routine)}
 @findex routine_to_string
 @quotation
 Convert a routine to a string.
 @end quotation
-@item @code{const char * result_to_string(int result)}
+@item @code{const char *result_to_string(int result)}
 @findex result_to_string
 @quotation
 Convert a read result to a string.

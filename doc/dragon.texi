@@ -941,7 +941,7 @@ Here are the public functions in @file{engine/worm.c}:
 
 @itemize @bullet
 @item @code{void make_worms(int save_verbose)}
-@findex void make_worms(int save_verbose)
+@findex make_worms
 @quotation
 This function finds all worms and assembles some data about them.
 Each worm is marked with an origin.  This is an arbitrarily chosen
@@ -951,18 +951,18 @@ though its location is irrelevant for applications. To see if two
 stones lie in the same worm, compare their origins.
 @end quotation
 @item @code{int is_same_worm(int w1, int w2) }
-@findex int is_same_worm(int w1, int w2) 
+@findex is_same_worm
 @quotation
 Test whether two worms are the same. Used by autohelpers.
 Before this function can be called, build_worms must have been run.
 @end quotation 
 @item @code{int is_worm_origin(int w, int pos)}
-@findex int is_worm_origin(int w, int pos)
+@findex is_worm_origin
 @quotation
 Test whether the origin of the worm at (w) is (pos).
 @end quotation
 @item @code{void change_defense(int str, int move, int dcode)}
-@findex void change_defense(int str, int move, int dcode)
+@findex change_defense
 @quotation
 @code{change_defense(str, move, dcode)} is used to add and remove defense
 points. It can also be used to change the defense code. The meaning
@@ -971,7 +971,7 @@ defense code (dcode). If (dcode) is zero, the move is removed from
 the list of defense moves if it was previously listed.
 @end quotation
 @item @code{void change_attack(int str, int move, int acode)}
-@findex void change_attack(int str, int move, int acode)
+@findex change_attack
 @quotation
 @code{change_attack(str, move, acode)} is used to add and remove attack
 points. It can also be used to change the attack code. The meaning
@@ -980,7 +980,7 @@ attack code (acode). If (acode) is zero, the move is removed from
 the list of attack moves if it was previously listed.
 @end quotation
 @item @code{void change_defense_threat(int str, int move, int dcode)}
-@findex void change_defense_threat(int str, int move, int dcode)
+@findex change_defense_threat
 @quotation
 Used to add and remove defense threat points. It can also be used to
 change the defense threat code. The meaning of the call is that the
@@ -989,7 +989,7 @@ code (dcode). If (dcode) is zero, the move is removed from the list
 of defense threat moves if it was previously listed.
 @end quotation  
 @item @code{void change_attack_threat(int str, int move, int acode)}
-@findex void change_attack_threat(int str, int move, int acode)
+@findex change_attack_threat
 @quotation
 Used to add and remove attack threat points. It can also be used to
 change the attack threat code. The meaning of the call is that the
@@ -998,31 +998,31 @@ code (acode). If (acode) is zero, the move is removed from the list
 of attack threat moves if it was previously listed.
 @end quotation
 @item @code{int attack_move_known(int move, int str)}
-@findex int attack_move_known(int move, int str)
+@findex attack_move_known
 @quotation
 Check whether (move) is listed as an attack point for (str) and
 return the attack code. If (move) is not listed, return 0.
 @end quotation
 @item @code{int defense_move_known(int move, int str)}
-@findex int defense_move_known(int move, int str)
+@findex defense_move_known
 @quotation
 Check whether (move) is listed as a defense point for (str) and
 return the defense code. If (move) is not listed, return 0.
 @end quotation
 @item @code{int attack_threat_move_known(int move, int str)}
-@findex int attack_threat_move_known(int move, int str)
+@findex attack_threat_move_known
 @quotation
 Check whether (move) is listed as an attack threat point for (str)
 and return the attack threat code. If (move) is not listed, return  * 0.
 @end quotation
 @item @code{int defense_threat_move_known(int move, int str)}
-@findex int defense_threat_move_known(int move, int str)
+@findex defense_threat_move_known
 @quotation
 Check whether (move) is listed as a defense threat point for (str)
 and return the defense threat code. If (move) is not listed, return 0.
 @end quotation
 @item @code{void propagate_worm(int pos)}
-@findex void propagate_worm(int pos)
+@findex propagate_worm
 @quotation
 propagate_worm() takes the worm data at one stone and copies it to 
 the remaining members of the worm.

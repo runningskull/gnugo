@@ -748,7 +748,7 @@ shape contributions.
 Flag that this move is worthwhile to play as a pure threat move.
 @end quotation
 @item @code{float compute_shape_factor(int pos) }
-@findex float compute_shape_factor
+@findex compute_shape_factor
 @quotation
 This function computes the shape factor, which multiplies the score of
 a move. We take the largest positive contribution to shape and add 1
@@ -928,13 +928,13 @@ here.
 
 @itemize @bullet
 @item @code{static void find_more_attack_and_defense_moves(int color)}
-@findex static void find_more_attack_and_defense_moves(int color)
+@findex find_more_attack_and_defense_moves
 @quotation
 Test all moves which defend, attack, connect or cut to see if they
 also attack or defend some other worm.
 @end quotation
 @item @code{static void find_more_owl_attack_and_defense_moves(int color)}
-@findex static void find_more_owl_attack_and_defense_moves(int color)
+@findex find_more_owl_attack_and_defense_moves
 @quotation
 Test certain moves to see whether they (too) can owl attack or
 defend an owl critical dragon. Tested moves are
@@ -946,7 +946,7 @@ defend an owl critical dragon. Tested moves are
 @end enumerate
 @end quotation
 @item @code{static int strategically_sound_defense(int aa, int tt)}
-@findex static int strategically_sound_defense(int aa, int tt)
+@findex strategically_sound_defense
 @quotation
 It's often bad to run away with a worm that is in a strategically
 weak position. This function gives heuristics for determining
@@ -954,7 +954,7 @@ whether a move at (tt) to defend the worm (aa) is
 strategically sound.
 @end quotation
 @item @code{static void induce_secondary_move_reasons(int color)}
-@findex static void induce_secondary_move_reasons(int color)
+@findex induce_secondary_move_reasons
 @quotation
 Any move that captures or defends a worm also connects or cuts
 the surrounding dragons. Find these secondary move reasons.
@@ -964,7 +964,7 @@ tactically safe dragons, however, because otherwise the effects of
 capturing has already been taken into account elsewhere.
 @end quotation
 @item @code{static void examine_move_safety(int color)}
-@findex static void examine_move_safety(int color)
+@findex examine_move_safety
 @quotation
 Examine the strategical and tactical safety of the moves. This is
 used to decide whether or not the stone should generate influence
@@ -973,7 +973,7 @@ value of strategically unsafe defense moves and connections of dead
 dragons. This sets the move.move_safety field.
 @end quotation
 @item @code{static float dragon_safety(int dr, int ignore_dead_dragons)}
-@findex static float dragon_safety(int dr, int ignore_dead_dragons)
+@findex dragon_safety
 @quotation
 An attempt to estimate the safety of a dragon. Safety values are:
 @itemize @minus
@@ -991,7 +991,7 @@ An attempt to estimate the safety of a dragon. Safety values are:
 @end itemize
 @end quotation
 @item @code{static float connection_value(int dragona, int dragonb, int tt, float margin)}
-@findex static float connection_value(int dragona, int dragonb, int tt, float margin)
+@findex connection_value
 @quotation
 Strategical value of connecting (or cutting) the dragon at (dragona)
 to the dragon at (dragonb). Notice that this function is assymetric.
@@ -1005,7 +1005,7 @@ to waste a move making sure of safety. If the margin is between
 impact values. (See @file{value_moves.c} for more information.)
 @end quotation
 @item @code{static float adjusted_worm_attack_value(int pos, int ww)}
-@findex static float adjusted_worm_attack_value(int pos, int ww)
+@findex adjusted_worm_attack_value
 @quotation
 Usually the value of attacking a worm is twice its effective size,
 but when evaluating certain move reasons we need to adjust this to
@@ -1024,44 +1024,44 @@ worm, since (pos) may be defended by attacking that worm. We make at
 most one adjustment of each type.
 @end quotation
 @item @code{static void estimate_territorial_value(int pos, int color, float score)}
-@findex static void estimate_territorial_value(int pos, int color, float score)
+@findex estimate_territorial_value
 @quotation
 Estimate the direct territorial value of a move at (pos).
 @end quotation
 @item @code{static void estimate_strategical_value(int pos, int color, float score)}
-@findex static void estimate_strategical_value(int pos, int color, float score)
+@findex estimate_strategical_value
 @quotation
 Estimate the strategical value of a move at (pos).
 @end quotation
 @item @code{static int compare_move_reasons(const void *p1, const void *p2)}
-@findex static int compare_move_reasons(const void *p1, const void *p2)
+@findex compare_move_reasons
 @quotation
 Compare two move reasons, used for sorting before presentation. */
 @end quotation
 @item @code{static float value_move_reasons(int pos, int color, float pure_threat_value, float score)}
-@findex static float value_move_reasons(int pos, int color, float pure_threat_value, float score)
+@findex value_move_reasons
 @quotation
 Combine the reasons for a move at (pos) into a simple numerical value.
 @end quotation
 @item @code{static void value_moves(int color, float pure_threat_value, float score)}
-@findex static void value_moves(int color, float pure_threat_value, float score)
+@findex value_moves
 @quotation
 Loop over all possible moves and value the move reasons for each.
 @end quotation
 @item @code{static void print_top_moves(void)}
-@findex static void print_top_moves(void)
+@findex print_top_moves
 @quotation
 Search through all board positions for the 10 highest valued
 moves and print them.
 @end quotation
 @item @code{static void reevaluate_ko_threats(int ko_move, int color)}
-@findex static void reevaluate_ko_threats(int ko_move, int color)
+@findex reevaluate_ko_threats
 @quotation
 This function is called if the biggest move on board was an illegal
 ko capture.
 @end quotation
 @item @code{static void redistribute_points(void)}
-@findex static void redistribute_points(void)
+@findex redistribute_points
 @quotation
 Redistribute points. When one move is declared a replacement for
 another by a replacement move reason, the move values for the

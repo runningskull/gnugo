@@ -487,14 +487,14 @@ it if @code{overwrite} is non-zero.
 
 @item @code{SGFNode *sgftreeCircle  (SGFTree *tree, SGFNode *node, int
 i, int j)}
-@findex sgftreeCircle  
+@findex sgftreeCircle
 @quotation
 Add a circle property at @code{(i, j)} to the tree.
 @end quotation
 
 @item @code{SGFNode *sgftreeSquare  (SGFTree *tree, SGFNode *node, int
 i, int j)}
-@findex sgftreeSquare  
+@findex sgftreeSquare
 @quotation
 Add a square property at @code{(i, j)} to the tree.
 @end quotation
@@ -507,7 +507,7 @@ Add a triangle property at @code{(i, j)} to the tree.
 @end quotation
 
 @item @code{SGFNode *sgftreeMark(SGFTree *tree, SGFNode *node, int i, int j)}
-@findex sgftreeMark    
+@findex sgftreeMark
 @quotation
 Add a mark property at @code{(i, j)} to the tree.
 @end quotation

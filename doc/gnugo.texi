@@ -49,6 +49,8 @@ are respected.
 
 @end titlepage
 
+@contents
+
 @node Top, Introduction, (dir), (dir)
 @comment node-name, next,         previous, up
 @ifinfo
@@ -253,9 +255,4 @@ Indices
 
 @printindex fn
 
-@contents
 @bye
-
-
-
-

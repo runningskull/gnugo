@@ -67,8 +67,9 @@ i +----------------------------------
  7|  64  65  66  67  68  69  70  71  72
 @end example
 
-To convert between a 1D index pos and a 2D index @code{(i,j)}, the macros
-@code{POS}, @code{I}, and @code{J} are provided, defined as below:
+To convert between a 1D index @code{pos} and a 2D index @code{(i,j)},
+the macros @code{POS}, @code{I}, and @code{J} are provided, defined as
+below:
 
 @example
 #define POS(i, j)    ((MAX_BOARD + 2) + (i) * (MAX_BOARD + 1) + (j))
@@ -112,7 +113,7 @@ i +----------------------------------
 @end example
 
 Navigation on the board is done by the @code{SOUTH}, @code{WEST},
-@code{NORTH}, and @code{EAST}macros,
+@code{NORTH}, and @code{EAST} macros,
 
 @example
 #define NS           (MAX_BOARD + 1)
@@ -141,8 +142,9 @@ where the first one should be used in the algorithms and the second
 one is useful for assertion tests.
 
 @strong{Important}: The 2D coordinate @code{(-1,-1)}, which is used for
-pass and sometimes to indicate no point, maps to the 1D coordinate 0,
-not to -1.
+pass and sometimes to indicate no point, maps to the 1D coordinate
+@code{0}, not to @code{-1}. Instead of a plain @code{0}, use one of the
+macros @code{NO_MOVE} or @code{PASS_MOVE}.
 
 A loop over multiple directions is straightforwardly written:
 
@@ -157,7 +159,7 @@ The following constants are useful for loops over the entire board and
 allocation of arrays with a 1-1 mapping to the board.
 
 @example
-#define BOARDSIZE    ((MAX_BOARD + 2) * (MAX_BOARD + 1))
+#define BOARDSIZE    ((MAX_BOARD + 2) * (MAX_BOARD + 1) + 1)
 #define BOARDMIN     (MAX_BOARD + 2)
 #define BOARDMAX     (MAX_BOARD + 1) * (MAX_BOARD + 1)
 @end example
@@ -174,7 +176,7 @@ at every vertex. Here are two possible ways of doing this:
   int m, n;
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) @{
-        do_something(POS(m, n));
+      do_something(POS(m, n));
     @}
 @end example
 
@@ -184,7 +186,7 @@ Or:
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) @{
     if (ON_BOARD(pos))
-        do_something(pos);
+      do_something(pos);
   @}
 @end example
 
@@ -193,7 +195,7 @@ Or:
 @section Move Generation Basics
 @cindex move generation
 
-The engine of GNU Go takes a positions and a color to move and
+The engine of GNU Go takes a position and a color to move and
 generates the (supposedly) optimal move.  This is done by the function
 @code{genmove()} in @file{engine/genmove.c}.
 @findex genmove
@@ -201,9 +203,9 @@ generates the (supposedly) optimal move.  This is done by the function
 The move generation is done in three passes:
 
 @enumerate
-@item information gathering
-@item different modules propose moves
-@item The values of the moves are weighted together and the best move is selected
+@item Information gathering.
+@item Different modules propose moves.
+@item The values of the moves are weighted together and the best move is selected.
 @end enumerate
 
 @subsection Information gathering
@@ -214,7 +216,7 @@ The information gathering is done by a function @code{examine_position()},
 which will be discussed in greater detail in the next section.
 Such information could be life and death of the groups, information
 about moyos, connection of groups and so on. Information gathering is
-performed by @code{examine_position}, which in turn calls:
+performed by @code{examine_position()}, which in turn calls:
 
 @itemize @bullet
 @item @code{make_worms()}
@@ -353,7 +355,7 @@ After the move generation modules have run, the best ten moves
 are selected by the function @code{review_move_reasons}. This
 function also does some analysis to try to turn up other moves
 which may have been missed. The modules @code{revise_semeai()} and
-@code{fill_liberty} are only run if no good move has been
+@code{fill_liberty()} are only run if no good move has been
 discovered by the other modules.
 
 @node  Examining the Position, Sequence of Events, Move Generation Basics, Overview
@@ -482,10 +484,11 @@ if still no move found
 
 The GNU Go engine is contained in two directories, @file{engine/} and
 @file{patterns/}. Code related to the user interface, reading and
-writing of smart go format files and testing are found in 
-the directories @file{interface/}, @file{sgf/}, and
-@file{regression/}. Code borrowed from other GNU programs is
-contained in @file{utils/}. Documentation is in @file{doc/}.
+writing of smart go format files, and testing are found in the
+directories @file{interface/}, @file{sgf/}, and @file{regression/}. Code
+borrowed from other GNU programs is contained in @file{utils/}. That
+directory also includes some code developed within GNU Go which is not
+go specific. Documentation is in @file{doc/}.
 
 In this document we will describe some of the individual files comprising
 the engine code in @file{engine/} and @file{patterns/}. In @file{interface/} 
@@ -930,7 +933,7 @@ Emacs' built-in facility for navigating the source. Switch to the
 root directory @file{gnugo-3.2.x/} and execute the command:
 
 @example
-find . -print|grep "\.[ch]$"|xargs etags
+find . -print|grep "\.[ch]$" | xargs etags
 @end example
 
 This will build a file called @file{gnugo-3.2.x/TAGS}. Now to
