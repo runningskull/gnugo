@@ -344,13 +344,15 @@ void add_antisuji_move(int pos);
 void add_semeai_move(int pos, int dr);
 void add_semeai_threat(int pos, int dr);
 
-void add_owl_attack_move(int pos, int dr, int code);
+void add_owl_attack_move(int pos, int dr, int kworm, int code);
 void add_owl_defense_move(int pos, int dr, int code);
 void add_owl_attack_threat_move(int pos, int dr, int code);
 void add_owl_defense_threat_move(int pos, int dr, int code);
 void add_owl_prevent_threat_move(int pos, int dr);
 void add_owl_uncertain_defense_move(int pos, int dr);
 void add_owl_uncertain_attack_move(int pos, int dr);
+void add_gain_move(int pos, int target1, int target2);
+void add_loss_move(int pos, int target1, int target2);
 
 void add_my_atari_atari_move(int pos, int size);
 void add_your_atari_atari_move(int pos, int size);
@@ -362,6 +364,15 @@ void add_strategical_attack_move(int pos, int dr);
 void add_strategical_defense_move(int pos, int dr);
 void add_worthwhile_threat_move(int pos);
 void add_replacement_move(int from, int to);
+
+/* Parameters to add_either_move and add_all_move */
+#define ATTACK_STRING  1
+#define DEFEND_STRING  2
+void add_either_move(int pos, int reason1, int target1,
+		     int reason2, int target2);
+void add_all_move(int pos, int reason1, int target1,
+		  int reason2, int target2);
+
 int  set_minimum_move_value(int pos, float value);
 void set_maximum_move_value(int pos, float value);
 void set_minimum_territorial_value(int pos, float value);
@@ -377,18 +388,6 @@ void scale_randomness(int pos, float scaling);
 
 void register_good_attack_threat(int move, int target);
 int is_known_good_attack_threat(int move, int target);
-
-/* Parameters to add_either_move and add_all_move */
-#define ATTACK_STRING  1
-#define DEFEND_STRING  2
-void add_either_move(int pos, int reason1, int target1,
-		     int reason2, int target2);
-void add_all_move(int pos, int reason1, int target1,
-		  int reason2, int target2);
-
-void add_gain_move(int pos, int target1, int target2);
-void add_loss_move(int pos, int target1, int target2);
-
 
 int get_attack_threats(int pos, int max_strings, int strings[]);
 int get_defense_threats(int pos, int max_strings, int strings[]);
@@ -502,6 +501,8 @@ int defense_move_known(int move, int str);
 int attack_threat_move_known(int move, int str);
 int defense_threat_move_known(int move, int str);
 void worm_reasons(int color);
+
+int semeai_move_reason_known(int move, int dr);
 
 int does_attack(int move, int str);
 int does_defend(int move, int str);
@@ -875,13 +876,13 @@ struct dragon_data2 {
   int surround_status;         /* Is it surrounded?                          */
   int surround_size;           /* Size of the surrounding area               */
 
-  int semeai;              /* true if a dragon is part of a semeai           */
-  int semeai_margin_of_safety; /* if small, the semeai is close              */
+  int semeais;         /* number of semeais in which the dragon is involved  */
   int semeai_defense_point;/* Move found by semeai code to rescue dragon     */
   int semeai_defense_certain;
+  int semeai_defense_target; /* The opponent dragon involved in the semeai   */
   int semeai_attack_point; /* Move found by semeai code to kill dragon       */
   int semeai_attack_certain;
-  int semeai_target;       /* The opponent dragon involved in the semeai     */
+  int semeai_attack_target; /* The opponent dragon involved in the semeai    */
   enum dragon_status owl_threat_status; /* CAN_THREATEN_ATTACK/DEFENSE       */
   enum dragon_status owl_status; /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
   int owl_attack_point;    /* vital point for attack                         */

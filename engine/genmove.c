@@ -293,8 +293,8 @@ void
 collect_move_reasons(int color)
 {
   worm_reasons(color);
-  owl_reasons(color);
   semeai_move_reasons(color);
+  owl_reasons(color);
   break_in_move_reasons(color);
 }
 
@@ -665,7 +665,7 @@ revise_semeai(int color)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (ON_BOARD(pos)
 	&& dragon[pos].color == other
-	&& DRAGON2(pos).semeai
+	&& DRAGON2(pos).semeais
 	&& dragon[pos].status == DEAD) {
       found_one = 1;
       dragon[pos].status = UNKNOWN;

@@ -760,8 +760,7 @@ initialize_supplementary_dragon_data(void)
     dragon2[d].surround_status          = 0;
     set_eyevalue(&dragon2[d].genus, 0, 0, 0, 0);
 
-    dragon2[d].semeai                   = 0;
-    dragon2[d].semeai_margin_of_safety  = -1;
+    dragon2[d].semeais                  = 0;
     dragon2[d].semeai_defense_point	= NO_MOVE;
     dragon2[d].semeai_attack_point	= NO_MOVE;
     dragon2[d].owl_attack_point         = NO_MOVE;
@@ -1604,7 +1603,7 @@ show_dragons(void)
 	gprintf("... owl defendable at %1m, code %d\n",
 		d2->owl_defense_point, d2->owl_defense_code);
       }
-      if (dd->status == CRITICAL && d2->semeai) {
+      if (dd->status == CRITICAL && d2->semeais) {
 	if (d2->semeai_defense_point)
 	  gprintf("... semeai defense move at %1m\n", d2->semeai_defense_point);
 	if (d2->semeai_attack_point)
@@ -2427,15 +2426,15 @@ report_dragon(FILE *outfile, int pos)
            d2->owl_second_defense_point);
   gfprintf(outfile, "owl_attack_kworm        %1m\n", d2->owl_attack_kworm);
   gfprintf(outfile, "owl_defense_kworm       %1m\n", d2->owl_defense_kworm);
-  gfprintf(outfile, "semeai                  %d\n", d2->semeai);
-  gfprintf(outfile, "semeai_margin_of_safety %d\n",
-	   d2->semeai_margin_of_safety);
+  gfprintf(outfile, "semeais                 %d\n", d2->semeais);
   gfprintf(outfile, "semeai_defense_point    %1m\n", d2->semeai_defense_point);
   gfprintf(outfile, "semeai_defense_certain  %d\n",
 	   d2->semeai_defense_certain);
+  gfprintf(outfile, "semeai_defense_target   %1m\n",
+      	   d2->semeai_defense_target);
   gfprintf(outfile, "semeai_attack_point     %1m\n", d2->semeai_attack_point);
   gfprintf(outfile, "semeai_attack_certain   %d\n", d2->semeai_attack_certain);
-  gfprintf(outfile, "semeai_target           %1m\n", d2->semeai_target);
+  gfprintf(outfile, "semeai_attack_target    %1m\n", d2->semeai_attack_target);
   gfprintf(outfile, "strings                 ");
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)

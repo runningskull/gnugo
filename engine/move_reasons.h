@@ -189,6 +189,7 @@ int defense_move_reason_known(int pos, int what);
 int owl_attack_move_reason_known(int pos, int what);
 int owl_defense_move_reason_known(int pos, int what);
 int owl_move_reason_known(int pos, int what);
+int semeai_move_reason_known(int pos, int what);
 int get_biggest_owl_target(int pos);
 int is_antisuji_move(int pos);
 

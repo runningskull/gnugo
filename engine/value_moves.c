@@ -354,10 +354,7 @@ do_find_more_owl_attack_and_defense_moves(int color, int pos,
       int acode = owl_does_attack(pos, dd, &kworm);
 
       if (acode >= DRAGON2(dd).owl_attack_code) {
-	if (acode == GAIN)
-	  add_gain_move(pos, dd, kworm);
-	else
-	  add_owl_attack_move(pos, dd, acode);
+	add_owl_attack_move(pos, dd, kworm, acode);
 	if (save_verbose)
 	  gprintf("Move at %1m upgraded to owl attack on %1m (%s).\n",
 		  pos, dd, result_to_string(acode));
@@ -484,10 +481,7 @@ find_more_owl_attack_and_defense_moves(int color)
 	    int kworm = NO_MOVE;
 	    int acode = owl_does_attack(pos2, pos, &kworm);
 	    if (acode >= DRAGON2(pos).owl_attack_code) {
-	      if (acode == GAIN)
-		add_gain_move(pos2, pos, kworm);
-	      else
-		add_owl_attack_move(pos2, pos, acode);
+	      add_owl_attack_move(pos2, pos, kworm, acode);
 	      if (save_verbose)
 	        gprintf("Move at %1m also owl attacks %1m (%s).\n",
 		        pos2, pos, result_to_string(acode));
@@ -696,7 +690,7 @@ induce_secondary_move_reasons(int color)
 	for (i = 0; i < DRAGON2(aa).neighbors; i++) {
 	  int bb = dragon2[DRAGON2(aa).adjacent[i]].origin;
 	  if (dragon[bb].color == color && worm[bb].attack_codes[0] == 0
-	      && !DRAGON2(bb).semeai) {
+	      && !DRAGON2(bb).semeais) {
 	    add_strategical_defense_move(pos, bb);
 	    do_find_more_owl_attack_and_defense_moves(color, pos,
 						      STRATEGIC_DEFEND_MOVE,

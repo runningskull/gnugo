@@ -4732,9 +4732,51 @@ goaldump(const char goal[BOARDMAX])
   gprintf("\n");
 }
 
+/*
+ * Owl attack moves are ineffective when the dragon can still live in a
+ * semeai. This function tests whether an owl attack move has this problem.
+ * If not, an owl attack move reason is added, otherwise we treat the
+ * move as a strategic attack.
+ */
+static void
+test_owl_attack_move(int pos, int dr, int kworm, int acode)
+{
+  int color = OTHER_COLOR(board[dr]);
+  if (DRAGON2(dr).semeais == 0
+      || DRAGON2(dr).semeai_defense_point == NO_MOVE
+      || (DRAGON2(dr).semeais == 1 && semeai_move_reason_known(pos, dr))
+      || acode == GAIN) {
+    add_owl_attack_move(pos, dr, kworm, acode);
+    DEBUG(DEBUG_OWL, "owl: %1m attacks %1m (%s) at move %d\n",
+	  pos, dr, result_to_string(DRAGON2(pos).owl_attack_code),
+	  movenum+1);
+  }
+  else {
+    int dr2 = DRAGON2(dr).semeai_defense_target;
+    int semeai_result, certain;
+    int save_verbose = verbose;
+    if (verbose > 0)
+      verbose--;
+    owl_analyze_semeai_after_move(pos, color, dr, dr2, &semeai_result,
+				  NULL, NULL, 1, &certain);
+    verbose = save_verbose;
+    if (certain >= DRAGON2(dr).semeai_defense_certain
+	&& (semeai_result >= REVERSE_RESULT(acode))) {
+      /* Demote the move reasons. */
+      DEBUG(DEBUG_OWL, "owl: %1m ineffective owl attack on %1m (can live in semeai with %1m)\n", pos, dr, dr2);
+      add_strategical_attack_move(pos, dr);
+    }
+    else {
+      add_owl_attack_move(pos, dr, kworm, acode);
+      DEBUG(DEBUG_OWL, "owl: %1m attacks %1m (%s) at move %d\n",
+	    pos, dr, result_to_string(DRAGON2(pos).owl_attack_code),
+	    movenum+1);
+    }
+  }
+}
 
-/* Add owl reasons. This function should be called once during
- * genmove.
+/* Add owl move reasons. This function should be called once during
+ * genmove. It has to be called after semeai_move_reasons().
  */
 
 void
@@ -4819,27 +4861,10 @@ owl_reasons(int color)
 	  }
 	}
 
-	/* If owl thinks the dragon is dead but the semeai code has
-         * revised the status to critical, then the owl attack point
-         * tends to be unreliable. Don't add it in that case.
-	 *
-	 * FIXME: Instead of just discarding it, we may want to test
-	 *        whether it also wins the semeai.
-	 */
-	if (DRAGON2(pos).owl_status != CRITICAL)
-	  continue;
-	
-	/* If we've reached this far, the attack is okay. */
-	if (DRAGON2(pos).owl_attack_code == GAIN) {
-	  add_gain_move(move, pos, DRAGON2(pos).owl_attack_kworm);
-	  DEBUG(DEBUG_OWL, "owl: %1m attacks %1m with gain at move %d\n",
-		move, pos, movenum+1);
-	}
-	else {
-	  add_owl_attack_move(move, pos, DRAGON2(pos).owl_attack_code);
-	  DEBUG(DEBUG_OWL, "owl: %1m attacks %1m at move %d\n", move, pos,
-		movenum+1);
-	}
+	/* If we've reached this far, it only remains to check the move
+	 * against semeai complications. */
+	test_owl_attack_move(move, pos, DRAGON2(pos).owl_attack_kworm,
+	    		    DRAGON2(pos).owl_attack_code);
       }
     }
     else if (DRAGON2(pos).owl_status == DEAD
@@ -4889,8 +4914,8 @@ owl_reasons(int color)
       else if (board[pos] == OTHER_COLOR(color)
 	       && DRAGON2(pos).owl_attack_point != NO_MOVE
 	       && DRAGON2(pos).owl_attack_code == GAIN) {
-	add_gain_move(DRAGON2(pos).owl_attack_point, pos,
-		      DRAGON2(pos).owl_attack_kworm);
+	add_owl_attack_move(DRAGON2(pos).owl_attack_point, pos,
+		            DRAGON2(pos).owl_attack_kworm, GAIN);
 	DEBUG(DEBUG_OWL, "owl: %1m attacks %1m with gain at move %d\n", 
 	      DRAGON2(pos).owl_attack_point, pos, movenum+1);
       }

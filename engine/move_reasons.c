@@ -574,6 +574,12 @@ owl_move_vs_worm_known(int pos, int what)
   return owl_move_reason_known(pos, dragon[what].origin);
 }
 
+int
+semeai_move_reason_known(int pos, int what)
+{
+  return move_reason_known(pos, SEMEAI_MOVE, what);
+}
+
 /* Check whether a worm is inessential */
 static int
 concerns_inessential_worm(int pos, int what)
@@ -1030,16 +1036,6 @@ add_all_move(int pos, int reason1, int target1, int reason2, int target2)
 
 
 void
-add_gain_move(int pos, int target1, int target2)
-{
-  int what1 = dragon[target1].origin;
-  int what2 = worm[target2].origin;
-  int index = find_pair_data(what1, what2);
-  ASSERT1(target2 != NO_MOVE, pos);
-  add_move_reason(pos, OWL_ATTACK_MOVE_GAIN, index);
-}
-
-void
 add_loss_move(int pos, int target1, int target2)
 {
   int what1 = dragon[target1].origin;
@@ -1142,7 +1138,7 @@ add_strategical_defense_move(int pos, int dr)
  * code reports an attack on the dragon (dr).
  */
 void
-add_owl_attack_move(int pos, int dr, int code)
+add_owl_attack_move(int pos, int dr, int kworm, int code)
 {
   dr = dragon[dr].origin;
 
@@ -1153,6 +1149,10 @@ add_owl_attack_move(int pos, int dr, int code)
     add_move_reason(pos, OWL_ATTACK_MOVE_GOOD_KO, dr);
   else if (code == KO_B)
     add_move_reason(pos, OWL_ATTACK_MOVE_BAD_KO, dr);
+  else if (code == GAIN) {
+    ASSERT_ON_BOARD1(kworm);
+    add_move_reason(pos, OWL_ATTACK_MOVE_GAIN, find_pair_data(dr, kworm));
+  }
 }
 
 /*
