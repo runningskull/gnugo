@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- atari_atari tuning
+- influence tuning
+- tuning
+- test revisions
+
 3.3.15 released January 12, 2003
 
 - evaluate_diagonal_intersection() tries additional moves to defend a diagonal

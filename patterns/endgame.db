@@ -1093,6 +1093,7 @@ O*X           about 1 point gote
 
 Pattern CE4a
 # gf Split and revised pattern. (3.3.10)
+# gf Revised constraint. (3.3.16)
 
 ??X     endgame move
 O*.     about 1 point reverse sente
@@ -1104,7 +1105,7 @@ O*.     about 1 point reverse sente
 O*.
 ?aO
 
-;marginal_eye(*) && proper_eye(a)
+;marginal_eye(*) && proper_eye(a) && (!halfeye(a) || false_eye_territory(a))
 
 
 Pattern CE4b

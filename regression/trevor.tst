@@ -448,9 +448,10 @@ loadsgf games/trevor/trevor_41.sgf 37
 #  handicaps. Gnugo played quite well. And in the end it almost 
 #  killed a corner of FunGo, but it played a big blunder:-(. 
 #  Attachment is the SGF file.
+# gf Added A18 and A16 as acceptable moves. (3.3.16)
 loadsgf games/trevor/trevor_42.sgf 211
 420 gg_genmove black
-#? [G16]
+#? [G16|A18|A16]
 
 #CATEGORY=TACTICAL_READING
 #DESCRIPTION=Minus 1 point, attacking very dead stone.

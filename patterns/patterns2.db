@@ -2084,14 +2084,17 @@ xx?
 
 Pattern Shape48
 # gf Added constraint. (3.3.15)
+# gf Revised pattern. (3.3.16)
 
 .X.     makes it harder for X to make eyes
 *.X
+?xx
 
 :8,s,shape(1)
 
 .A.
 *.X
+?xx
 
 ;weak(A)
 
@@ -2651,6 +2654,7 @@ xxx
 Pattern Shape86
 # gf New pattern. (3.3.15)
 # Prefer cut to peep as ko threat.
+# gf Revised constraint. (3.3.16)
 
 XO        ko threat
 *X
@@ -2660,7 +2664,7 @@ XO        ko threat
 AO
 *B
 
-;oplay_attack_either(*,A,B)
+;oplay_attack_either(*,A,B) && !safe_omove(*)
 
 
 ###########################
@@ -2919,6 +2923,7 @@ Pattern Sente13
 
 Pattern Sente13b
 # gf Revised constraint. (3.1.10)
+# gf Revised constraint. (3.3.16)
 
 .O
 *?
@@ -2929,7 +2934,27 @@ ba
 *?
 
 ;lib(a) == 2 && !attack(a) && olib(b) > 2 && safe_omove(*)
+;&& (safe_xmove(*) || safe_xmove(b))
 ;&& oplay_attack(*,b,b)==WIN
+# Action adds a reverse followup value.
+>defend_against_atari(a)
+
+
+Pattern Sente13c
+# gf New pattern. (3.3.16)
+
+O.O
+*.O
+
+:8,sO
+
+Oba
+*ca
+
+;lib(a) == 2 && !attack(a) && safe_omove(*)
+;&& (safe_xmove(b) || safe_xmove(c))
+;&& oplay_attack(*,b,b)==WIN
+;&& oplay_attack(*,c,c)==WIN
 # Action adds a reverse followup value.
 >defend_against_atari(a)
 
@@ -3016,6 +3041,60 @@ COX*.a
 ------
 
 ;omoyo_opposite(a) && alive(b) && alive(C)
+
+
+Pattern Sente19
+# gf New pattern. (3.3.16)
+# Usually underestimating the reverse followup, but better than nothing.
+
+?oO
+o.*
+?OX
+
+:8,OX,reverse_followup(1)
+
+?cO
+ba*
+?OX
+
+
+;((!o_somewhere(b) && oterri(b))
+; || (!o_somewhere(c) && oterri(c)))
+;&& safe_xmove(*) && !xplay_attack(*,a,*)
+
+
+Pattern Sente20
+# gf New pattern. (3.3.16)
+# Usually underestimating the reverse followup, but better than nothing.
+
+?.O
+..*
+?OX
+
+:8,OX,reverse_followup(2)
+
+?cO
+ba*
+?OX
+
+;oterri(b) && oterri(c) && safe_xmove(*) && !xplay_attack(*,a,*)
+
+
+Pattern Sente21
+# gf New pattern. (3.3.16)
+# Usually underestimating the reverse followup, but better than nothing.
+
+..O
+..*
+?OX
+
+:8,OX,reverse_followup(3)
+
+dcO
+ba*
+?OX
+
+;oterri(b) && oterri(c) && oterri(d) && safe_xmove(*) && !xplay_attack(*,a,*)
 
 
 ########################################################
@@ -3303,61 +3382,65 @@ Pattern Temp1
 :8,-,maxvalue(25)
 
 
-Pattern Temp2
-# Connection of half point kos are severely overvalued.
-# existed since at least 3.0.0
-
-OOXX
-O*OX
-----
-
-:8,X,maxvalue(1)
-
-
-Pattern Temp3a
-# Connection of half point kos are severely overvalued.
-# existed since at least 3.0.0
-
-oOXx
-O*OX
-----
-
-:8,X,maxvalue(1)
-
-obCx
-a*OD
-----
-
-;lib(a)>=3 && lib(b)>=4 && lib(C)>=3 && lib(D)>=3
-
-
-Pattern Temp3b
-# Connection of half point kos are severely overvalued.
-# existed since at least 3.0.0
-
-OOXX
-O*OX
-OOXX
-
-:8,X,maxvalue(1)
-
-
-Pattern Temp4
-# Connection of half point kos are severely overvalued.
-# existed since at least 3.0.0
-
-oOXx
-O*OX
-oOXx
-
-:8,X,maxvalue(1)
-
-obEx
-a*OD
-ocFx
-
-;lib(a)>=3 && lib(b)>=4 && lib(c)>=4
-;&& lib(D)>=3 && lib(E)>=3 && lib(F)>=3
+# Pattern Temp2
+# # Connection of half point kos are severely overvalued.
+# # existed since at least 3.0.0
+# # gf Removed. (3.3.16)
+# 
+# OOXX
+# O*OX
+# ----
+# 
+# :8,X,maxvalue(1)
+# 
+# 
+# Pattern Temp3a
+# # Connection of half point kos are severely overvalued.
+# # existed since at least 3.0.0
+# # gf Removed. (3.3.16)
+# 
+# oOXx
+# O*OX
+# ----
+# 
+# :8,X,maxvalue(1)
+# 
+# obCx
+# a*OD
+# ----
+# 
+# ;lib(a)>=3 && lib(b)>=4 && lib(C)>=3 && lib(D)>=3
+# 
+# 
+# Pattern Temp3b
+# # Connection of half point kos are severely overvalued.
+# # existed since at least 3.0.0
+# # gf Removed. (3.3.16)
+# 
+# OOXX
+# O*OX
+# OOXX
+# 
+# :8,X,maxvalue(1)
+# 
+# 
+# Pattern Temp4
+# # Connection of half point kos are severely overvalued.
+# # existed since at least 3.0.0
+# # gf Removed. (3.3.16)
+# 
+# oOXx
+# O*OX
+# oOXx
+# 
+# :8,X,maxvalue(1)
+# 
+# obEx
+# a*OD
+# ocFx
+# 
+# ;lib(a)>=3 && lib(b)>=4 && lib(c)>=4
+# ;&& lib(D)>=3 && lib(E)>=3 && lib(F)>=3
 
 
 Pattern Temp5

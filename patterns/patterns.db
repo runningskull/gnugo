@@ -274,12 +274,13 @@ a*B
 Pattern CC13
 # tm modified (3.1.10)
 # (compare Conn315)
+# gf Added n classification. (3.3.16)
 
 O?        cut!
 *X
 XO
 
-:8,B,shape(2)
+:8,Bn,shape(2)
 
 O?
 *A
@@ -485,42 +486,35 @@ a.?
 
 
 Pattern CC30
+# gf Revised pattern. (3.3.16)
 
 ?O*        double connection 
 X.O
 ?O.
 
-:8,n
+:8,nC
 
-?c*
-Xad
-?eb
+?b*
+XaO
+?c.
 
-;xplay_defend_both(a,*,b,a,b) && xplay_defend_both(a,b,*,a,*)
-
->add_connect_move(c,d);
->add_connect_move(c,e);
->add_connect_move(d,e);
+;!xplay_connect(a,b,c)
 
 
 Pattern CC31
-# This is used when connecting is necessary but CC30 doesn't apply.
+# gf Revised pattern. (3.3.16)
 
 ?O.        double connection 
 X*O
 ?O.
 
-:-,-
+:-,C
 
-?ca
-X*d
-?eb
+?a.
+X*O
+?b.
 
-;xplay_defend_both(*,a,b,*,b) && xplay_defend_both(*,b,a,*,a)
-
->add_connect_move(c,d);
->add_connect_move(c,e);
->add_connect_move(d,e);
+;!xplay_connect(*,a,b)
 
 
 Pattern CC32
@@ -910,6 +904,7 @@ AOB
 
 
 Pattern CC57
+# gf Removed obsolete add_connect_move actions. (3.3.16)
 
 ??XO?         connect three stones
 ..*.o
@@ -924,9 +919,6 @@ a..b?
 ?..??
 
 ;lib(a)>2 && lib(b)>2 && lib(c)>3
->add_connect_move(a,b);
->add_connect_move(a,c);
->add_connect_move(b,c);
 
 
 Pattern CC58
@@ -1354,6 +1346,7 @@ X..
 
 
 Pattern EC1
+# gf Removed obsolete add_connect_move actions. (3.3.16)
 
 O.XO?      connect under
 ..*.O
@@ -1371,11 +1364,9 @@ ca*df
 ;&& !oplay_defend_both(*,a,b,a,E)
 ;&& oplay_attack_either(*,b,a,c,b,c)
 
->add_connect_move(f,h);
->add_connect_move(g,h);
-
 
 Pattern EC2
+# gf Removed obsolete add_connect_move actions. (3.3.16)
 
 OXXO?      connect under
 O.*.O
@@ -1390,9 +1381,6 @@ ea*df
 -----
 
 ;odefend_against(*,d) && !oplay_attack(*,a,b,e)
-
->add_connect_move(f,e);
->add_connect_move(g,e);
 
 
 Pattern EC4
@@ -1780,6 +1768,7 @@ Xbc
 
 
 Pattern EC27
+# gf Removed obsolete add_connect_move action. (3.3.16)
 
 ?X*O          Use edge to stay connected.
 ?XOX
@@ -1797,10 +1786,9 @@ Pattern EC27
 
 ; !attack(D) && oplay_attack(*,a,a)
 
->add_connect_move(b,c);
-
 
 Pattern EC28
+# gf Removed obsolete add_connect_move action. (3.3.16)
 
 O.XO?        capture to connect
 OXOXO
@@ -1815,8 +1803,6 @@ ob.*.
 -----
 
 ;!oplay_attack(*,a,b,c) && !oplay_attack(*,b,a,c)
-
->add_connect_move(c,d);
 
 
 Pattern EC29
@@ -2523,6 +2509,19 @@ Xa*.
 ;xplay_attack(*,a,a)
 
 
+Pattern EC81
+# gf New Pattern (3.3.16)
+# See nngs1:31
+
+XXX.Ox   connect all stones
+OO..*X
+....O?
+......
+------
+
+:8,XC
+
+
 ##############################################
 # First line, one space, cuts and connections.
 ##############################################
@@ -3139,14 +3138,32 @@ O..X
 :8,OXad
 
 
-Pattern CS20
+Pattern CS20a
 # gf Corrected symmetry. (3.1.23)
+# gf Split pattern. (3.3.16)
 
 X..
 O*.
 ?xX
 
-:8,OXad
+:8,OXa
+
+
+Pattern CS20b
+# gf Corrected symmetry. (3.1.23)
+# gf Split pattern. (3.3.16)
+
+X..
+O*.
+?xX
+
+:8,OXd
+
+A..
+O*.
+?xB
+
+;!oplay_connect(*,A,B)
 
 
 Pattern CS21
@@ -4176,6 +4193,7 @@ xaOO.
 
 Pattern EB507
 # tm Reduced shape value from 4 to 3 (3.1.20)
+# gf Removed shape value. (3.3.16)
 
 ?o??
 ?O..           block
@@ -4184,7 +4202,7 @@ X*..
 ....
 ----
 
-:8,Oe,shape(3)
+:8,Oe
 
 
 Pattern EB507a
@@ -8033,7 +8051,7 @@ XX*.
 
 
 Pattern CB228
-# gf Sometimes it's better shape to jump. See nngs:1180. (3.3.7)
+# gf Sometimes it's better shape to jump. See nngs:1180. (3.3.7 )
 
 ?XX.             prevent bend
 OO*.
@@ -9041,6 +9059,26 @@ abh
 ;&& !oplay_disconnect(*,b,*,a) && !oplay_disconnect(*,c,*,a)
 
 
+Pattern CB338b
+# gf New pattern. (3.3.16)
+# Another safe variation of the diagonal move. See comment for CB338.
+
+?xxx      diagonal push
+?.*x
+OO.x
+?oO?
+
+:8,OXe
+
+?def
+?.*g
+aach
+?ib?
+
+;(x_somewhere(d,e,f,g,h) || xarea(f))
+;&& (same_string(a,b) || oplay_attack(*,c,?,i,i))
+
+
 Pattern CB340
 # db added (3.3.14)
 # compare CB242
@@ -10015,16 +10053,18 @@ deb..
 > antisuji(e);
 
 
-Pattern ED60
-
-??.??        attack one stone
-?.O.O
-.OX*X
-.....
-.....
------
-
-:8,J
+# Pattern ED60
+# # gf This is too often worth much less than the 35 points of a joseki move.
+# #    Removed. (3.3.16)
+# 
+# ??.??        attack one stone
+# ?.O.O
+# .OX*X
+# .....
+# .....
+# -----
+# 
+# :8,J
 
 
 Pattern ED61
@@ -12096,14 +12136,15 @@ X.O.x
 
 
 Pattern EJ43
+# gf Revised. (3.3.16)
 
-?...        connect after peep
-x.O.
-x.*X
-x.O.
-?...
-?...
-----
+?...?        connect after peep
+x.O.x
+x.*Xx
+x.O.x
+?...?
+?...?
+-----
 
 :8,OJ
 

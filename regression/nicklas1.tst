@@ -171,7 +171,7 @@ loadsgf games/nicklas/nicklas12.sgf 103
 #DESCRIPTION=Needless 2 point loss for B.
 #SEVERITY=7
 loadsgf games/nicklas/nicklas12.sgf 113
-1207 gg_genmove black
+1207 restricted_genmove black B18 C18 B17 C17
 #? [C17]*
 
 loadsgf games/nicklas/nicklas12.sgf 117

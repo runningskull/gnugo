@@ -240,7 +240,7 @@ A*B
 
 
 Pattern A15
-#evand new pattern 3.3.13
+#evand new pattern (3.3.13)
 
 ?X?
 X*.
@@ -271,5 +271,26 @@ x.
 --
 
 ;lib(A) == 3
+
+
+Pattern A17
+# gf New pattern. (3.3.16)
+
+?O??
+o*XX
+..xX
+...X
+----
+
+:8,-
+
+?O??
+o*AA
+..xA
+...A
+----
+
+;lib(A)==3 && olib(*)>=2
+
 
 # END OF FILE
