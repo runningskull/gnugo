@@ -348,7 +348,7 @@ loadsgf games/nngs/gnugo-3.1.30-morlvera-200204041921.sgf 154
 219 gg_genmove white
 #? [K9]*
 
-loadsgf nngs/gnugo-3.1.30-merlin-200204041428.sgf 189
+loadsgf games/nngs/gnugo-3.1.30-merlin-200204041428.sgf 189
 220 gg_genmove white
 #? [R6]*
 
