@@ -1359,16 +1359,17 @@ A*?
 
 
 Pattern D318
+# nn Modified (3.3.12)
 
-OOXX        descend - don't capture
+OOXx        descend - don't capture
 OXOX
-O.*.
+o.*.
 
 :8,-,value(82)
 
-OOXX
+OOXx
 OAOX
-O.*.
+o.*.
 
 ; does_attack(*,A)
 

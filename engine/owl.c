@@ -2400,6 +2400,9 @@ owl_determine_life(struct local_owl_data *owl,
   int dummy_eyemin = 0;
   int dummy_eyemax = 0;
   struct eyevalue eyevalue;
+  /* FIXME: use MAX_EYES from move_reasons.h ? */
+  struct eyevalue eyevalue_list[BOARDMAX/2];
+  int eyes_attack_points[BOARDMAX/2];
   char pessimistic_min;
   int attack_point;
   int defense_point;
@@ -2407,6 +2410,8 @@ owl_determine_life(struct local_owl_data *owl,
   int k;
   int lunch;
   int eye_color;
+  int num_eyes = 0;
+  int num_lunch = 0;
   int save_debug = debug;
   memset(mw, 0, sizeof(mw));
   memset(mz, 0, sizeof(mz));
@@ -2531,12 +2536,11 @@ owl_determine_life(struct local_owl_data *owl,
 		    || (mw[POS(i, j)] < 3 * mz[POS(i, j)]
 			&& mz[POS(i, j)] > 5)))
 	      pessimistic_min = 0;
-	
-	add_eyevalues(probable_eyes, &eyevalue, probable_eyes);
-	*eyemin += pessimistic_min;
-	*eyemax += max_eyes(probable_eyes);
 
-	
+	eyes_attack_points[num_eyes] = NO_MOVE;
+	eyevalue_list[num_eyes] = eyevalue;
+	*eyemin += pessimistic_min;
+
 	/* Fill in the value field for use by the owl_eyespace() function. */
 	eye[pos].value = eyevalue;
 	
@@ -2590,6 +2594,7 @@ owl_determine_life(struct local_owl_data *owl,
 	    
 	    owl_add_move(moves, attack_point, value, reason, 1, 0);
 	    vital_values[attack_point] = value;
+	    eyes_attack_points[num_eyes] = attack_point;
 	  }
 	  /* The reason for the last set of tests is that we don't
 	   * want to play a self atari in e.g. this position
@@ -2642,6 +2647,7 @@ owl_determine_life(struct local_owl_data *owl,
 	    vital_values[defense_point] = value;
 	  }
 	}
+	num_eyes++;
       }
     }
 
@@ -2663,9 +2669,8 @@ owl_determine_life(struct local_owl_data *owl,
 		    &lunch_min, &lunch_probable, &lunch_max, owl);
 
 	set_eyevalue(&e, 0, 0, lunch_probable, lunch_probable);
-	add_eyevalues(probable_eyes, &e, probable_eyes);
 	*eyemax += lunch_max;
-	
+
 	if (lunch_probable == 0)
 	  value = 20;
 	else if (lunch_probable == 1 && lunch_max == 1) {
@@ -2679,12 +2684,41 @@ owl_determine_life(struct local_owl_data *owl,
 	if (owl->lunch_attack_code[lunch] != WIN)
 	  value -= 10;
 
-	if (value < 21  && countstones(owl->lunch[lunch]) == 1)
+	if (value < 21  && countstones(owl->lunch[lunch]) == 1) {
+	  /* FIXME: consistent with previous implementation, but
+	   *        is this necessary ? if I'm not mistaken, here
+	   *        e is 0000, so remove this shouldn't hurt ... */
+	  num_lunch++;
+	  eyevalue_list[num_eyes++] = e;
 	  continue;
+	}
 
 	if (does_attack) {
 	  defense_point = improve_lunch_defense(owl->lunch[lunch],
 						owl->lunch_defense_point[lunch]);
+
+	  if (vital_values[defense_point]) {
+	    /* The point here is that the move which saves the lunch also
+	     * attacks an eye. So this attack move reduces the global eye
+	     * potential. The eyes arithmetic for probable_eyes has then
+	     * to be adapted accordingly.
+	     */
+	    int ne;
+	    for (ne = 0; ne < num_eyes - num_lunch; ne++)
+	      if (eyes_attack_points[ne] == defense_point)
+		break;
+	    gg_assert(ne < num_eyes - num_lunch);
+	    /* merge eye values */
+	    add_eyevalues(&eyevalue_list[ne], &e, &eyevalue_list[ne]);
+	    /* and adjust */
+	    eyevalue_list[ne].a = 0;
+	    eyevalue_list[ne].b = 0;
+	  } 
+	  else {
+	    num_lunch++;
+	    eyevalue_list[num_eyes++] = e;
+	  }
+
 	  TRACE("save lunch at %1m with %1m, score %d\n",
 		owl->lunch[lunch], defense_point, value);
 	  owl_add_move(moves, defense_point, value, "save lunch", 1, 0);
@@ -2695,10 +2729,23 @@ owl_determine_life(struct local_owl_data *owl,
 	  TRACE("eat lunch at %1m with %1m, score %d\n",
 		owl->lunch[lunch], attack_point, value);
 	  owl_add_move(moves, attack_point, value, "eat lunch", 1, 0);
+	  num_lunch++;
+	  eyevalue_list[num_eyes++] = e;
 	}
       }
   }
-  
+
+  /* now, totalize the eye potential */
+  {
+    int ne;
+    for (ne = 0; ne < num_eyes - num_lunch; ne++) {
+      add_eyevalues(probable_eyes, &eyevalue_list[ne], probable_eyes);
+      *eyemax += max_eyes(probable_eyes);
+    }
+    for (; ne < num_eyes; ne++)
+      add_eyevalues(probable_eyes, &eyevalue_list[ne], probable_eyes);
+  }
+
   debug = save_debug;
 }
 
@@ -3468,7 +3515,6 @@ owl_update_goal(int pos, int same_dragon, struct local_owl_data *owl,
   if (0)
     goaldump(owl->goal);
 }
-
 
 /* We update the boundary marks. The boundary mark must be
  * constant on each string. It is nonzero if the string

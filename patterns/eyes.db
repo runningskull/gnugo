@@ -5261,8 +5261,17 @@ Pattern 8007
 # Topology: ......
 #
 
-
 Pattern 8008
+# nn New pattern (3.3.12)
+
+|@ ..
+|....!
++-----
+
+:1122
+
+
+Pattern 8009
 
  xx
 !.*x.!
@@ -5274,7 +5283,7 @@ Pattern 8008
 # Topology:  .....
 #
 
-Pattern 8009
+Pattern 8010
 
  !
 |.
@@ -5286,7 +5295,7 @@ Pattern 8009
 :1122
 
 
-Pattern 8010
+Pattern 8011
 
 !.x
  x.x.@
@@ -5294,7 +5303,7 @@ Pattern 8010
 :1122
 
 
-Pattern 8011
+Pattern 8012
 # in some cases this could become seki
 
 !.x
