@@ -74,6 +74,6 @@
 #define SIZEOF_LONG 4
 
 /* Version number of package */
-#define VERSION "3.5.6"
+#define VERSION "3.5.7"
 
 #pragma warning(disable: 4244 4305)
