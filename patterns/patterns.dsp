@@ -65,8 +65,8 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /W3 /Gm /GX /ZI /Od /I "." /I ".." /I "..\engine" /I "../sgf" /I "../utils" /D "WIN32" /D "_DEBUG" /D "HAVE_CONFIG_H" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# SUBTRACT CPP /nologo
+# ADD CPP /W3 /Gm /GX /ZI /Od /I "." /I ".." /I "..\engine" /I "../sgf" /I "../utils" /D "WIN32" /D "_DEBUG" /D "HAVE_CONFIG_H" /D "_MBCS" /D "_LIB" /FR /FD /GZ /c
+# SUBTRACT CPP /nologo /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -115,11 +115,19 @@ SOURCE=.\eyes.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\fuseki13.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\fuseki19.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\fuseki9.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\fusekipat.c
 # End Source File
 # Begin Source File
 

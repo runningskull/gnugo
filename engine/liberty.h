@@ -595,8 +595,8 @@ extern struct worm_data worm[MAX_BOARD][MAX_BOARD];
 
 struct dragon_data {
   int color;    /* its color                                                 */
-  int id;       /* the index into the dragon2 array, not valid for caves     */
-  int origin;   /* the origin of the string. Two vertices are in the same    */
+  int id;       /* the index into the dragon2 array                          */
+  int origin;   /* the origin of the dragon. Two vertices are in the same    */
                 /* dragon iff they have same origin.                         */
   int size;     /* size of the dragon                                        */
   float effective_size; /* stones and surrounding spaces                     */

@@ -75,6 +75,7 @@ DECLARE(gtp_decrease_depths);
 DECLARE(gtp_defend);
 DECLARE(gtp_dragon_data);
 DECLARE(gtp_dragon_status);
+DECLARE(gtp_dragon_stones);
 DECLARE(gtp_dump_stack);
 DECLARE(gtp_echo);
 DECLARE(gtp_eval_eye);
@@ -126,6 +127,7 @@ DECLARE(gtp_version);
 DECLARE(gtp_what_color);
 DECLARE(gtp_worm_cutstone);
 DECLARE(gtp_worm_data);
+DECLARE(gtp_worm_stones);
 
 /* List of known commands. */
 static struct gtp_command commands[] = {
@@ -142,6 +144,7 @@ static struct gtp_command commands[] = {
   {"defend",           	      gtp_defend},
   {"dragon_data",             gtp_dragon_data},
   {"dragon_status",    	      gtp_dragon_status},
+  {"dragon_stones",           gtp_dragon_stones},
   {"dump_stack",       	      gtp_dump_stack},
   {"echo" ,                   gtp_echo},
   {"estimate_score",          gtp_estimate_score},
@@ -191,6 +194,7 @@ static struct gtp_command commands[] = {
   {"white",            	      gtp_playwhite},
   {"worm_cutstone",           gtp_worm_cutstone},
   {"worm_data",               gtp_worm_data},
+  {"worm_stones",             gtp_worm_stones},  
   {NULL,                      NULL}
 };
 
@@ -1939,6 +1943,35 @@ gtp_worm_data(char *s, int id)
   return GTP_OK;
 }
 
+/* Function:  List the stones of a worm
+ * Arguments: the location
+ * Fails:     if called on an empty or off-board location
+ * Returns:   list of stones
+ */
+static int
+gtp_worm_stones(char *s, int id)
+{
+  int m, n, i, j;
+  if (!gtp_decode_coord(s, &i, &j))
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "worm_stones called on an empty vertex");
+
+  examine_position(EMPTY, EXAMINE_WORMS);
+
+  gtp_printid(id, GTP_SUCCESS);
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++)
+      if (worm[m][n].origin == worm[i][j].origin)
+	gtp_mprintf("%m ", m, n);
+
+  gtp_printf("\n\n");
+  return GTP_OK;
+}
+
+
+
 /* Function:  Return the cutstone field in the worm data structure.
  * Arguments: non-empty vertex
  * Fails:     never
@@ -1988,7 +2021,7 @@ gtp_dragon_data(char *s, int id)
 	    || (i == -1
 		&& BOARD(m, n) != EMPTY
 		&& dragon[m][n].origin == POS(m, n))) {
-	  int k;
+	  int k, ti, tj;
 	  struct dragon_data *d = &dragon[m][n];
 	  struct dragon_data2 *d2 = &(dragon2[d->id]);
 	  gtp_print_vertex(m, n);
@@ -2047,11 +2080,48 @@ gtp_dragon_data(char *s, int id)
 	  gtp_printf("moyo:                   %d\n", DRAGON2(m, n).moyo);
 	  gtp_printf("safety:                 %s\n", 
 		     safety_to_string(DRAGON2(m, n).safety));
+	  gtp_printf("strings: ");
+	  for (ti = 0; ti < board_size; ti++)
+	    for (tj = 0; tj < board_size; tj++)
+	      if (worm[ti][tj].origin == POS(ti, tj)
+		  && dragon[ti][tj].origin == dragon[m][n].origin)
+		gtp_mprintf("%m ", ti, tj);
+	  gtp_printf("\n");
 	}
   }
   gtp_printf("\n");
   return GTP_OK;
 }
+
+
+/* Function:  List the stones of a dragon
+ * Arguments: the location
+ * Fails:     if called on an empty or off-board location
+ * Returns:   list of stones
+ */
+static int
+gtp_dragon_stones(char *s, int id)
+{
+  int m, n, i, j;
+  if (!gtp_decode_coord(s, &i, &j))
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "dragon_stones called on an empty vertex");
+
+  examine_position(EMPTY, EXAMINE_DRAGONS);
+
+  gtp_printid(id, GTP_SUCCESS);
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++)
+      if (dragon[m][n].origin == dragon[i][j].origin)
+	gtp_mprintf("%m ", m, n);
+
+  gtp_printf("\n\n");
+  return GTP_OK;
+}
+
+
 
 /* Function:  Tune the parameters for the move ordering in the tactical
  *            reading.
