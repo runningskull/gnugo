@@ -2042,6 +2042,9 @@ estimate_strategical_value(int pos, int color, float score)
 	if (worm[aa].defense_codes[0] == 0)
 	  break;
 
+	if (doing_scoring && dragon[aa].status == DEAD)
+	  break;
+	
 	/* FIXME: This is totally ad hoc, just guessing the value of
          *        potential cutting points.
 	 * FIXME: When worm[aa].cutstone2 == 1 we should probably add
@@ -2998,7 +3001,9 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
 	      int apos;
 	      if (attack(pos, &apos)
 		  && does_defend(apos, what)
-		  && !is_proper_eye_space(apos)) {
+		  && (forced_backfilling_moves[apos]
+		      || (!is_proper_eye_space(apos)
+			 && !false_eye_territory[apos]))) {
 		threat_does_work = 0;
 	      }
 	    }

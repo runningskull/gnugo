@@ -1329,6 +1329,14 @@ analyze_false_eye_territory(void)
 	gprintf("False eye territory at %1m\n", pos);
     }
   }
+
+  /* FIXME: This initialization doesn't really belong here but must be
+   *        done somewhere within examine_position().
+   *        The array is eventually filled by the endgame() function.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos))
+      forced_backfilling_moves[pos] = 0;
 }
 
 /* 

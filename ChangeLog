@@ -2,8 +2,16 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- endgame_find_backfilling_dame() revised
+- new global array forced_backfilling_moves[]
+- find_backfilling_move in filllib.c revised
+- disable revise_semeai() when doing_scoring
+- no bonus for attack or defense of dead potential cutstones
+  when doing_scoring
+- reevaluate_ko_threats() revised to avoid playing losing ko threats
 - RTRACE and VTRACE retired
 - corrected format of AP property in sgf_write_header()
+- tuning
 - new game records and test cases
 
 3.3.21 released June 3, 2003

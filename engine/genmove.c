@@ -648,6 +648,9 @@ revise_semeai(int color)
 
   if (stones_on_board(BLACK | WHITE) == 0)
     return 0;
+
+  if (doing_scoring)
+    return 0;
   
   gg_assert(dragon2 != NULL);
 

@@ -61,8 +61,7 @@ endgame(int color)
 	&& !worm[pos].inessential
 	&& worm[pos].attack_codes[0] == 0) {
       endgame_analyze_worm_liberties(pos, color);
-      if (board[pos] == color)
-	endgame_find_backfilling_dame(pos, color);
+      endgame_find_backfilling_dame(pos, color);
     }
   }
 }
@@ -387,9 +386,10 @@ endgame_analyze_worm_liberties(int pos, int color)
  * blunders while filling dame.
  */
 static void
-endgame_find_backfilling_dame(int str, int color)
+endgame_find_backfilling_dame(int str, int color_to_move)
 {
   int k;
+  int color = board[str];
   int other = OTHER_COLOR(color);
   int essential_liberties;
   int essential_libs[MAXLIBS];
@@ -415,9 +415,10 @@ endgame_find_backfilling_dame(int str, int color)
       if (board[str] == EMPTY)
 	break;
       if (attack_and_defend(str, NULL, NULL, NULL, &dpos)) {
-	if (worm[dpos].color == EMPTY)
+	if (worm[dpos].color == EMPTY) 
 	  move = dpos;
-	trymove(move, color, "endgame", str, EMPTY, NO_MOVE);
+	forced_backfilling_moves[dpos] = 1;
+	trymove(dpos, color, "endgame", str, EMPTY, NO_MOVE);
 	loop_again = 1;
 	break;
       }
@@ -429,8 +430,10 @@ endgame_find_backfilling_dame(int str, int color)
 
   if (move != NO_MOVE && safe_move(move, color)) {
     TRACE("  backfilling dame found at %1m for string %1m\n", move, str);
-    add_expand_territory_move(move);
-    set_minimum_territorial_value(move, 0.1);
+    if (color == color_to_move) {
+      add_expand_territory_move(move);
+      set_minimum_territorial_value(move, 0.1);
+    }
   }    
 }
 

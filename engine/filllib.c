@@ -393,7 +393,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
    * filllib:17 for a position where this matters.)
    *
    * It is also necessary to take care to first attack the string with
-   * the fewest liberties, which can probably by removed the fastest.
+   * the fewest liberties, which can probably be removed the fastest.
    * See filllib:37 for an example (J5 tactically attacks K7 but the
    * correct move is H5).
    *
@@ -402,8 +402,15 @@ find_backfilling_move(int move, int color, int *backfill_move)
    * lead to moves which complete the capture but cannot be played
    * before the attacking move itself. This is not ideal but probably
    * good enough.
+   *
+   * In order to avoid losing unnecessary points while capturing dead
+   * stones, we try first to capture stones in atari, second defending
+   * at a liberty, and third capture stones with two or more
+   * liberties. See filllib:43 for a position where capturing dead
+   * stones (B10 or C8) loses a point compared to defending at a
+   * liberty (C6).
    */
-  for (opponent_libs = 1; opponent_libs <= 5; opponent_libs++) {
+  for (opponent_libs = 1; opponent_libs <= 1; opponent_libs++) {
     for (k = 0; k < neighbors; k++) {
       if (opponent_libs < 5 && countlib(adjs[k]) != opponent_libs)
 	continue;
@@ -429,6 +436,23 @@ find_backfilling_move(int move, int color, int *backfill_move)
     }
   }
 
+  if (!found_one) {
+    for (opponent_libs = 2; opponent_libs <= 5; opponent_libs++) {
+      for (k = 0; k < neighbors; k++) {
+	if (opponent_libs < 5 && countlib(adjs[k]) != opponent_libs)
+	  continue;
+	if (attack(adjs[k], &bpos) == WIN) {
+	  if (liberty_of_string(bpos, adjs[k])) {
+	    *backfill_move = bpos;
+	    return 1;
+	  }
+	  else
+	    saved_move = bpos;
+	}
+      }
+    }
+  }
+  
   /* If no luck so far, try with superstring liberties. */
   if (!found_one) {
     trymove(move, color, "find_backfilling_move", move, EMPTY, NO_MOVE);

@@ -855,6 +855,7 @@ extern int close_white_worms[BOARDMAX][MAX_CLOSE_WORMS];
 extern int number_close_white_worms[BOARDMAX];
 
 extern int false_eye_territory[BOARDMAX];
+extern int forced_backfilling_moves[BOARDMAX];
 
 struct stats_data {
   int nodes;                     /* Number of visited nodes while reading */
