@@ -7,7 +7,9 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       score.tst manyfaces.tst cutstone.tst newscore.tst blunder.tst \
       niki.tst trevor.tst tactics.tst buzco.tst \
       capture.tst connect.tst global.tst vie.tst \
-      owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst arend.tst \
+      endgame_rot.tst optics_rot.tst connection_rot.tst ld_owl_rot.tst \
+      owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst \
+      reading_rot.tst arend.tst \
       trevora.tst trevorb.tst trevorc.tst trevord.tst semeai.tst 13x13.tst \
       nngs.tst lazarus.tst
 
@@ -29,6 +31,9 @@ test: all_batches
 reading: reading.tst
 	$(srcdir)/eval.sh reading.tst
 
+reading_rot: reading_rot.tst
+	$(srcdir)/eval.sh reading_rot.tst
+
 owl: owl.tst
 	$(srcdir)/eval.sh owl.tst
 
@@ -47,6 +52,9 @@ owl_rotall: owl.tst
 
 optics: optics.tst
 	$(srcdir)/eval.sh optics.tst
+
+optics_rot: optics_rot.tst
+	$(srcdir)/eval.sh optics_rot.tst
 
 life: life.tst
 	$(srcdir)/eval.sh life.tst --life
@@ -78,11 +86,20 @@ cutstone: cutstone.tst
 ld_owl: ld_owl.tst
 	$(srcdir)/eval.sh ld_owl.tst
 
+ld_owl_rot: ld_owl_rot.tst
+	$(srcdir)/eval.sh ld_owl_rot.tst
+
 connection: connection.tst
 	$(srcdir)/eval.sh connection.tst
 
+connection_rot: connection_rot.tst
+	$(srcdir)/eval.sh connection_rot.tst
+
 endgame: endgame.tst
 	$(srcdir)/eval.sh endgame.tst
+
+endgame_rot: endgame_rot.tst
+	$(srcdir)/eval.sh endgame_rot.tst
 
 blunder: blunder.tst
 	$(srcdir)/eval.sh blunder.tst
