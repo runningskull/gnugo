@@ -203,7 +203,6 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
 	if (verbose || (debug & DEBUG_DRAGONS))
 	  gprintf("Pattern %s joins %C dragons %1m, %1m\n",
 		  pattern->name, color, first_dragon, second_dragon);
-	fflush(stdout);
 	join_dragons(second_dragon, first_dragon);
 	/* Now look for another second dragon. */
 	second_dragon = NO_MOVE;
