@@ -22,6 +22,10 @@ loadsgf games/rosebud4.sgf 138
 4 gg_genmove white
 #? [K18]*
 
+loadsgf games/tactics04.sgf 206
+5 gg_genmove white
+#? [N16]*
+
 
 ############ End of Tests #################
 
