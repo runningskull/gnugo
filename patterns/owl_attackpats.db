@@ -2017,6 +2017,18 @@ oOXYa
 ;!obvious_false_xeye(a) || !obvious_false_oeye(b)
 
 
+Pattern A517
+#spl added (3.3.23) see nando:11
+
+?OYXxx      Prevent opponent from making an eye on the first line
+.*O.X.
+.....X
+------
+
+:8,-,value(5)
+
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves on the first line         #
