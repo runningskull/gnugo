@@ -56,8 +56,7 @@ formulate this statement if the X's are not perceived as a unit.
 The present implementation of the dragon code involves simplifying
 assumptions which can be refined in later implementations.
 
-@node Worms, Amalgamation, Worms and Dragons, Worms and Dragons
-@comment  node-name,  next,  previous,  up
+@node Worms
 @section Worms
 @cindex worm
 
@@ -328,8 +327,7 @@ These are points that threaten to attack or defend a worm.
 
 The function @code{makeworms()} will generate data for all worms.
 
-@node  Amalgamation, Connection, Worms, Worms and Dragons
-@comment  node-name,  next,  previous,  up
+@node  Amalgamation
 @section Amalgamation
 @cindex amalgamation of worms into dragons
 
@@ -378,8 +376,7 @@ captured. (ignores ko rule).
 
 A database of connection patterns may be found in @file{patterns/conn.db}.
 
-@node  Connection, Half Eyes, Amalgamation, Worms and Dragons
-@comment  node-name,  next,  previous,  up
+@node  Connection
 @section Connection
 @cindex connections
 
@@ -440,8 +437,7 @@ Oa..?
 where we verify that a move at @code{*} would stop the enemy from safely
 playing at the cutting point, thus defending against the cut.
 
-@node  Half Eyes, Dragons , Connection, Worms and Dragons
-@comment  node-name,  next,  previous,  up
+@node  Half Eyes
 @section Half Eyes and False Eyes
 @cindex half eye
 @cindex false eye
@@ -509,8 +505,7 @@ contains information about half and false eyes.  If the type is
 either attack or defend the eye. In rare cases the attack points
 could be different from the defense points.
 
-@node  Dragons, Dragons in Color, Half Eyes, Worms and Dragons
-@comment  node-name,  next,  previous,  up
+@node  Dragons
 @section Dragons
 @cindex dragons
 
@@ -805,8 +800,7 @@ Small if the semeai is close. Currently not reliable.
 @end quotation
 @end itemize
 
-@node Dragons in Color, Worm and Dragon Functions, Dragons, Worms and Dragons
-@comment  node-name,  next,  previous,  up
+@node Dragons in Color
 @section Colored Dragon Display
 @cindex colored display
 
@@ -843,8 +837,7 @@ Other useful colored displays may be obtained by using instead:
 
 The colored displays are documented elsewhere (@pxref{Colored Display}).
 
-@node Worm and Dragon Functions, , Dragons in Color, Worms and Dragons
-@comment  node-name,  next,  previous,  up
+@node Worm and Dragon Functions
 @section Worm and Dragon Functions
 
 Here are the public functions in @file{engine/worm.c}:

@@ -1,10 +1,7 @@
 @menu
 * Board Data Structures::      Board Data Structures
 * The Board Array::	       One-dimensional board array
-* Board Setup Functions::      Board Setup Functions
-* Move Functions::             Move Functions
-* Status Functions::           Status Functions
-* String Functions::           String and Miscellaneous Functions
+* Board Functions::      	Explanation of some board functions
 @end menu
 
 The foundation of the GNU Go engine is a library of very efficient
@@ -57,7 +54,7 @@ functions declared in it, i.e. the functions that are part of the
 engine, but not part of the board library.  You must link your
 application with @code{libboard.a}.
 
-@node Board Data Structures, The Board Array, , Libboard
+@node Board Data Structures
 @section Board Data structures
 
 The basic data structures of the board correspond tightly to the
@@ -95,7 +92,7 @@ section. If you write directly to them, the incremental data structures
 will become out of sync with each other, and a crash is the likely
 result. 
 
-@node The Board Array, Board Setup Functions, Board Data Structures, Libboard
+@node The Board Array
 @section The Board Array
 
 GNU Go represents the board in a one-dimensional array called
@@ -259,12 +256,10 @@ Or:
 @end example
 
 
-@node Board Setup Functions, Move Functions, The Board Array, Libboard
+@node Board Functions
 @section Board Functions
 
 These functions are all the public functions in @file{engine/board.c}.
-
-@subsection Setup Functions
 
 These functions are used when you want to set up a new position without
 actually playing out moves.
@@ -296,9 +291,6 @@ done.
 Remove a stone from the board and update the hashdata.
 @end quotation
 @end itemize
-
-@node Move Functions, Status Functions, Board Setup Functions, Libboard
-@subsection Move Functions
 
 @strong{Reading}, often called @strong{search} in computer game
 theory, is a fundamental process in GNU Go. This is the process
@@ -436,9 +428,6 @@ Retrieve the trymove counter.
 @end quotation
 @end itemize
 
-@node Status Functions, String Functions, Move Functions, Libboard
-@subsection Status Functions
-
 These functions are used for inquiring about properties of the current
 position or of potential moves.
 
@@ -504,9 +493,6 @@ only count stones in the permanent position, not stones placed by
 on the board.
 @end quotation
 @end itemize
-
-@node String Functions, , Status Functions, Libboard
-@subsection String and Miscellaneous Functions
 
 These functions are used for getting information like liberties, member
 stones and similar about strings. Most of these are here because they

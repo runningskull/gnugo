@@ -52,8 +52,8 @@ are respected.
 
 @contents
 
-@node Top, Introduction, (dir), (dir)
-@comment node-name, next,         previous, up
+@node Top
+@top
 @ifinfo
 @unnumbered GNU GO
 
@@ -110,131 +110,112 @@ Indices
 
 @end menu
 
-@node    Introduction, Installation, Top, Top
-@comment node-name,    next,        previous,     up
+@node    Introduction
 @chapter Introduction
 
 @include introduction.texi
 
-@node Installation, User Guide, Introduction, Top
-@comment node-name,    next,        previous,     up
+@node Installation
 @chapter Installation
 
 @include install.texi
 
-@node User Guide, Overview, Installation, Top
-@comment node-name,    next,        previous,     up
+@node User Guide
 @chapter Using GNU Go
 
 @include using.texi
 
-@node  Overview, Analyzing, User Guide, Top
-@comment node-name,    next,             previous,    up
+@node  Overview
 @chapter GNU Go engine overview
 
 @include overview.texi
 
-@node  Analyzing, API, Overview, Top
-@comment  node-name,  next,  previous,  up
+@node  Analyzing
 @chapter Analyzing GNU Go's moves
 
 @include analyze.texi
 
-@node API, SGF, Analyzing, Top
+@node API
 @chapter Application Programmers Interface to GNU Go
 
 @include api.texi
 
-@node SGF, Libboard, API, Top
+@node SGF
 @chapter Handling SGF trees in memory
 
 @include sgf.texi
 
-@node Libboard, Move Generation, SGF, Top
+@node Libboard
 @chapter The Board Library
 
 @include board.texi
 
-@node Move Generation, Worms and Dragons, Libboard, Top
-@comment  node-name,  next,  previous,  up
+@node Move Generation
 @chapter Move generation
 
 @include move_generation.texi
 
-@node Worms and Dragons, Eyes, Move Generation, Top
-@comment node-name,    next,            previous,      up
+@node Worms and Dragons
 @chapter Worms and Dragons
 
 @include dragon.texi
 
-@node Eyes, Patterns, Worms and Dragons, Top
-@comment  node-name,  next,  previous,  up
+@node Eyes
 @chapter Eyes and Half Eyes
 
 @include eyes.texi
 
-@node Patterns, DFA, Eyes, Top
-@comment  node-name,  next,  previous,  up
+@node Patterns
 @chapter The Pattern Code
 
 @include patterns.texi
 
-@node DFA, Tactical Reading, Patterns, Top
-@comment  node-name,  next,  previous,  up
+@node DFA
 @chapter The DFA pattern matcher
 
 @include dfa.texi
 
-@node Tactical Reading, Pattern Based Reading, DFA, Top
-@comment  node-name,  next,  previous,  up
+@node Tactical Reading
 @chapter Tactical reading
 
 @include reading.texi
 
-@node Pattern Based Reading, Influence, Tactical Reading, Top
-@comment  node-name,  next,  previous,  up
+@node Pattern Based Reading
 @chapter Pattern Based Reading
 
 @include owl.texi
 
-@node Influence, Moyo, Pattern Based Reading, Top
-@comment  node-name,  next,  previous,  up
+@node Influence
 @chapter Influence Function
 
 @include influence.texi
 
-@node Moyo, Utility Functions, Influence, Top
-@comment  node-name,  next,  previous,  up
+@node Moyo
 @chapter Moyo
 
 @include moyo.texi
 
-@node Utility Functions, Incremental Board, Moyo, Top
-@comment  node-name,  next,  previous,  up
+@node Utility Functions
 @chapter Utility Functions
 
 @include utils.texi
 
-@node Incremental Board, GTP, Utility Functions, Top
-@comment  node-name,  next,  previous,  up
+@node Incremental Board
 @chapter Incremental Algorithms in Reading
 
 @include incremental.texi
 
-@node GTP, Regression, Incremental Board, Top
-@comment  node-name,  next,  previous,  up
+@node GTP
 @chapter The Go Text Protocol
 
 @include gtp.texi
 
-@node Regression, Copying, GTP, Top
-@comment  node-name,  next,  previous,  up
+@node Regression
 @chapter Regression testing
 
 @include regression.texi
 
-@node Copying, Concept Index, Regression, Top
-@comment node-name,    next,        previous,     up
+@node Copying
 @appendix Copying
 
 @include copying.texi
@@ -244,14 +225,12 @@ Indices
 @c ------------------------
 
 
-@node  Concept Index, Functions Index, Copying, Top
-@comment node-name,    next,  previous,      up
+@node  Concept Index
 @unnumbered Concept Index
 
 @printindex cp
 
-@node  Functions Index,  , Concept Index, Top
-@comment  node-name,  next,  previous,  up
+@node  Functions Index
 @unnumbered Functions Index
 
 @printindex fn

@@ -30,8 +30,7 @@ For a summary of the reading functions see @xref{Reading Functions}.
 * Debugging::                    Debugging the reading code
 @end menu
 
-@node Reading Basics, Hashing, Tactical Reading, Tactical Reading
-@comment  node-name,  next,  previous,  up
+@node Reading Basics
 @section Reading Basics
 
 What we call @emph{Tactical Reading} is the analysis whether there is
@@ -194,8 +193,7 @@ considered safe. This may or may not be a good convention.
 @end quotation
 @end itemize
 
-@node Hashing, Hash Calculation, Reading Basics, Tactical Reading
-@comment  node-name,  next,  previous,  up
+@node Hashing
 @section Hashing of Positions
 
 @cindex Hashing of positions
@@ -235,8 +233,7 @@ reinitialized at the beginning of each move by a call to
 * Hash Functions::              Hash functions and macros
 @end menu
 
-@node Hash Calculation, Hash Organization, Hashing, Hashing
-@comment  node-name,  next,  previous,  up
+@node Hash Calculation
 @subsection Calculation of the hash value
 
 The hash algorithm is called Zobrist hashing, and is a standard
@@ -276,8 +273,7 @@ which are applicable for the position (white stones, black stones, and
 ko position).
 @end enumerate
 
-@node Hash Organization, Hash Structures, Hash Calculation, Hashing
-@comment  node-name,  next,  previous,  up
+@node Hash Organization
 @subsection Organization of the hash table
 
 The hash table consists of 3 parts:
@@ -348,8 +344,7 @@ of collisions could be changed in the future.  It is also not
 determined what the optimum sizes for the hash table, the number of
 positions and the number of results are.
 
-@node Hash Structures, Hash Functions, Hash Organization, Hashing
-@comment  node-name,  next,  previous,  up
+@node Hash Structures
 @subsection Hash Structures
 
 The basic hash structures are declared in @file{engine/hash.h} and
@@ -461,8 +456,7 @@ be done in the same position, there should be more of these than
 hash nodes.
 @end itemize
 
-@node Hash Functions, Persistent Cache, Hash Structures, Hashing
-@comment  node-name,  next,  previous,  up
+@node Hash Functions
 @subsection Hash Functions
 
 The following functions are defined in @file{hash.c}:
@@ -618,8 +612,8 @@ cache the @code{read_result}. Clear the hashtable if full and return
 @end quotation
 @end itemize
 
-@node Persistent Cache, Ko, Hash Functions, Tactical Reading
-@subsection Persistent Reading Cache
+@node Persistent Cache
+@section Persistent Reading Cache
 
 @cindex Persistent reading cache
 @findex store_persistent_reading_cache
@@ -693,7 +687,7 @@ If the stack pointer is >0 we add the moves already played from the
 moves stack with mark 4.
 @end itemize
 
-@node Ko, A Ko Example, Persistent Cache, Tactical Reading
+@node Ko
 @section Ko Handling
 
 The principles of ko handling are the same for tactical reading and
@@ -831,7 +825,7 @@ board_ko_pos.
 @end itemize
 @end itemize
 
-@node A Ko Example, Another Ko Example, Ko, Tactical Reading
+@node A Ko Example
 @section A Ko Example
 
 To see the komaster scheme in action, consider this position
@@ -927,8 +921,7 @@ he can do and he is found dead. Thus the komaster scheme
 produces the correct result.
 
 
-@node Another Ko Example, Alternate Komaster Schemes, A Ko Example, Tactical Reading
-@comment  node-name,  next,  previous,  up
+@node Another Ko Example
 @section Another Ko Example
 
 We now consider an example to show why the komaster is reset
@@ -988,8 +981,7 @@ still komaster, he could capture the ko at N3 and there would be
 no way to finish off B.
 
 
-@node Alternate Komaster Schemes, Superstrings, Another Ko Example,  Tactical Reading
-@comment  node-name,  next,  previous,  up
+@node Alternate Komaster Schemes
 @section Alternate Komaster Schemes
 
 The following alternate schemes have been proposed. It is assumed
@@ -1043,8 +1035,7 @@ captured by this move.
 @end itemize
 @end itemize
 
-@node Superstrings, Reading Functions, Alternate Komaster Schemes, Tactical Reading
-@comment  node-name,  next,  previous,  up
+@node Superstrings
 @section Superstrings
 
 A @emph{superstring} is an extended string, where the extensions are
@@ -1093,8 +1084,7 @@ reading because sometimes attacking or defending an element of the
 superstring is the best way to attack or defend a string. This is
 in contrast with dragons, which are ignored during tactical reading.
 
-@node Reading Functions, Debugging, Superstrings, Tactical Reading
-@comment  node-name,  next,  previous,  up
+@node Reading Functions
 @section Reading Functions
 
 Here we list the publically callable functions in @file{reading.c}.
@@ -1220,8 +1210,7 @@ going on.
 @end quotation
 @end itemize
 
-@node Debugging, , Reading Functions, Tactical Reading
-@comment  node-name,  next,  previous,  up
+@node Debugging
 @section Debugging the reading code
 
 @cindex How to debug the reading code

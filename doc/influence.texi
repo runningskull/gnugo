@@ -13,8 +13,7 @@
 * Influential Display::         Colored display and debugging of influence
 @end menu
 
-@node Influential Concepts, Influence Usage, Influence, Influence
-@comment  node-name,  next,  previous,  up
+@node Influential Concepts
 @section Conceptual Outline of Influence
 @cindex moyo
 @cindex territory
@@ -59,8 +58,7 @@ and patterns/barriers.db. The details are explained in
 @ref{Influential Patterns}.
 
 
-@node Influence Usage, Influence and Territory, Influential Concepts, Influence
-@comment  node-name,  next,  previous,  up
+@node Influence Usage
 @section Where influence gets used in the engine
 
 The information obtained from the influence computation is used in a variety
@@ -111,8 +109,7 @@ influence computation is done in order to compute the followup value of
 a move. Some explainations are in @ref{Territorial Details}.
 
 
-@node Influence and Territory, Territorial Details, Influence Usage, Influence
-@comment  node-name,  next,  previous,  up
+@node Influence and Territory
 @section Influence and Territory
 
 In this section we consider how the influence function is used to
@@ -271,8 +268,7 @@ territory. GNU Go 3.2 uses a revised heuristic, which is explained in the
 next section, to assign probable territory to each player.
 
 
-@node Territorial Details, The Influence Core, Influence and Territory, Influence
-@comment  node-name,  next,  previous,  up
+@node Territorial Details
 @section Details of the Territory Valuation
 
 
@@ -313,8 +309,7 @@ To fine tune this scheme, some revisions have been made to the influence
 computations that are relevant for territorial evaluation. This includes
 a reduced default attenuation and some revised pattern handling.
 
-@node The Influence Core, The Influence Algorithm, Territorial Details, Influence
-@comment  node-name,  next,  previous,  up
+@node The Influence Core
 @section The Core of the Influence Function
 
 The basic influence radiation process can efficiently be implemented
@@ -387,8 +382,7 @@ propagation still remains, i.e. no intersection is visited more
 than once and after being visited no more influence will be
 propagated to the intersection.
 
-@node The Influence Algorithm, Permeability, The Influence Core, Influence
-@comment  node-name,  next,  previous,  up
+@node The Influence Algorithm
 @section The Core of the Influence Function
 
 Let @code{(m, n)} be the coordinates of the influence source and
@@ -450,8 +444,7 @@ called once for each influence source. These invocations are
 totally independent and the influence contributions from the
 different sources are added together.
 
-@node Permeability, Escape, The Influence Algorithm, Influence
-@comment  node-name,  next,  previous,  up
+@node Permeability
 @section Permeability
 
 The permeability at the different points is initially one at all empty
@@ -497,8 +490,7 @@ We don't want @samp{X} influence to be spread from @samp{a} to
 @samp{b}, and since the permeability at both c and d is zero, the
 rule above stops this.
 
-@node Escape, Surrounded Dragons, Permeability, Influence
-@comment  node-name,  next,  previous,  up
+@node Escape
 @section Escape
 
 One application of the influence code is in computing the
@@ -590,7 +582,8 @@ The current escape route mechanism seems good enough to be useful
 but is not completely reliable. Mostly it seems to err on the side of
 being too optimistic.
 
-@node Surrounded Dragons, Influential Patterns, Escape, Influence
+@node Surrounded Dragons
+@section Surrounded Dragons
 
 When is a dragon surrounded?
 
@@ -711,8 +704,7 @@ the escape_route is divided by 2. If the dragon is SURROUNDED,
 escape_route is simply set to 0.
 
 
-@node Influential Patterns, Influential Functions, Surrounded Dragons, Influence
-@comment  node-name,  next,  previous,  up
+@node Influential Patterns
 @section Patterns used by the Influence module
 
 This section explains the details of the pattern databases used for
@@ -833,8 +825,7 @@ where @samp{b} refers to the stone at @samp{*}. In fact, almost all
 followup-specific constraints look similar to this.
 
 
-@node Influential Functions, Influential Display, Influential Patterns, Influence
-@comment  node-name,  next,  previous,  up
+@node Influential Functions
 @section Influential Functions
 
 @itemize @bullet 
@@ -963,8 +954,7 @@ assumed that the printmoyo global tells what information to print.
 @end quotation
 @end itemize
 
-@node Influential Display, ,Influential Functions, Influence
-@comment  node-name,  next,  previous,  up
+@node Influential Display
 @section Colored display and debugging of influence
 
 There are various ways to obtain detailed information about the influence

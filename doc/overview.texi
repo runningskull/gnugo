@@ -25,8 +25,7 @@ a fullboard lookahead.
 @end menu
 
 
-@node Examining the Position, Move Generators,, Overview
-@comment node-name,       next,          previous,     up
+@node Examining the Position
 @section Gathering Information
 
 This is by far the most important phase in the move generation. 
@@ -60,7 +59,8 @@ we mean a group of stones that cannot be disconnected.
 Naturally the first step in the responsible function @code{make_dragons()}
 is to identify these dragons, i.e. determine which worms cannot be
 disconnected from each other. This is partly done by patterns, but
-in most cases the specialized readconnect code (@pxref{Connections})
+in most cases the specialized readconnect code 
+@comment FIXME: Put in cross-ref here once Connection is documented 
 is called. This module does a minimax search to determine whether two
 given worms can be connected with, resp. disconnected from each other.
 
@@ -93,11 +93,11 @@ into an alleged territory, with sequences that would be too difficult to
 see for the influence code.
 
 
-@node Move Generators, Move Valuation, Examining the Position, Overview
+@node Move Generators
+@section Move Generators
 @cindex move generation
 @cindex move generators
 @cindex move reasons
-@section Move Generators
 
 Once we have found out all about the position it is time to generate
 the best move. Moves are proposed by a number of different modules
@@ -225,7 +225,7 @@ move is generated.
 @end quotation
 @end itemize
 
-@node Move Valuation, Detailed Sequence of Events, Move Generators, Overview
+@node Move Valuation
 @section Move Valuation
 
 After the move generation modules have run, each proposed candidate
@@ -244,8 +244,7 @@ here, e.g. to avoid duplication of such values. This is explained in
 more detail in @ref{Valuation}.
 
 
-@node Detailed Sequence of Events, Roadmap, Move Valuation, Overview
-@comment node-name,     next,            previous,        up
+@node Detailed Sequence of Events
 @section Detailed Sequence of Events
 
 First comes the sequence of events when
@@ -359,8 +358,7 @@ if still no move found
     pass
 @end format
 
-@node Roadmap, Coding Styles, Detailed Sequence of Events, Overview
-@comment node-name,     next,            previous,        up
+@node Roadmap
 @section Roadmap
 
 The GNU Go engine is contained in two directories, @file{engine/} and
@@ -705,8 +703,7 @@ These contain pattern databases in human readable form.
 @end itemize
 
 
-@node Coding Styles, Navigating the Source, Roadmap, Overview
-@comment node-name,     next,          previous,        up
+@node Coding Styles
 @section Coding styles and conventions
               
 @subsection Coding Conventions
@@ -796,8 +793,7 @@ the stack.
 We have adopted the convention of putting the word FIXME
 in comments to denote known bugs, etc.
 
-@node Navigating the Source, , Coding Styles, Overview
-@comment node-name,     next,          previous,        up
+@node Navigating the Source
 @section Navigating the Source
 
 If you are using Emacs, you may find it fast and convenient to use

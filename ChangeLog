@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- doc: Consistently use hierarchical structure instead of next/previous/up
 - tuning
 - owl tuning
 - doc: complete rewrite of first sections of overview.texi

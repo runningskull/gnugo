@@ -8,7 +8,7 @@ The file @file{score.c} contains algorithms for the computation of
 a number of useful things. Most can be displayed visually using
 the @option{-m} option (@pxref{Colored Display}).
 
-@node Moyo history, Bouzy, Moyo, Moyo
+@node Moyo history
 @section Moyo history
 
 In GNU Go 2.6 extensive use was made of an algorithm from
@@ -41,8 +41,7 @@ Not all features of the old @file{moyo.c} from
 GNU Go 2.6 were reimplemented---particularly the deltas were
 not---but the reimplementation may be more readable.
 
-@node Bouzy, , Moyo history, Moyo
-@comment  node-name,  next,  previous,  up
+@node Bouzy
 @section Bouzy's 5/21 algorithm
 
 Bouzy's algorithm was inspired by prior work of Zobrist and ideas from

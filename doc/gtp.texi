@@ -7,8 +7,7 @@
 * GTP command reference::         Details on every GTP command
 @end menu
 
-@node The Go Text Protocol, Protocol applications, GTP, GTP
-@comment  node-name,  next,  previous,  up
+@node The Go Text Protocol
 @section The GNU Go Text Protocol
 
 GNU Go 3.0 introduced a new interface, the Go Text Protocol
@@ -160,7 +159,7 @@ For exact specification of their arguments and results,
 @xref{GTP command reference}.
 
 
-@node Protocol applications, Protocol conventions, The Go Text Protocol, GTP
+@node Protocol applications
 @section Protocol applications
 
 The protocol is asymmetric and involves two parties, which we may
@@ -224,7 +223,7 @@ implementing setup 3 are also distributed with GNU Go (the files
 @file{interface/gtp_examples/twogtp} and 
 @file{interface/gtp_examples/2ptkgo.pl}).
 
-@node Protocol conventions, Regression with GTP, Protocol applications, GTP
+@node Protocol conventions
 @section Protocol conventions
 
 The GTP is currently unfinished and unstandardized. It is hoped that it
@@ -345,8 +344,7 @@ gtp_report_uncertainty(char *s)
 @}
 @end example
 
-@node Regression with GTP, GTP command reference, Protocol conventions, GTP
-@comment  node-name,  next,  previous,  up
+@node Regression with GTP
 @section Regression testing with GTP
 
 GNU Go uses GTP for regression testing. These tests are implemented as
@@ -357,7 +355,7 @@ results are then compared with expected results encoded in GTP comments
 in the file, using matching with regular expressions. More information
 can be found in the regression chapter (@pxref{Regression}).
 
-@node GTP command reference, , Regression with GTP, GTP
+@node GTP command reference
 @section GTP command reference
 
 This section lists the GTP command set along with some information about each

@@ -87,7 +87,7 @@ engine.
 * Positional Functions::     Functions which manipulate a Position
 @end menu
 
-@node Getting Started, Basic Data Structures, API, API
+@node Getting Started
 
 @section How to use the engine in your own program: getting started
 
@@ -106,11 +106,11 @@ the internal hash table. In addition to this the engine will use a few
 megabytes for other purposes such as data describing groups (liberties,
 life status, etc), eyes and so on.
 
-@node Basic Data Structures, The Board State, Getting Started, API
+@node Basic Data Structures
+@section Basic Data Structures in the Engine
 @cindex data structures
 @cindex position struct
 
-@section Basic Data Structures in the Engine
 
    There are some basic definitions in gnugo.h which are used
 everywhere. The most important of these are the numeric declarations of
@@ -154,7 +154,7 @@ board dates back to the ancestral program written by Man Lung Li
 before 1995. The API still uses the one-dimensional board, so
 the API functions have not changed much since GNU Go 3.0.
 
-@node The Board State, Positional Functions, Basic Data Structures, API
+@node The Board State
 
 @section The board_state struct
 @cindex board_state
@@ -200,7 +200,7 @@ move was not a ko capture, the komi, the number of captures, and
 corresponding data for the initial position at the beginning
 of the move history.
 
-@node Positional Functions, , The Board State, API
+@node Positional Functions
 
 @section Functions which manipulate a Position
 

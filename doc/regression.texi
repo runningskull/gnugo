@@ -23,7 +23,7 @@ if a change breaks something.
 * HTML Views::                  HTML Views
 @end menu
 
-@node Regression Testing, Test Suites, , Regression
+@node Regression Testing
 @section Regression testing in GNU Go
 
 Regression testing is performed by the files in the @file{regression/}
@@ -37,7 +37,7 @@ this. If you @command{make all_batches} most of the tests are run.
 Game records used by the regression tests are stored in the
 directory @file{regression/games/} and its subdirectories.
 
-@node Test Suites, Performance Testing, Regression Testing, Regression
+@node Test Suites
 @section Test suites
 
 The regression tests are grouped into suites and stored in files as GTP
@@ -85,7 +85,7 @@ followed by a @samp{&}, meaning that the result is ignored. This is
 primarily used to report statistics, e.g. how many tactical reading
 nodes were spent while running the test suite.
 
-@node Performance Testing, HTML Views, Test Suites, Regression
+@node Performance Testing
 @section Performing tests
 
 @code{./test.sh blunder.tst} runs the tests in @file{blunder.tst} and
@@ -175,7 +175,7 @@ example, @code{make blunder} runs the tests in the blunder test suite by
 executing @code{eval.sh blunder.tst}. @code{make test} runs all test
 suites in a sequence using the @code{regress.sh} script.
 
-@node HTML Views, , Performance Testing, Regression
+@node HTML Views
 @section HTML Regression Views
 
 Extremely useful HTML Views of the regression tests may be

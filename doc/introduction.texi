@@ -11,7 +11,7 @@ us at @email{gnugo@@gnu.org} if you are interested in helping.
 * TODO::                        The GNU Go Task list 
 @end menu
 
-@node About, Copyright, ,Introduction
+@node About
 
 @section About GNU Go and this Manual
 
@@ -55,8 +55,7 @@ move, and Chapters 6--7 form a general programmer's reference to the GNU
 Go API. The remaining chapters are more detailed explorations of
 different aspects of GNU Go's internals.
 
-@node    Copyright, Authors, About, Introduction
-@comment node-name,    next,     previous,     up
+@node    Copyright
 @section Copyrights
 
 Copyright 1999, 2000, 2001, 2002 and 2003 by the Free Software Foundation
@@ -93,8 +92,7 @@ The remaining SGF files are either copyright by the FSF or are in the public dom
 
 
 
-@node    Authors, Thanks, Copyright, Introduction
-@comment node-name,    next,        previous,     up
+@node    Authors
 @section Authors
 
 GNU Go maintainers are Daniel Bump, Gunnar Farneback and Arend
@@ -108,8 +106,7 @@ M@aa{}ns Ullerstam, Arend Bayer, Trevor Morris, Evan Berggren
 Daniel, Fernando Portela, Paul Pogonyshev, S.P. Lee and
 Stephane Nicolet.
 
-@node Thanks, TODO, Authors, Introduction
-@comment node-name,    next,        previous,     up
+@node Thanks
 @section Thanks
 
 We would like to thank Arthur Britto, Tim Hunt, Piotr Lakomy, Paul Leonard,
@@ -139,8 +136,7 @@ writing CGoban and gmp.c, Rene Grothmann for Jago and Erik van Riper and his
 collaborators for NNGS.
 
 
-@node TODO,  , Thanks, Introduction
-@comment  node-name,  next,  previous,  up
+@node TODO
 @section The GNU Go Task List
 
 You can help make GNU Go the best Go program.

@@ -36,9 +36,8 @@ compile time.
 @cindex product
 
 
-@node Introduction to the DFA, What is a DFA, DFA, DFA
-@comment  node-name,  next,  previous,  up
-@subsection Introduction to the DFA
+@node Introduction to the DFA
+@section Introduction to the DFA
 
 The general idea is as follows:
 
@@ -109,9 +108,8 @@ So we can forget that we are dealing with two dimensional patterns and
 consider linear patterns.
 
 
-@node What is a DFA, Pattern matching with DFA, Introduction to the DFA, DFA
-@comment  node-name,  next,  previous,  up
-@subsection What is a DFA
+@node What is a DFA
+@section What is a DFA
 
 The acronym DFA means Deterministic Finite state Automaton
 (See @uref{http://www.eti.pg.gda.pl/~jandac/thesis/node12.html}
@@ -264,9 +262,8 @@ dfa_t;}
 @end group
 @end example
 
-@node Pattern matching with DFA, Building the DFA, What is a DFA, DFA
-@comment  node-name,  next,  previous,  up
-@subsection Pattern matching with DFA
+@node Pattern matching with DFA
+@section Pattern matching with DFA
 
 Recognizing with a DFA is very simple
 and thus very fast 
@@ -335,9 +332,8 @@ After reaching state 6 where we match patterns
 To keep the same match order as in the standard algorithm, 
 the patterns indexes are collected in an array and sorted by indexes.
 
-@node Building the DFA, Incremental Algorithm, Pattern matching with DFA, DFA
-@comment  node-name,  next,  previous,  up
-@subsection Building the DFA
+@node Building the DFA
+@section Building the DFA
 
 The most flavouring point is the building of the minimal DFA 
 recognizing a given set of patterns.
@@ -399,9 +395,8 @@ explained in @cite{Aho, Ravi Sethi, Ullman "COMPILERS:
 Principles, Techniques and Tools" chapter Optimization of
 DFA-based pattern matchers}.
 
-@node Incremental Algorithm, DFA Optimizations, Building the DFA, DFA
-@comment  node-name,  next,  previous,  up
-@subsection Incremental Algorithm
+@node Incremental Algorithm
+@section Incremental Algorithm
 
 The incremental version of the DFA pattern matcher is not yet implemented
 in gnugo but we explain here how it will work.
@@ -434,9 +429,8 @@ of the pattern matcher is:
 In most situations reverse(lx-i,ly-j) will be inferior to
 top_stack[i][j]. This should speedup a lot pattern matching.
 
-@node DFA Optimizations,  , Incremental Algorithm, DFA
-@comment  node-name,  next,  previous,  up
-@subsection Some DFA Optimizations
+@node DFA Optimizations
+@section Some DFA Optimizations
 
 The dfa is constructed to minimize jumps in memory making some
 assumptions about the frequencies of the values: the EMPTY

@@ -40,11 +40,9 @@ in @file{config.h} can be changed with the configure options
 * The Owl Code::                Life and death reading
 * Owl Functions::               Functions in @file{owl.c}
 * Combinations::                Combinations
-* Connections::                 Connections
 @end menu
 
-@node The Owl Code, Owl Functions, , Pattern Based Reading
-@comment  node-name,  next,  previous,  up
+@node The Owl Code
 @section The Owl Code
 
 The life and death code in @file{optics.c}, described elsewhere
@@ -153,8 +151,7 @@ the dragon at @var{location} is checked, or both.
 @option{--decide-position} performs the same analysis for all
 dragons with small escape route. 
 
-@node Owl Functions, Combinations, The Owl Code, Pattern Based Reading
-@comment  node-name,  next,  previous,  up
+@node Owl Functions
 @section Functions in @file{owl.c}
 @cindex owl functions, how to write
 
@@ -293,7 +290,8 @@ the current owl data.
 @end quotation
 @end itemize
 
-@node Combinations, Connections, Owl Functions, Pattern Based Reading
+@node Combinations
+@section Combination reading
 
 It may happen that no single one of a set of worms can be killed,
 yet there is a move that guarantees that at least one can be captured. 
@@ -372,11 +370,6 @@ move at (move) has been made, and returns its size (in points).
 after this move.
 @end quotation
 @end itemize
-
-@node Connections, , Combinations, Pattern Based Reading
-
-
-
 
 
 

@@ -22,8 +22,7 @@ certain move.
 * Colored Display::             Colored Display
 @end menu
 
-@node Traces, Output File, Analyzing, Analyzing
-@comment  node-name,  next,  previous,  up
+@node Traces
 @section Interpreting Traces
 @cindex traces
 @cindex tuning GNU Go
@@ -50,8 +49,7 @@ worms and dragons around the board. This type of information is
 available by different methods, however (@pxref{Debugboard},
 @pxref{Colored Display}).
 
-@node Output File, Decide string, Traces, Analyzing
-@comment  node-name,  next,  previous,  up
+@node Output File
 @section The Output File
 @cindex output file
 @cindex output file
@@ -79,8 +77,7 @@ option will also help you to find out if your current version
 of GNU Go would play differently than the program that created
 the file.
 
-@node Decide string, Decide dragon, Output File, Analyzing
-@comment  node-name,  next,  previous,  up
+@node Decide string
 @section Checking the reading code
 @cindex decide-string
 
@@ -154,8 +151,7 @@ finding the function calls which generate these comments,
 try setting @code{sgf_dumptree=1} and setting a breakpoint in
 @code{sgf_trace}.
 
-@node Decide dragon, GTP and GDB techniques, Decide string, Analyzing
-@comment  node-name,  next,  previous,  up
+@node Decide dragon
 @section Checking the Owl code
 @cindex decide-dragon
 
@@ -166,8 +162,7 @@ to produce variation trees. These should be typically
 much smaller than the variation trees produced by
 @option{--decide-string}.
 
-@node GTP and GDB techniques, Debugboard, Decide dragon, Analyzing
-@comment  node-name,  next,  previous,  up
+@node GTP and GDB techniques
 @section GTP and GDB techniques
 @cindex GDB
 @cindex GTP
@@ -190,8 +185,7 @@ list the dragon data with the command:
 
 Similarly you can get the worm data with @command{worm P12}.
 
-@node Debugboard, Scoring, GTP and GDB techniques, Analyzing
-@comment  node-name,  next,  previous,  up
+@node Debugboard
 @section Debugboard
 @cindex debugboard
 
@@ -203,8 +197,7 @@ makes a graphical display of the board. Using the cursor
 movement keys, you can move around the board and find
 out the contents of the worm, dragon and eye arrays.
 
-@node Scoring, Colored Display, Debugboard, Analyzing
-@comment  node-name,  next,  previous,  up
+@node Scoring
 @section Scoring the game
 @cindex scoring
 
@@ -213,8 +206,7 @@ the score at the end of the game, but if you want this information about
 a game stored in a file, use the @option{--score} option (@pxref{Invoking
 GNU Go}).
 
-@node  Colored Display,  , Scoring, Analyzing
-@comment  node-name,  next,  previous,  up
+@node  Colored Display
 @section Colored Display
 @cindex colored display
 

@@ -10,8 +10,7 @@ functions and their in-source documentation (@pxref{Navigating the Source}).
 * Print Utilities::              Utilities from @file{engine/printutils.c}
 @end menu
 
-@node General Utilities, Print Utilities, , Utility Functions
-@comment  node-name,  next,  previous,  up
+@node General Utilities
 @section General Utilities
 
 Utility functions from @file{engine/utils.c}. Many of these
@@ -317,8 +316,7 @@ time is less than mintime.
 @end quotation
 @end itemize
 
-@node Print Utilities, ,General Utilities, Utility Functions
-@comment  node-name,  next,  previous,  up
+@node Print Utilities
 @section Print utilities
 
 Utility functions from @file{engine/printutils.c}.

@@ -10,8 +10,7 @@
 * Invoking GNU Go::          Command line options
 @end menu
 
-@node Documentation, CGoban, , User Guide
-@comment  node-name,  next,  previous,  up
+@node Documentation
 
 @section Getting Documentation
 
@@ -51,8 +50,7 @@ Documentation for developers is in the Texinfo documentation, and in comments
 throughout the source. Contact us at @email{gnugo@@gnu.org} if you are
 interested in helping to develop this program.
 
-@node CGoban, Ascii, Documentation, User Guide
-@comment  node-name,  next,  previous,  up
+@node CGoban
 @section Running GNU Go via CGoban
 @cindex CGoban
 
@@ -85,8 +83,7 @@ I/O other messages are sent to stderr, even if they are not error
 messages. These will appear in the terminal from which you started
 CGoban.
 
-@node Ascii, Emacs, CGoban, User Guide
-@comment  node-name,  next,  previous,  up
+@node Ascii
 @section Ascii Interface
 @cindex ascii interface
 
@@ -105,8 +102,7 @@ the command @command{gnugo -l @var{filename} --mode ascii}. Reloading
 games is not supported when playing with CGoban. However you can
 use CGoban to save a file, then reload it in ascii mode.
 
-@node Emacs, Jago, Ascii, User Guide
-@comment  node-name,  next,  previous,  up
+@node Emacs
 @section GNU Go mode in Emacs
 @cindex emacs mode
 
@@ -172,8 +168,7 @@ command for GNU Go. The possible commands are as in @xref{Ascii}.
 @end quotation
 @end itemize
 
-@node Jago, GMP and GTP, Emacs, User Guide
-@comment  node-name,  next,  previous,  up
+@node Jago
 @section Running GNU Go via Jago
 @cindex jago
 
@@ -186,8 +181,7 @@ You will need a Java runtime environment. Obtain Jago at
 @noindent
 and follow the links there for the Java runtime environment.
 
-@node GMP and GTP, Tournaments, Jago, User Guide
-@comment  node-name,  next,  previous,  up
+@node GMP and GTP
 @section The Go Modem Protocol and Go Text Protocol
 @cindex GMP
 @cindex GTP
@@ -208,7 +202,7 @@ GNU Go 3.0 introduced a new protocol, the Go Text Protocol
 (@pxref{GTP}) which we hope can serve the functions currently 
 used by the GMP.
 
-@node Tournaments, SGF Support, GMP and GTP, User Guide
+@node Tournaments
 
 @section Computer Go Tournaments
 
@@ -221,8 +215,7 @@ Setup window as usual. For White, select ``Device'' and set
 the device to @file{/dev/cua0} if your serial port is COM1
 and @file{/dev/cua1} if the port is COM2.
 
-@node SGF Support, Invoking GNU Go, Tournaments, User Guide
-@comment  node-name,  next,  previous,  up
+@node SGF Support
 @section Smart Go Format
 @cindex SGF (Smart Go Format)
 @cindex Smart Go Format
@@ -232,8 +225,7 @@ GNU Go supports both reading and writing SGF files. The SGF specification
 (FF[4]) is at:
 @url{http://www.red-bean.com/sgf/}
 
-@node Invoking GNU Go, , SGF Support, User Guide
-@comment  node-name,  next,  previous,  up
+@node Invoking GNU Go
 @section Invoking GNU Go: Command line options
 @cindex command line options
 @cindex invoking GNU Go

@@ -19,8 +19,7 @@
 * Corner Matcher::                A special matcher for joseki patterns.
 @end menu
 
-@node Patterns Overview, Pattern Classification, Patterns, Patterns
-@comment  node-name,  next,  previous,  up
+@node Patterns Overview
 @section Overview
 
 @cindex pattern overview
@@ -133,8 +132,7 @@ This program is not built by default---if you think you need it,
 @code{make transpat} in the @file{patterns/} directory and
 consult the usage remarks at the beginning of @file{patterns/transpat.c}.
 
-@node  Pattern Classification, Pattern Values, Patterns Overview, Patterns
-@comment  node-name,  next,  previous,  up
+@node  Pattern Classification
 @section Pattern Attributes
 
 @cindex pattern attributes
@@ -279,8 +277,7 @@ The types @samp{o} and @samp{O} could conceivably appear in a class, meaning it
 applies only to @code{UNKNOWN}. @samp{X} and @samp{x} could similarly be used together.
 All classes can be combined arbitrarily.
 
-@node  Pattern Values, Helper Functions, Pattern Classification, Patterns
-@comment  node-name,  next,  previous,  up
+@node  Pattern Values
 @section Pattern Attributes
 
 The second and following fields in the @samp{:} line of a pattern
@@ -328,8 +325,7 @@ Adds x to the move's followup value.
 
 The meaning of these values is documented in @xref{Move Generation}.
 
-@node  Helper Functions, Autohelpers and Constraints, Pattern Values, Patterns
-@comment  node-name,  next,  previous,  up
+@node  Helper Functions
 @section Helper Functions
 
 @cindex helper functions in pattern matching
@@ -418,8 +414,7 @@ If this attack fails we let @samp{O} connect at @samp{b} and use the
 need to remove the stones we placed from the reading stack. This is done
 with the function @code{popgo()}.
 
-@node  Autohelpers and Constraints, Autohelper Actions, Helper Functions, Patterns
-@comment  node-name,  next,  previous,  up
+@node  Autohelpers and Constraints
 @section Autohelpers and Constraints
 
 @cindex generation of helper functions
@@ -478,8 +473,7 @@ is in practice no reason to use anything more than boolean and
 arithmetic operators in addition to the autohelper functions.
 Constraints can span multiple lines, which are then concatenated.
 
-@node  Autohelper Actions, Autohelper Functions, Autohelpers and Constraints, Patterns
-@comment  node-name,  next,  previous,  up
+@node  Autohelper Actions
 @section Autohelper Actions
 
 @cindex autohelper actions
@@ -520,8 +514,7 @@ action can be used in the same pattern. If the action only needs to
 refer to @samp{*}, no constraint diagram is required. Like constraints,
 actions can span multiple lines.
 
-@node  Autohelper Functions, Attack and Defense DB, Autohelper Actions, Patterns
-@comment  node-name,  next,  previous,  up
+@node  Autohelper Functions
 @section Autohelper Functions
 
 The autohelper functions are translated into C code by the program in
@@ -970,8 +963,7 @@ is a true eye.
 Returns the escape value at @samp{x}. This is only useful in owl
 attack and defense patterns.
 
-@node  Attack and Defense DB, Connections Database, Autohelper Functions, Patterns
-@comment  node-name,  next,  previous,  up
+@node  Attack and Defense DB
 @section Attack and Defense Database
 
 The patterns in @file{attack.db} and @file{defense.db} are used to assist the
@@ -1001,8 +993,7 @@ Furthermore, @samp{A} patterns can only be used in @file{attack.db} and
 appear in these databases, but then they must work through actions to be
 effective.
 
-@node  Connections Database, Connection Functions, Attack and Defense DB, Patterns
-@comment  node-name,  next,  previous,  up
+@node  Connections Database
 @section The Connections Database
 
 @cindex connections database
@@ -1100,8 +1091,7 @@ true at any of the points @samp{*}, @samp{a} and @samp{b}. Thus the
 patterns @code{CB204} and @code{CB205} will not be matched, and the dragons will
 not be amalgamated.
 
-@node Connection Functions, Tuning, Connections Database, Patterns
-@comment  node-name,  next,  previous,  up
+@node Connection Functions
 @section Connections Functions
 
 Here are the public functions in @file{connections.c}.
@@ -1151,8 +1141,7 @@ function @code{cut_connect_callback} is invoked.
 @end quotation
 @end itemize
 
-@node  Tuning, PM Implementation, Connection Functions, Patterns
-@comment  node-name,  next,  previous,  up
+@node  Tuning
 @section Tuning the Pattern databases
 
 @cindex tuning the pattern database
@@ -1331,8 +1320,7 @@ eliminate the randomness in GNU Go's play by providing a fixed
 random seed with the @option{-r} option.
 
 
-@node PM Implementation, Symmetry & transformations, Tuning, Patterns
-@comment  node-name,  next,  previous,  up
+@node PM Implementation
 @section Implementation
 
 @cindex implementation of pattern matching
@@ -1362,7 +1350,6 @@ necessary)
 
 
 @node  Symmetry & transformations, Details, PM Implementation, Patterns
-@comment  node-name,  next,  previous,  up
 @section Symmetry and transformations
 
 @cindex symmetry and transformations
@@ -1417,8 +1404,7 @@ equivalent to the reflection (no-op) followed by a-d.  This argument
 therefore extends to include @samp{-} and @samp{/} as well as @samp{|}
 and @samp{\}.
 
-@node  Details, grid optimization, Symmetry & transformations, Patterns
-@comment  node-name,  next,  previous,  up
+@node  Details
 @section Implementation Details
 
 @cindex pattern matching optimization
@@ -1473,8 +1459,7 @@ bit 0 is not set.
 
 @end enumerate
 
-@node grid optimization, Joseki Compiler, Details, Patterns
-@comment  node-name,  next,  previous,  up
+@node grid optimization
 @section The ``Grid'' Optimization
 
 The comparisons between pattern and board are performed as 2-bit
@@ -1541,8 +1526,7 @@ masks for the pattern elements near the anchor. It is a simple matter
 to test the pattern with a similar test to (5) above, but for 32-bits
 at a time.
 
-@node  Joseki Compiler, Ladders in Joseki, grid optimization, Patterns
-@comment  node-name,  next,  previous,  up
+@node  Joseki Compiler
 @section The Joseki Compiler
 
 @cindex joseki
@@ -1639,8 +1623,7 @@ and a constraint
 ;xplay_attack(A,B,C,D,*)
 @end example
 
-@node Ladders in Joseki, Corner Matcher , Joseki Compiler, Patterns
-@comment  node-name,  next,  previous,  up
+@node Ladders in Joseki
 @section Ladders in Joseki
 
 As an example of how to use autohelpers with the
@@ -1715,8 +1698,7 @@ to the four intersections and a comment:
 The appropriate constraint (autohelper macro) will then be added
 to the Joseki @file{.db} file.
 
-@node Corner Matcher, , Ladders in Joseki, Patterns
-@comment  node-name, next,  previous,       up
+@node Corner Matcher
 @section Corner Matcher
 
 @cindex implementation of pattern matching

@@ -15,8 +15,7 @@ GNU Go to determine eyes.
 * Eye Functions::               Functions in @file{optics.c}
 @end menu
 
-@node Local Games, Eye Space, Eyes, Eyes
-@comment  node-name,  next,  previous,  up
+@node Local Games
 @section Local games
 
 The fundamental paradigm of combinatorial game theory is that games
@@ -55,8 +54,7 @@ XXXXX
 @end group
 @end example
 
-@node Eye Space, Eye Space as Local Game, Local Games, Eyes
-@comment  node-name,  next,  previous,  up
+@node Eye Space
 @section Eye spaces
 
 In order that each eyespace be assignable to a dragon,
@@ -136,8 +134,7 @@ comments in the source to the function @code{make_domains()} in
 The eyespaces can be conveniently displayed using a colored 
 ascii diagram by running @command{gnugo -E}.
 
-@node Eye Space as Local Game, Eye Example, Eye Space, Eyes
-@comment  node-name,  next,  previous,  up
+@node Eye Space as Local Game
 @section The eyespace as local game
 
 In the abstraction, an eyespace consists of a set of vertices
@@ -241,8 +238,7 @@ We will not attempt to characterize the terminal states
 of the local game (some of which could be seki) or
 the scoring. 
 
-@node Eye Example, Graphs, Eye Space as Local Game, Eyes
-@comment  node-name,  next,  previous,  up
+@node Eye Example
 @section An example
 
 Here is a local game which yields exactly one
@@ -330,8 +326,7 @@ Here is another variation:
 @end example
 
 
-@node Graphs, Eye Shape, Eye Example, Eyes
-@comment  node-name,  next,  previous,  up
+@node Graphs
 @section Graphs
 
 It is a useful observation that the local game associated
@@ -419,8 +414,7 @@ The graph of the eye_shape, ostensibly @samp{.....} is modified by replacing
 the left @samp{.} by @samp{!}. This is made directly in the eye data,
 not only during graph matching.
 
-@node Eye Shape, Eye Local Game Values, Graphs, Eyes
-@comment  node-name,  next,  previous,  up
+@node Eye Shape
 @section Eye shape analysis
 
 The patterns in @file{patterns/eyes.db} are compiled into graphs
@@ -451,7 +445,8 @@ matched against the graphs in @file{eyes.c}.  If a match is found, the
 result of the local game is known. If a graph cannot be matched, its
 local game is assumed to be @{2|2@}.
 
-@node Eye Local Game Values, Eye Topology, Eye Shape, Eyes
+@node Eye Local Game Values
+@section Eye Local Game Values
 
 The game values in @file{eyes.db} are given in a simplified scheme which is
 flexible enough to represent most possibilities in a useful way.
@@ -558,8 +553,7 @@ We always assume suicide to be allowed in this database. It is easy
 enough to sort out such moves at a higher level when suicide is
 disallowed.
 
-@node Eye Topology, Eye Topology with Ko, Eye Local Game Values, Eyes
-@comment  node-name,  next,  previous,  up
+@node Eye Topology
 @section Topology of Half Eyes and False Eyes
 
 A HALF EYE is a pattern where an eye may or may not materialize,
@@ -626,10 +620,9 @@ For all eye space points with at most one neighbor in the eye space,
 evaluate the status of the diagonal intersections according to the
 criteria above and classify the point from the sum of the values.
 
-@node  Eye Topology with Ko, False Margins, Eye Topology, Eyes
-@comment  node-name,  next,  previous,  up
-
+@node  Eye Topology with Ko
 @section Eye Topology with Ko
+
 
 This section extends the topological eye analysis to handle ko. We
 distinguish between a ko in favor of @samp{O}' and one in favor of @samp{X}:
@@ -867,8 +860,7 @@ When there are three kos around the same eyespace, things become
 more complex. This case is, however, rare enough that we ignore it.
 
 
-@node False Margins, Eye Functions, Eye Topology with Ko, Eyes
-@comment  node-name,  next,  previous,  up
+@node False Margins
 @section False Margins
 
 The following situation is rare but special enough to warrant separate
@@ -888,8 +880,7 @@ one liberty. We call this a @dfn{false margin}.
 For the purpose of the eye code, O's eyespace should be parsed
 as @code{(X)}, not @code{(X!)}.
 
-@node Eye Functions, , False Margins, Eyes
-@comment  node-name,  next,  previous,  up
+@node Eye Functions
 @section Functions in @file{optics.c}
 
 Here are the public functions in @file{optics.c}, except some simple

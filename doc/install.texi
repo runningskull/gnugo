@@ -12,7 +12,6 @@ about newer versions and get other information at
 @end menu
 
 @node GNU/Linux and Unix, Configure Options, ,Installation
-@comment  node-name,  next,  previous,  up
 @section GNU/Linux and Unix
 @cindex installation
 
@@ -65,7 +64,7 @@ number MUST be 1.9.1 at least or it won't work. CGoban 2 will not work.
 @xref{CGoban}, for instructions on how to run GNU Go from Cgoban, or
 @xref{Jago}, for Jago.
 
-@node Configure Options, Windows and MS-DOS, GNU/Linux and Unix, Installation
+@node Configure Options
 @section Configure Options
 
 There are three options which you should consider configuring,
@@ -78,7 +77,7 @@ particularly if you are dissatisfied with GNU Go's performance.
 * Experimental Options::      Experimental Options
 @end menu
 
-@node Ram Cache, Default Level, , Configure Options
+@node Ram Cache
 @subsection Ram Cache
 
 By default, GNU Go makes a cache of 16 Megabytes in RAM for its
@@ -119,7 +118,7 @@ option @option{--cache-size n}, where @code{n} is the size in
 megabytes of the cache you want, and @option{--level} where n is the
 level desired.  We will discuss setting these parameters next in detail.
 
-@node Default Level, DFA Option, Ram Cache, Configure Options
+@node Default Level
 @subsection Default Level
 
 GNU Go can play at different levels. Up to level 10 is
@@ -142,7 +141,7 @@ using level 10 unless you find it too slow. If you decide
 you want to change the default you may rerun configure
 and recompile the program.
 
-@node DFA Option, Experimental Options , Default Level, Configure Options
+@node DFA Option
 @subsection DFA Configure Option
 
 There are two distinct implementations of the pattern matcher in GNU
@@ -152,7 +151,7 @@ with the configure option @command{./configure --disable-dfa}.  The
 option is harder to debug than the old matcher but significantly
 faster (@pxref{DFA}).
 
-@node Experimental Options, , DFA Option, Configure Options
+@node Experimental Options
 @subsection Experimental Options
 
 There are a number of experimental configure options. For example
@@ -179,7 +178,6 @@ fast CPU.
 @end itemize
 
 @node Windows and MS-DOS, Macintosh, Configure Options, Installation
-@comment  node-name,  next,  previous,  up
 @section Compiling GNU Go on Microsoft platforms
 
 GNU Go is being developed on Unix variants. GNU Go is easy to build
@@ -226,7 +224,7 @@ to compile GNU go for Microsoft platforms.
 * VC::         Visual C++ using Project Files
 @end menu
 
-@node DJGPP, Cygwin, , Windows and MS-DOS
+@node DJGPP
 @subsection Windows 95/98, MS-DOS and Windows 3.x using DJGPP
 
 On these platforms DJGPP can be used. GNU Go installation has been
@@ -258,7 +256,7 @@ executable as follows:
 Optionally you can download glib for DJGPP to get a working version
 of snprintf.
 
-@node Cygwin, MinGW32, DJGPP, Windows and MS-DOS
+@node Cygwin
 @subsection Windows NT, Windows 95/98 using Cygwin
 
 On these platforms the Cygwin environment can be installed. Recent
@@ -300,7 +298,7 @@ for the win32 platform type the following at your cygwin prompt:
   make
 @end example
 
-@node VC, , MinGW32, Windows and MS-DOS
+@node VC
 @subsection Windows NT, Windows 95/98 using Visual C and project files
 
 We assume that you do not want to change any configure options.
@@ -369,8 +367,7 @@ Jago works well with both the Cygwin and MinGW32 executables. The
 DJGPP executable also works, but has some problems in the interaction
 with jago after the game has been finished and scored.
 
-@node Macintosh, , Windows and MS-DOS, Installation
-@comment  node-name,  next,  previous,  up
+@node Macintosh
 @section Macintosh
 
 If you have Mac OS X you can build GNU Go using Apple's compiler, 
