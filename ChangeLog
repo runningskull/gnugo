@@ -2,12 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- cgi interface in interface/html directory removed
+
 3.4 released July 31, 2003
 
 - breakage2tst.py and gnugo-db.el added to EXTRA_DIST
 - wariuchi fuseki: invade between shimaris
 - new sgmp mode
-- regress.pike added to EXTRADIST
+- regress.pike added to EXTRA_DIST
 - revision of copyright notices
 - warnings fixed on some platforms
 - doc revision
