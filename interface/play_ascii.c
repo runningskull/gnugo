@@ -58,6 +58,7 @@ static void endgame(Gameinfo *gameinfo);
 static void showcapture(char *line);
 static void showdefense(char *line);
 static void ascii_goto(Gameinfo *gameinfo, char *line);
+static void ascii_free_handicap(Gameinfo *gameinfo, char *handicap);
 
 /* If sgf game info is written can't reset parameters like handicap, etc. */
 static int sgf_initialized;
@@ -290,35 +291,37 @@ static void
 show_commands(void)
 {
   printf("\nCommands:\n");
-  printf(" back             Take back your last move\n");
-  printf(" boardsize        Set boardsize (on move 1 only!)\n");
-  printf(" comment          Write a comment to outputfile\n");
-  printf(" depth <num>      Set depth for reading\n");
-  printf(" display          Display game board\n");
-  printf(" exit             Exit GNU Go\n");
-  printf(" force <move>     Force a move for current color\n");
-  printf(" forward          Go to next node in game tree\n");
-  printf(" goto <movenum>   Go to movenum in game tree\n");
-  printf(" level <amount>   Playing level (default = 10)\n");
-  printf(" handicap         Set handicap (on move 1 only!)\n");
-  printf(" help             Display this help menu\n");
-  printf(" helpdebug        Display debug help menu\n");
-  printf(" info             Display program settings\n");
-  printf(" komi             Set komi (on move 1 only!)\n");
-  printf(" last             Goto last node in game tree\n");
-  printf(" pass             Pass on your move\n");
-  printf(" play <num>       Play <num> moves\n");
-  printf(" playblack        Play as Black (switch if White)\n");
-  printf(" playwhite        Play as White (switch if Black)\n");
-  printf(" quit             Exit GNU Go\n");
-  printf(" resign           Resign the current game\n");
-  printf(" save <file>      Save the current game\n");
-  printf(" load <file>      Load a game from file\n");
-  printf(" score            Toggle display of score On/Off\n");
-  printf(" showboard        Toggle display of board On/Off\n");
-  printf(" switch           Switch the color you are playing\n");
-  printf(" undo             Take the last move back (same as back)\n");
-  printf(" <move>           A move of the format <letter><number>");
+  printf(" back                Take back your last move\n");
+  printf(" boardsize           Set boardsize (on move 1 only)\n");
+  printf(" comment             Write a comment to outputfile\n");
+  printf(" depth <num>         Set depth for reading\n");
+  printf(" display             Display game board\n");
+  printf(" exit                Exit GNU Go\n");
+  printf(" force <move>        Force a move for current color\n");
+  printf(" forward             Go to next node in game tree\n");
+  printf(" goto <movenum>      Go to movenum in game tree\n");
+  printf(" level <amount>      Playing level (default = 10)\n");
+  printf(" handicap <num>      Set fixed handicap (on move 1 only)\n");
+  printf(" freehandicap <num>  Place free handicap (on move 1 only)\n");
+  printf("                     Omit <num> to place handicap yourself\n");
+  printf(" help                Display this help menu\n");
+  printf(" helpdebug           Display debug help menu\n");
+  printf(" info                Display program settings\n");
+  printf(" komi                Set komi (on move 1 only)\n");
+  printf(" last                Goto last node in game tree\n");
+  printf(" pass                Pass on your move\n");
+  printf(" play <num>          Play <num> moves\n");
+  printf(" playblack           Play as Black (switch if White)\n");
+  printf(" playwhite           Play as White (switch if Black)\n");
+  printf(" quit                Exit GNU Go\n");
+  printf(" resign              Resign the current game\n");
+  printf(" save <file>         Save the current game\n");
+  printf(" load <file>         Load a game from file\n");
+  printf(" score               Toggle display of score On/Off\n");
+  printf(" showboard           Toggle display of board On/Off\n");
+  printf(" switch              Switch the color you are playing\n");
+  printf(" undo                Take the last move back (same as back)\n");
+  printf(" <move>              A move of the format <letter><number>");
   printf("\n");
 }
 
@@ -332,7 +335,7 @@ enum commands {INVALID=-1, END, EXIT, QUIT, RESIGN,
                CMD_CAPTURE, CMD_DEFEND,
                CMD_HELPDEBUG, CMD_SHOWAREA, CMD_SHOWMOYO, CMD_SHOWTERRI,
                CMD_GOTO, CMD_SAVE, CMD_LOAD, CMD_SHOWDRAGONS, CMD_LISTDRAGONS,
-	       SETHURRY, SETLEVEL, NEW, COUNT
+              SETHURRY, SETLEVEL, NEW, COUNT, FREEHANDICAP
 };
 
 
@@ -367,7 +370,8 @@ get_command(char *command)
   if (!strncmp(command, "showdragons", 9)) return CMD_SHOWDRAGONS;
   if (!strncmp(command, "listdragons", 9)) return CMD_LISTDRAGONS;
   if (!strncmp(command, "boardsize", 9)) return SETBOARDSIZE;
-  if (!strncmp(command, "handicap", 8)) return SETHANDICAP;
+  if (!strncmp(command, "freehandicap", 9)) return FREEHANDICAP;
+  if (!strncmp(command, "handicap", 5)) return SETHANDICAP;
   if (!strncmp(command, "display", 7)) return DISPLAY;
   if (!strncmp(command, "helpdebug", 7)) return CMD_HELPDEBUG;
   if (!strncmp(command, "resign", 6)) return RESIGN;
@@ -676,6 +680,15 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  printf("\nSet handicap to %d\n", gameinfo->handicap);
           gameinfo->to_move = (gameinfo->handicap ? WHITE : BLACK);
 	  break;
+       case FREEHANDICAP:
+         if (sgf_initialized) {
+           printf("Handicap cannot be changed after game is started!\n");
+           break;
+         }
+         while (*command && *command != ' ')
+           command++;
+         ascii_free_handicap(gameinfo, command);
+         break;
 	case SETKOMI:
 	  if (sgf_initialized) {
 	    printf("Komi cannot be modified after game record is started!\n");
@@ -1099,6 +1112,80 @@ ascii_goto(Gameinfo *gameinfo, char *line)
   gameinfo_play_sgftree(gameinfo, &sgftree, movenumber);
 }
 
+
+static void
+ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
+{
+  int handi;
+  int i;
+  char line[80];
+  int stones[MAX_BOARD*MAX_BOARD];
+  int x, y, pos;
+
+  if (sscanf(handicap, "%d", &handi) == 1) {
+    /* Gnu Go is to place handicap */
+    if (handi < 0 || handi == 1) {
+      printf("\nInvalid command syntax!\n");
+      return;
+    }
+
+    gnugo_clear_board(board_size);
+    handi = place_free_handicap(handi);
+    printf("\nPlaced %d stones of free handicap.\n", handi);
+  }
+  else { /* User is to place handicap */
+    gnugo_clear_board(board_size);
+    handi = 0;
+
+    while (1) {
+      ascii_showboard();
+      printf("\nType in coordinates of next handicap stone, or one of the following commands:\n");
+      printf("  undo        take back the last stone placed\n");
+      printf("  clear       remove all the stones placed so far\n");
+      printf("  done        finish placing handicap\n\n");
+      printf("You have placed %d handicap stone(s) so far.\n\n", handi);
+
+      if (!fgets(line, 80, stdin))
+        return; /* EOF or some error */
+      for (i = 0; i < 80; i++)
+        line[i] = (isupper ((int) line[i]) ? tolower ((int) line[i]) : line[i]);
+
+      if (!strncmp(line, "undo", 4)) {
+        if (!handi)
+         printf("\nNothing to undo.\n");
+        else {
+         remove_stone(stones[--handi]);
+         gprintf("\nRemoved the stone at %m.\n", I(stones[handi]),
+           J(stones[handi]));
+       }
+      }
+      else if (!strncmp(line, "clear", 5)) {
+        gnugo_clear_board(board_size);
+        handi = 0;
+      }
+      else if (!strncmp(line, "done", 4)) {
+       if (handi == 1) /* Don't bother with checks later */
+         printf ("\nHandicap cannot be one stone. Either add "
+           "some more, or delete the only stone.\n");
+       else
+         break;
+      }
+      else if (string_to_location(board_size, line, &x, &y)) {
+       pos = POS(x,y);
+       if (board[pos] != EMPTY)
+         printf("\nThere's already a stone there.\n");
+       else {
+         add_stone(pos, BLACK);
+         stones[handi++] = pos;
+       }
+      }
+      else
+       printf("\nInvalid command: %s", line);
+    }
+  }
+  gameinfo->handicap = handi;
+  gameinfo->to_move = (handi ? WHITE : BLACK);
+}
 
 /*
  * Local Variables:

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new ascii command: freehandicap <num>.
+- new function: ascii_free_handicap
 - report_worm(): print all attack, defense, threat points/codes
 - worm_data::defend_codes is now called defense_codes
 - enhanced result_to_string() with new return codes.
