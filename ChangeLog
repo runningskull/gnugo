@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.8 released September 5, 2002
+
+- remove unneeded inclusion of stdlib.h in helpers.c
+- bugfix in matcher_check
+- URL's updated in documentation
+- tests updated
+
 3.3.7 released September 4, 2002
 
 - better ko tracking searching for additional worm attacks and defenses 
