@@ -43,9 +43,6 @@
 /* Hashing scheme. Default scheme 2 (new). */
 #undef HASHING_SCHEME
 
-/* Define if you have the `alarm' function. */
-#undef HAVE_ALARM
-
 /* Define if the curses headers defines KEY_{UP,DOWN,LEFT,RIGHT} */
 #undef HAVE_CURSES_ARROWS
 

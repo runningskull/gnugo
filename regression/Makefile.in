@@ -261,7 +261,7 @@ buzco: buzco.tst
 capture: capture.tst
 	$(srcdir)/eval.sh capture.tst  $(GG_OPTIONS)
 
-century: century2002.tst
+century2002: century2002.tst
 	$(srcdir)/eval.sh century2002.tst  $(GG_OPTIONS)
 
 connect: connect.tst
@@ -314,9 +314,6 @@ ld_owl: ld_owl.tst
 
 ld_owl_rot: ld_owl_rot.tst
 	$(srcdir)/eval.sh ld_owl_rot.tst $(GG_OPTIONS)
-
-life: life.tst
-	$(srcdir)/eval.sh life.tst --life $(GG_OPTIONS)
 
 manyfaces: manyfaces.tst
 	$(srcdir)/eval.sh manyfaces.tst $(GG_OPTIONS)
