@@ -722,7 +722,6 @@ loadsgf games/reading39.sgf
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 242
 trymove white B1
 176 attack B1
-popgo
 #? [0]
 popgo
 
