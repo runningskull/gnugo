@@ -28,6 +28,7 @@
 - don't crash on some .sgf-files from kgs
 - NEWS updated
 - refer to 3.6 instead of 3.4 in docs
+- new tests
 
 3.5.10 released August 7, 2004
 
