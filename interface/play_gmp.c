@@ -33,7 +33,8 @@
 /* --------------------------------------------------------------*/
 /* Play a game against a go-modem-protocol (GMP) client */
 /* --------------------------------------------------------------*/
-void play_gmp(int boardsize, Gameinfo *gameinfo)
+void
+play_gmp(int boardsize, Gameinfo *gameinfo)
 {
   SGFTree   sgftree;
 

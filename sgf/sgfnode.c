@@ -113,7 +113,8 @@ sgfNewNode()
  * Recursively free an sgf node
  */
 
-void sgfFreeNode(SGFNode *node) {
+void
+sgfFreeNode(SGFNode *node) {
   if (node == NULL)
     return;
   sgfFreeNode(node->next);
@@ -178,7 +179,7 @@ sgfGetIntProperty(SGFNode *node, const char *name, int *value)
   SGFProperty *prop;
   short nam = name[0] | name[1] << 8;
 
-  for (prop = node->props; prop; prop=prop->next)
+  for (prop = node->props; prop; prop = prop->next)
     if (prop->name == nam) {
       *value = atoi(prop->value);
       return 1;
@@ -240,7 +241,7 @@ sgfOverwriteProperty(SGFNode *node, const char *name, const char *text)
   SGFProperty *prop;
   short nam = name[0] | name[1] << 8;
 
-  for (prop = node->props; prop; prop=prop->next)
+  for (prop = node->props; prop; prop = prop->next)
     if (prop->name == nam) {
       prop->value = xrealloc(prop->value, strlen(text)+1);
       strcpy(prop->value, text);
@@ -373,7 +374,8 @@ sgfMkProperty(const char *name, const  char *value,
  *
  */
 
-void sgfFreeProperty(SGFProperty *prop) {
+void
+sgfFreeProperty(SGFProperty *prop) {
   if (prop == NULL)
     return;
   sgfFreeProperty(prop->next);
@@ -1199,11 +1201,11 @@ sgfPrintCommentProperty(FILE *file, SGFNode *node, const char *name)
   SGFProperty *prop;
   short nam = name[0] | name[1] << 8;
 
-  for (prop = node->props; prop; prop=prop->next) {
+  for (prop = node->props; prop; prop = prop->next) {
     if (prop->name == nam) {
-      prop->name|=0x20;  /*indicate already printed*/
+      prop->name |= 0x20;  /*indicate already printed*/
       if (first) {
-	if (name[1]==' ')
+	if (name[1] == ' ')
 	  fprintf(file, "%c[%s", name[0], prop->value);
 	else
 	  fprintf(file, "%s[%s", name, prop->value);

@@ -126,9 +126,9 @@ replay_node(SGFNode *node, Gameinfo *gameinfo, int color_to_replay)
       /* add black */
       gnugo_add_stone(&gameinfo->position,
 		      get_moveX(sgf_prop, boardsize),
-		      get_moveY(sgf_prop, boardsize),	BLACK);
+		      get_moveY(sgf_prop, boardsize), BLACK);
       sgffile_put_stone(get_moveX(sgf_prop, boardsize),
-			get_moveY(sgf_prop, boardsize),	BLACK);
+			get_moveY(sgf_prop, boardsize), BLACK);
       break;
     case SGFAW:
       /* add white */

@@ -336,13 +336,13 @@ void debug_influence_move(int i, int j);
 
 /* gnuc allows variadic macros, so the tests can be done inline */
 #define TRACE(fmt, args...) \
-    do { if (verbose) gprintf(fmt, ##args); } while(0)
+    do { if (verbose) gprintf(fmt, ##args); } while (0)
 #define RTRACE(fmt, args...) \
-    do { if (verbose >= 3) gprintf(fmt, ##args); } while(0)
+    do { if (verbose >= 3) gprintf(fmt, ##args); } while (0)
 #define VTRACE(fmt, args...) \
-    do { if (verbose >= 4) gprintf(fmt, ##args); } while(0)
+    do { if (verbose >= 4) gprintf(fmt, ##args); } while (0)
 #define DEBUG(level, fmt, args...) \
-    do { if ((debug & (level))) gprintf(fmt, ##args); } while(0)
+    do { if ((debug & (level))) gprintf(fmt, ##args); } while (0)
 
 #else
 
@@ -376,15 +376,15 @@ void silent_examine_position(int color, int how_much);
 
 /* These are mostly used for GTP examination. */
 void reset_life_node_counter(void);
-int  get_life_node_counter(void);
+int get_life_node_counter(void);
 void reset_owl_node_counter(void);
-int  get_owl_node_counter(void);
+int get_owl_node_counter(void);
 void reset_reading_node_counter(void);
-int  get_reading_node_counter(void);
+int get_reading_node_counter(void);
 void reset_trymove_counter(void);
-int  get_trymove_counter(void);
+int get_trymove_counter(void);
 void reset_connection_node_counter(void);
-int  get_connection_node_counter(void);
+int get_connection_node_counter(void);
 
 
 /* ================================================================ */
@@ -448,9 +448,9 @@ void report_pattern_profiling(void);
 void sgffile_move_made(int i, int j, int color, int value);
 void sgffile_put_stone(int i, int j, int color);
 
-int  sgffile_open_file(const char *);
-int  sgffile_close_file(void);
-int  sgffile_write_gameinfo(Gameinfo *gameinfo, const char *);
+int sgffile_open_file(const char *);
+int sgffile_close_file(void);
+int sgffile_write_gameinfo(Gameinfo *gameinfo, const char *);
 void sgffile_write_comment(const char *comment);
 void sgffile_printboard(int next);
 void sgffile_recordboard(SGFNode *node);

@@ -287,7 +287,7 @@ analyze_node(SGFNode *node, const char *prefix)
    * a comment.
    */
   for (prop = node->props; prop; prop = prop->next) {
-    switch(prop->name) {
+    switch (prop->name) {
     case SGFSQ: /* Square */
     case SGFMA: /* Mark */
       if (marki != -1)

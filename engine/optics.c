@@ -87,8 +87,8 @@ evaluate_diagonal_intersection(int m, int n, int color,
 
 
 /* These are used during the calculations of eye spaces. */
-static int  black_domain[BOARDMAX];
-static int  white_domain[BOARDMAX];
+static int black_domain[BOARDMAX];
+static int white_domain[BOARDMAX];
 
 
 /*
@@ -691,9 +691,9 @@ print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
  * min are different, then vital points of attack and defense are also
  * generated.
  * 
- * If add_moves==1, this function may add a move_reason for (color) at
- * a vital point which is found by the function. If add_moves==0,
- * set color==EMPTY.
+ * If add_moves == 1, this function may add a move_reason for (color) at
+ * a vital point which is found by the function. If add_moves == 0,
+ * set color == EMPTY.
  */
 
 void
@@ -715,10 +715,10 @@ compute_eyes(int pos, int *max, int *min,
   
   /* First we try to let the life code evaluate the eye space. */
   if (life && eye[pos].esize <= life_eyesize) {
-    int  max1, min1;
-    int  attack_point1;
-    int  defense_point1;
-    int  status;
+    int max1, min1;
+    int attack_point1;
+    int defense_point1;
+    int status;
 
     if (recognize_eye2(pos, attack_point, defense_point, max, min,
 		       eye, heye, add_moves, color)) {
@@ -1106,7 +1106,7 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
       return 1;
     }
     if (esize == 3) {
-      gg_assert (middle != NO_MOVE);
+      gg_assert(middle != NO_MOVE);
       if (board[middle] == EMPTY) {
 	*max = 2;
 	*min = 1;
@@ -1251,8 +1251,8 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
 
     if (esize == 4) {
       if (board[middle] == EMPTY) {
-	*max=1;
-	*min=1;
+	*max = 1;
+	*min = 1;
 	return 1;
       }
       else {
@@ -2121,7 +2121,8 @@ evaluate_diagonal_intersection(int m, int n, int color,
 
 
 /* Test whether the optics code evaluates an eyeshape consistently. */
-void test_eyeshape(int eyesize, int *eye_vertices)
+void
+test_eyeshape(int eyesize, int *eye_vertices)
 {
   int k;
   int n, N;

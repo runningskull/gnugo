@@ -52,7 +52,7 @@ change_matcher_status(int m, int n, int status)
 
 
 /*
- * Check whether a move at (ti,tj) stops the enemy from playing at (ai,aj).
+ * Check whether a move at (move) stops the enemy from playing at (apos).
  */
 
 int
@@ -70,7 +70,7 @@ defend_against(int move, int color, int apos)
 
 
 /* 
- * Returns true if color can cut at (i,j), or if connection through (i,j)
+ * Returns true if color can cut at (pos), or if connection through (pos)
  * is inhibited. This information is collected by find_cuts(), using the B
  * patterns in the connections database.
  */
@@ -890,9 +890,9 @@ double_atari(int move, int color)
     int dm = deltai[k];
     int dn = deltaj[k];
     
-    /* because (m,n) and (m+dm,n+dn) are opposite
-     * corners of a square, ON_BOARD2(m,n) && ON_BOARD2(m+dm,n+dn)
-     * implies ON_BOARD2(m+dm,n) and ON_BOARD2(n,n+dn)
+    /* because (m, n) and (m+dm, n+dn) are opposite
+     * corners of a square, ON_BOARD2(m, n) && ON_BOARD2(m+dm, n+dn)
+     * implies ON_BOARD2(m+dm, n) and ON_BOARD2(n, n+dn)
      */
     if (BOARD(m+dm, n+dn) == color
 	&& BOARD(m, n+dn) == other

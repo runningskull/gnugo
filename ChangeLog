@@ -2,7 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- value_territory in influence.c revised
+- code cleanup
+- devalued attacking dead group bonus
+- corrected value to final_value in review_move_reasons()
+- value_territory() in influence.c revised
 - common debug code moved from compute_eyes() and
   compute_eyes_pessimistic() to print_eyes()
 - inactive support to test the impact of linear_eyes() in

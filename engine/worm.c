@@ -32,14 +32,14 @@ static void compute_effective_worm_sizes(void);
 static void compute_unconditional_status(void);
 static void find_worm_attacks_and_defenses(void);
 static void find_worm_threats(void);
-static int  find_lunch(int str, int *lunch);
+static int find_lunch(int str, int *lunch);
 static void change_tactical_point(int str, int move, int code,
 				  int points[MAX_TACTICAL_POINTS],
 				  int codes[MAX_TACTICAL_POINTS]);
 static void propagate_worm2(int str);
-static int  genus(int str);
+static int genus(int str);
 static void markcomponent(int str, int pos, int mg[BOARDMAX]);
-static int  examine_cavity(int pos, int *edge);
+static int examine_cavity(int pos, int *edge);
 static void cavity_recurse(int pos, int mx[BOARDMAX], 
 			   int *border_color, int *edge, int str);
 static void ping_cave(int str, int *result1,  int *result2,
@@ -47,7 +47,7 @@ static void ping_cave(int str, int *result1,  int *result2,
 static void ping_recurse(int pos, int *counter, 
 			 int mx[BOARDMAX], 
 			 int mr[BOARDMAX], int color);
-static int  touching(int pos, int color);
+static int touching(int pos, int color);
 static void find_attack_patterns(void);
 static void attack_callback(int m, int n, int color,
 			    struct pattern *pattern, int ll, void *data);
@@ -210,7 +210,7 @@ make_worms(void)
 	    else if (!is_same_worm(pos2, w1))
 	      w2 = worm[pos2].origin;
 	  } /* loop over k */
-	} /* loop over i,j */
+	} /* loop over i, j */
 
       /* 
        *  We now verify the definition of cutting stones. We have
@@ -230,7 +230,7 @@ make_worms(void)
 	      pos, w1, w2, worm[pos].cutstone);
       }
 
-    } /* loop over m,n */
+    } /* loop over m, n */
 
   gg_assert(stackp == 0);
   
@@ -249,10 +249,11 @@ make_worms(void)
   small_semeai();
   gg_assert(stackp == 0);
 
-  /* Now we try to improve the values of worm.attack and worm.defend. If we
-   * find that capturing the string at (m,n) also defends the string at (i,j),
-   * or attacks it, then we add points of attack and defense.
-   * We don't add attacking point for strings that can't be defended.
+  /* Now we try to improve the values of worm.attack and worm.defend.
+   * If we find that capturing the string at (m, n) also defends the
+   * string at (i, j), or attacks it, then we add points of attack and
+   * defense. We don't add attacking point for strings that can't be
+   * defended.
    */
   {
     int mi[BOARDMAX]; /* mark changed information */
@@ -707,7 +708,7 @@ compute_effective_worm_sizes()
 		  break;
 		}
 	      if (!already_counted) {
-		gg_assert (nworms[m][n] < 2*(board_size-1));
+		gg_assert(nworms[m][n] < 2*(board_size-1));
 		worms[m][n][nworms[m][n]] = worms[ai][aj][k];
 		nworms[m][n]++;
 	      }
@@ -796,7 +797,7 @@ find_worm_attacks_and_defenses()
       if (board[pos] == EMPTY || !is_worm_origin(pos, pos))
 	continue;
 
-      TRACE ("considering attack of %1m\n", pos);
+      TRACE("considering attack of %1m\n", pos);
       /* Initialize all relevant fields at once. */
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
 	worm[pos].attack_codes[k]   = 0;
@@ -830,10 +831,10 @@ find_worm_attacks_and_defenses()
       if (worm[pos].attack_codes[0] != 0) {
 	int tpos = NO_MOVE;
 
-	TRACE ("considering defense of %1m\n", pos);
+	TRACE("considering defense of %1m\n", pos);
 	dcode = find_defense(pos, &tpos);
 	if (dcode) {
-	  TRACE ("worm at %1m can be defended at %1m\n", pos, tpos);
+	  TRACE("worm at %1m can be defended at %1m\n", pos, tpos);
 	  if (tpos != NO_MOVE)
 	    change_defense(pos, tpos, dcode);
 	}
@@ -849,8 +850,8 @@ find_worm_attacks_and_defenses()
 	      int acode = attack(pos, NULL);
 	      if (acode != WIN) {
 		change_defense(pos, aa, 3 - acode);
-		TRACE ("worm at %1m can be defended at %1m with code %d\n",
-		       pos, aa, 3 - acode);
+		TRACE("worm at %1m can be defended at %1m with code %d\n",
+		      pos, aa, 3 - acode);
 	      }	 
 	      popgo();
 	    }
@@ -1201,7 +1202,8 @@ change_attack_threat(int str, int move, int acode)
 /* Check whether (move) is listed as an attack point for (str) and
  * return the attack code. If (move) is not listed, return 0.
  */
-int attack_move_known(int move, int str)
+int
+attack_move_known(int move, int str)
 {
   return movelist_move_known(move, MAX_TACTICAL_POINTS,
 			     worm[str].attack_points,
@@ -1211,7 +1213,8 @@ int attack_move_known(int move, int str)
 /* Check whether (move) is listed as a defense point for (str) and
  * return the defense code. If (move) is not listed, return 0.
  */
-int defense_move_known(int move, int str)
+int
+defense_move_known(int move, int str)
 {
   return movelist_move_known(move, MAX_TACTICAL_POINTS,
 			     worm[str].defense_points,
@@ -1308,7 +1311,8 @@ propagate_worm2(int str)
 /* Report all known attack, defense, attack threat, and defense threat
  * moves. But limit this to the moves which can be made by (color).
  */
-void worm_reasons(int color)
+void
+worm_reasons(int color)
 {
   int pos;
   int k;
@@ -1799,7 +1803,7 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
 /*                      Debugger functions                          */
 /* ================================================================ */
 
-/* For use in gdb, print details of the worm at (m,n). 
+/* For use in gdb, print details of the worm at (m, n). 
  * Add this to your .gdbinit file:
  *
  * define worm

@@ -970,7 +970,8 @@ gtp_owl_defend(char *s, int id)
 /* Function:  Try to attack a dragon in 2 moves.
  * Arguments: vertex
  * Fails:     invalid vertex, empty vertex
- * Returns:   attack code followed by the two attack points if attack code nonzero.
+ * Returns:   attack code followed by the two attack points if
+ *            attack code nonzero.
  */
 static int
 gtp_owl_threaten_attack(char *s, int id)
@@ -1008,7 +1009,8 @@ gtp_owl_threaten_attack(char *s, int id)
 /* Function:  Try to defend a dragon with 2 moves.
  * Arguments: vertex
  * Fails:     invalid vertex, empty vertex
- * Returns:   defense code followed by the 2 defense points if defense code nonzero.
+ * Returns:   defense code followed by the 2 defense points if
+ *            defense code nonzero.
  */
 static int
 gtp_owl_threaten_defense(char *s, int id)
@@ -1030,7 +1032,8 @@ gtp_owl_threaten_defense(char *s, int id)
   if (sgf_dumptree)
     reading_cache_clear();
 
-  defend_code = owl_defend(POS(i, j), &defense_point1, &defense_point2);
+  defend_code = owl_threaten_defense(POS(i, j), &defense_point1,
+				     &defense_point2);
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_code(defend_code);
   if (defend_code > 0) {
@@ -1708,7 +1711,7 @@ gtp_undo(char *s, int id)
     return gtp_failure(id, "move stack overflow");
   restore_position(&starting_position);
   
-  move_stack_pointer=move_stack_pointer-nb_undo;
+  move_stack_pointer = move_stack_pointer - nb_undo;
   for (k = 0; k < move_stack_pointer; k++)
     play_move(POS(game_move[k].i, game_move[k].j), game_move[k].color);
 
@@ -2777,12 +2780,14 @@ gtp_print_vertices2(int n, int *moves)
   gtp_print_vertices(n, movei, movej);
 }
 
-static void rotate_on_input(int ai, int aj, int *bi, int *bj)
+static void
+rotate_on_input(int ai, int aj, int *bi, int *bj)
 {
   rotate(ai, aj, bi, bj, board_size, gtp_orientation);
 }
 
-static void rotate_on_output(int ai, int aj, int *bi, int *bj)
+static void
+rotate_on_output(int ai, int aj, int *bi, int *bj)
 {
   inv_rotate(ai, aj, bi, bj, board_size, gtp_orientation);
 }

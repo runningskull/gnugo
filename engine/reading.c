@@ -46,7 +46,7 @@
       scores[num_moves] = score;\
       (num_moves)++;\
     }\
-  } while(0) \
+  } while (0) \
 
 #define REMOVE_CANDIDATE_MOVE(move, moves, scores, num_moves)\
   do {\
@@ -61,7 +61,7 @@
 	break;\
       }\
     }\
-  } while(0) \
+  } while (0) \
 
 
 /*
@@ -358,10 +358,14 @@ attack_and_defend(int str,
     }
   }
 
-  if (attack_code)   *attack_code   = acode;
-  if (attack_point)  *attack_point  = apos;
-  if (defend_code)   *defend_code   = dcode;
-  if (defense_point) *defense_point = dpos;
+  if (attack_code)
+    *attack_code = acode;
+  if (attack_point)
+    *attack_point = apos;
+  if (defend_code)
+    *defend_code = dcode;
+  if (defense_point)
+    *defense_point = dpos;
 
   return acode != 0 && dcode != 0;
 }
@@ -406,9 +410,9 @@ attack_either(int astr, int bstr)
   }
 
   asuccess = attack(astr, NULL);
-  if (asuccess == WIN) {
+  if (asuccess == WIN)
     return asuccess;
-  }
+
   bsuccess = attack(bstr, NULL);
   if (asuccess || bsuccess) {
     return (asuccess > bsuccess) ? asuccess : bsuccess;
@@ -420,21 +424,23 @@ attack_either(int astr, int bstr)
     int alibs = findlib(astr, 2, libs);
     int defended0 = WIN;
     int defended1 = WIN;
-    int othercolor = 3 - board[astr];
+    int other = OTHER_COLOR(color);
     /* Let's just try the case where the group with the fewest liberties
-     * has only 2, and try each atari in turn.*/
-    if (alibs ==2) {
-      if (trymove(libs[0], othercolor, "attack_either_0", NO_MOVE, EMPTY, NO_MOVE)) {
+     * has only 2, and try each atari in turn.
+     */
+    if (alibs == 2) {
+      if (trymove(libs[0], other, "attack_either-A", astr, EMPTY, NO_MOVE)) {
 	defended0 = defend_both(astr, bstr);
 	popgo();
       }
       if (defended0 
-	  && trymove(libs[1], othercolor, "attack_either_1", NO_MOVE, EMPTY, NO_MOVE)) {
+	  && trymove(libs[1], other, "attack_either-B", astr,
+		     EMPTY, NO_MOVE)) {
 	defended1 = defend_both(astr, bstr);
 	popgo();
       }
     }
-    return 3 - ( (defended0 > defended1) ? defended1 : defended0);
+    return 3 - ((defended0 > defended1) ? defended1 : defended0);
   }
 
 }
@@ -826,15 +832,15 @@ break_through_helper(int apos, int bpos, int cpos,
 int
 attack_threats(int pos, int max_points, int moves[], int codes[])
 {
-  int  other;
-  int  num_threats;
-  int  liberties;
-  int  libs[MAXLIBS];
-  int  num_adj;
-  int  adjs[MAXCHAIN];
-  int  k;
-  int  l;
-  int  r;
+  int other;
+  int num_threats;
+  int liberties;
+  int libs[MAXLIBS];
+  int num_adj;
+  int adjs[MAXCHAIN];
+  int k;
+  int l;
+  int r;
 
   ASSERT1(IS_STONE(board[pos]), pos);
   other = OTHER_COLOR(board[pos]);
@@ -2501,7 +2507,7 @@ propose_edge_moves(int str, int *libs, int liberties, int moves[MAX_MOVES],
 	    && color == to_move) {         /* only applicable as defense */
 
 	  /* Case 1: other above the liberty (crawl along the edge). */
-	  int  xpos = apos;
+	  int xpos = apos;
 	
 	  while (ON_BOARD(xpos)) {
 	    if (board[xpos] == color
@@ -3623,7 +3629,7 @@ find_cap3(int str, int *move, int komaster, int kom_pos)
  * -----        the code that
  * cO.OX        follows can find
  * XXOOX        the attacking move
- * XO.OX        at 'c=(xi,xj)'.
+ * XO.OX        at c.
  * XOOOX
  * XXXXX
  *
@@ -4517,15 +4523,15 @@ break_chain2(int str, int *move, int komaster, int kom_pos)
 
 
 /*
- * (si,sj) points to a group. break_chain3(str, *i, *j)
+ * (str) points to a group. break_chain3(str, *move)
  * returns 1 if there is a string in the surrounding chain having
  * exactly three liberties whose attack leads to the rescue of
- * (str). Then (*i, *j) points to the location of the attacking move.
+ * (str). Then (*move) points to the location of the attacking move.
  * 
  * Returns KO_A if the saving move depends on ignoring a ko threat;
  * 
  * Returns KO_B if the saving move requires making a ko threat and winning
- *   the ko.
+ * the ko.
  */
 
 static int 
@@ -5547,7 +5553,8 @@ verify_stored_board(char p[BOARDMAX])
 /* Remove persistent cache entries which have (m, n) within their
  * active areas.
  */
-void purge_persistent_reading_cache()
+void
+purge_persistent_reading_cache()
 {
   int k;
   int r;

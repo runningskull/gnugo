@@ -560,7 +560,8 @@ get_attack_threats(int pos, int max_strings, int strings[])
 /* Report all, or up to max_strings, the strings that might be defended 
  * at (pos).
  */
-int  get_defense_threats(int pos, int max_strings, int strings[])
+int
+get_defense_threats(int pos, int max_strings, int strings[])
 {
   int k;
   int num_strings;
@@ -595,7 +596,7 @@ add_connection_move(int pos, int dr1, int dr2)
 
   ASSERT_ON_BOARD1(dr1);
   ASSERT_ON_BOARD1(dr2);
-  gg_assert (dragon[dr1].color == dragon[dr2].color);
+  gg_assert(dragon[dr1].color == dragon[dr2].color);
   if (dragon1 == dragon2)
     return;
   connection = find_connection(dragon1, dragon2);
@@ -616,7 +617,7 @@ add_cut_move(int pos, int dr1, int dr2)
 
   ASSERT_ON_BOARD1(dr1);
   ASSERT_ON_BOARD1(dr2);
-  gg_assert (dragon[dr1].color == dragon[dr2].color);
+  gg_assert(dragon[dr1].color == dragon[dr2].color);
   if (dragon1 == dragon2)
     return;
   connection = find_connection(dragon1, dragon2);
@@ -1950,7 +1951,7 @@ list_move_reasons(int color)
 	if (r < 0)
 	  break;
 	
-	switch(move_reasons[r].type) {
+	switch (move_reasons[r].type) {
 	case ATTACK_MOVE:
 	  aa = worms[move_reasons[r].what];
 	  gprintf("Move at %1m attacks %1m%s\n", pos, aa,
@@ -3582,20 +3583,22 @@ value_move_reasons(int pos, int color, float pure_threat_value,
      * be 0 points + followup.  But we want to take the intersections first
      * were we actually get some points.  0.5 points is a 1 point ko which
      * is the smallest value that is actually worth something.
-     * tm - But with reverse_followup values, we may want to play a 0 point move.
+     * tm - But with reverse_followup values, we may want to play a 0
+     *      point move. 
      */
     if (tot_value >= 0.5 
-        || (move[pos].reverse_followup_value >= 1)) {
+        || (move[pos].reverse_followup_value >= 1.0)) {
       float old_tot_value = tot_value;
       float contribution;
       /* We adjust the value according to followup and reverse followup
        * values.
        */
-      contribution = gg_min( gg_min(
-        0.5 * move[pos].followup_value
-             + 0.5 * move[pos].reverse_followup_value,
-        1    * tot_value + move[pos].followup_value),
-        1.1 * tot_value + move[pos].reverse_followup_value);
+      contribution = gg_min(gg_min(0.5 * move[pos].followup_value
+				   + 0.5 * move[pos].reverse_followup_value,
+				   1.0 * tot_value
+				   + move[pos].followup_value),
+			    1.1 * tot_value
+			    + move[pos].reverse_followup_value);
       tot_value += contribution;
       /* The first case applies to gote vs gote situation, the
        * second to reverse sente, and the third to sente situations.

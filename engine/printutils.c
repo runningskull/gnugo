@@ -49,7 +49,7 @@ vgprintf(FILE* outputfile, const char *fmt, va_list ap)
   else if (stackp > 0)
     fprintf(outputfile, "%.*s", stackp*2, "                                ");
 
-  for ( ; *fmt ; ++fmt ) {
+  for (; *fmt ; ++fmt) {
     if (*fmt == '%') {
       switch (*++fmt) {
       case 'c':

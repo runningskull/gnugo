@@ -222,9 +222,9 @@ ascii_showboard(Position *pos)
    
    printf("\n");
 
-   fflush (stdout);
+   fflush(stdout);
    printf("%s%s\n", (emacs ? "EMACS1\n" : ""), letterbar);
-   fflush (stdout);
+   fflush(stdout);
 
    for (i = 0; i < pos->boardsize; i++) {
      printf(" %2d", pos->boardsize-i);
@@ -291,9 +291,9 @@ ascii_showboard(Position *pos)
      printf("\n");
    }
 
-   fflush (stdout);
+   fflush(stdout);
    printf("%s\n\n", letterbar);
-   fflush (stdout);
+   fflush(stdout);
    
 }  /* end ascii_showboard */
 
@@ -343,10 +343,10 @@ enum commands {INVALID=-1, END, EXIT, QUIT, RESIGN,
 	       SETHANDICAP, SETBOARDSIZE, SETKOMI,
 	       SETDEPTH,
                INFO, DISPLAY, SHOWBOARD, HELP, UNDO, COMMENT, SCORE,
-               CMD_DEAD,CMD_BACK,CMD_FORWARD,CMD_LAST,
-               CMD_CAPTURE,CMD_DEFEND,
-               CMD_HELPDEBUG,CMD_SHOWAREA,CMD_SHOWMOYO,CMD_SHOWTERRI,
-               CMD_GOTO,CMD_SAVE,CMD_LOAD, CMD_SHOWDRAGONS,CMD_LISTDRAGONS,
+               CMD_DEAD, CMD_BACK, CMD_FORWARD, CMD_LAST,
+               CMD_CAPTURE, CMD_DEFEND,
+               CMD_HELPDEBUG, CMD_SHOWAREA, CMD_SHOWMOYO, CMD_SHOWTERRI,
+               CMD_GOTO, CMD_SAVE, CMD_LOAD, CMD_SHOWDRAGONS, CMD_LISTDRAGONS,
 	       SETHURRY, SETLEVEL, NEW, COUNT
 };
 
@@ -363,8 +363,8 @@ get_command(char *command)
 
   /* Check to see if a move was input. */
   if (!((sscanf(command, "%c%d", &c, &d) != 2)
-	|| ((c=toupper((int) c)) < 'A')
-	|| ((c=toupper((int) c)) > 'Z')
+	|| ((c = toupper((int) c)) < 'A')
+	|| ((c = toupper((int) c)) > 'Z')
 	|| (c == 'I')))
     return MOVE;
 
@@ -925,8 +925,8 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    writesgf(sgftree.root, tmpstring);
 	    sgf_initialized = 0;
 	    printf("You may resume the game");
-	    printf(" with -l %s --mode ascii\n",tmpstring);
-	    printf("or load %s\n",tmpstring);
+	    printf(" with -l %s --mode ascii\n", tmpstring);
+	    printf("or load %s\n", tmpstring);
 	  }
 	  else
 	    printf("Please specify filename\n");
@@ -958,7 +958,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	case NEW:
 	case INVALID:
 	default:
-	  printf("\nInvalid command: %s",command);
+	  printf("\nInvalid command: %s", command);
 	  break;
 	}
       }
@@ -981,7 +981,7 @@ Type \"save <filename>\" to save,\n\
       if (!fgets(line, 80, stdin))
 	break;
       command = strtok(line_ptr, "");
-      switch(get_command(command)) {
+      switch (get_command(command)) {
       case CMD_SAVE:
 	strtok(command, " ");
 	tmpstring = strtok(NULL, " ");

@@ -367,7 +367,6 @@ XXOOb
 ; oplay_attack(a,b,b) || !oplay_attack(a,b,c,d,a)
 
 
-
 # tm Removed (3.1.16)
 #   too many false matches.
 #Pattern A202
@@ -378,7 +377,6 @@ XXOOb
 #--
 #
 #:8,-,value(39)
-
 
 
 Pattern A203
@@ -975,7 +973,6 @@ XO
 :8,-,value(20)
 
 
-
 #########################################################
 #                                                       #
 #          Limiting moves on the first line             #
@@ -1197,7 +1194,7 @@ Pattern A406c
 # tm New Pattern (3.1.17)
 
 ?xx
-*..         center kiema enclosure
+*..         center keima enclosure
 ..O
 .XO
 
@@ -1359,8 +1356,7 @@ o..
 .*X
 Abc
 
-;owl_escape_value(A)>0 && 
-;oplay_defend_both(*,b,*,c)
+;owl_escape_value(A)>0 && oplay_defend_both(*,b,*,c)
 
 
 Pattern A416
@@ -1750,8 +1746,7 @@ xXa
 b*.
 ---
 
-;  !oplay_attack(*,a) 
-;  && !obvious_false_xeye(b)
+;!oplay_attack(*,a) && !obvious_false_xeye(b)
 
 
 Pattern A607b
@@ -1912,9 +1907,8 @@ Pattern A615
 ?b.*|
 ?x..|
 
-; !attack(C) &&
-; (!x_somewhere(b) || (x_somewhere(b) && o_somewhere(a)) )
-
+; !attack(C)
+; && (!x_somewhere(b) || (x_somewhere(b) && o_somewhere(a)))
 
 
 Pattern A616
@@ -2385,9 +2379,9 @@ aC?
 XbD
 .*X
 
-; lib(D) <= 3 &&
-; owl_proper_eye(a,C) &&
-; owl_proper_eye(b,C)
+; lib(D) <= 3
+; && owl_proper_eye(a,C)
+; && owl_proper_eye(b,C)
 
 
 #########################################################
@@ -2893,9 +2887,9 @@ X*?
 XAb
 X*?
 
-; owl_escape_value(b)>0 && 
-; oplay_defend_both(*,A,b,c,b) &&
-; oplay_defend_both(*,A,b,b,*)
+; owl_escape_value(b)>0
+; && oplay_defend_both(*,A,b,c,b)
+; && oplay_defend_both(*,A,b,b,*)
 
 
 Pattern A1014
@@ -2984,7 +2978,6 @@ A*B
 
 ; vital_chain(A) && vital_chain(B)
 ; && xplay_attack_either(*,A,B)
-
 
 
 Pattern A1102
@@ -3102,7 +3095,6 @@ Xc
 
 Pattern A1107c
 # tm New pattern. (3.1.17)
-
    
 .*       defend the surrounding chain
 O.
@@ -3120,7 +3112,6 @@ Xc
 
 Pattern A1107c
 # tm New pattern. (3.1.17)
-
    
 .*       defend the surrounding chain
 O.
@@ -3321,8 +3312,8 @@ a*E
 Dcb
 
 ;(owl_escape_value(a)>0 || owl_escape_value(b)>0)
-; && oplay_defend_both(*,c,D,*,D) &&
-; ( (o_somewhere(E) || x_somewhere(E)) || owl_escape_value(a) < 0)
+;&& oplay_defend_both(*,c,D,*,D)
+;&& ((o_somewhere(E) || x_somewhere(E)) || owl_escape_value(a) < 0)
 
 
 #########################################################
@@ -3386,7 +3377,7 @@ AO
 
 Pattern A1206
 
-*X          kill one string, possibly w/ ko!
+*X          kill one string, possibly with ko!
 XO
 
 :8,s,value(30)
@@ -3425,7 +3416,6 @@ X..o
 
 
 Pattern A1209
-
 
 OXX*
 .O..
@@ -4052,7 +4042,6 @@ X.*|
 ...|
 ---+
 
-
 :8,s,value(40)
 
 
@@ -4091,6 +4080,7 @@ X.*O
 
 :8,s,value(46)
 
+
 Pattern A1345
 # tm new pattern (3.1.15) (see cho1:160)
 
@@ -4100,6 +4090,7 @@ Pattern A1345
 +----
 
 :8,s,value(46)
+
 
 Pattern A1346
 # tm new pattern (3.1.15) (see cho1:200)
@@ -4448,5 +4439,6 @@ OX*X
 ----
 
 :8,s,value(75)
+
 
 # END OF FILE

@@ -29,8 +29,8 @@
 /* local versions of absolute value, min and max */
 
 #define gg_abs(x) ((x) < 0 ? -(x) : (x))
-#define gg_min(a,b) ((a)<(b) ? (a) : (b))
-#define gg_max(a,b) ((a)<(b) ? (b) : (a))
+#define gg_min(a, b) ((a)<(b) ? (a) : (b))
+#define gg_max(a, b) ((a)<(b) ? (b) : (a))
 
 /* not sure if this is the best way of doing this, but... */
 #define UNUSED(x)  x=x
@@ -161,10 +161,10 @@ void ascii_report_dragon(char *string);
 
 /* prototypes for reorientation functions */
 
-void  rotate2(int i, int j, int *ri, int *rj, int rot);
-void  inv_rotate2(int i, int j, int *ri, int *rj, int rot);
-int  rotate1(int pos, int rot);
-int  inv_rotate1(int pos, int rot);
+void rotate2(int i, int j, int *ri, int *rj, int rot);
+void inv_rotate2(int i, int j, int *ri, int *rj, int rot);
+int rotate1(int pos, int rot);
+int inv_rotate1(int pos, int rot);
 
 /* Is this point inside the board? */
 #if 0
@@ -174,7 +174,7 @@ int  inv_rotate1(int pos, int rot);
  * For the case when expr can only be slightly negative,
  *    if (expr < 0 || expr > something)
  * is equivalent to
- *    if ( (unsigned)expr > something)
+ *    if ((unsigned) expr > something)
  *
  * (I think gcc knows this trick, but it does no harm to
  *  encode it explicitly since it saves typing !)
@@ -222,6 +222,7 @@ void matchpat(matchpat_callback_fn_ptr callback, int color,
 	      char goal[BOARDMAX]);
 void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 			int color, struct fullboard_pattern *pattern);
+void dfa_match_init(void);
 
 void reading_cache_init(int bytes);
 void reading_cache_clear(void);
@@ -299,7 +300,7 @@ void find_connections(void);
 void modify_eye_spaces(void);
 
 /* movelist.c */
-int  movelist_move_known(int move, int max_points, int points[], int codes[]);
+int movelist_move_known(int move, int max_points, int points[], int codes[]);
 void movelist_change_point(int move, int code, int max_points, 
 			   int points[], int codes[]);
 
@@ -478,8 +479,7 @@ int influence_territory_color(int pos);
 int influence_moyo_color(int pos);
 int influence_area_color(int pos);
 int influence_get_moyo_size(int pos, int color);
-void influence_get_moyo_segmentation(int opposite, 
-                                     struct moyo_data *moyo);
+void influence_get_moyo_segmentation(int opposite, struct moyo_data *moyo);
 float influence_estimate_score(float moyo_coeff, float area_coeff);
 void influence_mark_non_territory(int pos, int color);
 
@@ -512,8 +512,8 @@ void move_considered(int move, float value);
 
 
 /* SGF routines for debugging purposes in sgffile.c */
-int  sgffile_write_line(const char *, ...);
-void sgffile_dragon_status(int, int, int );
+int sgffile_write_line(const char *line, ...);
+void sgffile_dragon_status(int i, int j, int status);
 void goaldump(char goal[BOARDMAX]);
 void begin_sgftreedump(struct SGFTree_t *tree);
 void end_sgftreedump(const char *filename);
@@ -568,12 +568,12 @@ extern SGFTree *sgf_dumptree;
 
 
 struct stats_data {
-  int  nodes;                     /* Number of visited nodes while reading */
-  int  position_entered;          /* Number of Positions entered. */
-  int  position_hits;             /* Number of hits of Positions. */
-  int  read_result_entered;       /* Number of Read_results entered. */
-  int  read_result_hits;          /* Number of hits of Read_results. */
-  int  hash_collisions;           /* Number of hash collisions. */
+  int nodes;                     /* Number of visited nodes while reading */
+  int position_entered;          /* Number of Positions entered. */
+  int position_hits;             /* Number of hits of Positions. */
+  int read_result_entered;       /* Number of Read_results entered. */
+  int read_result_hits;          /* Number of hits of Read_results. */
+  int hash_collisions;           /* Number of hash collisions. */
 };
 
 extern struct stats_data stats;
@@ -773,8 +773,8 @@ void make_domains(struct eye_data b_eye[BOARDMAX],
 
 int is_halfeye(struct half_eye_data heye[BOARDMAX], int pos);
 
-/* our own abort() which prints board state on the way out.
- * i,j is a "relevant" board position for info */
+/* Our own abort() which prints board state on the way out.
+ * (i, j) is a "relevant" board position for info. */
 void abortgo(const char *file, int line, const char *msg, int i, int j);
 
 #ifndef NDEBUG

@@ -179,8 +179,7 @@ X*           atari inside eyespace
 
 A*
 
-; lib(A)==2 && olib(*)>1 && 
-;  (owl_big_eyespace(*,A))
+;lib(A)==2 && olib(*)>1 && owl_big_eyespace(*,A)
 
 
 Pattern VA10
@@ -191,7 +190,7 @@ X*           atari inside eyespace with ko
 
 A*
 
-; lib(A)==2 && olib(*)==1 && owl_big_eyespace(*,A) && oplay_attack(*,*)!=WIN
+;lib(A)==2 && olib(*)==1 && owl_big_eyespace(*,A) && oplay_attack(*,*)!=WIN
 
 
 Pattern VA11
@@ -358,8 +357,8 @@ XaX
 XbX
 ?X?
 
-; owl_topological_eye(a,C) == 2 && 
-; owl_topological_eye(b,C) == 2
+; owl_topological_eye(a,C) == 2
+; && owl_topological_eye(b,C) == 2
 
 
 Pattern VA21
@@ -607,7 +606,6 @@ XO.|
 ; xlib(A)==2
 
 
-
 Pattern VA36
 
 ?XXX|    cut black up
@@ -622,7 +620,6 @@ XX*O|
 Pattern VA37
 # tm New Pattern (3.1.15)
 
-
 ?xXO?
 ?X.XO
 O.X.*
@@ -636,7 +633,6 @@ A.X.*
 -----
 
 ;lib(A) > 2
-
 
 
 Pattern VA38
@@ -670,7 +666,7 @@ XOO|
 
 :8,s,value(95)
 
-XO*|	  atari to kill eye
+XO*|
 ABX|
 XOO|
 
@@ -742,8 +738,8 @@ bXXd
 aO*c
 ----
 
-; !oplay_attack(*,c,d,d) &&
-; !oplay_attack(*,d,c,c)
+; !oplay_attack(*,c,d,d)
+; && !oplay_attack(*,d,c,c)
 
 
 Pattern VA43
@@ -757,9 +753,9 @@ o*o
 XBd
 A*C
 
-; owl_proper_eye(*,d) &&
-; (owl_proper_eye(A,d) + owl_proper_eye(B,d) + owl_proper_eye(C,d) > 2) &&
-; safe_xmove(*)
+; owl_proper_eye(*,d)
+; && (owl_proper_eye(A,d) + owl_proper_eye(B,d) + owl_proper_eye(C,d) > 2)
+; && safe_xmove(*)
 
 
 Pattern VA44
@@ -771,7 +767,7 @@ OX
 
 :8,-,value(75)
 
-X*     cut to create false eye
+X*
 OX
 --
 
@@ -792,9 +788,9 @@ X.X??
 CbX??
 ?XAO*
 
-; xlib(A) == 1 &&
-; olib(A) == 1 &&
-; owl_topological_eye(b,C) < 4 && owl_topological_eye(b,C) > 0
+; xlib(A) == 1
+; && olib(A) == 1
+; && owl_topological_eye(b,C) < 4 && owl_topological_eye(b,C) > 0
 
 
 Pattern VA46

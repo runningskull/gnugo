@@ -111,32 +111,29 @@ order_t;
  *    functions declaration     *
  ********************************/
 
-void dfa_init (void);	/* Every call to a fda function must be done */
-void dfa_end (void);	/* between calls of those 2 functions. */
-void buildSpiralOrder (order_t order[8][MAX_ORDER]); /* Needed by matchpat */
+void dfa_init(void);	/* Every call to a fda function must be done */
+void dfa_end(void);	/* between calls of those 2 functions. */
+void buildSpiralOrder(order_t order[8][MAX_ORDER]); /* Needed by matchpat */
 
 /* basic dfa manipulation */
-void print_c_dfa (FILE* of, const char *name, dfa_t * pdfa);
-void new_dfa (dfa_t * pdfa, const char *name);
-void copy_dfa (dfa_t * p_to, dfa_t * p_from);
-void kill_dfa (dfa_t * pdfa);
-int  dfa_size (dfa_t * pdfa);	/* in Kb */
-void save_dfa (const char *f_name, dfa_t * pdfa);
-dfa_t* load_dfa (const char *f_path, const char *f_name, dfa_t ** ppdfa);
-void dump_dfa (FILE * f, dfa_t * pdfa);
+void print_c_dfa(FILE* of, const char *name, dfa_t *pdfa);
+void new_dfa(dfa_t *pdfa, const char *name);
+void copy_dfa(dfa_t *p_to, dfa_t *p_from);
+void kill_dfa(dfa_t *pdfa);
+int dfa_size(dfa_t *pdfa);	/* in Kb */
+void save_dfa(const char *f_name, dfa_t *pdfa);
+dfa_t *load_dfa(const char *f_path, const char *f_name, dfa_t **ppdfa);
+void dump_dfa(FILE *f, dfa_t *pdfa);
 
 struct pattern;
 
 /* conversion between a gnugo pattern struct into a dfa string. */
-void pattern_2_string (struct pattern *pat, char *str,
-			      int trans, int ci, int cj);
+void pattern_2_string(struct pattern *pat, char *str,
+		      int trans, int ci, int cj);
 
 /* add a string with attribute att_val into a dfa */
-float dfa_add_string (dfa_t * pdfa, const char *str, int pattern_index);
+float dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index);
 
-
-/* loading of dfa files */
-void dfa_match_init(void);
 
 /* conversion macros */
 
@@ -144,8 +141,8 @@ void dfa_match_init(void);
 
 extern int dfa_asc2val[90];
 extern char dfa_val2asc[4];
-#define ASC2VAL(c) (c<90?dfa_asc2val[(int)c]:3)
-#define VAL2ASC(n) (n<4?dfa_val2asc[n]:'!')
+#define ASC2VAL(c) (c < 90 ? dfa_asc2val[(int)c] : 3)
+#define VAL2ASC(n) (n < 4 ? dfa_val2asc[n] : '!')
 
 extern int reverse_spiral[8][DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
 
@@ -154,7 +151,7 @@ extern int reverse_spiral[8][DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
 #define BASE DFA_MAX_BOARD * 2
 
 /* Give the row in spiral order of (i,j) when the scan start at (i0,j0) */
-#define GIVE_SPIRAL_ROW(ll,i0, j0, i, j) \
+#define GIVE_SPIRAL_ROW(ll, i0, j0, i, j) \
  (reverse_spiral[ll][BASE + (i) - (i0)][BASE + (j) - (j0)])
 
 

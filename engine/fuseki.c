@@ -73,14 +73,14 @@ openregion(int i1, int i2, int j1, int j2)
 
 static int corners[][2] =
 {
-  {3,3},
-  {3,4},
-  {4,3},
-  {4,4},
-  {5,3},
-  {3,5},
-  {5,4},
-  {4,5},
+  {3, 3},
+  {3, 4},
+  {4, 3},
+  {4, 4},
+  {5, 3},
+  {3, 5},
+  {5, 4},
+  {4, 5},
 };
 
 /* Relative weights for different corner moves at different board
@@ -153,7 +153,7 @@ choose_corner_move(int corner, int *m, int *n)
   *m = corners[i][0];
   *n = corners[i][1];
 
-  switch(corner) {
+  switch (corner) {
   case UPPER_LEFT:
     *m = *m - 1;
     *n = *n - 1;

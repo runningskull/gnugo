@@ -546,7 +546,7 @@ Pattern D204
 
 :8,-,value(60)
 
-??X?          push
+??X?
 AO*.
 ?.x.
 ----
@@ -730,7 +730,7 @@ xx..
 :8,-,value(60)
 
 o...
-O.*.     expand eyespace
+O.*.
 AB..
 ----
 
@@ -754,8 +754,6 @@ O.*.
 ----
 
 ; !oplay_defend(*,A)
-
-
 
 
 Pattern D217b
@@ -1470,7 +1468,7 @@ XO..
 
 
 # tm Removed (3.1.17)  too generic
-#   possibly add back w/ constraint, or lower value.
+#   possibly add back with constraint, or lower value.
 #Pattern D501
 #
 #?OXx        connect
@@ -1779,8 +1777,8 @@ occA
 ----
 
 #;owl_eyespace(b,c) && 
-;(!obvious_false_oeye(b) || oplay_attack(*,A)) && 
-;!xplay_attack(*,A)
+;(!obvious_false_oeye(b) || oplay_attack(*,A))
+;&& !xplay_attack(*,A)
 
 
 Pattern D604a
@@ -1797,7 +1795,6 @@ XCAb*.
 ------
 
 ; !oplay_defend(*,A,b,C)
-
 
 
 Pattern D605
@@ -2162,6 +2159,7 @@ OOX.|
 
 :8,-,value(45)
 
+
 Pattern D627
 # tm New pattern (3.1.15) (see maeda:100)
 
@@ -2196,7 +2194,6 @@ Pattern D628
 ; !xplay_attack(*,*) && oplay_attack(*,A,A)
 
 
-
 Pattern D629
 # tm New Pattern (3.1.15)
 
@@ -2220,7 +2217,7 @@ OX?
 
 :8,0,value(65)
 
-.*O    Cut off black stone
+.*O
 OA?
 ???
 ---
@@ -2238,14 +2235,14 @@ OOOO	funny edge capture.
 
 :8,s,value(75)
 
-OOOO	funny edge capture.
+OOOO
 .XC.
 A*OB
 ----
 
-; oplay_attack(*,C) &&
-; oplay_defend(*,A,*) && 
-; oplay_defend(*,B,*)
+; oplay_attack(*,C)
+; && oplay_defend(*,A,*)
+; && oplay_defend(*,B,*)
 
 
 Pattern D632
@@ -2258,7 +2255,7 @@ OX.*
 
 :8,-,value(65)
 
-OOX?	  Eat lunch with snapback.
+OOX?
 OXOA
 OX.*
 ----
@@ -2287,7 +2284,7 @@ XXO   Hane in sente
 
 :8,-,value(70)
 
-BXA   Hane in sente
+BXA
 .*.
 ---
 
@@ -2295,7 +2292,6 @@ BXA   Hane in sente
 
 
 Pattern D635
-
 # tm New Pattern (3.1.15)
 
 ?OO?
@@ -2324,7 +2320,7 @@ OOO.X	special eye shape on edge.
 
 :8,-,value(65)
 
-OOOaX	special eye shape on edge.
+OOOaX
 ..B*.
 -----
 
@@ -2900,7 +2896,6 @@ Pattern D811a
 :8,-,value(60)
 
 
-
 Pattern D812
 
 |oo?          work around eyespace generation weakness
@@ -3269,6 +3264,7 @@ Pattern D835
 
 :8,-,value(65)
 
+
 Pattern D836
 # tm New Pattern (3.1.15)
 
@@ -3513,7 +3509,7 @@ Pattern D1000
 O*          prevent opponent's safe cut
 XO
 
-:8,C,value(60)
+:/,-,value(60)
 
 O*
 aO
@@ -3525,12 +3521,11 @@ Pattern D1000a
 
 O*          save large section
 
-:8,-,value(95)
+:-,-,value(95)
 
 A*
 
 ; lib(A) == 1 && wormsize(A) > 2
-
 
 
 Pattern D1001
@@ -4007,7 +4002,6 @@ a*OO
 ;oplay_attack(*,a,B) && wormsize(B) > 2
 
 
-
 Pattern D1118
 
 ooo?       capture to defend and threaten escape
@@ -4283,9 +4277,8 @@ X.?
 O*a
 cB?
 
-; owl_escape_value(a)>0 &&
-; oplay_attack(*,a,c)
-
+; owl_escape_value(a)>0
+; && oplay_attack(*,a,c)
 
 
 Pattern D1136
@@ -4321,6 +4314,7 @@ Oa??
 ;lib(B)<=4 && owl_escape_value(c) + owl_escape_value(d) > 0
 ;&& oplay_attack_either(*,a,a,B)
 
+
 Pattern D1138
 # tm New Pattern (3.1.17)
 
@@ -4331,13 +4325,13 @@ XOX?
 :8,sb,value(85)
 
 e?f?
-.B*?   breakout!
+.B*?
 AOCd
 
-; (vital_chain(A) || owl_escape_value(e) > 0) &&  
-; (vital_chain(C) || owl_escape_value(f) > 0) &&
-; lib(C) == 2 &&
-; oplay_attack_either(*,d,B,A)
+; (vital_chain(A) || owl_escape_value(e) > 0)
+; && (vital_chain(C) || owl_escape_value(f) > 0)
+; && lib(C) == 2
+; && oplay_attack_either(*,d,B,A)
 
 
 ########################################################
@@ -4694,8 +4688,8 @@ X*oo
 ?OX?
 
 ;(!x_somewhere(e) && !x_somewhere(d) && (owl_escape_value(a) > 0))
-;||  owl_escape_value(b) > 0
-;||  owl_escape_value(c) > 0
+;|| owl_escape_value(b) > 0
+;|| owl_escape_value(c) > 0
 
 
 Pattern D1311
@@ -4853,7 +4847,7 @@ O*O      connect to friendly dragon
 
 a*b
 
-; !owl_goal_dragon(a) || !owl_goal_dragon(b)
+;!owl_goal_dragon(a) || !owl_goal_dragon(b)
 
 
 
@@ -4887,6 +4881,8 @@ Pattern D1323
 #    without more context this is often an inferior
 #    solution (for example games/manner.sgf move 12).
 # tm Modified (3.1.17)
+# gf Removed safe_xmove(*) from constraint. This is redundant with n
+#    classification. (3.1.17)
 
 O*O      connect to escape
 
@@ -4894,7 +4890,7 @@ O*O      connect to escape
 
 a*b
 
-;(owl_escape_value(a)>0 || owl_escape_value(b)>0) && safe_xmove(*)
+;owl_escape_value(a)>0 || owl_escape_value(b)>0
 
 
 Pattern D1323a
@@ -4906,14 +4902,13 @@ Pattern D1323a
 
 :8,n,value(55)
 
-
 BCd
 AO*
 ?.O
 
-;(owl_escape_value(A) > 0 ||
-; owl_escape_value(B) > 0 ||
-; owl_escape_value(C) > 0)
+;(owl_escape_value(A) > 0
+; || owl_escape_value(B) > 0
+; || owl_escape_value(C) > 0)
 ;&& oplay_attack(*,d)
 
 
@@ -5742,13 +5737,13 @@ ab..Xo
 Pattern D1375
 # tm New pattern (3.1.15)
 
-O?.?  connect out w/ atari.
+O?.?  connect out with atari.
 .*XO
 ..O.
 
 :8,-,value(75)
 
-O?.?  connect out w/ atari.
+O?.?
 .*AO
 ..O.
 
@@ -5768,8 +5763,8 @@ bdF?
 ec*a
 ----
 
-; (owl_escape_value(a) > 0 || owl_escape_value(b) > 0) &&
-; oplay_attack_either(*,c,d,c,F)
+; (owl_escape_value(a) > 0 || owl_escape_value(b) > 0)
+; && oplay_attack_either(*,c,d,c,F)
 
 
 Pattern D1377
@@ -5782,12 +5777,11 @@ OX*.o    hane into the open.
 :8,-,value(50)
 
 ?????
-OA*.o    hane into the open.
+OA*.o
 .O..o
 -----
 
-;defend(A) && !oplay_attack(*,*)
-
+;defend(A)
 
 
 Pattern D1378
@@ -5798,11 +5792,11 @@ X*X   breakout & attack
 
 :8,-,value(55)
 
-A*B   breakout & attack
+A*B
 ?O?
 
-; vital_chain(A) && vital_chain(B) &&
-; oplay_attack_either(*,A,B)
+; vital_chain(A) && vital_chain(B)
+; && oplay_attack_either(*,A,B)
 
 
 Pattern D1379
@@ -5820,12 +5814,12 @@ xeA
 O*X
 ?d?
 
-; ( owl_escape_value(A) > 0 || 
-;   owl_escape_value(B) > 0 || 
-;   owl_escape_value(C) > 0 ) &&
-; !attack(d) &&
-; oplay_attack(*,A,d) &&
-; oplay_attack(*,e,d)
+; (owl_escape_value(A) > 0
+; || owl_escape_value(B) > 0
+; || owl_escape_value(C) > 0)
+; && !attack(d)
+; && oplay_attack(*,A,d)
+; && oplay_attack(*,e,d)
 
 
 Pattern 1380
@@ -5836,7 +5830,7 @@ O.?
 
 :8,-,value(65)
 
-?AB	escape
+?AB
 .*C
 O.?
 

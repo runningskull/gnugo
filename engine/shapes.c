@@ -208,7 +208,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	    pattern->name, move);
     }
     else {
-      DEBUG(DEBUG_HELPER,"  helper does not like pattern '%s' at %1m\n", 
+      DEBUG(DEBUG_HELPER, "  helper does not like pattern '%s' at %1m\n", 
 	    pattern->name, move);
       return;  /* pattern matcher does not like it */
     }

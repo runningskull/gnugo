@@ -139,7 +139,6 @@ is_hoshi_point(int m, int n)
     return 0;
   }
 
-
   /* Is this a midpoint hoshi? */
   if ((m == hoshi || m == middle)
       && (n == hoshi || n == middle))
@@ -255,7 +254,7 @@ end_draw_board()
 static void 
 showchar(int i, int j, int empty, int xo)
 {
-  struct dragon_data *d;  /* dragon data at i,j */
+  struct dragon_data *d;  /* dragon data at (i, j) */
   int x;
   ASSERT_ON_BOARD2(i, j);
   x = BOARD(i, j);
@@ -265,7 +264,7 @@ showchar(int i, int j, int empty, int xo)
     if (xo != 2)
       fprintf(stderr, " %c", empty);
     else {
-      int  empty_color;
+      int empty_color;
       char empty_char;
       
       if (black_eye[POS(i, j)].color == BLACK_BORDER) {

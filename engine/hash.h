@@ -110,7 +110,7 @@ int hashposition_compare(Hashposition *pos1, Hashposition *pos2);
 void hashposition_dump(Hashposition *pos, FILE *outfile);
 
 void hashdata_recalc(Hash_data *hd, Intersection *board, int ko_pos);
-int  hashdata_compare(Hash_data *hd1, Hash_data *hd2);
+int hashdata_compare(Hash_data *hd1, Hash_data *hd2);
 void hashdata_set_ko(Hash_data *hd, int pos);
 void hashdata_remove_ko(Hash_data *hd);
 void hashdata_invert_stone(Hash_data *hd, int pos, int color);

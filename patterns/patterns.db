@@ -4593,6 +4593,7 @@ o..X.
 
 Pattern EB632
 # FIXME: tm - This is not really a b pattern, right?
+# gf It's a workaround for incorrect amalgamation, I think.
 
 ?oO??          clamp on second
 ?O..X
@@ -4979,13 +4980,12 @@ X*..
 
 :8,OXb,reverse_followup(6)
 
-?O..          block
+?O..
 XOb.
 C*a.
 ----
 
-;!owl_threatens(*,C) &&
-;!xplay_attack_either(*,a,b,*,b)
+;!owl_threatens(*,C) && !xplay_attack_either(*,a,b,*,b)
 
 
 Pattern EB713
@@ -5002,7 +5002,6 @@ C*a.
 ----
 
 ;!xplay_attack_either(*,a,b,*,b)
-
 
 
 Pattern EB714
@@ -13236,5 +13235,6 @@ OOa|
 ; oplay_attack(*,a,B)
 
 > replace(a,*)
+
 
 # END OF FILE

@@ -114,7 +114,7 @@ jump_out_helper(ARGS)
 
   UNUSED(transformation); UNUSED(pattern);
 
-  if (color==WHITE)
+  if (color == WHITE)
     own_eyespace = (white_eye[move].color == WHITE_BORDER);
   else
     own_eyespace = (black_eye[move].color == BLACK_BORDER);

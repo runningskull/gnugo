@@ -255,8 +255,8 @@ static struct autohelper_func autohelper_functions[] = {
 
 /* To get a valid function pointer different from NULL. */
 static int
-dummyhelper (struct pattern *patt, int transformation,
-	     int move, int color, int action)
+dummyhelper(struct pattern *patt, int transformation,
+	    int move, int color, int action)
 {
   UNUSED(patt); UNUSED(transformation); UNUSED(move); UNUSED(color);
   UNUSED(action);
@@ -434,9 +434,9 @@ static void
 compute_grids(void)
 {
 #if GRID_OPT
-  /*                       element : .  X  O  x  o  ,  a  ! */
-  static const uint32 and_mask[] = { 3, 3, 3, 1, 2, 3, 3, 1 };
-  static const uint32 val_mask[] = { 0, 2, 1, 0, 0, 0, 0, 0 };
+  /*                              element: .  X  O  x  o  ,  a  ! */
+  static const unsigned int and_mask[] = { 3, 3, 3, 1, 2, 3, 3, 1 };
+  static const unsigned int val_mask[] = { 0, 2, 1, 0, 0, 0, 0, 0 };
 
   int ll;  /* iterate over rotations */
   int k;   /* iterate over elements */
@@ -571,7 +571,7 @@ read_pattern_line(char *p)
     assert(off <= ATT_not || off == ATT_Q);
 
 	
-    if ( (ci == -1) && (off < 3) && ((off & anchor) != 0) ) {
+    if ((ci == -1) && (off < 3) && ((off & anchor) != 0)) {
       /* Use this position as the pattern origin. */
       ci = maxi;
       cj = j;
@@ -848,7 +848,7 @@ finish_pattern(char *line)
    * since that mangles the size info.
    */
   
-  switch(symmetry) {
+  switch (symmetry) {
   case '+' :
     if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
       fprintf(stderr,
@@ -1424,7 +1424,7 @@ main(int argc, char *argv[])
   {
     /* parse command-line args */
     while ((i = gg_getopt(argc, argv, "i:o:V:vcbXfmtD")) != EOF) {
-      switch(i) {
+      switch (i) {
       case 'v': verbose = 1; break;
       case 'c': pattern_type = CONNECTIONS; break;
       case 'b': anchor = ANCHOR_BOTH; break;
@@ -1569,9 +1569,9 @@ main(int argc, char *argv[])
       if (state == 2 || state == 5)
 	state++;
     }
-    else if ( strchr(VALID_PATTERN_CHARS, line[0]) ||
-		strchr(VALID_EDGE_CHARS, line[0]) ||
-		strchr(VALID_CONSTRAINT_LABELS, line[0])) { 
+    else if (strchr(VALID_PATTERN_CHARS, line[0])
+	     || strchr(VALID_EDGE_CHARS, line[0])
+	     || strchr(VALID_CONSTRAINT_LABELS, line[0])) { 
       /* diagram line */
       switch (state) {
       case 0:

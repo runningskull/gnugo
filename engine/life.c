@@ -880,7 +880,7 @@ compare_max_eyes(int eyes1, int ko1, int eyes2, int ko2)
 	  (message), (eyes), (ko), eye[attack],\
 	  hashdata.hashval);\
   return 1;\
-  } while(0)
+  } while (0)
 
 /*
  * We have a set of locations in eyepoints forming an eye shape.

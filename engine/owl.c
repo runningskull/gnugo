@@ -732,8 +732,9 @@ do_owl_analyze_semeai(int apos, int bpos,
 }
 
 				   
-/* If (i,j) points to an empty intersection, returns true if
- * this spot is adjacent to an element of the owl goal.  */
+/* If (pos) points to an empty intersection, returns true if
+ * this spot is adjacent to an element of the owl goal.
+ */
 
 static int
 liberty_of_goal(int pos, struct local_owl_data *owl)
@@ -795,8 +796,8 @@ find_backfilling_move(int worm, int liberty)
 
 
 /* Returns true if a move can be found to attack the dragon
- * at (m,n), in which case (*ui,*uj) is the recommended move.
- * (*ui,*uj) can be null pointers if only the result is needed.
+ * at (target), in which case (*attack_point) is the recommended move.
+ * (attack_point) can be a null pointer if only the result is needed.
  *
  * The array goal marks the extent of the dragon. This must
  * be maintained during reading. Call this function only when
@@ -998,7 +999,8 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
       else if (true_genus == 1 && probable_min >= 4)
 	live_reason = "1 secure eye, likely >= 4";
       else if (stackp > owl_distrust_depth 
-	       && probable_min >= 2 && !matches_found)
+	       && probable_min >= 2
+	       && !matches_found)
 	live_reason = "getting deep, looks lively";
       else
 	gg_assert(0); /* This should never happen */
@@ -1380,8 +1382,8 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
 
 
 /* Returns true if a move can be found to defend the dragon
- * at (m,n), in which case (*ui,*uj) is the recommended move.
- * (*ui, *uj) can be null pointers if the result is not needed.
+ * at (target), in which case (*defense_point) is the recommended move.
+ * (defense_point) can be a null pointer if the result is not needed.
  *
  * The array goal marks the extent of the dragon. This must
  * be maintained during reading. Call this function only when
@@ -1613,7 +1615,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       TRACE("%oVariation %d: ALIVE (%s)\n",
 	    this_variation_number, live_reason);
       SGFTRACE(0, WIN, live_reason);
-	READ_RETURN(read_result, move, 0, WIN);
+      READ_RETURN(read_result, move, 0, WIN);
     }
   }
 
@@ -2083,7 +2085,7 @@ owl_determine_life(struct local_owl_data *owl,
 
   *probable_min = 0;
   *probable_max = 0;
-  /* This test must be conditioned on (m,n) being its own origin,
+  /* This test must be conditioned on (m, n) being its own origin,
    * because some origins get moved during the topological eye
    * code.
    *
@@ -2454,7 +2456,7 @@ owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
 	    pattern->name, tval, move);
     }
     else {
-      DEBUG(DEBUG_HELPER,"  helper does not like pattern '%s' at %1m\n",
+      DEBUG(DEBUG_HELPER, "  helper does not like pattern '%s' at %1m\n",
 	    pattern->name, move);
       return;  /* pattern matcher does not like it */
     }
@@ -3472,7 +3474,7 @@ owl_safe_move(int move, int color)
   
 
 /* This function, called when stackp==0, returns true if capturing
- * the string at (i,j) results in a live group.
+ * the string at (str) results in a live group.
  */
 
 #define MAX_SUBSTANTIAL_LIBS 10
@@ -3722,7 +3724,7 @@ owl_topological_eye(int pos, int color)
 }
 
 /* This function returns true if it is judged that the capture of the
- * string at (m,n) is sufficient to create one eye.
+ * string at (pos) is sufficient to create one eye.
  */
 
 int
@@ -3983,7 +3985,8 @@ verify_stored_board(char p[BOARDMAX])
  * this function once per move, before starting the owl reading. It's
  * not required for correct operation though. 
  */
-void purge_persistent_owl_cache()
+void
+purge_persistent_owl_cache()
 {
   int k;
   static int last_purge_position_number = -1;

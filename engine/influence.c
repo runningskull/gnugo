@@ -101,7 +101,7 @@ static int debug_influence_j = -1;
 	if (permeability == 0.0) \
 	  continue; \
 	damping = (arg_d) ? diagonal_attenuation : attenuation; \
-	if (i==m && j==n) \
+	if (i == m && j == n) \
 	  cos2phi = 1.0; \
 	else { \
 	  float a = (arg_di)*(i-m) + (arg_dj)*(j-n); \
@@ -270,17 +270,17 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
     if (i > 0)
       code1(-1, 0, i-1, j, 0);
     if (i < board_size-1)
-      code1( 1, 0, i+1, j, 0);
+      code1(1, 0, i+1, j, 0);
     if (j > 0)
-      code1( 0,-1, i, j-1, 0);
+      code1(0, -1, i, j-1, 0);
     if (j < board_size-1)
-      code1( 0, 1, i, j+1, 0);
+      code1(0, 1, i, j+1, 0);
     if (i > 0 && j > 0)
-      code1(-1,-1, i-1, j-1, 1);
+      code1(-1, -1, i-1, j-1, 1);
     if (i < board_size-1 && j > 0)
-      code1( 1,-1, i+1, j-1, 1);
+      code1(1, -1, i+1, j-1, 1);
     if (i < board_size-1 && j < board_size-1)
-      code1( 1, 1, i+1, j+1, 1);
+      code1(1, 1, i+1, j+1, 1);
     if (i > 0 && j < board_size-1)
       code1(-1, 1, i-1, j+1, 1);
  
@@ -448,13 +448,17 @@ void
 add_influence_source(int pos, int color, float strength, float attenuation,
                      struct influence_data *q)
 {
-  if ((color & WHITE) && (q->white_strength[I(pos)][J(pos)] < strength)) {
-    q->white_strength[I(pos)][J(pos)] = strength;
-    q->white_attenuation[I(pos)][J(pos)] = attenuation;
+  int m = I(pos);
+  int n = J(pos);
+  
+  if ((color & WHITE) && (q->white_strength[m][n] < strength)) {
+    q->white_strength[m][n] = strength;
+    q->white_attenuation[m][n] = attenuation;
   }
-  if ((color & BLACK) && (q->black_strength[I(pos)][J(pos)] < strength)) {
-    q->black_strength[I(pos)][J(pos)] = strength;
-    q->black_attenuation[I(pos)][J(pos)] = attenuation;
+  
+  if ((color & BLACK) && (q->black_strength[m][n] < strength)) {
+    q->black_strength[m][n] = strength;
+    q->black_attenuation[m][n] = attenuation;
   }
 }
 
@@ -620,10 +624,9 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
     /* Increase strength if we're computing escape influence. */
     if (q == &escape_influence && (pattern->class & CLASS_e))
       add_influence_source(POS(ti, tj), this_color,
-          20 * pattern->value, 1.5, q);
+			   20 * pattern->value, 1.5, q);
     else
-      add_influence_source(POS(ti, tj), this_color,
-          pattern->value, 1.5, q);
+      add_influence_source(POS(ti, tj), this_color, pattern->value, 1.5, q);
 
     DEBUG(DEBUG_INFLUENCE,
 	  "  low intensity influence source at %m, strength %f, color %C\n",
@@ -636,7 +639,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
    */
   if (pattern->class & CLASS_E) {
     add_influence_source(POS(ti, tj), color,
-        pattern->value, DEFAULT_ATTENUATION, q);
+			 pattern->value, DEFAULT_ATTENUATION, q);
     DEBUG(DEBUG_INFLUENCE,
 	  "  extra %C source at %m, strength %f\n", color,
 	  ti, tj, pattern->value);
@@ -647,13 +650,13 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * for A, D, B, and t patterns.
    */
   for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-    if ((   (pattern->class & (CLASS_D | CLASS_A))
-	    && pattern->patn[k].att == ATT_comma)
+    if (((pattern->class & (CLASS_D | CLASS_A))
+	 && pattern->patn[k].att == ATT_comma)
 	|| ((pattern->class & CLASS_B)
 	    && pattern->patn[k].att == ATT_not)) {
       /* transform pattern real coordinate */
       int x, y;
-      TRANSFORM(pattern->patn[k].x,pattern->patn[k].y,&x,&y,ll);
+      TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
       x += m;
       y += n;
 
@@ -675,7 +678,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
       /* Low intensity influence source for the color in turn to move. */
       if (pattern->class & CLASS_B) {
         add_influence_source(POS(x, y), color,
-            pattern->value, DEFAULT_ATTENUATION, q);
+			     pattern->value, DEFAULT_ATTENUATION, q);
 	DEBUG(DEBUG_INFLUENCE, "  intrusion at %m\n", x, y);
       }
     }
@@ -1118,7 +1121,6 @@ influence_get_moyo_segmentation(int opposite,
                                 struct moyo_data *moyos)
 {
   int m, n;
-  int pos;
   int min_moyo_id;
   int max_moyo_id;
   int i;
@@ -1127,21 +1129,17 @@ influence_get_moyo_segmentation(int opposite,
   min_moyo_id = MAX_REGIONS;
   max_moyo_id = 0;
 
-  if (opposite) {
+  if (opposite)
     q = &initial_opposite_influence;
-  }
-  else {
+  else
     q = &initial_influence;
-  };
+
   /* Find out range of region ids used by moyos. */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
-      if (q->moyo_segmentation[I(pos)][J(pos)] != 0) {
-        min_moyo_id = gg_min(min_moyo_id,
-                    q->moyo_segmentation[I(pos)][J(pos)]);
-        max_moyo_id = gg_max(max_moyo_id,
-                    q->moyo_segmentation[I(pos)][J(pos)]);
+      if (q->moyo_segmentation[m][n] != 0) {
+        min_moyo_id = gg_min(min_moyo_id, q->moyo_segmentation[m][n]);
+        max_moyo_id = gg_max(max_moyo_id, q->moyo_segmentation[m][n]);
       }
     }
   moyos->number = max_moyo_id - min_moyo_id + 1;
@@ -1149,24 +1147,21 @@ influence_get_moyo_segmentation(int opposite,
   /* Export segmentation. */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
-      if (q->moyo_segmentation[I(pos)][J(pos)] != 0) {
-        moyos->segmentation[pos]
-             = q->moyo_segmentation[I(pos)][J(pos)] - min_moyo_id + 1;
+      if (q->moyo_segmentation[m][n] != 0) {
+        moyos->segmentation[POS(m, n)]
+	  = q->moyo_segmentation[m][n] - min_moyo_id + 1;
       }
-      else {
-        moyos->segmentation[pos] = 0;
-      }
+      else
+        moyos->segmentation[POS(m, n)] = 0;
     }
+  
   /* Export size and owner info. */
   for (i = min_moyo_id; i <= max_moyo_id; i++) {
     moyos->size[i - min_moyo_id + 1] = q->region_size[i];
-    if (q->region_type[i] & BLACK_REGION) {
-      moyos->owner[i - min_moyo_id  +1] = BLACK;
-    }
-    else {
-      moyos->owner[i - min_moyo_id  +1] = WHITE;
-    }
+    if (q->region_type[i] & BLACK_REGION)
+      moyos->owner[i - min_moyo_id + 1] = BLACK;
+    else
+      moyos->owner[i - min_moyo_id + 1] = WHITE;
   }
 }
 

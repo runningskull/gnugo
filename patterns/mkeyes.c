@@ -91,7 +91,7 @@ main(void)
 
     /* remove trailing whitespace */
     i = strlen(line)-2;	/* start removing backwards just before newline */
-    while(i >= 0 && (line[i] == ' ' || line[i] == '\t' || line[i] == '\r')) {
+    while (i >= 0 && (line[i] == ' ' || line[i] == '\t' || line[i] == '\r')) {
       line[i]   = '\n';
       line[i+1] = '\0';
       i--;

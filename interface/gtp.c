@@ -144,7 +144,7 @@ gtp_mprintf(const char *fmt, ...)
   va_list ap;
   va_start(ap, fmt);
   
-  for ( ; *fmt ; ++fmt ) {
+  for (; *fmt ; ++fmt) {
     if (*fmt == '%') {
       switch (*++fmt) {
       case 'c':

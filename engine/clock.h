@@ -73,8 +73,8 @@ void clock_push_button(int color);
 void clock_unpush_button(int color);
 
 /* getting informations about clock */
-int  clock_is_byoyomi(int color);
-int  clock_is_time_over(int color);
+int clock_is_byoyomi(int color);
+int clock_is_time_over(int color);
 double clock_get_timer(int color);
 double clock_get_btimer(int color);
 double clock_get_time_left(int color);

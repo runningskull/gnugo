@@ -133,7 +133,7 @@ extern const int transformations[8][2][2];
 do { \
   *ti = transformations[trans][0][0] * (i) + transformations[trans][0][1] * (j); \
   *tj = transformations[trans][1][0] * (i) + transformations[trans][1][1] * (j); \
-} while(0)
+} while (0)
 
 
 /* A situation is the combination of a board position and the move to
@@ -385,14 +385,14 @@ get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
   SGFProperty *prop;
   int i, j;
   
-  for (prop=node->props; prop; prop=prop->next) {
-    if(!prop || !prop->name || !node) {
+  for (prop = node->props; prop; prop = prop->next) {
+    if (!prop || !prop->name || !node) {
       /* something wrong with the SGF file properties */
-      if(1)
+      if (1)
 	fprintf(stderr, "Something wrong with the SGF file properties.\n");
       return 0;
     }
-    switch(prop->name) {
+    switch (prop->name) {
     case SGFAB:
       get_moveXY(prop, &i, &j, board_size);
       /* Put handicap stones on the board at once. */
@@ -414,7 +414,7 @@ get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
       *color = (prop->name == SGFW) ? WHITE : BLACK;
       
       if (!get_moveXY(prop, m, n, board_size)) {
-	if(0)
+	if (0)
 	  fprintf(stderr, "Warning: failed to get move coordinates.\n");
 	return 0;
       }
@@ -654,9 +654,8 @@ examine_game(SGFNode *sgf, int collect_statistics)
     gg_assert(m >= 0 && m < board_size && n >= 0 && n <= board_size);
     hash_board(&prehash, color);
     hash_board_and_move(&posthash, color, m, n);
-    if (collect_statistics) {
+    if (collect_statistics)
       add_situation(&prehash, &posthash);
-    }
     else
       store_pattern_if_winner(&prehash, &posthash, color, m, n);
     play_move(POS(m, n), color);
@@ -693,25 +692,25 @@ enough_strength(char *strength)
   int length = 0;
   int i = 0;
   int kyu = 30;
-  if (player_strength >= 30) {
+  if (player_strength >= 30)
     return 1;
-  }
+  
   length = strlen(strength);
   /* check if dan player */
-  for (i = 0; i < length; i++) {
-    if (strength[i] == 'd') return 1;
-  }
+  for (i = 0; i < length; i++)
+    if (strength[i] == 'd')
+      return 1;
   
   /* get the kyu strength as an integer */
   for (i = 0; i < length; i++) {
-    if (strength[i] == 'k') {
+    if (strength[i] == 'k')
       strength[i] = '\0';
-    }
     kyu = atoi(strength);
   }
-  if (kyu <= player_strength) {
+  
+  if (kyu <= player_strength)
     return 1;
-  }
+
   /* not enough strength */
   return 0;
 }
@@ -753,7 +752,7 @@ sort_games(void)
     }
     
     /* No handicap games */
-    else if(handicap_value == 0) {
+    else if (handicap_value == 0) {
       if (sgfGetIntProperty(sgf, "HA", &handicap) && handicap > 1) {
 	if (0)
 	  fprintf(stderr, "No handicap games allowed %d\n", handicap);
@@ -763,7 +762,7 @@ sort_games(void)
     }
     
     /* Only handicap games */
-    else if(handicap_value > 1) {
+    else if (handicap_value > 1) {
       if (!sgfGetIntProperty(sgf, "HA", &handicap)) {
 	if (0)
 	  fprintf(stderr, "Not a handicap game %d\n", handicap);
@@ -844,7 +843,7 @@ collect_situations(void)
     }
     
     /* No handicap games */
-    else if(handicap_value == 0) {
+    else if (handicap_value == 0) {
       if (sgfGetIntProperty(sgf, "HA", &handicap) && handicap > 1) {
 	if (0)
 	  fprintf(stderr, "No handicap games allowed %d\n", handicap);
@@ -854,7 +853,7 @@ collect_situations(void)
     }
     
     /* Only handicap games */
-    else if(handicap_value > 1) {
+    else if (handicap_value > 1) {
       if (!sgfGetIntProperty(sgf, "HA", &handicap)) {
 	if (0)
 	  fprintf(stderr, "Not a handicap game %d\n", handicap);
@@ -1218,7 +1217,7 @@ main(int argc, char *argv[])
     /* Tell the user everything worked out fine */
     fprintf(stderr, "The pattern database was produced with no errors.\n");
     for (i = 0; i < number_of_games; i++) {
-      if(unused_games[i]) number_of_unused_games++;
+      if (unused_games[i]) number_of_unused_games++;
     }
     fprintf(stderr, "Out of %d games, %d were not used.\n", 
 	    number_of_games, number_of_unused_games);

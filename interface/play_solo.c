@@ -74,7 +74,7 @@ play_solo(Gameinfo *gameinfo, int moves)
   }
   
   t1 = gg_gettimeofday();
-  memset(&totalstats,'\0',sizeof(totalstats));
+  memset(&totalstats, '\0', sizeof(totalstats));
   while (passes < 2 && --moves >= 0 && !time_to_die) {
     reset_owl_node_counter();
     move_val = gnugo_genmove(&gameinfo->position, &i, &j,
@@ -84,12 +84,12 @@ play_solo(Gameinfo *gameinfo, int moves)
 
     if (move_val < 0) {
       ++passes;
-      printf("%s(%d): Pass\n", gameinfo->to_move==BLACK ? "Black" : "White",
+      printf("%s(%d): Pass\n", gameinfo->to_move == BLACK ? "Black" : "White",
 	     gameinfo->move_number);
     }
     else {
       passes = 0;
-      gprintf("%s(%d): %m\n", gameinfo->to_move==BLACK ? "Black" : "White",
+      gprintf("%s(%d): %m\n", gameinfo->to_move == BLACK ? "Black" : "White",
 	      gameinfo->move_number, i, j);
     }
 
@@ -111,9 +111,9 @@ play_solo(Gameinfo *gameinfo, int moves)
   else
     printf("%.3f moves/sec\n", (save_moves-moves)/(t2-t1));
 #else
-  printf("%10d moves played in %0.3f seconds\n", save_moves-moves,t2-t1);
+  printf("%10d moves played in %0.3f seconds\n", save_moves-moves, t2-t1);
   if (save_moves != moves)
-    printf("%10.3f seconds/move\n", (t2-t1)/(save_moves-moves) );
+    printf("%10.3f seconds/move\n", (t2-t1)/(save_moves-moves));
   printf("%10d nodes\n", totalstats.nodes);
   printf("%10d positions entered\n", totalstats.position_entered);
   printf("%10d position hits\n", totalstats.position_hits);
@@ -167,7 +167,8 @@ load_and_analyze_sgf_file(SGFNode *head, Gameinfo *gameinfo,
       sgffile_move_made(i, j, next, 0);
     }
     else {
-      gprintf("%s move %m\n", next == WHITE ? "white (o)" : "black (X)", i,j);
+      gprintf("%s move %m\n", next == WHITE ? "white (o)" : "black (X)",
+	      i, j);
       gnugo_play_move(&gameinfo->position, i, j, next);
       sgffile_move_made(i, j, next, 0);
     }

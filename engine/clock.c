@@ -48,7 +48,7 @@
 #define CLOCK_HURRYR 0.02 /* (10 sec or or 2% of main_time) */
 #define CLOCK_HURRY_LEVEL 1 /* Last chance level: */
 #define CLOCK_SAFE  300   /* Keep Ahead limit: */
-#define CLOCK_SAFER 0.20 /* (5min or 20% of time ) */
+#define CLOCK_SAFER 0.20 /* (5min or 20% of time) */
 #define CLOCK_DELTA  10  /* Maximal time difference: */
 #define CLOCK_DELTAR 0.10 /* 10sec or 10% of left time */
 #define CLOCK_TIME_CONTRACT 0.75 /* 75% of time to play */
@@ -64,11 +64,11 @@ extern int board_size;
 typedef struct {
 
   /* clock parameters */
-  int    clock_on;
-  int    ready;
+  int clock_on;
+  int ready;
   double main_time;
   double byoyomi_time; /* zero if no byo-yomi */
-  int    byoyomi_stones;
+  int byoyomi_stones;
 
   /* clock status */
   double timer[3];
@@ -77,7 +77,7 @@ typedef struct {
   int dead[3];
 
   /* dates of each move */
-  int    moveno; /* invariant: COLOR(clk.moveno) = color of last move */
+  int moveno; /* invariant: COLOR(clk.moveno) = color of last move */
   double date[CLOCK_MAX_MOVES];
 
   /* adapative system parameters */
@@ -96,10 +96,10 @@ static gnugo_clock clk;
  *   WHITE : odd moves
  *   BLACK : even moves. 
  */
-#define COLOR(m) ((m)%2? WHITE : BLACK )
+#define COLOR(m) ((m) % 2 ? WHITE : BLACK)
 
 
-static const char *pname[3]={"     ","White","Black"};
+static const char *pname[3] = {"     ", "White", "Black"};
 
 
 /* forward declarations */
@@ -131,7 +131,7 @@ timeval_print (FILE* f, double tv)
 /*
  * Initialize the structure.
  * -1 mean "do not modify this value".
- * clock_init(-1,-1,-1) only reset the clock.
+ * clock_init(-1, -1, -1) only reset the clock.
  */
 void
 clock_init(int time, int byo_time, int byo_stones)
@@ -208,19 +208,18 @@ clock_byoyomi_update(int color, double dt)
     clk.btimer[color] = clk.btimer[color] + dt;
  
   /* check if player is just begining byoyomi */
-  if (clk.timer[color] < clk.main_time && !clk.byoyomi[color]) 
-    {
-      clk.byoyomi[color] = clk.moveno;
-      clk.btimer[color] = dt;
-    }
+  if (clk.timer[color] < clk.main_time && !clk.byoyomi[color]) {
+    clk.byoyomi[color] = clk.moveno;
+    clk.btimer[color] = dt;
+  }
   
   /* check if player is time-out. */
-  clk.dead[color] |= clock_is_byoyomi(color) && 
-                     clk.byoyomi_time < clk.btimer[color];
+  clk.dead[color] |= (clock_is_byoyomi(color)
+		      && clk.byoyomi_time < clk.btimer[color]);
 
   /* check byoyomi period reset */
-  if (clk.byoyomi[color] && clk.moveno - clk.byoyomi[color] 
-      == 2 * clk.byoyomi_stones - 1 ) {
+  if (clk.byoyomi[color]
+      && clk.moveno - clk.byoyomi[color] == 2 * clk.byoyomi_stones - 1) {
     clk.byoyomi[color] = clk.moveno;
     clk.btimer[color] = 0;
   }
@@ -232,7 +231,7 @@ clock_byoyomi_update(int color, double dt)
 void
 clock_push_button(int color)
 {
-  double now,dt,tme;
+  double now, dt, tme;
 
   if (!clk.clock_on)
     return;
@@ -247,7 +246,7 @@ clock_push_button(int color)
 
   /* first move */
   if (clk.moveno == -1) {
-    /* fprintf(stderr, "clock: first move by %s.\n",pname[color]); */
+    /* fprintf(stderr, "clock: first move by %s.\n", pname[color]); */
     clk.moveno++;
     clk.date[0] = now;
 
@@ -258,17 +257,16 @@ clock_push_button(int color)
     return;
   }
 
-  /* fprintf(stderr, "clock: %s push the button.\n",pname[color]);*/
-  /* fprintf(stderr, "clock: %s's turn.\n",pname[COLOR(clk.moveno+1)]);*/
+  /* fprintf(stderr, "clock: %s push the button.\n", pname[color]);*/
+  /* fprintf(stderr, "clock: %s's turn.\n", pname[COLOR(clk.moveno+1)]);*/
 
   /* push twice on the button does nothing */
-  if (color != COLOR(clk.moveno+1))
-    {
-      fprintf(stderr, "clock: double push.\n");
-      return;
-    }
+  if (color != COLOR(clk.moveno+1)) {
+    fprintf(stderr, "clock: double push.\n");
+    return;
+  }
 
-  /* other moves ( clk. moveno > -1) */
+  /* other moves (clk. moveno > -1) */
   clk.moveno++;
   gg_assert(clk.moveno < CLOCK_MAX_MOVES);
   clk.date[clk.moveno] = now;
@@ -279,10 +277,9 @@ clock_push_button(int color)
 
   /* estimate prediction error for next move */
   if (clk.moveno > 11)
-    clk.error = ( clk.error + 2 * gg_abs(dt-tme))/3;
+    clk.error = (clk.error + 2 * gg_abs(dt-tme))/3;
   else
     clk.error = 3.0;
-
 
   clock_byoyomi_update(color, dt);
   clock_print(color);
@@ -330,7 +327,8 @@ clock_unpush_button(int color)
 /*
  * return the (exact) main timer value.
  */
-double clock_get_timer(int color)
+double
+clock_get_timer(int color)
 {
   double dt;
 
@@ -358,11 +356,11 @@ clock_get_time_left(int color)
 /*
  * Check if color is (officially) in byoyomi.
  */
-int  clock_is_byoyomi(int color)
+int
+clock_is_byoyomi(int color)
 {
   return clock_get_time_left(color) < 0;
 }
-
 
 
 /*
@@ -403,12 +401,12 @@ clock_get_btime_left(int color, int *stones)
 int  
 clock_is_time_over(int color)
 {
-  return clock_is_byoyomi(color) && clock_get_btime_left(color,NULL) <= 0;
+  return clock_is_byoyomi(color) && clock_get_btime_left(color, NULL) <= 0;
 }
 
 
 void
-clock_print( int color)
+clock_print(int color)
 {
   double tleft;
   int stones;
@@ -418,11 +416,11 @@ clock_print( int color)
 
   gg_assert(clk.ready);
 
-  fprintf(stderr,"clock: "); 
-  fprintf(stderr,"%s ",pname[color]);
+  fprintf(stderr, "clock: "); 
+  fprintf(stderr, "%s ", pname[color]);
 
   if (clock_is_time_over(color))
-    fprintf(stderr,"TIME OUT! ");
+    fprintf(stderr, "TIME OUT! ");
   else {
     if (clock_is_byoyomi(color))
       tleft = clock_get_btime_left(color, &stones);
@@ -430,15 +428,15 @@ clock_print( int color)
       tleft = clock_get_time_left(color);
       
     if (clock_is_byoyomi(color)) {
-      fprintf(stderr,"byoyomi");
+      fprintf(stderr, "byoyomi");
       timeval_print(stderr, tleft);
-      fprintf(stderr,"for %d stones.\n",stones);
+      fprintf(stderr, "for %d stones.\n", stones);
     }
     else
       timeval_print(stderr, tleft);
 
   }
-  fprintf(stderr,"\n");
+  fprintf(stderr, "\n");
 }
 
 
@@ -453,30 +451,31 @@ clock_print( int color)
 void 
 clock_report_autolevel(FILE *f, int color)
 {
-  int i,first;
-  double dt,est,exp;
+  int i, first;
+  double dt, est, exp;
 
   if (!clk.autolevel_on)
     return;
 
   if (f == NULL)
-    f = fopen("autolevel.dat","w");
+    f = fopen("autolevel.dat", "w");
   if (f == NULL)
     return;
 
-  fprintf(f,"#\n#  level  prediction   expected  time/move\n");  
-  fprintf(f,  "#-----------------------------------------\n"); 
+  fprintf(f, "#\n#  level  prediction   expected  time/move\n");  
+  fprintf(f, "#-----------------------------------------\n"); 
 
   if (color == WHITE)
     first = 8;
   else
     first = 9;
 
-  for (i= first; i<clk.moveno; i+=2) {
+  for (i = first; i < clk.moveno; i += 2) {
     dt = clk.date[i+1] - clk.date[i];
     est = estimate_time_by_move(color, i);
-    exp = clk.expected[i+1];
-    fprintf(f, "%5.2f  %5.2f  %5.2f  %5.2f\n",clk.levels[i+1],est,exp,dt);
+    exp = clk.expected[i + 1];
+    fprintf(f, "%5.2f  %5.2f  %5.2f  %5.2f\n",
+	    clk.levels[i + 1], est, exp, dt);
   }
 }
 
@@ -489,7 +488,7 @@ clock_report_autolevel(FILE *f, int color)
 /* coeficients to estimate time/move */
 static const double 
 coef[5] = {
-  1.0/15.0, 2.0/15., 3.0/15., 4.0/15.0, 5.0/15.0 
+  1.0/15.0, 2.0/15.0, 3.0/15.0, 4.0/15.0, 5.0/15.0 
 };
 
 static double
@@ -504,7 +503,7 @@ estimate_time_by_move(int color, int move)
   gg_assert(COLOR(move) == OTHER_COLOR(color));
 
   res = 0;
-  for (i=0 ; i !=5 ; i++)
+  for (i = 0 ; i != 5 ; i++)
     res += coef[i] * (clk.date[move-9+i] - clk.date[move-10+i]);
   
   return res;
@@ -520,25 +519,25 @@ respect_time_contract(int color)
   double time_left, expected_tm, predicted_tm;
   double moves_left;
 
-  fprintf(stderr,"\n*** time contract:\n");
+  fprintf(stderr, "\n*** time contract:\n");
 
   predicted_tm = estimate_time_by_move(color, clk.moveno);
 
   /* Compute the expected mean time/move 
    * to recpect the contract.
    */
-  moves_left = (CLOCK_MOVE_CONTRACT(board_size) - clk.moveno)/2.0;
-  time_left = clock_get_time_left(color)
-    - (1.0-CLOCK_TIME_CONTRACT) * clk.main_time;
+  moves_left = (CLOCK_MOVE_CONTRACT(board_size) - clk.moveno) / 2.0;
+  time_left = (clock_get_time_left(color)
+	       - (1.0 - CLOCK_TIME_CONTRACT) * clk.main_time);
   expected_tm = time_left / moves_left;
 
-  clk.expected[clk.moveno +1] = expected_tm;
+  clk.expected[clk.moveno + 1] = expected_tm;
 
-  fprintf(stderr,"%4.0f moves ", moves_left);
-  fprintf(stderr,"must be played in %.2fsec\n", time_left);
-  fprintf(stderr,"time/move: prediction=%.2f", predicted_tm);
-  fprintf(stderr,"+/-%.2fsec --> ", clk.error);
-  fprintf(stderr,"expected=%.2f\n", expected_tm);
+  fprintf(stderr, "%4.0f moves ", moves_left);
+  fprintf(stderr, "must be played in %.2fsec\n", time_left);
+  fprintf(stderr, "time/move: prediction=%.2f", predicted_tm);
+  fprintf(stderr, "+/-%.2fsec --> ", clk.error);
+  fprintf(stderr, "expected=%.2f\n", expected_tm);
 
   /* Compare this result with the prediction
    * (up to prediction error estimation)
@@ -558,15 +557,15 @@ respect_time_contract(int color)
 static void
 keep_ahead(int color)
 {
-  double dt,st,delta_max;
+  double dt, st, delta_max;
 
-  fprintf(stderr,"*** safe limit reached: trying to keep ahead\n");
+  fprintf(stderr, "*** safe limit reached: trying to keep ahead\n");
 
-  dt = clock_get_time_left(color)-clock_get_time_left(OTHER_COLOR(color));
-  st = clock_get_time_left(color)+clock_get_time_left(OTHER_COLOR(color));
+  dt = clock_get_time_left(color) - clock_get_time_left(OTHER_COLOR(color));
+  st = clock_get_time_left(color) + clock_get_time_left(OTHER_COLOR(color));
   delta_max = gg_max(CLOCK_DELTA, CLOCK_DELTAR * st);
 
-  fprintf(stderr, "deltamax: %gsec, delta=%gsec => ",delta_max, dt);
+  fprintf(stderr, "deltamax: %gsec, delta=%gsec => ", delta_max, dt);
       
   if (dt < -delta_max) {
     fprintf(stderr, "behind\n");
@@ -610,11 +609,11 @@ clock_adapt_level(int *p_level, int color)
    * behind this limit the only priority is 
    * finish at all costs.
    */
-  hurry_limit = gg_max(CLOCK_HURRY, CLOCK_HURRYR * clk.main_time );
+  hurry_limit = gg_max(CLOCK_HURRY, CLOCK_HURRYR * clk.main_time);
   if (clock_get_time_left(color) < hurry_limit) {
-    fprintf(stderr,"*** hurry limit reached:\n");
+    fprintf(stderr, "*** hurry limit reached:\n");
     clk.level = CLOCK_HURRY_LEVEL;
-    (*p_level) = clk.level;
+    *p_level = clk.level;
     return;
   }
 
@@ -630,13 +629,15 @@ clock_adapt_level(int *p_level, int color)
    * when the safe_limit is reached gnugo tries to keep
    * ahead in time.
    */
-  safe_limit = gg_max(CLOCK_SAFE, CLOCK_SAFER * clk.main_time );
+  safe_limit = gg_max(CLOCK_SAFE, CLOCK_SAFER * clk.main_time);
   if (clock_get_time_left(color) < safe_limit) 
     keep_ahead(color);
 
   /* Update the level */
-  if (clk.level > clk.max_level) clk.level = clk.max_level;
-  if (clk.level < clk.min_level) clk.level = clk.min_level;
+  if (clk.level > clk.max_level)
+    clk.level = clk.max_level;
+  if (clk.level < clk.min_level)
+    clk.level = clk.min_level;
 
   clk.levels[clk.moveno + 1] = clk.level;
   *p_level = clk.level;

@@ -126,7 +126,7 @@ hash_init(void)
 int
 hashposition_compare(Hashposition *pos1, Hashposition *pos2)
 {
-  int  i;
+  int i;
 
   /* We need only compare to board_size.  MAX_BOARD is not necessary. */
   for (i = 0; i < (int) (board_size * board_size / POINTSPERCOMPACT + 1); i++)
@@ -152,7 +152,7 @@ hashposition_compare(Hashposition *pos1, Hashposition *pos2)
 void
 hashposition_dump(Hashposition *pos, FILE *outfile)
 {
-  int  i;
+  int i;
 
   fprintf(outfile, "Board:  ");
   for (i = 0; i < (int) COMPACT_BOARD_SIZE; ++i)
@@ -238,10 +238,10 @@ hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
 
 #else /* USE_SHIFTING */
 
-  int            index;
-  int            subindex;
-  int            pos;
-  Compacttype    bits;
+  int index;
+  int subindex;
+  int pos;
+  Compacttype bits;
 
   target->hashval = 0;
   index = 0;
@@ -403,7 +403,7 @@ hashdata_diff_dump(Hash_data *hd1, Hash_data *hd2)
 int
 hashdata_compare(Hash_data *hd1, Hash_data *hd2)
 {
-  int  rc;
+  int rc;
 
   rc = (hd1->hashval == hd2->hashval) ? 0 : 2;
   if (rc == 0)

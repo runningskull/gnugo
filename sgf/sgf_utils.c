@@ -96,7 +96,7 @@ show_sgf_properties(SGFNode *node)
   SGFProperty *sgf_prop;
   int propcount;
 
-  propcount=0;
+  propcount = 0;
 
   printf("P: ");
   if (!node->props) {

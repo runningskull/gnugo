@@ -339,7 +339,7 @@ make_dragons(int color, int stop_before_owl)
       {
 	dr = white_eye[ii].dragon;
 
-	gg_assert (board[dr] == WHITE);
+	gg_assert(board[dr] == WHITE);
 	TRACE("eye at %1m found for dragon at %1m--augmenting genus\n", 
 	      ii, dr);
 	DRAGON2(dr).genus += (white_eye[ii].mineye);
@@ -931,12 +931,9 @@ add_adjacent_dragon(int a, int b)
 static int
 dragon_invincible(int pos)
 {
-
   struct eye_data *eye;
-
   int i, j;
   int ii;
-
   int strong_eyes = 0;
 
   gg_assert(IS_STONE(board[pos]));
@@ -989,127 +986,123 @@ show_dragons(void)
   {"dead", "alive", "critical", "inessential", "tactically dead", "weak",
    "weakly_alive", "alive_in_seki", "strongly_alive", "invincible"};
   
-  int m, n;
-  int ii;
+  int pos;
   int k;
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      struct worm_data *w = &(worm[POS(m, n)]);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    struct worm_data *w = &(worm[pos]);
+    if (!IS_STONE(board[pos]))
+      continue;
 
-      ii = POS(m, n);
-
-      if (w->origin == ii) {
-	if (board[ii]) {
-	  gprintf("%1m : (dragon %1m) %s string of size %d (%f), genus %d: (%d,%d,%d,%d)",
-		  ii, dragon[ii].origin,
-		  color_to_string(board[ii]),
-		  w->size,
-		  w->effective_size,
-		  w->genus,
-		  w->liberties,
-		  w->liberties2,
-		  w->liberties3,
-		  w->liberties4);
-	  if (w->cutstone == 1)
-	    gprintf ("%o - is a potential cutting stone\n");
-	  else if (w->cutstone == 2)
-	    gprintf("%o - is a cutting stone\n");
-	  else
-	    gprintf("%o\n");
-
-	  if (w->cutstone2 > 0)
-	    gprintf("- cutstone2 = %d\n", w->cutstone2);
-
-	  /* FIXME: List all attack and defense points. Also list all
-           * threats.
-	   */
-	  for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
-	    if (w->attack_codes[k] == 0)
-	      break;
-	    gprintf("- attackable at %1m, attack code = %d\n",
-		    w->attack_points[k], w->attack_codes[k]);
-	  }
-	  
-	  for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
-	    if (w->defend_codes[k] == 0)
-	      break;
-	    if (w->defend_codes[k] != 0)
-	      gprintf("- defendable at %1m, defend code = %d\n",
-		      w->defense_points[k], w->defend_codes[k]);
-	  }
-
-	  for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
-	    if (w->attack_threat_codes[k] == 0)
-	      break;
-	    gprintf("- attack threat at %1m, attack threat code = %d\n",
-		    w->attack_threat_points[k], w->attack_threat_codes[k]);
-	  }
-	  
-	  for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
-	    if (w->defense_threat_codes[k] == 0)
-	      break;
-	    if (w->defense_threat_codes[k] != 0)
-	      gprintf("- defense threat at %1m, defense threat code = %d\n",
-		      w->defense_threat_points[k], w->defense_threat_codes[k]);
-	  }
-
-	  if (w->lunch != NO_MOVE)
-	    gprintf("... adjacent worm %1m is lunch\n", w->lunch);
-	  
-	  if (w->inessential)
-	    gprintf("- is inessential\n");
-	  
-	  if (w->invincible)
-	    gprintf("- is invincible\n");
-	  
-	  if (is_ko_point(POS(m, n)))
-	    gprintf("- is a ko stone\n");
-	}
+    if (w->origin == pos) {
+      gprintf("%1m : (dragon %1m) %s string of size %d (%f), genus %d: (%d,%d,%d,%d)",
+	      pos, dragon[pos].origin,
+	      color_to_string(board[pos]),
+	      w->size,
+	      w->effective_size,
+	      w->genus,
+	      w->liberties,
+	      w->liberties2,
+	      w->liberties3,
+	      w->liberties4);
+      if (w->cutstone == 1)
+	gprintf("%o - is a potential cutting stone\n");
+      else if (w->cutstone == 2)
+	gprintf("%o - is a cutting stone\n");
+      else
+	gprintf("%o\n");
+      
+      if (w->cutstone2 > 0)
+	gprintf("- cutstone2 = %d\n", w->cutstone2);
+      
+      /* FIXME: List all attack and defense points. Also list all
+       * threats.
+       */
+      for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+	if (w->attack_codes[k] == 0)
+	  break;
+	gprintf("- attackable at %1m, attack code = %d\n",
+		w->attack_points[k], w->attack_codes[k]);
       }
+      
+      for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+	if (w->defend_codes[k] == 0)
+	  break;
+	if (w->defend_codes[k] != 0)
+	  gprintf("- defendable at %1m, defend code = %d\n",
+		  w->defense_points[k], w->defend_codes[k]);
+      }
+      
+      for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+	if (w->attack_threat_codes[k] == 0)
+	  break;
+	gprintf("- attack threat at %1m, attack threat code = %d\n",
+		w->attack_threat_points[k], w->attack_threat_codes[k]);
+      }
+      
+      for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+	if (w->defense_threat_codes[k] == 0)
+	  break;
+	if (w->defense_threat_codes[k] != 0)
+	  gprintf("- defense threat at %1m, defense threat code = %d\n",
+		  w->defense_threat_points[k], w->defense_threat_codes[k]);
+      }
+      
+      if (w->lunch != NO_MOVE)
+	gprintf("... adjacent worm %1m is lunch\n", w->lunch);
+      
+      if (w->inessential)
+	gprintf("- is inessential\n");
+      
+      if (w->invincible)
+	gprintf("- is invincible\n");
+      
+      if (is_ko_point(pos))
+	gprintf("- is a ko stone\n");
     }
-
+  }
+    
   gprintf("%o\n");
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      struct dragon_data *d = &(dragon[POS(m, n)]);
-      struct dragon_data2 *d2 = &(dragon2[d->id]);
-      int k;
-
-      ii = POS(m, n);
-
-      if (d->origin == ii) {
-	if (board[ii]) {
-	  gprintf("%1m : %s dragon size %d (%f), genus %d, half eyes %d, escape factor %d, status %s, matcher status %s, moyo size %d safety %s",
-		  ii,
-		  board[ii]==BLACK ? "B" : "W",
-		  d->size,
-		  d->effective_size,
-		  d2->genus,
-		  d2->heyes,
-		  d2->escape_route,
-		  snames[d->status],
-		  snames[d->matcher_status],
-		  d2->moyo,
-		  safety_names[d2->safety]);
-	  gprintf(", owl status %s\n", snames[d->owl_status]);
-	  if (d->owl_status == CRITICAL) {
-	    gprintf("... owl attackable at %1m, code %d\n",
-		    d->owl_attack_point, d->owl_attack_code);
-	    gprintf("... owl defendable at %1m, code %d\n",
-		    d->owl_defense_point, d->owl_defense_code);
-	  }
-	  gprintf("... neighbors");
-	  for (k = 0; k < d2->neighbors; k++) {
-	    int d = d2->adjacent[k];
-	    gprintf(" %1m", dragon2[d].origin);
-	  }
-	  gprintf("\n");
-	  if (d2->lunch != NO_MOVE)
-	    gprintf("... adjacent worm %1m is lunch\n", d2->lunch);
-	}
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    struct dragon_data *d = &(dragon[pos]);
+    struct dragon_data2 *d2;
+    int k;
+    
+    if (!IS_STONE(board[pos]))
+      continue;
+    
+    d2 = &(dragon2[d->id]);
+    
+    if (d->origin == pos) {
+      gprintf("%1m : %s dragon size %d (%f), genus %d, half eyes %d, escape factor %d, status %s, matcher status %s, moyo size %d safety %s",
+	      pos,
+	      board[pos] == BLACK ? "B" : "W",
+	      d->size,
+	      d->effective_size,
+	      d2->genus,
+	      d2->heyes,
+	      d2->escape_route,
+	      snames[d->status],
+	      snames[d->matcher_status],
+	      d2->moyo,
+	      safety_names[d2->safety]);
+      gprintf(", owl status %s\n", snames[d->owl_status]);
+      if (d->owl_status == CRITICAL) {
+	gprintf("... owl attackable at %1m, code %d\n",
+		d->owl_attack_point, d->owl_attack_code);
+	gprintf("... owl defendable at %1m, code %d\n",
+		d->owl_defense_point, d->owl_defense_code);
       }
+      gprintf("... neighbors");
+      for (k = 0; k < d2->neighbors; k++) {
+	int d = d2->adjacent[k];
+	gprintf(" %1m", dragon2[d].origin);
+      }
+      gprintf("\n");
+      if (d2->lunch != NO_MOVE)
+	gprintf("... adjacent worm %1m is lunch\n", d2->lunch);
     }
+  }
 }
 
 
@@ -1552,23 +1545,23 @@ compute_surrounding_moyo_sizes(int opposite)
     result[i] = 0;
     for (j = 1; j <= moyos.number; j++)
       moyo_is_adjacent[i][j] = 0;
-  };
+  }
+  
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       pos = POS(m, n);
-      if ((moyos.segmentation[pos] != 0)
-          && (board[pos] == moyos.owner[moyos.segmentation[pos]]))
-        moyo_is_adjacent
-          [dragon[pos].id][moyos.segmentation[pos]] = 1; 
-    };
-  for (i = 0; i < number_of_dragons; i++) {
-    for (j = 1; j <= moyos.number; j++)
-      if (moyo_is_adjacent[i][j]) {
-         result[i] += moyos.size[j];
-      }
-    if (result[i] < dragon2[i].moyo) {
-       dragon2[i].moyo = result[i];
+      if (moyos.segmentation[pos] != 0
+          && board[pos] == moyos.owner[moyos.segmentation[pos]])
+        moyo_is_adjacent[dragon[pos].id][moyos.segmentation[pos]] = 1; 
     }
+  
+  for (i = 0; i < number_of_dragons; i++) {
+    for (j = 1; j <= moyos.number; j++) {
+      if (moyo_is_adjacent[i][j])
+         result[i] += moyos.size[j];
+    }
+    if (result[i] < dragon2[i].moyo)
+       dragon2[i].moyo = result[i];
   }
 }
 
@@ -1648,7 +1641,7 @@ lively_dragon_exists(int color)
 /*                      Debugger functions                          */
 /* ================================================================ */
 
-/* For use in gdb, print details of the dragon at (m,n). 
+/* For use in gdb, print details of the dragon at (m, n). 
  * Add this to your .gdbinit file:
  *
  * define dragon

@@ -239,9 +239,9 @@ static void sigterm_handler(int);
 int
 main(int argc, char *argv[])
 {
-  Gameinfo  gameinfo;
-  SGFTree   sgftree;
-  int       boardsize = 19;
+  Gameinfo gameinfo;
+  SGFTree sgftree;
+  int boardsize = 19;
 
   int i, umove;
   int mandated_color = EMPTY;
@@ -310,7 +310,7 @@ main(int argc, char *argv[])
   /* default parameters for clock
    * and auto level systems */
   clock_init(3600, 0, 0); /* One hour sudden death */
-  clock_init_autolevel(2,10); /* 2 < level < 10 */
+  clock_init_autolevel(2, 10); /* 2 < level < 10 */
 
   sgftree_clear(&sgftree);
   gameinfo_clear(&gameinfo, boardsize, komi);
@@ -408,7 +408,7 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_KOMI: 
-	if (sscanf(gg_optarg, "%f", &komi) !=1 ) {
+	if (sscanf(gg_optarg, "%f", &komi) != 1) {
 	  fprintf(stderr, "Invalid komi selection: %s\n", gg_optarg);
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	  exit(EXIT_FAILURE);
@@ -1079,7 +1079,7 @@ main(int argc, char *argv[])
   if (profile_patterns)
     report_pattern_profiling();
 
-  clock_report_autolevel(NULL,OTHER_COLOR(umove));
+  clock_report_autolevel(NULL, OTHER_COLOR(umove));
  
   return 0;
 }  /* end main */
@@ -1094,7 +1094,7 @@ main(int argc, char *argv[])
  * properly, so we trap the signal.
  */
 
-volatile int  time_to_die = 0;   /* set by signal handlers */
+volatile int time_to_die = 0;   /* set by signal handlers */
 
 static void 
 sigterm_handler(int sig)

@@ -159,7 +159,7 @@ write_color_char_no_space(int c, int x)
 
 #elif defined(WIN32)
   
-  static HANDLE hStdErr=0;
+  static HANDLE hStdErr = 0;
   DWORD iCharsWritten;
   BOOL succeed32;
   CONSOLE_SCREEN_BUFFER_INFO bufInfo;
@@ -182,7 +182,7 @@ write_color_char_no_space(int c, int x)
     fprintf(stderr, "%c", x);
     return;
   }
-  verifyW32(SetConsoleTextAttribute(hStdErr, (WORD)c) );
+  verifyW32(SetConsoleTextAttribute(hStdErr, (WORD) c));
   verifyW32(WriteConsole(hStdErr, &x, 1, &iCharsWritten, 0));
   verifyW32(SetConsoleTextAttribute(hStdErr, bufInfo.wAttributes));
 
@@ -196,9 +196,8 @@ write_color_char_no_space(int c, int x)
 void
 write_color_string(int c, const char *str)
 {
-  while (*str) {
+  while (*str)
     write_color_char_no_space(c, *str++);
-  }
 }
 
 void
@@ -268,7 +267,8 @@ gg_version(void) {
 
 /* return cputime used in secs */
 
-double gg_cputime(void)
+double
+gg_cputime(void)
 {
 #if HAVE_SYS_TIMES_H && HAVE_TIMES
     struct tms t;
@@ -277,7 +277,7 @@ double gg_cputime(void)
             / ((double) CLOCKS_PER_SEC);
 #elif defined(WIN32)
     FILETIME creationTime, exitTime, kernelTime, userTime;
-    ULARGE_INTEGER uKernelTime,uUserTime,uElapsedTime;
+    ULARGE_INTEGER uKernelTime, uUserTime, uElapsedTime;
     GetProcessTimes(GetCurrentProcess(), &creationTime, &exitTime,
                     &kernelTime, &userTime);
     uKernelTime.LowPart = kernelTime.dwLowDateTime;
@@ -299,8 +299,9 @@ double gg_cputime(void)
 #endif
 }
 
-/* Reorientation of point (i,j) into (*ri, *rj) */
-void rotate(int i, int j, int *ri, int *rj, int bs, int rot)
+/* Reorientation of point (i, j) into (*ri, *rj) */
+void
+rotate(int i, int j, int *ri, int *rj, int bs, int rot)
 {
   int bs1;
   assert(bs > 0);
@@ -321,31 +322,38 @@ void rotate(int i, int j, int *ri, int *rj, int bs, int rot)
     /* identity map */
     *ri = i;
     *rj = j;
-  } else if (rot == 1) {
+  }
+  else if (rot == 1) {
     /* rotation over 90 degrees */
     *ri = bs1 - j;
     *rj = i;
-  } else if (rot == 2) {
+  }
+  else if (rot == 2) {
     /* rotation over 180 degrees */
     *ri = bs1 - i;
     *rj = bs1 - j;
-  } else if (rot == 3) {
+  }
+  else if (rot == 3) {
     /* rotation over 270 degrees */
     *ri = j;
     *rj = bs1 - i;
-  } else if (rot == 4) {
+  }
+  else if (rot == 4) {
     /* flip along diagonal */
     *ri = j;
     *rj = i;
-  } else if (rot == 5) {
+  }
+  else if (rot == 5) {
     /* flip */
     *ri = bs1 - i;
     *rj = j;
-  } else if (rot == 6) {
+  }
+  else if (rot == 6) {
     /* flip along diagonal */
     *ri = bs1 - j;
     *rj = bs1 - i;
-  } else if (rot == 7) {
+  }
+  else if (rot == 7) {
     /* flip */
     *ri = i;
     *rj = bs1 - j;
@@ -353,16 +361,17 @@ void rotate(int i, int j, int *ri, int *rj, int bs, int rot)
 }
 
 /* inverse reorientation of reorientation rot */
-void inv_rotate(int i, int j, int *ri, int *rj, int bs, int rot) {
+void
+inv_rotate(int i, int j, int *ri, int *rj, int bs, int rot)
+{
   /* every reorientation is it's own inverse except rotations
      over 90 and 270 degrees */
-  if (rot == 1) {
+  if (rot == 1)
     rotate(i, j, ri, rj, bs, 3);
-  } else if (rot == 3) {
+  else if (rot == 3)
     rotate(i, j, ri, rj, bs, 1);
-  } else {
+  else
     rotate(i, j, ri, rj, bs, rot);
-  }
 }
 
 

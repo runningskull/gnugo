@@ -82,7 +82,7 @@ struct vertex_stack_entry {
 #define CLEAR_STACKS()\
 (change_stack_pointer = change_stack, vertex_stack_pointer = vertex_stack)
 
-/* Begin a record : adress==NULL */
+/* Begin a record : adress == NULL */
 #define BEGIN_CHANGE_RECORD()\
 ((change_stack_pointer++)->address = NULL,\
  (vertex_stack_pointer++)->address = NULL)
@@ -247,16 +247,16 @@ static int string_mark;
 
 
 /* Forward declaration. */
-static int  do_trymove(int pos, int color, int ignore_ko);
+static int do_trymove(int pos, int color, int ignore_ko);
 static void undo_move(void);
 static void new_position(void);
 static void init_board(void);
-static int  propagate_string(int stone, int str);
+static int propagate_string(int stone, int str);
 static void find_liberties_and_neighbors(int s);
-static int  do_remove_string(int s);
+static int do_remove_string(int s);
 static void do_play_move(int pos, int color);
-static int  slow_approxlib(int pos, int color, int maxlib, int *libs);
-static int  incremental_sloppy_self_atari(int pos, int color);
+static int slow_approxlib(int pos, int color, int maxlib, int *libs);
+static int incremental_sloppy_self_atari(int pos, int color);
 
 
 /* Statistics. */
@@ -345,10 +345,10 @@ clear_board(void)
  * position and which color made them. Perhaps 
  * this should be one array of a structure 
  */
-static int      stack[MAXSTACK];
-static int      move_color[MAXSTACK];
+static int stack[MAXSTACK];
+static int move_color[MAXSTACK];
 
-static Hash_data  hashdata_stack[MAXSTACK];
+static Hash_data hashdata_stack[MAXSTACK];
 
 
 /*
@@ -418,7 +418,7 @@ trymove(int pos, int color, const char *message, int str,
 
 /*
  * tryko pushes the position onto the stack, and makes a move
- * at (i, j) of color. The move is allowed even if it is an
+ * at (pos) of (color). The move is allowed even if it is an
  * illegal ko capture. It is to be imagined that (color) has
  * made an intervening ko threat which was answered and now
  * the continuation is to be explored.
@@ -483,7 +483,7 @@ do_trymove(int pos, int color, int ignore_ko)
   if (board[pos] != EMPTY)
     return 0;
 
-  /* 3. The location must not be the ko point, unless ignore_ko==1. */
+  /* 3. The location must not be the ko point, unless ignore_ko == 1. */
   if (!ignore_ko && pos == board_ko_pos) {
     if (board[WEST(pos)] == OTHER_COLOR(color)
 	|| board[EAST(pos)] == OTHER_COLOR(color)) {
@@ -1135,7 +1135,8 @@ komaster_trymove(int pos, int color, const char *message, int str,
 
 
 /* Determine whether vertex is on the edge. */
-int is_edge_vertex(int pos)
+int
+is_edge_vertex(int pos)
 {
   ASSERT_ON_BOARD1(pos);
   if (!ON_BOARD(SW(pos))
@@ -1252,9 +1253,9 @@ findlib(int str, int maxlib, int *libs)
 
 
 /* Find the liberties a stone of the given color would get if played
- * at pos, ignoring possible captures of opponent stones. (pos)
- * must be empty. If libi!=NULL, the locations of up to maxlib
- * liberties are written into (libs[]). The counting of
+ * at (pos), ignoring possible captures of opponent stones. (pos)
+ * must be empty. If libs != NULL, the locations of up to maxlib
+ * liberties are written into libs[]. The counting of
  * liberties may or may not be halted when maxlib is reached. The
  * number of liberties found is returned.
  *
@@ -1652,9 +1653,9 @@ chainlinks3(int str, int adj[MAXCHAIN], int lib)
 
 
 /*
- * Find the origin of a worm or a cavity, i.e. the point with smallest
- * i coordinate and in the case of a tie with smallest j coordinate.
- * The idea is to have a canonical reference point for a string.
+ * Find the origin of a worm or a cavity, i.e. the point with the
+ * smallest 1D board coordinate. The idea is to have a canonical
+ * reference point for a string.
  */
 
 int
@@ -1669,7 +1670,7 @@ find_origin(int str)
 }
 
 
-/* Determine whether a move by color at (m, n) would be a self atari,
+/* Determine whether a move by color at (pos) would be a self atari,
  * i.e. whether it would get more than one liberty. This function
  * returns true also for the case of a suicide move.
  */
@@ -2090,7 +2091,7 @@ new_position(void)
 
 
 /* Set up incremental board structures and populate them with the
- * strings available in the position given by p[][]. Clear the stacks
+ * strings available in the position given by board[]. Clear the stacks
  * and start the mark numbers from zero. All undo information is lost
  * by calling this function.
  */
@@ -2658,7 +2659,7 @@ assimilate_string(int s, int pos)
     string_number[pos] = s;
     last = pos;
     pos = NEXT_STONE(pos);
-  } while(!BACK_TO_FIRST_STONE(s2, pos));
+  } while (!BACK_TO_FIRST_STONE(s2, pos));
 
   /* Link the two cycles together. */
   {
@@ -3211,8 +3212,11 @@ incremental_order_moves(int move, int color, int str,
 #endif
 }
 
-/* Reorientation of point (i,j) into (*ri, *rj) */
-void  rotate2(int i, int j, int *ri, int *rj, int rot) {
+
+/* Reorientation of point (i, j) into (*ri, *rj). */
+void
+rotate2(int i, int j, int *ri, int *rj, int rot)
+{
   ASSERT2(rot >= 0 && rot < 8, i, j);
   if (is_pass(POS(i, j))) {
     *ri = i;
@@ -3223,8 +3227,10 @@ void  rotate2(int i, int j, int *ri, int *rj, int rot) {
   rotate(i, j, ri, rj, board_size, rot);
 }
 
-/* inverse reorientation of reorientation rot */
-void  inv_rotate2(int i, int j, int *ri, int *rj, int rot) {
+/* Inverse reorientation of reorientation rot. */
+void
+inv_rotate2(int i, int j, int *ri, int *rj, int rot)
+{
   ASSERT2(rot >= 0 && rot < 8, i, j);
   if (is_pass(POS(i, j))) {
     *ri = i;
@@ -3236,25 +3242,29 @@ void  inv_rotate2(int i, int j, int *ri, int *rj, int rot) {
 }
 
 /* 1D board: return reorientation of point pos */
-int  rotate1(int pos, int rot) {
-   int i, j;
-   ASSERT1(rot >= 0 && rot < 8, pos);
-   if (is_pass(pos))
-      return PASS_MOVE;
-   ASSERT_ON_BOARD1(pos);
-   rotate2(I(pos), J(pos), &i, &j, rot);
-   return POS(i, j);
+int
+rotate1(int pos, int rot)
+{
+  int i, j;
+  ASSERT1(rot >= 0 && rot < 8, pos);
+  if (is_pass(pos))
+    return PASS_MOVE;
+  ASSERT_ON_BOARD1(pos);
+  rotate2(I(pos), J(pos), &i, &j, rot);
+  return POS(i, j);
 }
 
 /* 1D board: return inverse reorientation of point pos */
-int  inv_rotate1(int pos, int rot) {
-   int i, j;
-   ASSERT1(rot >= 0 && rot < 8, pos);
-   if (is_pass(pos))
-      return PASS_MOVE;
-   ASSERT_ON_BOARD1(pos);
-   inv_rotate2(I(pos), J(pos), &i, &j, rot);
-   return POS(i, j);
+int
+inv_rotate1(int pos, int rot)
+{
+  int i, j;
+  ASSERT1(rot >= 0 && rot < 8, pos);
+  if (is_pass(pos))
+    return PASS_MOVE;
+  ASSERT_ON_BOARD1(pos);
+  inv_rotate2(I(pos), J(pos), &i, &j, rot);
+  return POS(i, j);
 }
 
 

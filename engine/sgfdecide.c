@@ -529,7 +529,7 @@ decide_eye(int pos, const char *sgf_output)
 
 
 /* 
- * decide_connection tries to find a combination attack for (color) by
+ * decide_combination tries to find a combination attack for (color) by
  * calling atari_atari().
  */
 

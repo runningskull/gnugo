@@ -354,12 +354,12 @@ do_genmove(int *move, int color, float pure_threat_value)
   
   if (printboard) {
     if (printboard == 1)
-      fprintf(stderr,"\n          dragon_status display:\n\n");
+      fprintf(stderr, "\n          dragon_status display:\n\n");
     if (printboard == 2)
-      fprintf(stderr,"\n          eye display:\n\n");
+      fprintf(stderr, "\n          eye display:\n\n");
     showboard(printboard); 
     if (printboard == 1) {
-      fprintf(stderr,"\n           owl_status display:\n\n");      
+      fprintf(stderr, "\n           owl_status display:\n\n");      
       showboard(3);
     }
   }
@@ -636,21 +636,21 @@ get_level(int *level)
  * -ve numbers map to  board_size - number
  *
  * The stones are placed in this order, *except* if there are
- * 5 or 7 stones, in which case center ( {0,0} ) is placed, and
+ * 5 or 7 stones, in which case center ({0, 0}) is placed, and
  * then as for 4 or 6.
  */
 
 static const int places[][2] = {
 
-  {2,-2}, {-2,2}, {2,2}, {-2,-2},  /* first 4 are easy */
-                                   /* for 5, {0,0} is explicitly placed */
+  {2, -2}, {-2, 2}, {2, 2}, {-2, -2}, /* first 4 are easy */
+                                      /* for 5, {0,0} is explicitly placed */
   
-  {0,2},  {0,-2},                  /* for 6 these two are placed */
-                                   /* for 7, {0,0} is explicitly placed */
+  {0, 2}, {0, -2},                    /* for 6 these two are placed */
+                                      /* for 7, {0,0} is explicitly placed */
   
-  {2,0}, {-2,0},                   /* for 8, these two are placed */
+  {2, 0}, {-2, 0},                    /* for 8, these two are placed */
 
-  {0,0},                           /* finally tengen for 9 */
+  {0, 0},                             /* finally tengen for 9 */
 };
 
 
@@ -708,8 +708,8 @@ placehand(int handicap)
     if (i == 0) i = mid;
     if (j == 0) j = mid;
 
-    if ( i < 0) i += board_size-1;
-    if ( j < 0) j += board_size-1;
+    if (i < 0) i += board_size-1;
+    if (j < 0) j += board_size-1;
 
     add_stone(POS(i, j), BLACK);
   }

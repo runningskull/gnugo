@@ -451,7 +451,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	      int important = 0;
 	      int safe_atari = 0;
 	      for (r = 0; r < 4; r++) {
-		int  d = delta[r];
+		int d = delta[r];
 		if (!ON_BOARD(apos+d))
 		  continue;
 		if (board[apos+d] == other

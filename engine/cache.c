@@ -485,8 +485,8 @@ hashtable_enter_position(Hashtable *table, Hash_data *hd)
 static Hashnode *
 hashtable_search(Hashtable *table, Hash_data *hd)
 {
-  Hashnode     * node;
-  int            bucket;
+  Hashnode *node;
+  int bucket;
 
   bucket = hd->hashval % table->hashtablesize;
   for (node = table->hashtable[bucket]; node != NULL; node = node->next) {
@@ -514,7 +514,7 @@ hashnode_search(Hashnode *node, int routine, int komaster, int kom_pos,
   Read_result *result;
   unsigned int search_for;
 
-  search_for = rr_compress_data(rr, routine, komaster, kom_pos,	str, stackp);
+  search_for = rr_compress_data(rr, routine, komaster, kom_pos, str, stackp);
 
   for (result = node->results; result != NULL; result = result->next) {
     if (result->compressed_data == search_for)

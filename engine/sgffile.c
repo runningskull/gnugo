@@ -47,7 +47,7 @@
 /* The SGF file while a game is played. */
 static FILE *sgfout = NULL;
 
-static int  sgffile_flush_file(void);
+static int sgffile_flush_file(void);
 
 
 /* ================================================================ */
@@ -293,7 +293,7 @@ sgffile_dragon_status(int i, int j, int status)
 void
 sgffile_printboard(int next) 
 {
-  int i,j;
+  int i, j;
   int start = 0;
 
   if (!sgfout)

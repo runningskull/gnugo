@@ -37,8 +37,8 @@
 /* local versions of absolute value, min and max */
 
 #define gg_abs(x) ((x) < 0 ? -(x) : (x))
-#define gg_min(a,b) ((a)<(b) ? (a) : (b))
-#define gg_max(a,b) ((a)<(b) ? (b) : (a))
+#define gg_min(a, b) ((a)<(b) ? (a) : (b))
+#define gg_max(a, b) ((a)<(b) ? (b) : (a))
 
 /* This tells Alpha OSF/1 not to define a getopt prototype in <stdio.h>.
  * Ditto for AIX 3.2 and <stdlib.h>. 
@@ -65,12 +65,9 @@
  */
 #define PROFILE_PATTERNS 0
 
-/* a 32-bit unsigned int */
-typedef unsigned int uint32;
-
 /* this trick forces a compile error if ints are not at least 32-bit */
 struct _unused_patterns_h {
-  int unused[ sizeof(uint32) >= 4 ? 1 : -1];
+  int unused[sizeof(unsigned int) >= 4 ? 1 : -1];
 };
 
 /* transformation stuff */
@@ -80,11 +77,11 @@ extern const int transformations[8][2][2];
  * a macro (inline) version of the transform function
  */
 
-#define TRANSFORM(i,j,ti,tj,trans) \
+#define TRANSFORM(i, j, ti, tj, trans) \
 do { \
   *ti = transformations[trans][0][0] * (i) + transformations[trans][0][1] * (j); \
   *tj = transformations[trans][1][0] * (i) + transformations[trans][1][1] * (j); \
-} while(0)
+} while (0)
 
 #define ATTACK_MACRO(pos) ((stackp==0) ? (worm[pos].attack_codes[0]) : attack(pos, NULL))
 #define DEFEND_MACRO(pos) ((stackp==0) ? (worm[pos].defend_codes[0]) : find_defense(pos, NULL))
@@ -98,7 +95,7 @@ struct pattern; /* forward reference to keep gcc happy */
  * call to evaluate the score of a move.
  * parameters:
  *   pattern and rotation are the current pattern being considered
- *   ti, tj: IN = posn of the 7,8 or 9 marker
+ *   ti, tj: IN = posn of the 7, 8 or 9 marker
  *           OUT = recommended move
  * return value : weight of move, or 0 if match failed            
  */
@@ -111,7 +108,7 @@ typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
 
 
 /* each pattern is compiled into a sequence of these elements.
- * Each describes a relative x,y from the pattern origin,
+ * Each describes a relative x, y from the pattern origin,
  * and a description of what should be there.
  * Current attributes are
  *  0 = .
@@ -194,9 +191,9 @@ typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
 
 
 typedef struct patval {
-  int  x;
-  int  y;
-  int  att;
+  int x;
+  int y;
+  int att;
 } Patval;
 
 
@@ -206,20 +203,20 @@ typedef struct patval {
 
 struct pattern {
   struct patval *patn;  /* array of elements */
-  int  patlen;          /* number of elements */
-  int  trfno;           /* number of transformations (rotations and reflections) */
-  const char    *name;  /* short description of pattern (optional) */
+  int patlen;           /* number of elements */
+  int trfno;            /* number of transformations (rotations and reflections) */
+  const char *name;     /* short description of pattern (optional) */
 
-  int  mini, minj;      /* min and max (relative to anchor) extent of ... */
-  int  maxi, maxj;      /* ...the pattern */
-  int  height, width;   /* differences between max and min extents */
-  int  edge_constraints; /* and combinations of NORTH,EAST etc. for edges */
+  int mini, minj;       /* min and max (relative to anchor) extent of ... */
+  int maxi, maxj;       /* ...the pattern */
+  int height, width;    /* differences between max and min extents */
+  int edge_constraints; /* and combinations of NORTH, EAST etc. for edges */
 
-  int  movei, movej;    /* position of the suggested move (relative to anchor) */
+  int movei, movej;     /* position of the suggested move (relative to anchor) */
 
 #if GRID_OPT
-  uint32 and_mask[8];  /* for each rotation, masks for a 4x4 grid around anchor */
-  uint32 val_mask[8];
+  unsigned int and_mask[8]; /* for each rotation, masks for a */
+  unsigned int val_mask[8]; /* 4x4 grid around anchor */
 #endif
 
   int class;            /* classification of pattern */
@@ -245,7 +242,7 @@ struct pattern {
 };
 
 struct pattern_db {
-  int  fixed_for_size;
+  int fixed_for_size;
   struct pattern *patterns;
   struct dfa *pdfa;
 };
