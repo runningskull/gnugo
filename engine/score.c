@@ -33,6 +33,8 @@ static void print_new_moyo(int dilations, int erosions);
 static void close_bubbles(int gb[BOARDMAX]);
 static int captured_territory(int pos, int color);
 
+void print_moyo(void);
+float old_estimate_score(float *upper, float *lower);
 
 #define ARRAYSIZE MAX_BOARD*MAX_BOARD
 

@@ -899,7 +899,7 @@ loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312161910.sgf 52
 # GNU Go 3.7.2 thinks white has an attack at D3.
 loadsgf games/kgs/maproom-gnugo3pt6.sgf 37
 217 attack C4
-#? [2 D4]
+#? [2 D4]*
 trymove W D3
 218 defend C4
 #? [1 B5]

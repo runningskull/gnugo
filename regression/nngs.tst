@@ -339,7 +339,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 241
 #J11 is terrible.
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 257
 820 reg_genmove white
-#? [J13|L9]*
+#? [J13|L9]
 
 
 
@@ -544,7 +544,7 @@ loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 54
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 62
 1160 reg_genmove white
-#? [!A8]*
+#? [!A8]
 
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 80
@@ -559,7 +559,7 @@ loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 82
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 98
 1190 owl_defend B13
-#? [0]*
+#? [0]
 
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 104

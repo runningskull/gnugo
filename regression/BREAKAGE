@@ -1,3 +1,44 @@
+========================== 3.7.3  ==================================
+
+./regress.sh . reading.tst 
+217 unexpected FAIL: Correct '2 D4', got '0'
+./regress.sh . ld_owl.tst 
+69 unexpected PASS!
+324 unexpected PASS!
+./regress.sh . neurogo.tst 
+3 unexpected FAIL: Correct 'H3|K3|K4', got 'Q3'
+./regress.sh . nngs.tst 
+820 unexpected PASS!
+1160 unexpected PASS!
+1190 unexpected PASS!
+./regress.sh . owl1.tst 
+274 unexpected PASS!
+322 unexpected PASS!
+323 unexpected PASS!
+351 unexpected PASS!
+354 unexpected PASS!
+357 unexpected FAIL: Correct '0', got '2 F2'
+362 unexpected PASS!
+364 unexpected FAIL: Correct '1 (PASS|A7|D6|F8|F9)', got '0'
+./regress.sh . nngs4.tst 
+580 unexpected PASS!
+./regress.sh . gunnar.tst 
+68 unexpected PASS!
+70 unexpected PASS!
+./regress.sh . 9x9.tst 
+360 unexpected PASS!
+380 unexpected FAIL: Correct 'C3|D3', got 'C8'
+390 unexpected FAIL: Correct 'D7', got 'H5'
+400 unexpected FAIL: Correct 'A5', got 'J4'
+./regress.sh . kgs.tst 
+40 unexpected PASS!
+./regress.sh . olympiad2004.tst 
+10 unexpected PASS!
+./regress.sh . tiny.tst 
+201 unexpected PASS!
+301 unexpected PASS!
+401 unexpected PASS!
+
 ========================== 3.7.2  ==================================
 
 ./regress.sh . reading.tst 

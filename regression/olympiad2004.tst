@@ -56,7 +56,7 @@ loadsgf games/olympiad2004/19x19/gnu-ind.sgf 179
 # definitely win the semeai.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 183
 10 reg_genmove black
-#? [B15]*
+#? [B15]
 
 # T17 is totally meritless compared to any of the local alternatives.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 203

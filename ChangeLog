@@ -2,15 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- special_rescue_moves() revised to allow self atari moves which may
-  set up a snapback
-- increase search depth after filling liberties in
-  endgame_find_backfilling_dame()
-- try harder to find a safe backfilling move in
-  endgame_find_backfilling_dame()
+3.7.3 released March 22, 2005
+
+- special_rescue_moves() allows self atari moves which may set up a snapback
+- increase depth after filling liberties in endgame_find_backfilling_dame()
+- try harder to find safe backfilling moves in endgame_find_backfilling_dame()
 - revised heuristics to find a font file in view.pike
-- avoid crashing on bad engine paths when starting a new engine in
-  view.pike
+- avoid crashing on bad engine paths when starting a new engine in view.pike
 - move_connects_strings() revised
 - outcommented patterns removed
 - ignore off board vertices in openregion() in fuseki.c
@@ -28,8 +26,7 @@
 - Doc revision (Emacs mode in using.texi)
 - use print_numeric_influence() for printing escape influence
 - take neighbouring half/false eyes into account when estimating lunch value
-- do not trust strategic attack and defense moves to be safe when
-  scoring
+- do not trust strategic attack and defense moves to be safe when scoring
 - thrash_around_helper() returns false if fuseki is disabled
 - value_territory() revised to disable certain reductions of the territory
   value when scoring

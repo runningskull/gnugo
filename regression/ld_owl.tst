@@ -192,7 +192,7 @@ play black A2
 # Clean capture, no ko.
 loadsgf games/life_and_death/ld13.sgf
 69 owl_attack R16
-#? [1 (T16|T18)]*
+#? [1 (T16|T18)]
 
 loadsgf games/life_and_death/lunches.sgf
 101 dragon_status A17
@@ -401,7 +401,7 @@ loadsgf games/life_and_death/mixed3.sgf
 323 owl_defend K13
 #? [0]
 324 owl_attack L4
-#? [1 N2]*
+#? [1 N2]
 
 # tough under the stones problem from Sensei's Library
 loadsgf games/owl47.sgf 5

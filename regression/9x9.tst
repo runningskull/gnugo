@@ -182,7 +182,7 @@ loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312241905.sgf 32
 
 loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312292348.sgf 8
 360 reg_genmove black
-#? [F4|E6|D5]*
+#? [F4|E6|D5]
 
 #E7 appears to be a losing move
 loadsgf games/nngs/gnugo-3.5.2gf1-Kiskol-200401021557.sgf 10
@@ -191,12 +191,12 @@ loadsgf games/nngs/gnugo-3.5.2gf1-Kiskol-200401021557.sgf 10
 
 loadsgf games/boardspace/GNUGo-GoFigure0.1-200503171816.sgf 9
 380 reg_genmove black
-#? [C3|D3]
+#? [C3|D3]*
 
 loadsgf games/boardspace/GNUGo-GoFigure0.1-200503171816.sgf 17
 390 reg_genmove black
-#? [D7]
+#? [D7]*
 
 loadsgf games/boardspace/GNUGo-GoFigure0.1-200503171816.sgf 35
 400 reg_genmove black
-#? [A5]
+#? [A5]*

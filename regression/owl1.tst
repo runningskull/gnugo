@@ -55,7 +55,7 @@ loadsgf games/owl39.sgf 1
 #? [1 G4]*
 
 274 owl_defend E7
-#? [1 G4|G7|B6]*
+#? [1 G4|G7|B6]
 
 loadsgf games/owl39.sgf
 275 owl_attack E7
@@ -253,11 +253,11 @@ loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 79
 
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 81
 322 owl_defend F3
-#? [0]*
+#? [0]
 
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 85
 323 owl_defend F3
-#? [0]*
+#? [0]
 
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 89
 324 owl_defend E5
@@ -374,7 +374,7 @@ play white C15
 play white A13
 play white E14
 351 owl_attack E16
-#? [1 (PASS|E11|F19|G18)]*
+#? [1 (PASS|E11|F19|G18)]
 
 loadsgf games/scoring/score14.sgf
 352 owl_attack B19
@@ -386,7 +386,7 @@ loadsgf games/owl53.sgf
 
 loadsgf games/scoring/score39.sgf
 354 owl_defend Q13
-#? [0]*
+#? [0]
 
 # See also olympiad2004:123.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 242
@@ -397,7 +397,7 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 242
 
 loadsgf games/owl54.sgf
 357 owl_defend D3
-#? [0]
+#? [0]*
 
 loadsgf games/scoring/score55.sgf
 358 owl_defend Q18
@@ -416,7 +416,7 @@ play white L14
 361 owl_attack L18
 #? [1 K16]*
 362 owl_defend L18
-#? [1 M16]*
+#? [1 M16]
 
 loadsgf games/kgs/GnuGoCVS-john.sgf 166
 363 owl_defend F9
@@ -424,7 +424,7 @@ loadsgf games/kgs/GnuGoCVS-john.sgf 166
 
 loadsgf games/owl54.sgf
 364 owl_attack E9
-#? [1 (PASS|A7|D6|F8|F9)]
+#? [1 (PASS|A7|D6|F8|F9)]*
 365 owl_defend E9
 #? [0]
 

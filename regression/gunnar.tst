@@ -381,7 +381,7 @@ loadsgf games/kgs/dogo-TheGNUGo.sgf 164
 # Capture on a large scale.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 170
 68 restricted_genmove black F6 D8
-#? [D8]*
+#? [D8]
 
 # Stop the main incursion first.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 178
@@ -391,7 +391,7 @@ loadsgf games/kgs/dogo-TheGNUGo.sgf 178
 # A13 and A18 live, the game move at D14 dies.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 190
 70 reg_genmove black
-#? [A18|A13]*
+#? [A18|A13]
 
 # D5 huge.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 198
