@@ -96,6 +96,14 @@ Pattern A1
 
 :8,n,value(80)
 
+?.*Bx        connect
+..OXX
+..a..
+.....
+-----
+
+; lib(B)<4
+
 
 Pattern A2
 
@@ -989,18 +997,18 @@ X*..
 ;owl_escape_value(a)>0
 
 
-Pattern A304
-# In this position, X often cannot get away by pushing on the first
-# line. Still it may be possible to evade long enough to hit various
-# reading depth limits. This move is only intended to stop such
-# nonsense, thus the low value.
-
-??....
-?O....           prevent escape
-X*....
-------
-
-:8,-,value(20)
+# Pattern A304
+# # In this position, X often cannot get away by pushing on the first
+# # line. Still it may be possible to evade long enough to hit various
+# # reading depth limits. This move is only intended to stop such
+# # nonsense, thus the low value.
+# 
+# ??....
+# ?O....           prevent escape
+# X*....
+# ------
+# 
+# :8,-,value(20)
 
 
 #########################################################

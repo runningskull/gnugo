@@ -621,7 +621,8 @@ Pattern D211
 |..O
 |..O       try before hanging connection
 |.OX
-|.*?
+|.*x
+|.x?
 
 :8,-,value(71)
 
