@@ -2409,7 +2409,7 @@ compute_connection_distances(int str, struct connection_data *conn)
     float smallest_dist = HUGE_CONNECTION_DISTANCE;
     int best_index = -1;
 
-    gg_assert(conn->queue_end < MAX_BOARD * MAX_BOARD);
+    gg_assert(conn->queue_end <= MAX_BOARD * MAX_BOARD);
 
     /* Find the smallest distance among the queued points. */
     for (k = conn->queue_start; k < conn->queue_end; k++) {

@@ -1681,6 +1681,8 @@ gtp_genmove_black(char *s, int id)
 
   if (genmove(&i, &j, BLACK) >= 0)
     play_move(POS(i, j), BLACK);
+  else
+    play_move(NO_MOVE, BLACK);
 
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_vertex(i, j);
@@ -1703,6 +1705,8 @@ gtp_genmove_white(char *s, int id)
 
   if (genmove(&i, &j, WHITE) >= 0)
     play_move(POS(i, j), WHITE);
+  else
+    play_move(NO_MOVE, WHITE);
 
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_vertex(i, j);
