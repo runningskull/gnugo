@@ -4,13 +4,13 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       owl_rot.tst heikki.tst golife.tst dniwog.tst strategy4.tst \
       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst \
       filllib.tst arion.tst endgame.tst viking.tst ego.tst atari_atari.tst \
-      score.tst ld_owl_rot.tst reading_rot.tst endgame_rot.tst manyfaces.tst \
+      score.tst manyfaces.tst \
       cutstone.tst newscore.tst blunder.tst niki.tst trevor.tst tactics.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
 EXTRA_DIST = games $(TST) $(noinst_SCRIPTS) regress.awk STRATEGY NICKLAS \
-	     READING rot1 rot2 rot3 BREAKAGE
+	     READING rot0 rot1 rot5 BREAKAGE
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *.orig *~
