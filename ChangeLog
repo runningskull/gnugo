@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new reorientation test suites
+- remove rot* subdirs from EXTRA_DIST
+- bugfix in score.c (typo from 1D conversion)
+- revisions to extract_fuseki: make partial board patterns
+- Corrected VC build error converting unsigned 64-bit long to double
+
 3.1.11 released October 21, 2001
 
 - tuning
