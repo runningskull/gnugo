@@ -34,10 +34,14 @@
 
 /* Count how many distinct strings are (solidly) connected by the move
  * at (pos). Add a bonus for strings with few liberties. Also add
- * bonus for opponent strings put in atari or removed.
+ * bonus for opponent strings put in atari or removed and for own
+ * strings in atari adjacent to removed opponent strings.
+ *
+ * The parameter to_move should be set when color is the color to
+ * move. (This function is called for both colors.)
  */
 static int
-move_connects_strings(int pos, int color)
+move_connects_strings(int pos, int color, int to_move)
 {
   int ss[4];
   int strings = 0;
@@ -80,8 +84,11 @@ move_connects_strings(int pos, int color)
     else {
       if (countlib(ss[k]) <= 2)
 	fewlibs++;
-      if (countlib(ss[k]) <= 1)
+      if (countlib(ss[k]) <= 1 && to_move) {
+	int dummy[MAXCHAIN];
 	fewlibs++;
+	fewlibs += chainlinks2(ss[k], dummy, 1);
+      }
     }
   }
 
@@ -3169,8 +3176,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     /* Add a special shape bonus for moves which connect own strings
      * or cut opponent strings.
      */
-    c = (move_connects_strings(pos, color)
-	 + move_connects_strings(pos, OTHER_COLOR(color)));
+    c = (move_connects_strings(pos, color, 1)
+	 + move_connects_strings(pos, OTHER_COLOR(color), 0));
     if (c > 0) {
       float shape_factor2 = pow(1.02, (float) c) - 1;
       float base_value = gg_max(gg_min(tot_value, 5.0), 1.0);
