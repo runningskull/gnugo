@@ -243,6 +243,10 @@ loadsgf games/owl48.sgf
 319 owl_attack S10
 #? [1 S6]*
 
+loadsgf games/nngs/takeda-gnugo-3.4-200308142205.sgf 60
+320 owl_attack R4
+#? [0]
+
 
 ########### end of tests #####################
 
