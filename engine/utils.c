@@ -1070,7 +1070,7 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
   int found_one;
   int moves_played = 0;
   int save_moves;
-  int m, n;
+  int pos;
   int k;
   int libs[MAXLIBS];
   int liberties;
@@ -1081,69 +1081,65 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
     something_captured = 0;
 
     /* Visit all friendly strings on the board. */
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	int ii = POS(m, n);
-	if (board[ii] != color || !is_worm_origin(ii, ii))
-	  continue;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (board[pos] != color || !is_worm_origin(pos, pos))
+	continue;
 	
-	/* Try to capture the worm at (m, n). */
-	liberties = findlib(ii, MAXLIBS, libs);
-	save_moves = moves_played;
-	for (k = 0; k < liberties; k++) {
-	  if (trymove(libs[k], other, "unconditional_life", ii, EMPTY, 0))
-	    moves_played++;
-	}
-
-	/* Successful if already captured or a single liberty remains.
-	 * Otherwise we must rewind and take back the last batch of moves.
-	 */
-	if (board[ii] == EMPTY)
-	  something_captured = 1;
-	else if (findlib(ii, 2, libs) == 1) {
-	  /* Need to use tryko as a defense against the extreme case
-           * when the only opponent liberty that is not suicide is an
-           * illegal ko capture, like in this 5x5 position:
-	   * +-----+
-	   * |.XO.O|
-	   * |XXOO.|
-	   * |X.XOO|
-	   * |XXOO.|
-	   * |.XO.O|
-	   * +-----+
-	   */
-	  int success = tryko(libs[0], other, "unconditional_life", EMPTY, 0);
-	  gg_assert(success);
+      /* Try to capture the worm at (m, n). */
+      liberties = findlib(pos, MAXLIBS, libs);
+      save_moves = moves_played;
+      for (k = 0; k < liberties; k++) {
+	if (trymove(libs[k], other, "unconditional_life", pos, EMPTY, 0))
 	  moves_played++;
-	  something_captured++;
-	}
-	else
-	  while (moves_played > save_moves) {
-	    popgo();
-	    moves_played--;
-	  }
       }
+      
+      /* Successful if already captured or a single liberty remains.
+       * Otherwise we must rewind and take back the last batch of moves.
+       */
+      if (board[pos] == EMPTY)
+	something_captured = 1;
+      else if (findlib(pos, 2, libs) == 1) {
+	/* Need to use tryko as a defense against the extreme case
+	 * when the only opponent liberty that is not suicide is an
+	 * illegal ko capture, like in this 5x5 position:
+	 * +-----+
+	 * |.XO.O|
+	 * |XXOO.|
+	 * |X.XOO|
+	 * |XXOO.|
+	 * |.XO.O|
+	 * +-----+
+	 */
+	int success = tryko(libs[0], other, "unconditional_life", EMPTY, 0);
+	gg_assert(success);
+	moves_played++;
+	something_captured++;
+      }
+      else
+	while (moves_played > save_moves) {
+	  popgo();
+	  moves_played--;
+	}
+    }
   }
-
+  
   /* The strings still remaining are uncapturable. Now see which
    * opponent strings can survive.
    *
    * 1. Play opponent stones on all liberties of the unconditionally
    *    alive strings except where illegal.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int ii = POS(m, n);
-      if (board[ii] != color || !is_worm_origin(ii, ii))
-	continue;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] != color || !is_worm_origin(pos, pos))
+      continue;
       
-      /* Play as many liberties as we can. */
-      liberties = findlib(ii, MAXLIBS, libs);
-      for (k = 0; k < liberties; k++) {
-	if (trymove(libs[k], other, "unconditional_life", ii, EMPTY, 0))
-	  moves_played++;
-      }
+    /* Play as many liberties as we can. */
+    liberties = findlib(pos, MAXLIBS, libs);
+    for (k = 0; k < liberties; k++) {
+      if (trymove(libs[k], other, "unconditional_life", pos, EMPTY, 0))
+	moves_played++;
     }
+  }
 
   /* 2. Recursively extend opponent strings in atari, except where this
    *    would be suicide.
@@ -1153,85 +1149,78 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
     /* Nothing found so far in this turn of the loop. */
     found_one = 0;
 
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	int ii = POS(m, n);
-	if (board[ii] != other || countlib(ii) > 1)
-	  continue;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (board[pos] != other || countlib(pos) > 1)
+	continue;
 	
-	/* Try to extend the string at (m, n). */
-	findlib(ii, 1, libs);
-	if (trymove(libs[0], other, "unconditional_life", ii, EMPTY, 0)) {
-	  moves_played++;
-	  found_one = 1;
-	}
+      /* Try to extend the string at (m, n). */
+      findlib(pos, 1, libs);
+      if (trymove(libs[0], other, "unconditional_life", pos, EMPTY, 0)) {
+	moves_played++;
+	found_one = 1;
       }
+    }
   }
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int ii = POS(m, n);
-      int aa;
-      int bb;
-      int aopen, bopen;
-      int alib, blib;
-      if (board[ii] != other || countlib(ii) != 2)
-	continue;
-      findlib(ii, 2, libs);
-      aa = libs[0];
-      bb = libs[1];
-      if (abs(I(aa) - I(bb)) + abs(J(aa) - J(bb)) != 1)
-	continue;
-
-      /* Only two liberties and these are adjacent. Play one. We want
-       * to maximize the number of open liberties. In this particular
-       * situation we can count this with approxlib for the opposite
-       * color. If the number of open liberties is the same, we
-       * maximize the total number of obtained liberties.
-       * Two relevant positions:
-       *
-       * |XXX. 
-       * |OOXX    |XXXXXXX
-       * |O.OX    |OOXOOOX
-       * |..OX    |..OO.OX
-       * +----    +-------
-       */
-      aopen = approxlib(aa, color, 4, NULL);
-      bopen = approxlib(bb, color, 4, NULL);
-      alib  = approxlib(aa, other, 4, NULL);
-      blib  = approxlib(bb, other, 4, NULL);
-
-      if (aopen > bopen || (aopen == bopen && alib >= blib)) {
-	trymove(aa, other, "unconditional_life", ii, EMPTY, 0);
-	moves_played++;
-      }
-      else {
-	trymove(bb, other, "unconditional_life", ii, EMPTY, 0);
-	moves_played++;
-      }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int apos;
+    int bpos;
+    int aopen, bopen;
+    int alib, blib;
+    if (board[pos] != other || countlib(pos) != 2)
+      continue;
+    findlib(pos, 2, libs);
+    apos = libs[0];
+    bpos = libs[1];
+    if (abs(I(apos) - I(bpos)) + abs(J(apos) - J(bpos)) != 1)
+      continue;
+    
+    /* Only two liberties and these are adjacent. Play one. We want
+     * to maximize the number of open liberties. In this particular
+     * situation we can count this with approxlib for the opposite
+     * color. If the number of open liberties is the same, we
+     * maximize the total number of obtained liberties.
+     * Two relevant positions:
+     *
+     * |XXX. 
+     * |OOXX    |XXXXXXX
+     * |O.OX    |OOXOOOX
+     * |..OX    |..OO.OX
+     * +----    +-------
+     */
+    aopen = approxlib(apos, color, 4, NULL);
+    bopen = approxlib(bpos, color, 4, NULL);
+    alib  = approxlib(apos, other, 4, NULL);
+    blib  = approxlib(bpos, other, 4, NULL);
+    
+    if (aopen > bopen || (aopen == bopen && alib >= blib)) {
+      trymove(apos, other, "unconditional_life", pos, EMPTY, 0);
+      moves_played++;
     }
-
+    else {
+      trymove(bpos, other, "unconditional_life", pos, EMPTY, 0);
+      moves_played++;
+    }
+  }
+  
   /* Identify unconditionally alive stones and unconditional territory. */
   memset(unconditional_territory, 0, sizeof(int) * BOARDMAX);
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int ii = POS(m, n);
-
-      if (board[ii] == color) {
-	unconditional_territory[ii] = 1;
-	if (is_worm_origin(ii, ii)) {
-	  liberties = findlib(ii, MAXLIBS, libs);
-	  for (k = 0; k < liberties; k++)
-	    unconditional_territory[libs[k]] = 2;
-	}
-      }
-      else if (board[ii] == other && countlib(ii) == 1) {
-	unconditional_territory[ii] = 2;
-	findlib(ii, 1, libs);
-	unconditional_territory[libs[0]] = 2;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == color) {
+      unconditional_territory[pos] = 1;
+      if (is_worm_origin(pos, pos)) {
+	liberties = findlib(pos, MAXLIBS, libs);
+	for (k = 0; k < liberties; k++)
+	  unconditional_territory[libs[k]] = 2;
       }
     }
-
+    else if (board[pos] == other && countlib(pos) == 1) {
+      unconditional_territory[pos] = 2;
+      findlib(pos, 1, libs);
+      unconditional_territory[libs[0]] = 2;
+    }
+  }
+  
   /* Take back all moves. */
   while (moves_played > 0) {
     popgo();

@@ -467,14 +467,14 @@ aftermath_genmove(int *aftermath_move, int color,
 	    int important = 0;
 	    int safe_atari = 0;
 	    for (r = 0; r < 4; r++) {
-	      int dlt = delta[r];
-	      if (!ON_BOARD(apos+dlt))
+	      int d = delta[r];
+	      if (!ON_BOARD(apos+d))
 		continue;
-	      if (board[apos+dlt] == other
-		  && dragon[apos+dlt].matcher_status == DEAD)
+	      if (board[apos+d] == other
+		  && dragon[apos+d].matcher_status == DEAD)
 		important = 1;
-	      else if (board[apos+dlt] == EMPTY
-		       && !is_self_atari(apos+dlt, other))
+	      else if (board[apos+d] == EMPTY
+		       && !is_self_atari(apos+d, other))
 		safe_atari = 1;
 	    }
 	    if (approxlib(pos, color, 3, NULL) > 2) {

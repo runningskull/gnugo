@@ -49,14 +49,14 @@ static int do_attack_pat(int str, int *move, int komaster, int kom_pos);
 
 #define ADD_CANDIDATE_MOVE(move, score, moves, scores, num_moves)\
   do {\
-    int la;\
-    for (la = 0; la < num_moves; la++)\
-      if (moves[la] == (move)) {\
-        if (scores[la] < score)\
-          scores[la] = score;\
+    int u;\
+    for (u = 0; u < num_moves; u++)\
+      if (moves[u] == (move)) {\
+        if (scores[u] < score)\
+          scores[u] = score;\
 	break;\
       }\
-    if ((la == num_moves) && (num_moves < MAX_MOVES)) {\
+    if ((u == num_moves) && (num_moves < MAX_MOVES)) {\
       moves[num_moves] = move;\
       scores[num_moves] = score;\
       (num_moves)++;\
@@ -65,12 +65,12 @@ static int do_attack_pat(int str, int *move, int komaster, int kom_pos);
 
 #define REMOVE_CANDIDATE_MOVE(move, moves, scores, num_moves)\
   do {\
-    int kr, lr;\
-    for (kr = 0; kr < num_moves; kr++) {\
-      if (moves[kr] == (move)) {\
-        for (lr = kr; lr < num_moves-1; lr++) {\
-	  moves[lr] = moves[lr+1];\
-	  scores[lr] = scores[lr+1];\
+    int u, v;\
+    for (u = 0; u < num_moves; u++) {\
+      if (moves[u] == (move)) {\
+        for (v = u; v < num_moves-1; v++) {\
+	  moves[v] = moves[v+1];\
+	  scores[v] = scores[v+1];\
 	}\
         (num_moves)--;\
 	break;\
@@ -251,7 +251,8 @@ attack(int str, int *move)
 
   origin = find_origin(str);
   if (search_persistent_reading_cache(ATTACK, origin, &result, &the_move)) {
-    if (move) *move = the_move;
+    if (move)
+      *move = the_move;
     return result;
   }
 
@@ -273,7 +274,8 @@ attack(int str, int *move)
 
   store_persistent_reading_cache(ATTACK, origin, result, the_move, nodes);
   
-  if (move) *move = the_move;
+  if (move)
+    *move = the_move;
   return result;
 }
 
@@ -303,14 +305,16 @@ find_defense(int str, int *move)
    * four liberties.
    */
   if (countlib(str) > 4) {
-    if (move) *move = NO_MOVE;
+    if (move)
+      *move = NO_MOVE;
     return WIN;
   }
 
   origin = find_origin(str);
   if (search_persistent_reading_cache(FIND_DEFENSE, origin, 
 				      &result, &the_move)) {
-    if (move) *move = the_move;
+    if (move)
+      *move = the_move;
     return result;
   }
 
@@ -333,7 +337,8 @@ find_defense(int str, int *move)
   store_persistent_reading_cache(FIND_DEFENSE, origin, result, 
 				 the_move, nodes);
   
-  if (move) *move = the_move;
+  if (move)
+    *move = the_move;
   return result;
 }
 

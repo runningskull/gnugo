@@ -865,7 +865,8 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
 	&& is_ko(pos, eye[pos].color == WHITE_BORDER ? BLACK : WHITE, NULL))
       *pessimistic_min = 0;
 
-    DEBUG(DEBUG_EYES, "  graph matching - max=%d, min=%d, pessimistic_min=%d\n",
+    DEBUG(DEBUG_EYES,
+	  "  graph matching - max=%d, min=%d, pessimistic_min=%d\n",
 	  *max, *min, *pessimistic_min);
   }
   
@@ -1838,8 +1839,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
 	if (board[eye_vertices[k]] == EMPTY
 	    && is_legal(eye_vertices[k], BLACK)
 	    && owl_does_attack(eye_vertices[k], str)) {
-	  gprintf("%1m alive, but %1m attacks:\n",
-		  str, eye_vertices[k]);
+	  gprintf("%1m alive, but %1m attacks:\n", str, eye_vertices[k]);
 	  showboard(0);
 	  gprintf("\n");
 	}
@@ -1853,8 +1853,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
 	for (k = 0; k < eyesize; k++) {
 	  if (board[eye_vertices[k]] == EMPTY
 	      && !owl_does_defend(eye_vertices[k], str)) {
-	    gprintf("%1m alive, but almost filled with nakade:\n",
-		    str);
+	    gprintf("%1m alive, but almost filled with nakade:\n", str);
 	    showboard(0);
 	  }
 	}
@@ -1870,8 +1869,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
 	  if (board[eye_vertices[k]] == EMPTY
 	      && is_legal(eye_vertices[k], WHITE)
 	      && owl_does_defend(eye_vertices[k], str)) {
-	    gprintf("%1m dead, but %1m defends:\n",
-		    str, eye_vertices[k]);
+	    gprintf("%1m dead, but %1m defends:\n", str, eye_vertices[k]);
 	    showboard(0);
 	    gprintf("\n");
 	  }
@@ -1882,7 +1880,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
          * attack and defense points.
 	 */
 	if (board[attack_point] != EMPTY
-		 || !is_legal(attack_point, BLACK)) {
+	    || !is_legal(attack_point, BLACK)) {
 	  gprintf("Bad attack point %1m:\n", attack_point);
 	  showboard(0);
 	}
@@ -1892,7 +1890,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
 	}
 
 	if (board[defense_point] != EMPTY
-		 || !is_legal(defense_point, WHITE)) {
+	    || !is_legal(defense_point, WHITE)) {
 	  gprintf("Bad defense point %1m:\n", defense_point);
 	  showboard(0);
 	}

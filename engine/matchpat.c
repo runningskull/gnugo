@@ -774,9 +774,12 @@ tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
 
 /* The tree data structure is output with raw integer offsets
  * relative to a single array of tree_node_list and match_node
- * elements.  These offsets need to added to the actual base
+ * elements.  These offsets need to be added to the actual base
  * address of the list of elements for the pointers to be
  * meaningful.
+ *
+ * FIXME: This code is not portable. On certain platforms the size of
+ *        a pointer and the size of an int differ.
  */
 void 
 tree_initialize_pointers(struct tree_node_list *tnl,
@@ -1170,8 +1173,8 @@ matchpat(matchpat_callback_fn_ptr callback, int color,
 
 void 
 matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
-	 struct pattern_db *pdb, void *callback_data,
-	 char goal[BOARDMAX], int anchor_in_goal) 
+		     struct pattern_db *pdb, void *callback_data,
+		     char goal[BOARDMAX], int anchor_in_goal) 
 {
   loop_fn_ptr_t loop = matchpat_loop;
   prepare_fn_ptr_t prepare = prepare_for_match;
