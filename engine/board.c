@@ -301,6 +301,7 @@ static void new_position(void);
 static int propagate_string(int stone, int str);
 static void find_liberties_and_neighbors(int s);
 static int do_remove_string(int s);
+static void do_commit_suicide(int pos, int color);
 static void do_play_move(int pos, int color);
 static int slow_approxlib(int pos, int color, int maxlib, int *libs);
 
@@ -939,7 +940,10 @@ play_move_no_history(int pos, int color)
     ASSERT1(board[pos] == EMPTY, pos);
 
     /* Do play the move. */
-    do_play_move(pos, color);
+    if (!is_suicide(pos, color))
+      do_play_move(pos, color);
+    else
+      do_commit_suicide(pos, color);
 
 #if CHECK_HASHING
     /* Check the hash table to see if it equals the previous one. */
@@ -4275,7 +4279,8 @@ assimilate_neighbor_strings(int pos)
 }
 
 
-/* Suicide at pos. Remove the neighboring friendly strings.
+/* Suicide at `pos' (the function assumes that the move is indeed suicidal).
+ * Remove the neighboring friendly strings.
  */
 
 static void
@@ -4292,10 +4297,18 @@ do_commit_suicide(int pos, int color)
 
   if (board[EAST(pos)] == color)
     do_remove_string(string_number[EAST(pos)]);
+
+  /* Count the stone we "played" as captured. */
+  if (color == WHITE)
+    white_captured++;
+  else
+    black_captured++;
 }
 
 
-/* Play a move without legality checking. Suicide is allowed.
+/* Play a move without legality checking. This is a low-level function,
+ * it assumes that the move is not a suicide. Such cases must be handled
+ * where the function is called.
  */
 
 static void
@@ -4304,103 +4317,78 @@ do_play_move(int pos, int color)
   int other = OTHER_COLOR(color);
   int captured_stones = 0;
   int neighbor_allies = 0;
-  int have_liberties = 0;
   int s = -1;
-  int south = SOUTH(pos);
-  int west = WEST(pos);
-  int north = NORTH(pos);
-  int east = EAST(pos);
-  
-  /* Remove captured stones and check for suicide.*/
-  if (board[south] == other && LIBERTIES(south) == 1)
-    captured_stones += do_remove_string(string_number[south]);
 
-  if (board[west] == other && LIBERTIES(west) == 1)
-    captured_stones += do_remove_string(string_number[west]);
+  /* Clear string mark. */
+  string_mark++;
 
-  if (board[north] == other && LIBERTIES(north) == 1)
-    captured_stones += do_remove_string(string_number[north]);
-
-  if (board[east] == other && LIBERTIES(east) == 1)
-    captured_stones += do_remove_string(string_number[east]);
-
-
-  if (captured_stones == 0) {
-    if (LIBERTY(south)
-	|| (board[south] == color && LIBERTIES(south) > 1))
-      have_liberties = 1;
-    else if (LIBERTY(west)
-	     || (board[west] == color && LIBERTIES(west) > 1))
-      have_liberties = 1;
-    else if (LIBERTY(north)
-	     ||	(board[north] == color && LIBERTIES(north) > 1))
-      have_liberties = 1;
-    else if (LIBERTY(east)
-	     ||(board[east] == color && LIBERTIES(east) > 1))
-      have_liberties = 1;
+  /* Look in all directions. Count the number of neighbor strings of the same
+   * color, remove captured strings and remove `pos' as liberty for opponent
+   * strings that are not captured.
+   */
+  if (board[SOUTH(pos)] == color) {
+    neighbor_allies++;
+    s = string_number[SOUTH(pos)];
+    MARK_STRING(SOUTH(pos));
   }
-  else
-      have_liberties = 1;
-
-
-  /* No captures and no liberties -> suicide. */
-  if (have_liberties == 0 && captured_stones == 0) {
-    do_commit_suicide(pos, color);
-    return;
+  else if (board[SOUTH(pos)] == other) {
+    if (LIBERTIES(SOUTH(pos)) > 1) {
+      remove_liberty(string_number[SOUTH(pos)], pos);
+      MARK_STRING(SOUTH(pos));
+    }
+    else
+      captured_stones += do_remove_string(string_number[SOUTH(pos)]);
   }
-  
+
+  if (UNMARKED_COLOR_STRING(WEST(pos), color)) {
+    neighbor_allies++;
+    s = string_number[WEST(pos)];
+    MARK_STRING(WEST(pos));
+  }
+  else if (UNMARKED_COLOR_STRING(WEST(pos), other)) {
+    if (LIBERTIES(WEST(pos)) > 1) {
+      remove_liberty(string_number[WEST(pos)], pos);
+      MARK_STRING(WEST(pos));
+    }
+    else
+      captured_stones += do_remove_string(string_number[WEST(pos)]);
+  }
+
+  if (UNMARKED_COLOR_STRING(NORTH(pos), color)) {
+    neighbor_allies++;
+    s = string_number[NORTH(pos)];
+    MARK_STRING(NORTH(pos));
+  }
+  else if (UNMARKED_COLOR_STRING(NORTH(pos), other)) {
+    if (LIBERTIES(NORTH(pos)) > 1) {
+      remove_liberty(string_number[NORTH(pos)], pos);
+      MARK_STRING(NORTH(pos));
+    }
+    else
+      captured_stones += do_remove_string(string_number[NORTH(pos)]);
+  }
+
+  if (UNMARKED_COLOR_STRING(EAST(pos), color)) {
+    neighbor_allies++;
+    s = string_number[EAST(pos)];
+#if 0
+    MARK_STRING(EAST(pos));
+#endif
+  }
+  else if (UNMARKED_COLOR_STRING(EAST(pos), other)) {
+    if (LIBERTIES(EAST(pos)) > 1) {
+      remove_liberty(string_number[EAST(pos)], pos);
+#if 0
+      MARK_STRING(EAST(pos));
+#endif
+    }
+    else
+      captured_stones += do_remove_string(string_number[EAST(pos)]);
+  }
+
   /* Put down the stone. */
   DO_ADD_STONE(pos, color);
 
-  /* Count the number of adjacent strings of my color and remove
-   * pos as liberty for the adjacent opponent strings.
-   */
-  string_mark++;
-
-  if (UNMARKED_COLOR_STRING(south, color)) {
-    neighbor_allies++;
-    s = string_number[south];
-    MARK_STRING(south);
-  }
-  else if (UNMARKED_COLOR_STRING(south, other)) {
-    remove_liberty(string_number[south], pos);
-    MARK_STRING(south);
-  }    
-  
-  if (UNMARKED_COLOR_STRING(west, color)) {
-    neighbor_allies++;
-    s = string_number[west];
-    MARK_STRING(west);
-  }
-  else if (UNMARKED_COLOR_STRING(west, other)) {
-    remove_liberty(string_number[west], pos);
-    MARK_STRING(west);
-  }    
-  
-  if (UNMARKED_COLOR_STRING(north, color)) {
-    neighbor_allies++;
-    s = string_number[north];
-    MARK_STRING(north);
-  }
-  else if (UNMARKED_COLOR_STRING(north, other)) {
-    remove_liberty(string_number[north], pos);
-    MARK_STRING(north);
-  }    
-  
-  if (UNMARKED_COLOR_STRING(east, color)) {
-    neighbor_allies++;
-    s = string_number[east];
-#if 0
-    MARK_STRING(east);
-#endif
-  }
-  else if (UNMARKED_COLOR_STRING(east, other)) {
-    remove_liberty(string_number[east], pos);
-#if 0
-    MARK_STRING(east);
-#endif
-  }    
-  
   /* Choose strategy depending on the number of friendly neighbors. */
   if (neighbor_allies == 0)
     create_new_string(pos);
