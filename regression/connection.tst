@@ -203,7 +203,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 216
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 238
 62 connect S18 S14
-#? [1 T15|T17]*
+#? [1 T15|T17]
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 258
 63 connect N13 N17

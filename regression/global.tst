@@ -28,11 +28,11 @@ loadsgf golois/Aya991113-6.sgf
 
 loadsgf golois/Aya991113-7.sgf
 8 gg_genmove black
-#? [H9]*
+#? [H9]
 
 loadsgf golois/Aya991113-8.sgf
 9 gg_genmove black
-#? [F4]*
+#? [F4]
 
 loadsgf golois/Aya991113-9.sgf
 10 gg_genmove black
@@ -131,7 +131,7 @@ loadsgf golois/GoMaster991113-5.sgf
 
 loadsgf golois/GoStar991114-1.sgf
 31 gg_genmove black
-#? [M8]*
+#? [M8]
 
 loadsgf golois/Indigo-Golois-991105-1.sgf
 32 gg_genmove black
@@ -143,7 +143,7 @@ loadsgf golois/Jimmy990906-1.sgf
 
 loadsgf golois/Lanka991113-1.sgf
 34 gg_genmove black
-#? [N6]
+#? [N6]*
 
 loadsgf golois/MeilleurCoup0001.sgf
 35 gg_genmove black

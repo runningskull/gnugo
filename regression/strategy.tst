@@ -181,7 +181,7 @@ loadsgf games/strategy5.sgf 20
 
 loadsgf games/strategy5.sgf 40
 29 gg_genmove black
-#? [R4]*
+#? [R4]
 
 loadsgf games/strategy5.sgf 44
 30 gg_genmove black
@@ -203,7 +203,7 @@ loadsgf games/strategy8.sgf 283
 
 loadsgf games/nicklas/nicklas8.sgf 72
 34 gg_genmove black
-#? [E17]
+#? [E17]*
 
 loadsgf games/nicklas/nicklas8.sgf 80
 35 gg_genmove black

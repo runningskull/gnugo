@@ -161,7 +161,7 @@ loadsgf games/trevor/auto/a016.sgf 18
 
 loadsgf games/trevor/auto/a017.sgf 20
 290 gg_genmove white
-#? [!C8]
+#? [!C8]*
 
 
 #B8 makes better eye space, at least one point better here, in reverse sente.

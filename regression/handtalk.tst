@@ -85,7 +85,7 @@ loadsgf games/handtalk/handtalk23.sgf 162
 
 loadsgf games/handtalk/handtalk23.sgf 186
 18 gg_genmove white
-#? [S5]*
+#? [S5]
 
 ############ End of Tests #################
 

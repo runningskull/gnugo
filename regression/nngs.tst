@@ -1,3 +1,10 @@
+# Reset applicable counters
+reset_life_node_counter
+reset_owl_node_counter
+reset_reading_node_counter
+reset_trymove_counter
+
+
 # games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf problems:
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 20
@@ -76,7 +83,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 24
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 30
 240 gg_genmove black
-#? [!T6]
+#? [!T6]*
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 56
@@ -120,7 +127,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 8
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 12
 320 gg_genmove black
-#? [B15|B16]*
+#? [B15|B16]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 14
@@ -158,7 +165,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 152
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 156
 400 gg_genmove black
-#? [!J15]*
+#? [!J15]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 204
@@ -595,7 +602,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 44
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 68
 1260 gg_genmove white
-#? [G18|F18]*
+#? [G18|F18]
 
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 90

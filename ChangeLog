@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.3 released June 4, 2002
+
 - new function owl_strong_dragon() and new autohelper with the same name
 - vital_chain() returns the max number of eyes
 - no amalgamation around eye spaces with experimental_connections enabled
@@ -40,6 +42,7 @@
 - new command line option --decide-dragon-data
 - consistency checking of replacement patterns reenabled for unstable line
 - tuning
+- new tests and sgf files
 
 3.3.2 released May 6, 2002
 

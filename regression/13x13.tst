@@ -90,7 +90,7 @@ loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 28
 # See also owl:262.
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 15 gg_genmove white
-#? [C7|B7|C6|B6|B5|C5]*
+#? [C7|B7|C6|B6|B5|C5]
 
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24
@@ -184,7 +184,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 102
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 110
 36 gg_genmove white
-#? [C5]*
+#? [C5]
 
 #CATEGORY=STRATEGY
 #SEVERITY=8
@@ -199,7 +199,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 39 gg_genmove white
-#? [H4|J4]
+#? [H4|J4]*
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50

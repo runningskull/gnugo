@@ -406,7 +406,7 @@ loadsgf games/trevor/auto/d32.sgf 240
 
 loadsgf games/trevor/auto/d32.sgf 244
 800 gg_genmove white
-#? [Q9]
+#? [Q9]*
 
 
 

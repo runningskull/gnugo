@@ -20,7 +20,7 @@ loadsgf games/wing-yuhiko-gnugo.sgf 220
 # See also manyfaces:2.
 loadsgf games/mfgg1.sgf 49
 265 owl_attack S15
-#? [1 S16]
+#? [1 S16]*
 
 ########### end of tests #####################
 

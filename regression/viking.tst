@@ -28,7 +28,7 @@ loadsgf games/viking1.sgf 189
 # Locally S5 is the only move.
 loadsgf games/viking3.sgf 79
 7 gg_genmove white
-#? [!T7]
+#? [!T7]*
 
 # A1 is of course inferior to B3
 loadsgf games/viking3.sgf 93

@@ -11,7 +11,7 @@ TST =  13x13.tst arb.tst arend.tst arion.tst atari_atari.tst blunder.tst \
        semeai2.tst strategy.tst strategy2.tst strategy3.tst strategy4.tst \
        strategy5.tst strategy_rot.tst tactics.tst trevor.tst \
        trevora.tst trevorb.tst trevorc.tst trevord.tst \
-       vie.tst viking.tst strat
+       vie.tst viking.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
 

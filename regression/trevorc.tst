@@ -845,7 +845,7 @@ loadsgf games/trevor/auto/c81.sgf 32
 
 loadsgf games/trevor/auto/c81.sgf 34
 1440 gg_genmove white
-#? [E12|F11]
+#? [E12|F11]*
 
 
 
@@ -927,7 +927,7 @@ loadsgf games/trevor/auto/c84.sgf 94
 
 loadsgf games/trevor/auto/c86.sgf 44
 1570 gg_genmove white
-#? [E2|F2|F3]*
+#? [E2|F2|F3]
 
 
 
@@ -968,7 +968,7 @@ loadsgf games/trevor/auto/c91.sgf 92
 
 loadsgf games/trevor/auto/c93.sgf 34
 1620 gg_genmove white
-#? [!E11]*
+#? [!E11]
 
 loadsgf games/trevor/auto/c93.sgf 35
 1621 attack E11
