@@ -669,9 +669,9 @@ sub check_matcher {
 	}
 
 	#cancel the undo
-	my $last_played = "B";
-	if ($toplay eq "B") { $last_played = "W"; }
-	print $in "gg_genmove $last_played\n";
+	my $last_played = "black";
+	if ($toplay eq "B") { $last_played = "white"; }
+	print $in "genmove_$last_played\n";
 	eat_move($out);
     }
 
