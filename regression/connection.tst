@@ -365,6 +365,9 @@ trymove white P16
 popgo
 popgo
 
+loadsgf games/gunnar/gunnar11.sgf
+107 connect C14 H12
+#? [0]
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
