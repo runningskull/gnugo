@@ -16,11 +16,10 @@ helping us find various problems.
 Thanks to Jessie Annala for the Handtalk games, and to Stefan
 Mertin for the games from his 13x13 tournament.
 
-Special thanks to Ebba Berggren for creating our logo, based on a
-design by Tanguy Urvoy and comments by Alan Crossman. The old
-GNU Go logo was adapted from Jamal Hannah's typing GNU:
-http://www.gnu.org/graphics/atypinggnu.html. Both logos
-can be found in doc/newlogo.* and doc/oldlogo.*
+Special thanks to Ebba Berggren for creating our logos, logo-34 and
+logo-36. Logo-34 is based on a design by Tanguy Urvoy and comments
+by Alan Crossman. The old GNU Go logo32 was adapted from Jamal
+Hannah's typing GNU: http://www.gnu.org/graphics/atypinggnu.html.
 
 We would like to thank Stuart Cracraft, Richard Stallman and Man Lung Li for
 their interest in making this program a part of GNU, William Shubert for
