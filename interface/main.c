@@ -1546,7 +1546,7 @@ static void
 show_help(void)
 {
   set_depth_values(DEFAULT_LEVEL, 0);
-  fprintf(stderr, USAGE,
+  fprintf(stderr, USAGE, level,
 	  depth, backfill_depth, fourlib_depth, ko_depth, branch_depth,
 	  backfill2_depth, break_chain_depth, superstring_depth, aa_depth, 
 	  owl_distrust_depth, owl_branch_depth,
