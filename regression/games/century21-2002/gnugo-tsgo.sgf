@@ -1,0 +1,35 @@
+(;GM[1]FF[4]
+RU[Japanese]
+PC[Edmondton]
+RE[W+67.5]
+SZ[19]HA[0]KM[5.5]
+PW[GNU Go 3.3.5]
+PB[TSGo]
+GN[White (W) vs. Black (B)]
+DT[2002-07-27]
+SY[Cgoban 1.9.10]TM[1 hr/125 moves];B[pq];W[dp];B[cd];W[qo];B[pc];
+W[op];B[mq];W[ec];B[fq];W[de];B[cn];W[ce];B[be];W[fp];B[hp];W[eq];
+B[fr];W[bf];B[ad];W[bc];B[gd];W[pe];B[cc];W[bd];B[bb];W[ae];B[ch];
+W[qc];B[qb];W[qd];B[qg];W[ql];B[qj];W[rb];B[er];W[ic];B[cq];W[he];
+B[kd];W[pb];B[cp];W[fn];B[ge];W[hn];B[gc];W[ob];B[mc];W[oq];B[oc];
+W[pr];B[nb];W[je];B[go];W[kq];B[fo];W[lp];B[do];W[fl];B[dl];W[pl];
+B[en];W[lo];B[jo];W[qq];B[ej];W[ip];B[jp];W[iq];B[jq];W[jr];B[hq];
+W[ir];B[hr];W[io];B[jn];W[km];B[jm];W[jl];B[ne];W[kk];B[ke];W[nj];
+B[nl];W[ok];B[oh];W[gn];B[pj];W[mh];B[on];W[mm];B[bg];W[ff];B[hl];
+W[lq];B[eg];W[db];B[cb];W[fb];B[hb];W[gf];B[hf];W[if];B[hg];W[ib];
+B[id];W[gb];B[jd];W[ie];B[ig];W[jg];B[jh];W[kg];B[hc];W[ha];B[kh];
+W[ea];B[lg];W[ef];B[fc];W[gk];B[ed];W[dd];B[ik];W[im];B[lh];W[nh];
+B[hm];W[rf];B[in];W[il];B[hk];W[ho];B[qf];W[re];B[qe];W[od];B[nd];
+W[gj];B[rg];W[ii];B[ml];W[nm];B[om];W[ol];B[dg];W[oi];B[mr];W[jj];
+B[lj];W[pi];B[ll];W[kl];B[lm];W[lk];B[mn];W[mk];B[lr];W[qi];B[rj];
+W[ri];B[og];W[kb];B[lb];W[mi];B[pf];W[li];B[ki];W[kj];B[ph];W[em];
+B[dm];W[ng];B[oe];W[pd];B[nc];W[mf];B[lf];W[me];B[nf];W[mg];B[po];
+W[no];B[qn];W[nn];B[ro];W[qp];B[rl];W[rm];B[qm];W[rk];B[rn];W[sl];
+B[rp];W[pm];B[rq];W[rr];B[pp];W[qr];B[os];W[pn];B[ek];W[el];B[oa];
+W[qa];B[hi];W[hj];B[gi];W[fi];B[fh];W[ih];B[gg];W[ei];B[gh];W[fj];
+B[di];W[eh];B[fg];W[ji];B[df];W[ee];B[fd];W[le];B[kf];W[ld];B[lc];
+W[kc];B[ci];W[jc];B[hd];W[ma];B[ja];W[na];B[ia];W[la];B[ga];W[dc];
+B[ka];W[pa];B[cf];W[hs];B[gs];W[is];B[qh];W[rd];B[sg];W[si];B[fk];
+W[gl];B[dk];W[dh];B[rh];W[sf];B[sh];W[af];B[ag];W[be];B[md];W[fa];
+B[ha];W[hh];B[jf];W[fe];B[tt];W[oa];B[tt];W[mb];B[jb];W[tt]
+)
