@@ -97,7 +97,7 @@ loadsgf games/incident240.sgf 69
 # incident 221
 loadsgf games/incident221.sgf 35
 120 gg_genmove black
-#? [C7]*
+#? [C7]
 
 # incident 222
 loadsgf games/incident221.sgf 39
@@ -192,7 +192,7 @@ loadsgf games/strategy33.sgf 189
 
 loadsgf games/owl26.sgf 138
 140 gg_genmove white
-#? [N5|M6]*
+#? [N5|M6]
 
 loadsgf games/strategy34.sgf 51
 141 gg_genmove black

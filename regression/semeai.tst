@@ -137,7 +137,7 @@ loadsgf games/semeai/semeai9.sgf
 loadsgf golois/Goemate990902-1.sgf
 
 23 owl_analyze_semeai G12 G13
-#? [ALIVE DEAD (F15|G15|H15|PASS)]*
+#? [ALIVE DEAD (F15|G15|H15|PASS)]
 
 24 owl_analyze_semeai G13 G12
 #? [DEAD ALIVE PASS]
@@ -185,5 +185,5 @@ loadsgf games/nicklas/nicklas14.sgf 55
 # S18 produces a favorable ko. T18 makes seki.
 loadsgf games/bretz.sgf 130
 34 owl_analyze_semeai N18 Q18
-#? [ALIVE DEAD S18]*
+#? [ALIVE DEAD S18]
 

@@ -42,7 +42,7 @@ loadsgf games/mfgg2.sgf 23
 #SEVERITY=8
 loadsgf games/mfgg2.sgf 45
 7 gg_genmove black
-#? [R2|S7]
+#? [R2|S7]*
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=GNU Go doesn't understand this type of corner position!

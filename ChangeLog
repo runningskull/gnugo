@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.20 released January 11, 2002
+
 - ko return codes from owl_does_attack() and owl_does_defend() handled
   in analyze_semeai()
 - special_rescue2() generalized and reimplemented
@@ -18,6 +20,7 @@
 - renamed some move reasons for name consistency
 - new function special_rescue6() in reading.c
 - defend3() revised
+- don't run compute_eyes on eye spaces not attached to a dragon
 - avoid giving followup values to non-sente threats in
   threaten_to_capture_helper() and in estimate_territorial_value()
 - new test_gray_border() in board.c with assertions in genmove.c

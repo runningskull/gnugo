@@ -28,7 +28,7 @@ loadsgf games/strategy3.sgf 14
 # Probably requires a dynamic connection analysis to solve.
 loadsgf games/incident104.sgf 63
 6 gg_genmove white
-#? [E10]
+#? [E10]*
 
 # incident 106
 loadsgf games/incident104.sgf 215
@@ -80,7 +80,7 @@ loadsgf games/incident108b.sgf 292
 # But the game move at R7 is not urgent!
 loadsgf games/incident121.sgf 24
 14 gg_genmove black
-#? [E9]
+#? [E9]*
 
 # incident 132
 loadsgf games/incident121.sgf 116
@@ -203,7 +203,7 @@ loadsgf games/strategy8.sgf 283
 
 loadsgf games/nicklas/nicklas8.sgf 72
 34 gg_genmove black
-#? [E17]*
+#? [E17]
 
 loadsgf games/nicklas/nicklas8.sgf 80
 35 gg_genmove black
@@ -311,7 +311,7 @@ loadsgf games/strategy12.sgf 19
 loadsgf games/strategy12.sgf 21
 # D16 is the strongest but these are acceptable
 49 gg_genmove black
-#? [C17|D16|B17]
+#? [C17|D16|B17]*
 
 
 #CATEGORY=OWL_TUNING

@@ -13,11 +13,11 @@ reset_trymove_counter
 
 loadsgf games/nicklas/nicklas8.sgf 146
 805 gg_genmove black
-#? [C5|B4]*
+#? [C5|B4]
 
 loadsgf games/nicklas/nicklas8.sgf 212
 809 gg_genmove black
-#? [B10]
+#? [B10]*
 
 # Changed correct answer from K12 to J12. /gf
 # K14 also secures a connection of all important stones but is one
@@ -33,14 +33,14 @@ loadsgf games/nicklas/nicklas11.sgf 56
 
 loadsgf games/nicklas/nicklas11.sgf 172
 1103 gg_genmove black
-#? [C2|C3]
+#? [C2|C3]*
 
 # It seems that GNU Go makes a logical mistake here: After seeing that
 # R9 can be defended with S7, and that Q8 can be defended with S7, I
 # doubt it checks whether both will be defended by S7. /ab
 loadsgf games/nicklas/nicklas12.sgf 29
 1201 gg_genmove black
-#? [Q9]*
+#? [Q9]
 
 # I have some doubt about the correct move. I might be advisable for B
 # to defend his center group, although W E16 hurts, of course. However,

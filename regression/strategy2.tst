@@ -22,7 +22,7 @@ loadsgf games/strategy14.sgf 53
 
 loadsgf games/strategy14.sgf 81
 54 gg_genmove white
-#? [P6]*
+#? [P6]
 
 loadsgf games/strategy14.sgf 125
 55 gg_genmove white
@@ -123,7 +123,7 @@ loadsgf games/strategy19.sgf 94
 # I have added R17, as it seems to kill the huge black dragon --arend
 loadsgf games/semeai2.sgf 116
 73 gg_genmove white
-#? [F7|R17]
+#? [F7|R17]*
 
 # I have added R17, as it seems to kill the huge black dragon --arend
 loadsgf games/semeai2.sgf 118

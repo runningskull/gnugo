@@ -113,6 +113,6 @@
 #define PACKAGE "gnugo"
 
 /* Version number of package */
-#define VERSION "3.1.19"
+#define VERSION "3.1.20"
 
 #pragma warning(disable: 4244 4305)

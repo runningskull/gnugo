@@ -82,7 +82,7 @@ loadsgf games/incident121.sgf 122
 22 owl_attack P12
 #? [1 (PASS|S11|S14|N13)]
 23 owl_defend P12
-#? [0]
+#? [0]*
 
 # incident 154
 loadsgf games/incident153.sgf 205
@@ -623,7 +623,7 @@ loadsgf games/poka.sgf 42
 loadsgf games/owl23.sgf
 # This isolates the problem in test 4
 170 owl_attack B14
-#? [0]*
+#? [0]
 
 # incident 284
 loadsgf games/incident278.sgf 318
@@ -760,7 +760,7 @@ loadsgf games/owl26.sgf 10
 
 loadsgf games/owl26.sgf 138
 207 owl_defend L6
-#? [0]
+#? [0]*
 
 loadsgf games/incident248.sgf 228
 208 owl_attack J2
@@ -887,7 +887,7 @@ loadsgf games/marginal_ko.sgf
 244 owl_attack D11
 #? [(2|3) F11]
 245 owl_defend D11
-#? [1 (F11|H8|F8)]*
+#? [1 (F11|H8|F8)]
 246 owl_attack O9
 #? [3 (M6|Q8)]
 247 owl_defend O9

@@ -1,7 +1,7 @@
 orientation 2
 loadsgf games/incident85.sgf 104
 4 owl_defend B11
-#? [1 C12]*
+#? [1 C12]
 
 orientation 1
 loadsgf games/incident256.sgf 157
@@ -16,7 +16,7 @@ loadsgf games/incident263.sgf 32
 orientation 2
 loadsgf games/strategy25.sgf 63
 150 owl_attack D15
-#? [0]
+#? [0]*
 
 orientation 3
 loadsgf games/strategy33.sgf 15

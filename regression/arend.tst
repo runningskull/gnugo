@@ -2,7 +2,7 @@
 # SEVERITY=5
 loadsgf games/arend/gnugo-gnugo1.sgf 25
 1 gg_genmove black
-#? [C4]
+#? [C4]*
 
 # CATEGORY=KO
 # SEVERITY=3
@@ -14,7 +14,7 @@ loadsgf games/arend/gnugo-gnugo1.sgf 112
 # SEVERITY=10
 loadsgf games/arend/gnugo-gnugo1.sgf 139
 3 gg_genmove black
-#? [P6|Q5]*
+#? [P6|Q5]
 
 # These kind of fights might be very difficult to do well
 # with current GNU Go methods (How should it choose between the different
@@ -41,7 +41,7 @@ loadsgf games/arend/gnugo-gnugo2.sgf 57
 # should be accepted as well
 loadsgf games/arend/gnugo-gnugo2.sgf 60
 8 gg_genmove white
-#? [!S16]*
+#? [!S16]
 
 #CATEGORY=TACTICAL_READING
 # GNU Go rejects S17 because it is "strategically or tactically unsafe".
@@ -126,7 +126,7 @@ loadsgf games/arend/gnugo-gnugo5.sgf 80
 # H10 is quite overvalued here.
 loadsgf games/arend/gnugo-gnugo5.sgf 105
 23 gg_genmove black
-#? [!H10]*
+#? [!H10]
 
 # Low Shimari clearly better here
 loadsgf games/arend/gnugo-gnugo6.sgf 20
@@ -162,7 +162,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 79
 # B14 can (and should) be saved here
 loadsgf games/arend/gnugo-gnugo7.sgf 81
 31 gg_genmove black
-#? [B13|C13]*
+#? [B13|C13]
  
 #CATEGORY=CONNECTION
 #SEVERITY=9
@@ -189,7 +189,7 @@ loadsgf games/arend/gnugo-gnugo8.sgf 32
 # game.
 loadsgf games/arend/constructed1.sgf
 36 gg_genmove black
-#? [C5]
+#? [C5]*
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/arend/constructed2.sgf

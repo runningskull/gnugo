@@ -33,7 +33,7 @@ loadsgf games/life_and_death/ld3.sgf
 #? [critical (S6|T6|T7|T2) S6]
 # Attacking on F1 only gives a ko, which is a failure.
 12 dragon_status B2
-#? [critical B1 (E1|E2|B1)]
+#? [critical B1 (E1|E2|B1)]*
 
 loadsgf games/life_and_death/ld4.sgf
 13 dragon_status B18

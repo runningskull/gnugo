@@ -30,7 +30,7 @@ loadsgf games/incident189.sgf 186
 
 loadsgf games/ssstator.sgf 133
 156 gg_genmove black
-#? [B14|B16]
+#? [B14|B16]*
 
 loadsgf games/ssstator.sgf 136
 157 gg_genmove white
@@ -62,7 +62,7 @@ loadsgf games/strategy39.sgf 156
 # tm - P8, though not as clean, also kills all the B stones.
 loadsgf games/strategy39.sgf 158
 163 gg_genmove white
-#? [O7|P8]
+#? [O7|P8]*
 
 #### N4 is clearly superior to O5.
 #### tm - N4 has it's weaknesses (at O5) too.  Both clearly kill.
@@ -108,7 +108,7 @@ loadsgf games/strategy42.sgf 174
 # move is A5.
 loadsgf games/strategy42.sgf 188
 171 gg_genmove white
-#? [A5]*
+#? [A5]
 
 # It's correct to make a ko threat, but N9 is inefficient because it
 # doesn't utilize the full ko potential of the position. Locally M8 is
@@ -126,7 +126,7 @@ loadsgf games/strategy42.sgf 214
 # insufficient.
 loadsgf games/strategy42.sgf 218
 173 gg_genmove white
-#? [A9]*
+#? [A9]
 
 # Always take the ko at least once.
 loadsgf games/strategy42.sgf 248
@@ -159,7 +159,7 @@ loadsgf games/xxlin.sgf 16
 #Added E2 (3.1.14) -trevor
 loadsgf games/xxlin.sgf 20
 179 gg_genmove black
-#? [P3|O2|P2|O4|E2]*
+#? [P3|O2|P2|O4|E2]
 
 #The point of this problem is that Q8 is locally better than M7.
 #However, GNU Go reasonably tenukis.
@@ -234,7 +234,7 @@ loadsgf games/bretz.sgf 58
 
 loadsgf games/bretz.sgf 88
 195 gg_genmove black
-#? [!S14]*
+#? [!S14]
 
 loadsgf games/bretz.sgf 100
 196 gg_genmove black
@@ -258,7 +258,7 @@ loadsgf games/bretz.sgf 164
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 212
 200 gg_genmove black
-#? [P6|P7|Q7|S18]
+#? [P6|P7|Q7|S18]*
 
 loadsgf games/juka1.sgf 8
 201 gg_genmove black
@@ -266,7 +266,7 @@ loadsgf games/juka1.sgf 8
 
 loadsgf games/juka1.sgf 14
 202 gg_genmove black
-#? [B6]*
+#? [B6]
 
 loadsgf games/juka1.sgf 18
 203 gg_genmove black
@@ -314,7 +314,7 @@ loadsgf games/lordofpi.sgf 56
 # Pattern LE14 gives an unreasonable value to H3.
 loadsgf games/owl31.sgf 28
 212 gg_genmove white
-#? [G2]*
+#? [G2]
 
 loadsgf games/strategy46.sgf 172
 213 gg_genmove white

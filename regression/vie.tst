@@ -68,7 +68,7 @@ loadsgf golois/Goemate990903-12.sgf
 # This is more of a semeai. /gf
 loadsgf golois/Goemate990903-5.sgf
 16 owl_attack M4
-#? [0]
+#? [0]*
 
 
 # tm - running out at E6 looks fine.
@@ -156,7 +156,7 @@ loadsgf golois/MeilleurCoup0001.sgf
 
 loadsgf golois/MeilleurCoup0002.sgf
 37 owl_defend D4
-#? [1 B6]
+#? [1 B6]*
 
 # db added A4
 loadsgf golois/MeilleurCoup0003.sgf

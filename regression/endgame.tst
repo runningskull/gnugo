@@ -151,7 +151,7 @@ loadsgf games/endgame2.sgf 18
 
 loadsgf games/endgame2.sgf 19
 219 gg_genmove white
-#? [T17]
+#? [T17]*
 
 #################################################################
 # endgame3.sgf features a subtle "eventual shortage of liberties"
@@ -171,7 +171,7 @@ loadsgf games/endgame3.sgf
 
 loadsgf games/endgame4.sgf
 401 gg_genmove black
-#? [C4]*
+#? [C4]
 
 
 ############ End of Tests #################

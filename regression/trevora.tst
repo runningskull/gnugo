@@ -119,7 +119,7 @@ loadsgf games/trevor/auto/a011.sgf 14
 #Locally, C3 is much better than B3.
 loadsgf games/trevor/auto/a013.sgf 20
 250 gg_genmove white
-#? [C3]*
+#? [C3]
 
 
 
@@ -152,7 +152,7 @@ loadsgf games/trevor/auto/a015.sgf 20
 #Locally, E5 better than E4.
 loadsgf games/trevor/auto/a016.sgf 18
 280 gg_genmove white
-#? [!E4]*
+#? [!E4]
 
 
 
@@ -273,7 +273,7 @@ loadsgf games/trevor/auto/a026.sgf 16
 
 loadsgf games/trevor/auto/a027.sgf 40
 430 gg_genmove white
-#? [G4]*
+#? [G4]
 
 
 

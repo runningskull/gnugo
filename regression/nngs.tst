@@ -7,7 +7,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 20
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 22
 110 gg_genmove black
-#? [!L3]*
+#? [!L3]
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 30
@@ -81,17 +81,17 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 30
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 56
 250 gg_genmove black
-#? [!S15]
+#? [!S15]*
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 60
 260 gg_genmove black
-#? [O13|P14]*
+#? [O13|P14]
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 92
 270 gg_genmove black
-#? [!J6]*
+#? [!J6]
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 98
@@ -120,7 +120,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 8
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 12
 320 gg_genmove black
-#? [B15|B16]*
+#? [B15|B16]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 14
@@ -207,7 +207,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 92
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 226
 530 gg_genmove black
-#? [N5]
+#? [N5]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 234
@@ -217,7 +217,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 234
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 242
 550 gg_genmove black
-#? [!N6]*
+#? [!N6]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 272
@@ -265,7 +265,7 @@ loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 38
 
 loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 40
 640 gg_genmove white
-#? [!M11]
+#? [!M11]*
 
 
 
@@ -316,18 +316,18 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 113
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 233
 800 gg_genmove white
-#? [!N19|M19|L19|S18|K1]*
+#? [!N19|M19|L19|S18|K1]
 
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 241
 810 gg_genmove white
-#? [!H1]*
+#? [!H1]
 
 
 #J11 is terrible.
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 257
 820 gg_genmove white
-#? [J13|L9]
+#? [J13|L9]*
 
 
 
@@ -374,7 +374,7 @@ loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051411.sgf 19
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051823.sgf 21
 900 gg_genmove white
-#? [Q15]*
+#? [Q15]
 
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051823.sgf 43
@@ -397,12 +397,12 @@ loadsgf games/nngs/gnugo-3.1.18-bnh-200201061916.sgf 30
 
 loadsgf games/nngs/gnugo-3.1.18-bnh-200201061916.sgf 34
 930 gg_genmove white
-#? [S8]*
+#? [S8]
 
 
 loadsgf games/nngs/gnugo-3.1.18-bnh-200201061916.sgf 36
 940 gg_genmove white
-#? [!S18]*
+#? [!S18]
 
 
 
@@ -495,7 +495,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 92
 #Yikes!
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 98
 1100 gg_genmove white
-#? [!B19]*
+#? [!B19]
 
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 146
@@ -510,7 +510,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 154
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 158
 1130 gg_genmove white
-#? [B7|C8]*
+#? [B7|C8]
 
 
 
@@ -524,7 +524,7 @@ loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 42
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 54
 1150 gg_genmove white
-#? [!L7]*
+#? [!L7]
 
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 62
@@ -534,7 +534,7 @@ loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 62
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 80
 1170 gg_genmove white
-#? [K6|K8]*
+#? [K6|K8]
 
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 82
@@ -572,13 +572,13 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 24
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 28
 1230 gg_genmove white
-#? [!H3]*
+#? [!H3]
 
 
 #Locally, there are better moves than H14
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 42
 1240 gg_genmove white
-#? [!H14]*
+#? [!H14]
 
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 44
@@ -593,7 +593,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 68
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 90
 1270 gg_genmove white
-#? [C16|B15]*
+#? [C16|B15]
 
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 138
@@ -618,7 +618,7 @@ loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 16
 
 loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 20
 1320 gg_genmove white
-#? [O18]*
+#? [O18]
 
 
 loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 161
@@ -670,7 +670,7 @@ loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 24
 # Other moves possible, !G6
 loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 44
 1520 gg_genmove white
-#? [F15|F14]*
+#? [F15|F14]
 
 
 
@@ -708,7 +708,7 @@ loadsgf games/nngs/juka-gnugo-3.1.16-200112142153.sgf 6
 #M3 is antisuji!
 loadsgf games/nngs/juka-gnugo-3.1.16-200112142153.sgf 8
 1590 gg_genmove black
-#? [!M3]*
+#? [!M3]
 
 
 #Egads, don't tenuki here!
@@ -830,7 +830,7 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 97
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 117
 1860 gg_genmove black
-#? [!L7|D19]
+#? [!L7|D19]*
 
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 125
@@ -860,6 +860,6 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 177
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 205
 1920 gg_genmove black
-#? [!L11]*
+#? [!L11]
 
 

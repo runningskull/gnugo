@@ -24,7 +24,7 @@ loadsgf golois/Aya991113-3.sgf
 
 loadsgf golois/Aya991113-6.sgf
 7 gg_genmove black
-#? [A5]
+#? [A5]*
 
 loadsgf golois/Aya991113-7.sgf
 8 gg_genmove black
@@ -155,7 +155,7 @@ loadsgf golois/MeilleurCoup0002.sgf
 
 loadsgf golois/MeilleurCoup0003.sgf
 37 gg_genmove black
-#? [B6]
+#? [B6]*
 
 loadsgf golois/MeilleurCoup0004.sgf
 38 gg_genmove black

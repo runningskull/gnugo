@@ -621,7 +621,7 @@ loadsgf games/strategy11.sgf 77
 
 loadsgf games/trevor/auto/d12.sgf 66
 159 attack B14
-#? [0]*
+#? [0]
 
 loadsgf games/ssstator.sgf 133
 trymove black C1

@@ -220,12 +220,12 @@ loadsgf games/nicklas/nicklas14.sgf 51
 
 loadsgf games/nicklas/nicklas14.sgf 55
 1405 gg_genmove black
-#? [B7]
+#? [B7]*
 
 # Semeai problem
 loadsgf games/nicklas/nicklas14.sgf 57
 1406 gg_genmove black
-#? [B6]
+#? [B6]*
 
 loadsgf games/nicklas/nicklas14.sgf 61
 1408 dragon_status A8
