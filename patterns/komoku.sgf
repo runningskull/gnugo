@@ -7,7 +7,7 @@ PB[Black]
 GN[White (W) vs. Black (B)]
 DT[1999-05-27]
 SY[Cgoban 1.9.2]TM[5:00:00(5x1:00)];B[qd]
-(;W[od]PL[1]
+(;W[od]PL[B]
 (;B[oc]MA[mg]
 (;W[nc]MA[lg]C[U
 ];B[pc]MA[mf]C[U
@@ -78,17 +78,12 @@ C[:-,shape(8)
 )
 )
 
-(;B[ld]MA[ki]C[S]
-;W[of]MA[ki]C[U]
-;B[qf]MA[ki]C[S]
-;W[oh]MA[ki]C[S]
-;B[qh]MA[ki]C[S]
-;W[id]MA[ii]C[S]
-)
+(;B[ld]MA[ki]C[S];W[of]MA[ki]C[U];B[qf]MA[ki]C[S];W[oh]MA[ki]C[S];
+B[qh]MA[ki]C[S];W[id]MA[ii]C[S])
 )
 
 (;W[oc]
-(;B[pe]MA[mi]PL[1]
+(;B[pe]MA[mi]PL[B]
 (;W[md]C[
 ]MA[kg];B[pc]MA[jh]C[U
 ];W[od]MA[kh]C[:-,shape(5)
@@ -150,8 +145,9 @@ MA[ki];B[qj]C[:-,shape(5)
 (;B[kc]MA[ig]C[:-,shape(8)
 ])
 
-(;B[mc]MA[lf];W[oe]MA[lg];B[pf]MA[lh];W[md]MA[kh];B[ld];W[me]MA[kh];
-B[nc];W[od]MA[kg])
+(;B[mc]MA[kf]LB[kc:A]C[;!xarea(A)
+];W[oe]MA[lg];B[pf]MA[lh];W[md]
+MA[kh];B[ld];W[me]MA[kh];B[nc];W[od]MA[kg])
 )
 
 )

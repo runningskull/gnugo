@@ -5,8 +5,7 @@ updates that keeps track of the following information for each string:
 @item The color of the string.
 @item Number of stones in the string.
 @item Origin of the string, i.e. a canonical reference point, defined
-to be the stone with smallest @samp{i} coordinate and if there is a tie with
-smallest @samp{j} coordinate.
+to be the stone with smallest 1D board coordinate.
 @item A list of the stones in the string.
 @item Number of liberties.
 @item A list of the liberties. If there are too many liberties the list is
@@ -19,16 +18,15 @@ The basic data structure is
 
 @example
 struct string_data @{
-  int color;                  /* Color of string, BLACK or WHITE */
-  int size;                   /* Number of stones in string. */
-  int origini;                /* Coordinates of "origin", i.e. */
-  int originj;                /* "upper left" stone. */
-  int liberties;              /* Number of liberties. */
-  int libi[MAX_LIBERTIES];    /* Coordinates of liberties. */
-  int libj[MAX_LIBERTIES];
-  int neighbors;              /* Number of neighbor strings */
-  int neighborlist[MAXCHAIN]; /* List of neighbor string numbers. */
-  int mark;                   /* General purpose mark. */
+  int color;                       /* Color of string, BLACK or WHITE */
+  int size;                        /* Number of stones in string. */
+  int origin;                      /* Coordinates of "origin", i.e. */
+                                   /* "upper left" stone. */
+  int liberties;                   /* Number of liberties. */
+  int libs[MAX_LIBERTIES];         /* Coordinates of liberties. */
+  int neighbors;                   /* Number of neighbor strings */
+  int neighborlist[MAXCHAIN];      /* List of neighbor string numbers. */
+  int mark;                        /* General purpose mark. */
 @};
 
 struct string_data string[MAX_STRINGS];
@@ -39,24 +37,22 @@ It should be clear that almost all information is stored in the
 @code{string} array we have
 
 @example
-int string_number[MAX_BOARD][MAX_BOARD];
+static int string_number[BOARDMAX];
 @end example
 
 @noindent
 which contains indices into the @code{string} array. This information is only
 valid at nonempty vertices, however, so it is necessary to first
-verify that @code{p[i][j] != EMPTY}.
+verify that @code{board[pos] != EMPTY}.
 
 The @code{string_data} structure does not include an array of the stone
-coordinates. This information is stored in a separate array (or rather
-two):
+coordinates. This information is stored in a separate array:
 
 @example
-int next_stonei[MAX_BOARD][MAX_BOARD];
-int next_stonej[MAX_BOARD][MAX_BOARD];
+static int next_stone[BOARDMAX];
 @end example
 
-These arrays implement cyclic linked lists of stones. Each vertex
+This array implements cyclic linked lists of stones. Each vertex
 contains a pointer to another (possibly the same) vertex. Starting at
 an arbitrary stone on the board, following these pointers should
 traverse the entire string in an arbitrary order before coming back to
@@ -68,7 +64,7 @@ strings) and making it easy to add a new stone or join two strings.
 Additionally the code makes use of some work variables:
 
 @example
-static int ml[MAX_BOARD][MAX_BOARD];
+static int ml[BOARDMAX];
 static int liberty_mark;
 static int string_mark;
 static int next_string;
@@ -77,8 +73,8 @@ static int strings_initialized = 0;
 
 The @code{ml} array and @code{liberty_mark} are used to "mark" liberties on
 the board, e.g. to avoid counting the same liberty twice. The convention is
-that if @code{ml[i][j]} has the same value as @code{liberty_mark}, then
-@code{(i, j)} is marked. To clear all marks it suffices to increase the value
+that if @code{ml[pos]} has the same value as @code{liberty_mark}, then
+@code{pos} is marked. To clear all marks it suffices to increase the value
 of @code{liberty_mark}, since it is never allowed to decrease.
 
 The same relation holds between the @code{mark} field of the @code{string_data}
@@ -88,7 +84,7 @@ individual strings.
 @code{next_string} gives the number of the next available entry in the
 @code{string} array. Then @code{strings_initialized} is set to one when
 all data structures are known to be up to date. Given an arbitrary board
-position in the @samp{p} array, this is done by calling
+position in the @samp{board} array, this is done by calling
 @code{incremental_board_init()}. It is not necessary to call this
 function explicitly since any other function that needs the information
 does this if it has not been done.
@@ -175,17 +171,17 @@ straightforward anyway.
 The often used construction
 
 @example
-    FIRST_STONE(s, i, j);
+    pos = FIRST_STONE(s);
     do @{
         ...
-        NEXT_STONE(i, j);
-    @} while (!BACK_TO_FIRST_STONE(s, i, j));
+        pos = NEXT_STONE(pos);
+    @} while (!BACK_TO_FIRST_STONE(s, pos));
 @end example
 
 @noindent
 traverses the stones of the string with number @samp{s} exactly once,
-with @code{(i, j)} holding the coordinates. In general @code{(i, j)} are
-used as board coordinates and @samp{s} as an index into the
+with @code{pos} holding the coordinates. In general @code{pos} is
+used as board coordinate and @samp{s} as an index into the
 @code{string} array or sometimes a pointer to an entry in the
 @code{string} array.
 

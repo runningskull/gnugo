@@ -761,6 +761,23 @@ XOXa
 ;!oplay_attack(a,b)
 
 
+Pattern Barrier56b
+
+XXOo
+XO.,
+.X.,
+----
+
+:8,Ds
+
+xXOo
+XOa,
+.X.,
+----
+
+;safe_omove(a)
+
+
 Pattern Barrier57
 
 X,

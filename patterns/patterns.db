@@ -2155,6 +2155,7 @@ Pattern EC59
 
 Pattern EC60
 # tm added constraint (3.1.18)
+# gf Changed B classification to C. (3.1.18)
 
 ?O..           protect cut
 XO*X
@@ -2162,7 +2163,7 @@ XXO.
 ....
 ----
 
-:8,BO
+:8,CO
 
 ?O..
 XO*X
@@ -2175,6 +2176,7 @@ XXcA
 
 Pattern EC60a
 # tm New Pattern (3.1.18)
+# gf Changed B classification to C. (3.1.18)
 
 ?O..           indirectly protect cut
 XO.X
@@ -2182,7 +2184,7 @@ XXO*
 ....
 ----
 
-:8,BO
+:8,CO
 
 ?b..
 XOaX

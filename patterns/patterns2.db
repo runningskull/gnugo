@@ -2358,7 +2358,7 @@ bOXx
 ;(x_somewhere(D) || oplay_attack(*,?,D,D)) && !oplay_defend(*,a,b,c,*)
 
 
-Pattern Shape 76
+Pattern Shape76
 # tm New Pattern. (3.1.16) (see trevor:220)
 
 ----
@@ -2376,6 +2376,28 @@ DA*.
 ; xlib(A) > 2
 ; && oplay_attack(*,A,b,C,D)
 ; && oplay_attack(*,A,b,E,C,*)
+
+
+Pattern Shape77
+# gf New pattern. (3.1.18) (see trevor:382)
+
+oOO
+O..
+XO*
+---
+
+:8,-,shape(-3)
+
+
+Pattern Shape78
+# gf New pattern. (3.1.18) (see trevor:382)
+
+oOO
+O.*
+XO.
+---
+
+:8,-,shape(1)
 
 
 ###########################

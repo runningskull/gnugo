@@ -263,7 +263,9 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 19
 #? [L7]*
 
 # Here N11 is generated as an "additional attack/defense move", although
-# the black dragon is still dead after black connects at N11
+# the black dragon is still dead after black connects at N11.
+# 
+# The correct answer lists M10 which is occupied. Needs revision. /gf
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 27
 50 gg_genmove black
 #? [!N11|M10]

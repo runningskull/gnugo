@@ -3492,6 +3492,7 @@ Pattern A1303b
 
 
 Pattern A1304
+# gf Revised constraint. (3.1.18)
 
 |.XO          throw in threatening to destroy two corner eye vertices
 |.*X
@@ -3499,11 +3500,11 @@ Pattern A1304
 
 :8,s,value(60)
 
-|.XO
+|bXO
 |.*A
 +---
 
-;lib(A)==2
+;lib(A)==2 && !obvious_false_xeye(b)
 
 
 Pattern A1305

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- 1D conversion of incremental.texi
+- new function dragon_looks_inessential() in dragon.c
 - adjusted_worm_attack_value() revised
 - indented debug output of secondary move values
 - new local struct aa_move in combinations.c
