@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix: typo in store_persistent_reading_cache()
+- major cleanup in influence.[ch]
 - pre-rotated pattern generation in mkpat. (-p option) implemented.
 - %2m added as valid syntax for gprintf
 - relabel rotation matrices in transform.c
