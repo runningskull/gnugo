@@ -51,13 +51,9 @@
  */
 #define NOT_COMPUTED (-2.0 * MAX_BOARD * MAX_BOARD)
 
-/* Values for the float working area w when used only for marking. */
-#define UNMARKED 0.0
-#define MARKED 1.0
-
 /* Territory, moyo, and area are segmented into connected components
  * and given a number from the same series. These values are used in
- * region_type[][].
+ * region_type[].
  */
 #define WHITE_REGION    0
 #define BLACK_REGION    1
@@ -89,19 +85,19 @@ struct intrusion_data
 
 struct influence_data
 {
-  float white_influence[MAX_BOARD][MAX_BOARD]; /* Accumulated influence. */
-  float black_influence[MAX_BOARD][MAX_BOARD]; /* Accumulated influence. */
-  int p[MAX_BOARD][MAX_BOARD];           /* Working copy of board array. */
-  float white_strength[MAX_BOARD][MAX_BOARD];  /* Strength of influence source. */
-  float black_strength[MAX_BOARD][MAX_BOARD];  /* Strength of influence source. */
-  float white_attenuation[MAX_BOARD][MAX_BOARD]; /* Attenuation. */
-  float black_attenuation[MAX_BOARD][MAX_BOARD]; /* Attenuation. */
-  float white_permeability[MAX_BOARD][MAX_BOARD];
-  float black_permeability[MAX_BOARD][MAX_BOARD];
+  float white_influence[BOARDMAX]; 	/* Accumulated influence. */
+  float black_influence[BOARDMAX]; 	/* Accumulated influence. */
+  int p[BOARDMAX];           		/* Working copy of board array. */
+  float white_strength[BOARDMAX];  	/* Strength of influence source. */
+  float black_strength[BOARDMAX];  	/* Strength of influence source. */
+  float white_attenuation[BOARDMAX]; 
+  float black_attenuation[BOARDMAX];
+  float white_permeability[BOARDMAX];
+  float black_permeability[BOARDMAX];
 
-  int territory_segmentation[MAX_BOARD][MAX_BOARD];
-  int moyo_segmentation[MAX_BOARD][MAX_BOARD];
-  int area_segmentation[MAX_BOARD][MAX_BOARD];
+  int territory_segmentation[BOARDMAX];
+  int moyo_segmentation[BOARDMAX];
+  int area_segmentation[BOARDMAX];
   int region_type[MAX_REGIONS];
   int region_size[MAX_REGIONS];
   float region_territorial_value[MAX_REGIONS];
@@ -111,14 +107,12 @@ struct influence_data
   int is_territorial_influence; /* True for post-owl initial_influence,
 				 * move_influence, but not escape_influence.*/
 
-  float territory_value[MAX_BOARD][MAX_BOARD];
-  int non_territory[MAX_BOARD][MAX_BOARD];
+  float territory_value[BOARDMAX];
+  int non_territory[BOARDMAX];
 
   int color_to_move; /* Which color is in turn to move. */
   
-  float w[MAX_BOARD][MAX_BOARD];         /* Working area. */
-  int queuei[MAX_BOARD * MAX_BOARD];     /* Points receiving influence. */
-  int queuej[MAX_BOARD * MAX_BOARD];
+  int queue[MAX_BOARD * MAX_BOARD];     /* Points receiving influence. */
 
   int intrusion_counter;
   struct intrusion_data intrusions[MAX_INTRUSIONS];
@@ -127,7 +121,7 @@ struct influence_data
 /* Typedef for pointer to either of the functions whose_territory(),
  * whose_moyo(), and whose_area().
  */
-typedef int (*owner_function_ptr)(struct influence_data *q, int m, int n);
+typedef int (*owner_function_ptr)(struct influence_data *q, int pos);
 
 /*
  * Local Variables:

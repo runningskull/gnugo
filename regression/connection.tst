@@ -314,6 +314,10 @@ loadsgf games/reading39.sgf
 95 disconnect O4 P3
 #? [1 (N1|N2)]*
 
+loadsgf games/handtalk/handtalk1.sgf 31
+96 same_dragon C16 C13
+#? [0]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
