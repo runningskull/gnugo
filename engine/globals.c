@@ -102,6 +102,7 @@ int printboard       = 0;  /* print board each move */
 int count_variations = 0;  /* used by decide_string */
 int sgf_dump         = 0;  /* used by decide_string */
 SGFTree *sgf_dumptree = NULL;
+int random_seed      = 0;  /* random seed */
 int loading          = 0;  /* TRUE if last loaded move comes from file */
 int life             = 0;  /* use eye reading code */
 int life_eyesize     = 0;  /* max eyesize for life code */

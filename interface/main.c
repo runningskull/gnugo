@@ -824,7 +824,7 @@ main(int argc, char *argv[])
   if (!seed)
     seed = time(0);
   gg_srand(seed);
-  gameinfo.seed = seed;
+  random_seed = seed;
 
   
   /* Initialize the GNU Go engine. */

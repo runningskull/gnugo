@@ -205,7 +205,7 @@ sgffile_write_gameinfo(Gameinfo *ginfo, const char *gametype)
   fprintf(sgfout, "HA[%d]", ginfo->handicap);
   fprintf(sgfout, "KM[%.1f]", komi);
   fprintf(sgfout, "GN[GNU Go %s %s ", VERSION, gametype);
-  fprintf(sgfout, "Random Seed %d", ginfo->seed);
+  fprintf(sgfout, "Random Seed %d", random_seed);
   fprintf(sgfout, "] ");
   fprintf(sgfout, "\n");
   

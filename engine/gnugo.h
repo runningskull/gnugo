@@ -162,7 +162,6 @@ typedef struct {
   int       to_move;		/* whose move it currently is */
   SGFTree   game_record;	/* Game record in sgf format. */
 
-  int       seed;		/* random seed */
   int       computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
 
   char      outfilename[128];	/* Trickle file */
@@ -183,6 +182,8 @@ int  gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head,
 /*                           global variables                       */
 /* ================================================================ */
 
+/* Random seed */
+extern int random_seed;
 
 /* Miscellaneous debug options. */
 extern int quiet;		/* Minimal output. */

@@ -385,7 +385,6 @@ gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi)
   sgftree_clear(&ginfo->game_record);
 
   /* Info relevant to the computer player. */
-  ginfo->seed = 0;
   ginfo->computer_player = WHITE; /* Make an assumption. */
 
   ginfo->outfilename[0] = '\0';

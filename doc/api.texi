@@ -356,7 +356,6 @@ typedef struct @{
   int       to_move;            /* whose move it currently is */
   SGFTree   game_record;        /* Game record in sgf format. */
 
-  int       seed;               /* random seed */
   int       computer_player;    /* BLACK, WHITE, or EMPTY (used as BOTH) */
 
   char      outfilename[128];   /* Trickle file */
@@ -373,14 +372,8 @@ The SGF tree @code{game_record} is used to store all the moves in the entire
 game, including a header node which contains, among other things, komi
 and handicap.
 
-If one or both of the opponents is the computer, the fields @code{seed}
-and @code{computer_player} are used. Otherwise they can be
-ignored. @code{seed} is used to store the number used to seed the random
-number generator. Given the same moves from the opponent, GNU Go will
-try to vary its game somewhat using a random function. But if the random
-generator is given the same seed, GNU Go will always play the same
-move. This is good, e.g. when we debug the engine but could also be used
-for other purposes.
+If one or both of the opponents is the computer, the field
+@code{computer_player} is used. Otherwise it can be ignored.
 
 GNU Go can use a trickle file to continuously save all the moves of an
 ongoing game. This file can also contain information about internal
