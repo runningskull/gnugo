@@ -66,7 +66,18 @@ reset_reading_node_counter
 # Strategy5 275
 # Strategy5 276
 
-# for any of these problems, if PASS is a solution it is the best
+# Another list of problems which have turned up unexpected results
+# when modifying the semeai code:
+#
+# neurogo:14
+# strategy2:54
+# nngs:290
+# nngs:820
+# global:34
+# handtalk:20
+# tactics1:105
+
+# For any of the problems below, if PASS is a solution it is the best
 # solution. However the other solutions are acceptable.
 
 ############## semeai tests #################
@@ -147,7 +158,7 @@ loadsgf games/semeai/semeai9.sgf
 loadsgf golois/Goemate990902-1.sgf
 
 23 owl_analyze_semeai G12 G13
-#? [ALIVE DEAD (F15|G15|H15|PASS)]*
+#? [ALIVE DEAD (F15|G15|H15|E13|F13|PASS)]*
 
 24 owl_analyze_semeai G13 G12
 #? [DEAD ALIVE PASS]
@@ -216,6 +227,17 @@ loadsgf golois/Aya991113-13.sgf
 
 40 owl_analyze_semeai H9 R12
 #? [ALIVE DEAD (J4|H4)]*
+
+loadsgf games/semeai/semeai9.sgf
+41 owl_analyze_semeai A3 A5
+#? [ALIVE DEAD (PASS|B3|A6|B6|C5|D4|E3|E2|E1)]
+42 owl_analyze_semeai A5 A3
+#? [DEAD ALIVE PASS]
+43 owl_analyze_semeai A16 A12
+#? [ALIVE DEAD (A15|A11|B11|C14|C13|D12|D11|D10|D9|B9|A9)]
+44 owl_analyze_semeai A12 A16
+#? [ALIVE DEAD (A17|B17|C16|D16|E15|E14|F13|F12|F11|F10|F9|F8|B9|A9)]
+
 
 ########### end of semeai tests #################
 
