@@ -106,6 +106,9 @@ loadsgf games/strategy50.sgf
 277 gg_genmove white
 #? [R19]
 
+loadsgf games/vaughn.sgf 44
+278 gg_genmove black
+#? [!J11]
 
 
 ############ End of Tests #################

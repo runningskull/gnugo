@@ -1,0 +1,46 @@
+(;GM[1]FF[3]
+US[Mike 
+Vaughn]
+DT[2002-12-11]
+HA[6]KM[0.5]SZ[19]
+RE[W+3.5]
+BR[13k]
+PB[GNU Go]
+WR[5k]
+PW[Mike Vaughn]
+AB[pd][dp][pp][dd][dj][pj]BS[0]WS[0]KI[1];
+W[fq];B[dn];W[mp];B[pn];W[dl];B[fo];W[go];B[qg];W[jd];B[lc];W[fc];
+B[fd];W[gd];B[fe];W[ec];B[dc];W[df];B[de];W[cf];B[eg];W[ef];B[ff];
+W[ci];B[gc];W[hc];B[gb];W[pl];B[hd];W[ge]
+C[Now B 
+can just play J 16 and W is finished. Instead, the ladder
+is miscalculated -- B did not
+grasp the ladder breaker.]
+;B[he];W[gf];B[ke];W[hb];B[fb];W[eb];B[gg];W[hf];B[if];W[hg];B[hh];
+W[ig];B[jg];W[ih];B[ii];W[jh];B[kh];W[ji];B[jj];W[ki];B[li];W[kj];
+B[kk];W[lj];B[lh]
+C[After taking about 3 minutes per move 
+running up the ladder, B fianlly gets 
+it.]
+;W[gh];B[nn];W[mj];B[er];W[fr];B[eq];W[oq];B[pq];W[fg];B[bc];W[cb];
+B[nq];W[mq];B[nr];W[mr];B[cj];W[cm];B[fj];W[fl];B[dh];W[eh];B[dg];
+W[ch];B[di];W[be];B[hj];W[jk];B[gm];W[gl];B[cn];W[fn];B[bl];W[bm];
+B[bj];W[cg];B[ij];W[ik];B[gk];W[hk];B[gp];W[fp];B[hp];W[eo];B[hl];
+W[hm];B[hr];W[jq];B[ir];W[ln];B[jr];W[ho];B[gr];W[es];B[cl];W[dm];
+B[ck];W[fk];B[jl];W[il];B[db];W[da];B[op];W[jf];B[pc];W[np];B[or];
+W[mm];B[ok];W[nk];B[ol];W[nh];B[bn];W[am];B[ds];W[fs];B[cr];W[an];
+B[me];W[bp];B[bs];W[do];B[jb];W[fa];B[ms];W[ls];B[ns];W[kr];B[bq];
+W[cp];B[kg];W[nf];B[ne];W[ar];B[aq];W[dq];B[of];W[og];B[pg];W[ph];
+B[qh];W[lf];B[mi];W[ni];B[kf];W[je];B[pi];W[le];B[ld];W[mf];B[kd];
+W[jc];B[ib];W[ic];B[kc];W[ia];B[ka];W[nm];B[om];W[no];B[oh];W[ng];
+B[cq];W[ep];B[dr];W[oo];B[on];W[po];B[qo];W[oi];B[nl];W[ml];B[mn];
+W[lo];B[ap];W[ao];B[dp];W[kb];B[lb];W[cc];B[ph];W[ha];B[ja];W[mo];
+B[dq];W[gj];B[lg];W[nj];B[oj];W[mh];B[mg]
+TB[kb][la][ma][na][oa][pa][qa][ra][sa][mb][mc][md][nd][nc][oc][ob][nb][pb][qb][rb][sb][sc][sd][se][sf][sg][sh][si][sj][sk][sl][sm][sn][so][sp][sq][os][ps][qs][rs][ss][sr][oq][pr][qr][rr][rq][rp][ro][rn][rm][rl][rk][rj][ri][rh][rg][rf][re][rd][rc][od][oe][pe][pd][qd][qc][qe][qf][pf][qi][qj][qk][ql][qm][qn][qp][qq][pm][pl][pk][br][ar][cs][as]
+TC[-153]
+TW[ga][gb][fb][gc][hd][he][ie][id][if][kk][lk][mk][jl][kl][ll][im][jm][km][lm][lr][lq][lp][kp][jp][ip][hp][gp][gs][hs][is][js][ks][kq][jr][ir][hr][hq][gq][gr][iq][io][jo][ko][kn][jn][in][hn][gn][gm][fm][em][en][dn][cn][bn][bo][co][fo][el][hl][gk][jj][ij][hj][hi][hh][ii][gi][gf][fh][fi][fj][ej][dj][cj][bj][aj][ak][al][bl][cl][ck][bk][dk][ek][ei][di][dh][dg][eg][ff][fe][fd][ed][ee][de][dd][dc][db][ea][ca][ba][aa][ab][ac][ad][ae][af][ag][ah][ai][bi][bh][bg][bf][bb][bc][bd][cd][ce]
+C[In this position, GnuGo could not
+compute the score, counting
+odd bits of territory to give
+a result of W 10.5 to B 7.]
+)
