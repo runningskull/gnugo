@@ -1135,7 +1135,8 @@ do_owl_analyze_semeai(int apos, int bpos,
       include_semeai_worms_in_eyespace = 1;
       if (!owl_estimate_life(owla, owlb, vital_defensive_moves,
 			     &live_reasona, 0, &dummy_eyes,
-			     &eyemin_a, &eyemax_a)) {
+			     &eyemin_a, &eyemax_a)
+	  && eyemax_a < 2) {
 	include_semeai_worms_in_eyespace = 0;
 	*resulta = 0;
 	*resultb = 0;
