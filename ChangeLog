@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- increase search depth after filling liberties in
+  endgame_find_backfilling_dame()
+- try harder to find a safe backfilling move in
+  endgame_find_backfilling_dame()
 - revised heuristics to find a font file in view.pike
 - avoid crashing on bad engine paths when starting a new engine in
   view.pike

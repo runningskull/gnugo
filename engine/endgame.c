@@ -399,6 +399,8 @@ endgame_find_backfilling_dame(int str, int color_to_move)
   int false_eye_libs[MAXLIBS];
   int dpos;
   int loop_again = 1;
+  int potential_moves[BOARDMAX];
+  int num_potential_moves = 0;
   int move = NO_MOVE;
 
   while (loop_again) {
@@ -411,29 +413,38 @@ endgame_find_backfilling_dame(int str, int color_to_move)
       if (!safe_move(inessential_libs[k], other)
 	  || !trymove(inessential_libs[k], other, "endgame", str))
 	continue;
+      increase_depth_values();
       if (board[str] == EMPTY)
 	break;
       if (attack_and_defend(str, NULL, NULL, NULL, &dpos)) {
-	if (worm[dpos].color == EMPTY) 
-	  move = dpos;
+	if (worm[dpos].color == EMPTY) {
+	  potential_moves[num_potential_moves] = dpos;
+	  num_potential_moves++;
+	}
 	forced_backfilling_moves[dpos] = 1;
-	trymove(dpos, color, "endgame", str);
+	if (trymove(dpos, color, "endgame", str))
+	  increase_depth_values();
 	loop_again = 1;
 	break;
       }
     }
   }
   
-  while (stackp > 0)
+  while (stackp > 0) {
     popgo();
+    decrease_depth_values();
+  }
 
-  if (move != NO_MOVE && safe_move(move, color)) {
-    TRACE("  backfilling dame found at %1m for string %1m\n", move, str);
-    if (color == color_to_move) {
-      add_expand_territory_move(move);
-      set_minimum_territorial_value(move, 0.1);
+  for (k = num_potential_moves - 1; k >= 0; k--)
+    if (safe_move(potential_moves[k], color)) {
+      move = potential_moves[k];
+      TRACE("  backfilling dame found at %1m for string %1m\n", move, str);
+      if (color == color_to_move) {
+	add_expand_territory_move(move);
+	set_minimum_territorial_value(move, 0.1);
+      }
+      break;
     }
-  }    
 }
 
 /* Find liberties of the string str with various characteristics. See
