@@ -317,15 +317,20 @@ display_board_intersection(int i, int j, int color)
 }
 
 void
-display_board_position(Position *pos, display_board_function *func)
+display_board_position(display_board_function *func)
 {
   int  ch;
   int  i;
   int  j;
+  int  board[MAX_BOARD][MAX_BOARD];
+  int  boardsize;
 
-  for (i = 0; i < pos->boardsize; ++i)
-    for (j = 0; j < pos->boardsize; ++j) {
-      switch (pos->board[i][j]) {
+  gnugo_get_board(board);
+  boardsize = gnugo_get_boardsize();
+  
+  for (i = 0; i < boardsize; ++i)
+    for (j = 0; j < boardsize; ++j) {
+      switch (board[i][j]) {
       case EMPTY: ch = '.'; break;
       case BLACK: ch = 'X'; break;
       case WHITE: ch = 'O'; break;

@@ -1455,7 +1455,7 @@ estimate_territorial_value(int pos, int color, float score)
        * This does not apply if we are doing scoring.
        */
       if (!doing_scoring
-	  && is_same_dragon(last_moves[0], aa)) {
+	  && is_same_dragon(get_last_opponent_move(color), aa)) {
 	this_value = 1.5 * dragon[aa].effective_size;
 	TRACE("  %1m: %f - attack last move played, although it seems dead\n",
 	      pos, this_value);
@@ -2397,6 +2397,7 @@ reevaluate_ko_threats(int ko_move, int color)
       else
         if (trymove(pos, color, "reevaluate_ko_threats", ko_move,
                     EMPTY, ko_move)) {
+	  ASSERT_ON_BOARD1(ko_stone);
           if (!find_defense(ko_stone, &opp_ko_move))
             threat_does_work = 1;
           else {

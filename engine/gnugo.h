@@ -105,11 +105,12 @@ void init_gnugo(float memory);
 
 
 /* Board sizes */
-#define MIN_BOARD     5		/* minimum supported board size */
-#define MAX_BOARD    19         /* maximum supported board size */
-#define MAX_HANDICAP  9		/* maximum supported handicap   */
+#define MIN_BOARD          5	   /* Minimum supported board size.   */
+#define MAX_BOARD         19       /* Maximum supported board size.   */
+#define MAX_HANDICAP       9	   /* Maximum supported handicap.     */
+#define MAX_MOVE_HISTORY 500       /* Max number of moves remembered. */
 
-/* This type is used to store each piece on the board.
+/* This type is used to store each intersection on the board.
  *
  * On a 486, char is best, since the time taken to push and pop
  * becomes significant otherwise. On other platforms, an int may
@@ -119,44 +120,36 @@ void init_gnugo(float memory);
 
 typedef unsigned char Intersection;
 
-typedef struct {
-  int          boardsize;
-  Intersection board[MAX_BOARD][MAX_BOARD];
-  int          ko_pos;
-  int          last[2];
 
-  float        komi;
-  int          white_captured;
-  int          black_captured;
-} Position;
-
-void gnugo_clear_position(Position *pos, int boardsize, float komi);
-void gnugo_copy_position(Position *to, Position *from);
-void gnugo_add_stone(Position *pos, int i, int j, int color);
-void gnugo_remove_stone(Position *pos, int i, int j);
+void gnugo_clear_board(int boardsize);
+void gnugo_set_komi(float new_komi);
+void gnugo_add_stone(int i, int j, int color);
+void gnugo_remove_stone(int i, int j);
 int  gnugo_is_pass(int i, int j);
-void gnugo_play_move(Position *pos, int i, int j, int color);
-int  gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move);
-int  gnugo_play_sgftree(Position *position, SGFNode *root, int *until, 
-			SGFNode **curnode);
-int  gnugo_is_legal(Position *pos, int i, int j, int color);
-int  gnugo_is_suicide(Position *pos, int i, int j, int color);
+void gnugo_play_move(int i, int j, int color);
+int  gnugo_undo_move(int n);
+int  gnugo_play_sgfnode(SGFNode *node, int to_move);
+int  gnugo_play_sgftree(SGFNode *root, int *until, SGFNode **curnode);
+int  gnugo_is_legal(int i, int j, int color);
+int  gnugo_is_suicide(int i, int j, int color);
 
-int  gnugo_placehand(Position *pos, int handicap);
-int  gnugo_sethand(Position *pos, int handicap, SGFNode *root);
-void gnugo_recordboard(Position *pos, SGFNode *node);
+int  gnugo_placehand(int handicap);
+int  gnugo_sethand(int handicap, SGFNode *root);
+void gnugo_recordboard(SGFNode *node);
 
-int  gnugo_genmove(Position *pos, int *i, int *j, int color,
-		   int move_number);
+int  gnugo_genmove(int *i, int *j, int color);
 
-int  gnugo_attack(Position *pos, int m, int n, int *i, int *j);
-int  gnugo_find_defense(Position *pos, int m, int n, int *i, int *j);
+int  gnugo_attack(int m, int n, int *i, int *j);
+int  gnugo_find_defense(int m, int n, int *i, int *j);
 
-void  gnugo_who_wins(Position *pos, int color, FILE *outfile);
-float gnugo_estimate_score(Position *pos, float *upper, float *lower);
-void  gnugo_force_to_globals(Position *pos);
-void  gnugo_examine_position(Position *pos, int color, int how_much);
+void  gnugo_who_wins(int color, FILE *outfile);
+float gnugo_estimate_score(float *upper, float *lower);
+void  gnugo_examine_position(int color, int how_much);
 
+int  gnugo_get_komi(void);
+void gnugo_get_board(int b[MAX_BOARD][MAX_BOARD]);
+int  gnugo_get_boardsize(void);
+int  gnugo_get_move_number(void);
 
 /* ================================================================ */
 /*                           Game handling                          */
@@ -166,10 +159,8 @@ void  gnugo_examine_position(Position *pos, int color, int how_much);
 typedef struct {
   int       handicap;
 
-  Position  position;
-  int       move_number;
   int       to_move;		/* whose move it currently is */
-  SGFTree   moves;		/* The moves in the game. */
+  SGFTree   game_record;	/* Game record in sgf format. */
 
   int       seed;		/* random seed */
   int       computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
@@ -183,7 +174,7 @@ void gameinfo_print(Gameinfo *ginfo);
 void gameinfo_load_sgfheader(Gameinfo *gameinfo, SGFNode *head);
 void gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color);
 int  gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
-			   const char *untilstr, int orientation);
+			       const char *untilstr, int orientation);
 int  gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head,
 			   const char *untilstr);
 
@@ -204,9 +195,6 @@ extern int printboard;		/* print board each move */
 extern int showstack;		/* debug stack pointer */
 extern int showstatistics;	/* print statistics */
 extern int profile_patterns;	/* print statistics of pattern usage */
-
-/* FIXME: This should be in liberty.h. */
-extern int last_moves[2];
 
 /* debug flag bits */
 /* NOTE : can specify -d0x... */
@@ -430,6 +418,9 @@ void setup_board(Intersection new_board[MAX_BOARD][MAX_BOARD], int ko_pos,
 void add_stone(int pos, int color);
 void remove_stone(int pos);
 void play_move(int pos, int color);
+int undo_move(int n);
+int get_last_move(void);
+int get_last_opponent_move(int color);
 int is_pass(int pos);
 int is_legal(int pos, int color);
 int is_suicide(int pos, int color);

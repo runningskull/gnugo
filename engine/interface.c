@@ -46,108 +46,36 @@ init_gnugo(float memory)
 }
 
 
-/*
- * Put the values in POS into the global variables which is the
- * equivalent of the position.  
- */
-
-static void
-position_to_globals(Position *pos)
-{
-  board_size = pos->boardsize;
-  setup_board(pos->board, pos->ko_pos, pos->last, pos->komi,
-	      pos->white_captured, pos->black_captured);
-}
-
-
-/*
- * Get the values in POS from the global variables which is the
- * equivalent of the position.
- */
-
-static void
-globals_to_position(Position *pos)
-{
-  int k;
-  int m, n;
-
-  pos->boardsize = board_size;
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      pos->board[m][n] = BOARD(m, n);
-
-  pos->ko_pos = board_ko_pos;
-  for (k = 0; k < 2; k++)
-    pos->last[k] = last_moves[k];
-
-  pos->komi = komi;
-  pos->white_captured = white_captured;
-  pos->black_captured = black_captured;
-}
-
-
-/* ---------------------------------------------------------------- */
-
-void
-store_position(Position *pos)
-{
-  globals_to_position(pos);
-}
-
-void
-restore_position(Position *pos)
-{
-  position_to_globals(pos);
-}
-
 /* ---------------------------------------------------------------- */
 
 /*
- * Clear a position.
+ * Clear the board.
  */
-/* FIXME: komi is already included among the globals? */
 void
-gnugo_clear_position(Position *pos, int boardsize, float komi)
+gnugo_clear_board(int boardsize)
 {
   gg_assert(MIN_BOARD <= boardsize && boardsize <= MAX_BOARD);
   board_size = boardsize;
   clear_board();
-  globals_to_position(pos);
-  pos->komi = komi;
 }
 
 
-/* Copy a position */
-void
-gnugo_copy_position(Position *to, Position *from)
+void gnugo_set_komi(float new_komi)
 {
-  memcpy(to, from, sizeof(Position));
+  komi = new_komi;
 }
 
-/* Wrapper for position_to_globals */
 void
-gnugo_force_to_globals(Position *pos)
+gnugo_add_stone(int i, int j, int color)
 {
-  position_to_globals(pos);
-}
-
-/* Interface to add_stone */
-void
-gnugo_add_stone(Position *pos, int i, int j, int color)
-{
-  position_to_globals(pos);
   add_stone(POS(i, j), color);
-  globals_to_position(pos);
 }
 
 
-/* Interface to remove_stone */
 void
-gnugo_remove_stone(Position *pos, int i, int j)
+gnugo_remove_stone(int i, int j)
 {
-  position_to_globals(pos);
   remove_stone(POS(i, j));
-  globals_to_position(pos);
 }
 
 int
@@ -156,16 +84,17 @@ gnugo_is_pass(int i, int j)
   return is_pass(POS(i, j));
 }
 
-/* Interface to play_move */
 void
-gnugo_play_move(Position *pos, int i, int j, int color)
+gnugo_play_move(int i, int j, int color)
 {
-  position_to_globals(pos);
-
   play_move(POS(i, j), color);
   clock_push_button(color);
+}
 
-  globals_to_position(pos);
+int
+gnugo_undo_move(int n)
+{
+  return undo_move(n);
 }
 
 
@@ -175,7 +104,7 @@ gnugo_play_move(Position *pos, int i, int j, int color)
  */
 
 int
-gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move)
+gnugo_play_sgfnode(SGFNode *node, int to_move)
 {
   int i, j;
   SGFProperty *prop;
@@ -184,14 +113,14 @@ gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move)
     switch (prop->name) {
     case SGFAB:
       /* A black stone. */
-      get_moveXY(prop, &i, &j, pos->boardsize);
-      gnugo_add_stone(pos, i, j, BLACK);
+      get_moveXY(prop, &i, &j, board_size);
+      gnugo_add_stone(i, j, BLACK);
       break;
 
     case SGFAW:
       /* A white stone. */
-      get_moveXY(prop, &i, &j, pos->boardsize);
-      gnugo_add_stone(pos, i, j, WHITE);
+      get_moveXY(prop, &i, &j, board_size);
+      gnugo_add_stone(i, j, WHITE);
       break;
 
     case SGFPL:
@@ -206,8 +135,8 @@ gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move)
     case SGFB:
       /* An ordinary move. */
       to_move = (prop->name == SGFW) ? WHITE : BLACK;
-      get_moveXY(prop, &i, &j, pos->boardsize);
-      gnugo_play_move(pos, i, j, to_move);
+      get_moveXY(prop, &i, &j, board_size);
+      gnugo_play_move(i, j, to_move);
       to_move = OTHER_COLOR(to_move);
       break;
     }
@@ -222,8 +151,7 @@ gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move)
  * Return whose turn it is to move (WHITE or BLACK).
  */
 int
-gnugo_play_sgftree(Position *position, SGFNode *root, int *until, 
-		   SGFNode **curnode)
+gnugo_play_sgftree(SGFNode *root, int *until, SGFNode **curnode)
 {
   SGFNode *node;
   int next = BLACK;
@@ -232,19 +160,19 @@ gnugo_play_sgftree(Position *position, SGFNode *root, int *until,
   int movenumber = 0;
 
   /* Start from the empty board. */
-  gnugo_clear_position(position, position->boardsize, komi);
+  gnugo_clear_board(board_size);
 
   for (node = root; node; node = node->child) {
     for (prop = node->props; prop; prop = prop->next) {
       switch (prop->name) {
       case SGFAB:
-	get_moveXY(prop, &i, &j, position->boardsize);
-	gnugo_add_stone(position, i, j, BLACK);
+	get_moveXY(prop, &i, &j, board_size);
+	gnugo_add_stone(i, j, BLACK);
 	break;
 
       case SGFAW:
-	get_moveXY(prop, &i, &j, position->boardsize);
-	gnugo_add_stone(position, i, j, WHITE);
+	get_moveXY(prop, &i, &j, board_size);
+	gnugo_add_stone(i, j, WHITE);
 	break;
 
       case SGFPL:
@@ -257,13 +185,13 @@ gnugo_play_sgftree(Position *position, SGFNode *root, int *until,
       case SGFW:
       case SGFB:
 	next = prop->name == SGFW ? WHITE : BLACK;
-	get_moveXY(prop, &i, &j, position->boardsize);
+	get_moveXY(prop, &i, &j, board_size);
 	movenumber++;
 	if (movenumber == *until) {
 	  *curnode = node->parent;
 	  return next;
 	}
-	gnugo_play_move(position, i, j, next);
+	gnugo_play_move(i, j, next);
 	next = OTHER_COLOR(next);
 	break;
       }
@@ -277,116 +205,95 @@ gnugo_play_sgftree(Position *position, SGFNode *root, int *until,
 
 /* Interface to is_legal. */
 int
-gnugo_is_legal(Position *pos, int i, int j, int color)
+gnugo_is_legal(int i, int j, int color)
 {
-  int retval;
-
-  position_to_globals(pos);
-  retval = is_legal(POS(i, j), color);
-
-  return retval;
+  return is_legal(POS(i, j), color);
 }
 
 
 /* Interface to is_suicide. */
 int
-gnugo_is_suicide(Position *pos, int i, int j, int color)
+gnugo_is_suicide(int i, int j, int color)
 {
-  int retval;
-
-  position_to_globals(pos);
-  retval = is_suicide(POS(i, j), color);
-
-  return retval;
+  return is_suicide(POS(i, j), color);
 }
 
 
 /* Interface to placehand. Sets up handicap pieces and
  * returns the number of placed handicap stones. */
 int
-gnugo_placehand(Position *pos, int handicap)
+gnugo_placehand(int handicap)
 {
-  int retval;
-
-  position_to_globals(pos);
-  retval = placehand(handicap);
-  globals_to_position(pos);
-
-  return retval;
+  return placehand(handicap);
 }
 
 
 /* Interface to sgffile_recordboard */
 void
-gnugo_recordboard(Position *pos, SGFNode *root)
+gnugo_recordboard(SGFNode *root)
 {
-  position_to_globals(pos);
   sgffile_recordboard(root);
 }
 
-/* Interface to placehand. Sets up handicap pieces and
+/* Interface to placehand. Sets up handicap stones and
  * returns the number of placed handicap stones, updating the sgf file
  */
 int
-gnugo_sethand(Position *pos, int handicap, SGFNode *node)
+gnugo_sethand(int handicap, SGFNode *node)
 {
-  int stones;
-
-  position_to_globals(pos);
-  stones = placehand(handicap);
+  int stones = placehand(handicap);
   sgffile_recordboard(node);
-  globals_to_position(pos);
-
   return stones;
 }
 
 
 /* Interface to genmove */
 int
-gnugo_genmove(Position *pos, int *i, int *j, int color, int move_number)
+gnugo_genmove(int *i, int *j, int color)
 {
-  position_to_globals(pos);
-  movenum = move_number;	/* Another global */
   return genmove(i, j, color);
 }
 
-/* Interface to attack*/
+/* Interface to attack */
 int
-gnugo_attack(Position *pos, int m, int n, int *i, int *j)
+gnugo_attack(int m, int n, int *i, int *j)
 {
   int retval;
   int move;
 
-  position_to_globals(pos);
   retval = attack(POS(m, n), &move);
 
-  if (i) *i = I(move);
-  if (j) *j = J(move);
+  if (i)
+    *i = I(move);
+  if (j)
+    *j = J(move);
+  
   return retval;
 }
 
 
 /* Interface to find_defense */
 int
-gnugo_find_defense(Position *pos, int m, int n, int *i, int *j)
+gnugo_find_defense(int m, int n, int *i, int *j)
 {
   int retval;
   int move;
 
-  position_to_globals(pos);
   retval = find_defense(POS(m, n), &move);
 
-  if (i) *i = I(move);
-  if (j) *j = J(move);
+  if (i)
+    *i = I(move);
+  if (j)
+    *j = J(move);
+
   return retval;
 }
 
 
 /* Interface to who_wins */
 void
-gnugo_who_wins(Position *pos, int color, FILE *outfile)
+gnugo_who_wins(int color, FILE *outfile)
 {
-  position_to_globals(pos);
   who_wins(color, outfile);
 }
 
@@ -398,20 +305,43 @@ gnugo_who_wins(Position *pos, int color, FILE *outfile)
  */
 
 float
-gnugo_estimate_score(Position *pos, float *upper, float *lower)
+gnugo_estimate_score(float *upper, float *lower)
 {
-  position_to_globals(pos);
   return estimate_score(lower, upper);
 }
 
 
 void
-gnugo_examine_position(Position *pos, int color, int how_much)
+gnugo_examine_position(int color, int how_much)
 {
-  position_to_globals(pos);
   examine_position(color, how_much);
 }
 
+
+/* Accessor functions for internal board state. */
+
+int gnugo_get_komi()
+{
+  return komi;
+}
+
+void gnugo_get_board(int b[MAX_BOARD][MAX_BOARD])
+{
+  int i, j;
+  for (i = 0; i < board_size; i++)
+    for (j = 0; j < board_size; j++)
+      b[i][j] = BOARD(i, j);
+}
+
+int gnugo_get_boardsize()
+{
+  return board_size;
+}
+
+int gnugo_get_move_number()
+{
+  return movenum;
+}
 
 /* ================================================================ */
 /*                             Gameinfo                             */
@@ -427,14 +357,14 @@ gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi)
 {
   ginfo->handicap = 0;
   
-  ginfo->move_number = 0;
-  gnugo_clear_position(&(ginfo->position), boardsize, komi);
+  gnugo_clear_board(boardsize);
+  gnugo_set_komi(komi);
   ginfo->to_move = BLACK;
-  sgftree_clear(&ginfo->moves);
+  sgftree_clear(&ginfo->game_record);
 
   /* Info relevant to the computer player. */
-  ginfo->seed = 0.0;
-  ginfo->computer_player = WHITE; /* Make an assumtion. */
+  ginfo->seed = 0;
+  ginfo->computer_player = WHITE; /* Make an assumption. */
 
   ginfo->outfilename[0] = '\0';
   ginfo->outfile = NULL;
@@ -448,10 +378,10 @@ gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi)
 void
 gameinfo_print(Gameinfo *ginfo)
 {
-  printf("Board Size:   %d\n", ginfo->position.boardsize);
+  printf("Board Size:   %d\n", board_size);
   printf("Handicap      %d\n", ginfo->handicap);
-  printf("Komi:         %.1f\n", ginfo->position.komi);
-  printf("Move Number:  %d\n", ginfo->move_number);
+  printf("Komi:         %.1f\n", komi);
+  printf("Move Number:  %d\n", movenum);
 
   printf("To Move:      %s\n", color_to_string(ginfo->to_move));
 
@@ -482,7 +412,9 @@ gameinfo_load_sgfheader(Gameinfo *gameinfo, SGFNode *head)
     bsize = 19;
   if (!sgfGetFloatProperty(head, "KM", &komi))
     komi = 5.5;
-  gnugo_clear_position(&gameinfo->position, bsize, komi);
+  
+  gnugo_clear_board(bsize);
+  gnugo_set_komi(komi);
   
   if (!sgfGetIntProperty(head, "HA", &handicap) || handicap < 0)
     /* Handicap stones should appear as AW, AB properties in the sgf file. */
@@ -505,12 +437,11 @@ gameinfo_load_sgfheader(Gameinfo *gameinfo, SGFNode *head)
 void
 gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color)
 {
-  gnugo_play_move(&ginfo->position, i, j, color);
-  sgftreeAddPlay(&ginfo->moves, 0, color, i, j);
+  gnugo_play_move(i, j, color);
+  sgftreeAddPlay(&ginfo->game_record, 0, color, i, j);
 
   sgffile_move_made(i, j, color, 0);
 
-  ginfo->move_number++;
   ginfo->to_move = OTHER_COLOR(color);
 }
 
@@ -550,7 +481,8 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
   }
   if (!sgfGetIntProperty(head, "SZ", &bs))
     bs = 19;
-  gnugo_clear_position(&gameinfo->position, bs, komi);
+  gnugo_clear_board(bs);
+  gnugo_set_komi(komi);
 
   /* Now we can safely parse the until string (which depends on board size). */
   if (untilstr) {
@@ -563,7 +495,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
       if (*untilstr >= 'I')
 	--untiln;
 	  
-      untilm = gameinfo->position.boardsize - atoi(untilstr+1);
+      untilm = board_size - atoi(untilstr+1);
       DEBUG(DEBUG_LOADSGF, "Loading until move at %d,%d (%m)\n", 
 	    untilm, untiln, untilm, untiln);
     }
@@ -589,35 +521,31 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	    prop->name & 0xff, (prop->name >> 8), prop->value);
       switch (prop->name) {
       case SGFAB:
-	get_moveXY(prop, &i, &j, gameinfo->position.boardsize);
+	get_moveXY(prop, &i, &j, board_size);
 	/* Generally the last move is unknown when the AB or AW
 	 * properties are encountered. These are used to set up
 	 * a board position (diagram) or to place handicap stones
 	 * without reference to the order in which the stones are
 	 * placed on the board.
 	 */
-	last_moves[0] = 0;
-	last_moves[1] = 0;
-	rotate(i, j, &i, &j, gameinfo->position.boardsize, orientation);
-	gnugo_add_stone(&gameinfo->position, i, j, BLACK);
+	rotate(i, j, &i, &j, board_size, orientation);
+	gnugo_add_stone(i, j, BLACK);
 	sgffile_put_stone(i, j, BLACK);
 	addstone = 1;
 	break;
 	      
       case SGFAW:
-	get_moveXY(prop, &i, &j, gameinfo->position.boardsize);
-	last_moves[0] = 0;
-	last_moves[1] = 0;
-	rotate(i, j, &i, &j, gameinfo->position.boardsize, orientation);
-	gnugo_add_stone(&gameinfo->position, i, j, WHITE);
+	get_moveXY(prop, &i, &j, board_size);
+	rotate(i, j, &i, &j, board_size, orientation);
+	gnugo_add_stone(i, j, WHITE);
 	sgffile_put_stone(i, j, WHITE);
 	addstone = 1;
 	break;
 	      
       case SGFPL:
 	/* following really should not be needed for proper sgf file */
-	if (!gameinfo->move_number && !addstone) {
-	  gnugo_sethand(&gameinfo->position, gameinfo->handicap, 0);
+	if (movenum != 0 && !addstone) {
+	  gnugo_sethand(gameinfo->handicap, 0);
 	  sgfOverwritePropertyInt(head, "HA", handicap);
 	}
 
@@ -638,21 +566,22 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
       case SGFB:
 	next = prop->name == SGFW ? WHITE : BLACK;
 	/* following really should not be needed for proper sgf file */
-	if (!gameinfo->move_number && !addstone) {
-	  gnugo_sethand(&gameinfo->position, gameinfo->handicap, 0);
+	if (movenum != 0 && !addstone) {
+	  gnugo_sethand(gameinfo->handicap, 0);
 	  sgfOverwritePropertyInt(head, "HA", handicap);
 	}
 
-	gameinfo->move_number++;
-	if (gameinfo->move_number == until)
+	if (movenum == until - 1)
 	  return next;
 	      
-	if (get_moveXY(prop, &i, &j, gameinfo->position.boardsize))
-	  if (i == untilm && j == untiln)
+	if (get_moveXY(prop, &i, &j, board_size))
+	  if (i == untilm && j == untiln) {
+	    gameinfo->to_move = next;
 	    return next;
+	  }
 
-	rotate(i, j, &i, &j, gameinfo->position.boardsize, orientation);
-	gnugo_play_move(&gameinfo->position, i, j, next);
+	rotate(i, j, &i, &j, board_size, orientation);
+	gnugo_play_move(i, j, next);
 	sgffile_move_made(i, j, next, 0);
 	next = OTHER_COLOR(next);
 	      
@@ -666,8 +595,8 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	 * (board_ko_i, board_ko_j) is set to the location of
 	 * the ko.
 	 */
-	get_moveXY(prop, &i, &j, gameinfo->position.boardsize);
-	rotate(i, j, &i, &j, gameinfo->position.boardsize, orientation);
+	get_moveXY(prop, &i, &j, board_size);
+	rotate(i, j, &i, &j, board_size, orientation);
 	{
 	  int move_color;
 

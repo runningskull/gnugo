@@ -112,6 +112,29 @@ extern Hash_data    hashdata;
 #define BOARD(i, j)   board[POS(i, j)]
 
 
+/* This struct holds the internal board state.
+ */
+struct board_state {
+  int board_size;
+
+  Intersection board[BOARDSIZE];
+  int board_ko_pos;
+  int black_captured;
+  int white_captured;
+
+  Intersection initial_board[BOARDSIZE];
+  int initial_board_ko_pos;
+  int initial_white_captured;
+  int initial_black_captured;
+  int move_history_color[MAX_MOVE_HISTORY];
+  int move_history_pos[MAX_MOVE_HISTORY];
+  int move_history_pointer;
+
+  float komi;
+  int move_number;
+};
+
+
 /* board utility functions */
 int find_origin(int str);
 int chainlinks(int str, int adj[MAXCHAIN]);
@@ -205,8 +228,8 @@ extern int deltai[8]; /* = { 1,  0, -1,  0,  1, -1, -1, 1}; */
 extern int deltaj[8]; /* = { 0, -1,  0,  1, -1, -1,  1, 1}; */
 extern int delta[8];  /* = { NS, -1, -NS, 1, NS-1, -NS-1, -NS+1, NS+1}; */
 
-void store_position(Position *pos);
-void restore_position(Position *pos);
+void store_board(struct board_state *state);
+void restore_board(struct board_state *state);
 
 /* Forward struct declarations. */
 struct pattern;
@@ -553,20 +576,29 @@ void end_sgftreedump(const char *filename);
 /* ================================================================ */
 
 /* The board and the other parameters deciding the current position. */
-extern int           board_size;             /* board size (usually 19) */
-extern Intersection  board[BOARDSIZE];       /* go board */
-extern Intersection  shadow[BOARDMAX];      /* reading tree shadow */
-extern int           board_ko_pos;
+extern int          board_size;             /* board size (usually 19) */
+extern Intersection board[BOARDSIZE];       /* go board */
+extern int          board_ko_pos;
+extern int          black_captured;   /* num. of black stones captured */
+extern int          white_captured;
 
-extern float         komi;
-extern int           black_captured;   /* num. of black stones captured */
-extern int           white_captured;
+extern Intersection initial_board[BOARDSIZE];
+extern int          initial_board_ko_pos;
+extern int          initial_white_captured;
+extern int          initial_black_captured;
+extern int          move_history_color[MAX_MOVE_HISTORY];
+extern int          move_history_pos[MAX_MOVE_HISTORY];
+extern int          move_history_pointer;
 
-extern int           movenum;          /* movenumber - used for debug output */
+extern float        komi;
+extern int          movenum;      /* movenumber - used for debug output */
+		    
+extern Intersection shadow[BOARDMAX];      /* reading tree shadow */
 
-extern int           disable_threat_computation;
-extern int           disable_endgame_patterns;
-extern int           doing_scoring;
+		    
+extern int          disable_threat_computation;
+extern int          disable_endgame_patterns;
+extern int          doing_scoring;
 
 /* Reading parameters */
 extern int depth;               /* deep reading cutoff */

@@ -265,9 +265,9 @@ static int liberty_mark;
 static int string_mark;
 
 
-/* Forward declaration. */
+/* Forward declarations. */
 static int do_trymove(int pos, int color, int ignore_ko);
-static void undo_move(void);
+static void undo_trymove(void);
 static void new_position(void);
 static void init_board(void);
 static int propagate_string(int stone, int str);
@@ -288,38 +288,79 @@ int deltai[8] = { 1,  0, -1,  0,  1, -1, -1, 1};
 int deltaj[8] = { 0, -1,  0,  1, -1, -1,  1, 1};
 int delta[8]  = { NS, -1, -NS, 1, NS-1, -NS-1, -NS+1, NS+1};
 
-/* ================================================================ */
-/*                         External functions                       */
-/* ================================================================ */
 
+/* ================================================================ */
+/*                    Board initialization                          */
+/* ================================================================ */
 
 /*
- * Set up an entirely new position.
+ * Save board state.
  */
 
 void
-setup_board(Intersection new_board[MAX_BOARD][MAX_BOARD], int ko_pos,
-	    int *last, float new_komi, int w_captured, int b_captured)
+store_board(struct board_state *state)
 {
   int k;
 
-  for (k = 0; k < BOARDSIZE; k++) {
-    if (!ON_BOARD2(I(k), J(k)))
-      board[k] = GRAY;
-    else
-      board[k] = new_board[I(k)][J(k)];
+  gg_assert(stackp == 0);
+
+  state->board_size = board_size;
+
+  memcpy(state->board, board, sizeof(board));
+  memcpy(state->initial_board, initial_board, sizeof(initial_board));
+
+  state->board_ko_pos = board_ko_pos;
+  state->white_captured = white_captured;
+  state->black_captured = black_captured;
+  
+  state->initial_board_ko_pos = initial_board_ko_pos;
+  state->initial_white_captured = initial_white_captured;
+  state->initial_black_captured = initial_black_captured;
+  
+  state->move_history_pointer = move_history_pointer;
+  for (k = 0; k < move_history_pointer; k++) {
+    state->move_history_color[k] = move_history_color[k];
+    state->move_history_pos[k] = move_history_pos[k];
   }
 
-  board_ko_pos = ko_pos;
+  state->komi = komi;
+  state->move_number = movenum;
+}
 
-  for (k = 0; k < 2; k++)
-    if (last[k] != 0)
-      last_moves[k] = last[k];
 
-  komi = new_komi;
-  white_captured = w_captured;
-  black_captured = b_captured;
+/*
+ * Restore a saved board state.
+ */
 
+void
+restore_board(struct board_state *state)
+{
+  int k;
+
+  gg_assert(stackp == 0);
+
+  board_size = state->board_size;
+
+  memcpy(board, state->board, sizeof(board));
+  memcpy(initial_board, state->initial_board, sizeof(initial_board));
+
+  board_ko_pos = state->board_ko_pos;
+  white_captured = state->white_captured;
+  black_captured = state->black_captured;
+  
+  initial_board_ko_pos = state->initial_board_ko_pos;
+  initial_white_captured = state->initial_white_captured;
+  initial_black_captured = state->initial_black_captured;
+  
+  move_history_pointer = state->move_history_pointer;
+  for (k = 0; k < move_history_pointer; k++) {
+    move_history_color[k] = state->move_history_color[k];
+    move_history_pos[k] = state->move_history_pos[k];
+  }
+
+  komi = state->komi;
+  movenum = state->move_number;
+  
   hashdata_recalc(&hashdata, board, board_ko_pos);
   new_position();
 }
@@ -337,24 +378,30 @@ clear_board(void)
   gg_assert(board_size > 0 && board_size <= MAX_BOARD);
   
   memset(board, EMPTY, sizeof(board));
-  for (k = 0; k < BOARDSIZE; k++)
-    if (I(k) < 0 || I(k) >= board_size || J(k) < 0 || J(k) >= board_size)
+  memset(initial_board, EMPTY, sizeof(initial_board));
+  for (k = 0; k < BOARDSIZE; k++) {
+    if (!ON_BOARD2(I(k), J(k))) {
       board[k] = GRAY;
+      initial_board[k] = GRAY;
+    }
+  }
 
-  board_ko_pos = 0;
-
-  for (k = 0; k < 2; k++)
-    last_moves[k] = 0;
-
+  board_ko_pos = NO_MOVE;
   white_captured = 0;
   black_captured = 0;
 
+  initial_board_ko_pos = NO_MOVE;
+  initial_white_captured = 0;
+  initial_black_captured = 0;
+
+  move_history_pointer = 0;
+  movenum = 0;
+  
   hashdata_recalc(&hashdata, board, board_ko_pos);
   new_position();
-  movenum = 0;
 }
 
-/* test the integrity of the gray border */
+/* Test the integrity of the gray border. */
 int
 test_gray_border(void)
 {
@@ -363,16 +410,16 @@ test_gray_border(void)
   gg_assert(board_size > 0 && board_size <= MAX_BOARD);
   
   for (k = 0; k < BOARDSIZE; k++)
-    if (I(k) < 0 || I(k) >= board_size || J(k) < 0 || J(k) >= board_size) {
+    if (!ON_BOARD2(I(k), J(k)))
       if (board[k] != GRAY)
       	return k;
-    }
+  
   return -1;
 }
 
 
 /* ================================================================ */
-/*                 Pushing and popping of boards                    */
+/*                      Temporary moves                             */
 /* ================================================================ */
 
 
@@ -399,7 +446,8 @@ komaster_is_empty(int komaster, int kom_pos) {
 /* KOMASTER_SCHEME 4 handles komaster interpretation differently from 
  * other schemes */
 const char *
-komaster_to_string(int komaster, int kom_pos) {
+komaster_to_string(int komaster, int kom_pos)
+{
 #if KOMASTER_SCHEME == 4 
   const char *b[4] = {"O-Illegal", "X-Illegal", "O-Legal", "X-Legal"};
   ASSERT1(komaster >=0 && komaster <=3, 0);
@@ -425,7 +473,7 @@ komaster_to_string(int komaster, int kom_pos) {
  *   }   
  *
  * The message can be written as a comment to an sgf file using 
- * sgfdump(). str can be 0 if it is not needed but otherwise  
+ * sgfdump(). str can be NO_MOVE if it is not needed but otherwise  
  * the location of str is included in the comment.
  */
 
@@ -444,7 +492,7 @@ trymove(int pos, int color, const char *message, int str,
     if (message == NULL)
       message = "UNKNOWN";
 
-    if (str == 0) {
+    if (str == NO_MOVE) {
       if (!komaster_is_empty(komaster, kom_pos))
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, count_variations, hashdata.hashval,
@@ -696,12 +744,12 @@ popgo()
   if (showstack)
     gprintf("<=    *** STACK  after pop: %d\n", stackp);
   
-  undo_move();
+  undo_trymove();
   
   memcpy(&hashdata, &(hashdata_stack[stackp]), sizeof(hashdata));
   if (sgf_dumptree) {
     char buf[100];
-    gg_snprintf(buf,100,"(next variation: %d)", count_variations);
+    gg_snprintf(buf, 100, "(next variation: %d)", count_variations);
     sgftreeAddComment(sgf_dumptree, NULL, buf);
     sgf_dumptree->lastnode = sgf_dumptree->lastnode->parent;
     /* After tryko() we need to undo two pass nodes too. Since we have
@@ -721,7 +769,7 @@ static void
 silent_popgo(void)
 {
   stackp--;
-  undo_move();
+  undo_trymove();
   memcpy(&hashdata, &(hashdata_stack[stackp]), sizeof(hashdata));
 }
 
@@ -732,7 +780,7 @@ silent_popgo(void)
  */
 
 static void
-undo_move()
+undo_trymove()
 {
   if (0 || KOMASTER_TRACE) {
     if (tracing_inside_komaster) {
@@ -782,33 +830,23 @@ dump_stack(void)
 
 
 /* ================================================================ */
-/*                Non-invertable board manipulation                 */
+/*                     Permanent moves                              */
 /* ================================================================ */
 
 
-/*
- * do_add_stone and do_remove_stone are defined as macros for 
- * efficiency reasons.
+static void
+reset_move_history(void)
+{
+  memcpy(initial_board, board, sizeof(board));
+  initial_board_ko_pos = board_ko_pos;
+  initial_white_captured = white_captured;
+  initial_black_captured = black_captured;
+  move_history_pointer = 0;
+}
+
+/* Place a stone on the board and update the hashdata. This operation
+ * destroys all move history.
  */
-
-#define do_add_stone(pos, color) \
-  do { \
-    board[pos] = color; \
-    hashdata_invert_stone(&hashdata, pos, color); \
-  } while (0)
-
-#define do_remove_stone(pos) \
-  do { \
-    hashdata_invert_stone(&hashdata, pos, board[pos]); \
-    board[pos] = EMPTY; \
-  } while (0)
-
-
-/*
- * And now the functions, accessible from outside this file.
- */
-
-/* place a stone on the board and update the hashdata. */
 
 void
 add_stone(int pos, int color)
@@ -817,12 +855,16 @@ add_stone(int pos, int color)
   ASSERT_ON_BOARD1(pos);
   ASSERT1(board[pos] == EMPTY, pos);
 
-  do_add_stone(pos, color);
+  board[pos] = color;
+  hashdata_invert_stone(&hashdata, pos, color);
+  reset_move_history();
   new_position();
 }
 
 
-/* remove a stone from the board and update the hashdata. */
+/* Remove a stone from the board and update the hashdata. This
+ * operation destroys the move history.
+ */
 
 void
 remove_stone(int pos)
@@ -831,24 +873,14 @@ remove_stone(int pos)
   ASSERT_ON_BOARD1(pos);
   ASSERT1(IS_STONE(board[pos]), pos);
 
-  do_remove_stone(pos);
+  hashdata_invert_stone(&hashdata, pos, board[pos]);
+  board[pos] = EMPTY;
+  reset_move_history();
   new_position();
 }
 
-
-/* Play a move. If you want to test for legality you should first call
- * is_legal(). This function strictly follows the algorithm: 
- * 1. Place a stone of given color on the board.
- * 2. If there are any adjacent opponent strings without liberties,
- *    remove them and increase the prisoner count. 
- * 3. If the newly placed stone is part of a string without liberties,
- *    remove it and increase the prisoner count.
- *
- * In contrast to a move played by trymove() or tryko(), this move
- * can't be easily unplayed.
- */
-void
-play_move(int pos, int color)
+static void
+play_move_no_history(int pos, int color)
 {
 #if CHECK_HASHING
   Hash_data oldkey;
@@ -857,17 +889,12 @@ play_move(int pos, int color)
   hashdata_recalc(&oldkey, board, board_ko_pos);
   gg_assert(hashdata_diff_dump(&oldkey, &hashdata) == 0);
 #endif
-  
-  gg_assert(stackp == 0);
-  
-  last_moves[1] = last_moves[0];
-  last_moves[0] = pos;
 
-  board_ko_pos = 0;
+  board_ko_pos = NO_MOVE;
   hashdata_remove_ko(&hashdata);
 
   /* If the move is a pass, we can skip some steps. */
-  if (pos != 0) {
+  if (pos != PASS_MOVE) {
     ASSERT_ON_BOARD1(pos);
     ASSERT1(board[pos] == EMPTY, pos);
 
@@ -880,12 +907,131 @@ play_move(int pos, int color)
     gg_assert(hashdata_diff_dump(&oldkey, &hashdata) == 0);
 #endif
   }
-  
-  movenum++;
   new_position();
 }
 
+/* Load the initial position and replay the first n moves. */
+static void
+replay_move_history(int n)
+{
+  int k;
+  
+  memcpy(board, initial_board, sizeof(board));
+  board_ko_pos = initial_board_ko_pos;
+  white_captured = initial_white_captured;
+  black_captured = initial_black_captured;
+  new_position();
 
+  for (k = 0; k < n; k++)
+    play_move_no_history(move_history_pos[k], move_history_color[k]);
+}
+
+/* Play a move. If you want to test for legality you should first call
+ * is_legal(). This function strictly follows the algorithm: 
+ * 1. Place a stone of given color on the board.
+ * 2. If there are any adjacent opponent strings without liberties,
+ *    remove them and increase the prisoner count. 
+ * 3. If the newly placed stone is part of a string without liberties,
+ *    remove it and increase the prisoner count.
+ *
+ * In spite of the name "permanent move", this move can (usually) be
+ * unplayed by undo_move(), but it is significantly more costly than
+ * unplaying a temporary move. There are limitations on the available
+ * move history, so under certain circumstances the move may not be
+ * possible to unplay at a later time.
+ */
+void
+play_move(int pos, int color)
+{
+  ASSERT1(stackp == 0, pos);
+
+  if (move_history_pointer >= MAX_MOVE_HISTORY) {
+    /* The move history is full. We resolve this by collapsing the
+     * first about 10% of the moves into the initial position.
+     */
+    int number_collapsed_moves = 1 + MAX_MOVE_HISTORY / 10;
+    int k;
+    Intersection saved_board[BOARDSIZE];
+    int saved_board_ko_pos = board_ko_pos;
+    int saved_white_captured = white_captured;
+    int saved_black_captured = black_captured;
+    memcpy(saved_board, board, sizeof(board));
+
+    replay_move_history(number_collapsed_moves);
+
+    memcpy(initial_board, board, sizeof(board));
+    initial_board_ko_pos = board_ko_pos;
+    initial_white_captured = white_captured;
+    initial_black_captured = black_captured;
+
+    for (k = number_collapsed_moves; k < move_history_pointer; k++) {
+      move_history_color[k - number_collapsed_moves] = move_history_color[k];
+      move_history_pos[k - number_collapsed_moves] = move_history_pos[k];
+    }
+    move_history_pointer -= number_collapsed_moves;
+
+    memcpy(board, saved_board, sizeof(board));
+    board_ko_pos = saved_board_ko_pos;
+    white_captured = saved_white_captured;
+    black_captured = saved_black_captured;
+  }
+
+  move_history_color[move_history_pointer] = color;
+  move_history_pos[move_history_pointer] = pos;
+  move_history_pointer++;
+  
+  play_move_no_history(pos, color);
+  
+  movenum++;
+}
+
+
+/* Undo n permanent moves. Returns 1 if successful and 0 if it fails.
+ * If n moves cannot be undone, no move is undone.
+ */
+int
+undo_move(int n)
+{
+  gg_assert(stackp == 0);
+  
+  /* Fail if and only if the move history is too short. */
+  if (move_history_pointer < n)
+    return 0;
+
+  replay_move_history(move_history_pointer - n);
+  move_history_pointer -= n;
+  movenum -= n;
+
+  return 1;
+}
+
+
+/* Return the last move done by the opponent to color. Both if no move
+ * was found or if the last move was a pass, PASS_MOVE is returned.
+ */
+int
+get_last_opponent_move(int color)
+{
+  int k;
+  
+  for (k = move_history_pointer - 1; k >= 0; k--)
+    if (move_history_color[k] == OTHER_COLOR(color))
+      return move_history_pos[k];
+
+  return PASS_MOVE;
+}
+
+/* Return the last move done by anyone. Both if no move was found or
+ * if the last move was a pass, PASS_MOVE is returned.
+ */
+int
+get_last_move()
+{
+  if (move_history_pointer == 0)
+    return PASS_MOVE;
+
+  return move_history_pos[move_history_pointer - 1];
+}
 
 /* ================================================================ */
 /*                        Utility functions                         */
@@ -959,7 +1105,6 @@ is_legal(int pos, int color)
  * 1. There is no neighboring empty intersection.
  * 2. There is no neighboring opponent string with exactly one liberty.
  * 3. There is no neighboring friendly string with more than one liberty.
- *
  */
 int 
 is_suicide(int pos, int color)
@@ -1145,7 +1290,7 @@ komaster_trymove(int pos, int color, const char *message, int str,
     if (komaster == other && pos == kom_pos)
       return 0;
 
-    /* If opponent is komaster we may not capture ko at all. */
+    /* If komaster is gray we may not capture ko at all. */
     if (komaster == GRAY)
       return 0;
 
@@ -1689,10 +1834,11 @@ findlib(int str, int maxlib, int *libs)
  */
 
 int
-fastlib(int pos, int color, int ignore_capture) {
+fastlib(int pos, int color, int ignore_capture)
+{
   int k;
-  int ally1 = 0;
-  int ally2 = 0;
+  int ally1 = NO_MOVE;
+  int ally2 = NO_MOVE;
   int fast_liberties = 0;
   int other = OTHER_COLOR(color);
 
@@ -1706,23 +1852,20 @@ fastlib(int pos, int color, int ignore_capture) {
   for (k = 0; k < 4; k++) {
     int neighbor = pos + delta[k];
     if (board[neighbor] == color) {
-      if (ally1) {
+      if (ally1 != NO_MOVE) {
         if (string_number[ally1] != string_number[neighbor]) { 
-          if (ally2) {
-            if (string_number[ally2] != string_number[neighbor]) { 
-              return -1; /* More than 2 allies not implemented (yet).*/
-            } else {
-              /* do nothing neighbor string == ally2 string */
+          if (ally2 != NO_MOVE) {
+            if (string_number[ally2] != string_number[neighbor]) {
+	      /* More than 2 allies not implemented (yet).*/
+              return -1;
             }
-          } else {
-            ally2 = neighbor;
           }
-        } else {
-              /* do nothing neighbor string == ally1 string */
+	  else
+            ally2 = neighbor;
         }
-      } else {
-        ally1 = neighbor;
       }
+      else
+        ally1 = neighbor;
     }
   }
   for (k = 0; k < 4; k++) {
@@ -2587,7 +2730,7 @@ get_trymove_counter()
 /* Don't trust the incremental string data until it's reinitialized.
  *
  * This function should be called if the board is modified by other
- * means than do_play_move() or undo_move().
+ * means than do_play_move() or undo_trymove().
  * It's also useful to force a recomputation of the strings if we
  * don't have any immediate plans to undo the move, because it recovers
  * undo stack space and holes in the 'string' array.

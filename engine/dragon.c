@@ -91,6 +91,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   int dr;
   int d;
   int k;
+  int last_move;
 
   start_timer(2);
   dragon2_initialized = 0;
@@ -557,8 +558,10 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
    * attacking it, particularly if we are ahead.
    */
 
-  if (last_moves[0] && dragon[last_moves[0]].matcher_status == DEAD) {
-    thrashing_dragon = dragon[last_moves[0]].origin;
+  last_move = get_last_move();
+  if (last_move != NO_MOVE
+      && dragon[last_move].matcher_status == DEAD) {
+    thrashing_dragon = dragon[last_move].origin;
     if (save_verbose)
       gprintf("thrashing dragon found at %1m\n", thrashing_dragon);
   }

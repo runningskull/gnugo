@@ -23,18 +23,19 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "interface.h"
 #include "gmp.h"
 #include "sgftree.h"
 
 /* --------------------------------------------------------------*/
-/* Play a game against a go-modem-protocol (GMP) client */
+/* Play a game against a go-modem-protocol (GMP) client.         */
 /* --------------------------------------------------------------*/
 void
-play_gmp(int boardsize, Gameinfo *gameinfo)
+play_gmp(Gameinfo *gameinfo)
 {
-  SGFTree   sgftree;
+  SGFTree sgftree;
 
   Gmp *ge;
   GmpResult message;
@@ -49,15 +50,15 @@ play_gmp(int boardsize, Gameinfo *gameinfo)
   int yourcolor;
   SGFNode *curnode = NULL; /* current SGFNode */
   
-  mycolor  = gameinfo->computer_player;
+  mycolor = gameinfo->computer_player;
 
   sgftree_clear(&sgftree);
-  sgftreeCreateHeaderNode(&sgftree, boardsize, gameinfo->position.komi);
+  sgftreeCreateHeaderNode(&sgftree, gnugo_get_boardsize(), gnugo_get_komi());
 
   yourcolor = OTHER_COLOR(mycolor);
 
   ge = gmp_create(0, 1);
-  TRACE("board size=%d\n", boardsize);
+  TRACE("board size=%d\n", gnugo_get_boardsize());
 
   curnode = sgftree.root;
   
@@ -69,8 +70,8 @@ play_gmp(int boardsize, Gameinfo *gameinfo)
   do {
     message = gmp_check(ge, 1, NULL, NULL, &error);
   } while (!time_to_die
-	   && ((message == gmp_nothing) 
-	       || (message == gmp_reset)));
+	   && (message == gmp_nothing
+	       || message == gmp_reset));
   
   if (message == gmp_err)  {
     fprintf(stderr, "gnugo-gmp: Error \"%s\" occurred.\n", error);
@@ -83,26 +84,24 @@ play_gmp(int boardsize, Gameinfo *gameinfo)
   }
 
   gameinfo->handicap = gmp_handicap(ge);
-  gameinfo->position.boardsize = gmp_size(ge);
+  gnugo_clear_board(gmp_size(ge));
   /* 
-   * The specification of the go modem protocol doesn't
-   *     even discuss komi. So we may have to guess the
-   *     komi. If the komi is set on the command line,
-   *     keep it. Otherwise, its value will be 0.0
-   *     and we use 5.5 in an even game, 0.5 otherwise.
+   * The specification of the go modem protocol doesn't even discuss
+   * komi. So we have to guess the komi. If the komi is set on the
+   * command line, keep it. Otherwise, its value will be 0.0 and we
+   * use 5.5 in an even game, 0.5 otherwise.
    */
-  if (gameinfo->position.komi == 0.0) {
+  if (gnugo_get_komi() == 0.0) {
     if (gameinfo->handicap == 0)
-      gameinfo->position.komi = 5.5;
+      gnugo_set_komi(5.5);
     else
-      gameinfo->position.komi = 0.5;
+      gnugo_set_komi(0.5);
   }
 
-  sgfOverwritePropertyInt(sgftree.root, "SZ", gameinfo->position.boardsize);
+  sgfOverwritePropertyInt(sgftree.root, "SZ", gnugo_get_boardsize());
 
-  TRACE("size=%d, handicap=%d, komi=%f\n", 
-	gameinfo->position.boardsize, gameinfo->handicap, 
-	gameinfo->position.komi);
+  TRACE("size=%d, handicap=%d, komi=%f\n", gnugo_get_boardsize(),
+	gameinfo->handicap, gnugo_get_komi());
 
   if (gameinfo->handicap)
     to_move = WHITE;
@@ -120,8 +119,7 @@ play_gmp(int boardsize, Gameinfo *gameinfo)
 
   gameinfo->computer_player = mycolor;
   sgffile_write_gameinfo(gameinfo, "gmp");
-  gameinfo->handicap = gnugo_sethand(&(gameinfo->position), gameinfo->handicap,
-				    sgftree.root);
+  gameinfo->handicap = gnugo_sethand(gameinfo->handicap, sgftree.root);
   sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 
   /* main GMP loop */
@@ -139,45 +137,42 @@ play_gmp(int boardsize, Gameinfo *gameinfo)
       }
 
       if (message == gmp_undo) {
-	int movenumber = gameinfo->move_number;
-	curnode = sgftree.root;
-	movenumber -= j-1;
-	if (movenumber < 0) {
-	  fprintf(stderr,
-		  "GNU Go: %s UNDO: already at the beginning of game tree\n",
-		  "play_gmp");
-	  continue;
+	int k;
+	assert(j > 0);
+	
+	for (k = 0; k < j; k++) {
+	  if (!gnugo_undo_move(1)) {
+	    fprintf(stderr, "GNU Go: play_gmp UNDO: can't undo %d moves\n",
+		    j - k);
+	    break;
+	  }
+	  sgffile_write_comment("undo");
+	  curnode = curnode->parent;
+	  to_move = OTHER_COLOR(to_move);
 	}
-	to_move = gnugo_play_sgftree(&gameinfo->position, curnode,
-				     &movenumber, &curnode);
-	gameinfo->move_number = movenumber-1;
 	continue;
       }
 
       if (message == gmp_pass) {
 	++passes;
         curnode = sgfAddPlay(curnode, to_move, -1, -1);
-	gnugo_play_move(&gameinfo->position, -1, -1, yourcolor);
+	gnugo_play_move(-1, -1, yourcolor);
 	sgffile_move_made(-1, -1, to_move, moveval);
-	gameinfo->move_number++;
       }
       else {
 	/* not pass */
 	passes = 0;
         curnode = sgfAddPlay(curnode, to_move, i, j);
 	TRACE("\nyour move: %m\n\n", i, j);
-	gnugo_play_move(&gameinfo->position, i, j, yourcolor);
+	gnugo_play_move(i, j, yourcolor);
 	sgffile_move_made(i, j, to_move, moveval);
-	gameinfo->move_number++;
       }
 
     }
     else {
       /* Generate my next move. */
-      moveval = gnugo_genmove(&gameinfo->position, &i, &j, mycolor,
-			      gameinfo->move_number);
-      gameinfo->move_number++;
-      gnugo_play_move(&gameinfo->position, i, j, mycolor);
+      moveval = gnugo_genmove(&i, &j, mycolor);
+      gnugo_play_move(i, j, mycolor);
       
       if (moveval < 0) {
 	/* pass */
@@ -215,8 +210,7 @@ play_gmp(int boardsize, Gameinfo *gameinfo)
   /* play_gmp() does not return to main(), therefore the score
    * writing code is here.
    */
-  score = gnugo_estimate_score(&gameinfo->position, 
-			       &lower_bound, &upper_bound);
+  score = gnugo_estimate_score(&lower_bound, &upper_bound);
 
   sgfWriteResult(sgftree.root, score, 1);
   

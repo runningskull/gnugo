@@ -1053,12 +1053,10 @@ compute_influence(struct influence_data *q, int color, int m, int n,
 	accumulate_influence(q, i, j, BLACK);
     }
   segment_influence(q);
-  /* FIXME: The "board_size - 19" stuff below is an ugly workaround for a bug
-   *        in main.c
-   */
+  
   if (((q == &initial_influence || q == &initial_opposite_influence)
        && (printmoyo & PRINTMOYO_INITIAL_INFLUENCE))
-      || (m == (board_size - 19) + debug_influence_i
+      || (m == debug_influence_i
 	  && n == debug_influence_j && m >= 0)) {
     if (q == &initial_opposite_influence)
       print_influence(q, (dragons_known ? "dragons_known, opposite, color"

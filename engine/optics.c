@@ -1740,7 +1740,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
   int defense_code;
   int defense_point;
   int save_verbose;
-  Position starting_position;
+  struct board_state starting_position;
 
   /* Clear the board and initialize the engine properly. */
   clear_board();
@@ -1791,7 +1791,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
   
   
   /* Store this position so we can come back to it. */
-  store_position(&starting_position);
+  store_board(&starting_position);
 
   /* Loop over all configurations of black stones inserted in the
    * eyeshape. There are N = 2^(eyesize) configurations and we can
@@ -1802,7 +1802,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
     int valid = 1;
     int internal_stones = 0;
     
-    restore_position(&starting_position);
+    restore_board(&starting_position);
     /* Play the stones for this configuration. */
     for (k = 0; k < eyesize; k++) {
       if (n & (1 << k)) {

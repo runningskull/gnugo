@@ -149,10 +149,8 @@ sgffile_write_line(const char * line, ...)
 void
 sgffile_write_comment(const char *comment)
 {
-  if (!sgfout)
-    return ;
-  
-  fprintf(sgfout, "C[%s]", comment);
+  if (sgfout)
+    fprintf(sgfout, "C[%s]", comment);
 }
 
 
@@ -195,7 +193,7 @@ sgffile_write_gameinfo(Gameinfo *ginfo, const char *gametype)
 
   fprintf(sgfout, "(;GM[1]FF[4]");
   fprintf(sgfout, "RU[%s]", "Japanese");
-  fprintf(sgfout, "SZ[%d]", ginfo->position.boardsize);
+  fprintf(sgfout, "SZ[%d]", board_size);
   fprintf(sgfout, "\n");
   
   sprintf(outbuf, "GNU Go %s (level %d) %s", VERSION, level, gametype);
@@ -205,7 +203,7 @@ sgffile_write_gameinfo(Gameinfo *ginfo, const char *gametype)
 	  (ginfo->computer_player == BLACK 
 	   || ginfo->computer_player == GRAY) ? outbuf : "Unknown");
   fprintf(sgfout, "HA[%d]", ginfo->handicap);
-  fprintf(sgfout, "KM[%.1f]", ginfo->position.komi);
+  fprintf(sgfout, "KM[%.1f]", komi);
   fprintf(sgfout, "GN[GNU Go %s %s ", VERSION, gametype);
   fprintf(sgfout, "Random Seed %d", ginfo->seed);
   fprintf(sgfout, "] ");

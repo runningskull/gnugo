@@ -33,7 +33,6 @@
 #include "gg_utils.h"
 
 /* Internal state that's not part of the engine. */
-float komi;
 int handicap;
 
 static int report_uncertainty = 0;
@@ -48,20 +47,6 @@ static void gtp_print_vertices2(int n, int *moves);
 static void rotate_on_input(int ai, int aj, int *bi, int *bj);
 static void rotate_on_output(int ai, int aj, int *bi, int *bj);
 
-/* For undo, we keep the starting position, and a stack
- * listing all moves made.
- */
-
-#define MAX_MOVES 1000
-static Position starting_position;
-
-struct game_move_data {
-  int i;
-  int j;
-  int color;
-};
-static struct game_move_data game_move[MAX_MOVES];
-static int move_stack_pointer = 0;
 
 #define DECLARE(func) static int func(char *s, int id)
 
@@ -264,8 +249,6 @@ play_gtp(FILE *gtp_input, int gtp_initial_orientation)
   
   /* Prepare pattern matcher and reading code. */
   reset_engine();
-  move_stack_pointer = 0;
-  store_position(&starting_position);
   gtp_main_loop(commands, gtp_input);
 }
 
@@ -368,8 +351,6 @@ gtp_set_boardsize(char *s, int id)
   clear_board();
   gtp_internal_set_boardsize(boardsize);
   reset_engine();
-  move_stack_pointer = 0;
-  store_position(&starting_position);
   return gtp_success(id, "");
 }
 
@@ -408,7 +389,6 @@ gtp_set_orientation(char *s, int id)
   clear_board();
   gtp_orientation = orientation;
   gtp_set_vertex_transform_hooks(rotate_on_input, rotate_on_output);
-  store_position(&starting_position);
   return gtp_success(id, "");
 }
 
@@ -490,11 +470,6 @@ gtp_playblack(char *s, int id)
     return gtp_failure(id, "illegal move");
 
   play_move(POS(i, j), BLACK);
-  game_move[move_stack_pointer].i = i;
-  game_move[move_stack_pointer].j = j;
-  game_move[move_stack_pointer].color = BLACK;
-  if (move_stack_pointer < MAX_MOVES)
-    move_stack_pointer++;
   return gtp_success(id, "");
 }
 
@@ -524,11 +499,6 @@ gtp_playwhite(char *s, int id)
     return gtp_failure(id, "illegal move");
 
   play_move(POS(i, j), WHITE);
-  game_move[move_stack_pointer].i = i;
-  game_move[move_stack_pointer].j = j;
-  game_move[move_stack_pointer].color = WHITE;
-  if (move_stack_pointer < MAX_MOVES)
-    move_stack_pointer++;
   return gtp_success(id, "");
 }
 
@@ -562,8 +532,7 @@ gtp_fixed_handicap(char *s, int id)
 	  first = 0;
 	gtp_mprintf("%m", m, n);
       }
-  store_position(&starting_position);
-  move_stack_pointer = 0;
+  
   return gtp_finish_response();
 }
 
@@ -614,15 +583,9 @@ gtp_loadsgf(char *s, int id)
     color_to_move = gameinfo_play_sgftree_rot(&gameinfo, sgf, untilstring,
                                               gtp_orientation);
 
-  gnugo_force_to_globals(&gameinfo.position);
-  movenum = gameinfo.move_number;
-  komi = gameinfo.position.komi;
   handicap = gameinfo.handicap;
-  gtp_internal_set_boardsize(gameinfo.position.boardsize);
+  gtp_internal_set_boardsize(board_size);
   reset_engine();
-  store_position(&starting_position);
-
-  move_stack_pointer = 0;
 
   gtp_printid(id, GTP_SUCCESS);
   gtp_mprintf("%C", color_to_move);
@@ -1670,12 +1633,6 @@ gtp_genmove_black(char *s, int id)
   if (genmove(&i, &j, BLACK) >= 0)
     play_move(POS(i, j), BLACK);
 
-  game_move[move_stack_pointer].i = i;
-  game_move[move_stack_pointer].j = j;
-  game_move[move_stack_pointer].color = BLACK;
-  if (move_stack_pointer < MAX_MOVES)
-    move_stack_pointer++;
-
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_vertex(i, j);
   return gtp_finish_response();
@@ -1697,12 +1654,6 @@ gtp_genmove_white(char *s, int id)
 
   if (genmove(&i, &j, WHITE) >= 0)
     play_move(POS(i, j), WHITE);
-
-  game_move[move_stack_pointer].i = i;
-  game_move[move_stack_pointer].j = j;
-  game_move[move_stack_pointer].color = WHITE;
-  if (move_stack_pointer < MAX_MOVES)
-    move_stack_pointer++;
 
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_vertex(i, j);
@@ -1825,35 +1776,28 @@ gtp_set_level(char *s, int id)
   return gtp_success(id, "");
 }
 
-/* Function:  Undo last move
- * Arguments: int
- * Fails:     If move pointer is 0
+/* Function:  Undo a number of moves
+ * Arguments: optional int
+ * Fails:     If move history is too short.
  * Returns:   nothing
  */
-
 
 static int
 gtp_undo(char *s, int id)
 {
-  int k, nb_undo;
-  
-  nb_undo = 1;
-  sscanf(s, "%d", &nb_undo);
-  if (move_stack_pointer == 0) 
-    return gtp_failure(id, "no moves to take back");
-  if ((move_stack_pointer-nb_undo) < 0)
-    return gtp_failure(id, "can't undo %d moves", nb_undo);
-  if (move_stack_pointer > MAX_MOVES)
-    return gtp_failure(id, "move stack overflow");
-  restore_position(&starting_position);
-  
-  move_stack_pointer = move_stack_pointer - nb_undo;
-  for (k = 0; k < move_stack_pointer; k++)
-    play_move(POS(game_move[k].i, game_move[k].j), game_move[k].color);
+  int number_moves = 1;
 
+  sscanf(s, "%d", &number_moves);
+
+  if (number_moves < 0)
+    return gtp_failure(id, "can't undo a negative number of moves");
+
+  if (!undo_move(number_moves))
+    return gtp_failure(id, "undo failed");
+  
   return gtp_success(id, "");
 }
-  
+
 
 /***********
  * scoring *
@@ -1877,7 +1821,7 @@ finish_and_score_game(int seed)
   int pass = 0;
   int moves = 0;
   int saved_board[MAX_BOARD][MAX_BOARD];
-  Position saved_pos;
+  struct board_state saved_pos;
   static int current_board[MAX_BOARD][MAX_BOARD];
   static int current_seed = -1;
   int cached_board = 1;
@@ -1901,7 +1845,7 @@ finish_and_score_game(int seed)
     return;
 
   doing_scoring = 1;
-  store_position(&saved_pos);
+  store_board(&saved_pos);
 
   /* FIXME: Letting black always start is a preliminary solution. */
   next = BLACK;
@@ -1925,7 +1869,7 @@ finish_and_score_game(int seed)
       saved_board[i][j] = BOARD(i, j);
     }
 
-  restore_position(&saved_pos);
+  restore_board(&saved_pos);
   doing_scoring = 0;
 
   /* Update the status for vertices which were changed while finishing

@@ -33,16 +33,26 @@
 
 
 /* The go board and position. */
+int          board_size = 19; /* board size */
 Intersection board[BOARDSIZE];
-Intersection shadow[BOARDMAX];
 int          board_ko_pos;
-int          last_moves[2];
+int          white_captured;    /* number of black and white stones captured */
+int          black_captured;
+
+Intersection initial_board[BOARDSIZE];
+int          initial_board_ko_pos;
+int          initial_white_captured;
+int          initial_black_captured;
+int          move_history_color[MAX_MOVE_HISTORY];
+int          move_history_pos[MAX_MOVE_HISTORY];
+int          move_history_pointer;
 
 int thrashing_dragon = 0; /* Dead opponent's dragon trying to live */
 
 float        komi;
-int          white_captured;    /* number of black and white stones captured */
-int          black_captured;
+int          movenum;
+
+Intersection shadow[BOARDMAX];
 
 /* Hashing of positions. */
 Hash_data    hashdata;
@@ -53,7 +63,6 @@ float potential_moves[MAX_BOARD][MAX_BOARD];
 
 /* Used by reading. */
 int stackp;             /* stack pointer */
-int movenum;            /* movenumber: Used only for debugging */
 int position_number;    /* position number */
 int depth;              /* deep reading cut off */
 int backfill_depth;     /* deep reading cut off */
@@ -91,7 +100,6 @@ int allpats          = 0;  /* generate all patterns, even small ones */
 int printworms       = 0;  /* print full data on each string */
 int printmoyo        = 0;  /* print moyo board each move */
 int printboard       = 0;  /* print board each move */
-int board_size       = 19; /* board size */
 int count_variations = 0;  /* used by decide_string */
 int sgf_dump         = 0;  /* used by decide_string */
 SGFTree *sgf_dumptree = NULL;
@@ -103,9 +111,9 @@ int disable_fuseki   = 0;  /* do not generate fuseki moves */
 int josekidb         = 1;  /* use fuseki database */
 int showtime         = 0;  /* print time to find move */
 int showscore        = 0;  /* print estimated score */
-float score          = 0.;
-float lower_bound    = 0.;
-float upper_bound    = 0.;
+float score          = 0.0;
+float lower_bound    = 0.0;
+float upper_bound    = 0.0;
 int level            = DEFAULT_LEVEL; /* strength; up to 10 supported */
 int urgent           = 0;  /* urgent move on board */
 int debug            = 0;  /* controls debug output */

@@ -737,7 +737,7 @@ play_aftermath(int color)
 {
   int m, n;
   int ii;
-  Position saved_pos;
+  struct board_state saved_board;
   struct aftermath_data *a = &aftermath;
   static int current_board[BOARDMAX];
   static int current_color = EMPTY;
@@ -774,9 +774,9 @@ play_aftermath(int color)
   a->white_area = 0;
   a->black_area = 0;
   
-  store_position(&saved_pos);
+  store_board(&saved_board);
   do_play_aftermath(color, a);
-  restore_position(&saved_pos);
+  restore_board(&saved_board);
   
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {

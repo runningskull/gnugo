@@ -122,7 +122,7 @@ main(int argc, char *argv[])
 
 
   /* Check if there is enough screen space. */
-  if (!display_init(MINWIDTH, MINHEIGHT, gameinfo.position.boardsize))
+  if (!display_init(MINWIDTH, MINHEIGHT, board_size))
     exit(1);
 
   /* Initialize the GNU Go engine. */
@@ -135,8 +135,8 @@ main(int argc, char *argv[])
 
   tab_window_draw(tabs);
 
-  display_board_position(&gameinfo.position, NULL);
-  gnugo_examine_position(&gameinfo.position, next, EXAMINE_ALL);
+  display_board_position(NULL);
+  gnugo_examine_position(next, EXAMINE_ALL);
 
   choose_worms_tab();
   main_loop();
@@ -323,15 +323,15 @@ show_current_info()
 {
   switch (display_cur_tabchoice()) {
   case 0: 
-    display_board_position(&gameinfo.position, display_worm_tactical_data);
+    display_board_position(display_worm_tactical_data);
     display_worm(POS(display_cur_row(), display_cur_col()));
     break;
   case 1:
-    display_board_position(&gameinfo.position, NULL);
+    display_board_position(NULL);
     display_dragon(POS(display_cur_row(), display_cur_col()));
     break;
   case 2: 
-    display_board_position(&gameinfo.position, NULL);
+    display_board_position(NULL);
     if (current_color == WHITE)
       display_eye(WHITE, white_eye, POS(display_cur_row(), display_cur_col()));
     else

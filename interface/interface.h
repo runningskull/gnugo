@@ -35,15 +35,13 @@ void play_ascii(SGFTree *tree, Gameinfo *gameinfo,
 void play_ascii_emacs(SGFTree *tree, Gameinfo *gameinfo, 
 		      char *filename, char *until);
 void play_gtp(FILE *gtp_input, int gtp_initial_orientation);
-void play_gmp(int boardsize, Gameinfo *gameinfo);
+void play_gmp(Gameinfo *gameinfo);
 void play_solo(Gameinfo *gameinfo, int benchmark);
 void play_replay(SGFNode *sgf_head, int color_to_test);
 
-void load_and_analyze_sgf_file(SGFNode *head, Gameinfo *gameinfo,
-			       const char *untilstr, int benchmark, 
-			       int to_move);
+void load_and_analyze_sgf_file(Gameinfo *gameinfo, int benchmark);
 void load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
-			     const char *untilstr);
+			     const char *scoringmode);
 
 
 #endif

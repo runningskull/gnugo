@@ -2,6 +2,23 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- global variable last_moves[] removed
+- move history added to board state
+- static function undo_move() in board.c renamed to undo_trymove()
+- new global functions store_board(), restore_board(), undo_move(),
+  get_last_opponent_move(), and get_last_move() in board.c 
+- macros do_add_stone() and do_remove_stone() removed from board.c
+- Position struct removed
+- Gameinfo struct revised
+- new board_state struct
+- API functions gnugo_* work on an internal board state instead of on
+  an externally provided board state
+- board_size workaround in influence.c obsoleted and removed
+- revised order of operations in main.c; in particular playing up the
+  position specified by -l and -L options centralized
+- revised modes for --score option
+- all undo implementations in GTP, GMP, and ASCII interfaces replaced
+  by the new undo_move() function in the board code
 - Added several .h files to appropriate .dsp files
 - corrected gcc warnings & other cleanup in mkpat.c
 - komaster_to_string now takes 2 arguments

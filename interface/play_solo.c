@@ -43,7 +43,7 @@ play_solo(Gameinfo *gameinfo, int moves)
   int move_val;
   double t1, t2;
   int save_moves = moves;
-  int boardsize = gameinfo->position.boardsize;
+  int boardsize = gnugo_get_boardsize();
 
   struct stats_data totalstats;
   int total_owl_count = 0;
@@ -65,8 +65,7 @@ play_solo(Gameinfo *gameinfo, int moves)
       do {
 	i = (gg_rand() % 4) + (gg_rand() % (boardsize - 4));
 	j = (gg_rand() % 4) + (gg_rand() % (boardsize - 4));
-      } while (!gnugo_is_legal(&gameinfo->position, i, j, 
-			       gameinfo->to_move));
+      } while (!gnugo_is_legal(i, j, gameinfo->to_move));
       
       gameinfo_play_move(gameinfo, i, j, gameinfo->to_move);
     } while (--n > 0);
@@ -76,20 +75,18 @@ play_solo(Gameinfo *gameinfo, int moves)
   memset(&totalstats, '\0', sizeof(totalstats));
   while (passes < 2 && --moves >= 0 && !time_to_die) {
     reset_owl_node_counter();
-    move_val = gnugo_genmove(&gameinfo->position, &i, &j,
-			     gameinfo->to_move,
-			     gameinfo->move_number);
+    move_val = gnugo_genmove(&i, &j, gameinfo->to_move);
     gameinfo_play_move(gameinfo, i, j, gameinfo->to_move);
 
     if (move_val < 0) {
       ++passes;
       printf("%s(%d): Pass\n", gameinfo->to_move == BLACK ? "Black" : "White",
-	     gameinfo->move_number);
+	     movenum);
     }
     else {
       passes = 0;
       gprintf("%s(%d): %m\n", gameinfo->to_move == BLACK ? "Black" : "White",
-	      gameinfo->move_number, i, j);
+	      movenum, i, j);
     }
 
     totalstats.nodes               += stats.nodes;
@@ -102,7 +99,7 @@ play_solo(Gameinfo *gameinfo, int moves)
   t2 = gg_cputime();
   
   /* Two passes and it's over. (EMPTY == BOTH) */
-  gnugo_who_wins(&gameinfo->position, EMPTY, stdout);
+  gnugo_who_wins(EMPTY, stdout);
 
 #if 0
   if (t2 == t1)
@@ -135,20 +132,13 @@ play_solo(Gameinfo *gameinfo, int moves)
  */
 
 void 
-load_and_analyze_sgf_file(SGFNode *head, Gameinfo *gameinfo, 
-			  const char *untilstr, int benchmark, int to_move)
+load_and_analyze_sgf_file(Gameinfo *gameinfo, int benchmark)
 {
   int i, j;
   int next;
   int r;
   
-  /* We load the header to get correct boardsize, komi, and handicap
-   * for writing.
-   */
-  gameinfo_load_sgfheader(gameinfo, head); 
-  next = gameinfo_play_sgftree(gameinfo, head, untilstr);
-  if (to_move != EMPTY)
-    next = to_move;
+  next = gameinfo->to_move;
   gameinfo->computer_player = next;
   sgffile_write_gameinfo(gameinfo, "load and analyze");
 
@@ -168,7 +158,7 @@ load_and_analyze_sgf_file(SGFNode *head, Gameinfo *gameinfo,
     else {
       gprintf("%s move %m\n", next == WHITE ? "white (o)" : "black (X)",
 	      i, j);
-      gnugo_play_move(&gameinfo->position, i, j, next);
+      gnugo_play_move(i, j, next);
       sgffile_move_made(i, j, next, 0);
     }
   }
@@ -177,22 +167,19 @@ load_and_analyze_sgf_file(SGFNode *head, Gameinfo *gameinfo,
 
 /*
  * Load SGF file and score the game
- * untilstr:
- * end  - finish the game by selfplaying from the end of the file until 
- *        two passes
- * last - estimate territorial balance at the end of the of the file
- * move - load file until move is reached and estimate territorial balance
- *
- * aftermath - like 'end' but also plays out the aftermath
+ * scoringmode:
+ * estimate  - estimate territorial balance
+ * finish    - finish the game by selfplaying and then count the score quickly
+ * aftermath - like 'finish' but also play out the aftermath in order to
+ *             get an accurate score
  */
 
 void 
 load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo, 
-			const char *untilstr)
+			const char *scoringmode)
 {
   int i, j, move_val, pass;
   int until;
-  float komi;
   float result;
   char *tempc = NULL;
   char dummy;
@@ -202,41 +189,36 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
   pass = 0;
 
   assert(tree);
-  gameinfo_load_sgfheader(gameinfo, tree->root);
   sgffile_write_gameinfo(gameinfo, "load and score");
-  next = gameinfo_play_sgftree(gameinfo, tree->root, untilstr);
-  komi = gameinfo->position.komi;
+  next = gameinfo->to_move;
   doing_scoring = 1;
   
-  until = atoi(untilstr);
-  if (!strcmp(untilstr, "end") || !strcmp(untilstr, "aftermath")) {
+  if (!strcmp(scoringmode, "finish") || !strcmp(scoringmode, "aftermath")) {
     until = 9999;
     do {
       move_val = genmove_conservative(&i, &j, next);
-      play_move(POS(i, j), next);
       if (move_val >= 0) {
 	pass = 0;
-	gprintf("%d %s move %m\n", gameinfo->move_number,
+	gprintf("%d %s move %m\n", movenum,
 		next == WHITE ? "white (o)" : "black (X)", i, j);
       }
       else {
 	++pass;
-	gprintf("%d %s move : PASS!\n", gameinfo->move_number, 
+	gprintf("%d %s move : PASS!\n", movenum, 
 		next == WHITE ? "white (o)" : "black (X)");
       }
+      play_move(POS(i, j), next);
       sgffile_move_made(i, j, next, move_val);
       sgftreeAddPlay(tree, 0, next, i, j);
-      gameinfo->move_number++;
       next = OTHER_COLOR(next);
-    } while ((gameinfo->move_number <= until) && (pass < 2));
+    } while (movenum <= until && pass < 2);
 
     if (pass >= 2) {
       /* Calculate the score */
-      if (!strcmp(untilstr, "aftermath"))
+      if (!strcmp(scoringmode, "aftermath"))
 	score = aftermath_compute_score(next, komi);
       else
-	score = gnugo_estimate_score(&gameinfo->position,
-				     &lower_bound, &upper_bound);
+	score = gnugo_estimate_score(&lower_bound, &upper_bound);
 
       if (score < 0.0) {
 	sprintf(text, "Black wins by %1.1f points\n", -score);
@@ -257,7 +239,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
 	if (sscanf(tempc, "%1c%f", &dummy, &result) == 2) {
 	  fprintf(stdout, "Result from file: %1.1f\n", result);
 	  fputs("GNU Go result and result from file are ", stdout);
-	  if ((result == fabs(score)) && (winner == dummy))
+	  if (result == fabs(score) && winner == dummy)
 	    fputs("identical\n", stdout);
 	  else
 	    fputs("different\n", stdout);
@@ -279,10 +261,13 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
   }
   doing_scoring = 0;
 
-  if (!strcmp(untilstr, "aftermath"))
+  if (!strcmp(scoringmode, "aftermath"))
     return;
 
-  move_val = genmove_conservative(&i, &j, next);
+  /* Before we call estimate_score() we must make sure that the dragon
+   * status is computed. Therefore the call to examine_position().
+   */
+  examine_position(next, EXAMINE_ALL);
   score = estimate_score(NULL, NULL);
 
   fprintf(stdout, "\n%s seems to win by %1.1f points\n",

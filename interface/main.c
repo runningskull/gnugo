@@ -260,7 +260,6 @@ main(int argc, char *argv[])
 {
   Gameinfo gameinfo;
   SGFTree sgftree;
-  int boardsize = 19;
 
   int i, umove;
   int mandated_color = EMPTY;
@@ -269,6 +268,7 @@ main(int argc, char *argv[])
   
   char *infilename = NULL;
   char *untilstring = NULL;
+  char *scoringmode = NULL;
   char *outfile = NULL;
   char *gtpfile = NULL;
   
@@ -279,17 +279,19 @@ main(int argc, char *argv[])
   char debuginfluence_move[4] = "\0";
   
   int benchmark = 0;  /* benchmarking mode (-b) */
-  float komi = 0.0;
   FILE *gtp_input_FILE;
   int orientation = 0;
-  int to_move = EMPTY;
+
+  /* If seed is zero, GNU Go will play a different game each time. If
+   * it is set using -r, GNU Go will play the same game each time.
+   * (Change seed to get a different game).
+   */
+  int seed = 0;
+
+  board_size = 19;
+  komi = 0.0;
   
-  int seed = 0;      /* If seed is zero, GNU Go will play a different game 
-			each time. If it is set using -r, GNU Go will play the
-			same game each time. (Change seed to get a different
-			game). */
-  
-  /* set SIGTERM handler*/
+  /* Set SIGTERM handler. */
   signal(SIGTERM, sigterm_handler);
 
   level = DEFAULT_LEVEL;
@@ -307,8 +309,6 @@ main(int argc, char *argv[])
   mandated_owl_reading_depth   = -1;
   mandated_owl_node_limit      = -1;
   mandated_aa_depth            = -1;
-  last_moves[0]                = 0;
-  last_moves[1]                = 0;
 
   debug = 0;
   life  = 0;
@@ -332,21 +332,20 @@ main(int argc, char *argv[])
   capture_all_dead = 0;
   play_out_aftermath = 0;
 
-  /* default parameters for clock
-   * and auto level systems */
-  clock_init(3600, 0, 0); /* One hour sudden death */
+  /* Default parameters for clock and auto level systems. */
+  clock_init(3600, 0, 0);      /* One hour sudden death. */
   clock_init_autolevel(2, 10); /* 2 < level < 10 */
 
   sgftree_clear(&sgftree);
-  gameinfo_clear(&gameinfo, boardsize, komi);
-
+  gameinfo_clear(&gameinfo, board_size, komi);
+  
   /* Set some standard options. */
   umove = BLACK;
   
   /* Now weed through all of the command line options. */
-  while ((i=gg_getopt_long(argc, argv, 
-			"-ab:B:d:D:EF:gh::H:K:l:L:M:m:o:p:r:fsStTvw",
-			long_options, NULL)) != EOF)
+  while ((i = gg_getopt_long(argc, argv, 
+			     "-ab:B:d:D:EF:gh::H:K:l:L:M:m:o:p:r:fsStTvw",
+			     long_options, NULL)) != EOF)
     {
       switch (i) {
       case 'T': printboard++; break;
@@ -443,16 +442,18 @@ main(int argc, char *argv[])
 	}
         break;
       
-      case OPT_BOARDSIZE: 
-	boardsize = atoi(gg_optarg);
+      case OPT_BOARDSIZE:
+        {
+	  int boardsize = atoi(gg_optarg);
 	  
-	if (boardsize < MIN_BOARD || boardsize > MAX_BOARD) {
-	  fprintf(stderr, "Illegal board size: %d.\n", boardsize);
-	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
-	  exit(EXIT_FAILURE);
+	  if (boardsize < MIN_BOARD || boardsize > MAX_BOARD) {
+	    fprintf(stderr, "Illegal board size: %d.\n", boardsize);
+	    fprintf(stderr, "Try `gnugo --help' for more information.\n");
+	    exit(EXIT_FAILURE);
+	  }
+	  gnugo_clear_board(boardsize);
+	  break;
 	}
-	gnugo_clear_position(&gameinfo.position, boardsize, komi);
-	break;
 	
       case OPT_KOMI: 
 	if (sscanf(gg_optarg, "%f", &komi) != 1) {
@@ -460,7 +461,6 @@ main(int argc, char *argv[])
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	  exit(EXIT_FAILURE);
 	}
-	gameinfo.position.komi = komi;
 	break;
 	
       case OPT_CHINESE_RULES: 
@@ -553,7 +553,7 @@ main(int argc, char *argv[])
 	if (strlen(gg_optarg) > 7) {
 	  fprintf(stderr, 
 		  "usage: --decide-connection [first string]/[second string]\n");
-	  return (EXIT_FAILURE);
+	  return EXIT_FAILURE;
 	}
 	strcpy(decide_this, gg_optarg);
 	strtok(decide_this, "/");
@@ -561,7 +561,7 @@ main(int argc, char *argv[])
 	if (!decide_that) {
 	  fprintf(stderr, 
 		  "usage: --decide-connection [first string]/[second string]\n");
-	  return (EXIT_FAILURE);
+	  return EXIT_FAILURE;
 	}
 
 	playmode = MODE_DECIDE_CONNECTION;
@@ -580,7 +580,7 @@ main(int argc, char *argv[])
 	if (strlen(gg_optarg) > 7) {
 	  fprintf(stderr, 
 		  "usage: --decide-semeai [first dragon]/[second dragon]\n");
-	  return (EXIT_FAILURE);
+	  return EXIT_FAILURE;
 	}
 	strcpy(decide_this, gg_optarg);
 	strtok(decide_this, "/");
@@ -588,7 +588,7 @@ main(int argc, char *argv[])
 	if (!decide_that) {
 	  fprintf(stderr, 
 		  "usage: --decide-semeai [first dragon]/[second dragon]\n");
-	  return (EXIT_FAILURE);
+	  return EXIT_FAILURE;
 	}
 
 	playmode = MODE_DECIDE_SEMEAI;
@@ -598,7 +598,7 @@ main(int argc, char *argv[])
 	if (strlen(gg_optarg) > 7) {
 	  fprintf(stderr, 
 		  "usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
-	  return (EXIT_FAILURE);
+	  return EXIT_FAILURE;
 	}
 	strcpy(decide_this, gg_optarg);
 	strtok(decide_this, "/");
@@ -606,7 +606,7 @@ main(int argc, char *argv[])
 	if (!decide_that) {
 	  fprintf(stderr, 
 		  "usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
-	  return (EXIT_FAILURE);
+	  return EXIT_FAILURE;
 	}
 
 	playmode = MODE_DECIDE_TACTICAL_SEMEAI;
@@ -731,7 +731,7 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_SCORE:
-	untilstring = gg_optarg;
+	scoringmode = gg_optarg;
 	if (playmode == MODE_UNKNOWN)
 	  playmode = MODE_LOAD_AND_SCORE;
 	break;
@@ -812,22 +812,50 @@ main(int argc, char *argv[])
       }
     }
 
-  /* Read the infile if there is one. */
+
+  /* Display copyright message unless --quiet option used. */
+  if (!quiet) {
+    fprintf(stderr, "\n");
+    show_version();
+    show_copyright();
+  }
+  
+  /* Start random number seed. */
+  if (!seed)
+    seed = time(0);
+  gg_srand(seed);
+  gameinfo.seed = seed;
+
+  
+  /* Initialize the GNU Go engine. */
+  init_gnugo(memory);
+
+  
+  /* Read the infile if there is one. Also play up the position. */
   if (infilename) {
     if (!sgftree_readfile(&sgftree, infilename)) {
       fprintf(stderr, "Cannot open or parse '%s'\n", infilename);
       exit(EXIT_FAILURE);
     }
+    
+    gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
+			      untilstring, orientation);
   }
+
+  /* Initialize and empty sgf tree if there was no infile. */
+  if (!sgftree.root)
+    sgftreeCreateHeaderNode(&sgftree, board_size, komi);
+
+  /* Set the game_record to be identical to the loaded one or the
+   * newly created empty sgf tree.
+   */
+  gameinfo.game_record = sgftree;
   
-  /* Need to know the board size before we can do this.
-   * FIXME: This has been broken at some time. Currently we
-   * don't have the right boardsize in the relevant case. There is
-   * an ugly workaround in influence.c for this.
+  /* Notice that we need to know the board size before we can do this.
    */
   if (debuginfluence_move[0]) {
     int m, n;
-    string_to_location(boardsize, debuginfluence_move, &m, &n);
+    string_to_location(board_size, debuginfluence_move, &m, &n);
     debug_influence_move(m, n);
   }
   
@@ -837,21 +865,6 @@ main(int argc, char *argv[])
       playmode = MODE_LOAD_AND_ANALYZE;
     else
       playmode = (isatty(0)) ? MODE_ASCII : MODE_GMP;
-  }
-  
-  /* start random number seed */
-  if (!seed)
-    seed = time(0);
-  gg_srand(seed);
-  gameinfo.seed = seed;
-  
-  /* Initialize the GNU go engine. */
-  init_gnugo(memory);
-  
-  if (!quiet) {
-    fprintf(stderr, "\n");
-    show_version();
-    show_copyright();
   }
   
   if (outfile) {
@@ -871,15 +884,10 @@ main(int argc, char *argv[])
   
   switch (playmode) {
   case MODE_GMP:     
-    if (!sgftree.root)
-      sgftreeCreateHeaderNode(&sgftree, boardsize, komi);
-    play_gmp(boardsize, &gameinfo);
+    play_gmp(&gameinfo);
     break;
     
   case MODE_SOLO:
-    if (!sgftree.root)
-      sgftreeCreateHeaderNode(&sgftree, boardsize, komi);
-    gameinfo.moves = sgftree;
     play_solo(&gameinfo, benchmark);
     break;
     
@@ -893,14 +901,13 @@ main(int argc, char *argv[])
     
   case MODE_LOAD_AND_ANALYZE:
     if (mandated_color != EMPTY)
-      to_move = mandated_color;
+      gameinfo.to_move = mandated_color;
     
     if (!sgftree.root) {
       fprintf(stderr, "You must use -l infile with load and analyze mode.\n");
       exit(EXIT_FAILURE);
     }
-    load_and_analyze_sgf_file(sgftree.root, &gameinfo, untilstring,
-			      benchmark, to_move);
+    load_and_analyze_sgf_file(&gameinfo, benchmark);
     break;
     
   case MODE_LOAD_AND_SCORE:
@@ -908,7 +915,7 @@ main(int argc, char *argv[])
       fprintf(stderr, "gnugo: --score must be used with -l\n");
       exit(EXIT_FAILURE);
     }
-    load_and_score_sgf_file(&sgftree, &gameinfo, untilstring);
+    load_and_score_sgf_file(&sgftree, &gameinfo, scoringmode);
     break;
     
   case MODE_LOAD_AND_PRINT:
@@ -917,16 +924,8 @@ main(int argc, char *argv[])
       exit(EXIT_FAILURE);
     }
     else {
-      int to_move;
-
-      gameinfo_load_sgfheader(&gameinfo, sgftree.root);
       sgffile_write_gameinfo(&gameinfo, "load and print"); 
-      to_move = gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
-      					untilstring, orientation);
-      sgffile_close_file();
-      sgffile_open_file(printsgffile);
-      sgffile_write_gameinfo(&gameinfo, "load and print"); 
-      sgffile_printboard(to_move);
+      sgffile_printboard(gameinfo.to_move);
     }
     break;
     
@@ -936,22 +935,18 @@ main(int argc, char *argv[])
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-string must be used with -l\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
       
-      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
-				untilstring, orientation);
-      boardsize = gameinfo.position.boardsize;
-      
-      if (!string_to_location(boardsize, decide_this, &m, &n)) {
+      if (!string_to_location(board_size, decide_this, &m, &n)) {
 	fprintf(stderr, "gnugo: --decide-string: strange coordinate \n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
 
-      rotate(m, n, &m, &n, boardsize, orientation);
+      rotate(m, n, &m, &n, board_size, orientation);
       decide_string(POS(m, n), outfile);
     }
-  break;
+    break;
   
   case MODE_DECIDE_CONNECTION:
     {
@@ -959,25 +954,21 @@ main(int argc, char *argv[])
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-connection must be used with -l\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
       
-      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
-      				untilstring, orientation);
-      boardsize = gameinfo.position.boardsize;
-      
-      if (!string_to_location(boardsize, decide_this, &ai, &aj)) {
+      if (!string_to_location(board_size, decide_this, &ai, &aj)) {
 	fprintf(stderr, "usage: --decide-connection [first string]/[second string]\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
       
-      if (!string_to_location(boardsize, decide_that, &bi, &bj)) {
+      if (!string_to_location(board_size, decide_that, &bi, &bj)) {
 	fprintf(stderr, "usage: --decide-connection [first string]/[second string]\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
 
-      rotate(ai, aj, &ai, &aj, boardsize, orientation);
-      rotate(bi, bj, &bi, &bj, boardsize, orientation);
+      rotate(ai, aj, &ai, &aj, board_size, orientation);
+      rotate(bi, bj, &bi, &bj, board_size, orientation);
       decide_connection(POS(ai, aj), POS(bi, bj), outfile);
     }
   break;
@@ -988,19 +979,15 @@ main(int argc, char *argv[])
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-dragon must be used with -l\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
       
-      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
-      				untilstring, orientation);
-      boardsize = gameinfo.position.boardsize;
-      
-      if (!string_to_location(boardsize, decide_this, &m, &n)) {
+      if (!string_to_location(board_size, decide_this, &m, &n)) {
 	fprintf(stderr, "gnugo: --decide-dragon: strange coordinate \n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
 
-      rotate(m, n, &m, &n, boardsize, orientation);
+      rotate(m, n, &m, &n, board_size, orientation);
       decide_dragon(POS(m, n), outfile);
     }
     break;
@@ -1011,27 +998,23 @@ main(int argc, char *argv[])
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-semeai must be used with -l\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
       
-      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
-      				untilstring, orientation);
-      boardsize = gameinfo.position.boardsize;
-      
-      if (!string_to_location(boardsize, decide_this, &ai, &aj)) {
+      if (!string_to_location(board_size, decide_this, &ai, &aj)) {
 	fprintf(stderr, 
 		"usage: --decide-semeai [first dragon]/[second dragon]\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
       
-      if (!string_to_location(boardsize, decide_that, &bi, &bj)) {
+      if (!string_to_location(board_size, decide_that, &bi, &bj)) {
 	fprintf(stderr, 
 		"usage: --decide-semeai [first dragon]/[second dragon]\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
 
-      rotate(ai, aj, &ai, &aj, boardsize, orientation);
-      rotate(bi, bj, &bi, &bj, boardsize, orientation);
+      rotate(ai, aj, &ai, &aj, board_size, orientation);
+      rotate(bi, bj, &bi, &bj, board_size, orientation);
       decide_semeai(POS(ai, aj), POS(bi, bj), outfile);
     }
     break;
@@ -1043,27 +1026,23 @@ main(int argc, char *argv[])
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-tactical-semeai must be used with -l\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
       
-      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
-      				untilstring, orientation);
-      boardsize = gameinfo.position.boardsize;
-      
-      if (!string_to_location(boardsize, decide_this, &ai, &aj)) {
+      if (!string_to_location(board_size, decide_this, &ai, &aj)) {
 	fprintf(stderr, 
 		"usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
       
-      if (!string_to_location(boardsize, decide_that, &bi, &bj)) {
+      if (!string_to_location(board_size, decide_that, &bi, &bj)) {
 	fprintf(stderr, 
 		"usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
 
-      rotate(ai, aj, &ai, &aj, boardsize, orientation);
-      rotate(bi, bj, &bi, &bj, boardsize, orientation);
+      rotate(ai, aj, &ai, &aj, board_size, orientation);
+      rotate(bi, bj, &bi, &bj, board_size, orientation);
       decide_tactical_semeai(POS(ai, aj), POS(bi, bj), outfile);
     }
     break;
@@ -1074,10 +1053,9 @@ main(int argc, char *argv[])
       int color;
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-position must be used with -l\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
-      color = gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
-      					untilstring, orientation);
+      color = gameinfo.to_move;
       if (mandated_color != EMPTY)
 	color = mandated_color;
       decide_position(color, outfile);
@@ -1090,19 +1068,15 @@ main(int argc, char *argv[])
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-eye must be used with -l\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
       
-      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
-      		untilstring, orientation);
-      boardsize = gameinfo.position.boardsize;
-      
-      if (!string_to_location(boardsize, decide_this, &m, &n)) {
+      if (!string_to_location(board_size, decide_this, &m, &n)) {
 	fprintf(stderr, "gnugo: --decide-eye: strange coordinate \n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
       
-      rotate(m, n, &m, &n, boardsize, orientation);
+      rotate(m, n, &m, &n, board_size, orientation);
       decide_eye(POS(m, n), outfile);
     }
     break;
@@ -1112,10 +1086,9 @@ main(int argc, char *argv[])
       int color;
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-combination must be used with -l\n");
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
-      color = gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
-      					untilstring, orientation);
+      color = gameinfo.to_move;
       if (mandated_color != EMPTY)
 	color = mandated_color;
       decide_combination(color, outfile);
@@ -1123,14 +1096,11 @@ main(int argc, char *argv[])
     break;
     
   case MODE_GTP:  
-    if (!sgftree.root)
-      sgftreeCreateHeaderNode(&sgftree, boardsize, komi);
-
     if (gtpfile != NULL) {
       gtp_input_FILE = fopen(gtpfile, "r");
       if (gtp_input_FILE == NULL) {
 	fprintf(stderr, "gnugo: Cannot open file %s\n", gtpfile);
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
       } 
     }
     else
@@ -1143,8 +1113,6 @@ main(int argc, char *argv[])
     if (mandated_color != EMPTY)
       umove = mandated_color;
     gameinfo.computer_player = OTHER_COLOR(umove);
-    if (!sgftree.root)
-      sgftreeCreateHeaderNode(&sgftree, boardsize, komi);
     play_ascii_emacs(&sgftree, &gameinfo, infilename, untilstring);
     break;
 
@@ -1153,8 +1121,6 @@ main(int argc, char *argv[])
     if (mandated_color != EMPTY)
       umove = mandated_color;
     gameinfo.computer_player = OTHER_COLOR(umove);
-    if (!sgftree.root)
-      sgftreeCreateHeaderNode(&sgftree, boardsize, komi);
     play_ascii(&sgftree, &gameinfo, infilename, untilstring);
     break;
   }
@@ -1267,9 +1233,8 @@ Experimental options:\n\
    --nofuseki              turn off fuseki moves entirely\n\
    --nojosekidb            turn off joseki database\n\
 Scoring:\n\
-   --score last            estimate score at last move in SGF file\n\
-   --score until <n>       score at move 'n' in SGF file\n\
-   --score end             generate moves to finish game, then score\n\
+   --score estimate        estimate score at loaded position\n\
+   --score finish          generate moves to finish game, then score\n\
    --score aftermath       generate moves to finish, use best algorithm\n\
    --score aftermath --capture-all-dead --chinese rules   Tromp-Taylor score\n\
 \n\
