@@ -25,6 +25,7 @@
 - bugfix in special_attack4
 - warning fixed in mkpat
 - formatting errors fixed in decidestring and other places: use %1m
+- gtp_dragon_data() revised
 - twogtp-a writes html
 - tuning
 - owl tuning
