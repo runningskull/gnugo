@@ -1184,6 +1184,27 @@ strategic_penalty(int pos, int color)
 }
 
 
+/* True if pos is adjacent to a nondead stone of the given color. This
+ * function can be called when stackp>0 but the result is given for the
+ * position when stackp==0.
+ *
+ * FIXME: Move this somewhere more generally accessible, probably
+ *        utils.c
+ */
+static int
+adjacent_to_nondead_stone(int pos, int color)
+{
+  int k;
+  for (k = 0; k < 4; k++)
+    if (ON_BOARD(pos + delta[k])
+	&& worm[pos + delta[k]].color == color
+	&& dragon[pos + delta[k]].status != DEAD)
+      return 1;
+  
+  return 0;
+}
+
+
 /*
  * Estimate the direct territorial value of a move at (pos).
  */
@@ -1394,7 +1415,8 @@ estimate_territorial_value(int pos, int color, float score)
 	 * move is tested.
 	 */
 	if (board[aa] != EMPTY
-	    && move[pos].move_safety == 1
+	    && (move[pos].move_safety == 1
+		|| adjacent_to_nondead_stone(pos, color))
 	    && find_defense(aa, &defense_move) == WIN
 	    && defense_move != NO_MOVE) {
 	  if (trymove(defense_move, other,
@@ -1880,9 +1902,12 @@ estimate_strategical_value(int pos, int color, float score)
 	      this_value = 0.0;
 
 	    /* If this dragon can be tactically attacked and the move
-             * does not defend, no points.
+             * does not defend or attack, no points.
 	     */
-	    if (worm[bb].attack_codes[0] != 0 && !does_defend(pos, bb))
+	    if (worm[bb].attack_codes[0] != 0
+		&& ((color == board[bb] && !does_defend(pos, bb))
+		    || (color == OTHER_COLOR(board[bb])
+			&& !does_attack(pos, bb))))
 	      this_value = 0.0;
 
 	    /* If we are doing scoring, are alive, and the move loses

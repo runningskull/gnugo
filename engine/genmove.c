@@ -322,6 +322,7 @@ do_genmove(int *move, int color, float pure_threat_value)
 {
   float val;
   int save_verbose;
+  int save_depth;
 
   start_timer(0);
   
@@ -347,6 +348,11 @@ do_genmove(int *move, int color, float pure_threat_value)
 
   /* Prepare pattern matcher and reading code. */
   reset_engine();
+
+  /* Store the depth value so we can check that it hasn't changed when
+   * we leave this function.
+   */
+  save_depth = depth;
 
   /* If in mirror mode, try to find a mirror move. */
   if (play_mirror_go
@@ -558,7 +564,7 @@ do_genmove(int *move, int color, float pure_threat_value)
     gprintf("Hash collisions:      %d\n", stats.hash_collisions);
   }
  
- if (showtime) {
+  if (showtime) {
     double spent = time_report(0, "TIME to generate move at ", *move, 1.0);
     total_time += spent;
     if (spent > slowest_time) {
@@ -576,8 +582,14 @@ do_genmove(int *move, int color, float pure_threat_value)
 
     }
   }
-  
+
+  /* Some consistency checks to verify that things are properly
+   * restored and/or have not been corrupted.
+   */
+  gg_assert(stackp == 0);
   gg_assert(test_gray_border() < 0);
+  gg_assert(depth == save_depth);
+
   return val;
 }
 

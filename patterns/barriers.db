@@ -123,6 +123,23 @@ ba
 ;oplay_attack_either(a,b,c,a,c) || !oplay_attack_either(a,b,b,d)
 
 
+Pattern Barrier6b
+# gf New pattern. (3.3.10)
+# See century2002:85.
+
+OX
+,.
+--
+
+:8,A
+
+aX
+,.
+--
+
+;!defend(a)
+
+
 Pattern Barrier7
 
 XX
@@ -876,6 +893,38 @@ Pattern Barrier62
 .!..
 
 :8,OXD
+
+
+Pattern Barrier63
+# gf New pattern. (3.3.10)
+
+oX..
+O,..
+.,,.
+....
+----
+
+:8,D
+
+
+Pattern Barrier64
+# gf New pattern. (3.3.10)
+
+oX..
+O,,.
+..,,
+....
+----
+
+:8,D
+
+oXc.
+Oab.
+..,,
+....
+----
+
+;!oplay_attack(a,b,c,c)
 
 
 Pattern Intrusion1
@@ -2714,6 +2763,29 @@ XaO
 ;!oplay_defend_both(a,?,b,C,D)
 
 >non_xterritory(b);
+
+
+Pattern Nonterritory40
+# gf New pattern. (3.3.10)
+
+oX.
+OX.
+...
+...
+---
+
+:8,t
+
+oX.
+OXc
+dab
+.e.
+---
+
+;!oplay_defend(a,b,c,d,a)
+
+>non_oterritory(d);
+>non_oterritory(e);
 
 
 # END OF FILE

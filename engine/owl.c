@@ -4255,6 +4255,8 @@ owl_substantial(int str)
       /* if we can't fill, try swapping with the next liberty */
       if (k < liberties-1
 	  && trymove(libs[k+1], owl->color, NULL, 0, EMPTY, 0)) {
+	if (level >= 10)
+	  increase_depth_values();
 	owl->goal[libs[k]] = 1;
 	libs[k+1] = libs[k];
       }
