@@ -77,6 +77,10 @@ loadsgf games/owl40.sgf
 277 owl_defend A3
 #? [1 PASS]*
 
+loadsgf games/nngs/gnugo-3.3.8-Joorin-200209251541.sgf 169
+278 owl_attack E6
+#? [1 F4]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
