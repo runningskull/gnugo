@@ -2300,7 +2300,7 @@ owl_estimate_life(struct local_owl_data *owl,
       matchpat(owl_shapes_callback, other,
 	       &owl_vital_apat_db, dummy_moves, owl->goal);
     }
-    else
+    else if (max_eyes(probable_eyes) >= 2)
       matchpat(owl_shapes_callback, other,
 	       &owl_vital_apat_db, vital_moves, owl->goal);
   }
