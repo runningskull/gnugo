@@ -59,6 +59,7 @@ static int resignation_allowed;
 /* Keep track of the score estimated before the last computer move. */
 static int current_score_estimate = NO_SCORE;
 
+static void do_play_ascii(Gameinfo *gameinfo);
 static int ascii_endgame(Gameinfo *gameinfo, int reason);
 static void ascii_count(Gameinfo *gameinfo);
 static void showcapture(char *line);
@@ -574,16 +575,7 @@ do_pass(Gameinfo *gameinfo, int *passes, int force)
 void
 play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 {
-  int m, num;
   int sz;
-  float fnum;
-  int passes = 0;  /* two passes and its over */
-  int tmp;
-  char line[80];
-  char *line_ptr = line;
-  char *command;
-  char *tmpstring;
-  int state = 1;
   
   setvbuf(stdout, (char *)NULL, _IONBF, 0); /* No buffering. */
   
@@ -605,6 +597,28 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
     }
     sgf_initialized = 0;
   }
+
+  do_play_ascii(gameinfo);
+  printf("\nThanks! for playing GNU Go.\n\n");
+
+  /* main() frees the tree and we might have changed it. */
+  *tree = sgftree;
+}
+
+
+void
+do_play_ascii(Gameinfo *gameinfo)
+{
+  int m, num;
+  int sz;
+  float fnum;
+  int passes = 0;  /* two passes and its over */
+  int tmp;
+  char line[80];
+  char *line_ptr = line;
+  char *command;
+  char *tmpstring;
+  int state = 1;
 
   while (state == 1) {
     state = 0;
@@ -636,17 +650,14 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 
       /* Read a line of input. */
       line_ptr = line;
-      if (!fgets(line, 80, stdin)) {
-	printf("\nThanks! for playing GNU Go.\n\n");
+      if (!fgets(line, 80, stdin))
 	return;
-      }
 #else
       snprintf(line,79,"%s(%d): ",
 	       color_to_string(gameinfo->to_move), movenum+1);
-      if (!(line_ptr = readline(line))) {
-	printf("\nThanks! for playing GNU go.\n\n");
+      if (!(line_ptr = readline(line)))
 	return;
-      }
+
       add_history(line_ptr);
 #endif
 
@@ -661,7 +672,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	case END:
 	case EXIT:
 	case QUIT:
-	  printf("\nThanks! for playing GNU Go.\n\n");
 	  return;
 
 	case HELP:
@@ -1007,8 +1017,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 
     gameinfo_clear(gameinfo, board_size, komi);
   }
-
-  printf("\nThanks! for playing GNU Go.\n\n");
 }
 
 

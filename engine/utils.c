@@ -194,10 +194,13 @@ somewhere(int color, int check_alive, int num_moves, ...)
     pos = va_arg(ap, int);
 
     if (board[pos] == color
-	&& (!check_alive || dragon[pos].status != DEAD))
+	&& (!check_alive || dragon[pos].status != DEAD)) {
+      va_end(ap);
       return 1;
+    }
   }
 
+  va_end(ap);
   return 0;
 }
 
