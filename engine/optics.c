@@ -822,6 +822,8 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
    */
   int interior_stones = 0;
 
+  memset(chainlinks, 0, BOARDMAX);
+
   for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
     int k;
 
