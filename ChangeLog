@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function special_rescue5() in reading.c
+- defend2() and defend3() revised
+- new GTP command list_stones
 - support for marginal eye points with opponent stones in eyes.db
 - persistent caching added to owl_does_attack()
 - owl_does_defend() and owl_does_attack() now understand ko
