@@ -94,4 +94,4 @@ loadsgf games/nngs/leftd-gnugo-3.3.16-200302252226.sgf -L 256
 
 loadsgf games/nngs/gnugo-3.3.16-ccwills-200303030550.sgf
 22 combination_attack black
-#? [L10]
+#? [L10]*

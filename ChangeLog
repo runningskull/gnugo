@@ -5,7 +5,6 @@
 - reevaluate_ko_threats() revised
 - new helper backfill_replace
 - influence tuning
-- tuning
 - joseki tuning
 - revisions of twogtp.py
 - bugfix in play_move()
@@ -14,6 +13,7 @@
 - new test case
 - semeai tracing improved
 - fix arraybound violation in corner_matchpat()
+- tuning
 
 3.3.17 released March 2, 2003
 

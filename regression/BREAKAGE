@@ -1,3 +1,24 @@
+============================= 3.3.18 pre 1 ===============================
+
+./regress.sh . atari_atari.tst 
+22 unexpected FAIL: Correct 'L10', got 'PASS'
+./regress.sh . strategy3.tst 
+123 unexpected PASS!
+./regress.sh . global.tst 
+27 unexpected PASS!
+34 unexpected FAIL: Correct 'N6', got 'S7'
+./regress.sh . nngs3.tst 
+760 unexpected PASS!
+./regress.sh . nngs4.tst 
+450 unexpected FAIL: Correct 'O8', got 'F7'
+460 unexpected FAIL: Correct 'N10', got 'O9'
+470 unexpected FAIL: Correct 'R9', got 'P10'
+./regress.sh . ninestones.tst 
+300 unexpected PASS!
+./regress.sh . gunnar.tst 
+20 unexpected PASS!
+23 unexpected PASS!
+
 ============================= 3.3.17 ===============================
 
 ./regress.sh . optics.tst 

@@ -99,7 +99,7 @@ loadsgf games/nngs/norate-ggl-200212301513.sgf 234
 # game move is playable but invites trouble.
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 4
 300 gg_genmove black
-#? [P16]*
+#? [P16]
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 8
 310 gg_genmove black
