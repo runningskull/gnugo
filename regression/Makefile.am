@@ -1,4 +1,4 @@
-TST =  13x13.tst arb.tst arend.tst arion.tst atari_atari.tst \
+TST =  13x13.tst arb.tst arend.tst arend2.tst arion.tst atari_atari.tst \
        auto01.tst auto02.tst auto03.tst auto04.tst \
        auto_handtalk.tst blunder.tst buzco.tst capture.tst \
        century2002.tst connect.tst connect_rot.tst \
@@ -39,6 +39,9 @@ arb: arb.tst
 	$(srcdir)/eval.sh arb.tst $(GG_OPTIONS)
 
 arend: arend.tst
+	$(srcdir)/eval.sh arend.tst $(GG_OPTIONS)
+
+arend2: arend2.tst
 	$(srcdir)/eval.sh arend.tst $(GG_OPTIONS)
 
 arion: arion.tst
@@ -350,3 +353,4 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) tactics1.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) manyfaces1.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) gunnar.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) arend2.tst $(GG_OPTIONS)

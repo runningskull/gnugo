@@ -131,6 +131,10 @@ loadsgf games/gunnar/gunnar3.sgf 88
 292 owl_defend T2
 #? [1 T4]*
 
+loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 80
+293 defend Q6
+#? [0]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
