@@ -161,6 +161,18 @@ loadsgf games/nngs/wingjk-gnugo-3.3.17-200304070910.sgf
 300 owl_defend Q4
 #? [1 S5|S2]
 
+loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 126
+301 owl_does_defend A12 A13
+#? [0]
+
+loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 148
+302 owl_defend C19
+#? [0]
+
+loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 166
+303 owl_does_defend A17 A16
+#? [0]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

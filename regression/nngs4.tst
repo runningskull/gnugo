@@ -222,6 +222,25 @@ loadsgf games/nngs/gnugo-3.3.17-ylamaki-200303262305.sgf 11
 540 gg_genmove white
 #? [Q2]*
 
+# New failure (3.3.18)
+loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 40
+550 restricted_genmove white O3 G5
+#? [O3]
+
+# New failure (3.3.18)
+loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 66
+560 restricted_genmove white B13 F7
+#? [B13]
+
+# New failure (3.3.18)
+loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 86
+570 gg_genmove white
+#? [F6]
+
+loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 88
+580 gg_genmove white
+#? [E5]
+
 
 ############ End of Tests #################
 

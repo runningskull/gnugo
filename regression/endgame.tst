@@ -96,7 +96,6 @@ loadsgf games/endgame3.sgf
 302 gg_genmove white
 #? [E5]
 
-
 #################################################################
 # endgame4.sgf is a question of ending with sente or not. Black E5
 # does defend the black F3 string, but turns out to lose a point in
@@ -171,6 +170,13 @@ loadsgf games/paul.sgf 205
 830 restricted_genmove white M19 B13
 #? [B13]
 
+loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 110
+840 gg_genmove white
+#? [L15]
+
+loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 140
+850 restricted_genmove white K4 J4 L4 P5
+#? [K4|J4|L4]
 
 ############ End of Tests #################
 
