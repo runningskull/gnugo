@@ -39,8 +39,13 @@
 void
 init_gnugo(float memory, unsigned int seed)
 {
-  set_random_seed(seed);
+  /* We need a fixed seed when initializing the Zobrist hashing to get
+   * reproducable results.
+   * FIXME: Test the quality of the seed.
+   */
+  set_random_seed(12345);
   reading_cache_init(memory * 1024 * 1024);
+  set_random_seed(seed);
   clear_board();
 
   transformation_init();

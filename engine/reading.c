@@ -1056,8 +1056,10 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
   int xpos = NO_MOVE;
   int dcode = 0;
   int liberties;
+#if !USE_HASHTABLE_NG
   int found_read_result;
   Read_result *read_result = NULL;
+#endif
   int retval;
   
   SETUP_TRACE_INFO("find_defense", str);
@@ -1083,7 +1085,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
     return WIN;
   }
 
-#ifdef USE_HASHTABLE_NG
+#if USE_HASHTABLE_NG
 
   if ((stackp <= depth) && (hashflags & HASH_FIND_DEFENSE)
       && tt_get(&ttable, komaster, kom_pos, FIND_DEFENSE, str, 
@@ -1129,7 +1131,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
     dcode = defend4(str, &xpos, komaster, kom_pos);
 
   if (dcode) {
-#ifdef USE_HASHTABLE_NG
+#if USE_HASHTABLE_NG
     READ_RETURN_NG(komaster, kom_pos, FIND_DEFENSE, str, depth - stackp, 
 		   move, xpos, dcode);
 #else
@@ -1137,7 +1139,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
 #endif
   }
     
-#ifdef USE_HASHTABLE_NG
+#if USE_HASHTABLE_NG
   READ_RETURN0_NG(komaster, kom_pos, FIND_DEFENSE, str, depth - stackp);
 #else
   READ_RETURN0(read_result);
@@ -2967,8 +2969,10 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   int xpos = NO_MOVE;
   int libs;
   int result = 0;
+#if !USE_HASHTABLE_NG
   int found_read_result;
   Read_result *read_result = NULL;
+#endif
   int  retval;
 
   SETUP_TRACE_INFO("attack", str);
@@ -2996,7 +3000,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
     return 0;
   }
 
-#ifdef USE_HASHTABLE_NG
+#if USE_HASHTABLE_NG
 
   if ((stackp <= depth) && (hashflags & HASH_ATTACK)
       && tt_get(&ttable, komaster, kom_pos, ATTACK, str, 
@@ -3051,14 +3055,14 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   ASSERT1(result >= 0 && result <= WIN, str);
   
   if (result)
-#ifdef USE_HASHTABLE_NG
+#if USE_HASHTABLE_NG
     READ_RETURN_NG(komaster, kom_pos, ATTACK, str, depth - stackp, 
 		   move, xpos, result);
 #else
     READ_RETURN(read_result, move, xpos, result);
 #endif
 
-#ifdef USE_HASHTABLE_NG
+#if USE_HASHTABLE_NG
   READ_RETURN0_NG(komaster, kom_pos, ATTACK, str, depth - stackp);
 #else
   READ_RETURN0(read_result);

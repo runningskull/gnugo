@@ -26,8 +26,8 @@
 #include "sgftree.h"
 
 
-/* Define if you want the new transposition table. */
-#define USE_HASHTABLE_NG
+/* Define to 1 if you want the new transposition table. */
+#define USE_HASHTABLE_NG	1
 
 /* local versions of absolute value, min and max */
 

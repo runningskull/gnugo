@@ -898,7 +898,7 @@ reading_cache_init(int bytes)
 {
   float nodes;
 
-#ifdef USE_HASHTABLE_NG
+#if USE_HASHTABLE_NG
 
   /* Use a majority of the memory for the transposition table because
    * that one is used for the tactical reading.  Tests reveal that we
