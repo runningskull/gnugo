@@ -1670,7 +1670,8 @@ estimate_strategical_value(int pos, int color, float score)
 	      this_value = 0.0;
 	    
 	    if (this_value > dragon_value[d1]) {
-	      DEBUG(DEBUG_MOVE_REASONS, "  %1m:   %f - %1m attacked/defended\n",
+	      DEBUG(DEBUG_MOVE_REASONS,
+		    "  %1m:   %f - %1m attacked/defended\n",
 		    pos, this_value, bb);
 	      dragon_value[d1] = this_value;
 	  }
@@ -1775,8 +1776,9 @@ estimate_strategical_value(int pos, int color, float score)
 	  this_value = connection_value(aa, bb, pos, 0);
 	if (this_value > dragon_value[d1]) {
 	  dragon_value[d1] = this_value;
-          DEBUG(DEBUG_MOVE_REASONS, "  %1m:   %f - %1m cut/connect strategic value\n",
-		    pos, this_value, aa);
+          DEBUG(DEBUG_MOVE_REASONS,
+		"  %1m:   %f - %1m cut/connect strategic value\n",
+		pos, this_value, aa);
 	}
 
 	
@@ -1787,8 +1789,9 @@ estimate_strategical_value(int pos, int color, float score)
 	  this_value = connection_value(bb, aa, pos, 0);
 	if (this_value > dragon_value[d2]) {
 	  dragon_value[d2] = this_value;
-          DEBUG(DEBUG_MOVE_REASONS, "  %1m:   %f - %1m cut/connect strategic value\n",
-		    pos, this_value, bb);
+          DEBUG(DEBUG_MOVE_REASONS,
+		"  %1m:   %f - %1m cut/connect strategic value\n",
+		pos, this_value, bb);
 	}
 	
 	break;
@@ -1900,8 +1903,9 @@ estimate_strategical_value(int pos, int color, float score)
 		
 	if (this_value > dragon_value[d1]) {
 	  dragon_value[d1] = this_value;
-          DEBUG(DEBUG_MOVE_REASONS, "  %1m:   %f - %1m strategic attack/defend\n",
-		    pos, this_value, aa);
+          DEBUG(DEBUG_MOVE_REASONS,
+		"  %1m:   %f - %1m strategic attack/defend\n",
+		pos, this_value, aa);
 
 	}
 	break;
@@ -1936,8 +1940,9 @@ estimate_strategical_value(int pos, int color, float score)
 	
 	if (this_value > dragon_value[d1]) {
 	  dragon_value[d1] = this_value;
-	  DEBUG(DEBUG_MOVE_REASONS, "  %1m:   %f - %1m uncertain owl defense bonus\n",
-		    pos, this_value, aa);
+	  DEBUG(DEBUG_MOVE_REASONS,
+		"  %1m:   %f - %1m uncertain owl defense bonus\n",
+		pos, this_value, aa);
 	}
 
 	break;
@@ -1959,7 +1964,8 @@ estimate_strategical_value(int pos, int color, float score)
 	&& dragon[aa].size == worm[aa].size
 	&& (attack_move_reason_known(pos, find_worm(aa))
 	    || defense_move_reason_known(pos, find_worm(aa)))) {
-      TRACE("  %1m:   %f - %1m strategic value already counted.\n", pos, dragon_value[k], aa);
+      TRACE("  %1m:   %f - %1m strategic value already counted.\n",
+	    pos, dragon_value[k], aa);
       continue;
     }
     /* If the dragon has been owl captured, owl defended, or involved
@@ -1979,8 +1985,10 @@ estimate_strategical_value(int pos, int color, float score)
 	TRACE("  %1m: %f - strategic bonus for %1m\n",
 	      pos, excess_value, dragons[k]);
 	tot_value += excess_value;
-      } else {
-	TRACE(" %1m:   %f - %1m strategic value already counted.\n", pos, dragon_value[k], aa);
+      }
+      else {
+	TRACE(" %1m:   %f - %1m strategic value already counted.\n",
+	      pos, dragon_value[k], aa);
       }
       
       continue;
