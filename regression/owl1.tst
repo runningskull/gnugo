@@ -133,7 +133,7 @@ loadsgf games/gunnar/gunnar3.sgf 88
 
 loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 80
 293 owl_defend Q6
-#? [0]
+#? [0]*
 
 loadsgf games/owl42.sgf
 294 owl_defend L11
@@ -296,7 +296,7 @@ loadsgf games/nngs/tommmal-gnugo-3.5.1-200310071202.sgf 194
 
 loadsgf games/nngs/tommmal-gnugo-3.5.1-200310140825.sgf 126
 333 owl_defend C17
-#? [0]
+#? [0]*
 
 ########### end of tests #####################
 

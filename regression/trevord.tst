@@ -40,7 +40,7 @@ loadsgf games/trevor/auto/d01.sgf 144
 
 loadsgf games/trevor/auto/d01.sgf 148
 170 reg_genmove white
-#? [Q8]*
+#? [Q8]
 
 
 loadsgf games/trevor/auto/d01.sgf 154

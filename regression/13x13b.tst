@@ -109,7 +109,7 @@ loadsgf games/mertin13x13/GNGA3.sgf 67
 # F10 blocks and connects in the best way. F11 is clearly inferior.
 loadsgf games/mertin13x13/GNGA3.sgf 81
 8 reg_genmove black
-#? [F10]*
+#? [F10]
 
 # Most other moves are better than the game move at C6.
 loadsgf games/mertin13x13/GHGN1.sgf 26

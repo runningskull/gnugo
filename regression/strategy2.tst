@@ -108,7 +108,7 @@ loadsgf games/strategy17.sgf
 # however it may be difficult to save both K16 and M18 so if the 
 # moves listed are not too undervalued we may accept this result
 70 reg_genmove white
-#? [M15|J15|N16|J16]*
+#? [M15|J15|N16|J16]
 
 # E6 is the only move.
 loadsgf games/strategy18.sgf

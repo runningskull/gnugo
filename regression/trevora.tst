@@ -304,7 +304,7 @@ loadsgf games/trevor/auto/a030.sgf 22
 #For a ko threat, D3 is better.
 loadsgf games/trevor/auto/a031.sgf 28
 470 reg_genmove white
-#? [!E2]*
+#? [!E2]
 
 
 #Sacrificing these two for the rest seems best.

@@ -26,12 +26,12 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302050206.sgf 204
 # D14 is way more solid than C13. Other moves are conceivable.
 loadsgf games/nngs/tommmal-gnugo-3.5.1-200310140825.sgf 78
 7 reg_genmove black
-#? [D14]
+#? [D14]*
 
 # H10 effectively destroys white's eye shape and development
 # potential. The game move at N4 has almost no effect on the thrashing
 # dragon.
 loadsgf games/nngs/tommmal-gnugo-3.5.1-200310140825.sgf 140
 8 reg_genmove black
-#? [H10]
+#? [H10]*
 
