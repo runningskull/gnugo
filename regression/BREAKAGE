@@ -1,3 +1,75 @@
+./regress.sh . ld_owl.tst 
+301 unexpected FAIL: Correct '1 C19', got '3 B18'
+./regress.sh . connection.tst 
+111 unexpected PASS!
+112 unexpected PASS!
+./regress.sh . blunder.tst 
+11 unexpected PASS!
+34 unexpected FAIL: Correct '!A19|C19', got 'A19'
+35 unexpected FAIL: Correct '!G1', got 'G1'
+./regress.sh . nngs1.tst 
+34 unexpected PASS!
+./regress.sh . arion.tst 
+6 unexpected PASS!
+./regress.sh . nicklas3.tst 
+401 unexpected FAIL: Correct 'A5', got 'C6'
+./regress.sh . manyfaces.tst 
+9 unexpected PASS!
+./regress.sh . global.tst 
+1 unexpected FAIL: Correct 'B3', got 'A4'
+44 unexpected FAIL: Correct 'D5', got 'G7'
+./regress.sh . arend.tst 
+29 unexpected PASS!
+./regress.sh . 13x13.tst 
+31 unexpected PASS!
+./regress.sh . trevord.tst 
+280 unexpected PASS!
+880 unexpected FAIL: Correct 'R7', got 'D6'
+./regress.sh . owl1.tst 
+339 unexpected FAIL: Correct '0', got '1 Q13'
+340 unexpected FAIL: Correct '1 A11', got '0'
+341 unexpected FAIL: Correct '1 K8', got '0'
+./regress.sh . nngs2.tst 
+1 unexpected FAIL: Correct 'B1|A2', got 'A4'
+./regress.sh . nngs3.tst 
+250 unexpected PASS!
+./regress.sh . nngs4.tst 
+620 unexpected PASS!
+1090 unexpected FAIL: Correct 'O3|D5|C5|C6|O16|O17|P16|P17|C9', got 'H4'
+1100 unexpected FAIL: Correct 'J7', got 'P7'
+1110 unexpected FAIL: Correct 'S9|Q8|P8|P9', got 'T9'
+1120 unexpected FAIL: Correct 'N7', got 'Q8'
+./regress.sh . strategy5.tst 
+286 unexpected PASS!
+291 unexpected FAIL: Correct 'L9', got 'P7'
+./regress.sh . century2002.tst 
+60 unexpected PASS!
+./regress.sh . gunnar.tst 
+48 unexpected FAIL: Correct 'P11', got 'M12'
+53 unexpected PASS!
+./regress.sh . nando.tst 
+32 unexpected PASS!
+./regress.sh . thrash.tst 
+16 unexpected FAIL: Correct 'B8|B9|B10|C8|C9', got 'E17'
+17 unexpected FAIL: Correct 'L19|K19', got 'P19'
+./regress.sh . joseki.tst 
+20 unexpected PASS!
+./regress.sh . seki.tst 
+111 unexpected FAIL: Correct 'C2', got 'C1'
+703 unexpected PASS!
+903 unexpected FAIL: Correct 'C2|C1', got 'B1'
+./regress.sh . kgs.tst 
+80 unexpected FAIL: Correct 'L1|O2|Q1', got 'D13'
+90 unexpected FAIL: Correct 'T8', got 'T7'
+100 unexpected FAIL: Correct 'C1', got 'C4'
+110 unexpected FAIL: Correct 'G13', got 'C9'
+120 unexpected FAIL: Correct 'S18', got 'P7'
+130 unexpected FAIL: Correct 'S18', got 'S19'
+140 unexpected FAIL: Correct 'P14|N15|G12', got 'M3'
+150 unexpected FAIL: Correct 'M14|Q13', got 'R9'
+160 unexpected FAIL: Correct 'G12|H8|J7|G7', got 'C12'
+170 unexpected FAIL: Correct 'G12|H8|G7', got 'K5'
+
 ========================== 3.5.6 =====================================
 
 With gcc 2.96 you may get the following different results:

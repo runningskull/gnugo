@@ -262,7 +262,7 @@ loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 144
 #pull out the stones /evand
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 152
 620 reg_genmove white
-#? [G13|G14]*
+#? [G13|G14]
 
 loadsgf games/nngs/evand-gnugo-3.3.21-200306130638.sgf 156
 630 reg_genmove black
@@ -476,22 +476,22 @@ loadsgf games/nngs/gnugo-3.5.3-dbr-200401121534.sgf 83
 #not H4
 loadsgf games/nngs/gnugo-3.5.5-liza-200404251738.sgf 6
 1090 reg_genmove white
-#? [O3|D5|C5|C6|O16|O17|P16|P17|C9]
+#? [O3|D5|C5|C6|O16|O17|P16|P17|C9]*
 
 
 loadsgf games/nngs/gnugo-3.5.5-liza-200404251750.sgf 108
 1100 reg_genmove white
-#? [J7]
+#? [J7]*
 
 #I think the big dragon is critical. /ab
 loadsgf games/nngs/gnugo-3.5.5-liza-200404251750.sgf 176
 1110 reg_genmove white
-#? [S9|Q8|P8|P9]
+#? [S9|Q8|P8|P9]*
 
 
 loadsgf games/nngs/gnugo-3.5.5-liza-200404251750.sgf 196
 1120 reg_genmove white
-#? [N7]
+#? [N7]*
 
 ############ End of Tests #################
 

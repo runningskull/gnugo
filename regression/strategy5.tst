@@ -143,7 +143,7 @@ loadsgf games/nngs/jypower-gnugo-3.3.22-200307050519.sgf 162
 
 loadsgf games/self_play/354-34-1.sgf 180
 286 reg_genmove white
-#? [K5]*
+#? [K5]
 
 loadsgf games/self_play/354-34-3.sgf 194
 287 reg_genmove white
@@ -166,7 +166,7 @@ loadsgf games/gg-040225.sgf 220
 # P7 creates a shortage of liberties.
 loadsgf games/kisei28_g7.sgf 189
 291 restricted_genmove black P7 L9
-#? [L9]
+#? [L9]*
 
 
 ############ End of Tests #################

@@ -101,7 +101,7 @@ undo
 undo
 play white B1
 111 reg_genmove black
-#? [C2]
+#? [C2]*
 
 undo
 play white C1
@@ -335,7 +335,7 @@ loadsgf games/seki11.sgf
 
 play white C1
 703 reg_genmove black
-#? [B2]*
+#? [B2]
 
 play black B2
 704 reg_genmove white
@@ -410,7 +410,7 @@ loadsgf games/seki13.sgf
 # but loses one point compared to C2 or C1.
 play white B2
 903 reg_genmove black
-#? [C2|C1]
+#? [C2|C1]*
 
 play black C2
 904 reg_genmove white

@@ -387,7 +387,7 @@ loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 290
 trymove W R18
 trymove B S17
 111 connect O18 R18
-#? [0]*
+#? [0]
 popgo
 popgo
 
@@ -395,7 +395,7 @@ popgo
 loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 104
 trymove B S6
 112 connect S3 S6
-#? [0]*
+#? [0]
 popgo
 
 # Report number of nodes visited by the tactical reading

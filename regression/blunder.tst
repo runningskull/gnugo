@@ -58,7 +58,7 @@ loadsgf games/blunder9.sgf
 # Black B3 loses at least five stones.
 loadsgf games/blunder10.sgf 1
 11 reg_genmove black
-#? [D4|E4|E5|F4|C6]*
+#? [D4|E4|E5|F4|C6]
 
 # White D4 kills at least six stones.
 loadsgf games/blunder10.sgf 2
@@ -164,9 +164,9 @@ loadsgf games/kisei28_g7.sgf 280
 # Fills a common liberty in a seki similar to blunder:32.
 loadsgf games/kgs/2004-04-28-R-dokuganryu-GnuGoCVS.sgf 302
 34 gg_genmove black
-#? [!A19|C19]
+#? [!A19|C19]*
 
 # An example of transforming a won semeai into a seki
 loadsgf games/blunder24.sgf
 35 gg_genmove white
-#? [!G1]
+#? [!G1]*

@@ -136,7 +136,7 @@ extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a\
 		       ../engine/libengine.a libpatterns.a\
                        ../sgf/libsgf.a ../utils/libutils.a
 
-extract_fuseki_LDFLAGS = -I$(top_srcdir)/sgf
+extract_fuseki_INCLUDES = -I$(top_srcdir)/sgf
 
 noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h dfa-mkpat.h
 
@@ -200,6 +200,7 @@ extract_fuseki_OBJECTS = $(am_extract_fuseki_OBJECTS)
 extract_fuseki_DEPENDENCIES = ../engine/libengine.a libpatterns.a \
 	../engine/libengine.a libpatterns.a ../sgf/libsgf.a \
 	../utils/libutils.a
+extract_fuseki_LDFLAGS =
 am_joseki_OBJECTS = joseki.$(OBJEXT)
 joseki_OBJECTS = $(am_joseki_OBJECTS)
 joseki_DEPENDENCIES = ../engine/libboard.a ../sgf/libsgf.a \

@@ -74,10 +74,10 @@ loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 278
 #restrain the dragon
 loadsgf games/nngs/gnugo-3.5.5-liza-200404251750.sgf 42
 16 reg_genmove white
-#? [B8|B9|B10|C8|C9]
+#? [B8|B9|B10|C8|C9]*
 
 # P19 as in the game is not so attractive. Better to first isolate 
 # the dragon completely. 
 loadsgf games/kgs/2004-04-10-Shun9137-GnuGoCVS.sgf 243
 17 gg_genmove black
-#? [L19|K19]
+#? [L19|K19]*

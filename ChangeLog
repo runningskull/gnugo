@@ -2,15 +2,16 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.5.6 released May 27, 2004
+
+- minor revisions in score.c
 - regress.pike measures uncertainty of moves
 - global variable hashdata renamed to board_hash
 - hashdata_compare() function removed
 - fields in struct stats_data updated for new cache
-- initialization of Zobrist random numbers in hash.c and cache.c
-  unified
+- initialization of Zobrist random numbers in hash.c and cache.c unified
 - new function hash_init_zobrist_array() in hash.c
-- macro hashdata_remainder() never uses more than the 32 lowest bits of
-  the hash value
+- hashdata_remainder() never uses more than the 32 lowest bits of hash value
 - hashdata_NULL, hashdata_clear(), and hashdata_init() macros removed
 - any number of MIN_HASHBITS can now be used
 - ROUTINE_COSTS revised

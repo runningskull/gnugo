@@ -130,6 +130,7 @@ libengine_a_SOURCES = \
       shapes.c \
       showbord.c \
       surround.c \
+      unconditional.c \
       utils.c \
       value_moves.c \
       worm.c
@@ -165,8 +166,8 @@ am_libengine_a_OBJECTS = aftermath.$(OBJEXT) board.$(OBJEXT) \
 	persistent.$(OBJEXT) printutils.$(OBJEXT) readconnect.$(OBJEXT) \
 	reading.$(OBJEXT) score.$(OBJEXT) semeai.$(OBJEXT) \
 	sgfdecide.$(OBJEXT) sgffile.$(OBJEXT) shapes.$(OBJEXT) \
-	showbord.$(OBJEXT) surround.$(OBJEXT) utils.$(OBJEXT) \
-	value_moves.$(OBJEXT) worm.$(OBJEXT)
+	showbord.$(OBJEXT) surround.$(OBJEXT) unconditional.$(OBJEXT) \
+	utils.$(OBJEXT) value_moves.$(OBJEXT) worm.$(OBJEXT)
 libengine_a_OBJECTS = $(am_libengine_a_OBJECTS)
 
 DEFS = @DEFS@
@@ -192,8 +193,8 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/semeai.Po $(DEPDIR)/sgfdecide.Po \
 @AMDEP_TRUE@	$(DEPDIR)/sgffile.Po $(DEPDIR)/shapes.Po \
 @AMDEP_TRUE@	$(DEPDIR)/showbord.Po $(DEPDIR)/surround.Po \
-@AMDEP_TRUE@	$(DEPDIR)/utils.Po $(DEPDIR)/value_moves.Po \
-@AMDEP_TRUE@	$(DEPDIR)/worm.Po
+@AMDEP_TRUE@	$(DEPDIR)/unconditional.Po $(DEPDIR)/utils.Po \
+@AMDEP_TRUE@	$(DEPDIR)/value_moves.Po $(DEPDIR)/worm.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -270,6 +271,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/shapes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/showbord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/surround.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/unconditional.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/value_moves.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/worm.Po@am__quote@

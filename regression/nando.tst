@@ -172,7 +172,7 @@ loadsgf games/nando/auto021.sgf
 #CATEGORY=ATARI_ATARI (?)
 loadsgf games/nando/auto022.sgf 206
 32 reg_genmove white
-#? [N13|O13]*
+#? [N13|O13]
 
 
 #--------------------------------------------------------------

@@ -30,7 +30,7 @@ loadsgf games/kgs/yagr5.sgf 153
 # Black could win the semeai, white must defend
 loadsgf games/kgs/20040507-GnuGoCVS-read.sgf 212
 80 reg_genmove white
-#? [L1|O2|Q1]
+#? [L1|O2|Q1]*
 
 # T8 only move. T7 only gives ko, but the owl code is missing
 # it, because the tactical reading is proposing a bogus lunch
@@ -38,7 +38,7 @@ loadsgf games/kgs/20040507-GnuGoCVS-read.sgf 212
 # tactical reading routines, but fails in the owl context)
 loadsgf games/kgs/20040507-GnuGoCVS-read.sgf 268
 90 reg_genmove white
-#? [T8]
+#? [T8]*
 
 # Semeai related problem. The status of D3 is revised to ALIVE
 # because black can't win the semeai C3 vs. D3 (both live after
@@ -46,41 +46,41 @@ loadsgf games/kgs/20040507-GnuGoCVS-read.sgf 268
 # dragon isn't critical.
 loadsgf games/kgs/20040516-GoBucks-GnuGoCVS.sgf 242
 100 reg_genmove black
-#? [C1]
+#? [C1]*
 
 loadsgf games/kgs/20040517-siRNA-GnuGoCVS.sgf 152
 110 reg_genmove black
-#? [G13]
+#? [G13]*
 
 # P18 is in danger now.
 loadsgf games/kgs/20040517-siRNA-GnuGoCVS.sgf 192
 120 reg_genmove black
-#? [S18]
+#? [S18]*
 
 # White missed, P18 can still be saved.
 loadsgf games/kgs/20040517-siRNA-GnuGoCVS.sgf 198
 130 reg_genmove black
-#? [S18]
+#? [S18]*
 
 # Awful tenuki.
 loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 56
 140 gg_genmove white
-#? [P14|N15|G12]
+#? [P14|N15|G12]*
 
 # Another tenuki from same fight - lots of cutting points are opportunities
 # for escape.
 loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 64
 150 gg_genmove white
-#? [M14|Q13]
+#? [M14|Q13]*
 
 # Later, ignores a fight and misreads a ladder - anything related to the
 # fight or the ladder is better than the move made in the game.
 loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 94
 160 gg_genmove white
-#? [G12|H8|J7|G7]
+#? [G12|H8|J7|G7]*
 
 # Again the move made in the game doesn't help the fight in the slightest
 # nor resolve the ladder.
 loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 96
 170 gg_genmove white
-#? [G12|H8|G7]
+#? [G12|H8|G7]*
