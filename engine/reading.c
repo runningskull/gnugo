@@ -1026,7 +1026,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
   liberties = countlib(str);
   
   if (liberties > 4
-      || (liberties == 4 && stackp > depth)
+      || (liberties == 4 && stackp > fourlib_depth)
       || (liberties == 3 && stackp > depth)) {
     /* No need to cache the result in these cases. */
     SGFTRACE(0, WIN, "too many liberties or stackp > depth");
