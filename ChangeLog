@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new argument recompute_dragons to owl_analyze_semeai_after_move()
+- owl_mark_dragon() and init_owl() revised
+- detect_tactical_blunder() revised
+- value of tactical blunders doubled to twice the effective size of
+  the string
+- not a blunder if a string which already is alive in seki becomes
+  tactically safe when outer liberties are filled
 - normalize apos, bpos in do_owl_analyze_semeai
 - find_cuts() called from make_dragons() instead of make_domains()
 - new function compute_new_dragons() and new static function

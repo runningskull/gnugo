@@ -494,7 +494,8 @@ void owl_analyze_semeai(int apos, int bpos,
 void owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
 				   int *resulta, int *resultb,
 				   int *semeai_move, int owl,
-				   int *semeai_result_certain);
+				   int *semeai_result_certain,
+				   int recompute_dragons);
 
 void set_search_diamond(int pos);
 void reset_search_mask(void);

@@ -270,7 +270,7 @@ find_moves_to_make_seki()
 	continue;
 
       owl_analyze_semeai_after_move(defend_move, color, opponent, str,
-				    &resulta, &resultb, NULL, 1, &certain);
+				    &resulta, &resultb, NULL, 1, &certain, 0);
 
       /* Do not trust uncertain results. In fact it should only take a
        * few nodes to determine the semeai result, if it is a proper
@@ -292,7 +292,7 @@ find_moves_to_make_seki()
 	 */
 	owl_analyze_semeai_after_move(defend_move, OTHER_COLOR(color),
 				      str, opponent, &resulta, NULL,
-				      NULL, 1, NULL);
+				      NULL, 1, NULL, 0);
 	if (resulta != WIN)
 	  dragon2[d].semeai_attack_point = defend_move;
 	else {
@@ -303,7 +303,7 @@ find_moves_to_make_seki()
 	  for (k = 0; k < liberties; k++) {
 	    owl_analyze_semeai_after_move(libs[k], OTHER_COLOR(color),
 					  str, opponent, &resulta, NULL,
-					  NULL, 1, NULL);
+					  NULL, 1, NULL, 0);
 	    if (resulta != WIN) {
 	      dragon2[d].semeai_attack_point = libs[k];
 	      break;
@@ -415,7 +415,7 @@ semeai_move_reasons(int color)
 					    dragon2[d].semeai_defense_target,
 					    dragon2[d].origin,
 					    &resulta, &resultb, &semeai_move,
-					    1, &s_result_certain);
+					    1, &s_result_certain, 0);
               if (resulta == 0 && resultb == 0) {
 	        add_semeai_move(libs[r], dragon2[d].origin);
 	        DEBUG(DEBUG_SEMEAI,
@@ -451,7 +451,7 @@ semeai_move_reasons(int color)
               owl_analyze_semeai_after_move(libs[r], color, dragon2[d].origin,
 					    dragon2[d].semeai_attack_target,
 					    &resulta, &resultb, &semeai_move,
-					    1, &s_result_certain);
+					    1, &s_result_certain, 0);
               if (resulta == 0 && resultb == 0) {
 	        add_semeai_move(libs[r], dragon2[d].origin);
 	        DEBUG(DEBUG_SEMEAI,

@@ -201,7 +201,8 @@ static int modify_stupid_eye_vital_point(struct local_owl_data *owl,
 					 int *vital_point,
 					 int is_attack_point);
 static void owl_mark_dragon(int apos, int bpos,
-			    struct local_owl_data *owl);
+			    struct local_owl_data *owl,
+			    int new_dragons[BOARDMAX]);
 static void owl_mark_worm(int apos, int bpos,
 			  struct local_owl_data *owl);
 static void owl_mark_boundary(struct local_owl_data *owl);
@@ -260,7 +261,7 @@ static char found_matches[BOARDMAX];
 static void reduced_init_owl(struct local_owl_data **owl,
     			     int at_bottom_of_stack);
 static void init_owl(struct local_owl_data **owl, int target1, int target2,
-		     int move, int use_stack);
+		     int move, int use_stack, int new_dragons[BOARDMAX]);
 
 static struct local_owl_data *owl_stack[2 * MAXSTACK];
 static int owl_stack_size = 0;
@@ -328,7 +329,7 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb,
 		   int *semeai_move, int owl, int *semeai_result_certain)
 {
   owl_analyze_semeai_after_move(PASS_MOVE, EMPTY, apos, bpos, resulta, resultb,
-				semeai_move, owl, semeai_result_certain);
+				semeai_move, owl, semeai_result_certain, 0);
 }
 
 /* Same as the function above with the addition that an arbitrary move
@@ -337,7 +338,8 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb,
 void
 owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
 			      int *resulta, int *resultb, int *semeai_move, 
-			      int owl, int *semeai_result_certain)
+			      int owl, int *semeai_result_certain,
+			      int recompute_dragons)
 {
   char ms[BOARDMAX];
   int w1, w2;
@@ -349,6 +351,7 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   int dummy_semeai_move;
   double start = 0.0;
   int reading_nodes_when_called = get_reading_node_counter();
+  int new_dragons[BOARDMAX];
   
   struct local_owl_data *owla;
   struct local_owl_data *owlb;
@@ -362,6 +365,16 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
+
+  if (recompute_dragons) {
+    if (tryko(move, color, "Recompute dragons for semeai.")) {
+      compute_new_dragons(new_dragons);
+      popgo();
+    }
+    else
+      recompute_dragons = 0;
+  }
+  
   
   /* Look for owl substantial worms of either dragon adjoining
    * the other dragon. Capturing such a worm wins the semeai.
@@ -441,8 +454,14 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
 	  color, move, apos, bpos);
   
   if (owl) {
-    init_owl(&owla, apos, NO_MOVE, NO_MOVE, 1);
-    init_owl(&owlb, bpos, NO_MOVE, NO_MOVE, 0);
+    if (recompute_dragons) {
+      init_owl(&owla, apos, NO_MOVE, NO_MOVE, 1, new_dragons);
+      init_owl(&owlb, bpos, NO_MOVE, NO_MOVE, 0, new_dragons);
+    }
+    else {
+      init_owl(&owla, apos, NO_MOVE, NO_MOVE, 1, NULL);
+      init_owl(&owlb, bpos, NO_MOVE, NO_MOVE, 0, NULL);
+    }
     owl_make_domains(owla, owlb);
   }
   else {
@@ -1645,7 +1664,7 @@ owl_attack(int target, int *attack_point, int *certain, int *kworm)
     start = gg_cputime();
   
   TRACE("owl_attack %1m\n", target);
-  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1);
+  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1, NULL);
   owl_make_domains(owl, NULL);
   prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
 		    kworm, 1);
@@ -2162,7 +2181,7 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
   
   gg_assert(stackp == 0);
   TRACE("owl_threaten_attack %1m\n", target);
-  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1);
+  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1, NULL);
   memcpy(saved_boundary, owl->boundary, sizeof(saved_boundary));
   owl_make_domains(owl, NULL);
   owl_shapes(&shape_patterns, moves, other, owl, &owl_attackpat_db);
@@ -2288,7 +2307,7 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
     start = gg_cputime();
 
   TRACE("owl_defend %1m\n", target);
-  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1);
+  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1, NULL);
   owl_make_domains(owl, NULL);
   prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
 		    kworm, 1);
@@ -2683,7 +2702,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
     start = gg_cputime();
 
   TRACE("owl_threaten_defense %1m\n", target);
-  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1);
+  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1, NULL);
   memcpy(saved_goal, owl->goal, sizeof(saved_goal));
   owl_make_domains(owl, NULL);
   owl_shapes(&shape_patterns, moves, color, owl, &owl_defendpat_db);
@@ -4240,33 +4259,47 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
 }  
 
 
-/* Marks the dragons at (apos) and (bpos). If only one dragon
- * needs marking, (bpos) should be passed as (0). 
+/* Marks the dragons at apos and bpos. If only one dragon
+ * needs marking, bpos should be passed as NO_MOVE. 
  */
 
 static void
-owl_mark_dragon(int apos, int bpos, struct local_owl_data *owl)
+owl_mark_dragon(int apos, int bpos, struct local_owl_data *owl,
+		int new_dragons[BOARDMAX])
 {
   int pos;
   int color = board[apos];
   
   ASSERT1(bpos == NO_MOVE || board[bpos] == color, bpos);
 
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos)) {
-      if (is_same_dragon(pos, apos) || is_same_dragon(pos, bpos))
-	owl->goal[pos] = 1;
-      else
-	owl->goal[pos] = 0;
-    }
+  if (new_dragons == NULL) {
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+      if (ON_BOARD(pos)) {
+	if (is_same_dragon(pos, apos) || is_same_dragon(pos, bpos))
+	  owl->goal[pos] = 1;
+	else
+	  owl->goal[pos] = 0;
+      }
+  }
+  else {
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+      if (ON_BOARD(pos)) {
+	if (IS_STONE(board[pos])
+	    && (new_dragons[pos] == new_dragons[apos]
+		|| new_dragons[pos] == new_dragons[bpos]))
+	  owl->goal[pos] = 1;
+	else
+	  owl->goal[pos] = 0;
+      }
+  }
 
   owl->color = color;
   owl_mark_boundary(owl);
 }
 
 
-/* Marks the worms at (apos) and (bpos). If only one worm
- * needs marking, (bpos) should be passed as (0). 
+/* Marks the worms at apos and bpos. If only one worm
+ * needs marking, bpos should be passed as NO_MOVE. 
  */
 
 static void
@@ -4531,7 +4564,7 @@ test_owl_attack_move(int pos, int dr, int kworm, int acode)
     if (verbose > 0)
       verbose--;
     owl_analyze_semeai_after_move(pos, color, dr, dr2, &semeai_result,
-				  NULL, NULL, 1, &certain);
+				  NULL, NULL, 1, &certain, 0);
     verbose = save_verbose;
     if (certain >= DRAGON2(dr).semeai_defense_certain
 	&& (semeai_result >= REVERSE_RESULT(acode))) {
@@ -4790,7 +4823,7 @@ owl_does_defend(int move, int target, int *kworm)
      * FIXME: (move) will be added to the goal dragon although we
      * do not know whether it is really connected.
      */
-    init_owl(&owl, target, NO_MOVE, move, 1);
+    init_owl(&owl, target, NO_MOVE, move, 1, NULL);
     prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
 		      kworm, 0);
     acode = do_owl_attack(target, NULL, &wid, owl, 0);
@@ -4867,7 +4900,7 @@ owl_confirm_safety(int move, int target, int *defense_point, int *kworm)
 	return 0;
     }
     
-    init_owl(&owl, target, NO_MOVE, move, 1);
+    init_owl(&owl, target, NO_MOVE, move, 1, NULL);
     prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
 		      kworm, 0);
     acode = do_owl_attack(target, &defense, &wid, owl, 0);
@@ -4941,7 +4974,7 @@ owl_does_attack(int move, int target, int *kworm)
    * some stones of the goal dragon from the board.
    */
 #if 1
-  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1);
+  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1, NULL);
 #endif
 
   if (trymove(move, other, "owl_does_attack", target)) {
@@ -5026,7 +5059,7 @@ owl_connection_defends(int move, int target1, int target2)
 				  target2, &result, NULL, NULL, NULL))
     return result;
 
-  init_owl(&owl, target1, target2, NO_MOVE, 1);
+  init_owl(&owl, target1, target2, NO_MOVE, 1, NULL);
 
   if (trymove(move, color, "owl_connection_defends", target1)) {
     owl_update_goal(move, 1, NO_MOVE, owl, 0);
@@ -6129,13 +6162,13 @@ reduced_init_owl(struct local_owl_data **owl, int at_bottom_of_stack)
  */
 static void
 init_owl(struct local_owl_data **owl, int target1, int target2, int move,
-         int at_bottom_of_stack)
+         int at_bottom_of_stack, int new_dragons[BOARDMAX])
 {
   reduced_init_owl(owl, at_bottom_of_stack);
 
   local_owl_node_counter = 0;
   (*owl)->lunches_are_current = 0;
-  owl_mark_dragon(target1, target2, *owl);
+  owl_mark_dragon(target1, target2, *owl, new_dragons);
   if (move != NO_MOVE)
     owl_update_goal(move, 1, NO_MOVE, *owl, 0);
   compute_owl_escape_values(*owl);

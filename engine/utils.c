@@ -1049,7 +1049,7 @@ detect_owl_blunder(int move, int color, int *defense_point,
 	  if (board[neighbor] == color)
 	    continue;
 	  owl_analyze_semeai_after_move(move, color, neighbor, bpos,
-					NULL, &resultb, NULL, 1, NULL);
+					NULL, &resultb, NULL, 1, NULL, 0);
 	  if (resultb == 0)
 	    acode = WIN;
 	}
@@ -1107,7 +1107,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
   int other = OTHER_COLOR(color);
   int pos;
   int ii;
-  int current_verbose = save_verbose;
+  int current_verbose = verbose;
 
   if (!trymove(move, color, NULL, NO_MOVE))
     return;
@@ -1157,30 +1157,38 @@ detect_tactical_blunder(int move, int color, int *defense_point,
       decrease_depth_values();
       owl_attacks = owl_does_attack(move, pos, NULL);
       if (owl_attacks != WIN) {
-	*return_value += worm[pos].effective_size;
+	*return_value += 2 * worm[pos].effective_size;
 	defense_effective = 1;
 	verbose = save_verbose;
-	TRACE("After %1m worm at %1m becomes defendable.\n", move, pos);
+	TRACE("After %1m worm at %1m becomes defendable - A.\n", move, pos);
 	verbose = current_verbose;
       }
-      else {
+      else if (dragon[pos].status != ALIVE) {
 	/* Before redoing the trymove we also check whether the worm now
 	 * has a semeai defense. See blunder:26 for an example.
+	 *
+	 * If the worm already was alive in seki, it is generally okay
+	 * that it also becomes tactically safe when the outer
+	 * liberties are filled, see e.g. blunder:32,34. Thus the
+	 * check above.
 	 */
 	int k;
-	for (k = 0; k < DRAGON2(pos).neighbors; k++) {
-	  int neighbor = dragon2[DRAGON2(pos).adjacent[k]].origin;
+	int adj[MAXCHAIN];
+	int num_adj;
+	num_adj = extended_chainlinks(pos, adj, 0);
+	for (k = 0; k < num_adj; k++) {
+	  int neighbor = adj[k];
 	  int resulta;
-	  if (board[neighbor] != color)
-	    continue;
 	  owl_analyze_semeai_after_move(move, color, pos, neighbor,
-					&resulta, NULL, NULL, 1, NULL);
+					&resulta, NULL, NULL, 1, NULL, 1);
 	  if (resulta != 0) {
-	    *return_value += worm[pos].effective_size;
+	    *return_value += 2 * worm[pos].effective_size;
 	    defense_effective = 1;
 	    verbose = save_verbose;
-	    TRACE("After %1m worm at %1m becomes defendable.\n", move, pos);
+	    TRACE("After %1m worm at %1m becomes defendable - B.\n",
+		  move, pos);
 	    verbose = current_verbose;
+	    break;
 	  }
 	}
       }

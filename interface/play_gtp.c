@@ -1807,7 +1807,7 @@ gtp_analyze_semeai_after_move(char *s)
 
   owl_analyze_semeai_after_move(move, color, dragona, dragonb,
 				&resulta, &resultb, &semeai_move, 1,
-				&result_certain);
+				&result_certain, 0);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(resulta);
   gtp_printf(" ");
