@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- reduced_init_owl() allocates bigger owl stack with --experimental-semeai
+- bugfix in pop_owl(): don't crash if owl stack has moved
+- reduce reading depth by one in influence pattern matching
 - new struct reading_moves in reading.c
 - owl stack can now handle two local_owl_data structs
 - semeai code now uses owl stack
@@ -14,7 +17,7 @@
 - bugfix in play_ascii.c: don't crash on unusual boardsizes
 - new tests and regressions
 
-3.3.3 released June 19, 2002
+3.3.4 released June 19, 2002
 
 - segment_regions also computes territorial value of regions if available
 - dragon2.moyo_size_pre_owl andmoyo_size_post_owl replace dragon2.moyo

@@ -859,10 +859,6 @@ do_owl_analyze_semeai(int apos, int bpos,
 	&& stackp < MAX_SEMEAI_DEPTH
 	&& semeai_trymove(mpos, color, moves[k].name, apos, bpos,
 			  owl_phase, moves[k].value)) {
-      if (owl_phase && stackp <= SEMEAI_BRANCH_DEPTH + 1)
-	push_owl(&owla, &owlb);
-      else
-	memcpy(saved_goal, owla->goal, sizeof(saved_goal));
       if ((debug & DEBUG_SEMEAI) && verbose)
 	dump_stack();
       if (board[bpos] == EMPTY) {
@@ -870,21 +866,29 @@ do_owl_analyze_semeai(int apos, int bpos,
 	this_resulta = ALIVE;
       }
       else {
+	if (owl_phase && stackp <= SEMEAI_BRANCH_DEPTH + 1)
+	  push_owl(&owla, &owlb);
+	else
+	  memcpy(saved_goal, owla->goal, sizeof(saved_goal));
+
 	owl_update_goal(mpos, moves[k].same_dragon, owla, 1);
 	owla->lunches_are_current = 0;
 	owl_update_boundary_marks(mpos, owla);
+
 	do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
 			      &this_resultb, &this_resulta, NULL, 0, owl_phase);
-      }
-      
-      if (this_resultb == DEAD && this_resulta == ALIVE) {
+
 	if (owl_phase && stackp <= SEMEAI_BRANCH_DEPTH + 1) {
 	  pop_owl(&owlb);
 	  pop_owl(&owla);
 	}
 	else
 	  memcpy(owla->goal, saved_goal, sizeof(saved_goal));
-	popgo();
+      }
+
+      popgo();
+      
+      if (this_resultb == DEAD && this_resulta == ALIVE) {
 	*resulta = ALIVE;
 	*resultb = DEAD;
 	if (move)
@@ -910,13 +914,6 @@ do_owl_analyze_semeai(int apos, int bpos,
 	best_move = mpos;
 	best_move_k = k;
       }
-      if (owl_phase && stackp <= SEMEAI_BRANCH_DEPTH + 1) {
-	pop_owl(&owlb);
-	pop_owl(&owla);
-      }
-      else
-	memcpy(owla->goal, saved_goal, sizeof(saved_goal));
-      popgo();
     }
   }
 
@@ -4543,7 +4540,11 @@ static void
 reduced_init_owl(struct local_owl_data **owl, int at_bottom_of_stack)
 {
   if (owl_stack_size == 0) {
-    owl_stack_size = owl_reading_depth + 2;
+    if (experimental_semeai)
+      owl_stack_size = gg_max(owl_reading_depth + 2,
+	  		      2 * SEMEAI_BRANCH_DEPTH + 4);
+    else
+      owl_stack_size = owl_reading_depth + 2;
     owl_stack = malloc(owl_stack_size * sizeof(*owl_stack));
     gg_assert(owl_stack != NULL);
   }
@@ -4612,30 +4613,42 @@ do_push_owl(struct local_owl_data **owl)
  * semeai code; use NULL otherwise.
  *
  * If you use push_owl with two arguments, later call
- * pop_owl(owlb); pop_owl(owla);
+ * pop_owl(&owlb); pop_owl(&owla);
  * in this order!
+ *
+ * Note that the owl stack might get moved in this function. This means
+ * that all pointers to the owl stack will get invalid. Only the pointers
+ * owla (and owlb) at the current recursion depth get corrected immediately.
+ * All other pointers will get corrected when pop_owl() is called. 
  */
 static void
 push_owl(struct local_owl_data **owla, struct local_owl_data **owlb)
 {
   /* Do we need to enlarge the stack? */
-  if (owl_stack_pointer == owl_stack_size - 1) {
+  if (owl_stack_pointer == owl_stack_size - 1
+      || (owl_stack_pointer == owl_stack_size - 2 && owlb)) {
     int num_a = (*owla)->number_in_stack;
     int num_b = 0;
-    if (owlb)
+    struct local_owl_data *old_stack_loc = owl_stack;
+    gg_assert(*owla == &(owl_stack[num_a]));
+    if (owlb) {
       num_b = (*owlb)->number_in_stack;
-    if (0)
+      gg_assert(*owlb == &(owl_stack[num_b]));
+    }  
+    if (0) {
       gprintf("Have to enlarge owl stack! (size %d, owl_stack %d, stackp %d)\n",
 	      owl_stack_size, owl_stack_pointer, stackp);
-    if (owlb)
-      owl_stack_size += 2;
-    else
-      owl_stack_size++;
+      dump_stack();
+    }
+    /* Better reallocate too much, than to have reallocate more often: */
+    owl_stack_size += 2;
     owl_stack = realloc(owl_stack, owl_stack_size * sizeof(*owl_stack));
     gg_assert(owl_stack != NULL);
-    *owla = &owl_stack[num_a];
+    if (0 && (owl_stack != old_stack_loc))
+      gprintf("Stack has moved! New stack size %d.\n", owl_stack_size);
+    *owla = &(owl_stack[num_a]);
     if (owlb)
-      *owlb = &owl_stack[num_b];
+      *owlb = &(owl_stack[num_b]);
   }
 
   do_push_owl(owla);
@@ -4651,9 +4664,8 @@ static void
 pop_owl(struct local_owl_data **owl)
 {
   int nodes = (*owl)->local_owl_node_counter;
-  gg_assert(*owl == &owl_stack[owl_stack_pointer]);
 
-  *owl = &owl_stack[(*owl)->restore_from];
+  *owl = &(owl_stack[owl_stack[owl_stack_pointer].restore_from]);
 
   owl_stack_pointer--;
   (*owl)->local_owl_node_counter = nodes;

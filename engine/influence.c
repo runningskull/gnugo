@@ -1566,6 +1566,8 @@ compute_initial_influence(int color, int dragons_known)
   initial_opposite_influence.dragons_known = dragons_known;
   initial_opposite_influence.is_territorial_influence = dragons_known;
 
+  decrease_depth_values();
+
   compute_influence(&initial_influence, OTHER_COLOR(color), -1, -1,
 		    NULL, NULL);
   if (dragons_known) {
@@ -1586,6 +1588,8 @@ compute_initial_influence(int color, int dragons_known)
       delta_territory_cache[POS(i, j)] = NOT_COMPUTED;
       followup_territory_cache[POS(i, j)] = NOT_COMPUTED;
     }
+
+  increase_depth_values();
 }
 
 /* Redo the segmentation of the initial influence. */
@@ -1697,11 +1701,9 @@ compute_move_influence(int m, int n, int color,
   move_influence.is_territorial_influence = 1;
 
   if (tryko(POS(m, n), color, "compute_move_influence", EMPTY, NO_MOVE)) {
-    increase_depth_values();
     compute_influence(&move_influence, OTHER_COLOR(color), m, n,
 		      NULL, saved_stones);
     compute_followup_influence(m, n, color, saved_stones);
-    decrease_depth_values();
     popgo();
 
     if (m == debug_influence_i
@@ -1781,8 +1783,10 @@ compute_escape_influence(char goal[BOARDMAX], int color,
   escape_influence.is_territorial_influence = 0;
   escape_influence.dragons_known = dragons_known;
 
+  decrease_depth_values();
   compute_influence(&escape_influence, OTHER_COLOR(color), -1, -1,
 		    goal, NULL);
+  increase_depth_values();
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
