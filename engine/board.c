@@ -4292,16 +4292,18 @@ do_play_move(int pos, int color)
 #endif
   }    
   
-
   /* Choose strategy depending on the number of friendly neighbors. */
   if (neighbor_allies == 0)
     create_new_string(pos);
   else if (neighbor_allies == 1) {
     gg_assert(s >= 0);
     extend_neighbor_string(pos, s);
+    return; /* can't be a ko, we're done */
   }
-  else
+  else {
     assimilate_neighbor_strings(pos);
+    return; /* can't be a ko, we're done */
+  }
 
   /* Check whether this move was a ko capture and if so set 
    * board_ko_pos.
