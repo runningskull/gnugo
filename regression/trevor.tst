@@ -82,7 +82,7 @@ loadsgf games/trevor/trevor_04.sgf 30
 #  }
 #CATEGORY=JOSEKI_DATABASE
 #DIFFICULTY=8
-#loadsgf games/trevor/trevor_05.sgf 6
+loadsgf games/trevor/trevor_05.sgf 6
 5 gg_genmove white
 #? [E5]*
 
