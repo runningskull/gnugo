@@ -23,6 +23,7 @@ EXTRA_DIST = $(DSP)\
 	influence.db\
 	barriers.db\
 	fuseki9.db\
+	fuseki13.db\
 	fuseki19.db
 
 mkpat_SOURCES  = mkpat.c transform.c
@@ -90,7 +91,7 @@ noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h
 GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  influence.c barriers.c endgame.c owl_attackpat.c\
 		 owl_vital_apat.c owl_defendpat.c \
-                 fuseki9.c fuseki19.c josekidb.c
+                 fuseki9.c fuseki13.c fuseki19.c josekidb.c
 
 DBBUILT = hoshi.db komoku.db sansan.db mokuhazushi.db takamoku.db
 
@@ -162,6 +163,9 @@ owl_defendpat.c : $(srcdir)/owl_defendpats.db mkpat$(EXEEXT)
 
 fuseki9.c : $(srcdir)/fuseki9.db mkpat$(EXEEXT)
 	./mkpat -b -f fuseki9 < $(srcdir)/fuseki9.db >fuseki9.c
+
+fuseki13.c : $(srcdir)/fuseki13.db mkpat$(EXEEXT)
+	./mkpat -b -f fuseki13 < $(srcdir)/fuseki13.db >fuseki13.c
 
 fuseki19.c : $(srcdir)/fuseki19.db mkpat$(EXEEXT)
 	./mkpat -b -f fuseki19 < $(srcdir)/fuseki19.db >fuseki19.c

@@ -74,14 +74,17 @@
 #include "random.h"
 
 #define USAGE "\n\
-Usage: extract_fuseki files boardsize moves patterns\n\
+Usage: extract_fuseki files boardsize moves patterns handicap strength
 \n\
 files:     The name of a file listing sgf files to examine,\n\
            one filename per line.\n\
 boardsize: Only consider games with this size.\n\
 moves:     Number of moves considered in each game.\n\
 patterns:  Number of patterns to generate.\n\
-\n\
+handicap:  0 - no handicap, 1 - any game, 2-9 - two to nine handicap stones\n\
+           10 any handicap game\n\
+strength:  The lowest strength of the players (1k-30k)\n\
+output file: Optional (if this exists, extract_fuseki will sort the games instead)\n\
 "
 
 /* Maximum length of sgf filename. */
@@ -89,11 +92,22 @@ patterns:  Number of patterns to generate.\n\
 
 /* Number of moves to consider in each game, given as argument.*/
 int moves_per_game;
+
 /* Maximum number of patterns to generate, given as argument.*/
 int patterns_to_extract;
 
+/* Handicap value, given as argument.*/
+int handicap_value;
+
+/* Lowest strength, given as argument.*/
+int player_strength;
+
 /* Number of games to analyze. */
 int number_of_games;
+
+/* The number of games that could not be used for some reason. */
+int *unused_games;
+
 /* Dynamically allocated list of sgf file names. */
 char **sgf_names;
 
@@ -124,7 +138,7 @@ do { \
  * as identification. If are interested in positions, we only use the first
  * hash value.
  *
- * Yes, we ignore the possibility of a hash collision.
+ * We ignore the possibility of a hash collision.
  */
 struct situation {
   struct invariant_hash pre;
@@ -161,6 +175,27 @@ struct winner {
 struct winner *winning_moves;
 int number_of_winning_moves;
 
+/*
+ * Write the files that are sorted to a specific file
+ */
+
+static void
+write_sgf_filenames(const char *name, char *filenames[])
+{
+  int n;
+  FILE *namefile = fopen(name, "a");
+  if (!namefile) {
+    fprintf(stderr, "Fatal error, couldn't open %s.\n", name);
+    exit(EXIT_FAILURE);
+  }
+  
+  for (n = 0; n < number_of_games; n++) {
+    if (unused_games[n] == 0)
+      fprintf(namefile, "%s\n", filenames[n]);
+  }
+}
+
+
 /* Read the sgf file names. These are assumed to be stored one per
  * line in the file with the name given by 'name'. The sgf file names
  * are copied into dynamically allocated memory by strdup() and
@@ -184,7 +219,15 @@ read_sgf_filenames(const char *name, char *filenames[])
   n = 0;
   while (fgets(buf, BUFSIZE, namefile) != NULL) {
     if (filenames != NULL) {
-      buf[strlen(buf) - 1] = 0; /* Delete newline character. */
+      if (buf[strlen(buf) - 2] == '\r') {
+	buf[strlen(buf) - 2] = '\0'; 
+	/* Delete newline character. PC only */
+      }
+      else {
+	buf[strlen(buf) - 1] = '\0'; 
+	/* Delete newline character. */
+      }
+      
       filenames[n] = strdup(buf);
       if (filenames[n] == NULL) {
 	fprintf(stderr, "Fatal error, strdup() failed.\n");
@@ -193,7 +236,7 @@ read_sgf_filenames(const char *name, char *filenames[])
     }
     n++;
   }
-
+  
   return n;
 }
 
@@ -205,14 +248,14 @@ init_zobrist_table(unsigned int hash[8][MAX_BOARD][MAX_BOARD])
   int m, n;
   int i, j;
   int mid = board_size/2;
-
+  
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       hash[0][m][n] = 0;
       for (k = 0; 32*k < CHAR_BIT*sizeof(hash[0][0][0]); k++)
 	hash[0][m][n] |= gg_urand() << k*32;
     }
-
+  
   /* Fill in all transformations of the hash table. */
   for (k = 1; k < 8; k++)
     for (m = 0; m < board_size; m++)
@@ -220,7 +263,7 @@ init_zobrist_table(unsigned int hash[8][MAX_BOARD][MAX_BOARD])
 	TRANSFORM(m-mid, n-mid, &i, &j, k);
 	hash[k][m][n] = hash[0][i+mid][j+mid];
       }
-
+  
   /* Debug output. */
   if (0) {
     for (k = 0; k < 8; k++) {
@@ -250,7 +293,7 @@ static void
 init_situations(void)
 {
   situation_table = calloc(moves_per_game * number_of_games,
-			  sizeof(*situation_table));
+			   sizeof(*situation_table));
   if (!situation_table) {
     fprintf(stderr, "Fatal error, failed to allocate situations table.\n");
     exit(EXIT_FAILURE);
@@ -316,10 +359,10 @@ hash_board_and_move(struct invariant_hash *hash, int color_to_play,
   int k;
   
   common_hash_board(hash, color_to_play);
-
+  
   for (k = 0; k < 8; k++)
     hash->values[k] ^= move_hash[k][m][n];
-
+  
   /* Notice that we of course must wait with sorting until we have
    * added the move to the hash values.
    */
@@ -338,8 +381,14 @@ get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
 {
   SGFProperty *prop;
   int i, j;
-      
+  
   for (prop=node->props; prop; prop=prop->next) {
+    if(!prop || !prop->name || !node) {
+      /* something wrong with the SGF file properties */
+      if(1)
+	fprintf(stderr, "Something wrong with the SGF file properties.\n");
+      return 0;
+    }
     switch(prop->name) {
     case SGFAB:
       get_moveXY(prop, &i, &j, board_size);
@@ -348,12 +397,12 @@ get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
       break;
       
     case SGFAW:
-      fprintf(stderr, "Warning: white stone added.\n");
+      /* fprintf(stderr, "Warning: white stone added.\n"); */
       return 0;
       break;
       
     case SGFPL:
-      fprintf(stderr, "Warning: PL property encountered.\n");
+      /* fprintf(stderr, "Warning: PL property encountered.\n"); */
       return 0;
       break;
       
@@ -362,14 +411,15 @@ get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
       *color = (prop->name == SGFW) ? WHITE : BLACK;
       
       if (!get_moveXY(prop, m, n, board_size)) {
-	fprintf(stderr, "Warning: failed to get move coordinates.\n");
+	if(0)
+	  fprintf(stderr, "Warning: failed to get move coordinates.\n");
 	return 0;
       }
       return 1;
       break;
     }
   }
-
+  
   return 0;
 }
 
@@ -392,7 +442,7 @@ compare_situations(const void *a, const void *b)
   const struct situation *aa = a;
   const struct situation *bb = b;
   int k;
-
+  
   for (k = 0; k < 8; k++) {
     if (aa->pre.values[k] > bb->pre.values[k])
       return 1;
@@ -406,7 +456,7 @@ compare_situations(const void *a, const void *b)
     if (aa->post.values[k] < bb->post.values[k])
       return -1;
   }
-
+  
   return 0;
 }
 
@@ -419,7 +469,7 @@ compare_positions(const void *a, const void *b)
   const struct situation *aa = a;
   const struct situation *bb = b;
   int k;
-
+  
   for (k = 0; k < 8; k++) {
     if (aa->pre.values[k] > bb->pre.values[k])
       return 1;
@@ -439,12 +489,12 @@ compare_frequencies(const void *a, const void *b)
 {
   const struct frequency *aa = a;
   const struct frequency *bb = b;
-
+  
   if (aa->n < bb->n)
-      return 1;
+    return 1;
   
   if (aa->n > bb->n)
-      return -1;
+    return -1;
   
   return 0;
 }
@@ -472,8 +522,13 @@ store_pattern_if_winner(struct invariant_hash *pre,
 	    winning_moves[k].pattern[i][j] = '.';
 	  else if (BOARD(i, j) == color)
 	    winning_moves[k].pattern[i][j] = 'O';
-	  else
+	  else if ((color == WHITE && p[i][j] == BLACK)
+		   || (color == BLACK && p[i][j] == WHITE))
 	    winning_moves[k].pattern[i][j] = 'X';
+	  else { /* something is wrong */
+	    fprintf(stderr, "Error in store_pattern_if_winner: %d\n",k);
+	    winning_moves[k].pattern[i][j] = '.';
+	  }
 	}
       winning_moves[k].pattern[m][n] = '*';
     }
@@ -496,23 +551,31 @@ examine_game(SGFNode *sgf, int collect_statistics)
   struct invariant_hash prehash;
   struct invariant_hash posthash;
   int color;
-
+  
   /* Call the engine to clear the board. */
   clear_board();
-
+  
   /* Loop through the first moves_per_game moves of each game. */
   for (k = 0; k < moves_per_game && node != NULL; node = node->child) {
-    if (!get_move_from_sgf(node, &m, &n, &color))
+    if (!get_move_from_sgf(node, &m, &n, &color)) {
+      if (k > 0) {
+	/* something is wrong with the file */
+	if (0)
+	  fprintf(stderr, "move number:%d\n",k);
+	return 0;
+      }
       continue;
+    }
     gg_assert(m >= 0 && m < board_size && n >= 0 && n <= board_size);
     hash_board(&prehash, color);
     hash_board_and_move(&posthash, color, m, n);
-    if (collect_statistics)
+    if (collect_statistics) {
       add_situation(&prehash, &posthash);
+    }
     else
       store_pattern_if_winner(&prehash, &posthash, color, m, n);
     play_move(POS(m, n), color);
-
+    
     /* Debug output. */
     if (0) {
       int l;
@@ -524,15 +587,140 @@ examine_game(SGFNode *sgf, int collect_statistics)
       fprintf(stderr, "\n");
       showboard(0);
     }
-
     k++;
   }
-
-  if (!node)
+  if (!node) {
+    if (0)
+      fprintf(stderr, "Node error\n");
     return 0;
+  }
   
   return 1;
 }
+
+/* Tests if the player has enough strength in the game to be interesting 
+ * for the library
+ */
+  
+static int
+enough_strength(char *strength)
+{
+  int length = 0;
+  int i = 0;
+  int kyu = 30;
+  if (player_strength >= 30) {
+    return 1;
+  }
+  length = strlen(strength);
+  /* check if dan player */
+  for (i = 0; i < length; i++) {
+    if (strength[i] == 'd') return 1;
+  }
+  
+  /* get the kyu strength as an integer */
+  for (i = 0; i < length; i++) {
+    if (strength[i] == 'k') {
+      strength[i] = '\0';
+    }
+    kyu = atoi(strength);
+  }
+  if (kyu <= player_strength) {
+    return 1;
+  }
+  /* not enough strength */
+  return 0;
+}
+
+/*
+ * Sort out the games that can be used
+ */
+
+static void
+sort_games(void)
+{
+  int k;
+  int handicap;
+  char *WR; /* white rank */
+  char *BR; /* black rank */
+  
+  for (k = 0; k < number_of_games; k++) {
+    int size;
+    SGFNode *sgf;
+    
+    /* Progress output. */
+    if (k % 500 == 0)
+      fprintf(stderr, "Sorting number %d, %s\n", k, sgf_names[k]);
+    
+    sgf = readsgffilefuseki(sgf_names[k], 0);
+    
+    if (!sgf) {
+      if (0)
+	fprintf(stderr, "Warning: Couldn't open sgf file %s.\n", sgf_names[k]);
+      unused_games[k] = 1; /* the game could not be used */
+      continue;
+    }
+    
+    else if (!sgfGetIntProperty(sgf, "SZ", &size) || size != board_size) {
+      if (0)
+	fprintf(stderr, "Warning: wrong size of board %d.\n", size);
+      unused_games[k] = 1; /* the game could not be used */
+      continue; /* Board of wrong size, ignore the game. */
+    }
+    
+    /* No handicap games */
+    else if(handicap_value == 0) {
+      if (sgfGetIntProperty(sgf, "HA", &handicap) && handicap > 1) {
+	if (0)
+	  fprintf(stderr, "No handicap games allowed %d\n", handicap);
+	unused_games[k] = 1; /* the game could not be used */
+	continue;
+      }
+    }
+    
+    /* Only handicap games */
+    else if(handicap_value > 1) {
+      if (!sgfGetIntProperty(sgf, "HA", &handicap)) {
+	if (0)
+	  fprintf(stderr, "Not a handicap game %d\n", handicap);
+	unused_games[k] = 1; /* the game could not be used */
+	continue;
+      }
+      
+      /* only specific handicap games */
+      else if (handicap_value != 10 && handicap != handicap_value) {
+	if (0)
+	  fprintf(stderr, "Wrong number of handicap stones %d\n", handicap);
+	unused_games[k] = 1; /* the game could not be used */
+	continue;
+      }
+    }
+    
+    if (unused_games[k] == 0) {
+      /* examine strength of players in the game and compare it 
+       * with minimum player strength 
+       */
+      if (sgfGetCharProperty(sgf, "BR", &BR) && !enough_strength(BR)) {
+	if (0)
+	  fprintf(stderr, "Wrong strength: %s.\n", BR);
+	unused_games[k] = 1; /* the game could not be used */
+	continue;
+      }
+      
+      /* examine strength of players in the game and compare it with 
+       * minimum player strength */
+      else if (sgfGetCharProperty(sgf, "WR", &WR) && !enough_strength(WR)) {
+	if (0)
+	  fprintf(stderr, "Wrong strength: %s.\n", WR);
+	unused_games[k] = 1; /* the game could not be used */
+	continue;
+      }
+    }
+    
+    /* Free memory of SGF file */
+    sgfFreeNode(sgf);
+  }
+}
+
 
 /* Play through the initial moves of all games and collect hash values
  * for the encountered situations.
@@ -541,26 +729,88 @@ static void
 collect_situations(void)
 {
   int k;
+  int handicap;
+  char *WR; /* white rank */
+  char *BR; /* black rank */
+  
   init_situations();
   for (k = 0; k < number_of_games; k++) {
     int size;
     SGFNode *sgf;
-
-    /* Debug output. */
-    if (0)
-      fprintf(stderr, "Reading %s\n", sgf_names[k]);
-
-    sgf = readsgffile(sgf_names[k]);
+    
+    /* Progress output. */
+    if (k % 500 == 0)
+      fprintf(stderr, "Reading number %d, %s\n", k, sgf_names[k]);
+    
+    sgf = readsgffilefuseki(sgf_names[k], moves_per_game);
+    
     if (!sgf) {
-      fprintf(stderr, "Warning: Couldn't open sgf file %s.\n", sgf_names[k]);
+      if (0)
+	fprintf(stderr, "Warning: Couldn't open sgf file %s.\n", sgf_names[k]);
+      unused_games[k] = 1; /* the game could not be used */
       continue;
     }
     
-    if (!sgfGetIntProperty(sgf, "SZ", &size) || size != board_size)
+    else if (!sgfGetIntProperty(sgf, "SZ", &size) || size != board_size) {
+      if (0)
+	fprintf(stderr, "Warning: wrong size of board %d.\n", size);
+      unused_games[k] = 1; /* the game could not be used */
       continue; /* Board of wrong size, ignore the game. */
-
-    if (!examine_game(sgf, 1))
-      fprintf(stderr, "Warning: Problem with sgf file %s.\n", sgf_names[k]);
+    }
+    
+    /* No handicap games */
+    else if(handicap_value == 0) {
+      if (sgfGetIntProperty(sgf, "HA", &handicap) && handicap > 1) {
+	if (0)
+	  fprintf(stderr, "No handicap games allowed %d\n", handicap);
+	unused_games[k] = 1; /* the game could not be used */
+	continue;
+      }
+    }
+    
+    /* Only handicap games */
+    else if(handicap_value > 1) {
+      if (!sgfGetIntProperty(sgf, "HA", &handicap)) {
+	if (0)
+	  fprintf(stderr, "Not a handicap game %d\n", handicap);
+	unused_games[k] = 1; /* the game could not be used */
+	continue;
+      }
+      
+      /* only specific handicap games */
+      else if (handicap_value != 10 && handicap != handicap_value) {
+	if (0)
+	  fprintf(stderr, "Wrong number of handicap stones %d\n", handicap);
+	unused_games[k] = 1; /* the game could not be used */
+	continue;
+      }
+    }
+    
+    /* examine strength of players in the game and compare it with 
+     * minimum player strength */
+    if (sgfGetCharProperty(sgf, "BR", &BR) && !enough_strength(BR)) {
+      if (0)
+	fprintf(stderr, "Wrong strength: %s.\n", BR);
+      unused_games[k] = 1; /* the game could not be used */
+      continue;
+    }
+    /* examine strength of players in the game and compare it with 
+     * minimum player strength */
+    else if (sgfGetCharProperty(sgf, "WR", &WR) && !enough_strength(WR)) {
+      if (0)
+	fprintf(stderr, "Wrong strength: %s.\n", WR);
+      unused_games[k] = 1; /* the game could not be used */
+      continue;
+    }
+    
+    if (!examine_game(sgf, 1)) {
+      if (0)
+	fprintf(stderr, "Warning: Problem with sgf file %s.\n", sgf_names[k]);
+      unused_games[k] = 1; /* the game could not be used */
+    }
+    
+    /* Free memory of SGF file */
+    sgfFreeNode(sgf);
   }
 }
 
@@ -574,7 +824,7 @@ analyze_statistics(void)
   /* Sort all the collected situations. */
   qsort(situation_table, number_of_situations, sizeof(*situation_table),
 	compare_situations);
-
+  
   /* Debug output. */
   if (0) {
     int i, k;
@@ -588,7 +838,7 @@ analyze_statistics(void)
       fprintf(stderr, "\n");
     }
   }
-
+  
   /* Set up frequency table. */
   frequency_table = calloc(number_of_situations, sizeof(*frequency_table));
   if (!frequency_table) {
@@ -607,11 +857,11 @@ analyze_statistics(void)
     }
     frequency_table[number_of_distinct_positions-1].n++;
   }
-
+  
   /* Sort the frequency table, in falling order. */
   qsort(frequency_table, number_of_distinct_positions,
 	sizeof(*frequency_table), compare_frequencies);
-
+  
   /* Debug output. */
   if (0) {
     int l;
@@ -620,7 +870,7 @@ analyze_statistics(void)
 	      frequency_table[l].index);
     }
   }
-
+  
   /* Set up winners array. */
   winning_moves = calloc(patterns_to_extract, sizeof(*winning_moves));
   if (!winning_moves) {
@@ -637,18 +887,18 @@ analyze_statistics(void)
   for (k = 0; k < number_of_distinct_positions; k++) {
     int index = frequency_table[k].index;
     int i;
-
+    
     /* Build a new frequency table for the different moves in this position. */
     struct frequency move_frequencies[MAX_BOARD * MAX_BOARD];
     int number_of_moves = 0;
-    for (i=index; ;i++) {
+    for (i = index; ;i++) {
       if (i == number_of_situations
 	  || (i > index
 	      && compare_positions(&situation_table[i],
 				   &situation_table[i-1]) != 0))
 	break;
-      if (i==index || compare_situations(&situation_table[i],
-					 &situation_table[i-1]) != 0) {
+      if (i == index || compare_situations(&situation_table[i],
+					   &situation_table[i-1]) != 0) {
 	move_frequencies[number_of_moves].index = i;
 	move_frequencies[number_of_moves].n = 0;
 	number_of_moves++;
@@ -659,7 +909,7 @@ analyze_statistics(void)
     /* Sort the moves, in falling order. */
     qsort(move_frequencies, number_of_moves,
 	  sizeof(*move_frequencies), compare_frequencies);
-
+    
     /* Debug output. */
     if (0) {
       for (i = 0; i < number_of_moves; i++) {
@@ -667,12 +917,17 @@ analyze_statistics(void)
 		move_frequencies[i].index);
       }
     }
-
+    
     /* Add the moves to the list of winners. */
     for (i = 0; i < number_of_moves; i++) {
+      /* This is where the cut-off of moves is decided */
       if (10 * move_frequencies[i].n < move_frequencies[0].n
 	  && move_frequencies[i].n < 10)
 	break;
+      /* Take away any move that hasn't been made by at least 2 people */
+      if (move_frequencies[i].n < 2)
+	break;
+      
       winning_moves[number_of_winning_moves].index = move_frequencies[i].index;
       winning_moves[number_of_winning_moves].position_frequency =
 	frequency_table[k].n;
@@ -687,7 +942,7 @@ analyze_statistics(void)
     if (number_of_winning_moves == patterns_to_extract)
       break;
   }
-
+  
   /* Debug output. */
   if (0) {
     int i;
@@ -707,16 +962,30 @@ static void
 generate_patterns(void)
 {
   int k;
+  SGFNode *sgf;
   for (k = 0; k < number_of_games; k++) {
-    int size;
-    SGFNode *sgf = readsgffile(sgf_names[k]);
+    
+    /* Progress output. */
+    if (k % 500 == 0)
+      fprintf(stderr, "Generating number %d, %s\n", k, sgf_names[k]);
+    
+    /* Check if this game is a valid game */
+    if (unused_games[k]) {
+      if (0)
+	fprintf(stderr, "Not used\n");
+      continue;
+    }
+    
+    sgf = readsgffilefuseki(sgf_names[k], moves_per_game);
     if (!sgf) {
       fprintf(stderr, "Warning: Couldn't open sgf file %s.\n", sgf_names[k]);
       continue;
     }
-    if (!sgfGetIntProperty(sgf, "SZ", &size) || size != board_size)
-      continue; /* Board of wrong size, ignore the game. */
+    
     (void) examine_game(sgf, 0);
+    
+    /* Free memory of SGF file */
+    sgfFreeNode(sgf);
   }
 }
 
@@ -724,36 +993,51 @@ generate_patterns(void)
 static void
 print_patterns(void)
 {
-  int k;
+  int k, l;
   int m, n;
+  l = 1;
   for (k = 0; k < number_of_winning_moves; k++) {
-    printf("Pattern Fuseki%d\n", k+1);
-    printf("# %d/%d\n\n", winning_moves[k].move_frequency,
-	   winning_moves[k].position_frequency);
-    for (m = 0; m < board_size; m++) {
-      printf("|");
-      for (n = 0; n < board_size; n++) {
-	printf("%c", winning_moves[k].pattern[m][n]);
+    
+    /* do not print errornous patterns */
+    if (winning_moves[k].pattern[0][0] != '\0') {
+      printf("Pattern Fuseki%d\n", l);
+      printf("# %d/%d\n\n", 
+	     winning_moves[k].move_frequency,
+	     winning_moves[k].position_frequency);
+      for (m = 0; m < board_size; m++) {
+	printf("|");
+	for (n = 0; n < board_size; n++) {
+	  if (winning_moves[k].pattern[m][n] == '\0') {
+	    fprintf(stderr, "Something wrong in print pattern\n");
+	    printf(".");
+	  }
+	  else
+	    printf("%c", winning_moves[k].pattern[m][n]);
+	}
+	printf("\n");
       }
-      printf("\n");
+      printf("+");
+      for (n = 0; n < board_size; n++) {
+	printf("-");
+      }
+      printf("\n\n:8,-,value(%d)\n\n\n", winning_moves[k].move_frequency);
+      l++;
     }
-    printf("+");
-    for (n = 0; n < board_size; n++) {
-      printf("-");
-    }
-    printf("\n\n:8,-,value(%d)\n\n\n", winning_moves[k].move_frequency);
   }
 }
 
 int
 main(int argc, char *argv[])
 {
+  int number_of_unused_games = 0;
+  int i = 0;
+  
   /* Check number of arguments. */
-  if (argc < 5) {
+  if (argc < 6) {
     fprintf(stderr, USAGE);
     exit(EXIT_FAILURE);
   }
-
+  
   /* Check arguments. */
   board_size = atoi(argv[2]);
   if (board_size % 2 == 0) {
@@ -768,15 +1052,32 @@ main(int argc, char *argv[])
   if (moves_per_game < 1 || moves_per_game > 20)
     fprintf(stderr, "Warning: strange number of moves per game: %d.\n",
 	    moves_per_game);
-
+  
   patterns_to_extract = atoi(argv[4]);
   if (patterns_to_extract < 1)
     fprintf(stderr, "Warning: strange number of patterns to extract: %d.\n",
 	    patterns_to_extract);
-
+  
+  handicap_value = atoi(argv[5]);
+  if (handicap_value < 0 || handicap_value > 2)
+    fprintf(stderr, "Warning: wrong handicap value: %d.\n",
+	    handicap_value);
+  
+  player_strength = atoi(argv[6]);
+  if (player_strength < 0 || player_strength > 30)
+    fprintf(stderr, "Warning: wrong lowest strength: %d.\n",
+	    player_strength);
+  
   /* Count the number of sgf files. */
   number_of_games = read_sgf_filenames(argv[1], NULL);
-
+  
+  /* Allocate space for the list of unused files. */
+  unused_games = calloc(number_of_games, sizeof(int));
+  if (unused_games == NULL) {
+    fprintf(stderr, "Fatal error, failed to allocate memory.\n");
+    exit(EXIT_FAILURE);
+  }
+  
   /* Allocate space for the list of sgf file names. */
   sgf_names = calloc(number_of_games, sizeof(*sgf_names));
   if (sgf_names == NULL) {
@@ -786,28 +1087,47 @@ main(int argc, char *argv[])
   
   /* Read the list of sgf files and store in memory. */
   (void) read_sgf_filenames(argv[1], sgf_names);
-
-  /* Build tables of random numbers for Zobrist hashing. */
-  init_zobrist_numbers();
   
-  /* Play through the initial moves of all games and collect hash values
-   * for the encountered situations.
-   */
-  collect_situations();
-
-  /* Find the most common positions and moves, for which we want to
-   * generate patterns.
-   */
-  analyze_statistics();
-
-  /* Generate patterns from the chosen positions and moves.
-   */
-  generate_patterns();
-
-  /* Write the patterns to stdout in patterns.db format.
-   */
-  print_patterns();
-
+  /* Save memory by sorting out the games that can be used first */
+  if (argv[7] != NULL) {
+    sort_games();
+    write_sgf_filenames(argv[7], sgf_names);
+  }
+  
+  else {
+    /* Build tables of random numbers for Zobrist hashing. */
+    init_zobrist_numbers();
+    
+    /* Play through the initial moves of all games and collect hash values
+     * for the encountered situations.
+     */
+    collect_situations();
+    fprintf(stderr, "collect OK.\n");
+    
+    /* Find the most common positions and moves, for which we want to
+     * generate patterns.
+     */
+    analyze_statistics();
+    fprintf(stderr, "analyze OK.\n");
+    
+    /* Generate patterns from the chosen positions and moves.
+     */
+    generate_patterns();
+    fprintf(stderr, "generate OK.\n");
+    
+    /* Write the patterns to stdout in patterns.db format.
+     */
+    print_patterns();
+    
+    /* Tell the user everything worked out fine */
+    fprintf(stderr, "The pattern database was produced with no errors.\n");
+    for (i = 0; i < number_of_games; i++) {
+      if(unused_games[i]) number_of_unused_games++;
+    }
+    fprintf(stderr, "Out of %d games, %d were not used.\n", 
+	    number_of_games, number_of_unused_games);
+  }
+  
   return 0;
 }
 

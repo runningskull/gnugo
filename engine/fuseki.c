@@ -35,7 +35,7 @@
 /* Pointless to do fuseki database pattern matching after this number
  * of stones have been placed on the board.
  */
-#define MAX_FUSEKI_DATABASE_STONES 19
+#define MAX_FUSEKI_DATABASE_STONES 10
 
 #define UPPER_LEFT  0
 #define UPPER_RIGHT 1
@@ -211,6 +211,7 @@ search_fuseki_database(int color)
   struct fullboard_pattern *database;
   int q;
   int k;
+  int best_fuseki_value;
 
   /* Disable matching after a certain number of stones are placed on
    * the board.
@@ -218,9 +219,11 @@ search_fuseki_database(int color)
   if (stones_on_board(BLACK | WHITE) > MAX_FUSEKI_DATABASE_STONES)
     return 0;
 
-  /* We only have databases for 9x9 and 19x19. */
+  /* We only have databases for 9x9, 13x13 and 19x19. */
   if (board_size == 9)
     database = fuseki9;
+  else if (board_size == 13)
+    database = fuseki13;
   else if (board_size == 19)
     database = fuseki19;
   else
@@ -236,8 +239,12 @@ search_fuseki_database(int color)
     return 0;
 
   /* Choose randomly with respect to relative weights for matched moves. */
+  /* do not choose moves with less value than 20% of the best move */
+  best_fuseki_value = fuseki_value[0];
   q = gg_rand() % fuseki_total_value;
   for (k = 0; k < fuseki_moves; k++) {
+    if (fuseki_value[k] < (best_fuseki_value / 5))
+      break;
     q -= fuseki_value[k];
     if (q < 0)
       break;

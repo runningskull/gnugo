@@ -87,7 +87,7 @@ Usage : mkpat [-cvh] <prefix>\n\
 #define MAXLINE 500
 #define MAXCONSTRAINT 10000
 #define MAXACTION 10000
-#define MAXPATNO 3000
+#define MAXPATNO 5000
 #define MAXLABELS 20
 #define MAXPARAMS 15
 
@@ -1479,7 +1479,7 @@ main(int argc, char *argv[])
   while (fgets(line, MAXLINE, stdin)) {
 
     if (line[strlen(line)-1] != '\n') {
-      fprintf(stderr, "mkpat: line truncated: %s\n", line);
+      	fprintf(stderr, "mkpat: line truncated: %s, length %d\n", line,strlen(line));
       fatal_errors++;
     }
 

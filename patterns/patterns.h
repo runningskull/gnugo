@@ -309,6 +309,7 @@ extern struct pattern_db endpat_db;
 extern struct pattern_db influencepat_db;
 extern struct pattern_db barrierspat_db;
 extern struct fullboard_pattern fuseki19[];
+extern struct fullboard_pattern fuseki13[];
 extern struct fullboard_pattern fuseki9[];
 
 
