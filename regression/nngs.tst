@@ -671,7 +671,7 @@ loadsgf games/nngs/gnugo-3.1.18-rpwiegand-200201072335.sgf 71
 #Can't block this way, unless have a stone around K16
 loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 18
 1500 gg_genmove white
-#? [R16]*
+#? [R16]
 
 
 loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 24

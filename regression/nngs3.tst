@@ -69,12 +69,12 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 94
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 98
 230 gg_genmove black
-#? [!L12]*
+#? [!L12]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 108
 240 gg_genmove black
-#? [G13|G12]*
+#? [G13|G12]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 110
@@ -89,7 +89,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 114
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 154
 270 gg_genmove black
-#? [!R2]*
+#? [!R2]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 174
@@ -113,7 +113,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 20
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 26
 310 gg_genmove black
-#? [C5|B5]*
+#? [C5|B5]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 32
@@ -123,7 +123,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 32
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 42
 330 gg_genmove black
-#? [P12|Q11]*
+#? [P12|Q11]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 46
@@ -143,7 +143,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 56
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 76
 370 gg_genmove black
-#? [!G6]*
+#? [!G6]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 84
@@ -158,12 +158,12 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 90
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 104
 400 gg_genmove black
-#? [N13]*
+#? [N13]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 134
 410 gg_genmove black
-#? [!E3]*
+#? [!E3]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 164
@@ -173,12 +173,12 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 164
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 176
 430 gg_genmove black
-#? [!A12]*
+#? [!A12]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 178
 440 gg_genmove black
-#? [!B10]*
+#? [!B10]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 202
@@ -218,7 +218,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 42
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 190
 510 gg_genmove black
-#? [P4]*
+#? [P4]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 208
@@ -262,7 +262,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204271842.sgf 122
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204271842.sgf 128
 590 gg_genmove black
-#? [!A4]*
+#? [!A4]
 
 
 
@@ -307,12 +307,12 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 44
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 54
 700 gg_genmove black
-#? [Q2]*
+#? [Q2]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 56
 710 gg_genmove black
-#? [Q2]*
+#? [Q2]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 66
@@ -327,12 +327,12 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 78
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 86
 740 gg_genmove black
-#? [!F2]*
+#? [!F2]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 122
 750 gg_genmove black
-#? [L17|L18]*
+#? [L17|L18]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 152
@@ -361,7 +361,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 80
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 86
 800 gg_genmove black
-#? [G4]*
+#? [G4]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 90
@@ -371,7 +371,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 90
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 96
 820 gg_genmove black
-#? [!F2]*
+#? [!F2]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 120
@@ -391,7 +391,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 136
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 180
 860 gg_genmove black
-#? [!O14]*
+#? [!O14]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 232
@@ -405,17 +405,17 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 232
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 28
 880 gg_genmove black
-#? [Q3]*
+#? [Q3]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 48
 890 gg_genmove black
-#? [!B4]*
+#? [!B4]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 54
 900 gg_genmove black
-#? [!P16]*
+#? [!P16]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 56
@@ -425,12 +425,12 @@ loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 56
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 58
 920 gg_genmove black
-#? [!F12]*
+#? [!F12]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 64
 930 gg_genmove black
-#? [!C18]*
+#? [!C18]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 68
@@ -445,22 +445,22 @@ loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 76
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 88
 960 gg_genmove black
-#? [L8]*
+#? [L8]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 146
 970 gg_genmove black
-#? [!J5]*
+#? [!J5]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 158
 980 gg_genmove black
-#? [!G10]*
+#? [!G10]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 160
 990 gg_genmove black
-#? [!O7]*
+#? [!O7]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 202
@@ -470,7 +470,7 @@ loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 202
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 216
 1010 gg_genmove black
-#? [H16|H17]*
+#? [H16|H17]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 222
@@ -494,22 +494,22 @@ loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 40
 
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 64
 1050 gg_genmove white
-#? [!C14]*
+#? [!C14]
 
 
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 68
 1060 gg_genmove white
-#? [B12]*
+#? [B12]
 
 
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 112
 1070 gg_genmove white
-#? [!L7]*
+#? [!L7]
 
 
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 194
 1080 gg_genmove white
-#? [!H7]*
+#? [!H7]
 
 
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 224
