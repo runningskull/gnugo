@@ -1,3 +1,30 @@
+========================== 3.3.15 pre 1 ============================
+
+./regress.sh . strategy.tst 
+50 unexpected PASS!
+./regress.sh . viking.tst 
+2 unexpected FAIL: Correct 'E2', got 'C4'
+./regress.sh . lazarus.tst 
+16 unexpected FAIL: Correct 'L16', got 'L17'
+./regress.sh . global.tst 
+34 unexpected PASS!
+./regress.sh . semeai.tst 
+23 unexpected FAIL: Correct 'ALIVE DEAD (F15|G15|H15|PASS)', got 'ALIVE DEAD E13'
+34 unexpected FAIL: Correct 'ALIVE DEAD S18', got 'DEAD ALIVE PASS'
+./regress.sh . strategy4.tst 
+155 unexpected PASS!
+179 unexpected FAIL: Correct 'P3|O2|P2|O4|E2', got 'O5'
+./regress.sh . nngs3.tst 
+240 unexpected PASS!
+./regress.sh . auto_handtalk.tst 
+7 unexpected FAIL: Correct 'ALIVE DEAD (O18|N18|O17|P17)', got 'ALIVE_IN_SEKI ALIVE_IN_SEKI N18'
+8 unexpected FAIL: Correct 'ALIVE DEAD (N18|O17|S15)', got 'ALIVE_IN_SEKI ALIVE_IN_SEKI N18'
+./regress.sh . ninestones.tst 
+260 unexpected FAIL: Correct 'B16', got 'C13'
+270 unexpected FAIL: Correct 'Q3', got 'Q2'
+280 unexpected FAIL: Correct 'R1|S1|S2', got 'T4'
+290 unexpected FAIL: Correct 'B1', got 'A4'
+
 ========================== 3.3.14 ============================
 
 ./regress.sh . ld_owl.tst 

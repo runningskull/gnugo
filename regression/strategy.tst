@@ -322,7 +322,7 @@ loadsgf games/strategy12.sgf 21
 # So much better, that I removed Q11 option -trevor
 loadsgf games/strategy13.sgf
 50 gg_genmove white
-#? [Q9]*
+#? [Q9]
 
 
 

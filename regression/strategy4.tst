@@ -26,7 +26,7 @@ loadsgf games/strategy37.sgf
 # Incident 190.
 loadsgf games/incident189.sgf 186
 155 gg_genmove black
-#? [D18]*
+#? [D18]
 
 loadsgf games/ssstator.sgf 133
 156 gg_genmove black
@@ -159,7 +159,7 @@ loadsgf games/xxlin.sgf 16
 #Added E2 (3.1.14) -trevor
 loadsgf games/xxlin.sgf 20
 179 gg_genmove black
-#? [P3|O2|P2|O4|E2]
+#? [P3|O2|P2|O4|E2]*
 
 #The point of this problem is that Q8 is locally better than M7.
 #However, GNU Go reasonably tenukis.
