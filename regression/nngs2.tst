@@ -228,6 +228,29 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 211
 540 gg_genmove white
 #? [B8|B9]*
 
+# gnugo-3.3.9-nailer-200210192319 problems.
+
+loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 122
+550 gg_genmove white
+#? [!H19]
+
+loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 146
+560 gg_genmove white
+#? [!L16]
+
+loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 148
+570 gg_genmove white
+#? [!F19]
+
+loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
+580 gg_genmove white
+#? [K19]
+
+# We still can live.
+loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 224
+600 gg_genmove white
+#? [B5]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
