@@ -5554,8 +5554,8 @@ simple_ladder(int str, int *move)
   findlib(str, 2, libs);
 
   /* If the defender can get enough liberties by playing one of these 
-   * two,    then we have no choice but to block there and consequently, 
-   * it is    unnecesary to try the other liberty.
+   * two, then we have no choice but to block there and consequently, 
+   * it is unnecesary to try the other liberty.
    */
 
   if (approxlib(libs[0], color, 4, NULL) <= 3)
