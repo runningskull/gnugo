@@ -169,6 +169,7 @@ static int owl_determine_life(struct local_owl_data *owl,
 			      int color, int komaster, int does_attack,
 			      struct owl_move_data *moves, int *probable_min,
 			      int *probable_max);
+static int modify_stupid_eye_vital_point(int *vital_point, int color);
 static void owl_mark_dragon(int apos, int bpos,
 			    struct local_owl_data *owl);
 static void owl_mark_boundary(struct local_owl_data *owl);
@@ -1585,8 +1586,10 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       if (pass == 0 || stackp > owl_distrust_depth) {
 	if (stackp == 0)
 	  move_cutoff = 70;
-	else if (true_genus + probable_min >= 3)
+	else if (true_genus + probable_min > 3)
 	  move_cutoff = 25;
+	else if (true_genus + probable_min >= 3)
+	  move_cutoff = 35;
 	else
 	  move_cutoff = 45;
       }
@@ -2040,6 +2043,13 @@ owl_determine_life(struct local_owl_data *owl,
 	    TRACE("%s at %1m, score %d (eye at %1m, max %d, min %d, pessimistic_min %d)\n",
 		  reason, attack_point, value, pos, max, min,
 		  pessimistic_min);
+	    
+	    if (eye[attack_point].marginal
+		&& modify_stupid_eye_vital_point(&attack_point,
+						  OTHER_COLOR(color)))
+	      TRACE("vital point looked stupid, moved it to %1m\n",
+		    attack_point);
+	    
 	    owl_add_move(moves, attack_point, value, reason, 1);
 	    vital_values[attack_point] = value;
 	  }
@@ -2056,6 +2066,12 @@ owl_determine_life(struct local_owl_data *owl,
 	    TRACE("%s at %1m, score %d (eye at %1m, max %d, min %d, pessimistic_min %d)\n",
 		  reason, defense_point, value, pos, max, min,
 		  pessimistic_min);
+
+	    if (eye[defense_point].marginal
+		&& modify_stupid_eye_vital_point(&defense_point, color))
+	      TRACE("vital point looked stupid, moved it to %1m\n",
+		    defense_point);
+	    
 	    owl_add_move(moves, defense_point, value, reason, 1);
 	    vital_values[defense_point] = value;
 	  }
@@ -2109,6 +2125,54 @@ owl_determine_life(struct local_owl_data *owl,
       }
   }
   return true_genus;
+}
+
+
+/* The optics code occasionally comes up with stupid vital moves, like
+ * a in this position:
+ *
+ * ----+
+ * O...|
+ * OX..|
+ * OX..|
+ * O.X.|
+ * .O.a|
+ * ....|
+ *
+ * This function moves such moves to the second line. The color
+ * parameter is the color of the player to move.
+ *
+ */
+static int
+modify_stupid_eye_vital_point(int *vital_point, int color)
+{
+  int up;
+  int right;
+  int k;
+  
+  for (k = 0; k < 4; k++) {
+    up = delta[k];
+    if (ON_BOARD(*vital_point - up))
+      continue;
+
+    if (board[*vital_point + up] != EMPTY)
+      continue;
+
+    right = delta[(k+1) % 4];
+
+    if (board[*vital_point + right] != EMPTY
+	|| board[*vital_point - right] != EMPTY)
+      continue;
+
+    if (board[*vital_point + 2 * up] == color
+	|| board[*vital_point + up + right] == color
+	|| board[*vital_point + up - right] == color) {
+      *vital_point += up;
+      return 1;
+    }
+  }
+  
+  return 0;
 }
 
 	

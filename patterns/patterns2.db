@@ -2247,6 +2247,51 @@ XO....
 :8,-,shape(1)
 
 
+Pattern Shape70
+# gf New pattern. (3.1.14)
+
+OX..      better to capture cleanly
+.*..
+----
+
+:8,-,shape(-2)
+
+OAb.
+.*..
+----
+
+;!oplay_defend(b,A)
+
+
+Pattern Shape71
+# gf New pattern. (3.1.14)
+
+?XO..     the descent leaves a peep
+XO...      
+.*...
+-----
+
+:8,-,shape(-1)
+
+
+Pattern Shape72
+# gf New pattern. (3.1.14)
+
+?XO.     don't leave double threat behind
+XO..      
+*...
+----
+
+:8,-,shape(-4)
+
+?Xc.
+Xba.      
+*...
+----
+
+;!oplay_defend_both(*,a,b,c)
+
+
 ###########################
 #
 # Followup moves. 

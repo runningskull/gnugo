@@ -1717,9 +1717,7 @@ cavity_recurse(int pos, int mx[BOARDMAX],
   mx[pos] = 1;
 
   
-  if ((!ON_BOARD(SOUTH(pos)) || !ON_BOARD(WEST(pos))
-       || !ON_BOARD(NORTH(pos)) || !ON_BOARD(EAST(pos)))
-      && board[pos] == EMPTY) 
+  if (is_edge_vertex(pos) && board[pos] == EMPTY) 
     (*edge)++;
 
   /* Loop over the four neighbors. */

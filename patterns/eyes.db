@@ -1349,7 +1349,26 @@ Pattern 647
 # Topology: ....
 #
 
+Pattern 650
+
+|.x
+|.X*.
++----
+
+:2,1
+
+
 Pattern 651
+# Not possible to do better than bent four in the corner.
+
+|..
+|.XX.
++----
+
+:1,1
+
+
+Pattern 652
 
 xX
 X*X.
@@ -1357,7 +1376,7 @@ X*X.
 :2,1
 
 
-Pattern 652
+Pattern 653
 
 xX
 XXX.
@@ -1365,7 +1384,7 @@ XXX.
 :1,1
 
 
-Pattern 653
+Pattern 654
 # Certain instances of this pattern are 1,1 on the edge.
 
 .x
@@ -1374,7 +1393,7 @@ x*x!
 :2,1
 
 
-Pattern 654
+Pattern 655
 # This pattern must be matched before 653.
 
 XX
@@ -1383,7 +1402,7 @@ X*x!
 :2,1
 
 
-Pattern 655
+Pattern 656
 
 Xx
 x.x!
@@ -1391,7 +1410,7 @@ x.x!
 :1,1
 
 
-Pattern 656
+Pattern 657
 
 xx
 xX.!
@@ -1399,7 +1418,7 @@ xX.!
 :1,1
 
 
-Pattern 657
+Pattern 658
 
 .x
 xXX@
@@ -1407,7 +1426,7 @@ xXX@
 :1,0
 
 
-Pattern 658
+Pattern 659
 
 @X
 xXX.

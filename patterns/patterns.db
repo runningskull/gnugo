@@ -7707,18 +7707,19 @@ OXX
 
 
 Pattern CB254
+# gf Revised classification and constraint. (3.1.14)
 
 ..O
 o*X
 ..O
 
-:-,OXbd
+:-,Xbd
 
+..a
+o*X
 ..b
-oaX
-..c
 
-;!oplay_attack(a,b) && !oplay_attack(a,c)
+;(alive(a) || alive(b)) && !oplay_attack(*,a) && !oplay_attack(*,b)
 
 
 Pattern CB255
@@ -10032,6 +10033,7 @@ Pattern ED83
 
 Pattern ED84
 # db added (3.1.7)
+# gf Changed antisuji action to replace action. (3.1.14)
 
 |xXXx        fall back to defend territory
 |XOOX
@@ -10047,7 +10049,37 @@ Pattern ED84
 |.*.O
 |...o
 
-> antisuji(a)
+>replace(a,*)
+
+
+Pattern ED85
+# gf New pattern. (3.1.14)
+
+|......      attach at 3-3 to defend
+|..X.O.
+|..*...
+|......
+|......
++------
+
+:8,Xd
+
+
+Pattern ED86
+# gf New pattern. (3.1.14)
+# This is not redundant in the presence of ED85, since it also infers
+# a strategical defense of the stone on the fifth line. If the two O
+# stones are not amalgamated, this makes a difference.
+
+|..x.O.
+|......      attach at 3-3 to defend
+|..X.O.
+|..*...
+|......
+|......
++------
+
+:8,Xd
 
 
 #####################################################################
@@ -12052,7 +12084,6 @@ XXA..
 -----
 
 ; !dead(A)
-
 
 
 #Pattern EJ83

@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function is_edge_vertex() in board.c
+- guess_eye_space() revised
+- compute_eyes_pessimistic revised
+- do_owl_defend() revised
+- move stupid vital marginal eye points from first line to second line
+  in owl_determine_life()
 - updated regress.pl
 - DFA_ENABLE ifdefs removed
 - bugfix in find_double_threats()

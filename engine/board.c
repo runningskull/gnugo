@@ -1130,6 +1130,19 @@ komaster_trymove(int pos, int color, const char *message, int str,
 #endif
 
 
+/* Determine whether vertex is on the edge. */
+int is_edge_vertex(int pos)
+{
+  ASSERT_ON_BOARD1(pos);
+  if (!ON_BOARD(SW(pos))
+      || !ON_BOARD(NE(pos)))
+    return 1;
+
+  return 0;
+}
+
+
+
 /* Count the number of liberties of the string at pos. pos must not be
  * empty.
  */

@@ -363,10 +363,7 @@ compute_primary_domains(int color, int domain[BOARDMAX],
 	    || lively_stone(NORTH(pos), other)
 	    || lively_stone(EAST(pos), other))
 	  inhibit[pos] = 2;
-	else if (!ON_BOARD(SOUTH(pos))
-		 || !ON_BOARD(WEST(pos))
-		 || !ON_BOARD(NORTH(pos))
-		 || !ON_BOARD(EAST(pos)))
+	else if (is_edge_vertex(pos))
 	  inhibit[pos] = 1;
       }
     }
@@ -941,31 +938,40 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
   }
   
   if (*max == *min && *max != *pessimistic_min) {
-    /* Find one marginal vertex and set as attack and defense point. */
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	int pos2 = POS(m, n);
-	if (eye[pos2].origin == pos) {
-	  if (eye[pos2].marginal
-	      && board[pos2] == EMPTY) {
-	    if (defense_point)
-	      *defense_point = pos2;
-	    if (attack_point)
-	      *attack_point = pos2;
-	    ASSERT_ON_BOARD1(pos2);
-	    return;
-	  }
-	  else if (is_halfeye(heye, pos2)) {
-	    ASSERT_ON_BOARD1(heye[pos2].defense_point[0]);
-	    ASSERT_ON_BOARD1(heye[pos2].attack_point[0]);
-	    if (defense_point)
-	      *defense_point = heye[pos2].defense_point[0];
-	    if (attack_point)
-	      *attack_point = heye[pos2].attack_point[0];
-	    return;
-	  }
+    /* Find one marginal vertex and set as attack and defense point.
+     *
+     * We make some effort to find the best marginal vertex by giving
+     * priority to ones with more than one neighbor in the eyespace.
+     */
+    int best_attack_point = NO_MOVE;
+    int best_defense_point = NO_MOVE;
+    float most_neighbors = 0.0;
+    int pos2;
+    
+    for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
+      if (ON_BOARD(pos2) && eye[pos2].origin == pos) {
+	if (eye[pos2].marginal
+	    && board[pos2] == EMPTY
+	    && (float) eye[pos2].neighbors > most_neighbors) {
+	  best_attack_point = pos2;
+	  best_defense_point = pos2;
+	  most_neighbors = (float) eye[pos2].neighbors;
+	}
+	else if (is_halfeye(heye, pos2) && most_neighbors == 0.0) {
+	  best_defense_point = heye[pos2].defense_point[0];
+	  best_attack_point = heye[pos2].attack_point[0];
+	  /* We prefer other marginal eyespaces than halfeyes. */
+	  most_neighbors = 0.5;
 	}
       }
+    }
+    
+    if (most_neighbors > 0) {
+      if (defense_point)
+	*defense_point = best_defense_point;
+      if (attack_point)
+	*attack_point = best_attack_point;
+    }
   }
 
   if (defense_point && *defense_point != NO_MOVE) {
@@ -984,10 +990,11 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
   if (effective_eyesize > 3) {
     *min = 2;
     *max = 2;
-    if (margins == 0 || effective_eyesize > 7)
-      *pessimistic_min = 1;
+    if ((margins == 0 && effective_eyesize > 7)
+	|| (margins > 0 && effective_eyesize > 9))
+      *pessimistic_min = 2;
     else
-      *pessimistic_min = 0;
+      *pessimistic_min = 1;
   }
   else if (effective_eyesize > 0) {
     *min = 1;

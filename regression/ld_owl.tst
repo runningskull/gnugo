@@ -344,9 +344,9 @@ loadsgf games/life_and_death/ld19.sgf
 #? [1 T2]
 311 owl_defend R3
 #? [1 (T2|R1|P1)]
-310 owl_attack C3
+312 owl_attack C3
 #? [1 B1]
-311 owl_defend C3
+313 owl_defend C3
 #? [1 (B1|A4)]
 
 # Report number of nodes visited by the tactical reading

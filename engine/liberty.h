@@ -115,6 +115,9 @@ int chainlinks2(int str, int adj[MAXCHAIN], int lib);
  */
 extern int position_number;
 
+/* Detect vertex on edge. */
+int is_edge_vertex(int pos);
+
 /* Count and/or find liberties at (pos). */
 int countlib(int str);
 int findlib(int str, int maxlib, int *libs);

@@ -175,7 +175,7 @@ Pattern VA9
 
 X*           atari inside eyespace
 
-:8,s,value(45)
+:-,s,value(45)
 
 A*
 
@@ -186,7 +186,7 @@ Pattern VA10
 
 X*           atari inside eyespace with ko
 
-:8,s,value(35)
+:-,s,value(35)
 
 A*
 
@@ -359,6 +359,74 @@ XbX
 
 ; owl_topological_eye(a,C) == 2 && 
 ; owl_topological_eye(b,C) == 2
+
+
+Pattern VA21
+# gf New pattern. (3.1.14)
+
+XO.       bogus eyespace
+.*X
+...
+---
+
+:8,-,value(75)
+
+XO.
+.*B
+.a.
+---
+
+;owl_big_eyespace(a,B)
+
+
+Pattern VA22
+# gf New pattern. (3.1.14)
+
+x.O       bogus eyespace
+.*X
+...
+---
+
+:8,-,value(75)
+
+xaO
+.*B
+...
+---
+
+;owl_big_eyespace(*,B) && oplay_attack(*,a,B)
+
+
+Pattern VA23
+# gf New pattern. (3.1.14)
+
+??O?      bogus eyespace
+x.*X
+....
+....
+----
+
+:8,-,value(75)
+
+??O?
+xc*D
+.ba.
+....
+----
+
+;owl_big_eyespace(*,D) && oplay_attack(*,a,b,c,a)
+
+
+Pattern VA24
+# gf New pattern. (3.1.14)
+
+X*           capture inside eyespace, not ko
+
+:-,-,value(76)
+
+A*
+
+;lib(A)==1 && owl_eyespace(*,A) && olib(*) > 0
 
 
 # END OF FILE
