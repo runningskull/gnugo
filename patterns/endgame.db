@@ -1300,6 +1300,7 @@ O??
 
 
 Pattern CE17
+# gf Revised constraint. (3.3.20)
 
 XO          endgame move
 .*          one point sente
@@ -1311,7 +1312,7 @@ XO
 a*
 xX
 
-;marginal_eye(*) && proper_eye(a) && olib(*)>2
+;marginal_eye(*) && proper_eye(a) && max_eye_value(a)>0 && olib(*)>2
 
 
 Pattern CE18

@@ -899,4 +899,25 @@ Pattern VA52b
 :8,-,value(65)
 
 
+Pattern VA53
+# gf New pattern. (3.3.20)
+# See ld_owl:68.
+
+|XXX   nakade if X cannot squeeze
+|O.X    
+|XOX
+|*OX
++---
+
+:8,s,value(75)
+
+|AAA
+|O.A    
+|XOA
+|*OA
++---
+
+;lib(A)==2
+
+
 # END OF FILE

@@ -1678,11 +1678,12 @@ BOC
 
 
 Pattern Shape18
+# gf Added n classification. (3.3.20)
 
 O.O     tiger
 .*X
 
-:8,-,shape(2)
+:8,n,shape(2)
 
 OaO
 b*X
@@ -3330,12 +3331,20 @@ Xb*
 
 
 Pattern DD8b
+# gf Added constraint. (3.3.20)
+# Not a problem if the opponent can't even threaten to cut after the move.
 
 O..       extend to connect
 XO*
 ?o.
 
 :8,O,shape(-1)
+
+ba.
+XO*
+?o.
+
+;oplay_disconnect(*,a,*,b)
 
 
 Pattern DD9
