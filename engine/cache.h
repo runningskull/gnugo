@@ -125,9 +125,10 @@ typedef struct read_result_t {
 
 /* Variation with two results. */
 #define rr_set_result_move2(rr, result1, result2, move) \
-	(rr).data2 = (((rr).data2 & 0x3ff) \
-          | (2 << 28) | (((result) & 0x0f) << 24) | (((move) & 0x3ff) << 10))
-
+	(rr).data2 = (((rr).data2 & 0x3ff) | (2 << 28) \
+                      | (((result1) & 0x0f) << 24) \
+                      | (((result2) & 0x0f) << 20) \
+                      | (((move) & 0x3ff) << 10))
 
 /*
  * The hash table consists of hash nodes.  Each hash node consists of
@@ -244,6 +245,10 @@ extern Hashtable *movehash;
 
 int get_read_result(int routine, int komaster, int kom_pos,
 		    int *str, Read_result **read_result);
+int
+get_read_result2(int routine, int komaster, int kom_pos, int *str1, int *str2,
+		 Read_result **read_result);
+
 
 /* ================================================================ */
 
@@ -271,6 +276,15 @@ int get_read_result(int routine, int komaster, int kom_pos,
     return (value); \
   } while (0)
 
+#define READ_RETURN_SEMEAI(read_result, point, move, value_a, value_b) \
+  do { \
+    if ((value_a) != 0 && (point) != 0) *(point) = (move); \
+    if (read_result) { \
+      rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
+    } \
+    return; \
+  } while (0)
+
 #else
 
 #define READ_RETURN0(read_result) \
@@ -294,9 +308,21 @@ int get_read_result(int routine, int komaster, int kom_pos,
     dump_stack(); \
     return (value); \
   } while (0)
-
-#endif
   
+#define READ_RETURN_SEMEAI(read_result, point, move, value_a, value_b) \
+  do { \
+    if ((value) != 0 && (point) != 0) *(point) = (move); \
+    if (read_result) { \
+      rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
+    } \
+    gprintf("%o%s %1m %d %d %d %d ", read_function_name, q, stackp, \
+	    (value_a), (value_b), (move)); \
+    dump_stack(); \
+    return (value); \
+  } while (0)
+
+ #endif
+
 /* ================================================================ */
 /* Routine numbers. */
 
@@ -312,8 +338,9 @@ int get_read_result(int routine, int komaster, int kom_pos,
 
 #define OWL_ATTACK      8
 #define OWL_DEFEND      9
+#define SEMEAI         10
 
-#define MAX_ROUTINE     OWL_DEFEND
+#define MAX_ROUTINE     SEMEAI
 #define NUM_ROUTINES    (MAX_ROUTINE+1)
   
 #endif

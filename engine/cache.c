@@ -376,7 +376,8 @@ hashtable_partially_clear(Hashtable *table)
 
     /* Remove all closed results for this node except OWL_{ATTACK,DEFEND}. */
     hashtable_unlink_closed_results(node, 
-				    (1 << OWL_ATTACK | 1 << OWL_DEFEND), 3,
+				    (1 << OWL_ATTACK | 1 << OWL_DEFEND
+				     | 1 << SEMEAI), 3,
 				    statistics);
     if (node->results != NULL)
       continue;
@@ -641,6 +642,41 @@ get_read_result(int routine, int komaster, int kom_pos, int *str,
   }
   return result;
 }
+
+/*
+ * Variant with two calling strings.
+ */
+
+int
+get_read_result2(int routine, int komaster, int kom_pos, int *str1, int *str2,
+		 Read_result **read_result)
+{
+  int result;
+  /* Only store the result if stackp <= depth. Above that, there
+   * is no branching, so we won't gain anything.
+   */
+  if (stackp > depth) {
+    *read_result = NULL;
+    return 0;
+  }
+  
+  /* Find the origin of the string containing (si, sj),
+   * in order to make the caching of read results work better.
+   */
+  *str1 = find_origin(*str1);
+  *str2 = find_origin(*str2);
+  
+  result = do_get_read_result(routine, komaster, kom_pos, *str1, *str2,
+			      read_result);
+  if (*read_result == NULL) {
+    /* Clean up the hashtable and try once more. */
+    hashtable_partially_clear(movehash);
+    result = do_get_read_result(routine, komaster, kom_pos, *str1, *str2,
+				read_result);
+  }
+  return result;
+}
+
 
 static int
 do_get_read_result(int routine, int komaster, int kom_pos,
