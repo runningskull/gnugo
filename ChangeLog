@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- redundant patterns removed from hoshi.c
+- killer move heuristic in reading.c
+- bugfix in evaluate_diagonal_intersection
+- do_owl_analyze_semeai doesn't crash on certain inconsistent eye results
 - new static functions mark_dragon() and identify_thrashing_dragons()
   in dragon.c
 - dead friendly neighbors of a thrashing dragon also considered thrashing
