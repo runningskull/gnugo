@@ -3012,9 +3012,12 @@ adjust_level_offset(int color)
   if (level + level_offset > max_level)
     level_offset = max_level - level;
 
-  if (1)
-    gprintf("New level %d (%d %C %d %d %d)\n", level + level_offset,
-	    movenum / 2, color, time_for_last_move, time_left, stones_left);
+  if (1) {
+    if (level_offset != 0) {
+      gprintf("New level %d (%d %C %d %d %d)\n", level + level_offset,
+	      movenum / 2, color, time_for_last_move, time_left, stones_left);
+    }
+  }
 }
 
 /* Function:  Set time allowance
