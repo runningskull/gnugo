@@ -1778,7 +1778,7 @@ dfa_patterns_clear(dfa_patterns *patterns)
 void
 dfa_patterns_add_pattern(dfa_patterns *patterns, const char *string, int index)
 {
-  dfa_pattern *pattern;
+  dfa_pattern *pattern = NULL;
 
   if (index == patterns->num_patterns - 1) {
     assert(patterns->last_pattern);

@@ -2,7 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.3.22 released July 15, 2003
+- warnings fixed on some platforms
+
+3.3.23 released July 15, 2003
 
 - bugfix in show_dragons()
 - redistribution consistency checking disabled for stable release

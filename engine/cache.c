@@ -119,10 +119,11 @@ hashtable_dump(Hashtable *table, FILE *outfile)
 
   /* Data about the table itself. */
   fprintf(outfile, "Dump of hashtable\n");
-  fprintf(outfile, "Total size: %d\n", table->node_limit - table->all_nodes);
+  fprintf(outfile, "Total size: %d\n", (int) (table->node_limit
+					      - table->all_nodes));
   fprintf(outfile, "Size of hash table: %d\n", table->hashtablesize);
   fprintf(outfile, "Number of positions in table: %d\n",
-	  table->free_node - table->all_nodes);
+	  (int) (table->free_node - table->all_nodes));
 
   /* Data about the contents. */
   for (i = 0; i < table->hashtablesize; ++i) {

@@ -2196,8 +2196,8 @@ tree_write_patterns(FILE *outfile)
 /* ================================================================ */
 
 #define CORNER_DB_SIZE(patterns, variations)\
-  (( patterns * sizeof(struct corner_pattern)\
-   + variations * sizeof(struct corner_variation)) / 1024)
+  ((int) (( patterns * sizeof(struct corner_pattern)\
+   + variations * sizeof(struct corner_variation)) / 1024))
 
 static struct corner_variation_b corner_root;
 static int second_corner_offset[MAXPATNO];
