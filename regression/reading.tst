@@ -600,10 +600,10 @@ loadsgf games/reading31.sgf
 153 attack C3
 #? [0]
 
-# Irrelevant ataris on boundary strings exhaust the reading depths too early.
+# Ko depth needs to be increased to 11 before the ko is detected.
 loadsgf games/trevor/trevor_03.sgf 29
 154 attack E4
-#? [1 G4]*
+#? [2 G4]*
 
 loadsgf games/reading32.sgf
 155 attack G9

@@ -879,6 +879,24 @@ aa..
 ;lib(a)>3
 
 
+Pattern EE1003
+# gf New pattern. (3.1.12)
+
+O*X?           at least one point and usually sente
+?X.o
+?X.o
+----
+
+:8,bOX,terri(1)
+
+O*X?
+?Abo
+?A.o
+----
+
+;lib(A)==3 && proper_eye(b)
+
+
 ######################################################################
 #
 # Edge followup patterns

@@ -201,7 +201,7 @@ loadsgf games/incident201.sgf 297
 57 owl_defend M19
 #? [1 T13]*
 58 owl_attack T19
-#? [1 T13]*
+#? [1 (T13|N19)]*
 59 owl_defend T19
 #? [1 (Q19|T13)]
 
@@ -435,7 +435,7 @@ loadsgf games/ko1.sgf
 
 loadsgf games/owl10.sgf
 117 owl_attack N11
-#? [1 (G12|L13|N13)]*
+#? [1 (G12|L14|N13)]*
 
 loadsgf games/owl11.sgf 126
 118 owl_attack H5
@@ -542,7 +542,7 @@ loadsgf games/owl18.sgf 140
 148 owl_defend E13
 #? [1 A5]
 
-# FIXME: Verify that there is indeed no defense for J3
+# J3 cannot be defended.
 loadsgf games/FSF-neurogo.sgf 40
 149 owl_defend J3
 #? [0]*
@@ -572,7 +572,7 @@ loadsgf games/strategy25.sgf 250
 
 loadsgf games/strategy25.sgf 251
 156 owl_attack M19
-#? [1 P13]*
+#? [1 O13]*
 157 owl_defend M19
 #? [3 (P16|Q15)]
 
@@ -836,6 +836,10 @@ loadsgf games/owl30.sgf 172
 loadsgf games/nicklas/nicklas18.sgf 17
 228 owl_attack B5
 #? [0]*
+
+loadsgf games/incident240.sgf 69
+229 owl_attack B12
+#? [1 D9]*
 
 ########### end of tests #####################
 

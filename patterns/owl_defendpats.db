@@ -799,6 +799,26 @@ XO*..
 :8,-,value(45)
 
 
+Pattern D226
+# gf New pattern. (3.1.12)
+
+?oO         threaten to escape and cut
+X.o       
+O*X
+...
+---
+
+:8,-,value(45)
+
+?ob
+X.o       
+a*X
+...
+---
+
+;owl_goal_dragon(a) && owl_escape_value(b)>0
+
+
 #########################################################
 #                                                       #
 #          Expanding moves in the center                #

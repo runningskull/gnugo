@@ -101,6 +101,10 @@ loadsgf games/golife.sgf 38
 28 disconnect H5 H7
 #? [0]*
 
+loadsgf games/incident240.sgf 69
+29 disconnect B12 F7
+#? [1 D9]*
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

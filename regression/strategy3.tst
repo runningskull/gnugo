@@ -72,9 +72,10 @@ loadsgf games/poka.sgf 52
 #? [G2]
 
 # incident 281
+# M4 and N5 are okay. O5 is a bad mistake.
 loadsgf games/incident278.sgf 212
 116 gg_genmove black
-#? [M4]*
+#? [M4|N5]*
 
 # incident 282
 loadsgf games/incident278.sgf 252
@@ -111,7 +112,7 @@ loadsgf games/incident272.sgf 250
 #? [P4]
 
 # incident 271
-# C5 seems to lead to seki.
+# C5 seems to lead to seki. Semeai mistake.
 loadsgf games/incident269.sgf 276
 124 gg_genmove black
 #? [C5]*
