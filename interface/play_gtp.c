@@ -1847,6 +1847,8 @@ gtp_undo(char *s, int id)
 
   if (!undo_move(number_moves))
     return gtp_failure(id, "undo failed");
+
+  reset_engine();
   
   return gtp_success(id, "");
 }
