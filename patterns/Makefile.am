@@ -1,5 +1,5 @@
-noinst_PROGRAMS = mkpat joseki mkeyes extract_fuseki
-EXTRA_PROGRAMS = transpat
+noinst_PROGRAMS = mkpat joseki mkeyes
+EXTRA_PROGRAMS = extract_fuseki transpat
 
 DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
 

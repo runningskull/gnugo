@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- 'make all' does not cause build of extract_fuseki and debugboard
 - owl_determine_life is careful if saving a lunch attacks an eye
 - bugfix: typo in store_persistent_reading_cache()
 - major cleanup in influence.[ch]

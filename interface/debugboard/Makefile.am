@@ -1,4 +1,4 @@
-bin_PROGRAMS = debugboard
+EXTRA_PROGRAMS = debugboard
 
 EXTRA_DIST = 
 
