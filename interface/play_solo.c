@@ -272,7 +272,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
 
 
   if (!strcmp(scoringmode, "aftermath")) {
-    if (gameinfo->outfile)
+    if (gameinfo->outfilename)
       writesgf(score_tree.root, gameinfo->outfilename);
     return;
   }

@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- only print debug output for eyes created during owl reading if owl
+  debug is also enabled
+- better traces for unused owl patterns
+- --decide-connection also reports ko results
+- bugfix in load_and_score_sgf_file()
+- new test cases
 - edge_block and double_atari_chain2 renamed to *_moves
 - do_attack uses simple_ladder_attack when stackp > depth+5
 - dragon field in struct eye_data removed

@@ -1225,8 +1225,9 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
     sgf_dumptree = save_sgf_dumptree;
     count_variations = save_count_variations;
 
-    DEBUG(DEBUG_EYES, "owl: true_genus=%d matches_found=%d\n",
-	  true_genus, matches_found);
+    if ((debug & DEBUG_EYES) && (debug & DEBUG_OWL))
+      gprintf("owl: true_genus=%d matches_found=%d\n",
+	      true_genus, matches_found);
     true_genus -= matches_found;
 
     if (true_genus >= 2
@@ -1843,8 +1844,9 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       matchpat(owl_shapes_callback, other, 
 	       &owl_vital_apat_db, shape_moves, owl->goal);
 
-    DEBUG(DEBUG_EYES, "owl: true_genus=%d matches_found=%d\n",
-	  true_genus, matches_found);
+    if ((debug & DEBUG_EYES) && (debug & DEBUG_OWL))
+      gprintf("owl: true_genus=%d matches_found=%d\n",
+	      true_genus, matches_found);
     true_genus -= matches_found;
 
     sgf_dumptree = save_sgf_dumptree;
@@ -2227,11 +2229,16 @@ owl_determine_life(struct local_owl_data *owl,
   int lunch;
   int eye_color;
   int topological_intersections;
+  int save_debug = debug;
   memset(mw, 0, sizeof(mw));
   memset(mx, 0, sizeof(mx));
   memset(vital_values, 0, sizeof(vital_values));
   UNUSED(komaster);
 
+  /* Turn off eye debugging if we're not also debugging owl. */
+  if (!(debug & DEBUG_OWL))
+    debug &= ~DEBUG_EYES;
+  
   for (k = 0; k < MAX_MOVES; k++) {
     moves[k].pos = 0;
     moves[k].value = -1;
@@ -2409,8 +2416,10 @@ owl_determine_life(struct local_owl_data *owl,
 	 */
 #if 0
 	/* Found two certain eyes---look no further. */
-	if (true_genus >= 2)
+	if (true_genus >= 2) {
+	  debug = save_debug;
 	  return 2;
+	}
 #endif
 	
 	if (max != min) {
@@ -2549,6 +2558,8 @@ owl_determine_life(struct local_owl_data *owl,
 	}
       }
   }
+  
+  debug = save_debug;
   return true_genus;
 }
 
@@ -2751,16 +2762,29 @@ close_pattern_list(int color, struct matched_patterns_list_data *list)
 	      list->pattern_list, list);
     if (allpats && verbose) {
       int i;
-      TRACE("Remaining valid (but unused) patterns at stack: ");
-      dump_stack();
+      int found_one = 0;
+      SGFTree *save_sgf_dumptree = sgf_dumptree;
+      int save_count_variations = count_variations;
+      sgf_dumptree = NULL;
+      count_variations = 0;
+      
       for (i = list->used ; i < list->counter; i++)
     	if (check_pattern_hard(list->pattern_list[i].move, color,
 	     		       list->pattern_list[i].pattern,
-			       list->pattern_list[i].ll))
+			       list->pattern_list[i].ll)) {
+	  if (!found_one) {
+	    TRACE("Remaining valid (but unused) patterns at stack: ");
+	    dump_stack();
+	    found_one = 1;
+	  }
       	  TRACE("Pattern %s found at %1m with value %d\n",
 	        list->pattern_list[i].pattern->name,
 	        list->pattern_list[i].move,
 	        (int) list->pattern_list[i].pattern->value);
+	}
+      
+      sgf_dumptree = save_sgf_dumptree;
+      count_variations = save_count_variations;
     }
     free(list->pattern_list);
   }

@@ -83,6 +83,10 @@ loadsgf games/handtalk/handtalk23.sgf 162
 17 gg_genmove white
 #? [B4|B6]*
 
+loadsgf games/handtalk/handtalk23.sgf 186
+18 gg_genmove white
+#? [S5]*
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

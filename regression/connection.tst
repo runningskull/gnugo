@@ -1,6 +1,7 @@
 # Reset applicable counters
 reset_reading_node_counter
 
+# See also test 87.
 loadsgf games/connection1.sgf
 1 same_dragon G17 K17
 #? [0]*
@@ -69,6 +70,7 @@ loadsgf games/arion.sgf 63
 18 same_dragon N17 P17
 #? [1]*
 
+# FIXME: Strange test. Wrong move number?
 loadsgf games/dublin1.sgf 71
 19 same_dragon B15 E16
 #? [0]*
@@ -258,6 +260,23 @@ loadsgf games/handtalk/handtalk13.sgf 106
 loadsgf games/handtalk/handtalk13.sgf 116
 82 same_dragon M7 M10
 #? [0]*
+
+loadsgf games/handtalk/handtalk23.sgf 80
+83 same_dragon K3 L5
+#? [0]*
+84 same_dragon H6 L5
+#? [0]*
+
+loadsgf games/handtalk/handtalk23.sgf 82
+85 same_dragon K3 G3
+#? [0]*
+86 same_dragon K3 M3
+#? [0]*
+
+# See also test 2. Possibly some more move works.
+loadsgf games/connection1.sgf
+87 disconnect R12 R9
+#? [1 S10]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

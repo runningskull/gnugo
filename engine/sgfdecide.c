@@ -154,6 +154,12 @@ decide_connection(int apos, int bpos, const char *sgf_output)
 	gprintf("%1m and %1m can be connected at %1m (%d variations)\n", 
 		apos, bpos, move, count_variations);
   }
+  else if (result == KO_A)
+    gprintf("%1m and %1m can be connected with ko (good) at %1m (%d variations)\n", 
+	    apos, bpos, move, count_variations);
+  else if (result == KO_B)
+    gprintf("%1m and %1m can be connected with ko (bad) at %1m (%d variations)\n", 
+	    apos, bpos, move, count_variations);
   else
     gprintf("%1m and %1m cannot be connected (%d variations)\n", 
 	    apos, bpos, count_variations);
@@ -168,6 +174,12 @@ decide_connection(int apos, int bpos, const char *sgf_output)
 	gprintf("%1m and %1m can be disconnected at %1m (%d variations)\n", 
 		apos, bpos, move, count_variations);
   }
+  else if (result == KO_A)
+    gprintf("%1m and %1m can be disconnected with ko (good) at %1m (%d variations)\n", 
+	    apos, bpos, move, count_variations);
+  else if (result == KO_B)
+    gprintf("%1m and %1m can be disconnected with ko (bad) at %1m (%d variations)\n", 
+	    apos, bpos, move, count_variations);
   else
     gprintf("%1m and %1m cannot be disconnected (%d variations)\n", 
 	    apos, bpos, count_variations);
