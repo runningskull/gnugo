@@ -103,6 +103,10 @@ SOURCE=.\clock.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\combination.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\dragon.c
 # End Source File
 # Begin Source File
