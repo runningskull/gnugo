@@ -69,6 +69,11 @@ loadsgf games/arb/dumonteil-6.sgf 33
 231 gg_genmove black
 #? [F5]*
 
+loadsgf games/arb/game03.sgf 109
+232 gg_genmove black
+#? [!PASS]*
+
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
