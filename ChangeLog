@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- experimental influence: yet another new_value_territory revision
+- experimental influence: fixed followup values really taken down (shapes.c)
+- experimental influence: pattern tuning
+- command line option --options reports configure options
 - verbose reduced in readconnect.
 - do_genmove tries harder to restrain thrashing dragons.
 - DFA_SORT set to 0.
