@@ -519,10 +519,6 @@ documented elsewhere (@pxref{Colored Display}).
 @quotation
 benchmarking mode - can be used with @option{-l}.
 @end quotation
-@item @option{-s}, @option{--stack}
-@quotation
-stack trace (for debugging purposes).
-@end quotation
 @item @option{-S}, @option{--statistics}
 @quotation
 Print statistics (for debugging purposes).

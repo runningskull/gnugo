@@ -50,7 +50,6 @@ libengine_a_SOURCES = \
 
 libboard_a_SOURCES = \
       board.c \
-      cache.c \
       globals.c \
       hash.c \
       printutils.c \

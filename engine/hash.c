@@ -27,7 +27,6 @@
 
 #include "liberty.h"
 #include "hash.h"
-#include "cache.h"
 #include "random.h"
 
 

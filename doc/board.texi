@@ -27,11 +27,6 @@ of strings and liberties on the go board.
 Code for hashing go positions.
 @end quotation
 
-@item @file{cache.c}
-@quotation
-Code for caching go positions
-@end quotation
-
 @item @file{globals.c}
 @quotation
 Global variables needed in the rest of the files.  This file also
@@ -498,21 +493,3 @@ Help collect the data needed by @code{order_moves()} in @file{reading.c}.
 It's the caller's responsibility to initialize the result parameters.
 @end quotation
 @end itemize
-
-@section Hashing of Board Positions
-
-Hashing of go positions in a hash table (sometimes also called a
-transposition table) is implemented in @code{libboard}, in @file{hash.c}
-and @file{cache.c} to be exact.  
-
-To use the hash function, you must include @file{hash.h} and to use the
-entire hash table, you must include @file{cache.h} in your program.  The
-details are described in @ref{Hashing}.
-
-
-
-
-
-
-
-

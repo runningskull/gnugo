@@ -222,7 +222,6 @@ static struct gg_option const long_options[] =
   {"worms",          no_argument,       0, 'w'},
   {"moyo",           required_argument, 0, 'm'},
   {"benchmark",      required_argument, 0, 'b'},
-  {"stack",          no_argument,       0, 's'},
   {"statistics",     no_argument,       0, 'S'},
   {"trace",          no_argument,       0, 't'},
   {"seed",           required_argument, 0, 'r'},
@@ -358,7 +357,6 @@ main(int argc, char *argv[])
 	
       case 'b': benchmark = atoi(gg_optarg); playmode = MODE_SOLO; break;
       case 'r': seed = atoi(gg_optarg); break;
-      case 's': showstack = 1; break;
       case 'S': showstatistics = 1; break;
       case 'w': printworms = 1; break;
       case 'm': printmoyo = strtol(gg_optarg, NULL, 0);  /* allows 0x... */ break;
@@ -1298,7 +1296,6 @@ Debugging Options:\n\
    -w, --worms                   print worm and dragon data and move reasons\n\
    -m, --moyo <level>            moyo debugging, show moyo board\n\
    -b, --benchmark num           benchmarking mode - can be used with -l\n\
-   -s, --stack                   stack trace (for debugging purposes)\n\n\
    -S, --statistics              print statistics (for debugging purposes)\n\n\
    -t, --trace                   verbose tracing\n\
    --showtime                    print timing diagnostic\n\

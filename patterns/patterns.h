@@ -28,10 +28,6 @@
 #ifndef __PATTERN_H__
 #define __PATTERN_H__
 
-#ifndef _DFA_H_
-#include "dfa.h"
-#endif
-
 /* local versions of absolute value, min and max */
 
 #define gg_abs(x) ((x) < 0 ? -(x) : (x))

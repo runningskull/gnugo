@@ -721,8 +721,6 @@ do_trymove(int pos, int color, int ignore_ko)
   PUSH_VALUE(black_captured);
   PUSH_VALUE(white_captured);
 
-  if (showstack)
-    gprintf("        *** STACK before push: %d\n", stackp);
   ++stackp;
 
   if (verbose == 4)
@@ -742,8 +740,6 @@ void
 popgo()
 {
   stackp--;
-  if (showstack)
-    gprintf("<=    *** STACK  after pop: %d\n", stackp);
   
   undo_trymove();
   

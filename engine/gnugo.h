@@ -192,7 +192,6 @@ extern int printworms;		/* print full data on each string */
 extern int printmoyo;		/* print moyo board each move */
 extern int printdragons;	/* print full data on each dragon */
 extern int printboard;		/* print board each move */
-extern int showstack;		/* debug stack pointer */
 extern int showstatistics;	/* print statistics */
 extern int profile_patterns;	/* print statistics of pattern usage */
 
