@@ -1866,7 +1866,18 @@ estimate_territorial_value(int pos, int color, float our_score,
 	secondary_value += 0.2 * this_value;
 	break;
       }
-
+      
+      if (DRAGON2(aa).owl_status == CRITICAL
+	  && (owl_defense_move_reason_known(pos, aa)
+	      < defense_move_reason_known(pos, aa))
+	  && !semeai_move_reason_known(pos, aa)) {
+	DEBUG(DEBUG_MOVE_REASONS,
+	      "  %1m:   %f (secondary) - ineffective defense of %1m (critical)\n",
+	      pos, 0.2 * this_value, aa);
+	secondary_value += 0.2 * this_value;
+	break;
+      }
+      
       /* Mark the string as saved, for evaluation in the influence code. */
       mark_changed_string(aa, safe_stones, strength, INFLUENCE_SAVED_STONE);
       TRACE("  %1m: defense of worm %1m\n", pos, aa);
