@@ -24,9 +24,6 @@
 /* GAIN/LOSS codes. Disabled by default. */
 #undef EXPERIMENTAL_OWL_EXT
 
-/* Experimental pattern based reading. Disabled by default. */
-#undef EXPERIMENTAL_READING
-
 /* Semeai module. Default standard. */
 #undef EXPERIMENTAL_SEMEAI
 
@@ -108,9 +105,6 @@
 
 /* Define if `major', `minor', and `makedev' are declared in <sysmacros.h>. */
 #undef MAJOR_IN_SYSMACROS
-
-/* Oracle. Default not enabled. */
-#undef ORACLE
 
 /* Owl Node Limit */
 #undef OWL_NODE_LIMIT

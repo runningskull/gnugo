@@ -124,8 +124,6 @@ enum {OPT_BOARDSIZE=127,
       OPT_ALLOW_SUICIDE,
       OPT_CAPTURE_ALL_DEAD,
       OPT_PLAY_OUT_AFTERMATH,
-      OPT_ATTACK_BY_PATTERN,
-      OPT_DEFEND_BY_PATTERN,
       OPT_MIRROR,
       OPT_MIRROR_LIMIT,
 };
@@ -251,8 +249,6 @@ static struct gg_option const long_options[] =
   {"score",          required_argument, 0, OPT_SCORE},
   {"printsgf",       required_argument, 0, OPT_PRINTSGF},
   {"profile-patterns", no_argument,     0, OPT_PROFILE_PATTERNS},
-  {"attack-by-pattern", no_argument,    0, OPT_ATTACK_BY_PATTERN},
-  {"defend-by-pattern", no_argument,    0, OPT_DEFEND_BY_PATTERN},
   {"mirror",         no_argument,       0, OPT_MIRROR},
   {"mirror-limit",   required_argument, 0, OPT_MIRROR_LIMIT},
   {NULL, 0, NULL, 0}
@@ -428,9 +424,6 @@ main(int argc, char *argv[])
 	if (EXPERIMENTAL_OWL_EXT)
 	  fprintf(stderr,
 		  "configure option enabled: experimental GAIN/LOSS codes\n");
-	if (EXPERIMENTAL_READING)
-	  fprintf(stderr,
-		  "configure option enabled: experimental reading\n");
 	if (OWL_THREATS)
 	  fprintf(stderr,
 		  "configure option enabled: owl threats\n");
@@ -799,18 +792,6 @@ main(int argc, char *argv[])
 	return EXIT_SUCCESS;
 	break;
 	
-#if EXPERIMENTAL_READING
-
-      case OPT_ATTACK_BY_PATTERN:
-        attack_by_pattern = 1;
-        break;
-
-      case OPT_DEFEND_BY_PATTERN:
-        defend_by_pattern = 1;
-        break;
-
-#endif
-
       case OPT_MIRROR:
         play_mirror_go = 1;
         break;

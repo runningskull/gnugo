@@ -79,10 +79,6 @@ AC_ARG_ENABLE(experimental-owl-ext,
  [  --enable-experimental-owl-ext      use the experimental GAIN/LOSS codes
   --disable-experimental-owl-ext     use standard owl module (default)])
 
-AC_ARG_ENABLE(experimental-reading,
- [  --enable-experimental-reading      use experimental pattern-based reading
-  --disable-experimental-reading     use standard reading (default)])
-
 AC_ARG_ENABLE(experimental-connections,
  [  --enable-experimental-connections  use experimental connection analysis 
                                          (default)
@@ -335,17 +331,6 @@ if test "$enable_experimental_owl_ext" = "yes" ; then
    AC_DEFINE(EXPERIMENTAL_OWL_EXT, 1)
 else
    AC_DEFINE(EXPERIMENTAL_OWL_EXT, 0)
-fi
-
-dnl ------------ Reading -------------------
-
-AH_TEMPLATE([EXPERIMENTAL_READING],
-[Experimental pattern based reading. Disabled by default.])
-
-if test "$enable_experimental_reading" = "yes" ; then
-   AC_DEFINE(EXPERIMENTAL_READING, 1)
-else
-   AC_DEFINE(EXPERIMENTAL_READING, 0)
 fi
 
 dnl ------------ Connections -------------------

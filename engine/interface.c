@@ -44,9 +44,6 @@ init_gnugo()
 
   transformation_init();
   dfa_match_init();
-#if EXPERIMENTAL_READING
-  tree_match_init();
-#endif
 }
 
 

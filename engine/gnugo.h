@@ -292,11 +292,6 @@ extern int play_mirror_go;           /* try to play mirror go if possible */
 extern int mirror_stones_limit;      /* but stop at this number of stones */
 extern int gtp_version;              /* version of Go Text Protocol */
 
-#if EXPERIMENTAL_READING
-extern int defend_by_pattern;  /* use patterns for tactical reading defense */
-extern int attack_by_pattern;  /* use patterns for tactical reading attack */
-#endif
-
 /* Mandatory values of reading parameters. Normally -1, if set at 
  * these override the values derived from the level. */
 extern int mandated_depth;
