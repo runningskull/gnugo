@@ -24,7 +24,7 @@
 /* Connection module. Default standard. */
 #define EXPERIMENTAL_CONNECTIONS 1
 
-/* Influence module. Default standard. */
+/* Influence module. Default experimental. */
 #define EXPERIMENTAL_INFLUENCE 1
 
 /* Experimental pattern based reading. Disabled by default. */
@@ -36,6 +36,9 @@
 /* Define as 1 to use the grid optimisation, or 2 to run it in self-test mode
    */
 #define GRID_OPT 1
+
+/* Hashing scheme. Default scheme 2 (new). */
+#define HASHING_SCHEME 2
 
 /* Owl Threats. 0 standard. */
 #define OWL_THREATS 0

@@ -6,6 +6,7 @@ use warnings;
 
 my %defaults =
  ( CHINESE_RULES => 0,
+   HASHING_SCHEME => 2,
    DEFAULT_LEVEL => 10,
    DEFAULT_MEMORY => 16,
    ALTERNATE_CONNECTIONS => 1,

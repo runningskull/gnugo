@@ -37,6 +37,9 @@
    */
 #define GRID_OPT 1
 
+/* Hashing scheme. Default scheme 2 (new). */
+#define HASHING_SCHEME 2
+
 /* Owl Threats. 0 standard. */
 #define OWL_THREATS 0
 
@@ -54,6 +57,6 @@
 #define SIZEOF_LONG 4
 
 /* Version number of package */
-#define VERSION "3.1.27"
+#define VERSION "3.1.28"
 
 #pragma warning(disable: 4244 4305)
