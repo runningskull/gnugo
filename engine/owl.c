@@ -1246,6 +1246,8 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
     owl_update_goal(move, same_dragon, lunch, owlb, 1);
     owl_update_boundary_marks(move, owla);
   }
+  mark_goal_in_sgf(owla->goal);
+  mark_goal_in_sgf(owlb->goal);
     
   /* Do a recursive call to read the semeai after the move we just
    * tried. If dragon b was captured by the move, call
@@ -2083,8 +2085,10 @@ do_owl_attack(int str, int *move, int *wormid,
 	}
       }
 
+      /* Test whether the move cut the goal dragon apart. */
       if (moves[k].cuts[0] != NO_MOVE)
 	owl_test_cuts(owl->goal, owl->color, moves[k].cuts);
+      mark_goal_in_sgf(owl->goal);
 
       if (origin == NO_MOVE)
 	dcode = 0;
@@ -2658,6 +2662,7 @@ do_owl_defend(int str, int *move, int *wormid,
        * pattern explicitly asked for not doing this.
        */
       owl_update_goal(mpos, moves[k].same_dragon, moves[k].lunch, owl, 0);
+      mark_goal_in_sgf(owl->goal);
 
       if (!ko_move) {
 	int acode = do_owl_attack(str, NULL, &wid, owl, new_escape);

@@ -23,6 +23,7 @@
 #include "board.h"
 #include "hash.h"
 #include "gg_utils.h"
+#include "sgftree.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -506,6 +507,25 @@ simple_showboard(FILE *outfile)
   
   fprintf(outfile, "\n");
   draw_letter_coordinates(outfile);
+}
+
+
+/* Adds square marks for each goal intersecion in the current sgf_dumptree.
+ * This function cannot be in sgf/ as it has to understand the 1-D board.
+ */
+void
+mark_goal_in_sgf(char goal[BOARDMAX])
+{
+  int pos;
+  SGFNode *node;
+
+  if (!sgf_dumptree)
+    return;
+  node = sgftreeNodeCheck(sgf_dumptree);
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos) && goal[pos])
+      sgfSquare(node, I(pos), J(pos));
 }
 
 
