@@ -618,7 +618,7 @@ gtp_loadsgf(char *s)
 {
   char filename[GTP_BUFSIZE];
   char untilstring[GTP_BUFSIZE];
-  SGFNode *sgf;
+  SGFTree sgftree;
   Gameinfo gameinfo;
   int nread;
   int color_to_move;
@@ -627,24 +627,24 @@ gtp_loadsgf(char *s)
   if (nread < 1)
     return gtp_failure("missing filename");
   
-  if ((sgf = readsgffile(filename)) == NULL)
+  if (!sgftree_readfile(&sgftree, filename))
     return gtp_failure("cannot open or parse '%s'", filename);
 
   gameinfo_clear(&gameinfo, 19, 5.5); /* Probably unnecessary. */
-  gameinfo_load_sgfheader(&gameinfo, sgf);
+  gameinfo_load_sgfheader(&gameinfo, sgftree.root);
 
   if (nread == 1)
-    color_to_move = gameinfo_play_sgftree_rot(&gameinfo, sgf, NULL,
+    color_to_move = gameinfo_play_sgftree_rot(&gameinfo, &sgftree, NULL,
 					      gtp_orientation);
   else
-    color_to_move = gameinfo_play_sgftree_rot(&gameinfo, sgf, untilstring,
+    color_to_move = gameinfo_play_sgftree_rot(&gameinfo, &sgftree, untilstring,
                                               gtp_orientation);
 
   handicap = gameinfo.handicap;
   gtp_internal_set_boardsize(board_size);
   reset_engine();
 
-  sgfFreeNode(sgf);
+  sgfFreeNode(sgftree.root);
 
   gtp_start_response(GTP_SUCCESS);
   gtp_mprintf("%C", color_to_move);

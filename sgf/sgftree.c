@@ -37,13 +37,50 @@ sgftree_readfile(SGFTree *tree, const char *infilename)
   SGFNode *savetree = tree->root;
 
   tree->root = readsgffile(infilename);
-  tree->lastnode = NULL;
   if (tree->root == NULL) {
     tree->root = savetree;
     return 0;
   }
+  tree->lastnode = NULL;
   return 1;
 }
+
+
+/* Go back one node in the tree. If lastnode is NULL, go to the last
+   node (the one in main variant which has no children) */
+
+int
+sgftreeBack(SGFTree *tree)
+{
+  if (tree->lastnode) {
+    if (tree->lastnode->parent)
+      tree->lastnode = tree->lastnode->parent;
+    else
+      return 0;
+  }
+  else
+    while (sgftreeForward(tree));
+  return 1;
+}
+
+
+/* Go forward one node in the tree. If lastnode is NULL, go to the
+   tree root */
+
+int
+sgftreeForward(SGFTree *tree)
+{
+  if (tree->lastnode) {
+    if (tree->lastnode->child)
+      tree->lastnode = tree->lastnode->child;
+    else
+      return 0;
+  }
+  else
+    tree->lastnode = tree->root;
+  return 1;
+}
+
 
 /* ================================================================ */
 /*                        High level functions                      */
@@ -53,6 +90,8 @@ sgftree_readfile(SGFTree *tree, const char *infilename)
  * Returns the node to modify. When node==NULL then lastnode is used,
  * except if lastnode is NULL, then the current end of game is used.
  */
+
+/* FIXME: do we need node parameter here? it is never used. */
 
 SGFNode *
 sgftreeNodeCheck(SGFTree *tree, SGFNode *node)
@@ -228,7 +267,7 @@ sgftreeMark(SGFTree *tree, int i, int j)
 
 
 /*
- * Start a new variant. Returns a pointer to the new node.
+ * Start a new variant.
  */
 
 void
@@ -240,13 +279,13 @@ sgftreeStartVariant(SGFTree *tree)
 
 
 /*
- * Start a new variant as first child. Returns a pointer to the new node.
+ * Start a new variant as first child.
  */
 
 void
 sgftreeStartVariantFirst(SGFTree *tree)
 {
-  SGFNode *node = sgftreeNodeCheck(tree, node);
+  SGFNode *node = sgftreeNodeCheck(tree, NULL);
   tree->lastnode = sgfStartVariantFirst(node);
 }
 

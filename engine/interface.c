@@ -477,7 +477,7 @@ gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color)
  */
 
 int
-gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
+gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 			  const char *untilstr, int orientation)
 {
   int bs, handicap;
@@ -488,15 +488,13 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
   int until = 9999;
   int addstone = 0;          /* handicap stone detector */
   
-  SGFNode *node;
-  
-  if (!sgfGetFloatProperty(head, "KM", &komi)) {
+  if (!sgfGetFloatProperty(tree->root, "KM", &komi)) {
     if (gameinfo->handicap == 0)
       komi = 5.5;
     else
       komi = 0.5;
   }
-  if (!sgfGetIntProperty(head, "SZ", &bs))
+  if (!sgfGetIntProperty(tree->root, "SZ", &bs))
     bs = 19;
   gnugo_clear_board(bs);
   gnugo_set_komi(komi);
@@ -518,7 +516,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
     }
   }
   
-  if (sgfGetIntProperty(head, "HA", &handicap) && handicap > 1) {
+  if (sgfGetIntProperty(tree->root, "HA", &handicap) && handicap > 1) {
     gameinfo->handicap = handicap;
     next = WHITE;
   }
@@ -529,11 +527,11 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
    *
    * The sgf routines map AB[aa][bb][cc] into AB[aa]AB[bb]AB[cc]
    */
-  for (node = head; node; node = node->child) {
+  for (tree->lastnode = NULL; sgftreeForward(tree);) {
     SGFProperty *prop;
     int i, j;
       
-    for (prop = node->props; prop; prop = prop->next) {
+    for (prop = tree->lastnode->props; prop; prop = prop->next) {
       DEBUG(DEBUG_LOADSGF, "%c%c[%s]\n", 
 	    prop->name & 0xff, (prop->name >> 8), prop->value);
       switch (prop->name) {
@@ -561,7 +559,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	/* following really should not be needed for proper sgf file */
 	if (movenum != 0 && !addstone) {
 	  gnugo_sethand(gameinfo->handicap, 0);
-	  sgfOverwritePropertyInt(head, "HA", gameinfo->handicap);
+         sgfOverwritePropertyInt(tree->root, "HA", gameinfo->handicap);
 	}
 
 	/* Due to a bad comment in the SGF FF3 definition (in the
@@ -583,17 +581,21 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	/* following really should not be needed for proper sgf file */
 	if (movenum != 0 && !addstone) {
 	  gnugo_sethand(gameinfo->handicap, 0);
-	  sgfOverwritePropertyInt(head, "HA", gameinfo->handicap);
+         sgfOverwritePropertyInt(tree->root, "HA", gameinfo->handicap);
 	}
 
 	if (movenum == until - 1) {
 	  gameinfo->to_move = next;
+         /* go back so that variant will be added to the proper node */
+         sgftreeBack(tree);
 	  return next;
 	}
 	      
 	if (get_moveXY(prop, &i, &j, board_size))
 	  if (i == untilm && j == untiln) {
 	    gameinfo->to_move = next;
+            /* go back so that variant will be added to the proper node */
+           sgftreeBack(tree);
 	    return next;
 	  }
 
@@ -645,9 +647,9 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 /* Same as previous function, using standard orientation */
 
 int
-gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
+gameinfo_play_sgftree(Gameinfo *gameinfo, SGFTree *tree, const char *untilstr)
 {
-  return gameinfo_play_sgftree_rot(gameinfo, head, untilstr, 0);
+  return gameinfo_play_sgftree_rot(gameinfo, tree, untilstr, 0);
 }
 
 

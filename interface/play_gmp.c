@@ -145,8 +145,7 @@ play_gmp(Gameinfo *gameinfo)
 	    break;
 	  }
 	  sgftreeAddComment(&sgftree, "undone");
-	  /* FIXME: Add a function in sgftree.c to do this. */
-	  sgftree.lastnode = sgftree.lastnode->parent;
+         sgftreeBack(&sgftree);
 	  to_move = OTHER_COLOR(to_move);
 	}
 	continue;

@@ -71,7 +71,7 @@ Tab tabs[] = {
 
 
 Gameinfo  gameinfo;
-SGFNode  *sgf_root;
+SGFTree   sgftree;
 
 int       current_color = WHITE;
 
@@ -100,7 +100,7 @@ main(int argc, char *argv[])
 
   /* Try to open the infile. */
   infilename = argv[1];
-  if ((sgf_root = readsgffile(infilename)) == NULL) {
+  if (!sgftree_readfile(&sgftree, infilename)) {
     fprintf(stderr, "Cannot open or parse '%s'\n", infilename);
     exit(1);
   }
@@ -118,7 +118,7 @@ main(int argc, char *argv[])
   josekidb = 1;
   
   gameinfo_clear(&gameinfo, 19, 5.5);
-  next = gameinfo_play_sgftree(&gameinfo, sgf_root, until);
+  next = gameinfo_play_sgftree(&gameinfo, &sgftree, until);
 
 
   /* Check if there is enough screen space. */

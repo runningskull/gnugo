@@ -47,7 +47,6 @@ static int opt_showboard = 1;
 static int showdead = 0;
 static int emacs = 0;
 SGFTree sgftree;
-SGFNode *curnode = 0;
 static int last_move_i;      /* The position of the last move */
 static int last_move_j;      /* -""-                          */
 
@@ -60,7 +59,6 @@ static void endgame(Gameinfo *gameinfo);
 static void showcapture(char *line);
 static void showdefense(char *line);
 static void ascii_goto(Gameinfo *gameinfo, char *line);
-static int ascii2pos(char *line, int *i, int *j);
 
 /* If sgf game info is written can't reset parameters like handicap, etc. */
 static int sgf_initialized;
@@ -416,16 +414,16 @@ get_command(char *command)
  */
 
 static void
-init_sgf(Gameinfo *ginfo, SGFNode *root)
+init_sgf(Gameinfo *ginfo)
 {
   if (sgf_initialized)
     return;
   sgf_initialized = 1;
 
-  sgf_write_header(root, 1, random_seed, komi, level, chinese_rules);
-  sgfOverwritePropertyInt(root, "HA", ginfo->handicap);
+  sgf_write_header(sgftree.root, 1, random_seed, komi, level, chinese_rules);
+  sgfOverwritePropertyInt(sgftree.root, "HA", ginfo->handicap);
   if (ginfo->handicap > 0)
-    gnugo_recordboard(root);
+    gnugo_recordboard(sgftree.root);
 }
 
 
@@ -439,7 +437,7 @@ computer_move(Gameinfo *gameinfo, int *passes)
   int i, j;
   int move_val;
 
-  init_sgf(gameinfo, sgftree.root);
+  init_sgf(gameinfo);
   
   /* Generate computer move. */
   move_val = gnugo_genmove(&i, &j, gameinfo->to_move);
@@ -459,8 +457,8 @@ computer_move(Gameinfo *gameinfo, int *passes)
     *passes = 0;
 
   gnugo_play_move(i, j, gameinfo->to_move);
-  sgffile_add_debuginfo(curnode, move_val);
-  curnode = sgfAddPlay(curnode, gameinfo->to_move, i, j);
+  sgffile_add_debuginfo(sgftree.lastnode, move_val);
+  sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
   sgffile_output(&sgftree);
 
   gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
@@ -476,7 +474,7 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
 {
   int i, j;
 
-  if (!ascii2pos(command, &i, &j)) {
+  if (!string_to_location(board_size, command, &i, &j)) {
     printf("\nInvalid move: %s\n", command);
     return;
   }
@@ -488,10 +486,10 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
 
   *passes = 0;
   TRACE("\nyour move: %m\n\n", i, j);
-  init_sgf(gameinfo, sgftree.root);
+  init_sgf(gameinfo);
   gnugo_play_move(i, j, gameinfo->to_move);
-  sgffile_add_debuginfo(curnode, 0);
-  curnode = sgfAddPlay(curnode, gameinfo->to_move, i, j);
+  sgffile_add_debuginfo(sgftree.lastnode, 0);
+  sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
   sgffile_output(&sgftree);
 
   last_move_i = i;
@@ -504,7 +502,7 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
   if (force) {
     gameinfo->computer_player = OTHER_COLOR(gameinfo->computer_player);
     gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
-    sgfAddComment(curnode, "forced");
+    sgftreeAddComment(&sgftree, "forced");
     return;
   }
   gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
@@ -520,16 +518,16 @@ static void
 do_pass(Gameinfo *gameinfo, int *passes, int force)
 {
   (*passes)++;
-  init_sgf(gameinfo, sgftree.root);
+  init_sgf(gameinfo);
   gnugo_play_move(-1, -1, gameinfo->to_move);
-  sgffile_add_debuginfo(curnode, 0);
-  curnode = sgfAddPlay(curnode, gameinfo->to_move, -1, -1);
+  sgffile_add_debuginfo(sgftree.lastnode, 0);
+  sgftreeAddPlay(&sgftree, gameinfo->to_move, -1, -1);
   sgffile_output(&sgftree);
 
   gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
   if (force) {
     gameinfo->computer_player = OTHER_COLOR(gameinfo->computer_player);
-    sgfAddComment(curnode, "forced");
+    sgftreeAddComment(&sgftree, "forced");
     return;
   }
   computer_move(gameinfo, passes);
@@ -569,9 +567,8 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
     
     if (filename) {
       gameinfo_load_sgfheader(gameinfo, sgftree.root);
-      gameinfo->to_move = gameinfo_play_sgftree(gameinfo, sgftree.root, until);
+      gameinfo->to_move = gameinfo_play_sgftree(gameinfo, &sgftree, until);
       sgf_initialized = 1;
-      curnode = sgftreeNodeCheck(&sgftree, 0);
     }
     else {
       if (sgfGetIntProperty(sgftree.root, "SZ", &sz)) 
@@ -583,7 +580,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	gameinfo->to_move = WHITE;
       }
       sgf_initialized = 0;
-      curnode = sgftree.root;
     }
     
     printf("\nBeginning ASCII mode game.\n\n");
@@ -617,7 +613,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  sgftreeWriteResult(&sgftree,
 			     gameinfo->to_move == WHITE ? -1000.0 : 1000.0,
 			     1);
-         sgffile_output(&sgftree);
+          sgffile_output(&sgftree);
 	case END:
 	case EXIT:
 	case QUIT:
@@ -793,33 +789,29 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	case UNDO:
 	case CMD_BACK:
 	  if (gnugo_undo_move(1)) {
-           sgfAddComment(curnode, "undone");
-	    curnode = curnode->parent;
+            sgftreeAddComment(&sgftree, "undone");
+           sgftreeBack(&sgftree);
 	    gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
 	  }
 	  else
 	    printf("\nCan't undo.\n");
 	  break;
 	case CMD_FORWARD:
-	  if (curnode->child) {
-	    gameinfo->to_move = gnugo_play_sgfnode(curnode->child,
+         if (sgftreeForward(&sgftree))
+           gameinfo->to_move = gnugo_play_sgfnode(sgftree.lastnode,
 						   gameinfo->to_move);
-	    curnode = curnode->child;
-	  }
 	  else
 	    printf("\nEnd of game tree.\n");
 	  break;
 	case CMD_LAST:
-	  while (curnode->child) {
-	    gameinfo->to_move = gnugo_play_sgfnode(curnode->child,
+         while (sgftreeForward(&sgftree))
+           gameinfo->to_move = gnugo_play_sgfnode(sgftree.lastnode,
 						   gameinfo->to_move);
-	    curnode = curnode->child;
-	  }
 	  break;
 	case COMMENT:
 	  printf("\nEnter comment. Press ENTER when ready.\n");
 	  fgets(line, 80, stdin);
-	  sgfAddComment(curnode, line);
+         sgftreeAddComment(&sgftree, line);
 	  break;
 	case SCORE:
 	  showscore = !showscore;
@@ -873,7 +865,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    /* discard newline */
 	    tmpstring[strlen(tmpstring)-1] = 0;
 	    /* make sure we are saving proper handicap */
-	    init_sgf(gameinfo, sgftree.root);
+           init_sgf(gameinfo);
 	    writesgf(sgftree.root, tmpstring);
 	    printf("You may resume the game");
 	    printf(" with -l %s --mode ascii\n", tmpstring);
@@ -895,9 +887,8 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
             /* to avoid changing handicap etc. */
             sgf_initialized = 1;
             gameinfo_load_sgfheader(gameinfo, sgftree.root);
-            gameinfo_play_sgftree(gameinfo, sgftree.root, NULL);
+            gameinfo_play_sgftree(gameinfo, &sgftree, NULL);
 	    sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
-	    curnode = sgftreeNodeCheck(&sgftree, 0);
 	  }
 	  else
 	    printf("Please specify a filename\n");
@@ -941,7 +932,7 @@ Type \"save <filename>\" to save,\n\
 	if (tmpstring) {
 	  /* discard newline */
 	  tmpstring[strlen(tmpstring)-1] = 0;
-          init_sgf(gameinfo, sgftree.root);
+          init_sgf(gameinfo);
 	  writesgf(sgftree.root, tmpstring);
 	}
 	else
@@ -1036,7 +1027,7 @@ to toggle its state or \"done\".\n");
       ascii_showboard();
     }
     else {
-      if (!ascii2pos(line, &i, &j) || BOARD(i, j) == EMPTY)
+      if (!string_to_location(board_size, line, &i, &j) || BOARD(i, j) == EMPTY)
 	printf("\ninvalid!\n");
       else {
 	int status = dragon_status(POS(i, j));
@@ -1055,7 +1046,7 @@ showcapture(char *line)
 {
   int i, j, x, y;
   if (line)
-    if (!ascii2pos(line, &i, &j) || BOARD(i, j) == EMPTY) {
+    if (!string_to_location(board_size, line, &i, &j) || BOARD(i, j) == EMPTY) {
       printf("\ninvalid point!\n");
       return;
     }
@@ -1071,7 +1062,7 @@ showdefense(char *line)
 {
   int i, j, x, y;
   if (line)
-    if (!ascii2pos(line, &i, &j) || BOARD(i, j) == EMPTY) {
+    if (!string_to_location(board_size, line, &i, &j) || BOARD(i, j) == EMPTY) {
       printf("\ninvalid point!\n");
       return;
     }
@@ -1090,50 +1081,18 @@ showdefense(char *line)
 static void
 ascii_goto(Gameinfo *gameinfo, char *line)
 {
-  int movenumber = 0;
+  char *movenumber = line;
+
   if (!line)
     return;
   if (!strncmp(line, "last", 4))
-    movenumber = 9999;
+    movenumber = "9999";
   else {
     if (!strncmp(line, "first", 4))
-      movenumber = 1;
-    else
-      sscanf(line, "%i", &movenumber);
+      movenumber = "1";
   }
-  printf("goto %i\n", movenumber);
-  curnode = sgftree.root;
-  gameinfo->to_move = gnugo_play_sgftree(curnode, &movenumber, &curnode);
-  return;
-}
-
-
-/* Convert a coordinate pair from ascii text to two integers.
- * FIXME: Check that this function is indeed equivalent to
- * string_to_location() and then replace it.
- */
-static int
-ascii2pos(char *line, int *i, int *j)
-{
-  int d;
-  char c;
-  if (sscanf(line, "%c%d", &c, &d) != 2)
-    return 0;
-
-  /* No 'I' in the coordinate system. */
-  if (tolower((int) c) == 'i')
-    return 0;
-  
-  *j = tolower((int) c) - 'a';
-  if (tolower((int) c) > 'i')
-    --*j;
-  
-  *i = board_size - d;
-
-  if (*i < 0 || *i >= board_size || *j < 0 || *j >= board_size)
-    return 0;
-  
-  return 1;
+  printf("goto %s\n", movenumber);
+  gameinfo_play_sgftree(gameinfo, &sgftree, movenumber);
 }
 
 

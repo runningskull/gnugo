@@ -874,8 +874,8 @@ main(int argc, char *argv[])
       exit(EXIT_FAILURE);
     }
     
-    gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
-			      untilstring, orientation);
+    gameinfo_play_sgftree_rot(&gameinfo, &sgftree, untilstring,
+                             orientation);
   }
   else
   /* Initialize and empty sgf tree if there was no infile. */

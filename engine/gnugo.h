@@ -170,9 +170,9 @@ void gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi);
 void gameinfo_print(Gameinfo *ginfo);
 void gameinfo_load_sgfheader(Gameinfo *gameinfo, SGFNode *head);
 void gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color);
-int  gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
+int  gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 			       const char *untilstr, int orientation);
-int  gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head,
+int  gameinfo_play_sgftree(Gameinfo *gameinfo, SGFTree *tree,
 			   const char *untilstr);
 
 
