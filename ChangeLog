@@ -2,9 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new (stub) function opponent_not_passing
+- new function sgffile_write_circle_mark
+- gg_cputime used for time statistics consistently.
 - alternate connection reading algorithm appended to readconnect.c
-- new option --alternate-connections to toggle between the two connection
-  reading algorithms
+- new option --alternate-connections toggles the connection reading algorithms
 - Zobrist hashing implemented in owl_analyze_semeai
 - do_owl_analyze_semeai no longer considers unsafe outside liberties
 - small_semeai reimplemented
@@ -16,10 +18,14 @@
 - faster implementation of accurate_approxlib.
 - mkpat takes multiple -i parameters, outputs in binary
 - Visual C now uses _vsnprintf
+- revision of patterns/mkpat.dsp
 - sgf output tweeking.
 - bugfix in experimental influence: floating point exception cure
 - bugfix in regress.plx: handling of gtp worm_stones
 - tuning
+- owl tuning
+- connection tuning
+- test revision
 
 3.1.23 released January 28, 2002
 
