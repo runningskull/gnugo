@@ -92,6 +92,8 @@ loadsgf games/incident169.sgf 154
 #? [F14]*
 
 # incident 177 (from the disastrous Indigo game)
+# D13 doesn't suffice to kill the whole black dragon because after
+# black F14, E13 and M16 are miai to make a second eye.
 loadsgf games/incident169.sgf 184
 68 gg_genmove white
 #? [F14]*
@@ -118,13 +120,15 @@ loadsgf games/strategy19.sgf 94
 72 gg_genmove white
 #? [A8]*
 
+# I have added R17, as it seems to kill the huge black dragon --arend
 loadsgf games/semeai2.sgf 116
 73 gg_genmove white
-#? [F7]*
+#? [F7|R17]*
 
+# I have added R17, as it seems to kill the huge black dragon --arend
 loadsgf games/semeai2.sgf 118
 74 gg_genmove white
-#? [F7]*
+#? [F7|R17]*
 
 loadsgf games/semeai2.sgf 150
 # If Q11 is not undervalued F7 is acceptable (though not correct)
@@ -172,8 +176,9 @@ loadsgf games/heikki/heikki01.sgf 17
 
 loadsgf games/heikki/heikki01.sgf 35
 # J18 makes ko
+# But Q13 seems larger -arend
 84 gg_genmove black
-#? [J18]*
+#? [Q13]*
 
 loadsgf games/strategy24.sgf
 85 gg_genmove white

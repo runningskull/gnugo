@@ -81,19 +81,6 @@ loadsgf games/incident121.sgf 24
 14 gg_genmove black
 #? [E9]
 
-#CATEGORY=BAD_PROBLEM
-#DESCRIPTION=Problem not clear enough.
-#SEVERITY=0
-#From STRATEGY:
-#     It is unclear that the recommended E9 is the best move. 
-#     W cannot cut at E11, or even threaten to cut and keep sente. 
-#     GNU Go 2.7.205 plays at G10 which is a good move.
-# incident 123
-# Again, E9 is not necessarily the best move.
-loadsgf games/incident121.sgf 60
-15 gg_genmove black
-#? [E9]*
-
 # incident 132
 loadsgf games/incident121.sgf 116
 16 gg_genmove black
@@ -121,9 +108,10 @@ loadsgf games/incident165.sgf 108
 # incident 166a
 # E5 is an overplay
 # See reading test 124
+# F3 seems fine to protect the two cuts -arend
 loadsgf games/incident165.sgf 142
 18 gg_genmove black
-#? [E4]*
+#? [E4|F3]
 
 loadsgf games/strategy4.sgf
 19 gg_genmove black
@@ -244,9 +232,10 @@ loadsgf games/nicklas/nicklas8.sgf 96
 #M11 is better than L4
 #    2.7.231: Broke again. M11 is overrated at 28 points. The
 #    large followup value is responsible.
+# I disagree. M11 makes territory while attacking. -arend
 loadsgf games/nicklas/nicklas8.sgf 98
 40 gg_genmove black
-#? [E5]*
+#? [E5|M11]*
 
 
 #CATEGORY=STRATEGY
