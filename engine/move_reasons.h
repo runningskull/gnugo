@@ -22,6 +22,7 @@
 /* values for move_reason.type */
 #define THREAT_BIT    1
 
+/* Only use even values for non-threat move reasons! */
 #define ATTACK_MOVE              2
 #define ATTACK_MOVE_GOOD_KO      4
 #define ATTACK_MOVE_BAD_KO       6
@@ -62,7 +63,7 @@
 #define ANTISUJI_MOVE           70
 
 #define EITHER_MOVE             100
-#define ALL_MOVE                101
+#define ALL_MOVE                102
 
 
 /* Bitmap values for move_reason.status */
