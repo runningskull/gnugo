@@ -1,6 +1,7 @@
-# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
+# Makefile.in generated automatically by automake 1.5 from Makefile.am.
 
-# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
+# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
+# Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -10,6 +11,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
+@SET_MAKE@
 
 SHELL = @SHELL@
 
@@ -31,13 +33,9 @@ infodir = @infodir@
 mandir = @mandir@
 includedir = @includedir@
 oldincludedir = /usr/include
-
-DESTDIR =
-
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-
 top_builddir = ..
 
 ACLOCAL = @ACLOCAL@
@@ -46,32 +44,38 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_HEADER = $(INSTALL_DATA)
 transform = @program_transform_name@
-
 NORMAL_INSTALL = :
 PRE_INSTALL = :
 POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+AMTAR = @AMTAR@
+AWK = @AWK@
 CC = @CC@
 CPP = @CPP@
+DEPDIR = @DEPDIR@
 EXEEXT = @EXEEXT@
 GCC_ONLY = @GCC_ONLY@
 GNUGO_ALL_WARNINGS = @GNUGO_ALL_WARNINGS@
 GNUGO_SOME_WARNINGS = @GNUGO_SOME_WARNINGS@
+INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 MAINT = @MAINT@
-MAKEINFO = @MAKEINFO@
 NO_WARNINGS = @NO_WARNINGS@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
-U = @U@
 VERSION = @VERSION@
+am__include = @am__include@
+am__quote = @am__quote@
 dfa_c = @dfa_c@
 glibconfig = @glibconfig@
+install_sh = @install_sh@
 perl = @perl@
 
 noinst_PROGRAMS = mkpat joseki mkeyes extract_fuseki
@@ -79,12 +83,36 @@ EXTRA_PROGRAMS = transpat
 
 DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
 
-EXTRA_DIST = $(DSP) 	dfa.c 	hoshi.sgf 	komoku.sgf 	mokuhazushi.sgf 	sansan.sgf 	takamoku.sgf 	patterns.db 	patterns2.db 	attack.db 	defense.db 	endgame.db 	aa_attackpats.db 	owl_attackpats.db 	owl_vital_apats.db 	owl_defendpats.db 	eyes.db 	conn.db 	influence.db 	barriers.db 	fuseki.db 	fuseki9.db 	fuseki13.db 	fuseki19.db
+EXTRA_DIST = $(DSP)\
+	dfa.c\
+	hoshi.sgf\
+	komoku.sgf\
+	mokuhazushi.sgf\
+	sansan.sgf\
+	takamoku.sgf\
+	patterns.db\
+	patterns2.db\
+	attack.db\
+	defense.db\
+	endgame.db\
+	aa_attackpats.db\
+	owl_attackpats.db\
+	owl_vital_apats.db\
+	owl_defendpats.db\
+	eyes.db\
+	conn.db\
+	influence.db\
+	barriers.db\
+	fuseki.db\
+	fuseki9.db\
+	fuseki13.db\
+	fuseki19.db
 
 
 mkpat_SOURCES = mkpat.c transform.c
 
 mkpat_LDADD = libdfa.a ../utils/libutils.a
+
 @DFA_ENABLED_TRUE@DFAFLAGS = -D -m
 @DFA_ENABLED_FALSE@DFAFLAGS = 
 
@@ -96,13 +124,20 @@ joseki_INCLUDES = -I$(top_srcdir)/sgf
 mkeyes_SOURCES = mkeyes.c
 extract_fuseki_SOURCES = extract_fuseki.c
 # Yes, we currently need duplicate libengine.a and libpatterns.a.
-extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a 		       ../engine/libengine.a libpatterns.a                        ../sgf/libsgf.a ../utils/libutils.a 		       libdfa.a
+extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a\
+		       ../engine/libengine.a libpatterns.a\
+                       ../sgf/libsgf.a ../utils/libutils.a\
+		       libdfa.a
 
 extract_fuseki_INCLUDES = -I$(top_srcdir)/sgf
 
 noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h
 
-GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c                  influence.c barriers.c endgame.c aa_attackpat.c                  owl_attackpat.c 		 owl_vital_apat.c owl_defendpat.c fusekipat.c                  fuseki9.c fuseki13.c fuseki19.c josekidb.c
+GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
+                 influence.c barriers.c endgame.c aa_attackpat.c\
+                 owl_attackpat.c\
+		 owl_vital_apat.c owl_defendpat.c fusekipat.c\
+                 fuseki9.c fuseki13.c fuseki19.c josekidb.c
 
 
 DBBUILT = hoshi.db komoku.db sansan.db mokuhazushi.db takamoku.db
@@ -117,304 +152,319 @@ noinst_LIBRARIES = libpatterns.a libdfa.a
 
 libpatterns_a_SOURCES = connections.c helpers.c $(GGBUILTSOURCES)
 libdfa_a_SOURCES = dfa.c transform.c
+subdir = patterns
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = ../config.h
-CONFIG_CLEAN_FILES = 
-LIBRARIES =  $(noinst_LIBRARIES)
+CONFIG_HEADER = $(top_builddir)/config.h
+CONFIG_CLEAN_FILES =
+LIBRARIES = $(noinst_LIBRARIES)
 
+libdfa_a_AR = $(AR) cru
+libdfa_a_LIBADD =
+am_libdfa_a_OBJECTS = dfa.$(OBJEXT) transform.$(OBJEXT)
+libdfa_a_OBJECTS = $(am_libdfa_a_OBJECTS)
+libpatterns_a_AR = $(AR) cru
+libpatterns_a_LIBADD =
+am_libpatterns_a_OBJECTS = connections.$(OBJEXT) helpers.$(OBJEXT) \
+	conn.$(OBJEXT) patterns.$(OBJEXT) apatterns.$(OBJEXT) \
+	dpatterns.$(OBJEXT) eyes.$(OBJEXT) influence.$(OBJEXT) \
+	barriers.$(OBJEXT) endgame.$(OBJEXT) aa_attackpat.$(OBJEXT) \
+	owl_attackpat.$(OBJEXT) owl_vital_apat.$(OBJEXT) \
+	owl_defendpat.$(OBJEXT) fusekipat.$(OBJEXT) fuseki9.$(OBJEXT) \
+	fuseki13.$(OBJEXT) fuseki19.$(OBJEXT) josekidb.$(OBJEXT)
+libpatterns_a_OBJECTS = $(am_libpatterns_a_OBJECTS)
+EXTRA_PROGRAMS = transpat$(EXEEXT)
+noinst_PROGRAMS = mkpat$(EXEEXT) joseki$(EXEEXT) mkeyes$(EXEEXT) \
+	extract_fuseki$(EXEEXT)
+PROGRAMS = $(noinst_PROGRAMS)
 
-DEFS = @DEFS@ -I. -I$(srcdir) -I..
+am_extract_fuseki_OBJECTS = extract_fuseki.$(OBJEXT)
+extract_fuseki_OBJECTS = $(am_extract_fuseki_OBJECTS)
+extract_fuseki_DEPENDENCIES = ../engine/libengine.a libpatterns.a \
+	../engine/libengine.a libpatterns.a ../sgf/libsgf.a \
+	../utils/libutils.a libdfa.a
+extract_fuseki_LDFLAGS =
+am_joseki_OBJECTS = joseki.$(OBJEXT)
+joseki_OBJECTS = $(am_joseki_OBJECTS)
+joseki_DEPENDENCIES = ../engine/libboard.a ../sgf/libsgf.a \
+	../utils/libutils.a
+joseki_LDFLAGS =
+am_mkeyes_OBJECTS = mkeyes.$(OBJEXT)
+mkeyes_OBJECTS = $(am_mkeyes_OBJECTS)
+mkeyes_LDADD = $(LDADD)
+mkeyes_DEPENDENCIES =
+mkeyes_LDFLAGS =
+am_mkpat_OBJECTS = mkpat.$(OBJEXT) transform.$(OBJEXT)
+mkpat_OBJECTS = $(am_mkpat_OBJECTS)
+mkpat_DEPENDENCIES = libdfa.a ../utils/libutils.a
+mkpat_LDFLAGS =
+am_transpat_OBJECTS = transpat.$(OBJEXT) patlib.$(OBJEXT) \
+	transform.$(OBJEXT)
+transpat_OBJECTS = $(am_transpat_OBJECTS)
+transpat_DEPENDENCIES =
+transpat_LDFLAGS =
+
+DEFS = @DEFS@
+DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libpatterns_a_LIBADD = 
-libpatterns_a_OBJECTS =  connections.o helpers.o conn.o patterns.o \
-apatterns.o dpatterns.o eyes.o influence.o barriers.o endgame.o \
-aa_attackpat.o owl_attackpat.o owl_vital_apat.o owl_defendpat.o \
-fusekipat.o fuseki9.o fuseki13.o fuseki19.o josekidb.o
-libdfa_a_LIBADD = 
-libdfa_a_OBJECTS =  dfa.o transform.o
-AR = ar
-noinst_PROGRAMS =  mkpat$(EXEEXT) joseki$(EXEEXT) mkeyes$(EXEEXT) \
-extract_fuseki$(EXEEXT)
-PROGRAMS =  $(noinst_PROGRAMS)
-
-transpat_OBJECTS =  transpat.o patlib.o transform.o
-transpat_DEPENDENCIES = 
-transpat_LDFLAGS = 
-mkpat_OBJECTS =  mkpat.o transform.o
-mkpat_DEPENDENCIES =  libdfa.a ../utils/libutils.a
-mkpat_LDFLAGS = 
-joseki_OBJECTS =  joseki.o
-joseki_DEPENDENCIES =  ../engine/libboard.a ../sgf/libsgf.a \
-../utils/libutils.a
-joseki_LDFLAGS = 
-mkeyes_OBJECTS =  mkeyes.o
-mkeyes_LDADD = $(LDADD)
-mkeyes_DEPENDENCIES = 
-mkeyes_LDFLAGS = 
-extract_fuseki_OBJECTS =  extract_fuseki.o
-extract_fuseki_DEPENDENCIES =  ../engine/libengine.a libpatterns.a \
-../engine/libengine.a libpatterns.a ../sgf/libsgf.a ../utils/libutils.a \
-libdfa.a
-extract_fuseki_LDFLAGS = 
-CFLAGS = @CFLAGS@
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+depcomp = $(SHELL) $(top_srcdir)/depcomp
+@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/aa_attackpat.Po $(DEPDIR)/apatterns.Po \
+@AMDEP_TRUE@	$(DEPDIR)/barriers.Po $(DEPDIR)/conn.Po \
+@AMDEP_TRUE@	$(DEPDIR)/connections.Po $(DEPDIR)/dfa.Po \
+@AMDEP_TRUE@	$(DEPDIR)/dpatterns.Po $(DEPDIR)/endgame.Po \
+@AMDEP_TRUE@	$(DEPDIR)/extract_fuseki.Po $(DEPDIR)/eyes.Po \
+@AMDEP_TRUE@	$(DEPDIR)/fuseki13.Po $(DEPDIR)/fuseki19.Po \
+@AMDEP_TRUE@	$(DEPDIR)/fuseki9.Po $(DEPDIR)/fusekipat.Po \
+@AMDEP_TRUE@	$(DEPDIR)/helpers.Po $(DEPDIR)/influence.Po \
+@AMDEP_TRUE@	$(DEPDIR)/joseki.Po $(DEPDIR)/josekidb.Po \
+@AMDEP_TRUE@	$(DEPDIR)/mkeyes.Po $(DEPDIR)/mkpat.Po \
+@AMDEP_TRUE@	$(DEPDIR)/owl_attackpat.Po \
+@AMDEP_TRUE@	$(DEPDIR)/owl_defendpat.Po \
+@AMDEP_TRUE@	$(DEPDIR)/owl_vital_apat.Po $(DEPDIR)/patlib.Po \
+@AMDEP_TRUE@	$(DEPDIR)/patterns.Po $(DEPDIR)/transform.Po \
+@AMDEP_TRUE@	$(DEPDIR)/transpat.Po
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
-HEADERS =  $(noinst_HEADERS)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+CFLAGS = @CFLAGS@
+DIST_SOURCES = $(libdfa_a_SOURCES) $(libpatterns_a_SOURCES) \
+	$(extract_fuseki_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) \
+	$(mkpat_SOURCES) $(transpat_SOURCES)
+HEADERS = $(noinst_HEADERS)
 
-DIST_COMMON =  README Makefile.am Makefile.in
+DIST_COMMON = README $(noinst_HEADERS) Makefile.am Makefile.in
+SOURCES = $(libdfa_a_SOURCES) $(libpatterns_a_SOURCES) $(extract_fuseki_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) $(mkpat_SOURCES) $(transpat_SOURCES)
 
+all: all-am
 
-DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
-
-TAR = tar
-GZIP_ENV = --best
-DEP_FILES =  .deps/aa_attackpat.P .deps/apatterns.P .deps/barriers.P \
-.deps/conn.P .deps/connections.P .deps/dfa.P .deps/dpatterns.P \
-.deps/endgame.P .deps/extract_fuseki.P .deps/eyes.P .deps/fuseki13.P \
-.deps/fuseki19.P .deps/fuseki9.P .deps/fusekipat.P .deps/helpers.P \
-.deps/influence.P .deps/joseki.P .deps/josekidb.P .deps/mkeyes.P \
-.deps/mkpat.P .deps/owl_attackpat.P .deps/owl_defendpat.P \
-.deps/owl_vital_apat.P .deps/patlib.P .deps/patterns.P \
-.deps/transform.P .deps/transpat.P
-SOURCES = $(libpatterns_a_SOURCES) $(libdfa_a_SOURCES) $(transpat_SOURCES) $(mkpat_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) $(extract_fuseki_SOURCES)
-OBJECTS = $(libpatterns_a_OBJECTS) $(libdfa_a_OBJECTS) $(transpat_OBJECTS) $(mkpat_OBJECTS) $(joseki_OBJECTS) $(mkeyes_OBJECTS) $(extract_fuseki_OBJECTS)
-
-all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .o .s
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu patterns/Makefile
+.SUFFIXES: .c .o .obj
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
+	cd $(top_srcdir) && \
+	  $(AUTOMAKE) --gnu  patterns/Makefile
+Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) && \
+	  CONFIG_HEADERS= CONFIG_LINKS= \
+	  CONFIG_FILES=$(subdir)/$@ $(SHELL) ./config.status
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
-	cd $(top_builddir) \
-	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
-
-
-mostlyclean-noinstLIBRARIES:
+AR = ar
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+libdfa.a: $(libdfa_a_OBJECTS) $(libdfa_a_DEPENDENCIES) 
+	-rm -f libdfa.a
+	$(libdfa_a_AR) libdfa.a $(libdfa_a_OBJECTS) $(libdfa_a_LIBADD)
+	$(RANLIB) libdfa.a
+libpatterns.a: $(libpatterns_a_OBJECTS) $(libpatterns_a_DEPENDENCIES) 
+	-rm -f libpatterns.a
+	$(libpatterns_a_AR) libpatterns.a $(libpatterns_a_OBJECTS) $(libpatterns_a_LIBADD)
+	$(RANLIB) libpatterns.a
 
-distclean-noinstLIBRARIES:
-
-maintainer-clean-noinstLIBRARIES:
-
-.s.o:
-	$(COMPILE) -c $<
-
-.S.o:
-	$(COMPILE) -c $<
+clean-noinstPROGRAMS:
+	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
+extract_fuseki$(EXEEXT): $(extract_fuseki_OBJECTS) $(extract_fuseki_DEPENDENCIES) 
+	@rm -f extract_fuseki$(EXEEXT)
+	$(LINK) $(extract_fuseki_LDFLAGS) $(extract_fuseki_OBJECTS) $(extract_fuseki_LDADD) $(LIBS)
+joseki$(EXEEXT): $(joseki_OBJECTS) $(joseki_DEPENDENCIES) 
+	@rm -f joseki$(EXEEXT)
+	$(LINK) $(joseki_LDFLAGS) $(joseki_OBJECTS) $(joseki_LDADD) $(LIBS)
+mkeyes$(EXEEXT): $(mkeyes_OBJECTS) $(mkeyes_DEPENDENCIES) 
+	@rm -f mkeyes$(EXEEXT)
+	$(LINK) $(mkeyes_LDFLAGS) $(mkeyes_OBJECTS) $(mkeyes_LDADD) $(LIBS)
+mkpat$(EXEEXT): $(mkpat_OBJECTS) $(mkpat_DEPENDENCIES) 
+	@rm -f mkpat$(EXEEXT)
+	$(LINK) $(mkpat_LDFLAGS) $(mkpat_OBJECTS) $(mkpat_LDADD) $(LIBS)
+transpat$(EXEEXT): $(transpat_OBJECTS) $(transpat_DEPENDENCIES) 
+	@rm -f transpat$(EXEEXT)
+	$(LINK) $(transpat_LDFLAGS) $(transpat_OBJECTS) $(transpat_LDADD) $(LIBS)
 
 mostlyclean-compile:
-	-rm -f *.o core *.core
-
-clean-compile:
+	-rm -f *.$(OBJEXT) core *.core
 
 distclean-compile:
 	-rm -f *.tab.c
 
-maintainer-clean-compile:
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/aa_attackpat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/apatterns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/barriers.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/conn.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/connections.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/dfa.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/dpatterns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/endgame.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/extract_fuseki.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/eyes.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/fuseki13.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/fuseki19.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/fuseki9.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/fusekipat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/helpers.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/influence.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/joseki.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/josekidb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/mkeyes.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/mkpat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl_attackpat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl_defendpat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl_vital_apat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/patlib.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/patterns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/transform.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/transpat.Po@am__quote@
 
-libpatterns.a: $(libpatterns_a_OBJECTS) $(libpatterns_a_DEPENDENCIES)
-	-rm -f libpatterns.a
-	$(AR) cru libpatterns.a $(libpatterns_a_OBJECTS) $(libpatterns_a_LIBADD)
-	$(RANLIB) libpatterns.a
+distclean-depend:
+	-rm -rf $(DEPDIR)
 
-libdfa.a: $(libdfa_a_OBJECTS) $(libdfa_a_DEPENDENCIES)
-	-rm -f libdfa.a
-	$(AR) cru libdfa.a $(libdfa_a_OBJECTS) $(libdfa_a_LIBADD)
-	$(RANLIB) libdfa.a
+.c.o:
+@AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<
 
-mostlyclean-noinstPROGRAMS:
-
-clean-noinstPROGRAMS:
-	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-
-distclean-noinstPROGRAMS:
-
-maintainer-clean-noinstPROGRAMS:
-
-transpat$(EXEEXT): $(transpat_OBJECTS) $(transpat_DEPENDENCIES)
-	@rm -f transpat$(EXEEXT)
-	$(LINK) $(transpat_LDFLAGS) $(transpat_OBJECTS) $(transpat_LDADD) $(LIBS)
-
-mkpat$(EXEEXT): $(mkpat_OBJECTS) $(mkpat_DEPENDENCIES)
-	@rm -f mkpat$(EXEEXT)
-	$(LINK) $(mkpat_LDFLAGS) $(mkpat_OBJECTS) $(mkpat_LDADD) $(LIBS)
-
-joseki$(EXEEXT): $(joseki_OBJECTS) $(joseki_DEPENDENCIES)
-	@rm -f joseki$(EXEEXT)
-	$(LINK) $(joseki_LDFLAGS) $(joseki_OBJECTS) $(joseki_LDADD) $(LIBS)
-
-mkeyes$(EXEEXT): $(mkeyes_OBJECTS) $(mkeyes_DEPENDENCIES)
-	@rm -f mkeyes$(EXEEXT)
-	$(LINK) $(mkeyes_LDFLAGS) $(mkeyes_OBJECTS) $(mkeyes_LDADD) $(LIBS)
-
-extract_fuseki$(EXEEXT): $(extract_fuseki_OBJECTS) $(extract_fuseki_DEPENDENCIES)
-	@rm -f extract_fuseki$(EXEEXT)
-	$(LINK) $(extract_fuseki_LDFLAGS) $(extract_fuseki_OBJECTS) $(extract_fuseki_LDADD) $(LIBS)
+.c.obj:
+@AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(COMPILE) -c `cygpath -w $<`
+CCDEPMODE = @CCDEPMODE@
+uninstall-info-am:
 
 tags: TAGS
 
-ID: $(HEADERS) $(SOURCES) $(LISP)
-	list='$(SOURCES) $(HEADERS)'; \
-	unique=`for i in $$list; do echo $$i; done | \
-	  awk '    { files[$$0] = 1; } \
+ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
+	list='$(SOURCES) $(HEADERS) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '    { files[$$0] = 1; } \
 	       END { for (i in files) print i; }'`; \
-	here=`pwd` && cd $(srcdir) \
-	  && mkid -f$$here/ID $$unique $(LISP)
+	mkid -fID $$unique $(LISP)
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)'; \
-	unique=`for i in $$list; do echo $$i; done | \
-	  awk '    { files[$$0] = 1; } \
+	list='$(SOURCES) $(HEADERS) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '    { files[$$0] = 1; } \
 	       END { for (i in files) print i; }'`; \
 	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
-	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+	  || etags $(ETAGS_ARGS) $$tags  $$unique $(LISP)
 
-mostlyclean-tags:
-
-clean-tags:
+GTAGS:
+	here=`CDPATH=: && cd $(top_builddir) && pwd` \
+	  && cd $(top_srcdir) \
+	  && gtags -i $(GTAGS_ARGS) $$here
 
 distclean-tags:
-	-rm -f TAGS ID
+	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH
 
-maintainer-clean-tags:
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 
-distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
-
-subdir = patterns
+top_distdir = ..
+distdir = $(top_distdir)/$(PACKAGE)-$(VERSION)
 
 distdir: $(DISTFILES)
-	here=`cd $(top_builddir) && pwd`; \
-	top_distdir=`cd $(top_distdir) && pwd`; \
-	distdir=`cd $(distdir) && pwd`; \
-	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu patterns/Makefile
 	@for file in $(DISTFILES); do \
-	  d=$(srcdir); \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
+	  if test "$$dir" != "$$file" && test "$$dir" != "."; then \
+	    $(mkinstalldirs) "$(distdir)/$$dir"; \
+	  fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
+	    cp -pR $$d/$$file $(distdir) \
+	    || exit 1; \
 	  else \
 	    test -f $(distdir)/$$file \
-	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
-	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	    || cp -p $$d/$$file $(distdir)/$$file \
+	    || exit 1; \
 	  fi; \
 	done
-	$(MAKE) $(AM_MAKEFLAGS) top_distdir="$(top_distdir)" distdir="$(distdir)" dist-hook
-
-DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
-
--include $(DEP_FILES)
-
-mostlyclean-depend:
-
-clean-depend:
-
-distclean-depend:
-	-rm -rf .deps
-
-maintainer-clean-depend:
-
-%.o: %.c
-	@echo '$(COMPILE) -c $<'; \
-	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
-	@-cp .deps/$(*F).pp .deps/$(*F).P; \
-	tr ' ' '\012' < .deps/$(*F).pp \
-	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
-	    >> .deps/$(*F).P; \
-	rm .deps/$(*F).pp
-
-%.lo: %.c
-	@echo '$(LTCOMPILE) -c $<'; \
-	$(LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
-	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
-	  < .deps/$(*F).pp > .deps/$(*F).P; \
-	tr ' ' '\012' < .deps/$(*F).pp \
-	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
-	    >> .deps/$(*F).P; \
-	rm -f .deps/$(*F).pp
-info-am:
-info: info-am
-dvi-am:
-dvi: dvi-am
+	$(MAKE) $(AM_MAKEFLAGS) \
+	  top_distdir="${top_distdir}" distdir="$(distdir)" \
+	  dist-hook
 check-am: all-am
 check: check-am
-installcheck-am:
-installcheck: installcheck-am
-install-exec-am:
-install-exec: install-exec-am
+all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(HEADERS)
 
-install-data-am:
+installdirs:
+
+install: install-am
+install-exec: install-exec-am
 install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-install: install-am
-uninstall-am:
-uninstall: uninstall-am
-all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(HEADERS)
-all-redirect: all-am
+
+installcheck: installcheck-am
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
-installdirs:
-
-
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+	  `test -z '$(STRIP)' || \
+	    echo "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'"` install
 mostlyclean-generic:
 
 clean-generic:
 
 distclean-generic:
-	-rm -f Makefile $(CONFIG_CLEAN_FILES)
-	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+	-rm -f Makefile $(CONFIG_CLEAN_FILES) stamp-h stamp-h[0-9]*
 	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
-mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
-		mostlyclean-noinstPROGRAMS mostlyclean-tags \
-		mostlyclean-depend mostlyclean-generic
-
-mostlyclean: mostlyclean-am
-
-clean-am:  clean-noinstLIBRARIES clean-compile clean-noinstPROGRAMS \
-		clean-tags clean-depend clean-generic mostlyclean-am
-
+	@echo "This command is intended for maintainers to use"
+	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-distclean-am:  distclean-noinstLIBRARIES distclean-compile \
-		distclean-noinstPROGRAMS distclean-tags \
-		distclean-depend distclean-generic clean-am
+clean-am: clean-generic clean-noinstLIBRARIES clean-noinstPROGRAMS \
+	mostlyclean-am
 
 distclean: distclean-am
 
-maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
-		maintainer-clean-compile \
-		maintainer-clean-noinstPROGRAMS maintainer-clean-tags \
-		maintainer-clean-depend maintainer-clean-generic \
-		distclean-am
-	@echo "This command is intended for maintainers to use;"
-	@echo "it deletes files that may require special tools to rebuild."
+distclean-am: clean-am distclean-compile distclean-depend \
+	distclean-generic distclean-tags
+
+dvi: dvi-am
+
+dvi-am:
+
+info: info-am
+
+info-am:
+
+install-data-am:
+
+install-exec-am:
+
+install-info: install-info-am
+
+install-man:
+
+installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 
-.PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
-clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
-mostlyclean-compile distclean-compile clean-compile \
-maintainer-clean-compile mostlyclean-noinstPROGRAMS \
-distclean-noinstPROGRAMS clean-noinstPROGRAMS \
-maintainer-clean-noinstPROGRAMS tags mostlyclean-tags distclean-tags \
-clean-tags maintainer-clean-tags distdir mostlyclean-depend \
-distclean-depend clean-depend maintainer-clean-depend info-am info \
-dvi-am dvi check check-am installcheck-am installcheck install-exec-am \
-install-exec install-data-am install-data install-am install \
-uninstall-am uninstall all-redirect all-am all installdirs \
-mostlyclean-generic distclean-generic clean-generic \
-maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+maintainer-clean-am: distclean-am maintainer-clean-generic
+
+mostlyclean: mostlyclean-am
+
+mostlyclean-am: mostlyclean-compile mostlyclean-generic
+
+uninstall-am: uninstall-info-am
+
+.PHONY: GTAGS all all-am check check-am clean clean-generic \
+	clean-noinstLIBRARIES clean-noinstPROGRAMS distclean \
+	distclean-compile distclean-depend distclean-generic \
+	distclean-tags distdir dvi dvi-am info info-am install \
+	install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic tags uninstall \
+	uninstall-am uninstall-info-am
 
 
 dist-hook:
@@ -486,7 +536,6 @@ fuseki13.c : $(srcdir)/fuseki13.db mkpat$(EXEEXT)
 
 fuseki19.c : $(srcdir)/fuseki19.db mkpat$(EXEEXT)
 	./mkpat -b -f fuseki19 < $(srcdir)/fuseki19.db >fuseki19.c
-
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
