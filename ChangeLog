@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- support for multiple engines in view.pike
 - more info about semeais in dragon_data2
 - double-check owl attack moves against dragons involved in semeai(s)
 - support for 'make gnugo.pdf' and make 'gnugo.html' in doc/
