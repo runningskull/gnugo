@@ -259,13 +259,13 @@ struct pattern {
 };
 
 
-struct graph_node_list;
+struct tree_node_list;
 
 struct pattern_db {
   int fixed_for_size;
   struct pattern *patterns;
   struct dfa *pdfa;
-  struct graph_node_list *gnl; /* For tree-based pattern matching */
+  struct tree_node_list *tnl; /* For tree-based pattern matching */
 };
 
 
@@ -308,31 +308,30 @@ int connect_and_cut_helper(int Apos, int bpos, int cpos);
 int connect_and_cut_helper2(int Apos, int bpos, int cpos, int color);
 int edge_double_sente_helper(int move, int apos, int bpos, int cpos);
 int dragon_weak(int pos);
+void set_value_helper(struct pattern *patt, int value);
+
+/* FIXME: Can this be set up inside of the mkpat.c function helper list? */
+#define set_value(x) set_value_helper(patt, x)
 
 
-/* FIXME: tm: My appologies for the set_value macro - needed for 
- * EXPERIMENTAL_READING code.  I will repair shortly - tm.
- */
-#define set_value(x) patt->value = (x)
-
-void init_graph_conn(void);
-void init_graph_pat(void);
-void init_graph_attpat(void);
-void init_graph_defpat(void);
-void init_graph_influencepat(void);
-void init_graph_barrierspat(void);
-void init_graph_endpat(void);
-void init_graph_aa_attackpat(void);
-void init_graph_owl_attackpat(void);
-void init_graph_owl_vital_apat(void);
-void init_graph_owl_defendpat(void);
-void init_graph_fusekipat(void);
-void init_graph_fuseki9(void);
-void init_graph_fuseki13(void);
-void init_graph_fuseki19(void);
-void init_graph_joseki(void);
-void init_graph_read_attack(void);
-void init_graph_read_defend(void);
+void init_tree_conn(void);
+void init_tree_pat(void);
+void init_tree_attpat(void);
+void init_tree_defpat(void);
+void init_tree_influencepat(void);
+void init_tree_barrierspat(void);
+void init_tree_endpat(void);
+void init_tree_aa_attackpat(void);
+void init_tree_owl_attackpat(void);
+void init_tree_owl_vital_apat(void);
+void init_tree_owl_defendpat(void);
+void init_tree_fusekipat(void);
+void init_tree_fuseki9(void);
+void init_tree_fuseki13(void);
+void init_tree_fuseki19(void);
+void init_tree_joseki(void);
+void init_tree_read_attack(void);
+void init_tree_read_defend(void);
 
 /* pattern arrays themselves */
 extern struct pattern_db pat_db;
@@ -359,10 +358,10 @@ extern struct pattern_db read_defend_db;
 
 
 /* Tree-based pattern matching structures*/
-/* FIXME: tm: graph_* should be renamed to tree_* */
+/* FIXED: graph_* should be renamed to tree_* */
 
 struct match_node;
-struct graph_node_list;
+struct tree_node_list;
 
 struct match_node {
   int patnum;
@@ -371,24 +370,17 @@ struct match_node {
 };
 
 
-struct graph_node {
+struct tree_node {
   struct match_node *matches;
   int att;
   int x;
   int y;
-  struct graph_node_list *next_list;
+  struct tree_node_list *next_list;
 };
 
-struct graph_node_list {
-  struct graph_node node;
-  struct graph_node_list *next;
-};
-
-
-/* FIXME: tm: This needn't be defined in the header file. */
-struct element_node {
-  struct patval e;
-  struct element_node *next;
+struct tree_node_list {
+  struct tree_node node;
+  struct tree_node_list *next;
 };
 
 

@@ -629,17 +629,18 @@ static void tree_matchpat_loop(matchpat_callback_fn_ptr callback,
 			       char goal[BOARDMAX], int anchor_in_goal);
 static void tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
 			     int color, struct pattern_db *database,
-			     void *callback_data, char goal[BOARDMAX]);
+			     void *callback_data, char goal[BOARDMAX],
+                             int anchor_in_goal);
 
 
 void
 tree_match_init(void)
 {
-  init_graph_read_attack();
-  init_graph_read_defend();
-  init_graph_owl_attackpat();
-  init_graph_owl_defendpat();
-  init_graph_owl_vital_apat();
+  init_tree_read_attack();
+  init_tree_read_defend();
+  init_tree_owl_attackpat();
+  init_tree_owl_defendpat();
+  init_tree_owl_vital_apat();
 }
 
 
@@ -663,7 +664,7 @@ tree_matchpat_loop(matchpat_callback_fn_ptr callback,
       if (board[POS(i,j)] == anchor
           && (!anchor_in_goal || goal[POS(i,j)] != 0))
 	tree_do_matchpat(i, j, callback, color, 
-			 pdb, callback_data, goal);
+			 pdb, callback_data, goal, anchor_in_goal);
 
 }
 
@@ -683,15 +684,15 @@ struct rec_data {
 static void 
 do_tree_matchpat_rec(int color, int m, int n, int goal_found,
                      char goal[BOARDMAX], 
-                     struct graph_node_list *gnl, 
+                     struct tree_node_list *tnl, 
                      struct rec_data *pdata)
 {
-  if (0 && !gnl) {
+  if (0 && !tnl) {
     return;
   }
-  gnl = gnl->next;
-  while (gnl) {
-    struct graph_node *node = &(gnl->node);
+  tnl = tnl->next;
+  while (tnl) {
+    struct tree_node *node = &(tnl->node);
     int x = m + node->x;
     int y = n + node->y;;
     if (ON_BOARD2(x,y)) {
@@ -700,7 +701,6 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
       if ((att == EMPTY && point_color == EMPTY)
           || (att == ATT_X && point_color == OTHER_COLOR(color))
           || (att == ATT_O && point_color == color)) {
-        /* FIXME: tm: Don't need this check if anchor_in_goal */
         goal_found = goal_found || goal[POS(x,y)];
         if (node->matches) {
           struct match_node *match = node->matches->next;
@@ -736,7 +736,7 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
         }
       }
     }
-    gnl = gnl->next;
+    tnl = tnl->next;
   }
 }
 
@@ -744,9 +744,10 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
 static void 
 tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
 			int color, struct pattern_db *database,
-			void *callback_data, char goal[BOARDMAX])
+			void *callback_data, char goal[BOARDMAX],
+                        int anchor_in_goal)
 {
-  struct graph_node_list *tree = database->gnl;
+  struct tree_node_list *tree = database->tnl;
   struct rec_data data;
 
   if (0) {
@@ -758,10 +759,11 @@ tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
   data.callback_data = callback_data;
   data.database = database;
 
-  /* note: goal_found parameter should be 1 if the database
-   * forces the anchor to be in the goal.
+  /* note: If anchor_in_goal is 0, then the goal_found parameter is
+   *   always trivially true.  This will short-circuit some array
+   *   lookups in the recursive version.
    */
-  do_tree_matchpat_rec(color, m, n, 0, goal, tree, &data);
+  do_tree_matchpat_rec(color, m, n, !anchor_in_goal, goal, tree, &data);
 }
 
 /**************************************************************************/
@@ -769,28 +771,28 @@ tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
 /**************************************************************************/
 
 /* The tree data structure is output with raw integer offsets
- * relative to a single array of graph_node_list and match_node
+ * relative to a single array of tree_node_list and match_node
  * elements.  These offsets need to added to the actual base
  * address of the list of elements for the pointers to be
  * meaningful.
  */
 void 
-tree_initialize_pointers(struct graph_node_list *gnl,
+tree_initialize_pointers(struct tree_node_list *tnl,
                          struct match_node *matches,
-                         int gnl_size,
+                         int tnl_size,
                          int matches_size)
 {
-  struct graph_node_list *gnl_walk = gnl;
+  struct tree_node_list *tnl_walk = tnl;
   struct match_node *matches_walk = matches;
 
   do {
-    if (gnl_walk->next)
-      gnl_walk->next = gnl + (int)(gnl_walk->next);
-    if (gnl_walk->node.matches)
-      gnl_walk->node.matches = matches + (int)(gnl_walk->node.matches);
-    if (gnl_walk->node.next_list)
-      gnl_walk->node.next_list = gnl + (int)(gnl_walk->node.next_list);
-  } while (++gnl_walk < gnl + gnl_size);
+    if (tnl_walk->next)
+      tnl_walk->next = tnl + (int)(tnl_walk->next);
+    if (tnl_walk->node.matches)
+      tnl_walk->node.matches = matches + (int)(tnl_walk->node.matches);
+    if (tnl_walk->node.next_list)
+      tnl_walk->node.next_list = tnl + (int)(tnl_walk->node.next_list);
+  } while (++tnl_walk < tnl + tnl_size);
 
 
   do {
@@ -1209,7 +1211,7 @@ matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
     prepare = dfa_prepare_for_match;
   }
 
-  if (pdb->gnl) {
+  if (pdb->tnl) {
     loop = tree_matchpat_loop;
     prepare = tree_prepare_for_match;
   }

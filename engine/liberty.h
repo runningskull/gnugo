@@ -238,7 +238,7 @@ struct pattern_db;
 struct fullboard_pattern;
 struct half_eye_data;
 struct movelist;
-struct graph_node_list;
+struct tree_node_list;
 struct match_node;
 
 /*
@@ -261,9 +261,9 @@ void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 			int color, struct fullboard_pattern *pattern);
 void dfa_match_init(void);
 void tree_match_init(void);
-void tree_initialize_pointers(struct graph_node_list *gnl,
+void tree_initialize_pointers(struct tree_node_list *tnl,
                               struct match_node *matches,
-                              int gnl_size,
+                              int tnl_size,
                               int matches_size);
 
 void reading_cache_init(int bytes);

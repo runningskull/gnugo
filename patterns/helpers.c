@@ -744,3 +744,10 @@ dragon_weak(int pos)
  * c-basic-offset: 2
  * End:
  */
+
+
+void
+set_value_helper(struct pattern *patt, int value)
+{
+  patt->value = value;
+}

@@ -7,7 +7,10 @@
 - MAX_INTRUSIONS doubled in size
 - intrusions beyond MAX_INTRUSION silently discarded
 - new connect_and_cut_helper2 autohelper macro
+- platform dependency resolved in store_persistent_reading_cache
 - EXP_J_VALUE increased to 35 in shapes.c
+- graph_ renamed to tree_ in mkpat.c & related files
+- a few FIXMEs addressed
 - tuning
 - influence tuning
 - new logo-32.jpg and logo-32.eps

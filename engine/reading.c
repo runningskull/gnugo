@@ -6311,25 +6311,22 @@ store_persistent_reading_cache(int routine, int str, int result, int move,
       active[k] = 3;
   }
   
-  /* Add neighbors of active area so far. 
-   * By using -1 as mark in this step, the test for old marks is
-   * simplified.
-   */
+  /* Add neighbors of active area so far. */
   for (k = BOARDMIN; k < BOARDMAX; k++) {
     if (!ON_BOARD(k))
       continue;
     if (active[k] != 0) 
       continue;
-    if ((ON_BOARD(SOUTH(k)) && active[SOUTH(k)] > 0)
-	|| (ON_BOARD(WEST(k)) && active[WEST(k)] > 0)
-	|| (ON_BOARD(NORTH(k)) && active[NORTH(k)] > 0)
-	|| (ON_BOARD(EAST(k)) && active[EAST(k)] > 0))
-      active[k] = -1;
+    if ((ON_BOARD(SOUTH(k)) && active[SOUTH(k)] > 0 && active[SOUTH(k)] < 4)
+	|| (ON_BOARD(WEST(k)) && active[WEST(k)] > 0 && active[WEST(k)] < 4)
+	|| (ON_BOARD(NORTH(k)) && active[NORTH(k)] > 0 && active[NORTH(k)] < 4)
+	|| (ON_BOARD(EAST(k)) && active[EAST(k)] > 1 && active[EAST(k)] < 4))
+      active[k] = 4;
   }
 
   /* Also add the previously played stones to the active area. */
   for (r = 0; r < stackp; r++)
-    active[entry->stack[r]] = 4;
+    active[entry->stack[r]] = 5;
 
   for (k = BOARDMIN; k < BOARDMAX; k++) {
     if (!ON_BOARD(k))

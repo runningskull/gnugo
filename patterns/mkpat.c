@@ -1458,6 +1458,11 @@ compare_elements_closest(const void *a, const void *b)
 
 static void tree_push_pattern(void);
 
+struct element_node {
+  struct patval e;
+  struct element_node *next;
+};
+
 
 /* flush out the pattern stored in elements[]. Don't forget
  * that elements[].{x,y} and min/max{i,j} are still relative
@@ -1502,9 +1507,9 @@ write_elements(FILE *outfile, char *name)
 }
 
 
-/* FIXME: tm: This only needs to be size 2, not 1000 */
-struct graph_node graph[1000];
-int graph_next = 0;
+/* FIXED: This only needs to be size 2, not 1000 */
+struct tree_node graph[2];
+int tree_next = 0;
 
 /* The elements of a "simplified" pattern, which has already been
  * copied in the following ways:
@@ -1520,22 +1525,22 @@ int graph_next = 0;
  */
 static void
 tree_push_elements(struct element_node *elist,
-		   struct graph_node *graph_start, int ll)
+		   struct tree_node *tree_start, int ll)
 {
-  struct graph_node_list *grptr;
+  struct tree_node_list *grptr;
   struct element_node *elist_next;
   struct element_node *elist_prev;
 
-   if (!graph_start->next_list) {
-     graph_start->next_list = malloc(sizeof(struct graph_node_list));
-     graph_start->next_list->next = 0;
+   if (!tree_start->next_list) {
+     tree_start->next_list = malloc(sizeof(struct tree_node_list));
+     tree_start->next_list->next = 0;
    }
 
     elist_prev = elist_next = elist;
     while (elist_next->next) {
       elist_prev = elist_next;
       elist_next = elist_next->next;
-      for (grptr = graph_start->next_list; grptr != 0; grptr = grptr->next) {
+      for (grptr = tree_start->next_list; grptr != 0; grptr = grptr->next) {
         if (elist_next->e.x == grptr->node.x
 	    && elist_next->e.y == grptr->node.y
 	    && elist_next->e.att == grptr->node.att)
@@ -1551,12 +1556,12 @@ tree_push_elements(struct element_node *elist,
 
     if (elist->next) {
       /* Still elements to add to tree */
-      for (grptr = graph_start->next_list;
+      for (grptr = tree_start->next_list;
 	   grptr->next != NULL;
 	   grptr = grptr->next)
 	;
       
-      grptr->next = malloc(sizeof(struct graph_node_list));
+      grptr->next = malloc(sizeof(struct tree_node_list));
       grptr = grptr->next;
       grptr->node.matches = 0;
       grptr->node.att = elist->next->e.att;
@@ -1585,12 +1590,12 @@ tree_push_elements(struct element_node *elist,
       struct match_node *matches;
       if (verbose)
         fprintf(stderr, "  pattern complete.\n");
-      matches = graph_start->matches;
+      matches = tree_start->matches;
       
       if (!matches) {
         matches = malloc(sizeof(struct match_node));
         matches->next = 0;
-        graph_start->matches = matches;
+        tree_start->matches = matches;
       }
       
       while (matches->next != NULL)
@@ -1728,12 +1733,12 @@ tree_push_pattern(void)
   int end_transformation;
 
   if (!init) {
-    memset(graph, 0, sizeof(struct graph_node));
+    memset(graph, 0, sizeof(struct tree_node));
     graph[0].att = ATT_X;
     graph[1].att = ATT_O;
     graph[0].next_list = 0;
     graph[1].next_list = 0;
-    graph_next = 2;
+    tree_next = 2;
     init = 1;
   }
 
@@ -1767,16 +1772,16 @@ tree_push_pattern(void)
 /* ================================================================ */
 
 static int mn_count;
-static int gnl_count;
+static int tnl_count;
 
-struct graph_node_list *gnl_dump;
+struct tree_node_list *tnl_dump;
 struct match_node *matches_dump;
 
 #define PASS_COUNT 1
 #define PASS_FILL 2
 
 
-/* Note: Currently the graph_node_list & match_node lists contain
+/* Note: Currently the tree_node_list & match_node lists contain
  * dummy headers in their lists, which isn't at all necessary when
  * being used by GNU Go, but are very handy when building them up 
  * in mkpat.  Probably can strip these out when writing out the
@@ -1786,11 +1791,11 @@ struct match_node *matches_dump;
  * for GNU Go.
  */
 static void
-dump_graph_node(FILE *outfile, struct graph_node *gn, int depth, int pass)
+dump_tree_node(FILE *outfile, struct tree_node *gn, int depth, int pass)
 {
   static int as_text = 0;
-  struct graph_node_list *gl;
-  gnl_count++;
+  struct tree_node_list *gl;
+  tnl_count++;
 
   if (as_text) {
     if (depth > 0)
@@ -1800,15 +1805,15 @@ dump_graph_node(FILE *outfile, struct graph_node *gn, int depth, int pass)
   }
   
   if (pass == PASS_FILL) {
-    gnl_dump[gnl_count].node.att = gn->att;
-    gnl_dump[gnl_count].node.x = gn->x;
-    gnl_dump[gnl_count].node.y = gn->y;
+    tnl_dump[tnl_count].node.att = gn->att;
+    tnl_dump[tnl_count].node.x = gn->x;
+    tnl_dump[tnl_count].node.y = gn->y;
   }
 
   if (gn->matches) {
     struct match_node *m = gn->matches->next;
     if (pass == PASS_FILL) {
-      gnl_dump[gnl_count].node.matches = (void*)mn_count;
+      tnl_dump[tnl_count].node.matches = (void*)mn_count;
       matches_dump[mn_count].patnum = -1; /*Unused*/
       matches_dump[mn_count].orientation = 0; /*Unused*/
       matches_dump[mn_count].next = (void*)(mn_count + 1);
@@ -1838,7 +1843,7 @@ dump_graph_node(FILE *outfile, struct graph_node *gn, int depth, int pass)
   }
   else {
     if (pass == PASS_FILL)
-      gnl_dump[gnl_count].node.matches = 0;
+      tnl_dump[tnl_count].node.matches = 0;
   }
 
   if (as_text)
@@ -1846,29 +1851,29 @@ dump_graph_node(FILE *outfile, struct graph_node *gn, int depth, int pass)
 
   gl = gn->next_list;
   if (gl) {
-    int prev_gnl_count = gnl_count;
+    int prev_tnl_count = tnl_count;
     if (pass == PASS_FILL) {
-      gnl_dump[gnl_count].node.next_list = (void*)(gnl_count+1);
-      /*gnl_dump[gnl_count+1].node data is unused.*/
-      gnl_dump[gnl_count+1].node.matches = 0;   /*Unused*/
-      gnl_dump[gnl_count+1].node.att = -1;      /*Unused*/
-      gnl_dump[gnl_count+1].node.x = -99;       /*Unused*/
-      gnl_dump[gnl_count+1].node.y = -99;       /*Unused*/
-      gnl_dump[gnl_count+1].node.next_list = 0; /*Unused*/
+      tnl_dump[tnl_count].node.next_list = (void*)(tnl_count+1);
+      /*tnl_dump[tnl_count+1].node data is unused.*/
+      tnl_dump[tnl_count+1].node.matches = 0;   /*Unused*/
+      tnl_dump[tnl_count+1].node.att = -1;      /*Unused*/
+      tnl_dump[tnl_count+1].node.x = -99;       /*Unused*/
+      tnl_dump[tnl_count+1].node.y = -99;       /*Unused*/
+      tnl_dump[tnl_count+1].node.next_list = 0; /*Unused*/
 
     }
-    prev_gnl_count = gnl_count;
-    gnl_count++;
+    prev_tnl_count = tnl_count;
+    tnl_count++;
     while (gl->next) {
       if (pass == PASS_FILL)
-        gnl_dump[prev_gnl_count+1].next = (void*)(gnl_count+1);
+        tnl_dump[prev_tnl_count+1].next = (void*)(tnl_count+1);
 
-      prev_gnl_count = gnl_count;
-      dump_graph_node(outfile, &gl->next->node, depth+1, pass);
+      prev_tnl_count = tnl_count;
+      dump_tree_node(outfile, &gl->next->node, depth+1, pass);
       gl = gl->next;
     }
     if (pass == PASS_FILL)
-      gnl_dump[prev_gnl_count+1].next = 0;
+      tnl_dump[prev_tnl_count+1].next = 0;
   }
   else {
     if (pass == PASS_FILL) {
@@ -1876,7 +1881,7 @@ dump_graph_node(FILE *outfile, struct graph_node *gn, int depth, int pass)
       /* This may be where we crash if we're missing an anchor color
        * in the database */
       if (0)
-	fprintf(outfile, "  gnl[%d].node.next_list = 0;\n", gnl_count);
+	fprintf(outfile, "  tnl[%d].node.next_list = 0;\n", tnl_count);
     }
   }
 
@@ -1894,39 +1899,39 @@ tree_write_patterns(FILE *outfile, char *name)
   fprintf(outfile, "#include \"patterns.h\"\n\n");
 
   mn_count = 1;
-  gnl_count = 0;
-  dump_graph_node(outfile, &graph[0], 0, PASS_COUNT);
+  tnl_count = 0;
+  dump_tree_node(outfile, &graph[0], 0, PASS_COUNT);
 
-  oanchor_index = gnl_count+1;
-  dump_graph_node(outfile, &graph[1], 0, PASS_COUNT);
+  oanchor_index = tnl_count+1;
+  dump_tree_node(outfile, &graph[1], 0, PASS_COUNT);
 
-  gnl_dump = malloc(sizeof(struct graph_node_list) * gnl_count);
+  tnl_dump = malloc(sizeof(struct tree_node_list) * tnl_count);
   matches_dump = malloc(sizeof(struct match_node) * mn_count);
 
-  gnl_dump[0].next = (void*)1;  /* X anchor node */
-  gnl_dump[0].node.att = -1;    /* Not used */
-  gnl_dump[0].node.matches = 0; /* Not used */
-  gnl_dump[0].node.x = -99;     /* Not used */
-  gnl_dump[0].node.y = -99;     /* Not used */
-  gnl_dump[0].node.next_list = 0; /* Not used */
-  gnl_dump[1].next = (void*) oanchor_index;
-  gnl_dump[oanchor_index].next = 0;
+  tnl_dump[0].next = (void*)1;  /* X anchor node */
+  tnl_dump[0].node.att = -1;    /* Not used */
+  tnl_dump[0].node.matches = 0; /* Not used */
+  tnl_dump[0].node.x = -99;     /* Not used */
+  tnl_dump[0].node.y = -99;     /* Not used */
+  tnl_dump[0].node.next_list = 0; /* Not used */
+  tnl_dump[1].next = (void*) oanchor_index;
+  tnl_dump[oanchor_index].next = 0;
   
   mn_count = 1;
-  gnl_count = 0;
-  dump_graph_node(outfile, &graph[0], 0, PASS_FILL);
-  dump_graph_node(outfile, &graph[1], 0, PASS_FILL);
+  tnl_count = 0;
+  dump_tree_node(outfile, &graph[0], 0, PASS_FILL);
+  dump_tree_node(outfile, &graph[1], 0, PASS_FILL);
 
-  fprintf(outfile, "struct graph_node_list gnl_%s[] =\n{\n", name);
-  for (i = 0; i < gnl_count+1; i++) {
+  fprintf(outfile, "struct tree_node_list tnl_%s[] =\n{\n", name);
+  for (i = 0; i < tnl_count+1; i++) {
     fprintf(outfile,
 	    "  { {(void*)%d, %d, %d, %d, (void*)%d}, (void*)%d}, /*#%d*/\n",
-	    (int)gnl_dump[i].node.matches,
-	    gnl_dump[i].node.att,
-	    gnl_dump[i].node.x,
-	    gnl_dump[i].node.y,
-	    (int)gnl_dump[i].node.next_list,
-	    (int)gnl_dump[i].next,
+	    (int)tnl_dump[i].node.matches,
+	    tnl_dump[i].node.att,
+	    tnl_dump[i].node.x,
+	    tnl_dump[i].node.y,
+	    (int)tnl_dump[i].node.next_list,
+	    (int)tnl_dump[i].next,
 	    i);
   }
   fprintf(outfile, "};\n\n");
@@ -1941,14 +1946,14 @@ tree_write_patterns(FILE *outfile, char *name)
   }
   fprintf(outfile, "};\n\n");
 
-  fprintf(outfile, "void\ninit_graph_%s(void)\n{\n", name);
-  fprintf(outfile, "  gg_assert(sizeof(gnl_%s) / sizeof(struct graph_node_list) == %d);\n", 
-	  name, gnl_count+1);
+  fprintf(outfile, "void\ninit_tree_%s(void)\n{\n", name);
+  fprintf(outfile, "  gg_assert(sizeof(tnl_%s) / sizeof(struct tree_node_list) == %d);\n", 
+	  name, tnl_count+1);
   fprintf(outfile, "  gg_assert(sizeof(matches_%s) / sizeof(struct match_node) == %d);\n",
 	  name, mn_count);
   fprintf(outfile,
-	  "  tree_initialize_pointers(gnl_%s, matches_%s, %d, %d);\n",
-	  name, name, gnl_count+1, mn_count+1);
+	  "  tree_initialize_pointers(tnl_%s, matches_%s, %d, %d);\n",
+	  name, name, tnl_count+1, mn_count+1);
   fprintf(outfile, "}\n\n");
 }
 
@@ -1962,7 +1967,7 @@ write_patterns(FILE *outfile, char *name)
   if (tree_output)
     tree_write_patterns(outfile, name);
   else
-    fprintf(outfile, "\nvoid\ninit_graph_%s(void)\n{\n"
+    fprintf(outfile, "\nvoid\ninit_tree_%s(void)\n{\n"
 	    "  /* nothing to do - tree option not compiled */\n"
 	    "}\n\n", name);
   
@@ -2077,7 +2082,7 @@ write_pattern_db(FILE *outfile, char *name)
   else
     fprintf(outfile, " , NULL\n"); /* pointer to a possible dfa */
   if (tree_output)
-    fprintf(outfile, " , gnl_%s", name);
+    fprintf(outfile, " , tnl_%s", name);
   else
     fprintf(outfile, " , NULL\n");
 
