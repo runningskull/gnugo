@@ -82,7 +82,7 @@ static void build_worms(void);
 void
 make_worms(int save_verbose)
 {
-  int m, n; /* iterate over board */
+  int pos;
 
   /* Build the basic worm data:  color, origin, size, liberties. */
   build_worms();
@@ -104,145 +104,136 @@ make_worms(int save_verbose)
   gg_assert(stackp == 0);
 
   /* Count liberties of different orders and initialize cutstone fields. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (board[pos] && is_worm_origin(pos, pos)) {
-	int lib1, lib2, lib3, lib4;
-
-	ping_cave(pos, &lib1, &lib2, &lib3, &lib4);
-	gg_assert(worm[pos].liberties == lib1);
-	worm[pos].liberties2 = lib2;
-	worm[pos].liberties3 = lib3;
-	worm[pos].liberties4 = lib4;
-	worm[pos].cutstone = 0;
-	worm[pos].cutstone2 = 0;
-	propagate_worm(pos);
-      }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (IS_STONE(board[pos]) && is_worm_origin(pos, pos)) {
+      int lib1, lib2, lib3, lib4;
+      
+      ping_cave(pos, &lib1, &lib2, &lib3, &lib4);
+      gg_assert(worm[pos].liberties == lib1);
+      worm[pos].liberties2 = lib2;
+      worm[pos].liberties3 = lib3;
+      worm[pos].liberties4 = lib4;
+      worm[pos].cutstone = 0;
+      worm[pos].cutstone2 = 0;
+      propagate_worm(pos);
     }
+  }
   
   gg_assert(stackp == 0);
 
-/*
- * There are two concepts of cutting stones in the worm array.
- *
- * worm.cutstone:
- *
- *     A CUTTING STONE is one adjacent to two enemy strings,
- *     which do not have a liberty in common. The most common
- *     type of cutting string is in this situation.
- *  
- *     XO
- *     OX
- *     
- *     A POTENTIAL CUTTING STONE is adjacent to two enemy
- *     strings which do share a liberty. For example, X in:
- *     
- *     XO
- *     O.
- *     
- *     For cutting strings we set worm[m][n].cutstone=2. For potential
- *     cutting strings we set worm[m][n].cutstone=1. For other strings,
- *     worm[m][n].cutstone=0.
- *
- * worm.cutstone2:
- *
- *     Cutting points are identified by the patterns in the
- *     connections database. Proper cuts are handled by the fact
- *     that attacking and defending moves also count as moves
- *     cutting or connecting the surrounding dragons. 
- *
- * The cutstone field will now be set. The cutstone2 field is set
- * later, during find_cuts(), called from make_domains().
- *
- * We maintain both fields because the historically older cutstone
- * field is needed to deal with the fact that e.g. in the position
- *
- *
- *    OXX.O
- *    .OOXO
- *    OXX.O
- *
- * the X stones are amalgamated into one dragon because neither cut
- * works as long as the two O stones are in atari. Therefore we add
- * one to the cutstone field for each potential cutting point,
- * indicating that these O stones are indeed worth rescuing.
- *
- * For the time being we use both concepts in parallel. It's
- * possible we also need the old concept for correct handling of lunches.
- */
+  /*
+   * There are two concepts of cutting stones in the worm array.
+   *
+   * worm.cutstone:
+   *
+   *     A CUTTING STONE is one adjacent to two enemy strings,
+   *     which do not have a liberty in common. The most common
+   *     type of cutting string is in this situation.
+   *  
+   *     XO
+   *     OX
+   *     
+   *     A POTENTIAL CUTTING STONE is adjacent to two enemy
+   *     strings which do share a liberty. For example, X in:
+   *     
+   *     XO
+   *     O.
+   *     
+   *     For cutting strings we set worm[m][n].cutstone=2. For potential
+   *     cutting strings we set worm[m][n].cutstone=1. For other strings,
+   *     worm[m][n].cutstone=0.
+   *
+   * worm.cutstone2:
+   *
+   *     Cutting points are identified by the patterns in the
+   *     connections database. Proper cuts are handled by the fact
+   *     that attacking and defending moves also count as moves
+   *     cutting or connecting the surrounding dragons. 
+   *
+   * The cutstone field will now be set. The cutstone2 field is set
+   * later, during find_cuts(), called from make_domains().
+   *
+   * We maintain both fields because the historically older cutstone
+   * field is needed to deal with the fact that e.g. in the position
+   *
+   *
+   *    OXX.O
+   *    .OOXO
+   *    OXX.O
+   *
+   * the X stones are amalgamated into one dragon because neither cut
+   * works as long as the two O stones are in atari. Therefore we add
+   * one to the cutstone field for each potential cutting point,
+   * indicating that these O stones are indeed worth rescuing.
+   *
+   * For the time being we use both concepts in parallel. It's
+   * possible we also need the old concept for correct handling of lunches.
+   */
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      int w1 = NO_MOVE;
-      int w2 = NO_MOVE;
-      int i, j, k;
-
-      /* Only work on each worm once. This is easiest done if we only 
-       * work with the origin of each worm.
-       */
-      if (board[pos] == EMPTY || !is_worm_origin(pos, pos))
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int w1 = NO_MOVE;
+    int w2 = NO_MOVE;
+    int k;
+    int pos2;
+    
+    /* Only work on each worm once. This is easiest done if we only 
+     * work with the origin of each worm.
+     */
+    if (!IS_STONE(board[pos]) || !is_worm_origin(pos, pos))
+      continue;
+    
+    /* Try to find two adjacent worms (w1) and (w2) 
+     * of opposite colour from (pos).
+     */
+    for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
+      /* Work only with the opposite color from (pos). */
+      if (board[pos2] != OTHER_COLOR(board[pos])) 
 	continue;
-
-      /* Try to find two adjacent worms (w1) and (w2) 
-       * of opposite colour from (pos).
-       */
-      for (i = 0; i < board_size; i++)
-	for (j = 0; j < board_size; j++) {
-	  int pos2 = POS(i, j);
-	  /* Work only with the opposite color from (pos). */
-	  if (board[pos2] != OTHER_COLOR(board[pos])) 
-	    continue;
-	      
-	  for (k = 0; k < 4; k++) {
-	    if (!ON_BOARD(pos2 + delta[k])
-		|| worm[pos2 + delta[k]].origin != pos)
-	      continue;
-
-	    ASSERT1(board[pos2 + delta[k]] == board[pos], pos);
-
-	    /* If we have not already found a worm which meets the criteria,
-	     * store it into (w1), otherwise store it into (w2).
-	     */
-	    if (w1 == NO_MOVE)
-	      w1 = worm[pos2].origin;
-	    else if (!is_same_worm(pos2, w1))
-	      w2 = worm[pos2].origin;
-	  } /* loop over k */
-	} /* loop over i, j */
-
-      /* 
-       *  We now verify the definition of cutting stones. We have
-       *  verified that the string at (pos) is adjacent to two enemy
-       *  strings at (w1) and (w2). We need to know if these
-       *  strings share a liberty.
-       */
-
-      /* Only do this if we really found something. */
-      if (w2 != NO_MOVE) {
-        worm[pos].cutstone = 2;
-	if (count_common_libs(w1, w2) > 0)
-	  worm[pos].cutstone = 1;
-	  
-	DEBUG(DEBUG_WORMS, 
-	      "Worm at %1m has w1 %1m and w2 %1m, cutstone %d\n",
-	      pos, w1, w2, worm[pos].cutstone);
+      
+      for (k = 0; k < 4; k++) {
+	if (!ON_BOARD(pos2 + delta[k])
+	    || worm[pos2 + delta[k]].origin != pos)
+	  continue;
+	
+	ASSERT1(board[pos2 + delta[k]] == board[pos], pos);
+	
+	/* If we have not already found a worm which meets the criteria,
+	 * store it into (w1), otherwise store it into (w2).
+	 */
+	if (w1 == NO_MOVE)
+	  w1 = worm[pos2].origin;
+	else if (!is_same_worm(pos2, w1))
+	  w2 = worm[pos2].origin;
       }
-
-    } /* loop over m, n */
-
+    }
+    
+    /* 
+     *  We now verify the definition of cutting stones. We have
+     *  verified that the string at (pos) is adjacent to two enemy
+     *  strings at (w1) and (w2). We need to know if these
+     *  strings share a liberty.
+     */
+    
+    /* Only do this if we really found something. */
+    if (w2 != NO_MOVE) {
+      worm[pos].cutstone = 2;
+      if (count_common_libs(w1, w2) > 0)
+	worm[pos].cutstone = 1;
+      
+      DEBUG(DEBUG_WORMS, "Worm at %1m has w1 %1m and w2 %1m, cutstone %d\n",
+	    pos, w1, w2, worm[pos].cutstone);
+    }
+  }
+  
   gg_assert(stackp == 0);
   
   /* Set the genus of all worms. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (IS_STONE(board[pos]) && is_worm_origin(pos, pos)) {
- 	worm[pos].genus = genus(pos);
-	propagate_worm(pos);
-      }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (IS_STONE(board[pos]) && is_worm_origin(pos, pos)) {
+      worm[pos].genus = genus(pos);
+      propagate_worm(pos);
     }
+  }
   gg_assert(stackp == 0);
 
   /* We try first to resolve small semeais. */
@@ -250,222 +241,117 @@ make_worms(int save_verbose)
   gg_assert(stackp == 0);
 
   /* Now we try to improve the values of worm.attack and worm.defend.
-   * If we find that capturing the string at (m, n) also defends the
-   * string at (i, j), or attacks it, then we add points of attack and
+   * If we find that capturing the string at str also defends the
+   * string at str2, or attacks it, then we add points of attack and
    * defense. We don't add attacking point for strings that can't be
    * defended.
    */
   {
-    int mi[BOARDMAX]; /* mark changed information */
-    int mxcolor[BOARDMAX]; /* mark tried moves for color */
-    int mxother[BOARDMAX]; /* mark tried moves for other */
-    int i, j;
+    int color;
+    int str;
+    int moves_to_try[BOARDMAX];
+    memset(moves_to_try, 0, sizeof(moves_to_try));
 
-    memset(mi, 0, sizeof(mi));
-    memset(mxcolor, 0, sizeof(mi));
-    memset(mxother, 0, sizeof(mi));
-    
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	int pos = POS(m, n);
-	
-	int color = board[pos];
-	int other = OTHER_COLOR(color);
-	
-	int aa = worm[pos].attack_points[0];
-	int dd = worm[pos].defense_points[0];
-	
-	/* For each worm, only work with the origin. */
-	if (board[pos] == EMPTY || !is_worm_origin(pos, pos))
+    /* Find which colors to try at what points. */
+    for (str = BOARDMIN; str < BOARDMAX; str++) {
+      if (IS_STONE(board[str]) && is_worm_origin(str, str)) {
+	color = board[str];
+	moves_to_try[worm[str].defense_points[0]] |= color;
+	moves_to_try[worm[str].attack_points[0]] |= OTHER_COLOR(color);
+      }
+    }
+
+    /* Loop over the board and over the colors and try the moves found
+     * in the previous loop.
+     */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos))
+	continue;
+
+      for (color = WHITE; color <= BLACK; color++) {
+	if (!(moves_to_try[pos] & color))
 	  continue;
 	
-	/* If the opponent has an attack on the worm (m, n), and we
-	 * have not tried this move before, carry it out and see
-	 * what it leads to.
-	 */
-	if (aa != NO_MOVE && mxother[aa] == 0) {
+	/* Try to play color at pos and see what it leads to. */
+	if (!trymove(pos, color, "make_worms", NO_MOVE, EMPTY, NO_MOVE))
+	  continue;
 	  
-	  mxother[aa] = 1;
-	  /* First, carry out the attacking move. */
-	  if (trymove(aa, other, "make_worms", NO_MOVE, EMPTY, NO_MOVE)) {
-	    
-	    /* We must read to the same depth that was used in the
-	     * initial determination of worm.attack and worm.defend
-	     * to avoid horizon effect. Since stackp has been
-	     * incremented we must also increment depth and
-	     * backfill_depth.
-	     */
-	    
-	    /* Now we try to find a group which is saved or attacked as well
-	     * by this move.
-	     */
-	    DEBUG(DEBUG_WORMS, "trying %1m\n", aa);
-	    increase_depth_values();
-	    
-	    for (i = 0; i < board_size; i++)
-	      for (j = 0; j < board_size; j++) {
-		int pos2 = POS(i, j);
-		/* If a worm has its origin (i, j), and it's not (m, n)...*/
-		if (board[pos2]
-		    && is_worm_origin(pos2, pos2)
-		    && pos2 != pos) {
-		  
-		  /* Either the worm is of the same color as (m, n),
-		   * then we try to attack it.  If there was a previous 
-		   * attack and defense of it, and there is no defense
-		   * for the attack now...
-		   */
-		  if (worm[pos2].color == color
-		      && worm[pos2].attack_codes[0] != 0
-		      && worm[pos2].defend_codes[0] != 0) {
-		    int dcode = find_defense(pos2, NULL);
-		    if (dcode < worm[pos2].defend_codes[0]) {
-		      int attack_works = 1;
-		      /* Sometimes find_defense() fails to find a
-		       * defense which has been found by other means.
-		       * Try if the old defense move still works.
-		       */
-		      if (worm[pos2].defend_codes[0] != 0
-			  && trymove(worm[pos2].defense_points[0],
-				     color, "make_worms", 0, EMPTY, 0)) {
-			int this_dcode = REVERSE_RESULT(attack(pos2, NULL));
-			if (this_dcode > dcode) {
-			  dcode = this_dcode;
-			  if (dcode >= worm[pos2].defend_codes[0])
-			    attack_works = 0;
-			}
-			popgo();
-		      }
-		    
-		      /* ...then move the attack point of that worm to
-		       * the attack point of (m, n).
-		       */
-		      if (attack_works) {
-			DEBUG(DEBUG_WORMS,
-			      "adding point of attack of %1m at %1m with code %d\n",
-			      pos2, aa, 3 - dcode);
-			change_attack(pos2, aa, 3 - dcode);
-			mi[pos2] = 1;
-		      }
-		    }
-		  }
-		  
-		  /* Or the worm is of the opposite color as (m, n).
-		   * If there previously was an attack on it, but there
-		   * is none now, then move the defense point of (i, j)
-		   * to the defense point of (m, n).
-		   */
-		  else if (worm[pos2].color == other
-			   && worm[pos2].attack_codes[0] != 0) {
-		    int acode = attack(pos2, NULL); 
-		    if (acode < worm[pos2].attack_codes[0]) {
-		      DEBUG(DEBUG_WORMS,
-			    "adding point of defense of %1m at %1m with code %d\n",
-			    pos2, aa, 3 - acode);
-		      change_defense(pos2, aa, 3 - acode);
-		      mi[pos2] = 1;
-		    }
-		  }
-		}
-	      }
-	    popgo();
-	    decrease_depth_values();
-	  }
-	}
-	
-	/* If there is a defense point for the worm (m, n), and we
-	 * have not tried this move before, move there and see what
-	 * it leads to.
+	/* We must read to the same depth that was used in the
+	 * initial determination of worm.attack and worm.defend
+	 * to avoid horizon effects. Since stackp has been
+	 * incremented we must also increment depth values.
 	 */
-	if (dd != NO_MOVE && mxcolor[dd] == 0) {
-
-	  mxcolor[dd] = 1;
-	  /* First carry out the defending move. */
-	  if (trymove(dd, color, "make_worms", NO_MOVE, EMPTY, NO_MOVE)) {
-	    
-	    DEBUG(DEBUG_WORMS, "trying %1m\n", dd);
-	    increase_depth_values();
-	    
-	    for (i = 0; i < board_size; i++)
-	      for (j = 0; j < board_size; j++) {
-		int pos2 = POS(i, j);
-		
-		/* If a worm has its origin (i, j), and it's not (m, n)...*/
-		if (board[pos2]
-		    && is_worm_origin(pos2, pos2)
-		    && pos2 != pos) {
-		  
-		  /* Either the worm is of the opposite color as (m, n),
-		   * then we try to attack it.  If there was a previous 
-		   * attack and defense of it, and there is no defense
-		   * for the attack now...
-		   */
-		  if (worm[pos2].color == other
-		      && worm[pos2].attack_codes[0] != 0 
-		      && worm[pos2].defend_codes[0] != 0) {
-		    int dcode = find_defense(pos2, NULL);
-		    if (dcode < worm[pos2].defend_codes[0]) {
-		    
-		      int attack_works = 1;
-		      /* Sometimes find_defense() fails to find a
-			 defense which has been found by other means.
-			 Try if the old defense move still works. */
-		      if (trymove(worm[pos2].defense_points[0],
-				  other, "make_worms",
-				  NO_MOVE, EMPTY, NO_MOVE)) {
-			int this_dcode = REVERSE_RESULT(attack(pos2, NULL));
-			if (this_dcode > dcode) {
-			  dcode = this_dcode;
-			  if (dcode >= worm[pos2].defend_codes[0])
-			    attack_works = 0;
-			}
-			popgo();
-		      }
-		      
-		      /* ...then move the attack point of that worm to
-		       * the defense point of (m, n).
-		       */
-		      if (attack_works) {
-			DEBUG(DEBUG_WORMS,
-			      "adding point of attack of %1m at %1m with code %d\n",
-			      pos2, dd, 3 - dcode);
-			change_attack(pos2, dd, 3 - dcode);
-			mi[pos2] = 1;
-		      }
-		    }
-		  }
-		  /* Or the worm is of the same color as (m, n).
-		   * If there previously was an attack on it, but there
-		   * is none now, then move the defense point of (i, j)
-		   * to the defense point of (m, n).
-		   */
-		  else if (worm[pos2].color == color
-			   && worm[pos2].attack_codes[0] != 0) {
-		    int acode = attack(pos2, NULL);
-		    if (acode < worm[pos2].attack_codes[0]) {
-		      DEBUG(DEBUG_WORMS,
-			    "adding point of defense of %1m at %1m with code %d\n",
-			    pos2, dd, 3 - acode);
-		      change_defense(pos2, dd, 3 - acode);
-		      mi[pos2] = 1;
-		    }
-		  }
+	
+	DEBUG(DEBUG_WORMS, "trying %1m\n", pos);
+	increase_depth_values();
+	
+	/* Now we try to find a group which is saved or attacked as well
+	 * by this move.
+	 */
+	for (str = BOARDMIN; str < BOARDMAX; str++) {
+	  if (!IS_STONE(board[str])
+	      || !is_worm_origin(str, str))
+	    continue;
+	  
+	  /* If the worm is of the opposite color to the move,
+	   * then we try to defend it. If there was a previous 
+	   * attack and defense of it, and there is no defense
+	   * for the attack now...
+	   */
+	  if (worm[str].color == OTHER_COLOR(color)
+	      && worm[str].attack_codes[0] != 0
+	      && worm[str].defend_codes[0] != 0) {
+	    int dcode = find_defense(str, NULL);
+	    if (dcode < worm[str].defend_codes[0]) {
+	      int attack_works = 1;
+	      /* Sometimes find_defense() fails to find a
+	       * defense which has been found by other means.
+	       * Try if the old defense move still works.
+	       */
+	      if (worm[str].defend_codes[0] != 0
+		  && trymove(worm[str].defense_points[0],
+			     OTHER_COLOR(color), "make_worms", 0, EMPTY, 0)) {
+		int this_dcode = REVERSE_RESULT(attack(str, NULL));
+		if (this_dcode > dcode) {
+		  dcode = this_dcode;
+		  if (dcode >= worm[str].defend_codes[0])
+		    attack_works = 0;
 		}
+		popgo();
 	      }
-	    popgo();
-	    decrease_depth_values();
+	      
+	      /* ...then add an attack point of that worm at pos. */
+	      if (attack_works) {
+		DEBUG(DEBUG_WORMS,
+		      "adding point of attack of %1m at %1m with code %d\n",
+		      str, pos, REVERSE_RESULT(dcode));
+		change_attack(str, pos, REVERSE_RESULT(dcode));
+	      }
+	    }
+	  }
+	  
+	  /* If the worm is of the same color as the move we try to
+	   * attack it. If there previously was an attack on it, but
+	   * there is none now, then add a defense point of str at
+	   * pos.
+	   */
+	  else if (worm[str].color == color
+		   && worm[str].attack_codes[0] != 0) {
+	    int acode = attack(str, NULL); 
+	    if (acode < worm[str].attack_codes[0]) {
+	      DEBUG(DEBUG_WORMS,
+		    "adding point of defense of %1m at %1m with code %d\n",
+		    str, pos, REVERSE_RESULT(acode));
+	      change_defense(str, pos, REVERSE_RESULT(acode));
+	    }
 	  }
 	}
+	decrease_depth_values();
+	popgo();
       }
-
-    /* FIXME: Should be redundant now. */
-    /* Propagate the newly generated info to all other stones of each worm. */
-    for (i = 0; i < board_size; i++)
-      for (j = 0; j < board_size; j++)
-	if (mi[POS(i, j)])
-	  propagate_worm(POS(i, j));
+    }
   }
-
+  
   gg_assert(stackp == 0);
   
   /* Sometimes it happens that the tactical reading finds adjacent
@@ -486,74 +372,68 @@ make_worms(int save_verbose)
    */
 
   /* First look for vertical neighbors. */
-  for (m = 0; m < board_size-1; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (!is_same_worm(pos, SOUTH(pos))
-	  && IS_STONE(board[pos])
-	  && IS_STONE(board[SOUTH(pos)])) {
-        if (worm[pos].attack_codes[0] != 0
-	    && worm[SOUTH(pos)].attack_codes[0] != 0) {
-	  if (worm[pos].defend_codes[0] == 0
-	      && does_defend(worm[SOUTH(pos)].attack_points[0], pos)) {
-	    /* FIXME: need to check ko relationship here */
-	    change_defense(pos, worm[SOUTH(pos)].attack_points[0], WIN);
-	  }
-	  if (worm[SOUTH(pos)].defend_codes[0] == 0
-              && does_defend(worm[pos].attack_points[0], SOUTH(pos))) {
-	    /* FIXME: need to check ko relationship here */	    
-	    change_defense(SOUTH(pos), worm[pos].attack_points[0], WIN);
-	  }
-        }
-      }
-    }
-  
-  /* Then look for horizontal neighbors. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size-1; n++) {
-      int pos = POS(m, n);
-      if (!is_same_worm(pos, EAST(pos))
-	  && IS_STONE(board[pos])
-	  && IS_STONE(board[EAST(pos)])) {
-        if (worm[pos].attack_codes[0] != 0
-	    && worm[EAST(pos)].attack_codes[0] != 0) {
-	  if (worm[pos].defend_codes[0] == 0
-              && does_defend(worm[EAST(pos)].attack_points[0], pos)) {
-	    /* FIXME: need to check ko relationship here */	    
-	    change_defense(pos, worm[EAST(pos)].attack_points[0], WIN);
-	  }
-	  if (worm[EAST(pos)].defend_codes[0] == 0
-              && does_defend(worm[pos].attack_points[0], EAST(pos))) {
-	    /* FIXME: need to check ko relationship here */	    
-	    change_defense(EAST(pos), worm[pos].attack_points[0], WIN);
-	  }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (IS_STONE(board[pos])
+	&& IS_STONE(board[SOUTH(pos)])
+	&& !is_same_worm(pos, SOUTH(pos))) {
+      if (worm[pos].attack_codes[0] != 0
+	  && worm[SOUTH(pos)].attack_codes[0] != 0) {
+	if (worm[pos].defend_codes[0] == 0
+	    && does_defend(worm[SOUTH(pos)].attack_points[0], pos)) {
+	  /* FIXME: need to check ko relationship here */
+	  change_defense(pos, worm[SOUTH(pos)].attack_points[0], WIN);
+	}
+	if (worm[SOUTH(pos)].defend_codes[0] == 0
+	    && does_defend(worm[pos].attack_points[0], SOUTH(pos))) {
+	  /* FIXME: need to check ko relationship here */	    
+	  change_defense(SOUTH(pos), worm[pos].attack_points[0], WIN);
 	}
       }
     }
+  }
+  
+  /* Then look for horizontal neighbors. */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (IS_STONE(board[pos])
+	&& IS_STONE(board[EAST(pos)])
+	&& !is_same_worm(pos, EAST(pos))) {
+      if (worm[pos].attack_codes[0] != 0
+	  && worm[EAST(pos)].attack_codes[0] != 0) {
+	if (worm[pos].defend_codes[0] == 0
+	    && does_defend(worm[EAST(pos)].attack_points[0], pos)) {
+	  /* FIXME: need to check ko relationship here */	    
+	  change_defense(pos, worm[EAST(pos)].attack_points[0], WIN);
+	}
+	if (worm[EAST(pos)].defend_codes[0] == 0
+	    && does_defend(worm[pos].attack_points[0], EAST(pos))) {
+	  /* FIXME: need to check ko relationship here */	    
+	  change_defense(EAST(pos), worm[pos].attack_points[0], WIN);
+	}
+      }
+    }
+  }
   
   gg_assert(stackp == 0);
   
   /* Find adjacent worms that can be easily captured, aka lunches. */
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      int lunch;
-
-      if (board[pos] == EMPTY || !is_worm_origin(pos, pos))
-	continue;
-
-      if (find_lunch(pos, &lunch)
-	  && (worm[lunch].attack_codes[0] == WIN
-	      || worm[lunch].attack_codes[0] == KO_A)) {
-	DEBUG(DEBUG_WORMS, "lunch found for %1m at %1m\n", pos, lunch);
-	worm[pos].lunch = lunch;
-      }
-      else
-	worm[pos].lunch = NO_MOVE;
-
-      propagate_worm(pos);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int lunch;
+    
+    if (!IS_STONE(board[pos]) || !is_worm_origin(pos, pos))
+      continue;
+    
+    if (find_lunch(pos, &lunch)
+	&& (worm[lunch].attack_codes[0] == WIN
+	    || worm[lunch].attack_codes[0] == KO_A)) {
+      DEBUG(DEBUG_WORMS, "lunch found for %1m at %1m\n", pos, lunch);
+      worm[pos].lunch = lunch;
     }
+    else
+      worm[pos].lunch = NO_MOVE;
+    
+    propagate_worm(pos);
+  }
   
   if (!disable_threat_computation)
     find_worm_threats();
@@ -581,26 +461,22 @@ make_worms(int save_verbose)
    * opponent's eye space.
    */
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (board[pos]
-	  && worm[pos].origin == pos
-	  && worm[pos].genus == 0
-	  && worm[pos].liberties2 == 0
-	  && !worm[pos].cutstone
-	  && worm[pos].lunch == NO_MOVE)
-      {
-	int edge;
-
-	int border_color = examine_cavity(pos, &edge);
-	if (border_color != GRAY_BORDER && edge < 3) {
-	  DEBUG(DEBUG_WORMS, "Worm %1m identified as inessential.\n", pos);
-	  worm[pos].inessential = 1;
-	  propagate_worm(pos);
-	}
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (IS_STONE(board[pos])
+	&& worm[pos].origin == pos
+	&& worm[pos].genus == 0
+	&& worm[pos].liberties2 == 0
+	&& !worm[pos].cutstone
+	&& worm[pos].lunch == NO_MOVE) {
+      int edge;
+      int border_color = examine_cavity(pos, &edge);
+      if (border_color != GRAY_BORDER && edge < 3) {
+	DEBUG(DEBUG_WORMS, "Worm %1m identified as inessential.\n", pos);
+	worm[pos].inessential = 1;
+	propagate_worm(pos);
       }
     }
+  }
 }
 
 
@@ -613,34 +489,31 @@ make_worms(int save_verbose)
 static void
 build_worms()
 {
-  int m, n;
   int pos;
 
   /* Set all worm data fields to 0. */
   memset(worm, 0 , sizeof(worm));
 
   /* Initialize the worm data for each worm. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      worm[POS(m, n)].origin = NO_MOVE;
-
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
-      if (worm[pos].origin != NO_MOVE)
-	continue;
-      worm[pos].color = board[pos];
-      worm[pos].origin = pos;
-      worm[pos].inessential = 0;
-      worm[pos].invincible = 0;
-      worm[pos].unconditional_status = UNKNOWN;
-      worm[pos].effective_size = 0.0;
-      if (IS_STONE(board[pos])) {
-	worm[pos].liberties = countlib(pos);
-	worm[pos].size = countstones(pos);
-	propagate_worm(pos);
-      }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos))
+      worm[pos].origin = NO_MOVE;
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos) || worm[pos].origin != NO_MOVE)
+      continue;
+    worm[pos].color = board[pos];
+    worm[pos].origin = pos;
+    worm[pos].inessential = 0;
+    worm[pos].invincible = 0;
+    worm[pos].unconditional_status = UNKNOWN;
+    worm[pos].effective_size = 0.0;
+    if (IS_STONE(board[pos])) {
+      worm[pos].liberties = countlib(pos);
+      worm[pos].size = countstones(pos);
+      propagate_worm(pos);
     }
+  }
 }
 
 
@@ -658,92 +531,93 @@ build_worms()
 static void
 compute_effective_worm_sizes()
 {
-  int m, n;
+  int pos;
 
   /* Distance to closest worm, -1 means unassigned, 0 that there is
    * a stone at the location, 1 a liberty of a stone, and so on.
    */
-  int distance[MAX_BOARD][MAX_BOARD];
+  int distance[BOARDMAX];
   /* Pointer to the origin of the closest worms. A very large number of
    * worms may potentially be equally close, but no more than
    * 2*(board_size-1).
    */
-  static int worms[MAX_BOARD][MAX_BOARD][2*(MAX_BOARD-1)];
-  int nworms[MAX_BOARD][MAX_BOARD];   /* number of equally close worms */
+  static int worms[BOARDMAX][2*(MAX_BOARD-1)];
+  int nworms[BOARDMAX];   /* number of equally close worms */
   int found_one;
   int dist; /* current distance */
   int k, l;
   int r;
     
   /* Initialize arrays. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
 
-      for (k = 0; k < 2*(board_size-1); k++)
-	worms[m][n][k] = NO_MOVE;
-      
-      nworms[m][n] = 0;
-	
-      if (BOARD(m, n) == EMPTY)
-	distance[m][n] = -1;
-      else {
-	distance[m][n] = 0;
-	worms[m][n][0] = worm[POS(m, n)].origin;
-	nworms[m][n]++;
-      }
+    for (k = 0; k < 2*(board_size-1); k++)
+      worms[pos][k] = NO_MOVE;
+    
+    nworms[pos] = 0;
+    
+    if (board[pos] == EMPTY)
+      distance[pos] = -1;
+    else {
+      distance[pos] = 0;
+      worms[pos][0] = worm[pos].origin;
+      nworms[pos]++;
     }
-
+  }
+  
   dist = 0;
   found_one = 1;
   while (found_one && dist <= 3) {
     found_one = 0;
     dist++;
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	if (distance[m][n] != -1)
-	  continue; /* already claimed */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos) || distance[pos] != -1)
+	continue; /* already claimed */
 
-	for (r = 0; r < 4; r++) {
-	  int ai = m + deltai[r];
-	  int aj = n + deltaj[r];
-	  
-	  if (ON_BOARD2(ai, aj) && distance[ai][aj] == dist - 1) {
-	    found_one = 1;
-	    distance[m][n] = dist;
-	    for (k = 0; k < nworms[ai][aj]; k++) {
-	      int already_counted = 0;
-	      for (l = 0; l < nworms[m][n]; l++)
-		if (worms[m][n][l] == worms[ai][aj][k]) {
-		  already_counted = 1;
-		  break;
-		}
-	      if (!already_counted) {
-		gg_assert(nworms[m][n] < 2*(board_size-1));
-		worms[m][n][nworms[m][n]] = worms[ai][aj][k];
-		nworms[m][n]++;
+      for (r = 0; r < 4; r++) {
+	int pos2 = pos + delta[r];
+	
+	if (ON_BOARD(pos2) && distance[pos2] == dist - 1) {
+	  found_one = 1;
+	  distance[pos] = dist;
+	  for (k = 0; k < nworms[pos2]; k++) {
+	    int already_counted = 0;
+	    for (l = 0; l < nworms[pos]; l++)
+	      if (worms[pos][l] == worms[pos2][k]) {
+		already_counted = 1;
+		break;
 	      }
+	    if (!already_counted) {
+	      gg_assert(nworms[pos] < 2*(board_size-1));
+	      worms[pos][nworms[pos]] = worms[pos2][k];
+	      nworms[pos]++;
 	    }
 	  }
 	}
       }
+    }
   }
-
+  
   /* Distribute (fractional) contributions to the worms. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      for (k = 0; k < nworms[m][n]; k++) {
-	int aa = worms[m][n][k];
-	if (BOARD(m, n) == EMPTY)
-	  worm[aa].effective_size += 0.5/nworms[m][n];
-	else
-	  worm[aa].effective_size += 1.0;
-      }
-	
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    
+    for (k = 0; k < nworms[pos]; k++) {
+      int w = worms[pos][k];
+      if (board[pos] == EMPTY)
+	worm[w].effective_size += 0.5/nworms[pos];
+      else
+	worm[w].effective_size += 1.0;
+    }
+  }
+    
   /* Propagate the effective size values all over the worms. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (IS_STONE(BOARD(m, n)) && is_worm_origin(POS(m, n), POS(m, n)))
-	propagate_worm(POS(m, n));
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (IS_STONE(board[pos]) && is_worm_origin(pos, pos))
+      propagate_worm(pos);
 }
 
 /* Identify worms which are unconditionally uncapturable in the
@@ -756,34 +630,32 @@ static void
 compute_unconditional_status()
 {
   int unconditional_territory[BOARDMAX];
-  int m, n;
+  int pos;
   int color;
   int other;
   
   for (color = WHITE; color <= BLACK; color++) {
     other = OTHER_COLOR(color);
     unconditional_life(unconditional_territory, color);
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	int ii = POS(m, n);
 
-	if (!unconditional_territory[ii])
-	  continue;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos) || !unconditional_territory[pos])
+	continue;
 	
-	if (board[ii] == color) {
-	  worm[ii].unconditional_status = ALIVE;
-	  if (unconditional_territory[ii] == 1)
-	    worm[ii].invincible = 1;
-	}
-	else if (board[ii] == EMPTY) {
-	  if (color == WHITE)
-	    worm[ii].unconditional_status = WHITE_BORDER;
-	  else
-	    worm[ii].unconditional_status = BLACK_BORDER;
-	}
-	else
-	  worm[ii].unconditional_status = DEAD;
+      if (board[pos] == color) {
+	worm[pos].unconditional_status = ALIVE;
+	if (unconditional_territory[pos] == 1)
+	  worm[pos].invincible = 1;
       }
+      else if (board[pos] == EMPTY) {
+	if (color == WHITE)
+	  worm[pos].unconditional_status = WHITE_BORDER;
+	else
+	  worm[pos].unconditional_status = BLACK_BORDER;
+      }
+      else
+	worm[pos].unconditional_status = DEAD;
+    }
   }
   gg_assert(stackp == 0);
 }
@@ -795,35 +667,38 @@ compute_unconditional_status()
 static void
 find_worm_attacks_and_defenses()
 {
-  int m, n;
+  int str;
   int k;
+  int acode, dcode;
+  int attack_point;
+  int defense_point;
+  static int libs[MAXLIBS];
+  int liberties;
+  int color;
+  int other;
 
    /* 1. Start with finding attack points. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      int acode;
-      int tpos;
+  for (str = BOARDMIN; str < BOARDMAX; str++) {
+    if (!IS_STONE(board[str]) || !is_worm_origin(str, str))
+      continue;
 
-      if (board[pos] == EMPTY || !is_worm_origin(pos, pos))
-	continue;
-
-      TRACE("considering attack of %1m\n", pos);
-      /* Initialize all relevant fields at once. */
-      for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
-	worm[pos].attack_codes[k]   = 0;
-	worm[pos].attack_points[k]  = 0;
-	worm[pos].defend_codes[k]   = 0;
-	worm[pos].defense_points[k] = 0;
-      }
-      propagate_worm(pos);
-      
-      acode = attack(pos, &tpos);
-      if (acode) {
-	DEBUG(DEBUG_WORMS, "worm at %1m can be attacked at %1m\n", pos, tpos);
-	change_attack(pos, tpos, acode);
-      }
+    TRACE("considering attack of %1m\n", str);
+    /* Initialize all relevant fields at once. */
+    for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+      worm[str].attack_codes[k]   = 0;
+      worm[str].attack_points[k]  = 0;
+      worm[str].defend_codes[k]   = 0;
+      worm[str].defense_points[k] = 0;
     }
+    propagate_worm(str);
+    
+    acode = attack(str, &attack_point);
+    if (acode != 0) {
+      DEBUG(DEBUG_WORMS, "worm at %1m can be attacked at %1m\n",
+	    str, attack_point);
+      change_attack(str, attack_point, acode);
+    }
+  }
   gg_assert(stackp == 0);
   
   /* 2. Use pattern matching to find a few more attacks. */
@@ -831,44 +706,39 @@ find_worm_attacks_and_defenses()
   gg_assert(stackp == 0);
   
   /* 3. Now find defense moves. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      int dcode;
+  for (str = BOARDMIN; str < BOARDMAX; str++) {
+    if (!IS_STONE(board[str]) || !is_worm_origin(str, str))
+      continue;
 
-      if (board[pos] == EMPTY || !is_worm_origin(pos, pos))
-	continue;
+    if (worm[str].attack_codes[0] != 0) {
 
-      if (worm[pos].attack_codes[0] != 0) {
-	int tpos = NO_MOVE;
-
-	TRACE("considering defense of %1m\n", pos);
-	dcode = find_defense(pos, &tpos);
-	if (dcode) {
-	  TRACE("worm at %1m can be defended at %1m\n", pos, tpos);
-	  if (tpos != NO_MOVE)
-	    change_defense(pos, tpos, dcode);
-	}
-	else {
-	  /* If the point of attack is not adjacent to the worm, 
-	   * it is possible that this is an overlooked point of
-	   * defense, so we try and see if it defends.
-	   */
-	  int aa = worm[pos].attack_points[0];
-	  if (!liberty_of_string(aa, pos))
-	    if (trymove(aa, worm[pos].color, "make_worms", NO_MOVE,
-			EMPTY, NO_MOVE)) {
-	      int acode = attack(pos, NULL);
-	      if (acode != WIN) {
-		change_defense(pos, aa, 3 - acode);
-		TRACE("worm at %1m can be defended at %1m with code %d\n",
-		      pos, aa, 3 - acode);
-	      }	 
-	      popgo();
-	    }
-	}
+      TRACE("considering defense of %1m\n", str);
+      dcode = find_defense(str, &defense_point);
+      if (dcode != 0) {
+	TRACE("worm at %1m can be defended at %1m\n", str, defense_point);
+	if (defense_point != NO_MOVE)
+	  change_defense(str, defense_point, dcode);
+      }
+      else {
+	/* If the point of attack is not adjacent to the worm, 
+	 * it is possible that this is an overlooked point of
+	 * defense, so we try and see if it defends.
+	 */
+	attack_point = worm[str].attack_points[0];
+	if (!liberty_of_string(attack_point, str))
+	  if (trymove(attack_point, worm[str].color, "make_worms", NO_MOVE,
+		      EMPTY, NO_MOVE)) {
+	    int acode = attack(str, NULL);
+	    if (acode != WIN) {
+	      change_defense(str, attack_point, REVERSE_RESULT(acode));
+	      TRACE("worm at %1m can be defended at %1m with code %d\n",
+		    str, attack_point, REVERSE_RESULT(acode));
+	    }	 
+	    popgo();
+	  }
       }
     }
+  }
   gg_assert(stackp == 0);
 
   /* 4. Use pattern matching to find a few more defense moves. */
@@ -876,71 +746,54 @@ find_worm_attacks_and_defenses()
   gg_assert(stackp == 0);
   
   /*
-   * In the new move generation scheme, we need to find all moves that
-   * attacks and or defends some string.
-   */
-
-  /*
    * 5. Find additional attacks and defenses by testing all immediate
    *    liberties. Further attacks and defenses are found by pattern
    *    matching and by trying whether each attack or defense point
    *    attacks or defends other strings.
    */
-  {
-    static int libs[MAXLIBS];
-    int color;
-    int other;
-    int liberties;
-
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	int pos = POS(m, n);
-	color = board[pos];
-	if (color == EMPTY || !is_worm_origin(pos, pos))
-	  continue;
-
-	other = OTHER_COLOR(color);
-	
-	if (worm[pos].attack_codes[0] == 0)
-	  continue;
-	
-	/* There is at least one attack on this group. Try the
-	 * liberties.
-	 */
-	liberties = findlib(pos, MAXLIBS, libs);
-	
-	for (k = 0; k < liberties; k++) {
-	  int aa = libs[k];
-	  if (!attack_move_known(aa, pos)) {
-	    /* Try to attack on the liberty. */
-	    if (trymove(aa, other, "make_worms", pos, EMPTY, NO_MOVE)) {
-	      if (!board[pos] || attack(pos, NULL)) {
-		int dcode;
-		if (!board[pos])
-		  dcode = 0;
-		else
-		  dcode = find_defense(pos, NULL);
-		
-		if (dcode != WIN) {
-		  change_attack(pos, aa, 3 - dcode);
-		}
-	      }
-	      popgo();
-	    }
+  for (str = BOARDMIN; str < BOARDMAX; str++) {
+    color = board[str];
+    if (!IS_STONE(color) || !is_worm_origin(str, str))
+      continue;
+    
+    other = OTHER_COLOR(color);
+    
+    if (worm[str].attack_codes[0] == 0)
+      continue;
+    
+    /* There is at least one attack on this group. Try the
+     * liberties.
+     */
+    liberties = findlib(str, MAXLIBS, libs);
+    
+    for (k = 0; k < liberties; k++) {
+      int pos = libs[k];
+      if (!attack_move_known(pos, str)) {
+	/* Try to attack on the liberty. */
+	if (trymove(pos, other, "make_worms", str, EMPTY, NO_MOVE)) {
+	  if (board[str] == EMPTY || attack(str, NULL)) {
+	    if (board[str] == EMPTY)
+	      dcode = 0;
+	    else
+	      dcode = find_defense(str, NULL);
+	    
+	    if (dcode != WIN)
+	      change_attack(str, pos, REVERSE_RESULT(dcode));
 	  }
-	  /* Try to defend at the liberty. */
-	  if (!defense_move_known(aa, pos)) {
-	    if (worm[pos].defend_codes[0] != 0)
-	      if (trymove(aa, color, "make_worms", NO_MOVE, EMPTY, NO_MOVE)) {
-		int acode = attack(pos, NULL);
-		if (acode != WIN) {
-		  change_defense(pos, aa, 3 - acode);
-		}
-		popgo();
-	      }
-	  }
+	  popgo();
 	}
       }
+      /* Try to defend at the liberty. */
+      if (!defense_move_known(pos, str)) {
+	if (worm[str].defend_codes[0] != 0)
+	  if (trymove(pos, color, "make_worms", NO_MOVE, EMPTY, NO_MOVE)) {
+	    acode = attack(str, NULL);
+	    if (acode != WIN)
+	      change_defense(str, pos, REVERSE_RESULT(acode));
+	    popgo();
+	  }
+      }
+    }
   }
   gg_assert(stackp == 0);
 }
@@ -953,112 +806,107 @@ find_worm_attacks_and_defenses()
 static void
 find_worm_threats()
 {
-  int m, n;
+  int str;
+  static int libs[MAXLIBS];
+  int liberties;
+  
+  int k;
+  int l;
+  int color;
+  int other;
+  
+  for (str = BOARDMIN; str < BOARDMAX; str++) {
+    color = board[str];
+    if (!IS_STONE(color) || !is_worm_origin(str, str))
+      continue;
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      int liberties;
-      static int libs[MAXLIBS];
+    other = OTHER_COLOR(color);
 
-      int k;
-      int l;
-      int color;
-      int other;
-
-      /* Only work with origins. */
-      color = board[pos];
-      if (color == EMPTY || !is_worm_origin(pos, pos))
-	continue;
-
-      other = OTHER_COLOR(color);
-
-      /* 1. Start with finding attack threats. */
-      /* Only try those worms that have no attack. */
-      if (worm[pos].attack_codes[0] == 0) {
-	attack_threats(pos, MAX_TACTICAL_POINTS,
-		       worm[pos].attack_threat_points,
-		       worm[pos].attack_threat_codes);
+    /* 1. Start with finding attack threats. */
+    /* Only try those worms that have no attack. */
+    if (worm[str].attack_codes[0] == 0) {
+      attack_threats(str, MAX_TACTICAL_POINTS,
+		     worm[str].attack_threat_points,
+		     worm[str].attack_threat_codes);
 #if 0
-	/* Threaten to attack by saving weak neighbors. */
-	num_adj = chainlinks(pos, adjs);
-	for (k = 0; k < num_adj; k++) {
-	  if (worm[adjs[k]].attack_codes[0] != 0
-	      && worm[adjs[k]].defend_codes[0] != 0)
-	    for (r = 0; r < MAX_TACTICAL_POINTS; r++) {
-	      int bb;
-
-	      if (worm[adjs[k]].defend_codes[r] == 0)
-		break;
-	      bb = worm[adjs[k]].defense_points[r];
-	      if (trymove(bb, other, "threaten attack", pos,
-			  EMPTY, NO_MOVE)) {
-		int acode;
-		if (board[pos] == EMPTY)
-		  acode = WIN;
-		else
-		  acode = attack(pos, NULL);
-		if (acode != 0)
-		  change_attack_threat(pos, bb, acode);
-		popgo();
-	      }
-	    }
-	}
-#endif
-	/* FIXME: Try other moves also (patterns?). */
-      }
-
-      /* 2. Continue with finding defense threats. */
-      /* Only try those worms that have an attack. */
-      if (worm[pos].attack_codes[0] != 0
-	  && worm[pos].defend_codes[0] == 0) {
-
-	liberties = findlib(pos, MAXLIBS, libs);
-
-	for (k = 0; k < liberties; k++) {
-	  int aa = libs[k];
-
-	  /* Try to threaten on the liberty. */
-	  if (trymove(aa, color, "threaten defense", NO_MOVE,
-		      EMPTY, NO_MOVE)) {
-	    if (attack(pos, NULL) == WIN) {
-	      int dcode = find_defense(pos, NULL);
-	      if (dcode != 0)
-		change_defense_threat(pos, aa, dcode);
-	    }
-	    popgo();
-	  }
-
-	  /* Try to threaten on second order liberties. */
-	  for (l = 0; l < 4; l++) {
-	    int bb = libs[k] + delta[l];
-
-	    if (!ON_BOARD(bb)
-		|| IS_STONE(board[bb])
-		|| liberty_of_string(bb, pos))
-	      continue;
-
-	    if (trymove(bb, color, "threaten defense", pos, EMPTY, NO_MOVE)) {
-	      if (attack(pos, NULL) == WIN) {
-		int dcode = find_defense(pos, NULL);
-		if (dcode != 0)
-		  change_defense_threat(pos, bb, dcode);
-	      }
+      /* Threaten to attack by saving weak neighbors. */
+      num_adj = chainlinks(str, adjs);
+      for (k = 0; k < num_adj; k++) {
+	if (worm[adjs[k]].attack_codes[0] != 0
+	    && worm[adjs[k]].defend_codes[0] != 0)
+	  for (r = 0; r < MAX_TACTICAL_POINTS; r++) {
+	    int bb;
+	    
+	    if (worm[adjs[k]].defend_codes[r] == 0)
+	      break;
+	    bb = worm[adjs[k]].defense_points[r];
+	    if (trymove(bb, other, "threaten attack", str,
+			EMPTY, NO_MOVE)) {
+	      int acode;
+	      if (board[str] == EMPTY)
+		acode = WIN;
+	      else
+		acode = attack(str, NULL);
+	      if (acode != 0)
+		change_attack_threat(str, bb, acode);
 	      popgo();
 	    }
 	  }
-	}
-
-	/* It might be interesting to look for defense threats by
-         * attacking weak neighbors, similar to threatening attack by
-         * defending a weak neighbor. However, in this case it seems
-         * probable that if there is such an attack, it's a real
-         * defense, not only a threat. 
-	 */
-	
-	/* FIXME: Try other moves also (patterns?). */
       }
+#endif
+      /* FIXME: Try other moves also (patterns?). */
     }
+    
+    /* 2. Continue with finding defense threats. */
+    /* Only try those worms that have an attack. */
+    if (worm[str].attack_codes[0] != 0
+	&& worm[str].defend_codes[0] == 0) {
+      
+      liberties = findlib(str, MAXLIBS, libs);
+      
+      for (k = 0; k < liberties; k++) {
+	int aa = libs[k];
+	
+	/* Try to threaten on the liberty. */
+	if (trymove(aa, color, "threaten defense", NO_MOVE, EMPTY, NO_MOVE)) {
+	  if (attack(str, NULL) == WIN) {
+	    int dcode = find_defense(str, NULL);
+	    if (dcode != 0)
+	      change_defense_threat(str, aa, dcode);
+	  }
+	  popgo();
+	}
+	
+	/* Try to threaten on second order liberties. */
+	for (l = 0; l < 4; l++) {
+	  int bb = libs[k] + delta[l];
+	  
+	  if (!ON_BOARD(bb)
+	      || IS_STONE(board[bb])
+	      || liberty_of_string(bb, str))
+	    continue;
+	  
+	  if (trymove(bb, color, "threaten defense", str, EMPTY, NO_MOVE)) {
+	    if (attack(str, NULL) == WIN) {
+	      int dcode = find_defense(str, NULL);
+	      if (dcode != 0)
+		change_defense_threat(str, bb, dcode);
+	    }
+	    popgo();
+	  }
+	}
+      }
+      
+      /* It might be interesting to look for defense threats by
+       * attacking weak neighbors, similar to threatening attack by
+       * defending a weak neighbor. However, in this case it seems
+       * probable that if there is such an attack, it's a real
+       * defense, not only a threat. 
+       */
+      
+      /* FIXME: Try other moves also (patterns?). */
+    }
+  }
 }
 
 
@@ -1072,40 +920,38 @@ find_worm_threats()
 static int
 find_lunch(int str, int *lunch)
 {
-  int i, j;
+  int pos;
   int k;
 
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(stackp == 0, str);
 
   *lunch = NO_MOVE;
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      int pos = POS(i, j);
-      if (board[pos] != OTHER_COLOR(board[str]))
-	continue;
-      for (k = 0; k < 8; k++) {
-	int apos = pos + delta[k];
-	if (ON_BOARD(apos) && is_same_worm(apos, str)) {
-	  if (worm[pos].attack_codes[0] != 0 && !is_ko_point(pos)) {
-	    /*
-	     * If several adjacent lunches are found, we pick the 
-	     * juiciest. First maximize cutstone, then minimize liberties. 
-	     * We can only do this if the worm data is available, 
-	     * i.e. if stackp==0.
-	     */
-	    if (*lunch == NO_MOVE
-		|| worm[pos].cutstone > worm[*lunch].cutstone 
-		|| (worm[pos].cutstone == worm[*lunch].cutstone 
-		    && worm[pos].liberties < worm[*lunch].liberties)) {
-	      *lunch = worm[pos].origin;
-	    }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] != OTHER_COLOR(board[str]))
+      continue;
+    for (k = 0; k < 8; k++) {
+      int apos = pos + delta[k];
+      if (ON_BOARD(apos) && is_same_worm(apos, str)) {
+	if (worm[pos].attack_codes[0] != 0 && !is_ko_point(pos)) {
+	  /*
+	   * If several adjacent lunches are found, we pick the 
+	   * juiciest. First maximize cutstone, then minimize liberties. 
+	   * We can only do this if the worm data is available, 
+	   * i.e. if stackp==0.
+	   */
+	  if (*lunch == NO_MOVE
+	      || worm[pos].cutstone > worm[*lunch].cutstone 
+	      || (worm[pos].cutstone == worm[*lunch].cutstone 
+		  && worm[pos].liberties < worm[*lunch].liberties)) {
+	    *lunch = worm[pos].origin;
 	  }
-	  break;
 	}
+	break;
       }
     }
-
+  }
+  
   if (*lunch != NO_MOVE)
     return 1;
 
@@ -1418,8 +1264,8 @@ ping_cave(int str, int *lib1, int *lib2, int *lib3, int *lib4)
 	&& mse[pos]
 	&& (((      !ON_BOARD(SOUTH(pos)) || board[SOUTH(pos)] == other)
 	     && (   !ON_BOARD(NORTH(pos)) || board[NORTH(pos)] == other))
-	    || ((   !ON_BOARD(WEST(pos))  || board[WEST(pos)] == other)
-		&& (!ON_BOARD(EAST(pos))  || board[EAST(pos)] == other))))
+	    || ((   !ON_BOARD(WEST(pos))  || board[WEST(pos)]  == other)
+		&& (!ON_BOARD(EAST(pos))  || board[EAST(pos)]  == other))))
       mse[pos] = 0;
   
   *lib2 = 0;
@@ -1471,7 +1317,7 @@ ping_recurse(int pos, int *counter,
 }
 
 
-/* touching(i, j, color) returns true if the vertex at (i, j) is
+/* touching(pos, color) returns true if the vertex at (pos) is
  * touching any stone of (color).
  */
 
@@ -1487,33 +1333,32 @@ touching(int pos, int color)
 
 /* The GENUS of a string is the number of connected components of
  * its complement, minus one. It is an approximation to the number of
- * eyes of the string. If (i, j) points to the origin of a string,
- * genus(i, j) returns its genus.
+ * eyes of the string.
  */
 
 static int 
 genus(int str)
 {
-  int m, n;
+  int pos;
   int mg[BOARDMAX];
   int gen = -1;
 
   memset(mg, 0, sizeof(mg));
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (!mg[pos] && (board[pos] == EMPTY || !is_worm_origin(pos, str))) {
-	markcomponent(str, pos, mg);
-	gen++;
-      }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (ON_BOARD(pos)
+	&& !mg[pos]
+	&& (board[pos] == EMPTY || !is_same_worm(pos, str))) {
+      markcomponent(str, pos, mg);
+      gen++;
     }
+  }
 
   return gen;
 }
 
 
-/* This recursive function marks the component at (m, n) of 
- * the complement of the string with origin (i, j)
+/* This recursive function marks the component at (pos) of 
+ * the complement of the string with origin (str)
  */
 
 static void 
@@ -1525,19 +1370,19 @@ markcomponent(int str, int pos, int mg[BOARDMAX])
     int apos = pos + delta[k];
     if (ON_BOARD(apos)
 	&& mg[apos] == 0
-	&& (board[apos] == EMPTY || !is_worm_origin(apos, str)))
+	&& (board[apos] == EMPTY || !is_same_worm(apos, str)))
       markcomponent(str, apos, mg);
   }
 }
 
 
-/* examine_cavity(m, n, *edge), if (m, n) is EMPTY, examines the
+/* examine_cavity(pos, *edge), if (pos) is EMPTY, examines the
  * cavity at (m, n) and returns its bordercolor,
  * which can be BLACK_BORDER, WHITE_BORDER or GRAY_BORDER. The edge
  * parameter is set to the number of edge vertices in the cavity.
  *
- * If (m, n) is nonempty, it returns the same result, imagining
- * that the string at (m, n) is removed. The edge parameter is
+ * If (pos) is nonempty, it returns the same result, imagining
+ * that the string at (pos) is removed. The edge parameter is
  * set to the number of vertices where the cavity meets the
  * edge in a point outside the removed string.  
  */
@@ -1589,9 +1434,9 @@ examine_cavity(int pos, int *edge)
  *   EMPTY       -> BLACK/WHITE
  *   BLACK/WHITE -> BLACK | WHITE
  *
- * mx[i][j] is 1 if (i, j) has already been visited.
+ * mx[pos] is 1 if (pos) has already been visited.
  *
- * if (ai, aj) points to the origin of a string, it will be ignored.
+ * if (str) points to the origin of a string, it will be ignored.
  *
  * On (fully-unwound) exit
  *   *border_color should be BLACK, WHITE or BLACK | WHITE
@@ -1610,7 +1455,6 @@ cavity_recurse(int pos, int mx[BOARDMAX],
 
   mx[pos] = 1;
 
-  
   if (is_edge_vertex(pos) && board[pos] == EMPTY) 
     (*edge)++;
 

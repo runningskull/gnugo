@@ -231,7 +231,7 @@ DEBUG_func(int flag, const char *fmt, ...)
 
 /*
  * A wrapper around abort() which shows the state variables at the time
- * of the problem.  (i, j) are typically a related move, or -1, -1.
+ * of the problem.  (x, y) are typically a related move, or -1, -1.
  */
 
 void 

@@ -558,7 +558,7 @@ sgfTriangle(SGFNode *node, int i, int j)
  */
 
 SGFNode *
-sgfLabel(SGFNode *node, char *label, int i, int j)
+sgfLabel(SGFNode *node, const char *label, int i, int j)
 {
   /* allows 12 chars labels - more than enough */
   char text[16];

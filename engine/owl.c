@@ -59,7 +59,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include "liberty.h"
 #include "patterns.h"
 #include "cache.h"
@@ -4106,7 +4105,8 @@ improve_lunch_attack(int lunch, int attack_point)
  * .XOX.X|	.XOX.X|
  * ------+	------+
  */
-static int improve_lunch_defense(int lunch, int defense_point)
+static int
+improve_lunch_defense(int lunch, int defense_point)
 {
   int color = board[lunch];
   int k;

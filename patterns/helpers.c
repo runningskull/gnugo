@@ -20,11 +20,10 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "liberty.h"
 #include "patterns.h"
-
-#include <stdlib.h>
-#include <assert.h>
 
 
 #define TRYMOVE(pos, color) trymove(pos, color, "helper", NO_MOVE, EMPTY, NO_MOVE)

@@ -523,7 +523,7 @@ hashtable_search(Hashtable *table, Hash_data *hd)
 
 /* 
  * Search the result list in a hash node for a particular result. This
- * result is from ROUTINE (e.g. readlad1) at (i, j) and reading depth
+ * result is from ROUTINE (e.g. readlad1) at (str1) and reading depth
  * stackp.
  *
  * All these numbers must be unsigned, and 0 <= x <= 255).

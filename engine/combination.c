@@ -98,70 +98,69 @@ combinations(int color)
 static void
 find_double_threats(int color)
 {
-  int i, j;
   int ii;
   int k;
   int l;
 
-  for (i = 0; i < board_size; ++i)
-    for (j = 0; j < board_size; ++j) {
-      int num_a_threatened_groups;
-      int a_threatened_groups[MAX_THREATENED_STRINGS];
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    int num_a_threatened_groups;
+    int a_threatened_groups[MAX_THREATENED_STRINGS];
 #if 0
-      int num_d_threatened_groups;
-      int d_threatened_groups[MAX_THREATENED_STRINGS];
+    int num_d_threatened_groups;
+    int d_threatened_groups[MAX_THREATENED_STRINGS];
 #endif
 
-      ii = POS(i, j);
-      
-      /* Generate ATTACK_EITHER_MOVE move reasons for each pair of the 
-       * threatened strings.  We must also remove the threats, because
-       * otherwise we would get followup points for them also.     
-       *
-       * FIXME: 
-       *   - This is perhaps not the best way to do it, but realistically
-       *     it will be seldom that more than two strings are threatened
-       *     at the same point.  Still, we should find a better way.
-       *   - ATTACK_EITHER_MOVE should be generalized to more than two strings.
-       */
-      num_a_threatened_groups = get_attack_threats(ii, MAX_THREATENED_STRINGS,
-						   a_threatened_groups);
-      if (num_a_threatened_groups > 1) {
-	if (trymove(ii, color, "find_double_threats-A", ii, EMPTY, NO_MOVE)) {
-	  for (k = 0; k < num_a_threatened_groups - 1; ++k)
-	    for (l = k + 1; l < num_a_threatened_groups; ++l) {
-	      /* Note: If we used attack_either() here instead of trymove()
-	       *       and !defend_both(), we would not make use of the fact
-	       *       that we already know of a common threat point for
-	       *       the two strings.
-	       * Besides, attack_either is currently (3.1.11) not very good.
-	       *
-	       * The call to attack() is intended to detect the case
-	       * where the move at ii is a snapback capture.
-	       */
-	      if (board[a_threatened_groups[k]] == EMPTY
-		  || board[a_threatened_groups[l]] == EMPTY) {
-		if (!attack(ii, NULL)) {
-		  add_either_move(ii, ATTACK_STRING, a_threatened_groups[k], 
-				  ATTACK_STRING, a_threatened_groups[l]);
-		  remove_attack_threat_move(ii, a_threatened_groups[k]);
-		  remove_attack_threat_move(ii, a_threatened_groups[l]);
-		}
-	      }
-	      else if (!defend_both(a_threatened_groups[k],
-				    a_threatened_groups[l])) {
+    if (!ON_BOARD(ii))
+      continue;
+
+    /* Generate ATTACK_EITHER_MOVE move reasons for each pair of the 
+     * threatened strings.  We must also remove the threats, because
+     * otherwise we would get followup points for them also.     
+     *
+     * FIXME: 
+     *   - This is perhaps not the best way to do it, but realistically
+     *     it will be seldom that more than two strings are threatened
+     *     at the same point.  Still, we should find a better way.
+     *   - ATTACK_EITHER_MOVE should be generalized to more than two strings.
+     */
+    num_a_threatened_groups = get_attack_threats(ii, MAX_THREATENED_STRINGS,
+						 a_threatened_groups);
+    if (num_a_threatened_groups > 1) {
+      if (trymove(ii, color, "find_double_threats-A", ii, EMPTY, NO_MOVE)) {
+	for (k = 0; k < num_a_threatened_groups - 1; ++k)
+	  for (l = k + 1; l < num_a_threatened_groups; ++l) {
+	    /* Note: If we used attack_either() here instead of trymove()
+	     *       and !defend_both(), we would not make use of the fact
+	     *       that we already know of a common threat point for
+	     *       the two strings.
+	     * Besides, attack_either is currently (3.1.11) not very good.
+	     *
+	     * The call to attack() is intended to detect the case
+	     * where the move at ii is a snapback capture.
+	     */
+	    if (board[a_threatened_groups[k]] == EMPTY
+		|| board[a_threatened_groups[l]] == EMPTY) {
+	      if (!attack(ii, NULL)) {
 		add_either_move(ii, ATTACK_STRING, a_threatened_groups[k], 
 				ATTACK_STRING, a_threatened_groups[l]);
 		remove_attack_threat_move(ii, a_threatened_groups[k]);
 		remove_attack_threat_move(ii, a_threatened_groups[l]);
 	      }
 	    }
-	  popgo();
-	}
+	    else if (!defend_both(a_threatened_groups[k],
+				  a_threatened_groups[l])) {
+	      add_either_move(ii, ATTACK_STRING, a_threatened_groups[k], 
+			      ATTACK_STRING, a_threatened_groups[l]);
+	      remove_attack_threat_move(ii, a_threatened_groups[k]);
+	      remove_attack_threat_move(ii, a_threatened_groups[l]);
+	    }
+	  }
+	popgo();
       }
     }
-
-
+  }
+  
+  
   /* FIXME:
    *   TODO:
    *     - defense threats

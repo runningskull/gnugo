@@ -93,7 +93,7 @@ int sgfPrintCharProperty(FILE *file, SGFNode *node, const char *name);
 int sgfPrintCommentProperty(FILE *file, SGFNode *node, const char *name);
 void sgfWriteResult(SGFNode *node, float score, int overwrite);
 
-SGFNode *sgfLabel(SGFNode *node, char *label, int i, int j);
+SGFNode *sgfLabel(SGFNode *node, const char *label, int i, int j);
 SGFNode *sgfLabelInt(SGFNode *node, int num, int i, int j);
 SGFNode *sgfCircle(SGFNode *node, int i, int j);
 SGFNode *sgfSquare(SGFNode *node, int i, int j);

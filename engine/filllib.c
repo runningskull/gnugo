@@ -103,8 +103,8 @@ analyze_neighbor(int pos, int *found_black, int *found_white)
 int 
 fill_liberty(int *move, int color)
 {
-  int m, n;
   int k;
+  int pos;
   int other = OTHER_COLOR(color);
   int defense_point;
   int potential_color[BOARDMAX];
@@ -116,212 +116,208 @@ fill_liberty(int *move, int color)
    * the process.
    */
   memset(potential_color, 0, sizeof(potential_color));
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (board[pos] == EMPTY)
-	continue;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!IS_STONE(board[pos]))
+      continue;
 
-      if (worm[pos].inessential || DRAGON2(pos).safety == INESSENTIAL)
-	continue;
-
-      if (dragon[pos].status != ALIVE) {
-	for (k = 0; k < 4; k++) {
-	  int pos2 = pos + delta[k];
-	  if (board[pos2] == EMPTY)
-	    potential_color[pos2] |= OTHER_COLOR(board[pos]);
-	}
-      }
-      
-      if (dragon[pos].status != DEAD) {
-	for (k = 0; k < 12; k++) {
-	  int d = delta[k%8];
-
-	  if (k >= 8) {
- 	    if (board[pos + d] != EMPTY)
- 	      continue;
-	    d *= 2;
-	  }
-	  if (board[pos + d] == EMPTY)
-	    potential_color[pos + d] |= board[pos];
-	}
+    if (worm[pos].inessential || DRAGON2(pos).safety == INESSENTIAL)
+      continue;
+    
+    if (dragon[pos].status != ALIVE) {
+      for (k = 0; k < 4; k++) {
+	int pos2 = pos + delta[k];
+	if (board[pos2] == EMPTY)
+	  potential_color[pos2] |= OTHER_COLOR(board[pos]);
       }
     }
-
-  
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      /* It seems we can't trust an empty liberty to be gray-colored
-       * either as a cave or as a cavity. Instead we look for empty
-       * intersections with at least one neighbor of each color, where
-       * dead stones count as enemy stones. We also count empty
-       * neighbors to either color if the opponent can't play there.
-       */
-      int found_white = 0;
-      int found_black = 0;
-
-      if (board[pos] != EMPTY)
-	continue;
-
-      /* Quick rejection based on preliminary test above. */
-      if (potential_color[pos] != GRAY)
-	continue;
-
-      /* Loop over the neighbors. */
-      for (k = 0; k < 4; k++) {
-	int d = delta[k];
-	if (ON_BOARD(pos + d))
-	  analyze_neighbor(pos + d, &found_black, &found_white);
+    
+    if (dragon[pos].status != DEAD) {
+      for (k = 0; k < 12; k++) {
+	int d = delta[k%8];
+	
+	if (k >= 8) {
+	  if (board[pos + d] != EMPTY)
+	    continue;
+	  d *= 2;
+	}
+	if (board[pos + d] == EMPTY)
+	  potential_color[pos + d] |= board[pos];
       }
-      
-      /* Do we have neighbors of both colors? */
-      if (!(found_white && found_black))
+    }
+  }
+  
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    /* It seems we can't trust an empty liberty to be gray-colored
+     * either as a cave or as a cavity. Instead we look for empty
+     * intersections with at least one neighbor of each color, where
+     * dead stones count as enemy stones. We also count empty
+     * neighbors to either color if the opponent can't play there.
+     */
+    int found_white = 0;
+    int found_black = 0;
+    
+    if (board[pos] != EMPTY)
+      continue;
+
+    /* Quick rejection based on preliminary test above. */
+    if (potential_color[pos] != GRAY)
+      continue;
+    
+    /* Loop over the neighbors. */
+    for (k = 0; k < 4; k++) {
+      int d = delta[k];
+      if (ON_BOARD(pos + d))
+	analyze_neighbor(pos + d, &found_black, &found_white);
+    }
+    
+    /* Do we have neighbors of both colors? */
+    if (!(found_white && found_black))
+      continue;
+    
+    /* Ok, we wish to play here, but maybe we can't. The following
+     * cases may occur:
+     * 1. Move is legal and safe.
+     * 2. Move is legal but not safe because it's in the middle of a seki.
+     * 3. Move is legal but not safe, can be played after backfilling.
+     * 4. Move is an illegal ko recapture.
+     * 5. Move is illegal but can be played after back-captures.
+     * 6. Move would violate confirm_safety.
+     */
+    
+    DEBUG(DEBUG_FILLLIB, "Filllib: Considering move at %1m.\n", pos);
+    
+    /* Legal and tactically safe, play it if it passes
+     * confirm_safety test, i.e. that it isn't a blunder which
+     * causes problems for other strings.
+     */
+    if (safe_move(pos, color) == WIN) {
+      DEBUG(DEBUG_FILLLIB, "Filllib: Tactically safe.\n");
+      if (filllib_confirm_safety(pos, color, &defense_point)) {
+	/* Safety confirmed. */
+	DEBUG(DEBUG_FILLLIB, "Filllib: Safety confirmed.\n");
+	*move = pos;
+	return 1;
+      }
+      else if (defense_point != NO_MOVE) {
+	/* Safety not confirmed because the move at (pos) would set
+	 * up a double threat. (defense_point) is assumed to defend
+	 * against this threat.
+	 *
+	 * FIXME: We should verify that (defense_point) really is effective.
+	 */
+	DEBUG(DEBUG_FILLLIB,
+	      "Filllib: Safety not confirmed, but %1m defends.\n",
+	      defense_point);
+	*move = defense_point;
+	return 1;
+      }
+      else {
+	/* The move causes problems somewhere else on the board, so
+	 * we have to discard it. If everything works right this
+	 * should not happen at this time.
+	 */
+	DEBUG(DEBUG_FILLLIB, "Filllib: Safety not confirmed, discarded.\n");
+	TRACE("Warning: Blunder detected in fill_liberty().\n");
 	continue;
-
-      /* Ok, we wish to play here, but maybe we can't. The following
-       * cases may occur:
-       * 1. Move is legal and safe.
-       * 2. Move is legal but not safe because it's in the middle of a seki.
-       * 3. Move is legal but not safe, can be played after backfilling.
-       * 4. Move is an illegal ko recapture.
-       * 5. Move is illegal but can be played after back-captures.
-       * 6. Move would violate confirm_safety.
-       */
-
-      DEBUG(DEBUG_FILLLIB, "Filllib: Considering move at %1m.\n", pos);
+      }
+    }
+    
+    /* Try to play the move. */
+    if (trymove(pos, color, "fill_liberty", NO_MOVE, EMPTY, NO_MOVE)) {
+      popgo();
+      /* Legal, but not safe. Look for backfilling move. */
+      DEBUG(DEBUG_FILLLIB,
+	    "Filllib: Legal but not safe, looking for backfilling move.\n");
       
-      /* Legal and tactically safe, play it if it passes
-       * confirm_safety test, i.e. that it isn't a blunder which
-       * causes problems for other strings.
-       */
-      if (safe_move(pos, color) == WIN) {
-	DEBUG(DEBUG_FILLLIB, "Filllib: Tactically safe.\n");
-	if (filllib_confirm_safety(pos, color, &defense_point)) {
-	  /* Safety confirmed. */
-	  DEBUG(DEBUG_FILLLIB, "Filllib: Safety confirmed.\n");
-	  *move = pos;
-	  return 1;
-	}
-	else if (defense_point != NO_MOVE) {
-	  /* Safety not confirmed because the move at (pos) would set
-           * up a double threat. (defense_point) is assumed to defend
-           * against this threat.
-	   *
-	   * FIXME: We should verify that (defense_point) really is effective.
-	   */
-	  DEBUG(DEBUG_FILLLIB,
-		"Filllib: Safety not confirmed, but %1m defends.\n",
-		defense_point);
-	  *move = defense_point;
-	  return 1;
-	}
-	else {
-	  /* The move causes problems somewhere else on the board, so
-           * we have to discard it. If everything works right this
-           * should not happen at this time.
-	   */
-	  DEBUG(DEBUG_FILLLIB, "Filllib: Safety not confirmed, discarded.\n");
-	  TRACE("Warning: Blunder detected in fill_liberty().\n");
+      if (find_backfilling_move(pos, color, move)) {
+	DEBUG(DEBUG_FILLLIB, "Filllib: Backfilling move at %1m.\n", *move);
+	/* In certain positions it may happen that an illegal move
+	 * is found. This probably only can happen if we try to play
+	 * a move inside a lost semeai. Anyway we should discard the
+	 * move.
+	 */
+	if (!is_legal(*move, color)) {
+	  DEBUG(DEBUG_FILLLIB, "Filllib: Was illegal, discarded.\n");
+	  *move = NO_MOVE;
 	  continue;
 	}
+	
+	/* If the move turns out to be strategically unsafe, or
+	 * setting up a double threat elsewhere, also discard it.
+	 */
+	if (!filllib_confirm_safety(*move, color, &defense_point)) {
+	  DEBUG(DEBUG_FILLLIB,
+		"Filllib: Safety not confirmed, discarded.\n");
+	  continue;
+	}
+	
+	/* Seems to be ok. */
+	return 1;
       }
-      
-      /* Try to play the move. */
-      if (trymove(pos, color, "fill_liberty", NO_MOVE, EMPTY, NO_MOVE)) {
-	popgo();
-	/* Legal, but not safe. Look for backfilling move. */
-	DEBUG(DEBUG_FILLLIB,
-	      "Filllib: Legal but not safe, looking for backfilling move.\n");
-
-	if (find_backfilling_move(pos, color, move)) {
-	  DEBUG(DEBUG_FILLLIB, "Filllib: Backfilling move at %1m.\n", *move);
-	  /* In certain positions it may happen that an illegal move
-	   * is found. This probably only can happen if we try to play
-	   * a move inside a lost semeai. Anyway we should discard the
-	   * move.
-	   */
-	  if (!is_legal(*move, color)) {
-	    DEBUG(DEBUG_FILLLIB, "Filllib: Was illegal, discarded.\n");
-	    *move = NO_MOVE;
-	    continue;
-	  }
-
-	  /* If the move turns out to be strategically unsafe, or
-           * setting up a double threat elsewhere, also discard it.
-	   */
-	  if (!filllib_confirm_safety(*move, color, &defense_point)) {
+      else {
+	/* If we captured some stones, this move should be ok anyway. */
+	if (does_capture_something(pos, color)) {
+	  DEBUG(DEBUG_FILLLIB,
+		"Filllib: Not tactically safe, but captures stones.\n");
+	  if (!filllib_confirm_safety(pos, color, &defense_point)) {
 	    DEBUG(DEBUG_FILLLIB,
 		  "Filllib: Safety not confirmed, discarded.\n");
 	    continue;
 	  }
-
-	  /* Seems to be ok. */
+	  *move = pos;
 	  return 1;
 	}
-	else {
-	  /* If we captured some stones, this move should be ok anyway. */
-	  if (does_capture_something(pos, color)) {
-	    DEBUG(DEBUG_FILLLIB,
-		  "Filllib: Not tactically safe, but captures stones.\n");
-	    if (!filllib_confirm_safety(pos, color, &defense_point)) {
-	      DEBUG(DEBUG_FILLLIB,
-		    "Filllib: Safety not confirmed, discarded.\n");
-	      continue;
-	    }
-	    *move = pos;
-	    return 1;
-	  }
+      }
+    }
+    else {
+      /* Move is illegal. Look for an attack on one of the neighbor
+       * worms. If found, return that move for back-capture.
+       */
+      DEBUG(DEBUG_FILLLIB, "Filllib: Illegal, looking for back-capture.\n");
+      for (k = 0; k < 4; k++) {
+	int d = delta[k];
+	if (board[pos + d] == other
+	    && worm[pos + d].attack_codes[0] == WIN) {
+	  *move = worm[pos + d].attack_points[0];
+	  DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
+	  return 1;
 	}
       }
-      else {
-	/* Move is illegal. Look for an attack on one of the neighbor
-	 * worms. If found, return that move for back-capture.
-	 */
-	DEBUG(DEBUG_FILLLIB, "Filllib: Illegal, looking for back-capture.\n");
-	for (k = 0; k < 4; k++) {
-	  int d = delta[k];
-	  if (board[pos + d] == other
-	      && worm[pos + d].attack_codes[0] == WIN) {
-	    *move = worm[pos + d].attack_points[0];
+      
+      DEBUG(DEBUG_FILLLIB,
+	    "Filllib: Nothing found, looking for ko back-capture.\n");
+      for (k = 0; k < 4; k++) {
+	int d = delta[k];
+	if (board[pos + d] == other
+	    && worm[pos + d].attack_codes[0] != 0
+	    && is_legal(worm[pos + d].attack_points[0], color)) {
+	  *move = worm[pos + d].attack_points[0];
+	  DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
+	  return 1;
+	}
+      }
+      
+      DEBUG(DEBUG_FILLLIB,
+	    "Filllib: Nothing found, looking for threat to back-capture.\n");
+      for (k = 0; k < 4; k++) {
+	int d = delta[k];
+	if (board[pos + d] == other
+	    && worm[pos + d].attack_codes[0] != 0) {
+	  /* Just pick some other liberty. */
+	  int libs[2];
+	  if (findlib(pos + d, 2, libs) > 1) {
+	    if (is_legal(libs[0], color))
+	      *move = libs[0];
+	    else if (is_legal(libs[1], color))
+	      *move = libs[1];
 	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
 	    return 1;
-	  }
-	}
-
-	DEBUG(DEBUG_FILLLIB,
-	      "Filllib: Nothing found, looking for ko back-capture.\n");
-	for (k = 0; k < 4; k++) {
-	  int d = delta[k];
-	  if (board[pos + d] == other
-	      && worm[pos + d].attack_codes[0] != 0
-	      && is_legal(worm[pos + d].attack_points[0], color)) {
-	    *move = worm[pos + d].attack_points[0];
-	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
-	    return 1;
-	  }
-	}
-
-	DEBUG(DEBUG_FILLLIB,
-	      "Filllib: Nothing found, looking for threat to back-capture.\n");
-	for (k = 0; k < 4; k++) {
-	  int d = delta[k];
-	  if (board[pos + d] == other
-	      && worm[pos + d].attack_codes[0] != 0) {
-	    /* Just pick some other liberty. */
-	    int libs[2];
-	    if (findlib(pos + d, 2, libs) > 1) {
-	      if (is_legal(libs[0], color))
-		*move = libs[0];
-	      else if (is_legal(libs[1], color))
-		*move = libs[1];
-	      DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
-	      return 1;
-	    }
 	  }
 	}
       }
     }
+  }
   
   /* Nothing found. */
   DEBUG(DEBUG_FILLLIB, "Filllib: No move found.\n");

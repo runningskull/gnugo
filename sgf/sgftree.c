@@ -40,7 +40,7 @@ sgftree_readfile(SGFTree *tree, const char *infilename)
   tree->lastnode = NULL;
   if (tree->root == NULL) {
     tree->root = savetree;
-    return NULL;
+    return 0;
   }
   return 1;
 }

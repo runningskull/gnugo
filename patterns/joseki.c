@@ -23,7 +23,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -316,8 +315,8 @@ analyze_node(SGFNode *node, const char *prefix)
 
     case SGFLB: /* Label, with value like "mh:A" */
       get_moveXY(prop, &i, &j, board_size);
-      assert(i >= 0 && i < board_size && j >= 0 && j < board_size);
-      assert(prop->value[2] == ':');
+      gg_assert(i >= 0 && i < board_size && j >= 0 && j < board_size);
+      gg_assert(prop->value[2] == ':');
       labels[i][j] = prop->value[3];
       label_found = 1;
       break;

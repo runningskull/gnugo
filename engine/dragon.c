@@ -88,7 +88,6 @@ void
 make_dragons(int color, int stop_before_owl, int save_verbose)
 {
   int str;
-  int i, j;
   int dr;
   int d;
   int last_move;
@@ -230,42 +229,40 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   modify_eye_spaces();
   
   /* Compute the number of eyes, half eyes, etc. in an eye space. */
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      str = POS(i, j);
+  for (str = BOARDMIN; str < BOARDMAX; str++) {
+    if (!ON_BOARD(str))
+      continue;
 
-      if (black_eye[str].color == BLACK_BORDER
-	  && black_eye[str].origin == str)
-      {
-	struct eyevalue value;
-	int attack_point, defense_point;
-
-	compute_eyes(str, &value, &attack_point, &defense_point, 
-		     black_eye, half_eye, 1, color);
-	DEBUG(DEBUG_EYES, "Black eyespace at %1m: min=%d, max=%d\n",
-	      str, value.mineye, value.maxeye);
-	black_eye[str].value = value;
-	black_eye[str].attack_point = attack_point;
-	black_eye[str].defense_point = defense_point;
-	propagate_eye(str, black_eye);
-      }
-
-      if (white_eye[str].color == WHITE_BORDER
-	  && white_eye[str].origin == str)
-      {
-	struct eyevalue value;
-	int attack_point, defense_point;
-
-	compute_eyes(str, &value, &attack_point, &defense_point,
-		     white_eye, half_eye, 1, color);
-	DEBUG(DEBUG_EYES, "White eyespace at %1m: min=%d, max=%d\n",
-	      str, value.mineye, value.maxeye);
-	white_eye[str].value = value;
-	white_eye[str].attack_point = attack_point;
-	white_eye[str].defense_point = defense_point;
-	propagate_eye(str, white_eye);
-      }
+    if (black_eye[str].color == BLACK_BORDER
+	&& black_eye[str].origin == str) {
+      struct eyevalue value;
+      int attack_point, defense_point;
+      
+      compute_eyes(str, &value, &attack_point, &defense_point, 
+		   black_eye, half_eye, 1, color);
+      DEBUG(DEBUG_EYES, "Black eyespace at %1m: min=%d, max=%d\n",
+	    str, value.mineye, value.maxeye);
+      black_eye[str].value = value;
+      black_eye[str].attack_point = attack_point;
+      black_eye[str].defense_point = defense_point;
+      propagate_eye(str, black_eye);
     }
+    
+    if (white_eye[str].color == WHITE_BORDER
+	&& white_eye[str].origin == str) {
+      struct eyevalue value;
+      int attack_point, defense_point;
+      
+      compute_eyes(str, &value, &attack_point, &defense_point,
+		   white_eye, half_eye, 1, color);
+      DEBUG(DEBUG_EYES, "White eyespace at %1m: min=%d, max=%d\n",
+	    str, value.mineye, value.maxeye);
+      white_eye[str].value = value;
+      white_eye[str].attack_point = attack_point;
+      white_eye[str].defense_point = defense_point;
+      propagate_eye(str, white_eye);
+    }
+  }
   time_report(2, "  time to find eyes", NO_MOVE, 1.0);
 
   /* Now we compute the genus. */
@@ -1395,7 +1392,6 @@ int
 dragon_escape(char goal[BOARDMAX], int color,
 	      int escape_value[BOARDMAX])
 {
-  int i, j;
   int ii;
   int k;
   static int mx[BOARDMAX];
@@ -1415,13 +1411,9 @@ dragon_escape(char goal[BOARDMAX], int color,
   }
 
   /* Enter the stones of the dragon in the queue. */
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      ii = POS(i, j);
-
-      if (goal[ii])
-	ENQUEUE(ii);
-    }
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+    if (ON_BOARD(ii) && goal[ii])
+      ENQUEUE(ii);
   
   /* Find points at increasing distances from the dragon. At distance
    * four, sum the escape values at those points to get the escape
@@ -1556,19 +1548,15 @@ dragon_escape(char goal[BOARDMAX], int color,
 static int
 compute_escape(int pos, int dragon_status_known)
 {
-  int i, j;
   int ii;
   char goal[BOARDMAX];
   int escape_value[BOARDMAX];
 
   ASSERT1(IS_STONE(board[pos]), pos);
-  
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      ii = POS(i, j);
 
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+    if (ON_BOARD(ii))
       goal[ii] = is_same_dragon(ii, pos);
-    }
 
   /* Compute escape_value array.  Points are awarded for moyo (4),
    * area (2) or EMPTY (1).  Values may change without notice.
@@ -1577,26 +1565,26 @@ compute_escape(int pos, int dragon_status_known)
 			   dragon_status_known);
 
   /* If we can reach a live group, award 6 points. */
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      ii = POS(i, j);
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    if (!ON_BOARD(ii))
+      continue;
 
-      if (dragon_status_known) {
-	if (dragon[ii].crude_status == ALIVE)
-	  escape_value[ii] = 6;
-	else if (dragon[ii].crude_status == UNKNOWN
-		 && (DRAGON2(ii).escape_route > 5
-		     || DRAGON2(ii).moyo_size_pre_owl  > 5))
-	  escape_value[ii] = 4;
-      }
-      else {
-	if (board[ii] == board[pos]
-	    && !goal[ii]
-	    && worm[ii].attack_codes[0] == 0)
-	  escape_value[ii] = 2;
-      }
+    if (dragon_status_known) {
+      if (dragon[ii].crude_status == ALIVE)
+	escape_value[ii] = 6;
+      else if (dragon[ii].crude_status == UNKNOWN
+	       && (DRAGON2(ii).escape_route > 5
+		   || DRAGON2(ii).moyo_size_pre_owl  > 5))
+	escape_value[ii] = 4;
     }
-
+    else {
+      if (board[ii] == board[pos]
+	  && !goal[ii]
+	  && worm[ii].attack_codes[0] == 0)
+	escape_value[ii] = 2;
+    }
+  }
+  
   return dragon_escape(goal, board[pos], escape_value);
 }
 
@@ -1891,11 +1879,11 @@ report_dragon(FILE *outfile, int pos)
   gfprintf(outfile, "genus                   %d\n", d2->genus);
   gfprintf(outfile, "escape_route            %d\n", d2->escape_route);
   gfprintf(outfile, "lunch                   %1m\n", d2->lunch);
-  gfprintf(outfile, "status                  %s\n",
+  gfprintf(outfile, "crude status            %s\n",
 	   status_to_string(d->crude_status));
   gfprintf(outfile, "owl_status              %s\n",
 	   status_to_string(d->owl_status));
-  gfprintf(outfile, "status          %s\n",
+  gfprintf(outfile, "status                  %s\n",
 	   status_to_string(d->status));
   gfprintf(outfile, "owl_threat_status       %s\n",
 	   status_to_string(d->owl_threat_status));

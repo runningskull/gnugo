@@ -1346,8 +1346,7 @@ void
 add_replacement_move(int from, int to)
 {
   int cc;
-  int m, n;
-  int ii;
+  int pos;
 
   ASSERT_ON_BOARD1(from);
   ASSERT_ON_BOARD1(to);
@@ -1389,12 +1388,10 @@ add_replacement_move(int from, int to)
   else
     replacement_map[from] = to;
   
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      ii = POS(m, n);
-      if (replacement_map[ii] == from)
-	replacement_map[ii] = replacement_map[from];
-    }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (ON_BOARD(pos) && replacement_map[pos] == from)
+      replacement_map[pos] = replacement_map[from];
+  }
 }
 
 

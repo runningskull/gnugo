@@ -51,94 +51,93 @@ static int captured_territory(int pos, int color);
 static int
 dilate_erode(int dilations, int erosions, int gb[BOARDMAX], int color)
 {
-  int i, j;
   int ii;
   int work[BOARDMAX];
   int n;
   int critical_found = 0;
   
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      ii = POS(i, j);
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    if (!ON_BOARD(ii))
+      continue;
 
-      if (board[ii] && dragon[ii].status == CRITICAL)
-	critical_found = 1;
-      if (board[ii] == WHITE && !captured_territory(ii, color))
-	gb[ii] = 128;
-      else if (board[ii] == BLACK && !captured_territory(ii, color))      
-	gb[ii] = -128;
-      else
-	gb[ii] = 0;
-    }
+    if (board[ii] && dragon[ii].status == CRITICAL)
+      critical_found = 1;
+    if (board[ii] == WHITE && !captured_territory(ii, color))
+      gb[ii] = 128;
+    else if (board[ii] == BLACK && !captured_territory(ii, color))      
+      gb[ii] = -128;
+    else
+      gb[ii] = 0;
+  }
   
   /* dilate */
   memcpy(work, gb, sizeof(work));
   for (n = 0; n < dilations; n++) {
-    for (i = 0; i < board_size; i++)
-      for (j = 0; j < board_size; j++) {
-	ii = POS(i, j);
-
-	if (gb[ii] >= 0
-	    && (!ON_BOARD(SOUTH(ii)) || gb[SOUTH(ii)] >= 0)
-	    && (!ON_BOARD(WEST(ii))  || gb[WEST(ii)]  >= 0)
-	    && (!ON_BOARD(NORTH(ii)) || gb[NORTH(ii)] >= 0)
-	    && (!ON_BOARD(EAST(ii))  || gb[EAST(ii)]  >= 0)) {
-	  if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] > 0)
-	    work[ii]++;
-	  if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  > 0)
-	    work[ii]++;
-	  if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] > 0)
-	    work[ii]++;
-	  if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  > 0)
-	    work[ii]++;
-	}
-	
-	if (gb[ii] <= 0
-	    && (!ON_BOARD(SOUTH(ii)) || gb[SOUTH(ii)] <= 0)
-	    && (!ON_BOARD(WEST(ii))  || gb[WEST(ii)]  <= 0)
-	    && (!ON_BOARD(NORTH(ii)) || gb[NORTH(ii)] <= 0)
-	    && (!ON_BOARD(EAST(ii))  || gb[EAST(ii)]  <= 0)) {
-	  if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] < 0)
-	    work[ii]--;
-	  if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  < 0)
-	    work[ii]--;
-	  if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] < 0)
-	    work[ii]--;
-	  if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  < 0)
-	    work[ii]--;
-	}
+    for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+      if (!ON_BOARD(ii))
+	continue;
+      
+      if (gb[ii] >= 0
+	  && (!ON_BOARD(SOUTH(ii)) || gb[SOUTH(ii)] >= 0)
+	  && (!ON_BOARD(WEST(ii))  || gb[WEST(ii)]  >= 0)
+	  && (!ON_BOARD(NORTH(ii)) || gb[NORTH(ii)] >= 0)
+	  && (!ON_BOARD(EAST(ii))  || gb[EAST(ii)]  >= 0)) {
+	if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] > 0)
+	  work[ii]++;
+	if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  > 0)
+	  work[ii]++;
+	if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] > 0)
+	  work[ii]++;
+	if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  > 0)
+	  work[ii]++;
       }
+	
+      if (gb[ii] <= 0
+	  && (!ON_BOARD(SOUTH(ii)) || gb[SOUTH(ii)] <= 0)
+	  && (!ON_BOARD(WEST(ii))  || gb[WEST(ii)]  <= 0)
+	  && (!ON_BOARD(NORTH(ii)) || gb[NORTH(ii)] <= 0)
+	  && (!ON_BOARD(EAST(ii))  || gb[EAST(ii)]  <= 0)) {
+	if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] < 0)
+	  work[ii]--;
+	if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  < 0)
+	  work[ii]--;
+	if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] < 0)
+	  work[ii]--;
+	if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  < 0)
+	  work[ii]--;
+      }
+    }
     memcpy(gb, work, sizeof(work));
   }
 
   /* erode */
   for (n = 0; n < erosions; n++) {
-    for (i = 0; i < board_size; i++)
-      for (j = 0; j < board_size; j++) {
-	ii = POS(i, j);
+    for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+      if (!ON_BOARD(ii))
+	continue;
 
-	if (work[ii] > 0) {
-	  if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] <= 0)
-	    work[ii]--;
-	  if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  <= 0 && work[ii] > 0)
-	    work[ii]--;
-	  if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] <= 0 && work[ii] > 0)
-	    work[ii]--;
-	  if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  <= 0 && work[ii] > 0)
-	    work[ii]--;
-	}
-	  
-	if (work[ii] < 0) {
-	  if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] >= 0)
-	    work[ii]++;
-	  if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  >= 0 && work[ii] < 0)
-	    work[ii]++;
-	  if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] >= 0 && work[ii] < 0)
-	    work[ii]++;
-	  if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  >= 0 && work[ii] < 0)
-	    work[ii]++;
-	}
+      if (work[ii] > 0) {
+	if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] <= 0)
+	  work[ii]--;
+	if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  <= 0 && work[ii] > 0)
+	  work[ii]--;
+	if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] <= 0 && work[ii] > 0)
+	  work[ii]--;
+	if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  <= 0 && work[ii] > 0)
+	  work[ii]--;
       }
+      
+      if (work[ii] < 0) {
+	if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] >= 0)
+	  work[ii]++;
+	if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  >= 0 && work[ii] < 0)
+	  work[ii]++;
+	if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] >= 0 && work[ii] < 0)
+	  work[ii]++;
+	if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  >= 0 && work[ii] < 0)
+	  work[ii]++;
+      }
+    }
     memcpy(gb, work, sizeof(work));
   }
   
@@ -164,87 +163,80 @@ static void
 close_bubbles(int gb[BOARDMAX])
 {
   int bubbles[BOARDMAX];
-  int i, j;
   int ii;
   int found_one = 1;
 
   memset(bubbles, 0, sizeof(bubbles));
   while (found_one) {
     found_one = 0;
-    for (i = 0; i < board_size; i++)
-      for (j = 0; j < board_size; j++) {
-	int white_neighbor = 0;
-	int black_neighbor = 0;
-	int new_color = 0;
-
-	ii = POS(i, j);
-
-	if (gb[ii] || bubbles[ii] == GRAY)
-	  continue;
+    for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+      int white_neighbor = 0;
+      int black_neighbor = 0;
+      int new_color = 0;
+      
+      if (!ON_BOARD(ii) || gb[ii] || bubbles[ii] == GRAY)
+	continue;
 	
-	/* If any neighbor is gray, mark the spot gray */
-	if ((ON_BOARD(SOUTH(ii)) && bubbles[SOUTH(ii)] == GRAY)
-	    || (ON_BOARD(WEST(ii)) && bubbles[WEST(ii)] == GRAY)
-	    || (ON_BOARD(NORTH(ii)) && bubbles[NORTH(ii)] == GRAY)
-	    || (ON_BOARD(EAST(ii)) && bubbles[EAST(ii)] == GRAY)) {
-	  found_one = 1;
-	  bubbles[ii] = GRAY;
+      /* If any neighbor is gray, mark the spot gray */
+      if ((ON_BOARD(SOUTH(ii)) && bubbles[SOUTH(ii)] == GRAY)
+	  || (ON_BOARD(WEST(ii)) && bubbles[WEST(ii)] == GRAY)
+	  || (ON_BOARD(NORTH(ii)) && bubbles[NORTH(ii)] == GRAY)
+	  || (ON_BOARD(EAST(ii)) && bubbles[EAST(ii)] == GRAY)) {
+	found_one = 1;
+	bubbles[ii] = GRAY;
+      }
+      else {
+	/* Look for white neighbors, including the spot itself */
+	if (bubbles[ii] == WHITE
+	    || (ON_BOARD(SOUTH(ii))
+		&& (gb[SOUTH(ii)] > 0 || bubbles[SOUTH(ii)] == WHITE))
+	    || (ON_BOARD(WEST(ii))
+		&& (gb[WEST(ii)] > 0 || bubbles[WEST(ii)] == WHITE))
+	    || (ON_BOARD(NORTH(ii))
+		&& (gb[NORTH(ii)] > 0 || bubbles[NORTH(ii)] == WHITE))
+	    || (ON_BOARD(EAST(ii))
+		&& (gb[EAST(ii)] > 0 || bubbles[EAST(ii)] == WHITE)))
+	  white_neighbor = 1;
+	
+	if (bubbles[ii] == BLACK
+	    || (ON_BOARD(SOUTH(ii))
+		&& (gb[SOUTH(ii)] < 0 || bubbles[SOUTH(ii)] == BLACK))
+	    || (ON_BOARD(WEST(ii))
+		&& (gb[WEST(ii)] < 0 || bubbles[WEST(ii)] == BLACK))
+	    || (ON_BOARD(NORTH(ii))
+		&& (gb[NORTH(ii)] < 0 || bubbles[NORTH(ii)] == BLACK))
+	    || (ON_BOARD(EAST(ii))
+		&& (gb[EAST(ii)] < 0 || bubbles[EAST(ii)] == BLACK)))
+	  black_neighbor = 1;
+	
+	if (white_neighbor) {
+	  if (black_neighbor)
+	    new_color = GRAY;
+	  else
+	    new_color = WHITE;
 	}
-	else {
-	  /* Look for white neighbors, including the spot itself */
-	  if (bubbles[ii] == WHITE
-	      || (ON_BOARD(SOUTH(ii))
-		  && (gb[SOUTH(ii)] > 0 || bubbles[SOUTH(ii)] == WHITE))
-	      || (ON_BOARD(WEST(ii))
-		  && (gb[WEST(ii)] > 0 || bubbles[WEST(ii)] == WHITE))
-	      || (ON_BOARD(NORTH(ii))
-		  && (gb[NORTH(ii)] > 0 || bubbles[NORTH(ii)] == WHITE))
-	      || (ON_BOARD(EAST(ii))
-		  && (gb[EAST(ii)] > 0 || bubbles[EAST(ii)] == WHITE)))
-	    white_neighbor = 1;
-	  
-	  if (bubbles[ii] == BLACK
-	      || (ON_BOARD(SOUTH(ii))
-		  && (gb[SOUTH(ii)] < 0 || bubbles[SOUTH(ii)] == BLACK))
-	      || (ON_BOARD(WEST(ii))
-		  && (gb[WEST(ii)] < 0 || bubbles[WEST(ii)] == BLACK))
-	      || (ON_BOARD(NORTH(ii))
-		  && (gb[NORTH(ii)] < 0 || bubbles[NORTH(ii)] == BLACK))
-	      || (ON_BOARD(EAST(ii))
-		  && (gb[EAST(ii)] < 0 || bubbles[EAST(ii)] == BLACK)))
-	    black_neighbor = 1;
-	  
-	  if (white_neighbor) {
-	    if (black_neighbor)
-	      new_color = GRAY;
-	    else
-	      new_color = WHITE;
-	  }
-	  else if (black_neighbor)
-	    new_color = BLACK;
-	  
-	  if (new_color && new_color != bubbles[ii]) {
-	    found_one = 1;
-	    bubbles[ii] = new_color;
-	  }
+	else if (black_neighbor)
+	  new_color = BLACK;
+	
+	if (new_color && new_color != bubbles[ii]) {
+	  found_one = 1;
+	  bubbles[ii] = new_color;
 	}
       }
+    }
   }
   /* The bubbles are found and classified. Now adjoin them. */
 
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      ii = POS(i, j);
-
-      if (gb[ii])
-	continue;
-      
-      if (bubbles[ii] == WHITE)
-	gb[ii] = 1;
-      
-      if (bubbles[ii] == BLACK)
-	gb[ii] = -1;
-    }
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    if (!ON_BOARD(ii) || gb[ii])
+      continue;
+    
+    if (bubbles[ii] == WHITE)
+      gb[ii] = 1;
+    
+    if (bubbles[ii] == BLACK)
+      gb[ii] = -1;
+  }
 }
 
 
@@ -273,25 +265,25 @@ print_regions(int gb[BOARDMAX])
       switch (k) {
       case EMPTY:
 	if (gb[ii] > 0)
-	  draw_color_char(I(ii), J(ii), 'w', GG_COLOR_GREEN);
+	  draw_color_char(i, j, 'w', GG_COLOR_GREEN);
 	else if (gb[ii] < 0)
-	  draw_color_char(I(ii), J(ii), 'b', GG_COLOR_MAGENTA);
+	  draw_color_char(i, j, 'b', GG_COLOR_MAGENTA);
 	else
-	  draw_color_char(I(ii), J(ii), '.', GG_COLOR_BLACK);
+	  draw_color_char(i, j, '.', GG_COLOR_BLACK);
 	break;
 
       case BLACK:
 	if (dragon[ii].status == CRITICAL)
-	  draw_color_char(I(ii), J(ii), 'X', GG_COLOR_RED);
+	  draw_color_char(i, j, 'X', GG_COLOR_RED);
 	else
-	  draw_color_char(I(ii), J(ii), 'X', GG_COLOR_BLACK);
+	  draw_color_char(i, j, 'X', GG_COLOR_BLACK);
 	break;
 
       case WHITE:
 	if (dragon[ii].status == CRITICAL)
-	  draw_color_char(I(ii), J(ii), 'O', GG_COLOR_RED);
+	  draw_color_char(i, j, 'O', GG_COLOR_RED);
 	else
-	  draw_color_char(I(ii), J(ii), 'O', GG_COLOR_BLACK);
+	  draw_color_char(i, j, 'O', GG_COLOR_BLACK);
 	break;
       }
     }

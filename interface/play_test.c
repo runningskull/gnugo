@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <ctype.h>
 
 #include "interface.h"
@@ -171,12 +170,13 @@ replay_node(SGFNode *node, int color_to_replay)
     if (i != m || j != n) {
       char buf[127];
       gg_snprintf(buf, 127, "GNU Go plays %s(%.2f) - Game move %s(%.2f)",
-	location_to_string(POS(i,j)),
-	gnugo_is_pass(i, j) ? 0 : potential_moves[i][j],
-	location_to_string(POS(m,n)),
-        gnugo_is_pass(m, n) && potential_moves[m][n] < 0.0 ? 0 : potential_moves[m][n]);
+		  location_to_string(POS(i, j)),
+		  gnugo_is_pass(i, j) ? 0 : potential_moves[i][j],
+		  location_to_string(POS(m, n)),
+		  gnugo_is_pass(m, n)
+		  && potential_moves[m][n] < 0.0 ? 0 : potential_moves[m][n]);
       sgffile_write_comment(buf);
-      sgffile_write_circle_mark(i,j);
+      sgffile_write_circle_mark(i, j);
     }
   }
 

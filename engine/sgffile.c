@@ -34,7 +34,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <string.h>
 
 #include "liberty.h"
