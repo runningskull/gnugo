@@ -1935,9 +1935,6 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
   int savemove = NO_MOVE;
   int savecode = 0;
   int tried_moves = 0;
-/* FIXME: Temporary measure to turn off new cache in readconnect. */
-#undef USE_HASHTABLE_NG
-#define USE_HASHTABLE_NG 0
 #if USE_HASHTABLE_NG
   int  value;
 #else
@@ -1972,6 +1969,9 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
     SGFTRACE2(PASS_MOVE, 0, "connection depth limit reached");
     return 0;
   }
+
+  str1 = find_origin(str1);
+  str2 = find_origin(str2);
 
 #if USE_HASHTABLE_NG
 
@@ -2168,6 +2168,9 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
 
   sgf_dumptree = NULL;
   count_variations = 0;
+
+  str1 = find_origin(str1);
+  str2 = find_origin(str2);
 
   attack_code1 = attack(str1, &attack_pos1);
   if (attack_code1 == WIN) {
@@ -2884,9 +2887,6 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   int savemove = NO_MOVE;
   int savecode = 0;
   int tried_moves = 0;
-/* FIXME: Temporary measure to turn new cache back on for break_in. */
-#undef USE_HASHTABLE_NG
-#define USE_HASHTABLE_NG 1
 #if USE_HASHTABLE_NG
   int retval;
 #else

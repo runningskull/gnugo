@@ -114,7 +114,7 @@ tt_init(Transposition_table *table, int memsize)
   int  num_entries;
  
   /* Make sure the hash system is initialized. */
-  hash_ng_init();
+  hash_init();
   keyhash_init();
 
   num_entries = memsize / sizeof(Hashentry_ng);
@@ -191,10 +191,8 @@ tt_get(Transposition_table *table,
     hashdata_xor(hashval, *extra_hash);
 
   /* Sanity check. */
-  if (remaining_depth < 0)
-    remaining_depth = 0;
-  if (remaining_depth > HN_MAX_REMAINING_DEPTH)
-    remaining_depth = HN_MAX_REMAINING_DEPTH;
+  if (remaining_depth < 0 || remaining_depth > HN_MAX_REMAINING_DEPTH)
+    return 0;
 
   /* Get the correct entry and node. */
   entry = &table->entries[hashdata_remainder(hashval, table->num_entries)];
@@ -205,17 +203,20 @@ tt_get(Transposition_table *table,
   else
     return 0;
 
+  stats.position_hits++;
+
   /* Return data.  Only set the result if remaining depth in the table
    * is big enough to be trusted.  The move can always be used for move
    * ordering if nothing else.
    */
   if (move)
-    *move = hn_get_move(*node);
-  if ((unsigned) remaining_depth <= hn_get_remaining_depth(*node)) {
+    *move = hn_get_move(node->data);
+  if ((unsigned) remaining_depth <= hn_get_remaining_depth(node->data)) {
     if (value1)
-      *value1 = hn_get_value1(*node);
+      *value1 = hn_get_value1(node->data);
     if (value2)
-      *value2 = hn_get_value2(*node);
+      *value2 = hn_get_value2(node->data);
+    stats.read_result_hits++;
     return 2;
   }
 
@@ -238,6 +239,9 @@ tt_update(Transposition_table *table,
   Hashnode_ng *deepest;
   Hashnode_ng *newest;
   unsigned int data;
+  /* Get routine costs definitions from cache.h. */
+  static const int routine_costs[] = { ROUTINE_COSTS };
+  gg_assert(routine_costs[NUM_CACHE_ROUTINES] == -1);
 
   /* Get the combined hash value. */
   calculate_hashval_for_tt(routine, target1, target2,
@@ -246,12 +250,11 @@ tt_update(Transposition_table *table,
     hashdata_xor(hashval, *extra_hash);
 
   /* Sanity check. */
-  if (remaining_depth < 0)
-    remaining_depth = 0;
-  if (remaining_depth > HN_MAX_REMAINING_DEPTH)
-    remaining_depth = HN_MAX_REMAINING_DEPTH;
+  if (remaining_depth < 0 || remaining_depth > HN_MAX_REMAINING_DEPTH)
+    return;
 
-  data = hn_create_data(remaining_depth, value1, value2, move, 0);
+  data = hn_create_data(remaining_depth, value1, value2, move,
+      		        routine_costs[routine]);
 
   /* Get the entry and nodes. */ 
   entry = &table->entries[hashdata_remainder(hashval, table->num_entries)];
@@ -260,34 +263,32 @@ tt_update(Transposition_table *table,
  
   /* See if we found an already existing node. */
   if (hashdata_is_equal(hashval, deepest->key)
-      && (unsigned) remaining_depth >= hn_get_remaining_depth(*deepest)) {
- 
+      && (unsigned) remaining_depth >= hn_get_remaining_depth(deepest->data)) {
+
     /* Found deepest */
     deepest->data = data;
- 
-  } 
+
+  }
   else if (hashdata_is_equal(hashval, newest->key)
-	   && (unsigned) remaining_depth >= hn_get_remaining_depth(*newest)) {
- 
+           && (unsigned) remaining_depth >= hn_get_remaining_depth(newest->data)) {
+
     /* Found newest */
     newest->data = data;
- 
+
     /* If newest has become deeper than deepest, then switch them. */
-    if (hn_get_remaining_depth(*newest) > hn_get_remaining_depth(*deepest)) {
+    if (hn_get_remaining_depth(newest->data)
+	> hn_get_remaining_depth(deepest->data)) {
       Hashnode_ng temp;
- 
+
       temp = *deepest;
       *deepest = *newest;
       *newest = temp;
     }
- 
-  } 
-  else if ((unsigned) remaining_depth > hn_get_remaining_depth(*deepest)) {
- 
-    /* This can only happen if newest is empty. */
-    if (hn_get_remaining_depth(*newest) < hn_get_remaining_depth(*deepest))
+
+  }
+  else if (hn_get_total_cost(data) > hn_get_total_cost(deepest->data)) {
+    if (hn_get_total_cost(newest->data) < hn_get_total_cost(deepest->data))
       *newest = *deepest;
- 
     deepest->key  = hashval;
     deepest->data = data;
   } 
@@ -297,6 +298,7 @@ tt_update(Transposition_table *table,
     newest->data = data;
   }
 
+  stats.position_entered++;
   table->is_clean = 0;
 }
 
@@ -905,31 +907,11 @@ hashnode_new_result(Hashtable *table, Hashnode *node,
 void
 reading_cache_init(int bytes)
 {
+#if USE_HASHTABLE_NG
+  tt_init(&ttable, bytes);
+#else
   float nodes;
 
-#if USE_HASHTABLE_NG
-
-  /* Use a majority of the memory for the transposition table because
-   * that one is used for the tactical reading.  Tests reveal that we
-   * use approximately 500 tactical reading nodes for each owl node.
-   * This would point to 99.8%, but it is better to have a bit too
-   * many owl nodes in the cache than too few.
-   *
-   * Using 5% for the owl nodes and 95% for the transposition table
-   * seems to give a 2% speedup, but this should be better once the
-   * owl table is gone and everything is in the new transposition
-   * table.
-   */
-#define NG_PERCENTAGE  95
-  tt_init(&ttable, bytes / 100 * NG_PERCENTAGE);
-
-  /* Use the rest of the available memory for the old cache where
-   * still owl, semeai and readconnect caching takes place.
-   */
-  bytes = bytes / 100 * (100 - NG_PERCENTAGE);
-#endif
-  
-    
   /* Initialize hash table.
    *
    * The number 1.4 below is the quotient between the number of nodes
@@ -954,6 +936,7 @@ reading_cache_init(int bytes)
 	    "Warning: failed to allocate hashtable, caching disabled.\n");
     hashflags = HASH_NOTHING;
   }
+#endif
 }
 
 

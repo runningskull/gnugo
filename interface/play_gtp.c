@@ -349,7 +349,10 @@ play_gtp(FILE *gtp_input, FILE *gtp_dump_commands, int gtp_initial_orientation)
   
   /* Prepare pattern matcher and reading code. */
   reset_engine();
+  clearstats();
   gtp_main_loop(commands, gtp_input, gtp_dump_commands);
+  if (showstatistics)
+    showstats();
 }
 
 

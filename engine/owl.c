@@ -553,9 +553,6 @@ do_owl_analyze_semeai(int apos, int bpos,
   const char *best_move_name = NULL;
   int this_resulta = -1;
   int this_resultb = -1;
-/* FIXME: Temporary measure to turn new cache off for semeai. */
-#undef USE_HASHTABLE_NG
-#define USE_HASHTABLE_NG 0
 #if USE_HASHTABLE_NG
   int  xpos;
   int  value1;
@@ -1769,9 +1766,6 @@ do_owl_attack(int str, int *move, int *wormid,
   struct eyevalue probable_eyes; /* Best guess of eyevalue. */
   const char *live_reason;
   int move_cutoff;
-/* FIXME: Temporary measure to turn new cache back on for owl. */
-#undef USE_HASHTABLE_NG
-#define USE_HASHTABLE_NG 1
 #if USE_HASHTABLE_NG
   int  xpos;
   int  value1;
@@ -1786,6 +1780,7 @@ do_owl_attack(int str, int *move, int *wormid,
 
   shape_patterns.initialized = 0;
 
+  str = find_origin(str);
 #if USE_HASHTABLE_NG
 
   if ((hashflags & HASH_OWL_ATTACK)
@@ -2508,6 +2503,7 @@ do_owl_defend(int str, int *move, int *wormid,
 
   shape_patterns.initialized = 0;
   
+  str = find_origin(str);
 #if USE_HASHTABLE_NG
 
   if ((hashflags & HASH_OWL_DEFEND)
@@ -5411,8 +5407,11 @@ owl_find_lunches(struct local_owl_data *owl)
 	  owl->lunch_attack_code[lunches]  = acode;
 	  owl->lunch_attack_point[lunches] = apos;
 	  owl->lunch_defend_code[lunches]  = dcode;
-	  if (dcode != 0)
+	  ASSERT1(board[apos == EMPTY], lunch);
+	  if (dcode != 0) {
 	    owl->lunch_defense_point[lunches] = dpos;
+	    ASSERT1(board[apos == EMPTY], lunch);
+	  }
 	  else
 	    owl->lunch_defense_point[lunches] = NO_MOVE;
 	  lunches++;

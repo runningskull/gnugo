@@ -50,11 +50,13 @@
  * fields:
  *
  *   RESERVED       :  5 bits
- *   remaining_depth:  5 bits (depth - stackp)  NOTE: HN_MAX_REMAINING_DEPTH
  *   value1         :  4 bits
  *   value2         :  4 bits
  *   move           : 10 bits
- *   flags          :  4 bits
+ *   cost           :  4 bits
+ *   remaining_depth:  5 bits (depth - stackp)  NOTE: HN_MAX_REMAINING_DEPTH
+ *
+ *   The last 9 bits together give an index for the total costs.
  */
 typedef struct {
   Hash_data     key;
@@ -72,18 +74,19 @@ typedef struct {
 } Hashentry_ng;
 
 /* Hn is for hash node. */
-#define hn_get_remaining_depth(hn)  (((hn).data >> 22) & 0x1f)
-#define hn_get_value1(hn)           (((hn).data >> 18) & 0x0f)
-#define hn_get_value2(hn)           (((hn).data >> 14) & 0x0f)
-#define hn_get_move(hn)             (((hn).data >>  4) & 0x3ff)
-#define hn_get_flags(hn)            (((hn).data >>  0) & 0x0f)
+#define hn_get_value1(hn)           ((hn >> 23) & 0x0f)
+#define hn_get_value2(hn)           ((hn >> 19) & 0x0f)
+#define hn_get_move(hn)             ((hn >>  9) & 0x3ff)
+#define hn_get_cost(hn)             ((hn >>  5) & 0x0f)
+#define hn_get_remaining_depth(hn)  ((hn >>  0) & 0x1f)
+#define hn_get_total_cost(hn)       ((hn >>  0) & 0x1ff)
 
-#define hn_create_data(remaining_depth, value1, value2, move, flags) \
-  (((remaining_depth & 0x1f)  << 22) \
-   | (((value1)      & 0x0f)  << 18) \
-   | (((value2)      & 0x0f)  << 14) \
-   | (((move)        & 0x3ff) << 4) \
-   | (((flags)       & 0x0f)  << 0))
+#define hn_create_data(remaining_depth, value1, value2, move, cost) \
+    ((((value1)         & 0x0f)  << 23) \
+   | (((value2)         & 0x0f)  << 19) \
+   | (((move)           & 0x3ff) <<  9) \
+   | (((cost)           & 0x0f)  <<  5) \
+   | (((remaining_depth & 0x1f)  <<  0)))
 
 
 /* Transposition_table: transposition table used for caching. */

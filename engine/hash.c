@@ -38,59 +38,6 @@
  */
 
 
-/* Random values for the hash function. */
-static Hash_data  white_hash_ng[BOARDMAX];
-static Hash_data  black_hash_ng[BOARDMAX];
-static Hash_data  ko_hash_ng[BOARDMAX];
-
-static struct init_struct {
-  Hash_data  *array;
-  int         array_size;
-} hash_init_values[] = {
-  {white_hash_ng, BOARDMAX},
-  {black_hash_ng, BOARDMAX},
-  {ko_hash_ng,    BOARDMAX}
-};
-
-
-/*
- * Initialize the entire hash and transposition table system.
- *
- * This should only be called once, and before calling any other 
- * functions in this file.
- */
-
-void
-hash_ng_init(void)
-{
-  static int  is_initialized = 0;
-  Hash_data  *array;
-  int         size;
-  unsigned    i;
-  int         j;
-  
-  if (is_initialized)
-    return;
-  
-#if TRACE_READ_RESULTS
-  /* We need consistent hash values when this option is enabled. */
-  gg_srand(1);
-#endif
-  
-  for (i = 0; 
-       i < sizeof(hash_init_values) / sizeof(struct init_struct);
-       i++) {
-    array = hash_init_values[i].array;
-    size  = hash_init_values[i].array_size;
-
-    for (j = 0; j < size; j++)
-      hashdata_init(array[j], gg_urand(), gg_urand()); 
-  }
-
-  is_initialized = 1;
-}
-
-
 /* ================================================================ */
 
 

@@ -78,7 +78,7 @@ reset_engine()
 
   /* Initialize things for hashing of positions. */
   reading_cache_clear();
-  
+
   hashdata_recalc(&hashdata, board, board_ko_pos);
 
   worms_examined = -1;
@@ -321,17 +321,10 @@ do_genmove(int *move, int color, float pure_threat_value,
   int save_depth;
 
   start_timer(0);
+  clearstats();
   
   /* Prepare our table of moves considered. */
   memset(potential_moves, 0, sizeof(potential_moves));
-  
-  /* Reset all the statistics for each move. */
-  stats.nodes = 0;
-  stats.position_entered    = 0;
-  stats.position_hits       = 0;
-  stats.read_result_entered = 0;
-  stats.read_result_hits    = 0;
-  stats.hash_collisions     = 0;
   
   /* no move is found yet. */
   *move = NO_MOVE;  
@@ -567,15 +560,9 @@ do_genmove(int *move, int color, float pure_threat_value,
   }
   
   /* If statistics is turned on, this is the place to show it. */
-  if (showstatistics) {
-    gprintf("Nodes:                %d\n", stats.nodes);
-    gprintf("Positions entered:    %d\n", stats.position_entered);
-    gprintf("Position hits:        %d\n", stats.position_hits);
-    gprintf("Read results entered: %d\n", stats.read_result_entered);
-    gprintf("Read result hits:     %d\n", stats.read_result_hits);
-    gprintf("Hash collisions:      %d\n", stats.hash_collisions);
-  }
- 
+  if (showstatistics)
+    showstats();
+
   if (showtime) {
     double spent = time_report(0, "TIME to generate move at ", *move, 1.0);
     total_time += spent;
@@ -585,8 +572,6 @@ do_genmove(int *move, int color, float pure_threat_value,
       slowest_movenum = movenum + 1;
     }
   }
-  if (0 && (debug & DEBUG_BREAKIN))
-    print_persistent_breakin_cache();
 
   /* Some consistency checks to verify that things are properly
    * restored and/or have not been corrupted.

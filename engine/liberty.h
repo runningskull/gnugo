@@ -45,6 +45,8 @@
 
 void start_timer(int n);
 double time_report(int n, const char *occupation, int move, double mintime);
+void showstats(void);
+void clearstats(void);
 
 void transformation_init(void);
 
@@ -99,6 +101,15 @@ enum routine_id {
   "owl_connection_defends", \
   "owl_substantial", \
   "owl_confirm_safety"
+
+/* To prioritize between different types of reading, we give a cost
+ * ranking to each of the routines above:
+ * 3 for owl, 2 for break-in, 1 for connection, 0 for tactical reading.
+ * -1 is left at the end for a consistency check.
+ */
+#define ROUTINE_COSTS \
+  3, 3, 3, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, -1
+  
 
 const char *routine_id_to_string(enum routine_id routine);
 

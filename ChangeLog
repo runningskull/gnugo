@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- complete conversion to new cache
+- add priority to reading results in new cache
+- kill unused hash_ng_init()
+- minor statistics improvements
 - enlarge owl goal when it has had lunch
 - komaster and kom_pos made static variables in board.c
 - edge_block_moves() proposes more moves
