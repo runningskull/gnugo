@@ -918,6 +918,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    sgf_initialized = 0;
 	    gameinfo_play_sgftree(gameinfo, sgftree.root, NULL);
 	    sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
+	    curnode = sgftreeNodeCheck(&sgftree, 0);
 	  }
 	  else
 	    printf("Please specify a filename\n");
