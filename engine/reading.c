@@ -889,33 +889,36 @@ attack_threats(int pos, int max_points, int moves[], int codes[])
   for (k = 0; k < num_adj; k++) {
     int bb;
     int dd;  /* Defense point of weak neighbor. */
-
-    if (attack(adjs[k], NULL) != 0
-	&& find_defense(adjs[k], &dd) != 0) {
-
-	for (r = -1; r < max_points; r++) {
-	  /* -1 is used only when stackp > 0. */
-	  if (r == -1 && stackp > 0)
-	    break;
+    int acode;
+    int dcode;
+    attack_and_defend(adjs[k], &acode, NULL, &dcode, &dd);
+    if (acode != 0 && dcode != 0) {
+      for (r = -1; r < max_points; r++) {
+	/* -1 is used only when stackp > 0. */
+	if (stackp > 0) {
 	  if (r == -1)
 	    bb = dd;
-	  else {
-	    if (worm[adjs[k]].defend_codes[r] == 0)
-	      break;
-	    bb = worm[adjs[k]].defense_points[r];
-	  }
-
-	  if (trymove(bb, other, "attack_threats-C", pos, EMPTY, NO_MOVE)) {
-	    int acode;
-	    if (board[pos] == EMPTY)
-	      acode = WIN;
-	    else
-	      acode = attack(pos, NULL);
-	    if (acode != 0)
-	      movelist_change_point(bb, acode, max_points, moves, codes);
-	    popgo();
-	  }
+	  else
+	    break;
 	}
+	else {
+	  if (r == -1)
+	    continue;
+	  if (worm[adjs[k]].defend_codes[r] == 0)
+	    break;
+	  bb = worm[adjs[k]].defense_points[r];
+	}
+	
+	if (trymove(bb, other, "attack_threats-C", pos, EMPTY, NO_MOVE)) {
+	  if (board[pos] == EMPTY)
+	    acode = WIN;
+	  else
+	    acode = attack(pos, NULL);
+	  if (acode != 0)
+	    movelist_change_point(bb, acode, max_points, moves, codes);
+	  popgo();
+	}
+      }
     }
   }
 
