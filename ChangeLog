@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
+3.1.6 released September 15, 2001
+
+- limited pushing of p[][] allows one level of recursion in global_matchpat
+- bugfix in sgf_utils.c function get_moveX() and get_moveY()
+- new functions find_common_libs() and are_neighbor_strings() in board.c
+
 3.1.5 released September 15, 2001
 
 - board changed from 2D to 1D array representation

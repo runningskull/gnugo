@@ -116,7 +116,7 @@ Windows installation is described in a separate file, called WINDOWS.
                            MACINTOSH
 
 If you have Mac OS X you can build GNU Go using Apple's compiler, 
-which is derived from GCC. We recommend adding the flag -no-cpp-precom
+which is derived from GCC. We recommend adding the flag -no-cpp-precomp
 to CFLAGS.
 
                           THE MANUAL
