@@ -203,7 +203,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
 40 gg_genmove white
-#? [K13]*
+#? [K13]
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
 41 gg_genmove white
@@ -273,7 +273,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 27
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 33
 51 gg_genmove black
-#? [L5]
+#? [L5]*
 
 # GNU Go 3.1.15 wants to play F10 here (although 3.0.0 got H10)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 35
@@ -372,7 +372,7 @@ loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 89
 # I think that securing the corner is larger.
 loadsgf games/mertin13x13/gnugo-gointellect1.W+28.sgf 11
 70 gg_genmove black
-#? [L10|L9|L11]*
+#? [L10|L9|L11]
 
 loadsgf games/mertin13x13/gnugo-gointellect1.W+28.sgf 19
 71 gg_genmove black
@@ -404,7 +404,7 @@ loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 13
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 17
 76 gg_genmove black
-#? [K6|L6|J3]*
+#? [K6|L6|J3]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 19

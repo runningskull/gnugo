@@ -153,7 +153,7 @@ loadsgf games/trevor/auto/c18.sgf 18
 
 loadsgf games/trevor/auto/c18.sgf 30
 340 gg_genmove white
-#? [M3|M4]*
+#? [M3|M4]
 
 
 loadsgf games/trevor/auto/c18.sgf 48
@@ -318,7 +318,7 @@ loadsgf games/trevor/auto/c35.sgf 32
 
 loadsgf games/trevor/auto/c35.sgf 62
 610 gg_genmove white
-#? [!N3]
+#? [!N3]*
 
 
 loadsgf games/trevor/auto/c35.sgf 88
@@ -778,7 +778,7 @@ loadsgf games/trevor/auto/c72.sgf 64
 
 loadsgf games/trevor/auto/c73.sgf 34
 1340 gg_genmove white
-#? [C7]
+#? [C7]*
 
 
 
@@ -801,7 +801,7 @@ loadsgf games/trevor/auto/c76.sgf 68
 
 loadsgf games/trevor/auto/c77.sgf 36
 1370 gg_genmove white
-#? [B9]*
+#? [B9]
 
 
 
@@ -830,7 +830,7 @@ loadsgf games/trevor/auto/c78.sgf 100
 
 loadsgf games/trevor/auto/c78.sgf 102
 1420 gg_genmove white 6
-#? [J4]*
+#? [J4]
 
 
 

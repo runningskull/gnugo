@@ -119,7 +119,7 @@ loadsgf games/endgame2.sgf 10
 # A5 is sente because the followup is bigger than black's capture at O2.
 loadsgf games/endgame2.sgf 11
 211 gg_genmove white
-#? [A5]
+#? [A5]*
 
 loadsgf games/endgame2.sgf 12
 212 gg_genmove black

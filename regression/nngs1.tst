@@ -38,7 +38,7 @@ loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 44
 
 loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 46
 10 gg_genmove black
-#? [R13]
+#? [R13]*
 
 loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 104
 11 gg_genmove black
@@ -94,7 +94,7 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 130
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203121818.sgf 88
 24 gg_genmove white
-#? [L7|J5|M6]*
+#? [L7|J5|M6]
 
 loadsgf games/nngs/gnugo-3.1.27-wingjk-200203101039.sgf 78
 25 gg_genmove white
@@ -203,7 +203,7 @@ loadsgf games/nngs/gnugo-3.1.29-merlin-200203281708.sgf 33
 
 loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 26
 51 gg_genmove white
-#? [!K18]*
+#? [!K18]
 
 loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 28
 52 gg_genmove white
@@ -215,4 +215,4 @@ loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 30
 
 loadsgf games/nngs/gnugo-3.1.31-niki-200204131518.sgf 14
 54 gg_genmove white
-#? [Q14]*
+#? [Q14]

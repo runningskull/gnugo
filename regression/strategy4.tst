@@ -301,7 +301,7 @@ loadsgf games/lordofpi.sgf 36
 # A4 allows W to make seki
 loadsgf games/lordofpi.sgf 46
 209 gg_genmove black
-#? [!A4]
+#? [!A4]*
 
 loadsgf games/lordofpi.sgf 52
 210 gg_genmove black

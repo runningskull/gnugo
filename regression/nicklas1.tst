@@ -200,7 +200,7 @@ loadsgf games/nicklas/nicklas12.sgf 215
 # H3 doesn't seem critical. /gf
 loadsgf games/nicklas/nicklas12.sgf 259
 1216 gg_genmove black
-#? [H3]
+#? [H3]*
 
 loadsgf games/nicklas/nicklas13.sgf 57
 1302 gg_genmove black

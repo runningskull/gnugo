@@ -1,3 +1,34 @@
+======================= 3.1.32 =========================
+
+unexpected PASS:
+
+13x13:40,70,76
+arend:32
+golife:7
+nicklas4:1103
+nngs:210,800,1160
+nngs1:24,51
+owl:157
+strategy3:119
+trevorb:300,440,480
+trevorc:340,1370,1420
+trevord:500,1070
+
+unexpected FAIL:
+
+13x13:51
+arend:3,17
+endgame:11
+global:1
+nicklas1:1216
+nngs:120
+nngs1:10
+strategy4:46
+trevorb:700
+trevorc:610,1340
+trevord:310,600,940,1050
+
+
 ======================= 3.1.31 =========================
 
 ./regress.sh . filllib.tst

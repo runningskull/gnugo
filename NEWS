@@ -1,7 +1,9 @@
-VERSION 3.1.31
+VERSION 3.1.32
 
 New in 3.2 (since 3.0)
 
+- stronger than 3.0
+- uses less RAM than 3.0
 - 1-dimensional board
 - experimental dynamic connection analysis
 - experimental reading semeai module

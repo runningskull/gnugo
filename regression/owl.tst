@@ -930,7 +930,7 @@ loadsgf games/owl35.sgf
 # This is quite trivial, but at least GNU Go 3.1.31 fails it.
 loadsgf games/handtalk11.sgf 157
 258 owl_defend O2
-#? [0]*
+#? [0]
 
 ########### end of tests #####################
 

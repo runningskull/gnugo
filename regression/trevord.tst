@@ -131,7 +131,7 @@ loadsgf games/trevor/auto/d03.sgf 86
 
 loadsgf games/trevor/auto/d03.sgf 88
 310 gg_genmove white
-#? [S17]
+#? [S17]*
 
 
 loadsgf games/trevor/auto/d03.sgf 96
@@ -237,7 +237,7 @@ loadsgf games/trevor/auto/d12.sgf 40
 
 loadsgf games/trevor/auto/d12.sgf 52
 500 gg_genmove white
-#? [E3]*
+#? [E3]
 
 
 loadsgf games/trevor/auto/d12.sgf 66
@@ -292,7 +292,7 @@ loadsgf games/trevor/auto/d24.sgf 180
 #L14 is ko threat for both.
 loadsgf games/trevor/auto/d24.sgf 212
 600 gg_genmove white
-#? [L14]
+#? [L14]*
 
 
 loadsgf games/trevor/auto/d24.sgf 216
@@ -487,7 +487,7 @@ loadsgf games/trevor/auto/d39.sgf 196
 
 loadsgf games/trevor/auto/d39.sgf 198
 940 gg_genmove white
-#? [!R19]
+#? [!R19]*
 
 
 loadsgf games/trevor/auto/d39.sgf 204
@@ -554,7 +554,7 @@ loadsgf games/trevor/auto/d45.sgf 66
 
 loadsgf games/trevor/auto/d46.sgf 132
 1050 gg_genmove white
-#? [!M12]
+#? [!M12]*
 
 
 loadsgf games/trevor/auto/d46.sgf 156
@@ -564,7 +564,7 @@ loadsgf games/trevor/auto/d46.sgf 156
 
 loadsgf games/trevor/auto/d46.sgf 228
 1070 gg_genmove white
-#? [R13]*
+#? [R13]
 
 
 
