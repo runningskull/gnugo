@@ -348,19 +348,6 @@ accumulate_influence(struct influence_data *q, int pos, int color)
  *
  */
 
-static float strength_map[10] = {
-  0.0,   /* DEAD            */
-  0.9,   /* ALIVE           */
-  0.5,   /* CRITICAL        */
-  0.0,   /* INESSENTIAL     */
-  0.0,   /* TACTICALLY DEAD */
-  0.7,   /* WEAK            */
-  0.8,   /* WEAKLY_ALIVE    */
-  0.6,   /* ALIVE IN SEKI   */
-  0.95,  /* STRONGLY ALIVE  */
-  1.0    /* INVINCIBLE      */
-};
-
 static void
 init_influence(struct influence_data *q, int color,
 	       char saved_stones[BOARDMAX])
@@ -477,15 +464,15 @@ init_influence(struct influence_data *q, int color,
 	    if (color == BLACK && DRAGON2(ii).safety == CRITICAL)
 	      q->white_strength[ii] = 0.0;
 	    else
-	      q->white_strength[ii] = (DEFAULT_STRENGTH
-					 * strength_map[DRAGON2(ii).safety]);
+	      q->white_strength[ii] = DEFAULT_STRENGTH
+				      * (1.0 - 0.3 * DRAGON2(ii).weakness_pre_owl);
 	  }
 	  else if (q->p[ii] == BLACK) {
 	    if (color == WHITE && DRAGON2(ii).safety == CRITICAL)
 	      q->black_strength[ii] = 0.0;
 	    else
-	      q->black_strength[ii] = (DEFAULT_STRENGTH
-					 * strength_map[DRAGON2(ii).safety]);
+	      q->black_strength[ii] = DEFAULT_STRENGTH
+				      * (1.0 - 0.3 * DRAGON2(ii).weakness_pre_owl);
 	  }
 	}
       }
@@ -1574,7 +1561,7 @@ compute_initial_influence(int color, int dragons_known)
   initial_influence.dragons_known = dragons_known;
   initial_influence.is_territorial_influence = dragons_known;
   initial_opposite_influence.dragons_known = dragons_known;
-  initial_opposite_influence.is_territorial_influence = dragons_known;
+  initial_opposite_influence.is_territorial_influence = 1;
 
   decrease_depth_values();
 

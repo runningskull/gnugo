@@ -737,7 +737,7 @@ revise_thrashing_dragon(int color, float advantage)
 	&& is_same_dragon(pos, thrashing_dragon))
       dragon[pos].status = UNKNOWN;
 
-  DRAGON2(thrashing_dragon).safety = WEAKLY_ALIVE;
+  DRAGON2(thrashing_dragon).safety = ALIVE;
   compute_initial_influence(color, 1);
   compute_refined_dragon_weaknesses();
   

@@ -93,10 +93,8 @@ void init_gnugo(float memory);
 #define MAX_DRAGON_STATUS 4	/* used to size an array in matchpat.c */
 
 /* Dragon safety values. DEAD, ALIVE, and CRITICAL are reused. */
-#define INESSENTIAL     3
-#define TACTICALLY_DEAD 4
-#define WEAK            5
-#define WEAKLY_ALIVE    6
+#define INESSENTIAL     5
+#define TACTICALLY_DEAD 6
 #define ALIVE_IN_SEKI   7
 #define STRONGLY_ALIVE  8
 #define INVINCIBLE      9

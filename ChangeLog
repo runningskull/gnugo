@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- use "territorial_influence" for pre-owl initial_influence
+- safety values WEAKLY_ALIVE and WEAK removed
+- use dragon2[].weakness or new field .weakness_pre_owl instead in most places
+- use crude_dragon_weakness() to decide whether owl analysis is needed
+- interestions with prisoners only contribute 1.0 to moyo_value
 - arrays worms[], dragons[] removed in worms.c and value_moves.c
 - new discard rule to enforce definiton of attack either/defend both reasons
 - cleanups and improvements in board.c

@@ -4941,7 +4941,7 @@ compute_owl_escape_values(struct local_owl_data *owl)
 	  owl->escape_values[pos] = 6;
 	else if (dragon[pos].crude_status == UNKNOWN
 		 && (DRAGON2(pos).escape_route > 5
-		     || DRAGON2(pos).moyo_size_pre_owl > 5))
+		     || DRAGON2(pos).moyo_size > 5))
 	  owl->escape_values[pos] = 4;
       }
       DEBUG(DEBUG_ESCAPE, "%o%d", owl->escape_values[pos]);

@@ -488,22 +488,23 @@ Pattern D123
 
 Pattern D124
 # tm New Pattern (3.1.20) (see trevorb:660)
+# ab Revised constraint.
 
-X..   split off weak stones
-*OO
-.Xx
-...
----
+?X..   split off weak stones
+o*OO
+o.Xx
+o...
+----
 
 :8,-,value(81)
 
-X..
-*OO
-.ax
-...
----
+?X..
+a*OO
+?bcx
+?...
+----
 
-;weak(a)
+;oplay_attack(*,a,b,c) && !attack(c)
 
 
 #########################################################

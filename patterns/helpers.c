@@ -731,9 +731,7 @@ dragon_weak(int pos)
    */
   if (dragon[pos].id < 0 || dragon[pos].id >= number_of_dragons)
      return 1;
-  return DRAGON2(pos).safety != ALIVE
-         && DRAGON2(pos).safety != STRONGLY_ALIVE \
-	 && DRAGON2(pos).safety != INVINCIBLE;
+  return (DRAGON2(pos).weakness > 0.40001);
 }
 
 

@@ -894,11 +894,11 @@ struct dragon_data2 {
   int adjacent[MAX_NEIGHBOR_DRAGONS]; /* adjacent dragons                    */
   int neighbors;                      /* number of adjacent dragons          */
   int hostile_neighbors;              /* neighbors of opposite color         */
-  int moyo_size_pre_owl;              /* size of surrounding influence moyo  */
-  int moyo_size_post_owl;             /* size of surrounding influence moyo, */
+  int moyo_size;		      /* size of surrounding influence moyo, */
   float moyo_territorial_value;       /* ...and its territorial value */
   int safety;                         /* a more detailed status estimate     */
   float weakness; /* A new (3.3.x) continuos estimate of the dragon's safety */
+  float weakness_pre_owl;     /* Dragon safety based on pre-owl computations */
   int escape_route; /* a measurement of likelihood of escape                 */
   struct eyevalue genus;    /* the number of eyes (approximately)            */
   int heye;     /* coordinates of a half eye                                 */

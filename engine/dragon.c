@@ -64,8 +64,7 @@ static void connected_to_eye_recurse(int pos, int str, int color,
 static int compute_crude_status(int pos);
 static void dragon_eye(int pos, struct eye_data[BOARDMAX]);
 static int compute_escape(int pos, int dragon_status_known);
-static void compute_surrounding_moyo_sizes(int opposite,
-    					   int dragon_status_known);
+static void compute_surrounding_moyo_sizes(int opposite);
 
 static int dragon2_initialized;
 static int lively_white_dragons;
@@ -107,7 +106,6 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   start_timer(2);
   dragon2_initialized = 0;
   initialize_dragon_data();
-  time_report(2, "  time to initialize dragons", NO_MOVE, 1.0);
 
   make_domains(black_eye, white_eye, 0);
   time_report(2, "  time to make domains", NO_MOVE, 1.0);
@@ -146,7 +144,6 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
    * amalgamation of dragons.
    */
   initialize_supplementary_dragon_data();
-  time_report(2, "  time to initialize dragon2", NO_MOVE, 1.0);
   
   /* Find adjacent worms which can be easily captured: */
   
@@ -189,7 +186,6 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	}
       }
     }
-  time_report(2, "  time to find lunches", NO_MOVE, 1.0);
 
   /* Find topological half eyes and false eyes. */
   find_half_and_false_eyes(BLACK, black_eye, half_eye, NULL);
@@ -235,13 +231,11 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       propagate_eye(str, white_eye);
     }
   }
-  time_report(2, "  time to find eyes", NO_MOVE, 1.0);
 
   /* Try to determine whether topologically false and half eye points
    * contribute to territory even if the eye doesn't solidify.
    */
   analyze_false_eye_territory();
-  time_report(2, "  time to analyze false eye territory", NO_MOVE, 1.0);
 
   /* Now we compute the genus. */
   for (str = BOARDMIN; str < BOARDMAX; str++) {
@@ -278,13 +272,11 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 		    &DRAGON2(dr).genus);
     }
   }
-  time_report(2, "  time to compute genus", NO_MOVE, 1.0);
 
   /* Compute the escape route measure. */
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (IS_STONE(board[str]) && dragon[str].origin == str)
       DRAGON2(str).escape_route = compute_escape(str, 0);
-  time_report(2, "  time to compute escape", NO_MOVE, 1.0);
 
   /* Update the segmentation of the initial influence before we
    * compute the surrounding moyo sizes. The reason for this is that
@@ -292,18 +284,11 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
    * into account.
    */
   resegment_initial_influence();
-  time_report(2, "  resegment_initial_influence", NO_MOVE, 1.0);
 
-  /* Compute the surrounding moyo sizes. */
-  for (d = 0; d < number_of_dragons; d++) 
-    dragon2[d].moyo_size_pre_owl = 2 * BOARDMAX;
-  /* Set moyo sizes according to initial_influence. */
-  compute_surrounding_moyo_sizes(0, 0);
-  /* Set moyo sizes according to initial_opposite_influence if
-   * this yields smaller results.
-   */
-  compute_surrounding_moyo_sizes(1, 0);
-  time_report(2, "  time to compute moyo sizes", NO_MOVE, 1.0);
+  /* Set dragon weaknesses according to initial_influence. */
+  compute_refined_dragon_weaknesses();
+  for (d = 0; d < number_of_dragons; d++)
+    dragon2[d].weakness_pre_owl = dragon2[d].weakness;
 
   /* Determine status: ALIVE, DEAD, CRITICAL or UNKNOWN */
   for (str = BOARDMIN; str < BOARDMAX; str++)
@@ -311,7 +296,6 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       if (dragon[str].origin == str && board[str]) {
 	dragon[str].crude_status = compute_crude_status(str);
       }
-  time_report(2, "  compute_crude_status", NO_MOVE, 1.0);
   
   /* We must update the dragon status at every intersection before we
    * call the owl code. This updates all fields.
@@ -324,7 +308,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
     }
   
   find_neighbor_dragons();
-  time_report(2, "  find_neighbor_dragons", NO_MOVE, 1.0);
+  time_report(2, "  pre-owl dragon data", NO_MOVE, 1.0);
   
   if (stop_before_owl)
     return;
@@ -337,16 +321,18 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
     if (ON_BOARD(str)) {
       int attack_point = NO_MOVE;
       int defense_point = NO_MOVE;
+      struct eyevalue no_eyes;
+      set_eyevalue(&no_eyes, 0, 0, 0, 0);
       
       if (board[str] == EMPTY
 	  || dragon[str].origin != str)
 	continue;
       
       /* Some dragons can be ignored but be extra careful with big dragons. */
-      if (DRAGON2(str).escape_route > 25
-	  || DRAGON2(str).moyo_size_pre_owl > 20
-	  || (DRAGON2(str).moyo_size_pre_owl > 10
-	      && DRAGON2(str).moyo_size_pre_owl > dragon[str].size)) {
+      if (crude_dragon_weakness(ALIVE, &no_eyes, 0,
+	    			DRAGON2(str).moyo_territorial_value,
+				DRAGON2(str).escape_route - 10)
+	  < 0.00001 + gg_max(0.12, 0.32 - 0.01*dragon[str].effective_size)) {
 	dragon[str].owl_status = UNCHECKED;
 	dragon[str].owl_attack_point  = NO_MOVE;
 	dragon[str].owl_defense_point = NO_MOVE;
@@ -487,11 +473,12 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
     if (ON_BOARD(str) 
 	&& board[str] != EMPTY 
 	&& dragon[str].origin == str) {
-      /* Some dragons can be ignored but be extra careful with big dragons. */
-      if (DRAGON2(str).escape_route > 25
-	  || DRAGON2(str).moyo_size_pre_owl > 20
-	  || (DRAGON2(str).moyo_size_pre_owl > 10
-	      && DRAGON2(str).moyo_size_pre_owl > dragon[str].size)) {
+      struct eyevalue no_eyes;
+      set_eyevalue(&no_eyes, 0, 0, 0, 0);
+      if (crude_dragon_weakness(ALIVE, &no_eyes, 0,
+	    			DRAGON2(str).moyo_territorial_value,
+				DRAGON2(str).escape_route - 10)
+	  < 0.00001 + gg_max(0.12, 0.32 - 0.01*dragon[str].effective_size)) {
 	dragon[str].owl_threat_status = UNCHECKED;
 	dragon[str].owl_second_attack_point  = NO_MOVE;
 	dragon[str].owl_second_defense_point = NO_MOVE;
@@ -555,7 +542,6 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
     }
   }
 
-  time_report(2, "  surround status", NO_MOVE, 0.0);
 
   /* Compute the safety value. */
   for (d = 0; d < number_of_dragons; d++) {
@@ -579,27 +565,14 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       dragon2[d].safety = DEAD;
     else if (dragon[origin].owl_status == CRITICAL)
       dragon2[d].safety = CRITICAL;
-    else if (dragon[origin].owl_status == UNCHECKED
-	     && true_genus < 4
-	     && dragon2[d].moyo_size_pre_owl <= 10)
-      dragon2[d].safety = WEAK;
     else if (dragon_invincible(origin))
       dragon2[d].safety = INVINCIBLE;
-    else if (true_genus >= 6 || dragon2[d].moyo_size_pre_owl > 20)
+    else if (true_genus >= 6 || dragon2[d].moyo_size > 20)
       dragon2[d].safety = STRONGLY_ALIVE;
-    else if ((2 * true_genus + dragon2[d].moyo_size_pre_owl
-	      + 2 * (dragon2[d].lunch != NO_MOVE) < 8
-	      && dragon2[d].escape_route < 10)
-	     || (dragon[origin].owl_threat_status == CAN_THREATEN_ATTACK)) {
-      if (DRAGON(d).owl_attack_certain)
-	  dragon2[d].safety = WEAKLY_ALIVE;
-      else
-	  dragon2[d].safety = WEAK;
-    }
     else
       dragon2[d].safety = ALIVE;
   }
-  time_report(2, "  compute dragon safety", NO_MOVE, 1.0);
+  time_report(2, "  post owl dragon data", NO_MOVE, 1.0);
 
   /* Resolve semeais. This may revise the safety and status fields. */
   if (experimental_semeai && level >= 8)
@@ -814,8 +787,7 @@ initialize_supplementary_dragon_data(void)
   for (d = 0; d < number_of_dragons; d++) {
     dragon2[d].neighbors               = 0;
     dragon2[d].hostile_neighbors       = 0;
-    dragon2[d].moyo_size_pre_owl       = -1;
-    dragon2[d].moyo_size_post_owl      = -1;
+    dragon2[d].moyo_size	       = -1;
     dragon2[d].moyo_territorial_value  = 0.0;
     dragon2[d].safety                  = -1;
     dragon2[d].escape_route            = 0;
@@ -1411,7 +1383,7 @@ show_dragons(void)
     d2 = &(dragon2[dd->id]);
     
     if (dd->origin == pos) {
-      gprintf("%1m : %s dragon size %d (%f), genus %s, escape factor %d, crude status %s, status %s, moyo size pre owl %d, moyo size post owl %d, moyo territory value %f, safety %s, weakness %f",
+      gprintf("%1m : %s dragon size %d (%f), genus %s, escape factor %d, crude status %s, status %s, moyo size %d, moyo territory value %f, safety %s, weakness pre owl %f, weakness %f",
 	      pos,
 	      board[pos] == BLACK ? "B" : "W",
 	      dd->size,
@@ -1420,10 +1392,10 @@ show_dragons(void)
 	      d2->escape_route,
 	      snames[dd->crude_status],
 	      snames[dd->status],
-	      d2->moyo_size_pre_owl,
-	      d2->moyo_size_post_owl,
+	      d2->moyo_size,
 	      d2->moyo_territorial_value,
 	      safety_names[d2->safety],
+	      d2->weakness_pre_owl,
 	      d2->weakness);
       gprintf(", owl status %s\n", snames[dd->owl_status]);
       if (dd->owl_status == CRITICAL) {
@@ -1612,7 +1584,7 @@ compute_crude_status(int pos)
   if (lunch == NO_MOVE || worm[lunch].cutstone < 2) {
     if (true_genus < 3
 	&& DRAGON2(pos).escape_route == 0
-	&& DRAGON2(pos).moyo_size_pre_owl < 5)
+	&& DRAGON2(pos).moyo_size < 5)
       return DEAD;
 
     if (true_genus == 3
@@ -1849,7 +1821,7 @@ compute_escape(int pos, int dragon_status_known)
 	escape_value[ii] = 6;
       else if (dragon[ii].crude_status == UNKNOWN
 	       && (DRAGON2(ii).escape_route > 5
-		   || DRAGON2(ii).moyo_size_pre_owl  > 5))
+		   || DRAGON2(ii).moyo_size  > 5))
 	escape_value[ii] = 4;
     }
     else {
@@ -1867,8 +1839,6 @@ compute_escape(int pos, int dragon_status_known)
  * Sum up the surrounding moyo sizes for each dragon. Write this into
  * dragon2[].moyo if it is smaller than the current entry. If (opposite)
  * is true, we use initial_opposite_influence, otherwise initial_influence.
- * If dragons_known is false, then .moyo_size_pre_owl is set, otherwise
- * .moyo_size_post_owl and .moyo_territorial_value.
  *
  * Currently this is implemented differently depending on whether
  * experimental connections are used or not. The reason why this is
@@ -1879,7 +1849,7 @@ compute_escape(int pos, int dragon_status_known)
  * surrounding moyo which is closest to some worm of the dragon.
  */
 static void
-compute_surrounding_moyo_sizes(int opposite, int dragon_status_known)
+compute_surrounding_moyo_sizes(int opposite)
 {
   int pos;
   int d;
@@ -1909,16 +1879,10 @@ compute_surrounding_moyo_sizes(int opposite, int dragon_status_known)
 	}
       }
       
-      if (!dragon_status_known) {
-	if (this_moyo_size < dragon2[d].moyo_size_pre_owl) {
-	  dragon2[d].moyo_size_pre_owl = this_moyo_size;
-	}
+      if (this_moyo_size < dragon2[d].moyo_size) {
+	dragon2[d].moyo_size = this_moyo_size;
+	dragon2[d].moyo_territorial_value = this_moyo_value;
       }
-      else
-	if (this_moyo_size < dragon2[d].moyo_size_post_owl) {
-	  dragon2[d].moyo_size_post_owl = this_moyo_size;
-	  dragon2[d].moyo_territorial_value = this_moyo_value;
-	}
     }
   }
   else {
@@ -1948,7 +1912,7 @@ compute_surrounding_moyo_sizes(int opposite, int dragon_status_known)
 	  int dr = dragon[w].origin;
 	  
 	  moyo_sizes[dr] += 1.0 / number_close_white_worms[pos];
-	  moyo_values[dr] += (territory_value[pos]
+	  moyo_values[dr] += (gg_min(territory_value[pos], 1.0)
 			      / number_close_white_worms[pos]);
 	}
       }
@@ -1959,7 +1923,7 @@ compute_surrounding_moyo_sizes(int opposite, int dragon_status_known)
 	  int dr = dragon[w].origin;
 	  
 	  moyo_sizes[dr] += 1.0 / number_close_black_worms[pos];
-	  moyo_values[dr] += (territory_value[pos]
+	  moyo_values[dr] += (gg_min(territory_value[pos], 1.0)
 			      / number_close_black_worms[pos]);
 	}
       }
@@ -1969,12 +1933,8 @@ compute_surrounding_moyo_sizes(int opposite, int dragon_status_known)
       int this_moyo_size = (int) moyo_sizes[dragon2[d].origin];
       float this_moyo_value = moyo_values[dragon2[d].origin];
       
-      if (!dragon_status_known) {
-	if (this_moyo_size < dragon2[d].moyo_size_pre_owl)
-	  dragon2[d].moyo_size_pre_owl = this_moyo_size;
-      }
-      else if (this_moyo_size < dragon2[d].moyo_size_post_owl) {
-	dragon2[d].moyo_size_post_owl = this_moyo_size;
+      if (this_moyo_size < dragon2[d].moyo_size) {
+	dragon2[d].moyo_size = this_moyo_size;
 	dragon2[d].moyo_territorial_value = this_moyo_value;
       }
     }
@@ -2096,15 +2056,15 @@ compute_refined_dragon_weaknesses()
 
   /* Compute the surrounding moyo sizes. */
   for (d = 0; d < number_of_dragons; d++)
-    dragon2[d].moyo_size_post_owl = 2 * BOARDMAX;
+    dragon2[d].moyo_size = 2 * BOARDMAX;
   
   /* Set moyo sizes according to initial_influence. */
-  compute_surrounding_moyo_sizes(0, 1);
+  compute_surrounding_moyo_sizes(0);
   
   /* Set moyo sizes according to initial_opposite_influence if
    * this yields smaller results.
    */
-  compute_surrounding_moyo_sizes(1, 1);
+  compute_surrounding_moyo_sizes(1);
 
   for (d = 0; d < number_of_dragons; d++)
     dragon2[d].weakness = compute_dragon_weakness_value(d);
@@ -2277,8 +2237,7 @@ report_dragon(FILE *outfile, int pos)
   for (k = 0; k < d2->neighbors; k++)
     gfprintf(outfile, "%1m ", DRAGON(d2->adjacent[k]).origin);
   gfprintf(outfile, "\nhostile neighbors       %d\n", d2->hostile_neighbors);
-  gfprintf(outfile, "moyo size pre owl       %d\n", d2->moyo_size_pre_owl);
-  gfprintf(outfile, "moyo size post owl      %d\n", d2->moyo_size_post_owl);
+  gfprintf(outfile, "moyo size               %d\n", d2->moyo_size);
   gfprintf(outfile, "moyo territorial value  %f\n",
 	   d2->moyo_territorial_value);
   gfprintf(outfile, "safety                  %s\n",
