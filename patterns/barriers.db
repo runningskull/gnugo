@@ -1013,6 +1013,24 @@ Pattern Intrusion1
 >return (lib(a)>2 || (lib(a) == 2 && connect_and_cut_helper(a,b,c)));
 
 
+Pattern Intrusion1a
+
+|??x
+|!!X
+|..Q
++---
+
+:8,B,value(30)
+
+|??x
+|.cX
+|.ba
++---
+
+;safe_omove(c)
+>return (lib(a)>2 || (lib(a) == 2 && connect_and_cut_helper(a,b,c)));
+
+
 Pattern Intrusion1b
 
 xxxx
