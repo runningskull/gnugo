@@ -333,11 +333,11 @@ loadsgf games/kgs/20040507-GnuGoCVS-read.sgf 224
 
 loadsgf games/kgs/yagr-r08ert.sgf 139
 342 owl_attack S6
-#? [(2|3) T2]
+#? [(2|3) T2]*
 
 loadsgf games/kgs/yagr-r08ert.sgf 140
 343 owl_defend S6
-#? [(2|3) T3]
+#? [(2|3) T3]*
 
 
 

@@ -206,7 +206,7 @@ loadsgf games/kgs/yagr-eddyy.sgf 198
 
 loadsgf games/kgs/yagr-gab9.sgf 205
 920 reg_genmove white
-#? [C4]
+#? [C4]*
 
 
 

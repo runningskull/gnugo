@@ -1,3 +1,29 @@
+========================== 3.5.10 =====================================
+
+./regress.sh . reading.tst 
+200 unexpected FAIL: Correct '1 B2', got '0'
+./regress.sh . endgame.tst 
+920 unexpected FAIL: Correct 'C4', got 'P15'
+./regress.sh . owl1.tst 
+342 unexpected FAIL: Correct '(2|3) T2', got '0'
+343 unexpected FAIL: Correct '(2|3) T3', got '0'
+./regress.sh . kgs.tst 
+180 unexpected FAIL: Correct 'C4|C3|D3', got 'B13'
+190 unexpected FAIL: Correct 'C4', got 'D2'
+200 unexpected FAIL: Correct '!K4', got 'K4'
+210 unexpected FAIL: Correct 'Q13', got 'S14'
+220 unexpected FAIL: Correct 'T10', got 'T8'
+230 unexpected FAIL: Correct 'J12|J11|L10|L9|J19', got 'F18'
+240 unexpected FAIL: Correct 'B7', got 'B3'
+250 unexpected FAIL: Correct 'P1', got 'J2'
+260 unexpected FAIL: Correct 'T10|Q11|O11', got 'F12'
+270 unexpected FAIL: Correct 'T1', got 'PASS'
+280 unexpected FAIL: Correct 'G1', got 'J6'
+290 unexpected FAIL: Correct 'B2', got 'D5'
+300 unexpected FAIL: Correct 'H4', got 'H5'
+320 unexpected FAIL: Correct 'K12', got 'J9'
+
+
 ========================== 3.5.9 =====================================
 
 ./regress.sh . reading.tst 

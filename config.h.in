@@ -115,7 +115,7 @@
 /* Name of package */
 #undef PACKAGE
 
-/* Allow resignation. Default disabled */
+/* Allow resignation. Default enabled */
 #undef RESIGNATION_ALLOWED
 
 /* Semeai Variations. 500 default */

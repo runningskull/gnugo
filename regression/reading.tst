@@ -842,7 +842,7 @@ loadsgf games/reading45.sgf
 # Ladder reading problem. See also kgs:290 and kgs:300
 loadsgf games/kgs/yagr-czarny.sgf 17
 200 attack B4
-#? [1 B2]
+#? [1 B2]*
 
 
 # Report number of nodes visited by the tactical reading

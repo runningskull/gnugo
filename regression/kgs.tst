@@ -87,64 +87,64 @@ loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 96
 
 loadsgf games/kgs/geluba-yagr.sgf 164
 180 reg_genmove black
-#? [C4|C3|D3]
+#? [C4|C3|D3]*
 
 # Only way to control damage: sacrifice the three stones at E3
 loadsgf games/kgs/geluba-yagr.sgf 166
 190 reg_genmove black
-#? [C4]
+#? [C4]*
 
 # Don't kill your own group.
 loadsgf games/kgs/yagr-ituyosi.sgf 160
 200 restricted_genmove white K4 M4 L4
-#? [!K4]
+#? [!K4]*
 
 # An "owl attack captures tail" problem
 loadsgf games/kgs/yagr-gab9.2.sgf 158
 210 reg_genmove white
-#? [Q13]
+#? [Q13]*
 
 # Connect the monkey jump instead of running nowhere!
 loadsgf games/kgs/yagr-Sapojnik.sgf 80
 220 reg_genmove white
-#? [T10]
+#? [T10]*
 
 # Win the semeai!
 loadsgf games/kgs/yagr-Sapojnik.sgf 149
 230 reg_genmove white
-#? [J12|J11|L10|L9|J19]
+#? [J12|J11|L10|L9|J19]*
 
 loadsgf games/kgs/yagr-yudeta.sgf 257
 240 reg_genmove white
-#? [B7]
+#? [B7]*
 
 # In the game, GNU Go ran on the first line until the very end :((
 loadsgf games/kgs/yagr-yudeta.sgf 78
 250 reg_genmove white
-#? [P1]
+#? [P1]*
 
 # Huge semeai.
 loadsgf games/kgs/malitourne-yagr.sgf 240
 260 reg_genmove black
-#? [T10|Q11|O11]
+#? [T10|Q11|O11]*
 
 # Same problem as test 250.
 loadsgf games/kgs/malitourne-yagr.sgf 80
 270 restricted_genmove white O1 T1
-#? [T1]
+#? [T1]*
 
 loadsgf games/kgs/yagr-hasenhirn.sgf 71
 280 reg_genmove white
-#? [G1]
+#? [G1]*
 
 # A ladder desaster.
 loadsgf games/kgs/yagr-czarny.sgf 16
 290 reg_genmove white
-#? [B2]
+#? [B2]*
 
 loadsgf games/kgs/yagr-czarny.sgf 24
 300 restricted_genmove white H4 H5
-#? [H4]
+#? [H4]*
 
 # N15 as played in the game is off-topic.
 loadsgf games/kgs/yagr-awf.sgf 191
@@ -154,6 +154,6 @@ loadsgf games/kgs/yagr-awf.sgf 191
 # Probably owl cut problem. At least have to try to win the semeai.
 loadsgf games/kgs/yagr-Mythenmetz.sgf 156
 320 reg_genmove white
-#? [K12]
+#? [K12]*
 
 

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.5.9 released August 7, 2004
+
 - move initalization of ..._vital_points to initialize_dragon_data()
 - persistent caches reorganized to share common code
 

@@ -1248,7 +1248,7 @@ fi
 
 # Define the identity of the package.
 PACKAGE=gnugo
-VERSION=3.5.9
+VERSION=3.5.10
 
 cat >>confdefs.h <<EOF
 #define PACKAGE "$PACKAGE"
@@ -4298,14 +4298,14 @@ EOF
 
 fi
 
-if test "$enable_resignation_allowed" = "yes" ; then
+if test "$disable_resignation_allowed" = "yes" ; then
    cat >>confdefs.h <<\EOF
-#define RESIGNATION_ALLOWED 1
+#define RESIGNATION_ALLOWED 0
 EOF
 
 else
    cat >>confdefs.h <<\EOF
-#define RESIGNATION_ALLOWED 0
+#define RESIGNATION_ALLOWED 1
 EOF
 
 fi
