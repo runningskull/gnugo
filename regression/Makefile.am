@@ -6,7 +6,7 @@ TST =  13x13.tst arb.tst arend.tst arend2.tst arion.tst atari_atari.tst \
        dniwog.tst ego.tst endgame.tst endgame_rot.tst \
        filllib.tst global.tst golife.tst gunnar.tst handtalk.tst \
        heikki.tst lazarus.tst ld_owl.tst ld_owl_rot.tst \
-       manyfaces.tst manyfaces1.tst neurogo.tst newscore.tst \
+       manyfaces.tst manyfaces1.tst nando.tst neurogo.tst newscore.tst \
        nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst \
        nicklas5.tst niki.tst ninestones.tst nngs.tst \
        nngs1.tst nngs2.tst nngs3.tst nngs4.tst optics.tst \
@@ -131,6 +131,9 @@ manyfaces: manyfaces.tst
 
 manyfaces1: manyfaces1.tst
 	$(srcdir)/eval.sh manyfaces1.tst $(GG_OPTIONS)
+
+nando: nando.tst
+	$(srcdir)/eval.sh nando.tst $(GG_OPTIONS)
 
 neurogo: neurogo.tst
 	$(srcdir)/eval.sh neurogo.tst $(GG_OPTIONS)
@@ -358,3 +361,4 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) manyfaces1.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) gunnar.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) arend2.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) nando.tst $(GG_OPTIONS)

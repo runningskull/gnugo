@@ -451,6 +451,10 @@ estimate_score(float *upper, float *lower)
 	    black_territory_in_row += 2;
 	    black_area++;
 	  }
+	  else {
+	    white_area++;
+	    white_area_in_row++;
+	  }
 	}
 	else {
 	  if (gb[ii] > 0.0) {
