@@ -260,7 +260,7 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
 	DEBUG(DEBUG_TERRITORY, "%1m: Erasing territory at %1m -a.\n",
 	      info_pos, move);
       else
-	DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -a.\n", info_pos, move);
+	DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -a.\n", move);
     }
 
     for (k = 0; k < conn.queue_end; k++) {
