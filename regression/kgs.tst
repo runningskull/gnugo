@@ -118,10 +118,11 @@ loadsgf games/kgs/yagr-yudeta.sgf 257
 240 reg_genmove white
 #? [B7]*
 
-# In the game, GNU Go ran on the first line until the very end :((
-loadsgf games/kgs/yagr-yudeta.sgf 78
-250 reg_genmove white
-#? [P1]*
+# This should be a different game, but I don't know which one.
+## In the game, GNU Go ran on the first line until the very end :((
+#loadsgf games/kgs/yagr-yudeta.sgf 78
+#250 reg_genmove white
+##? [P1]*
 
 # Huge semeai.
 loadsgf games/kgs/malitourne-yagr.sgf 240
@@ -129,7 +130,7 @@ loadsgf games/kgs/malitourne-yagr.sgf 240
 #? [T10|Q11|O11]*
 
 # Same problem as test 250.
-loadsgf games/kgs/malitourne-yagr.sgf 80
+loadsgf games/kgs/yagr-Rayden.sgf 80
 270 restricted_genmove white O1 T1
 #? [T1]*
 
