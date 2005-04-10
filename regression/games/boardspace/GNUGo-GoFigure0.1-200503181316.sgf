@@ -1,0 +1,17 @@
+(;GM[1]FF[4]
+SZ[9]HA[0]KM[5.5]
+PW[GoFigure (GoFigure 0.1)]WR[NR]
+PB[GNUGo]BR[NR]
+PC[cg_nngs]DT[2005-03-18]AP[gnugoclient:3.0]
+RE[W+6.5]
+;B[ee]BL[599]WL[594];W[dc];B[fc]BL[596];W[fg]WL[591];B[ge]BL[590]
+;W[cg]WL[589];B[ce]BL[586];W[hf]WL[583];B[eb]BL[579];W[bf]WL[581]
+;B[cb]BL[572];W[bd]WL[473];B[he]BL[567];W[gf]WL[440];B[cc]BL[561]
+;W[ie]WL[419];B[id]BL[557];W[if]WL[397];B[hc]BL[554];W[bc]WL[385]
+;B[be]BL[552];W[ae]WL[374];B[eg]BL[548];W[eh]WL[314];B[ff]BL[535]
+;W[gg]WL[294];B[dg]BL[533];W[dh]WL[262];B[cf]BL[531];W[bg]WL[249]
+;B[bb]BL[530];W[cd]WL[244];B[de]BL[527];W[dd]WL[242];B[db]BL[526]
+;W[ed]WL[237];B[fd]BL[526];W[ab]WL[232];B[ba]BL[525];W[ac]WL[230]
+;B[ec]BL[525];W[af]WL[226];B[aa]BL[525];W[ad]WL[224];B[]BL[524];W[]
+C[final_score: W+6.5])
+
