@@ -428,6 +428,33 @@ loadsgf games/owl54.sgf
 365 owl_defend E9
 #? [0]
 
+loadsgf games/kgs/munchie-GNU.sgf 164
+366 owl_attack N2
+#? [0]
+367 owl_attack O5
+#? [1 O4]
+368 owl_defend O5
+#? [1 (O4|N3)]
+369 owl_attack N7
+#? [1 (O4|N5)]
+370 owl_defend N7
+#? [1 O4]
+
+loadsgf games/kgs/PsyDuck-GNU.sgf 76
+371 owl_attack K11
+#? [1 M13]
+
+loadsgf games/kgs/GNU-higher.sgf 267
+372 owl_defend A17
+#? [1 D18]
+
+# See also nngs2:580.
+loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
+373 owl_attack F18
+#? [1 (N19|P19|M19|K19|H19|J14|J15)]
+374 owl_defend F18
+#? [1 K19]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

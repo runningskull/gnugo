@@ -141,7 +141,8 @@ loadsgf games/trevor/trevor_14.sgf
 14 reg_genmove white
 #? [!PASS]
 
-#protecting at E7 is very necessary.
+# Protecting at E7 is very necessary.
+# See also connection:117.
 loadsgf games/trevor/trevor_15.sgf 
 15 reg_genmove white
 #? [E7]

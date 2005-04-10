@@ -247,6 +247,7 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 122
 # 570 reg_genmove white
 # #? [!F19]
 
+# See also owl1:373,374.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
 580 reg_genmove white
 #? [N19]

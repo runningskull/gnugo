@@ -904,6 +904,22 @@ trymove W D3
 218 defend C4
 #? [1 B5]
 
+# See also connection:119.
+loadsgf games/kgs/llk-GNU.sgf 150
+trymove W N10
+trymove B M10
+trymove W M9
+trymove B L10
+trymove W M11
+trymove B L14
+219 defend K12
+popgo
+popgo
+popgo
+popgo
+popgo
+popgo
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

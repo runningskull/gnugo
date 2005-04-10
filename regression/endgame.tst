@@ -208,7 +208,50 @@ loadsgf games/kgs/yagr-gab9.sgf 205
 920 reg_genmove white
 #? [C4]
 
+# C11 is one point reverse sente.
+# E4 is at the very least three points reverse sente, probably five or
+# six points reverse sente.
+# P4 is three points reverse sente.
+# R16/O14 are very very big. O14 is bigger than R16.
+loadsgf games/kgs/GNU-merlenoir.sgf 185
+930 restricted_genmove white O14 R16
+#? [O14]
+931 restricted_genmove white R16 E4
+#? [R16]
+932 restricted_genmove white E4 P4
+#? [E4]
+933 restricted_genmove white P4 C11
+#? [P4]
 
+# E4 is at the very least three points reverse sente, probably five or
+# six points reverse sente.
+# P4 is three points reverse sente.
+# R16 is about two points (slightly more) reverse sente.
+# K11 is three points gote.
+# R1 is about one and a half points reverse sente and in any case
+# locally smaller than P4.
+loadsgf games/kgs/GNU-merlenoir.sgf 193
+940 restricted_genmove white P4 R16
+#? [P4]
+941 restricted_genmove white R16 K11
+#? [R16]
+942 restricted_genmove white P4 R1
+#? [P4]
+
+# R16 is about two points (slightly more) reverse sente.
+# H8 is one point reverse sente.
+# C1 is between one and two points gote.
+loadsgf games/kgs/GNU-merlenoir.sgf 209
+950 restricted_genmove white R16 H8
+#? [R16]
+951 restricted_genmove white H8 C1
+#? [H8]
+
+# J10 is at least four points gote, in reality probably six.
+# H8 is one point reverse sente.
+loadsgf games/kgs/GNU-merlenoir.sgf 233
+960 restricted_genmove white J10 H8
+#? [J10]
 
 ############ End of Tests #################
 
