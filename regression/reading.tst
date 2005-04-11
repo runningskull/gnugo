@@ -902,6 +902,7 @@ loadsgf games/kgs/maproom-gnugo3pt6.sgf 37
 #? [2 D4]*
 trymove W D3
 218 defend C4
+popgo
 #? [1 B5]
 
 # See also connection:119.
