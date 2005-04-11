@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- unused code to compute genus removed from make_dragons()
+- new tests
+
 3.7.3 released March 22, 2005
 
 - special_rescue_moves() allows self atari moves which may set up a snapback

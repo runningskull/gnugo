@@ -139,53 +139,8 @@ make_dragons(int stop_before_owl)
   analyze_false_eye_territory();
 
   /* Now we compute the genus. */
-#if 1
-
   for (d = 0; d < number_of_dragons; d++)
     compute_dragon_genus(dragon2[d].origin, &dragon2[d].genus, NO_MOVE);
-
-#else
-
-  {
-    int dr;
-
-    for (str = BOARDMIN; str < BOARDMAX; str++) {
-      if (!ON_BOARD(str))
-	continue;
-
-      if (black_eye[str].color == BLACK
-	  && black_eye[str].origin == str
-	  && find_eye_dragons(black_eye[str].origin, black_eye,
-			      BLACK, &dr, 1) == 1) {
-
-	ASSERT1(board[dr] == BLACK, dr);
-	TRACE("eye at %1m found for dragon at %1m--augmenting genus\n",
-	      str, dr);
-	if (eye_move_urgency(&black_eye[str].value)
-	    > eye_move_urgency(&DRAGON2(dr).genus))
-	  DRAGON2(dr).heye = black_eye[str].defense_point;
-	add_eyevalues(&DRAGON2(dr).genus, &black_eye[str].value,
-		      &DRAGON2(dr).genus);
-      }
-
-      if (white_eye[str].color == WHITE
-	  && white_eye[str].origin == str
-	  && find_eye_dragons(white_eye[str].origin, white_eye,
-			      WHITE, &dr, 1) == 1) {
-
-	ASSERT1(board[dr] == WHITE, dr);
-	TRACE("eye at %1m found for dragon at %1m--augmenting genus\n",
-	      str, dr);
-	if (eye_move_urgency(&white_eye[str].value)
-	    > eye_move_urgency(&DRAGON2(dr).genus))
-	  DRAGON2(dr).heye = white_eye[str].defense_point;
-	add_eyevalues(&DRAGON2(dr).genus, &white_eye[str].value,
-		      &DRAGON2(dr).genus);
-      }
-    }
-  }
-
-#endif
 
   /* Compute the escape route measure. */
   for (str = BOARDMIN; str < BOARDMAX; str++)
