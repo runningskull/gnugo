@@ -914,6 +914,7 @@ trymove B L10
 trymove W M11
 trymove B L14
 219 defend K12
+#? [1 M14]
 popgo
 popgo
 popgo

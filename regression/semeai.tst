@@ -530,7 +530,7 @@ loadsgf games/semeai/semeai17.sgf 64
 115 dragon_status H2
 #? [alive]
 
-loadsgf games/kgs/GNU-minautore 80
+loadsgf games/kgs/GNU-minautore.sgf 80
 131 dragon_status P8
 #? [critical T8 (T8|T10|T11|T12)]
 
