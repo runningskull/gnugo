@@ -427,4 +427,21 @@ Pattern A25
 ;lib(A)<=3 && lib(B)<=3 && (oplay_attack(*,A) || oplay_attack(*,B))
 
 
+Pattern A26
+# pp New pattern, see kgs:490. (3.7.4)
+
+?XX
+O*.
+?X.
+
+:8,-
+
+?CC
+A*a
+?B.
+
+# FIXME: The constraint is not very good.
+; lib(B) <= 5 && lib(A) > lib(B) && !oplay_defend(*,?,a,C)
+
+
 # END OF FILE
