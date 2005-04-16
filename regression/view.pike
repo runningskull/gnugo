@@ -1477,7 +1477,7 @@ class Controller
                     ->attach_defaults(sgf_viewer_entry, 1, 2, 1, 2);
 
 	new_testcase_entry = GTK.Entry();
-        new_testcase_entry->set_text("owl:1");
+        new_testcase_entry->set_text(testcase);
         new_testcase_entry->set_editable(1);
         new_testcase_button = GTK.Button("Load new testcase");
         new_testcase_button->signal_connect_new("clicked", new_testcase);
@@ -1857,6 +1857,12 @@ class Controller
 	testcase_label->set_text(full_testcase * "\n");
         viewers->new_testcase(complete_testcase, testcase_command);
         viewers->handle_testcase();
+
+	if (has_prefix(testcase_command, "reg_genmove")
+	    || has_prefix(testcase_command, "restricted_genmove")) {
+	    controller_notebook->show_all();
+	    controller_notebook->set_page(1);
+	}
     }
 
 
