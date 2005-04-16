@@ -1231,6 +1231,60 @@ do_find_defense(int str, int *move)
 }
 
 
+/* Determine if a `move' by `color' allows under-the-stones tesuji
+ * a.k.a. "big snapback".  Here is an example:
+ *
+ *     |XXXX...
+ *     |XXOOXXX
+ *     |OOOXOOX
+ *     |..O*OOX
+ *     +-------
+ *
+ * Even though the move at '*' allows black to capture four white
+ * stones, white can later recapture black stones and create a second
+ * eye.  This is very similar to a snapback.
+ *
+ * This function returns true if a move creates a string of with two
+ * liberties, which can, however, be instantly recaptured by opponent.
+ * It is actually not required that the move captures something.  If
+ * the caller needs captures, it should check for them itself.
+ */
+static int
+allows_under_the_stones_tesuji(int move, int color)
+{
+  int result = 0;
+  SGFTree *save_sgf_dumptree;
+  int save_count_variations;
+
+  if (accuratelib(move, color, 3, NULL) != 2)
+    return 0;
+
+  save_sgf_dumptree     = sgf_dumptree;
+  save_count_variations = count_variations;
+
+  sgf_dumptree	   = NULL;
+  count_variations = 0;
+
+  if (trymove(move, color, "allows_under_the_stones_tesuji", NO_MOVE)) {
+    int libs[2];
+
+    findlib(move, 2, libs);
+    if ((!is_self_atari(libs[0], color)
+	 && accuratelib(libs[1], OTHER_COLOR(color), 3, NULL) <= 2)
+	|| (!is_self_atari(libs[1], color)
+	    && accuratelib(libs[0], OTHER_COLOR(color), 3, NULL) <= 2))
+      result = 1;
+
+    popgo();
+  }
+
+  sgf_dumptree	   = save_sgf_dumptree;
+  count_variations = save_count_variations;
+
+  return result;
+}
+
+
 /* Called by the defendN functions.  Don't think too much if there's
  * an easy way to get enough liberties.
  */
@@ -1334,6 +1388,17 @@ fast_defense(int str, int liberties, int *libs, int *move)
       total--;
 
     if (total >= goal_liberties) {
+      /* One case when this code can give a false defense is an
+       * under-the-stones tesuji or "big snapback."  See reading:199
+       * for an example.  While this position is probably very rare,
+       * it is nice to make GNU Go understand "neat" tesujis.
+       */
+      if (liberties == 1 && lib == libs[0]
+	  && allows_under_the_stones_tesuji(lib, color)) {
+	/* This is a bad "fast defense". */
+	continue;
+      }
+
       *move = lib;
       return 1;
     }
@@ -4402,7 +4467,7 @@ break_chain_moves(int str, struct reading_moves *moves)
  */
 static int
 defend_secondary_chain1_moves(int str, struct reading_moves *moves,
-    int min_liberties)
+			      int min_liberties)
 {
   int r, s;
   int color = OTHER_COLOR(board[str]);
@@ -4724,42 +4789,38 @@ break_chain2_defense_moves(int str, struct reading_moves *moves,
 }
 
 
-/*
- * (str) points to a group.
- * If there is a string in the surrounding chain having
- * exactly three liberties whose attack leads to the rescue of
- * (str), break_chain3_moves(str, *moves) adds attack moves against
- * the surrounding string as candidate moves.
+/* Helper function for break_chain3_moves() and
+ * superstring_break_chain_moves().
  */
-
 static void
-break_chain3_moves(int str, struct reading_moves *moves, int be_aggressive)
+do_find_break_chain3_moves(int *chain_links, int num_chain_links,
+			   struct reading_moves *moves, int be_aggressive,
+			   const char *caller_function_name)
 {
-  int color = board[str];
-  int other = OTHER_COLOR(color);
+  int other = board[chain_links[0]];
+  int color = OTHER_COLOR(other);
+  char move_added[BOARDMAX];
+  int possible_moves[MAX_MOVES];
+  int num_possible_moves = 0;
   int r;
   int k;
-  int u = 0, v;
-  int apos;
-  int adj;
-  int adjs[MAXCHAIN];
-  int libs[3];
-  int possible_moves[MAX_MOVES];
-  int mw[BOARDMAX];
 
-  memset(mw, 0, sizeof(mw));
-  
-  adj = chainlinks2(str, adjs, 3);
-  for (r = 0; r < adj; r++) {
-    int lib1 = 0, lib2 = 0, lib3 = 0;
-    apos = adjs[r];
+  gg_assert(num_chain_links > 0);
+
+  memset(move_added, 0, sizeof move_added);
+
+  for (r = 0; r < num_chain_links; r++) {
+    int lib1;
+    int lib2;
+    int lib3;
+    int libs[3];
 
     /* We make a list in the (adjs) array of the liberties
      * of boundary strings having exactly three liberties. We mark
      * each liberty in the mw array so that we do not list any
      * more than once.
      */
-    findlib(apos, 3, libs);
+    findlib(chain_links[r], 3, libs);
 
     /* If the 3 liberty chain easily can run away through one of the
      * liberties, we don't play on any of the other liberties.
@@ -4773,54 +4834,86 @@ break_chain3_moves(int str, struct reading_moves *moves, int be_aggressive)
     if ((lib1 >= 4 || lib2 >= 4) && lib3 >= 4)
       continue;
 
-    if (lib1 >= 4 && !mw[libs[0]]) {
-      mw[libs[0]] = 1;
-      possible_moves[u++] = libs[0];
+    if (lib1 >= 4) {
+      if (!move_added[libs[0]]) {
+	possible_moves[num_possible_moves++] = libs[0];
+	move_added[libs[0]] = 1;
+      }
+
       continue;
     }
-    
-    if (lib2 >= 4 && !mw[libs[1]]) {
-      mw[libs[1]] = 1;
-      possible_moves[u++] = libs[1];
+
+    if (lib2 >= 4) {
+      if (!move_added[libs[1]]) {
+	possible_moves[num_possible_moves++] = libs[1];
+	move_added[libs[1]] = 1;
+      }
+
       continue;
     }
-    
-    if (lib3 >= 4 && !mw[libs[2]]) {
-      mw[libs[2]] = 1;
-      possible_moves[u++] = libs[2];
+
+    if (lib3 >= 4) {
+      if (!move_added[libs[2]]) {
+	possible_moves[num_possible_moves++] = libs[2];
+	move_added[libs[2]] = 1;
+      }
+
       continue;
     }
 
     /* No easy escape, try all liberties. */
     for (k = 0; k < 3; k++) {
-      if (!mw[libs[k]]) {
-	mw[libs[k]] = 1;
-	possible_moves[u++] = libs[k];
+      if (!move_added[libs[k]]) {
+	possible_moves[num_possible_moves++] = libs[k];
+	move_added[libs[k]] = 1;
       }
     }
 
     if (stackp <= backfill2_depth
 	|| (be_aggressive && stackp <= backfill_depth))
-      defend_secondary_chain1_moves(adjs[r], moves, 3);
+      defend_secondary_chain1_moves(chain_links[r], moves, 3);
   }
 
-  for (v = 0; v < u; v++) {
-    /* We do not wish to consider the move if it can be 
-     * immediately recaptured, unless stackp < backfill2_depth.
-     * Beyond backfill2_depth, the necessary capturing move might not
-     * get generated in follow-up for the attacker.
-     * (This currently only makes a difference at stackp == backfill2_depth.)
+  for (k = 0; k < num_possible_moves; k++) {
+    /* We do not wish to consider the move if it can be immediately
+     * recaptured, unless stackp < backfill2_depth.  Beyond
+     * backfill2_depth, the necessary capturing move might not get
+     * generated in follow-up for the attacker.  (This currently only
+     * makes a difference at stackp == backfill2_depth.)
      */
-    int xpos = possible_moves[v];
+    int move = possible_moves[k];
+
     if (stackp <= break_chain_depth
 	|| (be_aggressive && stackp <= backfill_depth)
-	|| approxlib(xpos, color, 2, NULL) > 1)
+	|| approxlib(move, color, 2, NULL) > 1)
       /* We use a negative initial score here as we prefer to find
        * direct defense moves.
        */
-      ADD_CANDIDATE_MOVE(xpos, -2, *moves, "break_chain3");
+      ADD_CANDIDATE_MOVE(move, -2, *moves, caller_function_name);
   }
 }
+
+
+/*
+ * (str) points to a group.
+ * If there is a string in the surrounding chain having
+ * exactly three liberties whose attack leads to the rescue of
+ * (str), break_chain3_moves(str, *moves) adds attack moves against
+ * the surrounding string as candidate moves.
+ */
+
+static void
+break_chain3_moves(int str, struct reading_moves *moves, int be_aggressive)
+{
+  int chain_links[MAXCHAIN];
+  int num_chain_links = chainlinks2(str, chain_links, 3);
+
+  if (num_chain_links > 0) {
+    do_find_break_chain3_moves(chain_links, num_chain_links,
+			       moves, be_aggressive, "break_chain3");
+  }
+}
+
 
 /*
  * (str) points to a group.
@@ -4942,6 +5035,8 @@ superstring_break_chain_moves(int str, int liberty_cap,
 {
   int adj;
   int adjs[MAXCHAIN];
+  int chain_links3[MAXCHAIN];
+  int num_chain_links3 = 0;
   int k;
   int apos;
 
@@ -4954,6 +5049,13 @@ superstring_break_chain_moves(int str, int liberty_cap,
     }
     else if (liberties == 2)
       do_find_break_chain2_efficient_moves(str, adjs[k], moves);
+    else if (liberties == 3)
+      chain_links3[num_chain_links3++] = adjs[k];
+  }
+
+  if (num_chain_links3 > 0) {
+    do_find_break_chain3_moves(chain_links3, num_chain_links3,
+			       moves, 0, "superstring_break_chain-3");
   }
 }
 
