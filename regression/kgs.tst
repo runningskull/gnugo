@@ -233,8 +233,9 @@ loadsgf games/kgs/evand-TheGNUGo.sgf 242
 #? [H13]*
 
 loadsgf games/kgs/evand-TheGNUGo.sgf 270
+# Removed P13, too short on liberties to play that.  /pp
 500 reg_genmove black
-#? [O15|P13]*
+#? [O15]*
 
 # P8 seems the most reasonable move here.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 16

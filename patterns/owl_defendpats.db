@@ -7022,6 +7022,39 @@ O.X
 ;lib(A) == 2
 
 
+Pattern D1393
+# pp New pattern, see kgs:500 (3.7.4)
+
+O.O.	    secure escape connection by first threatening opponent
+?*XO
+
+:8,B,value(50)
+
+A.Ca
+?*DB
+
+# Note: xplay_disconnect() to avoid generating this move when it is
+# not really needed.
+
+; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
+; && xplay_disconnect(A,C) && oplay_attack(*,a,D)
+
+
+Pattern D1394
+#pp New pattern, see kgs:500 (3.7.4)
+
+O.O*	    connect out!
+??XO
+
+:8,B,value(70)
+
+A.O*
+??XB
+
+; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
+; && safe_xmove(*) && !oplay_disconnect(*,A,B)
+
+
 #########################################################
 #                                                       #
 #                          Ko                           #
