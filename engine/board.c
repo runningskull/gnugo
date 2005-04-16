@@ -23,14 +23,12 @@
 
 /* The functions in this file implements a go board with incremental
  * update of strings and liberties.
- *
- * See the Texinfo documentation (Utility Functions: Incremental
- * Board) for an introduction.
+ * 
+ * See the Texinfo documentation (Utility Functions: Incremental Board)
+ * for an introduction.
  */
 
-
 #include "board.h"
-#include "board-private.h"
 #include "hash.h"
 #include "sgftree.h"
 #include "gg_utils.h"
@@ -41,470 +39,423 @@
 #include <stdarg.h>
 
 
-
-/* Macros declaring constant local pointers to various parts of
- * `Goban' structure.  The purpose is to save typing.
+/* This can be used for internal checks w/in board.c that should
+ * typically not be necessary (for speed).
  */
-
-#define ACCESS_PRIVATE_DATA						\
-  Goban_private_data *const private = goban->private
-
-#define ACCESS_PRIVATE_DATA_CONST					\
-  const Goban_private_data *const private = goban->private
-
-#define ACCESS_BOARD							\
-  Intersection *const board = goban->board
-
-#define ACCESS_BOARD_CONST						\
-  const Intersection *const board = goban->board
+#if 1
+#define PARANOID1(x, pos) ASSERT1(x, pos)
+#else
+#define PARANOID1(x, pos)
+#endif
 
 
-
-/* Various stack accessory macros. */
-
-#define CLEAR_STACKS()							\
-  do {									\
-    private->change_stack_pointer = private->change_stack;		\
-    private->vertex_stack_pointer = private->vertex_stack;		\
-    VALGRIND_MAKE_WRITABLE(private->change_stack,			\
-			   sizeof private->change_stack);		\
-    VALGRIND_MAKE_WRITABLE(private->vertex_stack,			\
-			   sizeof private->vertex_stack);		\
-  } while (0)
-
-/* Begin a record: use `address == NULL' as mark. */
-#define BEGIN_CHANGE_RECORD()						\
-  ((private->change_stack_pointer++)->address = NULL,			\
-   (private->vertex_stack_pointer++)->address = NULL)
+/* ================================================================ */
+/*                          data structures                         */
+/* ================================================================ */
 
 
-/* Save a value: store the address and the value in the stack. */
-#define PUSH_VALUE(the_value)						\
-  (private->change_stack_pointer->address = &(the_value),		\
-   (private->change_stack_pointer++)->value = (the_value))
+/* Incremental string data. */
+struct string_data {
+  int color;                       /* Color of string, BLACK or WHITE */
+  int size;                        /* Number of stones in string. */
+  int origin;                      /* Coordinates of "origin", i.e. */
+                                   /* "upper left" stone. */
+  int liberties;                   /* Number of liberties. */
+  int neighbors;                   /* Number of neighbor strings */
+  int mark;                        /* General purpose mark. */
+};
 
-/* Save a board value: store the address and the value in the
- * stack.
+struct string_liberties_data {
+  int list[MAX_LIBERTIES];         /* Coordinates of liberties. */
+};
+
+struct string_neighbors_data {
+  int list[MAXCHAIN];              /* List of neighbor string numbers. */
+};
+
+/* we keep the address and the old value */
+struct change_stack_entry {
+  int *address;
+  int value;
+};
+
+/* we keep the address and the old value */
+struct vertex_stack_entry {
+  Intersection *address;
+  int value;
+};
+
+
+/* Experimental results show that the average number of change stack
+ * entries per move usually is in the 20-30 range and very seldom
+ * exceeds 40. But since we have no way to recover from running out of
+ * stack space, we allocate with a substantial safety margin.
  */
-#define PUSH_VERTEX(the_value)						\
-  (private->vertex_stack_pointer->address = &(the_value),		\
-   (private->vertex_stack_pointer++)->value = (the_value))
+#define STACK_SIZE 80 * MAXSTACK
 
 
-#define POP_MOVE()							\
-  do {									\
-    while ((--private->change_stack_pointer)->address)			\
-      *(private->change_stack_pointer->address)				\
-	= private->change_stack_pointer->value;				\
-  } while (0)
+#define CLEAR_STACKS() do { \
+  change_stack_pointer = change_stack; \
+  vertex_stack_pointer = vertex_stack; \
+  VALGRIND_MAKE_WRITABLE(change_stack, sizeof(change_stack)); \
+  VALGRIND_MAKE_WRITABLE(vertex_stack, sizeof(vertex_stack)); \
+} while (0)
 
-#define POP_VERTICES()							\
-  do {									\
-    while ((--private->vertex_stack_pointer)->address)			\
-      *(private->vertex_stack_pointer->address)				\
-	= private->vertex_stack_pointer->value;				\
-  } while (0)
+/* Begin a record : address == NULL */
+#define BEGIN_CHANGE_RECORD()\
+((change_stack_pointer++)->address = NULL,\
+ (vertex_stack_pointer++)->address = NULL)
+
+/* Save a value : store the address and the value in the stack */
+#define PUSH_VALUE(v)\
+(change_stack_pointer->address = &(v),\
+ (change_stack_pointer++)->value = (v))
+
+/* Save a board value : store the address and the value in the stack */
+#define PUSH_VERTEX(v)\
+(vertex_stack_pointer->address = &(v),\
+ (vertex_stack_pointer++)->value = (v))
+
+#define POP_MOVE()\
+  while ((--change_stack_pointer)->address)\
+  *(change_stack_pointer->address) =\
+  change_stack_pointer->value
 
 
+#define POP_VERTICES()\
+  while ((--vertex_stack_pointer)->address)\
+  *(vertex_stack_pointer->address) =\
+  vertex_stack_pointer->value
 
-/* The string index at `pos'.  There must be a stone for this macro to
- * give meaningful results.
+
+/* ================================================================ */
+/*                      static data structures                      */
+/* ================================================================ */
+
+
+/* Main array of string information. */
+static struct string_data string[MAX_STRINGS];
+static struct string_liberties_data string_libs[MAX_STRINGS];
+static struct string_neighbors_data string_neighbors[MAX_STRINGS];
+
+/* Stacks and stack pointers. */
+static struct change_stack_entry change_stack[STACK_SIZE];
+static struct change_stack_entry *change_stack_pointer;
+
+static struct vertex_stack_entry vertex_stack[STACK_SIZE];
+static struct vertex_stack_entry *vertex_stack_pointer;
+
+
+/* Index into list of strings. The index is only valid if there is a
+ * stone at the vertex.
  */
-#define STRING_INDEX(pos)	(private->string_index[pos])
-
-/* Get a pointer to `String_data' structure for the string at `pos'. */
-#define STRING_DATA(pos)						\
-  STRING_DATA_BY_INDEX(STRING_INDEX(pos))
-
-/* Likewise for a strinng with known index. */
-#define STRING_DATA_BY_INDEX(string_index)				\
-  (&private->strings[string_index])
+static int string_number[BOARDMAX];
 
 
-/* Do the stones at `pos1' and `pos2' belong to the same string? */
-#define SAME_STRING(pos1, pos2) (STRING_INDEX(pos1) == STRING_INDEX(pos2))
+/* The stones in a string are linked together in a cyclic list. 
+ * These are the coordinates to the next stone in the string.
+ */
+static int next_stone[BOARDMAX];
 
 
-/* Get string origin. */
-#define ORIGIN(pos)							\
-  (STRING_DATA(pos)->origin)
-#define ORIGIN_BY_INDEX(string_index)					\
-  (STRING_DATA_BY_INDEX(string_index)->origin)
-
-/* Get the number of string liberties. */
-#define LIBERTIES(pos)							\
-  (STRING_DATA(pos)->num_liberties)
-#define LIBERTIES_BY_INDEX(string_index)				\
-  (STRING_DATA_BY_INDEX(string_index)->num_liberties)
-
-/* Get the size (number of stones) of the string. */
-#define COUNT_STONES(pos)						\
-  (STRING_DATA(pos)->size)
-#define COUNT_STONES_BY_INDEX(string_index)				\
-  (STRING_DATA_BY_INDEX(string_index)->size)
-
-/* Get the number of string neighbors. */
-#define COUNT_NEIGHBORS(pos)						\
-  (STRING_DATA(pos)->num_neighbors)
-#define COUNT_NEIGHBORS_BY_INDEX(string_index)				\
-  (STRING_DATA_BY_INDEX(string_index)->num_neighbors)
-
-
-#define STRING_LIBERTIES(string_index)					\
-  (private->string_liberties[string_index])
-
-#define STRING_NEIGHBORS(string_index)					\
-  (private->string_neighbors[string_index])
+/* ---------------------------------------------------------------- */
 
 
 /* Macros to traverse the stones of a string.
  *
  * Usage:
- *
- *	int s, pos;
- *	s = find_the_string()
- *	pos = FIRST_STONE(goban, s);
- *	do {
- *	  use_stone(pos);
- *	  pos = NEXT_STONE(goban, pos);
- *	} while (!BACK_TO_FIRST_STONE(goban, s, pos));
+ * int s, pos;
+ * s = find_the_string()
+ * pos = FIRST_STONE(s);
+ *   do {
+ *    use_stone(pos);
+ *    pos = NEXT_STONE(pos);
+ *  } while (!BACK_TO_FIRST_STONE(s, pos));
  */
-#define FIRST_STONE(string_index)					\
-  (ORIGIN_BY_INDEX(string_index))
+#define FIRST_STONE(s) \
+  (string[s].origin)
 
-#define NEXT_STONE(pos)		(private->next_stone[pos])
+#define NEXT_STONE(pos) \
+  (next_stone[pos])
 
-#define BACK_TO_FIRST_STONE(string_index, pos)				\
-  ((pos) == FIRST_STONE(string_index))
+#define BACK_TO_FIRST_STONE(s, pos) \
+  ((pos) == string[s].origin)
 
 
-/* Is `pos' empty? */
-#define LIBERTY(pos)		(board[pos] == EMPTY)
+/* Assorted useful macros.
+ *
+ * Some of them could have been functions but are implemented as
+ * macros for speed.
+ */
 
-/* Is `pos' empty and not marked? */
-#define UNMARKED_LIBERTY(pos)						\
-  (board[pos] == EMPTY &&						\
-   private->last_liberty_marks[pos] != private->liberty_mark)
+#define LIBERTY(pos) \
+  (board[pos] == EMPTY)
 
-/* Mark `pos'.  Use together with UNMARKED_LIBERTY(). */
-#define MARK_LIBERTY(pos)						\
-  (private->last_liberty_marks[pos] = private->liberty_mark)
+#define UNMARKED_LIBERTY(pos) \
+  (board[pos] == EMPTY && ml[pos] != liberty_mark)
 
-#define UNMARKED_STRING(pos)						\
-  (STRING_DATA(pos)->mark != private->string_mark)
+#define MARK_LIBERTY(pos) \
+  ml[pos] = liberty_mark
+
+#define UNMARKED_STRING(pos) \
+  (string[string_number[pos]].mark != string_mark)
 
 /* Note that these two macros are not complementary. Both return
  * false if board[pos] != color.
  */
-#define UNMARKED_COLOR_STRING(pos, color)				\
-  (board[pos] == (color) && UNMARKED_STRING(pos))
+#define UNMARKED_COLOR_STRING(pos, color)\
+  (board[pos] == color\
+   && string[string_number[pos]].mark != string_mark)
 
-#define MARKED_COLOR_STRING(pos, color)					\
-  (board[pos] == (color) && !UNMARKED_STRING(pos))
+#define MARKED_COLOR_STRING(pos, color)\
+  (board[pos] == color\
+   && string[string_number[pos]].mark == string_mark)
 
-#define MARK_STRING(pos)						\
-  (STRING_DATA(pos)->mark = private->string_mark)
+#define MARK_STRING(pos) string[string_number[pos]].mark = string_mark
 
-#define STRING_AT_VERTEX(pos, string_index, color)			\
-  (board[pos] == (color) && STRING_INDEX(pos) == (string_index))
+#define STRING_AT_VERTEX(pos, s, color)\
+  ((board[pos] == color) && string_number[pos] == (s))
 
-#define NEIGHBOR_OF_STRING(pos, string_index, color)			\
-  (STRING_AT_VERTEX(SOUTH(pos), (string_index), (color))		\
-   || STRING_AT_VERTEX(WEST(pos), (string_index), (color))		\
-   || STRING_AT_VERTEX(NORTH(pos), (string_index), (color))		\
-   || STRING_AT_VERTEX(EAST(pos), (string_index), (color)))
+#define NEIGHBOR_OF_STRING(pos, s, color)\
+  (STRING_AT_VERTEX(SOUTH(pos), s, color)\
+   || STRING_AT_VERTEX(WEST(pos), s, color)\
+   || STRING_AT_VERTEX(NORTH(pos), s, color)\
+   || STRING_AT_VERTEX(EAST(pos), s, color))
 
 /* These four macros have rather confusing names. It should be read as:
  * "(pos) is a neighbor of string (s) of (color) in any direction except
  * the specified one".
  */
-#define NON_SOUTH_NEIGHBOR_OF_STRING(pos, string_index, color)		\
-  (STRING_AT_VERTEX(SOUTH(pos), (string_index), (color))		\
-   || STRING_AT_VERTEX(WEST(pos), (string_index), (color))		\
-   || STRING_AT_VERTEX(EAST(pos), (string_index), (color)))
+#define NON_SOUTH_NEIGHBOR_OF_STRING(pos, s, color)\
+  (STRING_AT_VERTEX(SOUTH(pos), s, color)\
+   || STRING_AT_VERTEX(WEST(pos), s, color)\
+   || STRING_AT_VERTEX(EAST(pos), s, color))
+  
+#define NON_WEST_NEIGHBOR_OF_STRING(pos, s, color)\
+  (STRING_AT_VERTEX(WEST(pos), s, color)\
+   || STRING_AT_VERTEX(NORTH(pos), s, color)\
+   || STRING_AT_VERTEX(SOUTH(pos), s, color))
+  
+#define NON_NORTH_NEIGHBOR_OF_STRING(pos, s, color)\
+  (STRING_AT_VERTEX(NORTH(pos), s, color)\
+   || STRING_AT_VERTEX(EAST(pos), s, color)\
+   || STRING_AT_VERTEX(WEST(pos), s, color))
+  
+#define NON_EAST_NEIGHBOR_OF_STRING(pos, s, color)\
+  (STRING_AT_VERTEX(EAST(pos), s, color)\
+   || STRING_AT_VERTEX(SOUTH(pos), s, color)\
+   || STRING_AT_VERTEX(NORTH(pos), s, color))
+  
+#define LIBERTIES(pos)\
+  string[string_number[pos]].liberties
 
-#define NON_WEST_NEIGHBOR_OF_STRING(pos, string_index, color)		\
-  (STRING_AT_VERTEX(WEST(pos), (string_index), (color))			\
-   || STRING_AT_VERTEX(NORTH(pos), (string_index), (color))		\
-   || STRING_AT_VERTEX(SOUTH(pos), (string_index), (color)))
+#define COUNTSTONES(pos) \
+  string[string_number[pos]].size
 
-#define NON_NORTH_NEIGHBOR_OF_STRING(pos, string_index, color)		\
-  (STRING_AT_VERTEX(NORTH(pos), (string_index), (color))		\
-   || STRING_AT_VERTEX(EAST(pos), (string_index), (color))		\
-   || STRING_AT_VERTEX(WEST(pos), (string_index), (color)))
-
-#define NON_EAST_NEIGHBOR_OF_STRING(pos, string_index, color)		\
-  (STRING_AT_VERTEX(EAST(pos), (string_index), (color))			\
-   || STRING_AT_VERTEX(SOUTH(pos), (string_index), (color))		\
-   || STRING_AT_VERTEX(NORTH(pos), (string_index), (color)))
-
-
-#define ADD_LIBERTY(string_index, pos)					\
-  do {									\
-    if (LIBERTIES_BY_INDEX(string_index) < MAX_LIBERTIES) {		\
-      STRING_LIBERTIES(string_index)[LIBERTIES_BY_INDEX(string_index)]	\
-	= (pos);							\
-    }									\
-    LIBERTIES_BY_INDEX(string_index)++;					\
+#define ADD_LIBERTY(s, pos)\
+  do {\
+    if (string[s].liberties < MAX_LIBERTIES)\
+      string_libs[s].list[string[s].liberties] = pos;\
+    string[s].liberties++;\
   } while (0)
 
-#define ADD_AND_MARK_LIBERTY(string_index, pos)				\
-  do {									\
-    ADD_LIBERTY((string_index), (pos));					\
-    MARK_LIBERTY(pos);							\
+#define ADD_AND_MARK_LIBERTY(s, pos)\
+  do {\
+    if (string[s].liberties < MAX_LIBERTIES)\
+      string_libs[s].list[string[s].liberties] = pos;\
+    string[s].liberties++;\
+    ml[pos] = liberty_mark;\
   } while (0)
 
-#define ADD_NEIGHBOR(string_index, pos)					\
-  (STRING_NEIGHBORS(string_index)					\
-   [COUNT_NEIGHBORS_BY_INDEX(string_index)++] = STRING_INDEX(pos))
+#define ADD_NEIGHBOR(s, pos)\
+  string_neighbors[s].list[string[s].neighbors++] = string_number[pos]
 
-#define DO_ADD_STONE(pos, color)					\
-  do {									\
-    PUSH_VERTEX(board[pos]);						\
-    board[pos] = color;							\
-    hashdata_invert_stone(&goban->board_hash, pos, color);		\
+#define DO_ADD_STONE(pos, color)\
+  do {\
+    PUSH_VERTEX(board[pos]);\
+    board[pos] = color;\
+    hashdata_invert_stone(&board_hash, pos, color);\
   } while (0)
 
-#define DO_REMOVE_STONE(pos)						\
-  do {									\
-    PUSH_VERTEX(board[pos]);						\
-    hashdata_invert_stone(&goban->board_hash, pos, board[pos]);		\
-    board[pos] = EMPTY;							\
-  } while (0)
-
-
-#define STORE_LIBERTY(new_liberty, liberty_list, num_liberties)		\
-  do {									\
-    if (liberty_list)							\
-      (liberty_list) [num_liberties] = (new_liberty);			\
-    (num_liberties)++;							\
-  } while (0)
-
-#define STORE_LIBERTY_WITH_LIMIT(new_liberty,				\
-				 liberty_list, num_liberties, limit)	\
-  do {									\
-    STORE_LIBERTY((new_liberty), (liberty_list), (num_liberties));	\
-    if ((num_liberties) >= (limit))					\
-      return num_liberties;						\
+#define DO_REMOVE_STONE(pos)\
+  do {\
+    PUSH_VERTEX(board[pos]);\
+    hashdata_invert_stone(&board_hash, pos, board[pos]);\
+    board[pos] = EMPTY;\
   } while (0)
 
 
 /* ---------------------------------------------------------------- */
 
 
+
+/* Number of the next free string. */
+static int next_string;
+
+
+/* For marking purposes. */
+static int ml[BOARDMAX];
+static int liberty_mark;
+static int string_mark;
+
+
 /* Forward declarations. */
-static int  do_trymove(Goban *goban, int pos, int color, int ignore_ko);
-static void undo_trymove(Goban *goban);
+static int do_trymove(int pos, int color, int ignore_ko);
+static void undo_trymove(void);
 
-static int  do_approxlib(const Goban *goban, int pos, int color,
-			 int maxlib, int *libs);
-static int  slow_approxlib(const Goban *goban, int pos, int color,
-			   int maxlib, int *libs);
-static int  do_accuratelib(const Goban *goban, int pos, int color,
-			   int maxlib, int *libs);
+static int do_approxlib(int pos, int color, int maxlib, int *libs);
+static int slow_approxlib(int pos, int color, int maxlib, int *libs);
+static int do_accuratelib(int pos, int color, int maxlib, int *libs);
 
-static void new_position(Goban *goban);
-static int  propagate_string(const Goban *goban, int stone, int str);
-static void find_liberties_and_neighbors(const Goban *goban, int s);
-static int  do_remove_string(Goban *goban, int s);
-static void do_commit_suicide(Goban *goban, int pos, int color);
-static void do_play_move(Goban *goban, int pos, int color);
+static void new_position(void);
+static int propagate_string(int stone, int str);
+static void find_liberties_and_neighbors(int s);
+static int do_remove_string(int s);
+static void do_commit_suicide(int pos, int color);
+static void do_play_move(int pos, int color);
 
+static int komaster, kom_pos;
+
+
+/* Statistics. */
+static int trymove_counter = 0;
 
 /* Coordinates for the eight directions, ordered
  * south, west, north, east, southwest, northwest, northeast, southeast.
  */
-int deltai[8] = {  1,  0,  -1, 0,    1,    -1,    -1,    1 };
-int deltaj[8] = {  0, -1,   0, 1,   -1,    -1,     1,    1 };
-int delta[8]  = { NS, -1, -NS, 1, NS-1, -NS-1, -NS+1, NS+1 };
+int deltai[8] = { 1,  0, -1,  0,  1, -1, -1, 1};
+int deltaj[8] = { 0, -1,  0,  1, -1, -1,  1, 1};
+int delta[8]  = { NS, -1, -NS, 1, NS-1, -NS-1, -NS+1, NS+1};
 
 
 /* ================================================================ */
 /*                    Board initialization                          */
 /* ================================================================ */
 
+/*
+ * Save board state.
+ */
 
-Goban *
-create_goban(int board_size)
-{
-  Goban *goban = malloc(sizeof(Goban));
-  gg_assert(NULL, goban);
-
-  goban->private = malloc(sizeof(Goban_private_data));
-  gg_assert(NULL, goban->private);
-
-  goban->variations_counter = 0;
-  goban->sgf_dumptree = NULL;
-
-  goban->allow_suicide = 0;
-  goban->chinese_rules = 0;
-
-  goban->position_number		   = 0;
-  goban->private->trymove_counter	   = 0;
-  goban->private->stone_count_for_position = 0;
-  goban->private->white_stones_on_board	   = 0;
-  goban->private->black_stones_on_board	   = 0;
-
-  clear_internal_caches(goban);
-
-  /* clear_board() also initializes all the rest fields. */
-  goban->board_size = board_size;
-  clear_board(goban);
-
-  return goban;
-}
-
-
-/* Save board state. */
 void
-store_board(const Goban *goban, Board_state *state)
+store_board(struct board_state *state)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
   int k;
 
-  gg_assert(goban, goban->stackp == 0);
+  gg_assert(stackp == 0);
 
-  state->board_size	= goban->board_size;
-  state->board_ko_pos	= goban->board_ko_pos;
-  state->white_captured = goban->white_captured;
-  state->black_captured = goban->black_captured;
+  state->board_size = board_size;
 
-  memcpy(state->board, goban->board, sizeof goban->board);
+  memcpy(state->board, board, sizeof(board));
+  memcpy(state->initial_board, initial_board, sizeof(initial_board));
 
-  state->initial_board_ko_pos	= private->initial_board_ko_pos;
-  state->initial_white_captured = private->initial_white_captured;
-  state->initial_black_captured = private->initial_black_captured;
-
-  memcpy(state->initial_board, private->initial_board,
-	 sizeof private->initial_board);
-
-  state->move_history_pointer = private->move_history_pointer;
-  for (k = 0; k < private->move_history_pointer; k++) {
-    state->move_history_color[k] = private->move_history_color[k];
-    state->move_history_pos[k]	 = private->move_history_pos[k];
+  state->board_ko_pos = board_ko_pos;
+  state->white_captured = white_captured;
+  state->black_captured = black_captured;
+  
+  state->initial_board_ko_pos = initial_board_ko_pos;
+  state->initial_white_captured = initial_white_captured;
+  state->initial_black_captured = initial_black_captured;
+  
+  state->move_history_pointer = move_history_pointer;
+  for (k = 0; k < move_history_pointer; k++) {
+    state->move_history_color[k] = move_history_color[k];
+    state->move_history_pos[k] = move_history_pos[k];
   }
 
-  state->komi	     = goban->komi;
-  state->move_number = goban->move_number;
+  state->komi = komi;
+  state->move_number = movenum;
 }
 
 
-/* Restore a saved board state. */
-void
-restore_board(Goban *goban, const Board_state *state)
-{
-  ACCESS_PRIVATE_DATA;
+/*
+ * Restore a saved board state.
+ */
 
+void
+restore_board(struct board_state *state)
+{
   int k;
 
-  gg_assert(goban, goban->stackp == 0);
+  gg_assert(stackp == 0);
 
-  goban->board_size     = state->board_size;
-  goban->board_ko_pos   = state->board_ko_pos;
-  goban->white_captured = state->white_captured;
-  goban->black_captured = state->black_captured;
+  board_size = state->board_size;
 
-  memcpy(goban->board, state->board, sizeof goban->board);
+  memcpy(board, state->board, sizeof(board));
+  memcpy(initial_board, state->initial_board, sizeof(initial_board));
 
-  private->initial_board_ko_pos   = state->initial_board_ko_pos;
-  private->initial_white_captured = state->initial_white_captured;
-  private->initial_black_captured = state->initial_black_captured;
-
-  memcpy(private->initial_board, state->initial_board,
-	 sizeof private->initial_board);
-
-  private->move_history_pointer = state->move_history_pointer;
-  for (k = 0; k < private->move_history_pointer; k++) {
-    private->move_history_color[k] = state->move_history_color[k];
-    private->move_history_pos[k]   = state->move_history_pos[k];
+  board_ko_pos = state->board_ko_pos;
+  white_captured = state->white_captured;
+  black_captured = state->black_captured;
+  
+  initial_board_ko_pos = state->initial_board_ko_pos;
+  initial_white_captured = state->initial_white_captured;
+  initial_black_captured = state->initial_black_captured;
+  
+  move_history_pointer = state->move_history_pointer;
+  for (k = 0; k < move_history_pointer; k++) {
+    move_history_color[k] = state->move_history_color[k];
+    move_history_pos[k] = state->move_history_pos[k];
   }
 
-  goban->komi	     = state->komi;
-  goban->move_number = state->move_number;
-
-  hashdata_recalc(&goban->board_hash, goban->board, goban->board_ko_pos);
-  new_position(goban);
+  komi = state->komi;
+  movenum = state->move_number;
+  
+  hashdata_recalc(&board_hash, board, board_ko_pos);
+  new_position();
 }
 
 
-/* Clear the internal board. */
+/*
+ * Clear the internal board.
+ */
+
 void
-clear_board(Goban *goban)
+clear_board(void)
 {
-  ACCESS_PRIVATE_DATA;
+  int k;
 
-  int pos;
-
-  gg_assert(goban, goban->board_size > 0 && goban->board_size <= MAX_BOARD);
-
-  memset(goban->board, EMPTY, sizeof goban->board);
-  memset(private->initial_board, EMPTY, sizeof private->initial_board);
-
-  for (pos = 0; pos < BOARDSIZE; pos++) {
-    if (!ON_BOARD2(goban, I(pos), J(pos))) {
-      goban->board[pos]		  = GRAY;
-      private->initial_board[pos] = GRAY;
+  gg_assert(board_size > 0 && board_size <= MAX_BOARD);
+  
+  memset(board, EMPTY, sizeof(board));
+  memset(initial_board, EMPTY, sizeof(initial_board));
+  for (k = 0; k < BOARDSIZE; k++) {
+    if (!ON_BOARD2(I(k), J(k))) {
+      board[k] = GRAY;
+      initial_board[k] = GRAY;
     }
   }
 
-  goban->board_ko_pos   = NO_MOVE;
-  goban->white_captured = 0;
-  goban->black_captured = 0;
+  board_ko_pos = NO_MOVE;
+  white_captured = 0;
+  black_captured = 0;
 
-  goban->stackp = 0;
+  komaster = EMPTY;
+  kom_pos = NO_MOVE;
 
-  private->komaster = EMPTY;
-  private->kom_pos  = NO_MOVE;
+  initial_board_ko_pos = NO_MOVE;
+  initial_white_captured = 0;
+  initial_black_captured = 0;
 
-  private->initial_board_ko_pos   = NO_MOVE;
-  private->initial_white_captured = 0;
-  private->initial_black_captured = 0;
-
-  private->move_history_pointer = 0;
-  goban->move_number		= 0;
-
-  hashdata_recalc(&goban->board_hash, goban->board, goban->board_ko_pos);
-  new_position(goban);
+  move_history_pointer = 0;
+  movenum = 0;
+  
+  hashdata_recalc(&board_hash, board, board_ko_pos);
+  new_position();
 }
-
-
-void
-clear_internal_caches(const Goban *goban)
-{
-#if USE_BOARD_CACHES
-
-  ACCESS_PRIVATE_DATA;
-
-  int pos;
-
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    /* Set thresholds to zero, so that the "cached" values are not
-     * used even if we have an accidental hash value match.
-     */
-    private->approxlib_cache[pos][0].threshold	 = 0;
-    private->approxlib_cache[pos][1].threshold	 = 0;
-    private->accuratelib_cache[pos][0].threshold = 0;
-    private->accuratelib_cache[pos][1].threshold = 0;
-  }
-
-#endif
-}
-
 
 /* Test the integrity of the gray border. */
 int
-test_gray_border(const Goban *goban)
+test_gray_border(void)
 {
-  int pos;
+  int k;
 
-  gg_assert(goban, goban->board_size > 0 && goban->board_size <= MAX_BOARD);
-
-  for (pos = 0; pos < BOARDSIZE; pos++) {
-    if (!ON_BOARD2(goban, I(pos), J(pos)) && goban->board[pos] != GRAY)
-      return pos;
-  }
-
+  gg_assert(board_size > 0 && board_size <= MAX_BOARD);
+  
+  for (k = 0; k < BOARDSIZE; k++)
+    if (!ON_BOARD2(I(k), J(k)))
+      if (board[k] != GRAY)
+      	return k;
+  
   return -1;
 }
 
@@ -512,6 +463,16 @@ test_gray_border(const Goban *goban)
 /* ================================================================ */
 /*                      Temporary moves                             */
 /* ================================================================ */
+
+
+/* Stack of trial moves to get to current
+ * position and which color made them. Perhaps 
+ * this should be one array of a structure 
+ */
+static int stack[MAXSTACK];
+static int move_color[MAXSTACK];
+
+static Hash_data board_hash_stack[MAXSTACK];
 
 /*
  * trymove pushes the position onto the stack, and makes a move
@@ -523,67 +484,56 @@ test_gray_border(const Goban *goban)
  *   if (trymove(...)) {
  *      ...
  *      popgo();
- *   }
+ *   }   
  *
- * The message can be written as a comment to an sgf file using
- * sgfdump(). str can be NO_MOVE if it is not needed but otherwise
+ * The message can be written as a comment to an sgf file using 
+ * sgfdump(). str can be NO_MOVE if it is not needed but otherwise  
  * the location of str is included in the comment.
  */
 
-int
-trymove(Goban *goban, int pos, int color, const char *message, int str)
+int 
+trymove(int pos, int color, const char *message, int str)
 {
-  /* FIXME: Why do we pass it around then? */
   UNUSED(str);
-
   /* Do the real work elsewhere. */
-  if (!do_trymove(goban, pos, color, 0))
+  if (!do_trymove(pos, color, 0))
     return 0;
 
   /* Store the move in an sgf tree if one is available. */
-  if (goban->sgf_dumptree) {
-    ACCESS_PRIVATE_DATA_CONST;
-    char buffer[100];
+  if (sgf_dumptree) {
+    char buf[100];
 
     if (message == NULL)
       message = "UNKNOWN";
 
     if (pos == NO_MOVE) {
-      if (private->komaster != EMPTY)
-	gg_snprintf(buffer, sizeof buffer,
-		    "%s (variation %d, hash %s, komaster %s:%s)",
-		    message, goban->variations_counter,
-		    hashdata_to_string(&goban->board_hash),
-		    color_to_string(private->komaster),
-		    location_to_string(goban->board_size, private->kom_pos));
+      if (komaster != EMPTY)
+	gg_snprintf(buf, 100, "%s (variation %d, hash %s, komaster %s:%s)", 
+		    message, count_variations, hashdata_to_string(&board_hash),
+		    color_to_string(komaster), location_to_string(kom_pos));
       else
-	gg_snprintf(buffer, sizeof buffer,
-		    "%s (variation %d, hash %s)", message,
-		    goban->variations_counter,
-		    hashdata_to_string(&goban->board_hash));
+	gg_snprintf(buf, 100, "%s (variation %d, hash %s)", message,
+		    count_variations, hashdata_to_string(&board_hash));
     }
     else {
-      if (private->komaster != EMPTY)
-	gg_snprintf(buffer, sizeof buffer,
-		    "%s at %s (variation %d, hash %s, komaster %s:%s)",
-		    message, location_to_string(goban->board_size, pos),
-		    goban->variations_counter,
-		    hashdata_to_string(&goban->board_hash),
-		    color_to_string(private->komaster),
-		    location_to_string(goban->board_size, private->kom_pos));
+      if (komaster != EMPTY)
+	gg_snprintf(buf, 100, 
+		    "%s at %s (variation %d, hash %s, komaster %s:%s)", 
+		    message, location_to_string(pos), count_variations,
+		    hashdata_to_string(&board_hash),
+		    color_to_string(komaster),
+		    location_to_string(kom_pos));
       else
-	gg_snprintf(buffer, sizeof buffer, "%s at %s (variation %d, hash %s)",
-		    message, location_to_string(goban->board_size, pos),
-		    goban->variations_counter,
-		    hashdata_to_string(&goban->board_hash));
+	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %s)", 
+		    message, location_to_string(pos), count_variations,
+		    hashdata_to_string(&board_hash));
     }
-
-    sgftreeAddPlayLast(goban->sgf_dumptree, color, I(pos), J(pos));
-    sgftreeAddComment(goban->sgf_dumptree, buffer);
+    sgftreeAddPlayLast(sgf_dumptree, color, I(pos), J(pos));
+    sgftreeAddComment(sgf_dumptree, buf);
   }
-
-  if (goban->variations_counter)
-    goban->variations_counter++;
+  
+  if (count_variations)
+    count_variations++;
   stats.nodes++;
 
   return 1;
@@ -601,31 +551,24 @@ trymove(Goban *goban, int pos, int color, const char *message, int str)
  * zero if it is not legal because of suicide.
  */
 
-int
-tryko(Goban *goban, int pos, int color, const char *message)
+int 
+tryko(int pos, int color, const char *message)
 {
   /* Do the real work elsewhere. */
-  if (!do_trymove(goban, pos, color, 1))
+  if (!do_trymove(pos, color, 1))
     return 0;
 
-  if (goban->sgf_dumptree) {
-    ACCESS_PRIVATE_DATA_CONST;
-    char buffer[100];
-
+  if (sgf_dumptree) {
+    char buf[100];
     if (message == NULL)
       message = "UNKNOWN";
-
-    if (private->komaster != EMPTY)
-      gg_snprintf(buffer, sizeof buffer,
-		  "tryko: %s (variation %d, %s, komaster %s:%s)",
-		  message, goban->variations_counter,
-		  hashdata_to_string(&goban->board_hash),
-		  color_to_string(private->komaster),
-		  location_to_string(goban->board_size, private->kom_pos));
+    if (komaster != EMPTY)
+      gg_snprintf(buf, 100, "tryko: %s (variation %d, %s, komaster %s:%s)", 
+		  message, count_variations, hashdata_to_string(&board_hash),
+		  color_to_string(komaster), location_to_string(kom_pos));
     else
-      gg_snprintf(buffer, sizeof buffer, "tryko: %s (variation %d, %s)",
-		  message, goban->variations_counter,
-		  hashdata_to_string(&goban->board_hash));
+      gg_snprintf(buf, 100, "tryko: %s (variation %d, %s)", message,
+		  count_variations, hashdata_to_string(&board_hash));
 
     /* Add two pass moves to the SGF output to simulate the ko threat
      * and the answer.
@@ -635,17 +578,17 @@ tryko(Goban *goban, int pos, int color, const char *message)
      * captures. SGF FF[4] compliant browsers should have no problem
      * with this, though.
      */
-    sgftreeAddPlayLast(goban->sgf_dumptree, color, -1, -1);
-    sgftreeAddComment(goban->sgf_dumptree, "tenuki (ko threat)");
-    sgftreeAddPlayLast(goban->sgf_dumptree, OTHER_COLOR(color), -1, -1);
-    sgftreeAddComment(goban->sgf_dumptree, "tenuki (answers ko threat)");
+    sgftreeAddPlayLast(sgf_dumptree, color, -1, -1);
+    sgftreeAddComment(sgf_dumptree, "tenuki (ko threat)");
+    sgftreeAddPlayLast(sgf_dumptree, OTHER_COLOR(color), -1, -1);
+    sgftreeAddComment(sgf_dumptree, "tenuki (answers ko threat)");
 
-    sgftreeAddPlayLast(goban->sgf_dumptree, color, I(pos), J(pos));
-    sgftreeAddComment(goban->sgf_dumptree, buffer);
+    sgftreeAddPlayLast(sgf_dumptree, color, I(pos), J(pos));
+    sgftreeAddComment(sgf_dumptree, buf);
   }
-
-  if (goban->variations_counter)
-    goban->variations_counter++;
+  
+  if (count_variations)
+    count_variations++;
   stats.nodes++;
 
   return 1;
@@ -658,29 +601,25 @@ tryko(Goban *goban, int pos, int color, const char *message)
  * Return 1 if the move was valid, otherwise 0.
  */
 
-static int
-do_trymove(Goban *goban, int pos, int color, int ignore_ko)
+static int 
+do_trymove(int pos, int color, int ignore_ko)
 {
-  ACCESS_PRIVATE_DATA;
-
   /* 1. The color must be BLACK or WHITE. */
-  gg_assert(goban, color == BLACK || color == WHITE);
-
+  gg_assert(color == BLACK || color == WHITE);
+ 
   if (pos != PASS_MOVE) {
-    ACCESS_BOARD;
-
     /* 2. Unless pass, the move must be inside the board. */
-    ASSERT_ON_BOARD1(goban, pos);
-
+    ASSERT_ON_BOARD1(pos);
+    
     /* Update the reading tree shadow. */
-    goban->shadow[pos] = 1;
+    shadow[pos] = 1;
 
     /* 3. The location must be empty. */
     if (board[pos] != EMPTY)
       return 0;
-
+    
     /* 4. The location must not be the ko point, unless ignore_ko == 1. */
-    if (!ignore_ko && pos == goban->board_ko_pos) {
+    if (!ignore_ko && pos == board_ko_pos) {
       if (board[WEST(pos)] == OTHER_COLOR(color)
 	  || board[EAST(pos)] == OTHER_COLOR(color)) {
 	return 0;
@@ -688,18 +627,18 @@ do_trymove(Goban *goban, int pos, int color, int ignore_ko)
     }
 
     /* 5. Test for suicide. */
-    if (is_suicide(goban, pos, color))
+    if (is_suicide(pos, color))
       return 0;
   }
-
+  
   /* Check for stack overflow. */
-  if (goban->stackp >= MAXSTACK - 2) {
-    fprintf(stderr,
+  if (stackp >= MAXSTACK-2) {
+    fprintf(stderr, 
 	    "gnugo: Truncating search. This is beyond my reading ability!\n");
     /* FIXME: Perhaps it's best to just assert here and be done with it? */
-    if (0)
-      ASSERT1(goban, 0 && "trymove stack overflow", pos);
-
+    if (0) {
+      ASSERT1(0 && "trymove stack overflow", pos);
+    }
 #if 0
     if (verbose > 0) {
       showboard(0);
@@ -712,20 +651,20 @@ do_trymove(Goban *goban, int pos, int color, int ignore_ko)
 
 
   /* Only count trymove when we do create a new position. */
-  private->trymove_counter++;
-
+  trymove_counter++;
+  
   /* So far, so good. Now push the move on the move stack. These are
    * needed for dump_stack().
    */
-  private->stack[goban->stackp]	     = pos;
-  private->move_color[goban->stackp] = color;
+  stack[stackp] = pos;
+  move_color[stackp] = color;
 
   /*
    * FIXME: Do we really have to store board_hash in a stack?
    *
    * Answer: No, we don't.  But for every stone that we add
    *         or remove, we must call hashdata_invert_stone(). This is
-   *         not difficult per se, but the whole board.c
+   *         not difficult per se, but the whole board.c 
    *         will have to be checked, and there is lots of room
    *         for mistakes.
    *
@@ -734,21 +673,20 @@ do_trymove(Goban *goban, int pos, int color, int ignore_ko)
    *         this is not an urgent FIXME.
    */
   BEGIN_CHANGE_RECORD();
-  PUSH_VALUE(goban->board_ko_pos);
-  memcpy(&private->board_hash_stack[goban->stackp], &goban->board_hash,
-	 sizeof goban->board_hash);
+  PUSH_VALUE(board_ko_pos);
+  memcpy(&board_hash_stack[stackp], &board_hash, sizeof(board_hash));
 
-  if (goban->board_ko_pos != NO_MOVE)
-    hashdata_invert_ko(&goban->board_hash, goban->board_ko_pos);
+  if (board_ko_pos != NO_MOVE)
+    hashdata_invert_ko(&board_hash, board_ko_pos);
 
-  goban->board_ko_pos = NO_MOVE;
-
-  goban->stackp++;
+  board_ko_pos = NO_MOVE;
+  
+  stackp++;
 
   if (pos != PASS_MOVE) {
-    PUSH_VALUE(goban->black_captured);
-    PUSH_VALUE(goban->white_captured);
-    do_play_move(goban, pos, color);
+    PUSH_VALUE(black_captured);
+    PUSH_VALUE(white_captured);
+    do_play_move(pos, color);
   }
 
   return 1;
@@ -760,38 +698,33 @@ do_trymove(Goban *goban, int pos, int color, int ignore_ko)
  */
 
 void
-popgo(Goban *goban)
+popgo()
 {
-  ACCESS_PRIVATE_DATA;
+  stackp--;
+  
+  undo_trymove();
+  
+  memcpy(&board_hash, &(board_hash_stack[stackp]), sizeof(board_hash));
 
-  goban->stackp--;
-  undo_trymove(goban);
-
-  memcpy(&goban->board_hash, &private->board_hash_stack[goban->stackp],
-	 sizeof goban->board_hash);
-
-  if (goban->sgf_dumptree) {
-    char buffer[100];
+  if (sgf_dumptree) {
+    char buf[100];
     int is_tryko = 0;
     char *sgf_comment;
 
     /* FIXME: Change the sgfGet*Property() interface so that either
      * "C" instead of "C " works or the SGFXX symbols are used.
      */
-    if (sgfGetCharProperty(goban->sgf_dumptree->lastnode, "C ", &sgf_comment)
+    if (sgfGetCharProperty(sgf_dumptree->lastnode, "C ", &sgf_comment)
 	&& strncmp(sgf_comment, "tryko:", 6) == 0)
       is_tryko = 1;
-
-    gg_snprintf(buffer, sizeof buffer, "(next variation: %d)",
-		goban->variations_counter);
-    sgftreeAddComment(goban->sgf_dumptree, buffer);
-    goban->sgf_dumptree->lastnode = goban->sgf_dumptree->lastnode->parent;
+    
+    gg_snprintf(buf, 100, "(next variation: %d)", count_variations);
+    sgftreeAddComment(sgf_dumptree, buf);
+    sgf_dumptree->lastnode = sgf_dumptree->lastnode->parent;
 
     /* After tryko() we need to undo two pass nodes too. */
-    if (is_tryko) {
-      goban->sgf_dumptree->lastnode
-	= goban->sgf_dumptree->lastnode->parent->parent;
-    }
+    if (is_tryko)
+      sgf_dumptree->lastnode = sgf_dumptree->lastnode->parent->parent;
   }
 }
 
@@ -803,12 +736,11 @@ popgo(Goban *goban)
  */
 
 static void
-silent_popgo(Goban *goban)
+silent_popgo(void)
 {
-  goban->stackp--;
-  undo_trymove(goban);
-  memcpy(&goban->board_hash, &private->board_hash_stack[goban->stackp],
-	 sizeof goban->board_hash);
+  stackp--;
+  undo_trymove();
+  memcpy(&board_hash, &(board_hash_stack[stackp]), sizeof(board_hash));
 }
 
 #endif
@@ -819,19 +751,13 @@ silent_popgo(Goban *goban)
  */
 
 static void
-undo_trymove(Goban *goban)
+undo_trymove()
 {
-  ACCESS_PRIVATE_DATA;
-
-  gg_assert(goban,
-	    private->change_stack_pointer - private->change_stack
-	    <= STACK_SIZE);
+  gg_assert(change_stack_pointer - change_stack <= STACK_SIZE);
 
   if (0) {
-    gprintf(goban, "Change stack size = %d\n",
-	    private->change_stack_pointer - private->change_stack);
-    gprintf(goban, "Vertex stack size = %d\n",
-	    private->vertex_stack_pointer - private->vertex_stack);
+    gprintf("Change stack size = %d\n", change_stack_pointer - change_stack);
+    gprintf("Vertex stack size = %d\n", vertex_stack_pointer - vertex_stack);
   }
 
   POP_MOVE();
@@ -841,38 +767,33 @@ undo_trymove(Goban *goban)
 
 
 /*
- * dump_stack() for use under gdb prints the move stack.
+ * dump_stack() for use under gdb prints the move stack. 
  */
 
 void
-dump_stack(const Goban *goban)
+dump_stack(void)
 {
-  do_dump_stack(goban);
+  do_dump_stack();
 
 #if !TRACE_READ_RESULTS
-  if (goban->variations_counter)
-    gprintf(goban, "%o (variation %d)", goban->variations_counter - 1);
+  if (count_variations)
+    gprintf("%o (variation %d)", count_variations-1);
 #else
-  gprintf(goban, "%o (%s)", hashdata_to_string(&goban->board_hash));
+  gprintf("%o (%s)", hashdata_to_string(&board_hash));
 #endif
 
-  gprintf(goban, "%o\n");
+  gprintf("%o\n");
   fflush(stderr);
 }
 
 /* Bare bones of dump_stack(). */
 void
-do_dump_stack(const Goban *goban)
+do_dump_stack(void)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
   int n;
 
-  for (n = 0; n < goban->stackp; n++) {
-    gprintf(goban, "%o%s:%1m ",
-	    private->move_color[n] == BLACK ? "B" : "W",
-	    private->stack[n]);
-  }
+  for (n = 0; n < stackp; n++)
+    gprintf("%o%s:%1m ", move_color[n] == BLACK ? "B" : "W", stack[n]);
 }
 
 /* ================================================================ */
@@ -881,16 +802,13 @@ do_dump_stack(const Goban *goban)
 
 
 static void
-reset_move_history(Goban *goban)
+reset_move_history(void)
 {
-  ACCESS_PRIVATE_DATA;
-
-  memcpy(private->initial_board, goban->board, sizeof goban->board);
-  private->initial_board_ko_pos	  = goban->board_ko_pos;
-  private->initial_white_captured = goban->white_captured;
-  private->initial_black_captured = goban->black_captured;
-
-  private->move_history_pointer = 0;
+  memcpy(initial_board, board, sizeof(board));
+  initial_board_ko_pos = board_ko_pos;
+  initial_white_captured = white_captured;
+  initial_black_captured = black_captured;
+  move_history_pointer = 0;
 }
 
 /* Place a stone on the board and update the board_hash. This operation
@@ -898,19 +816,16 @@ reset_move_history(Goban *goban)
  */
 
 void
-add_stone(Goban *goban, int pos, int color)
+add_stone(int pos, int color)
 {
-  ACCESS_BOARD;
-
-  ASSERT1(goban, goban->stackp == 0, pos);
-  ASSERT_ON_BOARD1(goban, pos);
-  ASSERT1(goban, board[pos] == EMPTY, pos);
+  ASSERT1(stackp == 0, pos);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] == EMPTY, pos);
 
   board[pos] = color;
-  hashdata_invert_stone(&goban->board_hash, pos, color);
-  reset_move_history(goban);
-
-  new_position(goban);
+  hashdata_invert_stone(&board_hash, pos, color);
+  reset_move_history();
+  new_position();
 }
 
 
@@ -919,19 +834,16 @@ add_stone(Goban *goban, int pos, int color)
  */
 
 void
-remove_stone(Goban *goban, int pos)
+remove_stone(int pos)
 {
-  ACCESS_BOARD;
+  ASSERT1(stackp == 0, pos);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(IS_STONE(board[pos]), pos);
 
-  ASSERT1(goban, goban->stackp == 0, pos);
-  ASSERT_ON_BOARD1(goban, pos);
-  ASSERT1(goban, IS_STONE(board[pos]), pos);
-
-  hashdata_invert_stone(&goban->board_hash, pos, board[pos]);
+  hashdata_invert_stone(&board_hash, pos, board[pos]);
   board[pos] = EMPTY;
-  reset_move_history(goban);
-
-  new_position(goban);
+  reset_move_history();
+  new_position();
 }
 
 
@@ -943,74 +855,67 @@ remove_stone(Goban *goban, int pos)
  * it yourself after all the moves have been played.
  */
 static void
-play_move_no_history(Goban *goban, int pos, int color, int update_internals)
+play_move_no_history(int pos, int color, int update_internals)
 {
-  ACCESS_PRIVATE_DATA;
-
 #if CHECK_HASHING
   Hash_data oldkey;
 
   /* Check the hash table to see if it corresponds to the cumulative one. */
-  hashdata_recalc(&oldkey, goban->board, goban->board_ko_pos);
-  gg_assert(goban, hashdata_is_equal(oldkey, goban->board_hash));
+  hashdata_recalc(&oldkey, board, board_ko_pos);
+  gg_assert(hashdata_is_equal(oldkey, board_hash));
 #endif
 
-  if (goban->board_ko_pos != NO_MOVE)
-    hashdata_invert_ko(&goban->board_hash, goban->board_ko_pos);
-  goban->board_ko_pos = NO_MOVE;
+  if (board_ko_pos != NO_MOVE)
+    hashdata_invert_ko(&board_hash, board_ko_pos);
+  board_ko_pos = NO_MOVE;
 
   /* If the move is a pass, we can skip some steps. */
   if (pos != PASS_MOVE) {
-    ASSERT_ON_BOARD1(goban, pos);
-    ASSERT1(goban, goban->board[pos] == EMPTY, pos);
+    ASSERT_ON_BOARD1(pos);
+    ASSERT1(board[pos] == EMPTY, pos);
 
     /* Do play the move. */
-    if (!is_suicide(goban, pos, color))
-      do_play_move(goban, pos, color);
+    if (!is_suicide(pos, color))
+      do_play_move(pos, color);
     else
-      do_commit_suicide(goban, pos, color);
+      do_commit_suicide(pos, color);
 
 #if CHECK_HASHING
     /* Check the hash table to see if it equals the previous one. */
-    hashdata_recalc(&oldkey, goban->board, goban->board_ko_pos);
-    gg_assert(goban, hashdata_is_equal(oldkey, goban->board_hash));
+    hashdata_recalc(&oldkey, board, board_ko_pos);
+    gg_assert(hashdata_is_equal(oldkey, board_hash));
 #endif
   }
 
-  if (update_internals || private->next_string == MAX_STRINGS)
-    new_position(goban);
+  if (update_internals || next_string == MAX_STRINGS)
+    new_position();
   else
     CLEAR_STACKS();
 }
 
 /* Load the initial position and replay the first n moves. */
 static void
-replay_move_history(Goban *goban, int n)
+replay_move_history(int n)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
   int k;
+  
+  memcpy(board, initial_board, sizeof(board));
+  board_ko_pos = initial_board_ko_pos;
+  white_captured = initial_white_captured;
+  black_captured = initial_black_captured;
+  new_position();
 
-  memcpy(goban->board, private->initial_board, sizeof goban->board);
-  goban->board_ko_pos	= private->initial_board_ko_pos;
-  goban->white_captured = private->initial_white_captured;
-  goban->black_captured = private->initial_black_captured;
+  for (k = 0; k < n; k++)
+    play_move_no_history(move_history_pos[k], move_history_color[k], 0);
 
-  new_position(goban);
-
-  for (k = 0; k < n; k++) {
-    play_move_no_history(goban, private->move_history_pos[k],
-			 private->move_history_color[k], 0);
-  }
-
-  new_position(goban);
+  new_position();
 }
 
 /* Play a move. If you want to test for legality you should first call
- * is_legal(). This function strictly follows the algorithm:
+ * is_legal(). This function strictly follows the algorithm: 
  * 1. Place a stone of given color on the board.
  * 2. If there are any adjacent opponent strings without liberties,
- *    remove them and increase the prisoner count.
+ *    remove them and increase the prisoner count. 
  * 3. If the newly placed stone is part of a string without liberties,
  *    remove it and increase the prisoner count.
  *
@@ -1021,62 +926,53 @@ replay_move_history(Goban *goban, int n)
  * possible to unplay at a later time.
  */
 void
-play_move(Goban *goban, int pos, int color)
+play_move(int pos, int color)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD;
+  ASSERT1(stackp == 0, pos);
+  ASSERT1(color == WHITE || color == BLACK, pos);
+  ASSERT1(pos == PASS_MOVE || ON_BOARD1(pos), pos);
+  ASSERT1(pos == PASS_MOVE || board[pos] == EMPTY, pos);
+  ASSERT1(komaster == EMPTY && kom_pos == NO_MOVE, pos);
 
-  ASSERT1(goban, goban->stackp == 0, pos);
-  ASSERT1(goban, color == WHITE || color == BLACK, pos);
-  ASSERT1(goban, pos == PASS_MOVE || ON_BOARD1(goban, pos), pos);
-  ASSERT1(goban, pos == PASS_MOVE || board[pos] == EMPTY, pos);
-  ASSERT1(goban, private->komaster == EMPTY && private->kom_pos == NO_MOVE,
-	  pos);
-
-  if (private->move_history_pointer >= MAX_MOVE_HISTORY) {
+  if (move_history_pointer >= MAX_MOVE_HISTORY) {
     /* The move history is full. We resolve this by collapsing the
      * first about 10% of the moves into the initial position.
      */
     int number_collapsed_moves = 1 + MAX_MOVE_HISTORY / 10;
     int k;
     Intersection saved_board[BOARDSIZE];
-    int saved_board_ko_pos   = goban->board_ko_pos;
-    int saved_white_captured = goban->white_captured;
-    int saved_black_captured = goban->black_captured;
+    int saved_board_ko_pos = board_ko_pos;
+    int saved_white_captured = white_captured;
+    int saved_black_captured = black_captured;
+    memcpy(saved_board, board, sizeof(board));
 
-    memcpy(saved_board, board, sizeof goban->board);
+    replay_move_history(number_collapsed_moves);
 
-    replay_move_history(goban, number_collapsed_moves);
+    memcpy(initial_board, board, sizeof(board));
+    initial_board_ko_pos = board_ko_pos;
+    initial_white_captured = white_captured;
+    initial_black_captured = black_captured;
 
-    memcpy(private->initial_board, board, sizeof goban->board);
-    private->initial_board_ko_pos   = goban->board_ko_pos;
-    private->initial_white_captured = goban->white_captured;
-    private->initial_black_captured = goban->black_captured;
-
-    for (k = number_collapsed_moves; k < private->move_history_pointer; k++) {
-      private->move_history_color[k - number_collapsed_moves]
-	= private->move_history_color[k];
-      private->move_history_pos[k - number_collapsed_moves]
-	= private->move_history_pos[k];
+    for (k = number_collapsed_moves; k < move_history_pointer; k++) {
+      move_history_color[k - number_collapsed_moves] = move_history_color[k];
+      move_history_pos[k - number_collapsed_moves] = move_history_pos[k];
     }
+    move_history_pointer -= number_collapsed_moves;
 
-    private->move_history_pointer -= number_collapsed_moves;
-
-    memcpy(board, saved_board, sizeof goban->board);
-    goban->board_ko_pos   = saved_board_ko_pos;
-    goban->white_captured = saved_white_captured;
-    goban->black_captured = saved_black_captured;
-
-    new_position(goban);
+    memcpy(board, saved_board, sizeof(board));
+    board_ko_pos = saved_board_ko_pos;
+    white_captured = saved_white_captured;
+    black_captured = saved_black_captured;
+    new_position();
   }
 
-  private->move_history_color[private->move_history_pointer] = color;
-  private->move_history_pos[private->move_history_pointer]   = pos;
-  private->move_history_pointer++;
-
-  play_move_no_history(goban, pos, color, 1);
-
-  goban->move_number++;
+  move_history_color[move_history_pointer] = color;
+  move_history_pos[move_history_pointer] = pos;
+  move_history_pointer++;
+  
+  play_move_no_history(pos, color, 1);
+  
+  movenum++;
 }
 
 
@@ -1084,48 +980,19 @@ play_move(Goban *goban, int pos, int color)
  * If n moves cannot be undone, no move is undone.
  */
 int
-undo_moves(Goban *goban, int n)
+undo_move(int n)
 {
-  ACCESS_PRIVATE_DATA;
-
-  gg_assert(goban, goban->stackp == 0);
-
+  gg_assert(stackp == 0);
+  
   /* Fail if and only if the move history is too short. */
-  if (private->move_history_pointer < n)
+  if (move_history_pointer < n)
     return 0;
 
-  replay_move_history(goban, private->move_history_pointer - n);
-  private->move_history_pointer -= n;
-  goban->move_number		-= n;
+  replay_move_history(move_history_pointer - n);
+  move_history_pointer -= n;
+  movenum -= n;
 
   return 1;
-}
-
-
-/* Return the last move done by anyone. Both if no move was found or
- * if the last move was a pass, PASS_MOVE is returned.
- */
-int
-get_last_move(const Goban *goban)
-{
-  ACCESS_PRIVATE_DATA;
-  if (private->move_history_pointer == 0)
-    return PASS_MOVE;
-
-  return private->move_history_pos[private->move_history_pointer - 1];
-}
-
-/* Return the color of the player doing the last move. If no move was
- * found, EMPTY is returned.
- */
-int
-get_last_player(const Goban *goban)
-{
-  ACCESS_PRIVATE_DATA;
-  if (private->move_history_pointer == 0)
-    return EMPTY;
-
-  return private->move_history_color[private->move_history_pointer - 1];
 }
 
 
@@ -1133,17 +1000,39 @@ get_last_player(const Goban *goban)
  * was found or if the last move was a pass, PASS_MOVE is returned.
  */
 int
-get_last_opponent_move(const Goban *goban, int color)
+get_last_opponent_move(int color)
 {
-  ACCESS_PRIVATE_DATA;
   int k;
-
-  for (k = private->move_history_pointer - 1; k >= 0; k--) {
-    if (private->move_history_color[k] == OTHER_COLOR(color))
-      return private->move_history_pos[k];
-  }
+  
+  for (k = move_history_pointer - 1; k >= 0; k--)
+    if (move_history_color[k] == OTHER_COLOR(color))
+      return move_history_pos[k];
 
   return PASS_MOVE;
+}
+
+/* Return the last move done by anyone. Both if no move was found or
+ * if the last move was a pass, PASS_MOVE is returned.
+ */
+int
+get_last_move()
+{
+  if (move_history_pointer == 0)
+    return PASS_MOVE;
+
+  return move_history_pos[move_history_pointer - 1];
+}
+
+/* Return the color of the player doing the last move. If no move was
+ * found, EMPTY is returned.
+ */
+int
+get_last_player()
+{
+  if (move_history_pointer == 0)
+    return EMPTY;
+
+  return move_history_color[move_history_pointer - 1];
 }
 
 
@@ -1168,43 +1057,42 @@ is_pass(int pos)
  * pos is legal.
  */
 
-int
-is_legal(const Goban *goban, int pos, int color)
+int 
+is_legal(int pos, int color)
 {
-  ACCESS_BOARD_CONST;
-
   /* 0. A pass move is always legal. */
   if (pos == 0)
     return 1;
 
   /* 1. The move must be inside the board. */
-  ASSERT_ON_BOARD1(goban, pos);
+  ASSERT_ON_BOARD1(pos);
 
   /* 2. The location must be empty. */
-  if (board[pos] != EMPTY)
+  if (board[pos] != EMPTY) 
     return 0;
 
   /* 3. The location must not be the ko point. */
-  if (pos == goban->board_ko_pos
-      && (board[WEST(pos)] == OTHER_COLOR(color)
-	  || board[EAST(pos)] == OTHER_COLOR(color)))
-    return 0;
+  if (pos == board_ko_pos)
+    if (board[WEST(pos)] == OTHER_COLOR(color)
+	|| board[EAST(pos)] == OTHER_COLOR(color)) {
+      return 0;
+    }
 
   /* Check for stack overflow. */
-  if (goban->stackp >= MAXSTACK - 2) {
-    fprintf(stderr,
+  if (stackp >= MAXSTACK-2) {
+    fprintf(stderr, 
 	    "gnugo: Truncating search. This is beyond my reading ability!\n");
     /* FIXME: Perhaps it's best to just assert here and be done with it? */
-    if (0)
-      ASSERT1(goban, 0 && "is_legal stack overflow", pos);
-
+    if (0) {
+      ASSERT1(0 && "is_legal stack overflow", pos);
+    }
     return 0;
   }
 
   /* Check for suicide. */
-  if (!goban->allow_suicide && is_suicide(goban, pos, color))
+  if (!allow_suicide && is_suicide(pos, color))
     return 0;
-
+  
   return 1;
 }
 
@@ -1218,33 +1106,30 @@ is_legal(const Goban *goban, int pos, int color)
  * 2. There is no neighboring opponent string with exactly one liberty.
  * 3. There is no neighboring friendly string with more than one liberty.
  */
-int
-is_suicide(const Goban *goban, int pos, int color)
+int 
+is_suicide(int pos, int color)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-  ACCESS_BOARD_CONST;
-
-  ASSERT_ON_BOARD1(goban, pos);
-  ASSERT1(goban, board[pos] == EMPTY, pos);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] == EMPTY, pos);
 
   /* Check for suicide. */
   if (LIBERTY(SOUTH(pos))
-      || (ON_BOARD(goban, SOUTH(pos))
+      || (ON_BOARD(SOUTH(pos))
 	  && ((board[SOUTH(pos)] == color) ^ (LIBERTIES(SOUTH(pos)) == 1))))
     return 0;
 
   if (LIBERTY(WEST(pos))
-      || (ON_BOARD(goban, WEST(pos))
+      || (ON_BOARD(WEST(pos))
 	  && ((board[WEST(pos)] == color) ^ (LIBERTIES(WEST(pos)) == 1))))
     return 0;
 
   if (LIBERTY(NORTH(pos))
-      || (ON_BOARD(goban, NORTH(pos))
+      || (ON_BOARD(NORTH(pos))
 	  && ((board[NORTH(pos)] == color) ^ (LIBERTIES(NORTH(pos)) == 1))))
     return 0;
 
   if (LIBERTY(EAST(pos))
-      || (ON_BOARD(goban, EAST(pos))
+      || (ON_BOARD(EAST(pos))
 	  && ((board[EAST(pos)] == color) ^ (LIBERTIES(EAST(pos)) == 1))))
     return 0;
 
@@ -1256,45 +1141,36 @@ is_suicide(const Goban *goban, int pos, int color)
  * is_illegal_ko_capture(pos, color) determines whether the move
  * (color) at (pos) would be an illegal ko capture.
  */
-int
-is_illegal_ko_capture(const Goban *goban, int pos, int color)
+int 
+is_illegal_ko_capture(int pos, int color)
 {
-  ACCESS_BOARD_CONST;
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] == EMPTY, pos);
 
-  ASSERT_ON_BOARD1(goban, pos);
-  ASSERT1(goban, board[pos] == EMPTY, pos);
-
-  return (pos == goban->board_ko_pos
-	  && (board[WEST(pos)] == OTHER_COLOR(color)
-	      || board[EAST(pos)] == OTHER_COLOR(color)));
+  return (pos == board_ko_pos
+	  && ((board[WEST(pos)] == OTHER_COLOR(color))
+	      || (board[EAST(pos)] == OTHER_COLOR(color))));
 }
-
 
 /* Necessary work to set the new komaster state. */
 static void
-set_new_komaster(Goban *goban, int new_komaster)
+set_new_komaster(int new_komaster)
 {
-  ACCESS_PRIVATE_DATA;
-
-  PUSH_VALUE(private->komaster);
-  hashdata_invert_komaster(&goban->board_hash, private->komaster);
-  private->komaster = new_komaster;
-  hashdata_invert_komaster(&goban->board_hash, private->komaster);
+  PUSH_VALUE(komaster);
+  hashdata_invert_komaster(&board_hash, komaster);
+  komaster = new_komaster;
+  hashdata_invert_komaster(&board_hash, komaster);
 }
-
 
 /* Necessary work to set the new komaster position. */
 static void
-set_new_kom_pos(Goban *goban, int new_kom_pos)
+set_new_kom_pos(int new_kom_pos)
 {
-  ACCESS_PRIVATE_DATA;
-
-  PUSH_VALUE(private->kom_pos);
-  hashdata_invert_kom_pos(&goban->board_hash, private->kom_pos);
-  private->kom_pos = new_kom_pos;
-  hashdata_invert_kom_pos(&goban->board_hash, private->kom_pos);
+  PUSH_VALUE(kom_pos);
+  hashdata_invert_kom_pos(&board_hash, kom_pos);
+  kom_pos = new_kom_pos;
+  hashdata_invert_kom_pos(&board_hash, kom_pos);
 }
-
 
 /* Variation of trymove()/tryko() where ko captures (both conditional
  * and unconditional) must follow a komaster scheme.
@@ -1310,7 +1186,7 @@ set_new_kom_pos(Goban *goban, int new_kom_pos)
  */
 
 /* V. Complex scheme, O to move.
- *
+ * 
  * 1. Komaster is EMPTY.
  * 1a) Unconditional ko capture is allowed.
  *       Komaster remains EMPTY if previous move was not a ko capture.
@@ -1319,17 +1195,17 @@ set_new_kom_pos(Goban *goban, int new_kom_pos)
  * 1b) Conditional ko capture is allowed. Komaster is set to O and
  *     kom_pos to the location of the ko, where a stone was
  *     just removed.
- *
+ * 
  * 2. Komaster is O:
  * 2a) Only nested ko captures are allowed. Kom_pos is moved to the
  *     new removed stone.
  * 2b) If komaster fills the ko at kom_pos then komaster reverts to
  *     EMPTY.
- *
+ * 
  * 3. Komaster is X:
  *    Play at kom_pos is not allowed. Any other ko capture
  *    is allowed. If O takes another ko, komaster becomes GRAY_X.
- *
+ * 
  * 4. Komaster is GRAY_O or GRAY_X:
  *    Ko captures are not allowed. If the ko at kom_pos is
  *    filled then the komaster reverts to EMPTY.
@@ -1342,17 +1218,13 @@ set_new_kom_pos(Goban *goban, int new_kom_pos)
  * 5c) Conditional ko capture is allowed according to the rules of 1b.
  */
 int
-komaster_trymove(Goban *goban, int pos, int color,
-		 const char *message, int str,
+komaster_trymove(int pos, int color, const char *message, int str,
 		 int *is_conditional_ko, int consider_conditional_ko)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-  ACCESS_BOARD_CONST;
-
   int other = OTHER_COLOR(color);
   int ko_move;
   int kpos;
-  int previous_board_ko_pos = goban->board_ko_pos;
+  int previous_board_ko_pos = board_ko_pos;
 
   /* First we check whether the ko claimed by komaster has been
    * resolved. If that is the case, we revert komaster to EMPTY.
@@ -1361,64 +1233,62 @@ komaster_trymove(Goban *goban, int pos, int color,
    * been filled, or if it is no longer a ko and an opponent move
    * there is suicide.
    */
-  if (((private->komaster == WHITE || private->komaster == GRAY_WHITE)
-       && (IS_STONE(board[private->kom_pos])
-	   || (!is_ko(goban, private->kom_pos, BLACK, NULL)
-	       && is_suicide(goban, private->kom_pos, BLACK))))
-      || ((private->komaster == BLACK || private->komaster == GRAY_BLACK)
-	  && (IS_STONE(board[private->kom_pos])
-	      || (!is_ko(goban, private->kom_pos, WHITE, NULL)
-		  && is_suicide(goban, private->kom_pos, WHITE))))) {
-    set_new_komaster(goban, EMPTY);
-    set_new_kom_pos(goban, NO_MOVE);
+  if (((komaster == WHITE || komaster == GRAY_WHITE)
+       && (IS_STONE(board[kom_pos])
+	   || (!is_ko(kom_pos, BLACK, NULL)
+	       && is_suicide(kom_pos, BLACK))))
+      || ((komaster == BLACK || komaster == GRAY_BLACK)
+	  && (IS_STONE(board[kom_pos])
+	      || (!is_ko(kom_pos, WHITE, NULL)
+		  && is_suicide(kom_pos, WHITE))))) {
+    set_new_komaster(EMPTY);
+    set_new_kom_pos(NO_MOVE);
   }
 
   *is_conditional_ko = 0;
-  ko_move = is_ko(goban, pos, color, &kpos);
+  ko_move = is_ko(pos, color, &kpos);
 
   if (!ko_move) {
-    if (private->komaster == WEAK_KO) {
-      set_new_komaster(goban, EMPTY);
-      set_new_kom_pos(goban, NO_MOVE);
+    if (komaster == WEAK_KO) {
+      set_new_komaster(EMPTY);
+      set_new_kom_pos(NO_MOVE);
     }
   }
   else {
     /* If opponent is komaster we may not capture his ko. */
-    if (private->komaster == other && pos == private->kom_pos)
+    if (komaster == other && pos == kom_pos)
       return 0;
 
     /* If komaster is gray we may not capture ko at all. */
-    if (private->komaster == GRAY_WHITE || private->komaster == GRAY_BLACK)
+    if (komaster == GRAY_WHITE || komaster == GRAY_BLACK)
       return 0;
 
     /* If we are komaster, we may only do nested captures. */
-    if (private->komaster == color
-	&& !DIAGONAL_NEIGHBORS(kpos, private->kom_pos))
+    if (komaster == color && !DIAGONAL_NEIGHBORS(kpos, kom_pos))
       return 0;
 
     /* If komaster is WEAK_KO, we may only do nested ko capture or
      * conditional ko capture.
      */
-    if (private->komaster == WEAK_KO) {
-      if (pos != goban->board_ko_pos
-	  && !DIAGONAL_NEIGHBORS(kpos, private->kom_pos))
+    if (komaster == WEAK_KO) {
+      if (pos != board_ko_pos && !DIAGONAL_NEIGHBORS(kpos, kom_pos))
 	return 0;
     }
   }
 
-  if (!trymove(goban, pos, color, message, str)) {
+  if (!trymove(pos, color, message, str)) {
     if (!consider_conditional_ko)
       return 0;
 
-    if (!tryko(goban, pos, color, message))
+    if (!tryko(pos, color, message))
       return 0; /* Suicide. */
-
+      
     *is_conditional_ko = 1;
 
     /* Conditional ko capture, set komaster parameters. */
-    if (private->komaster == EMPTY || private->komaster == WEAK_KO) {
-      set_new_komaster(goban, color);
-      set_new_kom_pos(goban, kpos);
+    if (komaster == EMPTY || komaster == WEAK_KO) {
+      set_new_komaster(color);
+      set_new_kom_pos(kpos);
       return 1;
     }
   }
@@ -1426,78 +1296,74 @@ komaster_trymove(Goban *goban, int pos, int color,
   if (!ko_move)
     return 1;
 
-  if (private->komaster == other) {
+  if (komaster == other) {
     if (color == WHITE)
-      set_new_komaster(goban, GRAY_BLACK);
+      set_new_komaster(GRAY_BLACK);
     else
-      set_new_komaster(goban, GRAY_WHITE);
+      set_new_komaster(GRAY_WHITE);
   }
-  else if (private->komaster == color) {
+  else if (komaster == color) {
     /* This is where we update kom_pos after a nested capture. */
-    set_new_kom_pos(goban, kpos);
+    set_new_kom_pos(kpos);
   }
   else {
     /* We can reach here when komaster is EMPTY or WEAK_KO. If previous
      * move was also a ko capture, we now set komaster to WEAK_KO.
      */
     if (previous_board_ko_pos != NO_MOVE) {
-      set_new_komaster(goban, WEAK_KO);
-      set_new_kom_pos(goban, previous_board_ko_pos);
+      set_new_komaster(WEAK_KO);
+      set_new_kom_pos(previous_board_ko_pos);
     }
   }
-
+  
   return 1;
 }
 
-
 int
-get_komaster(const Goban *goban)
+get_komaster()
 {
-  return goban->private->komaster;
+  return komaster;
 }
 
-
 int
-get_kom_pos(const Goban *goban)
+get_kom_pos()
 {
-  return goban->private->kom_pos;
+  return kom_pos;
 }
 
 
 /* Determine whether vertex is on the edge. */
 int
-is_edge_vertex(const Goban *goban, int pos)
+is_edge_vertex(int pos)
 {
-  ASSERT_ON_BOARD1(goban, pos);
-  if (!ON_BOARD(goban, SW(pos))
-      || !ON_BOARD(goban, NE(pos)))
+  ASSERT_ON_BOARD1(pos);
+  if (!ON_BOARD(SW(pos))
+      || !ON_BOARD(NE(pos)))
     return 1;
 
   return 0;
 }
 
-
-/* Calculate the distance to the edge. */
+/* Distance to the edge. */
 int
-edge_distance(const Goban *goban, int pos)
+edge_distance(int pos)
 {
   int i = I(pos);
   int j = J(pos);
-  ASSERT_ON_BOARD1(goban, pos);
-  return gg_min(gg_min(i, (goban->board_size - 1) - i),
-		gg_min(j, (goban->board_size - 1) - j));
+  ASSERT_ON_BOARD1(pos);
+  return gg_min(gg_min(i, board_size-1 - i), gg_min(j, board_size-1 - j));
 }
 
 
 /* Determine whether vertex is a corner. */
 int
-is_corner_vertex(const Goban *goban, int pos)
+is_corner_vertex(int pos)
 {
-  ASSERT_ON_BOARD1(goban, pos);
-  if ((!ON_BOARD(goban, WEST(pos)) || !ON_BOARD(goban, EAST(pos)))
-      && (!ON_BOARD(goban, SOUTH(pos)) || !ON_BOARD(goban, NORTH(pos))))
+  ASSERT_ON_BOARD1(pos);
+  if ((!ON_BOARD(WEST(pos)) || !ON_BOARD(EAST(pos)))
+      && (!ON_BOARD(SOUTH(pos)) || !ON_BOARD(NORTH(pos))))
     return 1;
-
+  
   return 0;
 }
 
@@ -1506,21 +1372,19 @@ is_corner_vertex(const Goban *goban, int pos)
  * adjacent to the empty vertex respectively the string at pos2.
  */
 int
-are_neighbors(const Goban *goban, int pos1, int pos2)
+are_neighbors(int pos1, int pos2)
 {
-  ACCESS_BOARD_CONST;
-
   if (board[pos1] == EMPTY) {
     if (board[pos2] == EMPTY)
       return (gg_abs(pos1 - pos2) == NS || gg_abs(pos1 - pos2) == WE);
     else
-      return neighbor_of_string(goban, pos1, pos2);
+      return neighbor_of_string(pos1, pos2);
   }
   else {
     if (board[pos2] == EMPTY)
-      return neighbor_of_string(goban, pos2, pos1);
+      return neighbor_of_string(pos2, pos1);
     else
-      return adjacent_strings(goban, pos1, pos2);
+      return adjacent_strings(pos1, pos2);
   }
 }
 
@@ -1529,14 +1393,12 @@ are_neighbors(const Goban *goban, int pos1, int pos2)
  * empty.
  */
 int
-countlib(const Goban *goban, int str)
+countlib(int str)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
-  ASSERT1(goban, IS_STONE(goban->board[str]), str);
-
+  ASSERT1(IS_STONE(board[str]), str);
+  
   /* We already know the number of liberties. Just look it up. */
-  return LIBERTIES(str);
+  return string[string_number[str]].liberties;
 }
 
 
@@ -1550,18 +1412,15 @@ countlib(const Goban *goban, int str)
  */
 
 int
-findlib(const Goban *goban, int str, int maxlib, int *libs)
+findlib(int str, int maxlib, int *libs)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int k;
   int liberties;
   int s;
-
-  ASSERT1(goban, IS_STONE(board[str]), str);
-  ASSERT1(goban, libs != NULL, str);
-
+  
+  ASSERT1(IS_STONE(board[str]), str);
+  ASSERT1(libs != NULL, str);
+  
   /* We already have the list of liberties and only need to copy it to
    * libs[].
    *
@@ -1570,15 +1429,15 @@ findlib(const Goban *goban, int str, int maxlib, int *libs)
    * we have to traverse the stones in the string in order to find
    * where the liberties are.
    */
-  s = STRING_INDEX(str);
-  liberties = LIBERTIES_BY_INDEX(s);
+  s = string_number[str];
+  liberties = string[s].liberties;
 
   if (liberties <= MAX_LIBERTIES || maxlib <= MAX_LIBERTIES) {
     /* The easy case, it suffices to copy liberty locations from the
      * incrementally updated list.
      */
     for (k = 0; k < maxlib && k < liberties; k++)
-      libs[k] = STRING_LIBERTIES(s)[k];
+      libs[k] = string_libs[s].list[k];
   }
   else {
     /* The harder case, where we have to traverse the stones in the
@@ -1587,8 +1446,7 @@ findlib(const Goban *goban, int str, int maxlib, int *libs)
      * before that happens.
      */
     int pos;
-    private->liberty_mark++;
-
+    liberty_mark++;
     for (k = 0, pos = FIRST_STONE(s);
 	 k < maxlib && k < liberties;
 	 pos = NEXT_STONE(pos)) {
@@ -1598,21 +1456,21 @@ findlib(const Goban *goban, int str, int maxlib, int *libs)
 	if (k >= maxlib)
 	  break;
       }
-
+      
       if (UNMARKED_LIBERTY(WEST(pos))) {
 	libs[k++] = WEST(pos);
 	MARK_LIBERTY(WEST(pos));
 	if (k >= maxlib)
 	  break;
       }
-
+      
       if (UNMARKED_LIBERTY(NORTH(pos))) {
 	libs[k++] = NORTH(pos);
 	MARK_LIBERTY(NORTH(pos));
 	if (k >= maxlib)
 	  break;
       }
-
+      
       if (UNMARKED_LIBERTY(EAST(pos))) {
 	libs[k++] = EAST(pos);
 	MARK_LIBERTY(EAST(pos));
@@ -1621,7 +1479,7 @@ findlib(const Goban *goban, int str, int maxlib, int *libs)
       }
     }
   }
-
+      
   return liberties;
 }
 
@@ -1642,75 +1500,71 @@ findlib(const Goban *goban, int str, int maxlib, int *libs)
  */
 
 int
-fastlib(const Goban *goban, int pos, int color, int ignore_captures)
+fastlib(int pos, int color, int ignore_captures)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int ally1 = -1;
   int ally2 = -1;
   int fast_liberties = 0;
 
-  ASSERT1(goban, board[pos] == EMPTY, pos);
-  ASSERT1(goban, IS_STONE(color), pos);
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
 
   /* Find neighboring strings of the same color. If there are more than two of
    * them, we give up (it's too difficult to count their common liberties).
    */
   if (board[SOUTH(pos)] == color) {
-    ally1 = STRING_INDEX(SOUTH(pos));
+    ally1 = string_number[SOUTH(pos)];
 
     if (board[WEST(pos)] == color
-	&& STRING_INDEX(WEST(pos)) != ally1) {
-      ally2 = STRING_INDEX(WEST(pos));
+	&& string_number[WEST(pos)] != ally1) {
+      ally2 = string_number[WEST(pos)];
 
       if (board[NORTH(pos)] == color
-	  && STRING_INDEX(NORTH(pos)) != ally1
-	  && STRING_INDEX(NORTH(pos)) != ally2)
+	  && string_number[NORTH(pos)] != ally1
+	  && string_number[NORTH(pos)] != ally2)
 	return -1;
     }
     else if (board[NORTH(pos)] == color
-	     && STRING_INDEX(NORTH(pos)) != ally1)
-      ally2 = STRING_INDEX(NORTH(pos));
+	     && string_number[NORTH(pos)] != ally1)
+      ally2 = string_number[NORTH(pos)];
 
     if (board[EAST(pos)] == color
-	&& STRING_INDEX(EAST(pos)) != ally1) {
+	&& string_number[EAST(pos)] != ally1) {
       if (ally2 < 0)
-	ally2 = STRING_INDEX(EAST(pos));
-      else if (STRING_INDEX(EAST(pos)) != ally2)
+	ally2 = string_number[EAST(pos)];
+      else if (string_number[EAST(pos)] != ally2)
 	return -1;
     }
   }
   else if (board[WEST(pos)] == color) {
-    ally1 = STRING_INDEX(WEST(pos));
+    ally1 = string_number[WEST(pos)];
 
     if (board[NORTH(pos)] == color
-	&& STRING_INDEX(NORTH(pos)) != ally1) {
-      ally2 = STRING_INDEX(NORTH(pos));
+	&& string_number[NORTH(pos)] != ally1) {
+      ally2 = string_number[NORTH(pos)];
 
       if (board[EAST(pos)] == color
-	  && STRING_INDEX(EAST(pos)) != ally1
-	  && STRING_INDEX(EAST(pos)) != ally2)
+	  && string_number[EAST(pos)] != ally1
+	  && string_number[EAST(pos)] != ally2)
 	return -1;
     }
     else if (board[EAST(pos)] == color
-	     && STRING_INDEX(EAST(pos)) != ally1)
-      ally2 = STRING_INDEX(EAST(pos));
+	     && string_number[EAST(pos)] != ally1)
+      ally2 = string_number[EAST(pos)];
   }
   else if (board[NORTH(pos)] == color) {
-    ally1 = STRING_INDEX(NORTH(pos));
-
+    ally1 = string_number[NORTH(pos)];
+    
     if (board[EAST(pos)] == color
-	&& STRING_INDEX(EAST(pos)) != ally1)
-      ally2 = STRING_INDEX(EAST(pos));
+	&& string_number[EAST(pos)] != ally1)
+      ally2 = string_number[EAST(pos)];
   }
   else if (board[EAST(pos)] == color)
-    ally1 = STRING_INDEX(EAST(pos));
+    ally1 = string_number[EAST(pos)];
 
   /* If we are to ignore captures, the things are very easy. */
   if (ignore_captures) {
-    if (ally1 < 0) {
-      /* No allies. */
+    if (ally1 < 0) {			/* No allies */
       if (LIBERTY(SOUTH(pos)))
 	fast_liberties++;
       if (LIBERTY(WEST(pos)))
@@ -1720,8 +1574,7 @@ fastlib(const Goban *goban, int pos, int color, int ignore_captures)
       if (LIBERTY(EAST(pos)))
 	fast_liberties++;
     }
-    else if (ally2 < 0) {
-      /* One ally. */
+    else if (ally2 < 0) {		/* One ally */
       if (LIBERTY(SOUTH(pos))
 	  && !NON_SOUTH_NEIGHBOR_OF_STRING(SOUTH(pos), ally1, color))
 	fast_liberties++;
@@ -1735,10 +1588,9 @@ fastlib(const Goban *goban, int pos, int color, int ignore_captures)
 	  && !NON_EAST_NEIGHBOR_OF_STRING(EAST(pos), ally1, color))
 	fast_liberties++;
 
-      fast_liberties += LIBERTIES_BY_INDEX(ally1) - 1;
+      fast_liberties += string[ally1].liberties - 1;
     }
-    else {
-      /* Two allies. */
+    else {				/* Two allies */
       if (LIBERTY(SOUTH(pos))
 	  && !NON_SOUTH_NEIGHBOR_OF_STRING(SOUTH(pos), ally1, color)
 	  && !NON_SOUTH_NEIGHBOR_OF_STRING(SOUTH(pos), ally2, color))
@@ -1756,12 +1608,8 @@ fastlib(const Goban *goban, int pos, int color, int ignore_captures)
 	  && !NON_EAST_NEIGHBOR_OF_STRING(EAST(pos), ally2, color))
 	fast_liberties++;
 
-      fast_liberties += (LIBERTIES_BY_INDEX(ally1)
-			 + LIBERTIES_BY_INDEX(ally2)
-			 - count_common_libs(goban,
-					     ORIGIN_BY_INDEX(ally1),
-					     ORIGIN_BY_INDEX(ally2))
-			 - 1);
+      fast_liberties += string[ally1].liberties + string[ally2].liberties
+	- count_common_libs(string[ally1].origin, string[ally2].origin) - 1;
     }
   }
   /* We are to take captures into account. This case is much more rare, so
@@ -1777,10 +1625,9 @@ fastlib(const Goban *goban, int pos, int color, int ignore_captures)
 	  && (ally1 < 0 || !NEIGHBOR_OF_STRING(neighbor, ally1, color))
 	  && (ally2 < 0 || !NEIGHBOR_OF_STRING(neighbor, ally2, color)))
 	fast_liberties++;
-      else if (board[neighbor] == OTHER_COLOR(color)
+      else if (board[neighbor] == OTHER_COLOR(color)	/* A capture */
 	       && LIBERTIES(neighbor) == 1) {
-	/* A capture. */
-	int neighbor_size = COUNT_STONES(neighbor);
+	int neighbor_size = COUNTSTONES(neighbor);
 
 	if (neighbor_size == 1 || (neighbor_size == 2 && ally1 < 0))
 	  fast_liberties++;
@@ -1790,17 +1637,43 @@ fastlib(const Goban *goban, int pos, int color, int ignore_captures)
     }
 
     if (ally1 >= 0) {
-      fast_liberties += LIBERTIES_BY_INDEX(ally1) - 1;
-      if (ally2 >= 0) {
-	fast_liberties += (LIBERTIES_BY_INDEX(ally2)
-			   - count_common_libs(goban,
-					       ORIGIN_BY_INDEX(ally1),
-					       ORIGIN_BY_INDEX(ally2)));
-      }
+      fast_liberties += string[ally1].liberties - 1;
+      if (ally2 >= 0)
+	fast_liberties += string[ally2].liberties
+	  - count_common_libs(string[ally1].origin, string[ally2].origin);
     }
   }
 
   return fast_liberties;
+}
+
+
+/* Effectively true unless we store full position in hash. */
+#define USE_BOARD_CACHES	(NUM_HASHVALUES <= 4)
+
+struct board_cache_entry {
+  int threshold;
+  int liberties;
+  Hash_data position_hash;
+};
+
+
+/* approxlib() cache. */
+static struct board_cache_entry approxlib_cache[BOARDMAX][2];
+
+
+/* Clears approxlib() cache. This function should be called only once
+ * during engine initialization. Sets thresholds to zero.
+ */
+void
+clear_approxlib_cache(void)
+{
+  int pos;
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    approxlib_cache[pos][0].threshold = 0;
+    approxlib_cache[pos][1].threshold = 0;
+  }
 }
 
 
@@ -1816,34 +1689,33 @@ fastlib(const Goban *goban, int pos, int color, int ignore_captures)
  * allocate space for libs[] accordingly.
  */
 int
-approxlib(const Goban *goban, int pos, int color, int maxlib, int *libs)
+approxlib(int pos, int color, int maxlib, int *libs)
 {
   int liberties;
 
 #ifdef USE_BOARD_CACHES
 
-  ACCESS_PRIVATE_DATA;
+  struct board_cache_entry *entry = &approxlib_cache[pos][color - 1];
 
-  Board_cache_entry *entry = &private->approxlib_cache[pos][color - 1];
-
-  ASSERT1(goban, goban->board[pos] == EMPTY, pos);
-  ASSERT1(goban, IS_STONE(color), pos);
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
 
   if (!libs) {
     /* First see if this result is cached. */
-    if (hashdata_is_equal(goban->board_hash, entry->position_hash)
-	&& maxlib <= entry->threshold)
+    if (hashdata_is_equal(board_hash, entry->position_hash)
+	&& maxlib <= entry->threshold) {
       return entry->liberties;
+    }
 
-    liberties = fastlib(goban, pos, color, 1);
+    liberties = fastlib(pos, color, 1);
     if (liberties >= 0) {
       /* Since fastlib() always returns precise result and doesn't take
        * `maxlib' into account, we set threshold to MAXLIBS so that this
        * result is used regardless of any `maxlib' passed.
        */
-      entry->threshold	   = MAXLIBS;
-      entry->liberties	   = liberties;
-      entry->position_hash = goban->board_hash;
+      entry->threshold = MAXLIBS;
+      entry->liberties = liberties;
+      entry->position_hash = board_hash;
 
       return liberties;
     }
@@ -1857,28 +1729,28 @@ approxlib(const Goban *goban, int pos, int color, int maxlib, int *libs)
   entry->threshold = maxlib;
 
   if (maxlib <= MAX_LIBERTIES)
-    liberties = do_approxlib(goban, pos, color, maxlib, libs);
+    liberties = do_approxlib(pos, color, maxlib, libs);
   else
-    liberties = slow_approxlib(goban, pos, color, maxlib, libs);
+    liberties = slow_approxlib(pos, color, maxlib, libs);
 
-  entry->liberties     = liberties;
-  entry->position_hash = goban->board_hash;
+  entry->liberties = liberties;
+  entry->position_hash = board_hash;
 
 #else /* not USE_BOARD_CACHES */
 
-  ASSERT1(goban, goban->board[pos] == EMPTY, pos);
-  ASSERT1(goban, IS_STONE(color), pos);
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
 
   if (!libs) {
-    liberties = fastlib(goban, pos, color, 1);
+    liberties = fastlib(pos, color, 1);
     if (liberties >= 0)
       return liberties;
   }
 
   if (maxlib <= MAX_LIBERTIES)
-    liberties = do_approxlib(goban, pos, color, maxlib, libs);
+    liberties = do_approxlib(pos, color, maxlib, libs);
   else
-    liberties = slow_approxlib(goban, pos, color, maxlib, libs);
+    liberties = slow_approxlib(pos, color, maxlib, libs);
 
 #endif /* not USE_BOARD_CACHES */
 
@@ -1888,11 +1760,8 @@ approxlib(const Goban *goban, int pos, int color, int maxlib, int *libs)
 
 /* Does the real work of approxlib(). */
 static int
-do_approxlib(const Goban *goban, int pos, int color, int maxlib, int *libs)
+do_approxlib(int pos, int color, int maxlib, int *libs)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int k;
   int liberties = 0;
 
@@ -1907,75 +1776,106 @@ do_approxlib(const Goban *goban, int pos, int color, int maxlib, int *libs)
   /* Start by marking pos itself so it isn't counted among its own
    * liberties.
    */
-  private->liberty_mark++;
+  liberty_mark++;
   MARK_LIBERTY(pos);
 
   if (UNMARKED_LIBERTY(SOUTH(pos))) {
-    STORE_LIBERTY_WITH_LIMIT(SOUTH(pos), libs, liberties, maxlib);
+    if (libs != NULL)
+      libs[liberties] = SOUTH(pos);
+    liberties++;
+    /* Stop counting if we reach maxlib. */
+    if (liberties >= maxlib)
+      return liberties;
     MARK_LIBERTY(SOUTH(pos));
   }
   else if (board[SOUTH(pos)] == color) {
-    int s = STRING_INDEX(SOUTH(pos));
-    for (k = 0; k < LIBERTIES_BY_INDEX(s); k++) {
-      int lib = STRING_LIBERTIES(s)[k];
+    int s = string_number[SOUTH(pos)];
+    for (k = 0; k < string[s].liberties; k++) {
+      int lib = string_libs[s].list[k];
       if (UNMARKED_LIBERTY(lib)) {
-	STORE_LIBERTY_WITH_LIMIT(lib, libs, liberties, maxlib);
+	if (libs != NULL)
+	  libs[liberties] = lib;
+	liberties++;
+	if (liberties >= maxlib)
+	  return liberties;
 	MARK_LIBERTY(lib);
       }
     }
   }
-
+  
   if (UNMARKED_LIBERTY(WEST(pos))) {
-    STORE_LIBERTY_WITH_LIMIT(WEST(pos), libs, liberties, maxlib);
+    if (libs != NULL)
+      libs[liberties] = WEST(pos);
+    liberties++;
+    /* Stop counting if we reach maxlib. */
+    if (liberties >= maxlib)
+      return liberties;
     MARK_LIBERTY(WEST(pos));
   }
   else if (board[WEST(pos)] == color) {
-    int s = STRING_INDEX(WEST(pos));
-    for (k = 0; k < LIBERTIES_BY_INDEX(s); k++) {
-      int lib = STRING_LIBERTIES(s)[k];
+    int s = string_number[WEST(pos)];
+    for (k = 0; k < string[s].liberties; k++) {
+      int lib = string_libs[s].list[k];
       if (UNMARKED_LIBERTY(lib)) {
-	STORE_LIBERTY_WITH_LIMIT(lib, libs, liberties, maxlib);
+	if (libs != NULL)
+	  libs[liberties] = lib;
+	liberties++;
+	if (liberties >= maxlib)
+	  return liberties;
 	MARK_LIBERTY(lib);
       }
     }
   }
-
+  
   if (UNMARKED_LIBERTY(NORTH(pos))) {
-    STORE_LIBERTY_WITH_LIMIT(NORTH(pos), libs, liberties, maxlib);
+    if (libs != NULL)
+      libs[liberties] = NORTH(pos);
+    liberties++;
+    /* Stop counting if we reach maxlib. */
+    if (liberties >= maxlib)
+      return liberties;
     MARK_LIBERTY(NORTH(pos));
   }
   else if (board[NORTH(pos)] == color) {
-    int s = STRING_INDEX(NORTH(pos));
-    for (k = 0; k < LIBERTIES_BY_INDEX(s); k++) {
-      int lib = STRING_LIBERTIES(s)[k];
+    int s = string_number[NORTH(pos)];
+    for (k = 0; k < string[s].liberties; k++) {
+      int lib = string_libs[s].list[k];
       if (UNMARKED_LIBERTY(lib)) {
-	STORE_LIBERTY_WITH_LIMIT(lib, libs, liberties, maxlib);
+	if (libs != NULL)
+	  libs[liberties] = lib;
+	liberties++;
+	if (liberties >= maxlib)
+	  return liberties;
 	MARK_LIBERTY(lib);
       }
     }
   }
-
+  
   if (UNMARKED_LIBERTY(EAST(pos))) {
+    if (libs != NULL)
+      libs[liberties] = EAST(pos);
+    liberties++;
+    /* Unneeded since we're about to leave. */
 #if 0
-    STORE_LIBERTY_WITH_LIMIT(EAST(pos), libs, liberties, maxlib);
+    if (liberties >= maxlib)
+      return liberties;
     MARK_LIBERTY(EAST(pos));
-#else
-    /* No limit checking and liberty marking since we are about to
-     * leave.
-     */
-    STORE_LIBERTY(EAST(pos), libs, liberties);
 #endif
   }
   else if (board[EAST(pos)] == color) {
-    int s = STRING_INDEX(EAST(pos));
-    for (k = 0; k < LIBERTIES_BY_INDEX(s); k++) {
-      int lib = STRING_LIBERTIES(s)[k];
+    int s = string_number[EAST(pos)];
+    for (k = 0; k < string[s].liberties; k++) {
+      int lib = string_libs[s].list[k];
       if (UNMARKED_LIBERTY(lib)) {
-	STORE_LIBERTY_WITH_LIMIT(lib, libs, liberties, maxlib);
+	if (libs != NULL)
+	  libs[liberties] = lib;
+	liberties++;
+	if (liberties >= maxlib)
+	  return liberties;
 	MARK_LIBERTY(lib);
       }
     }
-  }
+  }  
 
 #if USE_BOARD_CACHES
   /* If we reach here, then we have counted _all_ the liberties, so
@@ -1983,9 +1883,8 @@ do_approxlib(const Goban *goban, int pos, int color, int maxlib, int *libs)
    * of `maxlib' value).
    */
   if (!libs)
-    private->approxlib_cache[pos][color - 1].threshold = MAXLIBS;
+    approxlib_cache[pos][color - 1].threshold = MAXLIBS;
 #endif
-
   return liberties;
 }
 
@@ -1996,41 +1895,46 @@ do_approxlib(const Goban *goban, int pos, int color, int maxlib, int *libs)
  * algorithm can't be used.
  */
 static int
-slow_approxlib(const Goban *goban, int pos, int color, int maxlib, int *libs)
+slow_approxlib(int pos, int color, int maxlib, int *libs)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int k;
   int liberties = 0;
 
-  private->liberty_mark++;
-  private->string_mark++;
+  liberty_mark++;
   MARK_LIBERTY(pos);
-
+  string_mark++;
   for (k = 0; k < 4; k++) {
-    int neighbor = pos + delta[k];
-
-    if (UNMARKED_LIBERTY(neighbor)) {
-      STORE_LIBERTY_WITH_LIMIT(neighbor, libs, liberties, maxlib);
-      MARK_LIBERTY(neighbor);
+    int d = delta[k];
+    if (UNMARKED_LIBERTY(pos + d)) {
+      if (libs)
+	libs[liberties] = pos + d;
+      liberties++;
+      if (liberties == maxlib)
+	return liberties;
+      MARK_LIBERTY(pos + d);
     }
-    else if (board[neighbor] == color && UNMARKED_STRING(neighbor)) {
-      int s = STRING_INDEX(neighbor);
-      int pos2 = FIRST_STONE(s);
+    else if (board[pos + d] == color
+	     && UNMARKED_STRING(pos + d)) {
+      int s = string_number[pos + d];
+      int pos2;
+      pos2 = FIRST_STONE(s);
       do {
 	int l;
 	for (l = 0; l < 4; l++) {
-	  int neighbor2 = pos2 + delta[l];
-	  if (UNMARKED_LIBERTY(neighbor2)) {
-	    STORE_LIBERTY_WITH_LIMIT(neighbor2, libs, liberties, maxlib);
-	    MARK_LIBERTY(neighbor2);
+	  int d2 = delta[l];
+	  if (UNMARKED_LIBERTY(pos2 + d2)) {
+	    if (libs)
+	      libs[liberties] = pos2 + d2;
+	    liberties++;
+	    if (liberties == maxlib)
+	      return liberties;
+	    MARK_LIBERTY(pos2 + d2);
 	  }
 	}
 
 	pos2 = NEXT_STONE(pos2);
       } while (!BACK_TO_FIRST_STONE(s, pos2));
-      MARK_STRING(neighbor);
+      MARK_STRING(pos + d);
     }
   }
 
@@ -2040,10 +1944,28 @@ slow_approxlib(const Goban *goban, int pos, int color, int maxlib, int *libs)
    * of `maxlib' value).
    */
   if (!libs)
-    goban->private->approxlib_cache[pos][color - 1].threshold = MAXLIBS;
+    approxlib_cache[pos][color - 1].threshold = MAXLIBS;
 #endif
-
   return liberties;
+}
+
+
+/* accuratelib() cache. */
+static struct board_cache_entry accuratelib_cache[BOARDMAX][2];
+
+
+/* Clears accuratelib() cache. This function should be called only once
+ * during engine initialization. Sets thresholds to zero.
+ */
+void
+clear_accuratelib_cache(void)
+{
+  int pos;
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    accuratelib_cache[pos][0].threshold = 0;
+    accuratelib_cache[pos][1].threshold = 0;
+  }
 }
 
 
@@ -2056,7 +1978,7 @@ slow_approxlib(const Goban *goban, int pos, int color, int maxlib, int *libs)
  * when maxlib is reached. The number of found liberties is returned.
  *
  * This function guarantees that liberties which are not results of
- * captures come first in libs[] array. To find whether all the
+ * captures come first in libs[] array. To find whether all the 
  * liberties starting from a given one are results of captures, one
  * may use  if (board[libs[k]] != EMPTY)  construction.
  *
@@ -2065,61 +1987,60 @@ slow_approxlib(const Goban *goban, int pos, int color, int maxlib, int *libs)
  * allocate space for libs[] accordingly.
  */
 int
-accuratelib(const Goban *goban, int pos, int color, int maxlib, int *libs)
+accuratelib(int pos, int color, int maxlib, int *libs)
 {
   int liberties;
 
 #ifdef USE_BOARD_CACHES
 
-  Board_cache_entry *entry
-    = &goban->private->accuratelib_cache[pos][color - 1];
+  struct board_cache_entry *entry = &accuratelib_cache[pos][color - 1];
 
-  ASSERT1(goban, goban->board[pos] == EMPTY, pos);
-  ASSERT1(goban, IS_STONE(color), pos);
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
 
   if (!libs) {
     /* First see if this result is cached. */
-    if (hashdata_is_equal(goban->board_hash, entry->position_hash)
+    if (hashdata_is_equal(board_hash, entry->position_hash)
 	&& maxlib <= entry->threshold) {
       return entry->liberties;
     }
 
-    liberties = fastlib(goban, pos, color, 0);
+    liberties = fastlib(pos, color, 0);
     if (liberties >= 0) {
       /* Since fastlib() always returns precise result and doesn't take
        * `maxlib' into account, we set threshold to MAXLIBS so that this
        * result is used regardless of any `maxlib' passed.
        */
-      entry->threshold	   = MAXLIBS;
-      entry->liberties	   = liberties;
-      entry->position_hash = goban->board_hash;
+      entry->threshold = MAXLIBS;
+      entry->liberties = liberties;
+      entry->position_hash = board_hash;
 
       return liberties;
     }
   }
 
-  liberties = do_accuratelib(goban, pos, color, maxlib, libs);
+  liberties = do_accuratelib(pos, color, maxlib, libs);
 
   /* If accuratelib() found less than `maxlib' liberties, then its
    * result is certainly independent of `maxlib' and we set threshold
    * to MAXLIBS.
    */
-  entry->threshold     = liberties < maxlib ? MAXLIBS : maxlib;
-  entry->liberties     = liberties;
-  entry->position_hash = goban->board_hash;
+  entry->threshold = liberties < maxlib ? MAXLIBS : maxlib;
+  entry->liberties = liberties;
+  entry->position_hash = board_hash;
 
 #else /* not USE_BOARD_CACHES */
 
-  ASSERT1(goban, goban->board[pos] == EMPTY, pos);
-  ASSERT1(goban, IS_STONE(color), pos);
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
 
   if (!libs) {
-    liberties = fastlib(goban, pos, color, 0);
+    liberties = fastlib(pos, color, 0);
     if (liberties >= 0)
       return liberties;
   }
 
-  liberties = do_accuratelib(goban, pos, color, maxlib, libs);
+  liberties = do_accuratelib(pos, color, maxlib, libs);
 
 #endif /* not USE_BOARD_CACHES */
 
@@ -2129,41 +2050,48 @@ accuratelib(const Goban *goban, int pos, int color, int maxlib, int *libs)
 
 /* Does the real work of accuratelib(). */
 static int
-do_accuratelib(const Goban *goban, int pos, int color, int maxlib, int *libs)
+do_accuratelib(int pos, int color, int maxlib, int *libs)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int k, l;
   int liberties = 0;
   int lib;
   int captured[4];
   int captures = 0;
 
-  private->string_mark++;
-  private->liberty_mark++;
+  string_mark++;
+  liberty_mark++;
   MARK_LIBERTY(pos);
 
   for (k = 0; k < 4; k++) {
     int pos2 = pos + delta[k];
     if (UNMARKED_LIBERTY(pos2)) {
       /* A trivial liberty */
-      STORE_LIBERTY_WITH_LIMIT(pos2, libs, liberties, maxlib);
+      if (libs)
+	libs[liberties] = pos2;
+      liberties++;
+      if (liberties >= maxlib)
+	return liberties;
+
       MARK_LIBERTY(pos2);
     }
     else if (UNMARKED_COLOR_STRING(pos2, color)) {
       /* An own neighbor string */
-      int string_index = STRING_INDEX(pos2);
+      struct string_data *s = &string[string_number[pos2]];
+      struct string_liberties_data *sl = &string_libs[string_number[pos2]];
 
-      if (LIBERTIES_BY_INDEX(string_index) <= MAX_LIBERTIES
-	  || maxlib <= MAX_LIBERTIES - 1) {
+      if (s->liberties <= MAX_LIBERTIES || maxlib <= MAX_LIBERTIES - 1) {
 	/* The easy case - we already have all (necessary) liberties of
 	 * the string listed
 	 */
-	for (l = 0; l < LIBERTIES_BY_INDEX(string_index); l++) {
-	  lib = STRING_LIBERTIES(string_index)[l];
+	for (l = 0; l < s->liberties; l++) {
+	  lib = sl->list[l];
 	  if (UNMARKED_LIBERTY(lib)) {
-	    STORE_LIBERTY_WITH_LIMIT(lib, libs, liberties, maxlib);
+	    if (libs)
+	      libs[liberties] = lib;
+	    liberties++;
+	    if (liberties >= maxlib)
+	      return liberties;
+
 	    MARK_LIBERTY(lib);
 	  }
 	}
@@ -2178,22 +2106,42 @@ do_accuratelib(const Goban *goban, int pos, int color, int maxlib, int *libs)
 	int stone = pos2;
 	do {
 	  if (UNMARKED_LIBERTY(SOUTH(stone))) {
-	    STORE_LIBERTY_WITH_LIMIT(SOUTH(stone), libs, liberties, maxlib);
+	    if (libs)
+	      libs[liberties] = SOUTH(stone);
+	    liberties++;
+	    if (liberties >= maxlib)
+	      return liberties;
+
 	    MARK_LIBERTY(SOUTH(stone));
 	  }
 
 	  if (UNMARKED_LIBERTY(WEST(stone))) {
-	    STORE_LIBERTY_WITH_LIMIT(WEST(stone), libs, liberties, maxlib);
+	    if (libs)
+	      libs[liberties] = WEST(stone);
+	    liberties++;
+	    if (liberties >= maxlib)
+	      return liberties;
+
 	    MARK_LIBERTY(WEST(stone));
 	  }
 
 	  if (UNMARKED_LIBERTY(NORTH(stone))) {
-	    STORE_LIBERTY_WITH_LIMIT(NORTH(stone), libs, liberties, maxlib);
+	    if (libs)
+	      libs[liberties] = NORTH(stone);
+	    liberties++;
+	    if (liberties >= maxlib)
+	      return liberties;
+
 	    MARK_LIBERTY(NORTH(stone));
 	  }
 
 	  if (UNMARKED_LIBERTY(EAST(stone))) {
-	    STORE_LIBERTY_WITH_LIMIT(EAST(stone), libs, liberties, maxlib);
+	    if (libs)
+	      libs[liberties] = EAST(stone);
+	    liberties++;
+	    if (liberties >= maxlib)
+	      return liberties;
+
 	    MARK_LIBERTY(EAST(stone));
 	  }
 
@@ -2203,7 +2151,8 @@ do_accuratelib(const Goban *goban, int pos, int color, int maxlib, int *libs)
 
       MARK_STRING(pos2);
     }
-    else if (board[pos2] == OTHER_COLOR(color) && LIBERTIES(pos2) == 1) {
+    else if (board[pos2] == OTHER_COLOR(color)
+	     && string[string_number[pos2]].liberties == 1) {
       /* A capture. */
       captured[captures++] = pos2;
     }
@@ -2220,14 +2169,18 @@ do_accuratelib(const Goban *goban, int pos, int color, int maxlib, int *libs)
     if (!MARKED_COLOR_STRING(SOUTH(lib), color)
 	&& !MARKED_COLOR_STRING(WEST(lib), color)
 	&& !MARKED_COLOR_STRING(NORTH(lib), color)
-	&& !MARKED_COLOR_STRING(EAST(lib), color))
-      STORE_LIBERTY_WITH_LIMIT(lib, libs, liberties, maxlib);
+	&& !MARKED_COLOR_STRING(EAST(lib), color)) {
+      if (libs)
+	libs[liberties] = lib;
+      liberties++;
+      if (liberties >= maxlib)
+	return liberties;
+    }
 
     /* Check if we already know of this capture. */
-    for (l = 0; l < k; l++) {
-      if (SAME_STRING(captured[l], lib))
+    for (l = 0; l < k; l++)
+      if (string_number[captured[l]] == string_number[lib])
 	break;
-    }
 
     if (l == k) {
       /* Traverse all the stones of the capture and add to the list
@@ -2238,8 +2191,13 @@ do_accuratelib(const Goban *goban, int pos, int color, int maxlib, int *libs)
 	if (MARKED_COLOR_STRING(SOUTH(lib), color)
 	    || MARKED_COLOR_STRING(WEST(lib), color)
 	    || MARKED_COLOR_STRING(NORTH(lib), color)
-	    || MARKED_COLOR_STRING(EAST(lib), color))
-	  STORE_LIBERTY_WITH_LIMIT(lib, libs, liberties, maxlib);
+	    || MARKED_COLOR_STRING(EAST(lib), color)) {
+	  if (libs)
+	    libs[liberties] = lib;
+	  liberties++;
+	  if (liberties >= maxlib)
+	    return liberties;
+	}
 
 	lib = NEXT_STONE(lib);
       } while (lib != captured[k]);
@@ -2254,47 +2212,43 @@ do_accuratelib(const Goban *goban, int pos, int color, int maxlib, int *libs)
  */
 
 int
-count_common_libs(const Goban *goban, int str1, int str2)
+count_common_libs(int str1, int str2)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int all_libs1[MAXLIBS], *libs1;
   int liberties1, liberties2;
   int commonlibs = 0;
-  int k, n;
-
-  ASSERT_ON_BOARD1(goban, str1);
-  ASSERT_ON_BOARD1(goban, str2);
-  ASSERT1(goban, IS_STONE(board[str1]), str1);
-  ASSERT1(goban, IS_STONE(board[str2]), str2);
-
-  n = STRING_INDEX(str1);
-  liberties1 = LIBERTIES_BY_INDEX(n);
-
-  if (liberties1 > LIBERTIES(str2)) {
-    int tmp = str1;
-    str1    = str2;
-    str2    = tmp;
-
-    /* The strings have been swapped.  Update variables. */
-    n = STRING_INDEX(str1);
-    liberties1 = LIBERTIES_BY_INDEX(n);
+  int k, n, tmp;
+  
+  ASSERT_ON_BOARD1(str1);
+  ASSERT_ON_BOARD1(str2);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT1(IS_STONE(board[str2]), str2);
+  
+  n = string_number[str1];
+  liberties1 = string[n].liberties;
+  
+  if (liberties1 > string[string_number[str2]].liberties) {
+    n = string_number[str2];
+    liberties1 = string[n].liberties;
+    tmp = str1;
+    str1 = str2;
+    str2 = tmp;
   }
 
   if (liberties1 <= MAX_LIBERTIES) {
-    /* Speed optimization: don't copy liberties with findlib(). */
-    libs1 = STRING_LIBERTIES(n);
-    n = STRING_INDEX(str2);
-    liberties2 = LIBERTIES_BY_INDEX(n);
-
+    /* Speed optimization: don't copy liberties with findlib */
+    libs1 = string_libs[n].list;
+    n = string_number[str2];
+    liberties2 = string[n].liberties;
+    
     if (liberties2 <= MAX_LIBERTIES) {
-      /* Speed optimization: NEIGHBOR_OF_STRING() is quite expensive. */
-      private->liberty_mark++;
+      /* Speed optimization: NEIGHBOR_OF_STRING is quite expensive */
+      liberty_mark++;
+      
       for (k = 0; k < liberties1; k++)
 	MARK_LIBERTY(libs1[k]);
 
-      libs1 = STRING_LIBERTIES(n);
+      libs1 = string_libs[n].list;
       for (k = 0; k < liberties2; k++)
 	if (!UNMARKED_LIBERTY(libs1[k]))
 	  commonlibs++;
@@ -2303,15 +2257,14 @@ count_common_libs(const Goban *goban, int str1, int str2)
     }
   }
   else {
-    findlib(goban, str1, MAXLIBS, all_libs1);
+    findlib(str1, MAXLIBS, all_libs1);
     libs1 = all_libs1;
   }
-
-  for (k = 0; k < liberties1; k++) {
-    if (NEIGHBOR_OF_STRING(libs1[k], STRING_INDEX(str2), board[str2]))
+  
+  for (k = 0; k < liberties1; k++)
+    if (NEIGHBOR_OF_STRING(libs1[k], string_number[str2], board[str2]))
       commonlibs++;
-  }
-
+  
   return commonlibs;
 }
 
@@ -2326,71 +2279,66 @@ count_common_libs(const Goban *goban, int str1, int str2)
  */
 
 int
-find_common_libs(const Goban *goban, int str1, int str2, int maxlib, int *libs)
+find_common_libs(int str1, int str2, int maxlib, int *libs)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int all_libs1[MAXLIBS], *libs1;
   int liberties1, liberties2;
   int commonlibs = 0;
-  int k, n;
-
-  ASSERT_ON_BOARD1(goban, str1);
-  ASSERT_ON_BOARD1(goban, str2);
-  ASSERT1(goban, IS_STONE(board[str1]), str1);
-  ASSERT1(goban, IS_STONE(board[str2]), str2);
-  ASSERT1(goban, libs != NULL, str1);
-
-  n = STRING_INDEX(str1);
-  liberties1 = LIBERTIES_BY_INDEX(n);
-
-  if (liberties1 > LIBERTIES(str2)) {
-    int tmp = str1;
-    str1    = str2;
-    str2    = tmp;
-
-    /* The strings have been swapped.  Update variables. */
-    n = STRING_INDEX(str1);
-    liberties1 = LIBERTIES_BY_INDEX(n);
+  int k, n, tmp;
+  
+  ASSERT_ON_BOARD1(str1);
+  ASSERT_ON_BOARD1(str2);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT1(IS_STONE(board[str2]), str2);
+  ASSERT1(libs != NULL, str1);
+  
+  n = string_number[str1];
+  liberties1 = string[n].liberties;
+  
+  if (liberties1 > string[string_number[str2]].liberties) {
+    n = string_number[str2];
+    liberties1 = string[n].liberties;
+    tmp = str1;
+    str1 = str2;
+    str2 = tmp;
   }
-
+  
   if (liberties1 <= MAX_LIBERTIES) {
-    /* Speed optimization: don't copy liberties with findlib(). */
-    libs1 = STRING_LIBERTIES(n);
-    n = STRING_INDEX(str2);
-    liberties2 = LIBERTIES_BY_INDEX(n);
+    /* Speed optimization: don't copy liberties with findlib */
+    libs1 = string_libs[n].list;
+    n = string_number[str2];
+    liberties2 = string[n].liberties;
 
     if (liberties2 <= MAX_LIBERTIES) {
-      /* Speed optimization: NEIGHBOR_OF_STRING() is quite expensive. */
-      private->liberty_mark++;
+      /* Speed optimization: NEIGHBOR_OF_STRING is quite expensive */
+      liberty_mark++;
+
       for (k = 0; k < liberties1; k++)
 	MARK_LIBERTY(libs1[k]);
-
-      libs1 = STRING_LIBERTIES(n);
+      
+      libs1 = string_libs[n].list;
       for (k = 0; k < liberties2; k++)
 	if (!UNMARKED_LIBERTY(libs1[k])) {
-	  if (commonlibs < maxlib)
+          if (commonlibs < maxlib)
 	    libs[commonlibs] = libs1[k];
 	  commonlibs++;
 	}
-
+      
       return commonlibs;
     }
   }
   else {
-    findlib(goban, str1, MAXLIBS, all_libs1);
+    findlib(str1, MAXLIBS, all_libs1);
     libs1 = all_libs1;
   }
-
-  for (k = 0; k < liberties1; k++) {
-    if (NEIGHBOR_OF_STRING(libs1[k], STRING_INDEX(str2), board[str2])) {
+  
+  for (k = 0; k < liberties1; k++)
+    if (NEIGHBOR_OF_STRING(libs1[k], string_number[str2], board[str2])) {
       if (commonlibs < maxlib)
 	libs[commonlibs] = libs1[k];
       commonlibs++;
     }
-  }
-
+  
   return commonlibs;
 }
 
@@ -2399,49 +2347,44 @@ find_common_libs(const Goban *goban, int str1, int str2, int maxlib, int *libs)
  * If they do and lib != NULL, one common liberty is returned in *lib.
  */
 int
-have_common_lib(const Goban *goban, int str1, int str2, int *lib)
+have_common_lib(int str1, int str2, int *lib)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int all_libs1[MAXLIBS], *libs1;
   int liberties1;
-  int k, n;
-
-  ASSERT_ON_BOARD1(goban, str1);
-  ASSERT_ON_BOARD1(goban, str2);
-  ASSERT1(goban, IS_STONE(board[str1]), str1);
-  ASSERT1(goban, IS_STONE(board[str2]), str2);
-
-  n = STRING_INDEX(str1);
-  liberties1 = LIBERTIES_BY_INDEX(n);
-
-  if (liberties1 > LIBERTIES(str2)) {
-    int tmp = str1;
-    str1    = str2;
-    str2    = tmp;
-
-    /* The strings have been swapped.  Update variables. */
-    n = STRING_INDEX(str1);
-    liberties1 = LIBERTIES_BY_INDEX(n);
+  int k, n, tmp;
+  
+  ASSERT_ON_BOARD1(str1);
+  ASSERT_ON_BOARD1(str2);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT1(IS_STONE(board[str2]), str2);
+  
+  n = string_number[str1];
+  liberties1 = string[n].liberties;
+  
+  if (liberties1 > string[string_number[str2]].liberties) {
+    n = string_number[str2];
+    liberties1 = string[n].liberties;
+    tmp = str1;
+    str1 = str2;
+    str2 = tmp;
   }
-
+  
   if (liberties1 <= MAX_LIBERTIES)
-    /* Speed optimization: don't copy liberties with findlib(). */
-    libs1 = STRING_LIBERTIES(n);
+    /* Speed optimization: don't copy liberties with findlib */
+    libs1 = string_libs[n].list;
   else {
-    findlib(goban, str1, MAXLIBS, all_libs1);
+    findlib(str1, MAXLIBS, all_libs1);
     libs1 = all_libs1;
   }
 
   for (k = 0; k < liberties1; k++) {
-    if (NEIGHBOR_OF_STRING(libs1[k], STRING_INDEX(str2), board[str2])) {
+    if (NEIGHBOR_OF_STRING(libs1[k], string_number[str2], board[str2])) {
       if (lib)
 	*lib = libs1[k];
       return 1;
     }
   }
-
+  
   return 0;
 }
 
@@ -2452,14 +2395,12 @@ have_common_lib(const Goban *goban, int str1, int str2, int *lib)
  */
 
 int
-countstones(const Goban *goban, int str)
+countstones(int str)
 {
-  ACCESS_PRIVATE_DATA_CONST;
+  ASSERT_ON_BOARD1(str);
+  ASSERT1(IS_STONE(board[str]), str);
 
-  ASSERT_ON_BOARD1(goban, str);
-  ASSERT1(goban, IS_STONE(goban->board[str]), str);
-
-  return COUNT_STONES(str);
+  return COUNTSTONES(str);
 }
 
 
@@ -2469,21 +2410,19 @@ countstones(const Goban *goban, int str)
  */
 
 int
-findstones(const Goban *goban, int str, int maxstones, int *stones)
+findstones(int str, int maxstones, int *stones)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
   int s;
   int size;
   int pos;
   int k;
+  
+  ASSERT_ON_BOARD1(str);
+  ASSERT1(IS_STONE(board[str]), str);
 
-  ASSERT_ON_BOARD1(goban, str);
-  ASSERT1(goban, IS_STONE(goban->board[str]), str);
-
-  s = STRING_INDEX(str);
-  size = COUNT_STONES_BY_INDEX(s);
-
+  s = string_number[str];
+  size = string[s].size;
+  
   /* Traverse the stones of the string, by following the cyclic chain. */
   pos = FIRST_STONE(s);
   for (k = 0; k < maxstones && k < size; k++) {
@@ -2501,25 +2440,22 @@ findstones(const Goban *goban, int str, int maxstones, int *stones)
  */
 
 int
-count_adjacent_stones(const Goban *goban, int str1, int str2, int maxstones)
+count_adjacent_stones(int str1, int str2, int maxstones)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-  ACCESS_BOARD_CONST;
-
   int s1, s2;
   int size;
   int pos;
   int k;
   int count = 0;
 
-  ASSERT_ON_BOARD1(goban, str1);
-  ASSERT1(goban, IS_STONE(board[str1]), str1);
-  ASSERT_ON_BOARD1(goban, str2);
-  ASSERT1(goban, IS_STONE(board[str2]), str2);
+  ASSERT_ON_BOARD1(str1);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT_ON_BOARD1(str2);
+  ASSERT1(IS_STONE(board[str2]), str2);
 
-  s1 = STRING_INDEX(str1);
-  s2 = STRING_INDEX(str2);
-  size = COUNT_STONES_BY_INDEX(s1);
+  s1 = string_number[str1];
+  s2 = string_number[str2];
+  size = string[s1].size;
 
   /* Traverse the stones of the string, by following the cyclic chain. */
   pos = FIRST_STONE(s1);
@@ -2537,26 +2473,24 @@ count_adjacent_stones(const Goban *goban, int str1, int str2, int maxstones)
  * the string at (str). The number of chains is returned.
  */
 
-int
-chainlinks(const Goban *goban, int str, int adj[MAXCHAIN])
+int 
+chainlinks(int str, int adj[MAXCHAIN])
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
-  int num_neighbors;
-  const int *neighbors;
+  struct string_data *s;
+  struct string_neighbors_data *sn;
   int k;
 
-  ASSERT1(goban, IS_STONE(goban->board[str]), str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   /* We already have the list ready, just copy it and fill in the
    * desired information.
    */
-  num_neighbors = COUNT_NEIGHBORS(str);
-  neighbors	= STRING_NEIGHBORS(STRING_INDEX(str));
-  for (k = 0; k < num_neighbors; k++)
-    adj[k] = ORIGIN_BY_INDEX(neighbors[k]);
+  s = &string[string_number[str]];
+  sn = &string_neighbors[string_number[str]];
+  for (k = 0; k < s->neighbors; k++)
+    adj[k] = string[sn->list[k]].origin;
 
-  return num_neighbors;
+  return s->neighbors;
 }
 
 
@@ -2566,30 +2500,27 @@ chainlinks(const Goban *goban, int str, int adj[MAXCHAIN])
  */
 
 int
-chainlinks2(const Goban *goban, int str, int adj[MAXCHAIN], int lib)
+chainlinks2(int str, int adj[MAXCHAIN], int lib)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
-  int num_neighbors;
-  int num_all_neighbors;
-  const int *neighbors;
+  struct string_data *s, *t;
+  struct string_neighbors_data *sn;
   int k;
+  int neighbors;
 
-  ASSERT1(goban, IS_STONE(goban->board[str]), str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   /* We already have the list ready, just copy the strings with the
    * right number of liberties.
    */
-  num_neighbors	    = 0;
-  num_all_neighbors = COUNT_NEIGHBORS(str);
-  neighbors	    = STRING_NEIGHBORS(STRING_INDEX(str));
-
-  for (k = 0; k < num_all_neighbors; k++) {
-    if (LIBERTIES_BY_INDEX(neighbors[k]) == lib)
-      adj[num_neighbors++] = ORIGIN_BY_INDEX(neighbors[k]);
+  neighbors = 0;
+  s = &string[string_number[str]];
+  sn = &string_neighbors[string_number[str]];
+  for (k = 0; k < s->neighbors; k++) {
+    t = &string[sn->list[k]];
+    if (t->liberties == lib)
+      adj[neighbors++] = t->origin;
   }
-
-  return num_neighbors;
+  return neighbors;
 }
 
 
@@ -2599,30 +2530,27 @@ chainlinks2(const Goban *goban, int str, int adj[MAXCHAIN], int lib)
  */
 
 int
-chainlinks3(const Goban *goban, int str, int adj[MAXCHAIN], int lib)
+chainlinks3(int str, int adj[MAXCHAIN], int lib)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
-  int num_neighbors;
-  int num_all_neighbors;
-  const int *neighbors;
+  struct string_data *s, *t;
+  struct string_neighbors_data *sn;
   int k;
+  int neighbors;
 
-  ASSERT1(goban, IS_STONE(goban->board[str]), str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   /* We already have the list ready, just copy the strings with the
    * right number of liberties.
    */
-  num_neighbors	    = 0;
-  num_all_neighbors = COUNT_NEIGHBORS(str);
-  neighbors	    = STRING_NEIGHBORS(STRING_INDEX(str));
-
-  for (k = 0; k < num_all_neighbors; k++) {
-    if (LIBERTIES_BY_INDEX(neighbors[k]) <= lib)
-      adj[num_neighbors++] = ORIGIN_BY_INDEX(neighbors[k]);
+  neighbors = 0;
+  s = &string[string_number[str]];
+  sn = &string_neighbors[string_number[str]];
+  for (k = 0; k < s->neighbors; k++) {
+    t = &string[sn->list[k]];
+    if (t->liberties <= lib)
+      adj[neighbors++] = t->origin;
   }
-
-  return num_neighbors;
+  return neighbors;
 }
 
 
@@ -2634,52 +2562,48 @@ chainlinks3(const Goban *goban, int str, int adj[MAXCHAIN], int lib)
  * liberty are returned.
  */
 
-int
-extended_chainlinks(const Goban *goban, int str, int adj[MAXCHAIN],
-		    int both_colors)
+int 
+extended_chainlinks(int str, int adj[MAXCHAIN], int both_colors)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
-  int string_index;
+  struct string_data *s;
+  struct string_neighbors_data *sn;
   int n;
   int k;
   int r;
   int libs[MAXLIBS];
   int liberties;
 
-  ASSERT1(goban, IS_STONE(board[str]), str);
-
-  string_index = STRING_INDEX(str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   /* We already have the list of directly adjacent strings ready, just
    * copy it and mark the strings.
    */
-  private->string_mark++;
-  for (n = 0; n < COUNT_NEIGHBORS_BY_INDEX(string_index); n++) {
-    adj[n] = ORIGIN_BY_INDEX(STRING_NEIGHBORS(string_index)[n]);
+  s = &string[string_number[str]];
+  sn = &string_neighbors[string_number[str]];
+  string_mark++;
+  for (n = 0; n < s->neighbors; n++) {
+    adj[n] = string[sn->list[n]].origin;
     MARK_STRING(adj[n]);
   }
 
   /* Get the liberties. */
-  liberties = findlib(goban, str, MAXLIBS, libs);
+  liberties = findlib(str, MAXLIBS, libs);
 
   /* Look for unmarked opponent strings next to a liberty and add the
    * ones which are found to the output.
    */
   for (r = 0; r < liberties; r++) {
     for (k = 0; k < 4; k++) {
-      int neighbor = libs[r] + delta[k];
-      if ((board[neighbor] == OTHER_COLOR(board[str])
-	   || (both_colors && board[neighbor] == board[str]))
-	  && UNMARKED_STRING(neighbor)) {
-	adj[n] = ORIGIN(neighbor);
+      if ((board[libs[r] + delta[k]] == OTHER_COLOR(board[str])
+	   || (both_colors && board[libs[r] + delta[k]] == board[str]))
+	  && UNMARKED_STRING(libs[r] + delta[k])) {
+	adj[n] = string[string_number[libs[r] + delta[k]]].origin;
 	MARK_STRING(adj[n]);
 	n++;
       }
     }
   }
-
+  
   return n;
 }
 
@@ -2691,13 +2615,11 @@ extended_chainlinks(const Goban *goban, int str, int adj[MAXCHAIN],
  */
 
 int
-find_origin(const Goban *goban, int str)
+find_origin(int str)
 {
-  ACCESS_PRIVATE_DATA_CONST;
+  ASSERT1(IS_STONE(board[str]), str);
 
-  ASSERT1(goban, IS_STONE(goban->board[str]), str);
-
-  return ORIGIN(str);
+  return string[string_number[str]].origin;
 }
 
 
@@ -2707,31 +2629,25 @@ find_origin(const Goban *goban, int str)
  */
 
 int
-is_self_atari(const Goban *goban, int pos, int color)
+is_self_atari(int pos, int color)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int other = OTHER_COLOR(color);
-
-  /* Number of empty neighbors. */
+  /* number of empty neighbors */
   int trivial_liberties = 0;
-
-  /* Number of captured opponent strings. */
+  /* number of captured opponent strings */
   int captures = 0;
-
   /* Whether there is a friendly neighbor with a spare liberty. If it
    * has more than one spare liberty we immediately return 0.
    */
   int far_liberties = 0;
-
-  ASSERT_ON_BOARD1(goban, pos);
-  ASSERT1(goban, board[pos] == EMPTY, pos);
-  ASSERT1(goban, IS_STONE(color), pos);
+  
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
 
   /* 1. Try first to solve the problem without much work. */
-  private->string_mark++;
-
+  string_mark++;
+  
   if (LIBERTY(SOUTH(pos)))
     trivial_liberties++;
   else if (board[SOUTH(pos)] == color) {
@@ -2741,7 +2657,7 @@ is_self_atari(const Goban *goban, int pos, int color)
       far_liberties++;
   }
   else if (board[SOUTH(pos)] == other
-	  && LIBERTIES(SOUTH(pos)) == 1 && UNMARKED_STRING(SOUTH(pos))) {
+          && LIBERTIES(SOUTH(pos)) == 1 && UNMARKED_STRING(SOUTH(pos))) {
     captures++;
     MARK_STRING(SOUTH(pos));
   }
@@ -2755,7 +2671,7 @@ is_self_atari(const Goban *goban, int pos, int color)
       far_liberties++;
   }
   else if (board[WEST(pos)] == other
-	  && LIBERTIES(WEST(pos)) == 1 && UNMARKED_STRING(WEST(pos))) {
+          && LIBERTIES(WEST(pos)) == 1 && UNMARKED_STRING(WEST(pos))) {
     captures++;
     MARK_STRING(WEST(pos));
   }
@@ -2769,7 +2685,7 @@ is_self_atari(const Goban *goban, int pos, int color)
       far_liberties++;
   }
   else if (board[NORTH(pos)] == other
-	  && LIBERTIES(NORTH(pos)) == 1 && UNMARKED_STRING(NORTH(pos))) {
+          && LIBERTIES(NORTH(pos)) == 1 && UNMARKED_STRING(NORTH(pos))) {
     captures++;
     MARK_STRING(NORTH(pos));
   }
@@ -2783,7 +2699,7 @@ is_self_atari(const Goban *goban, int pos, int color)
       far_liberties++;
   }
   else if (board[EAST(pos)] == other
-	  && LIBERTIES(EAST(pos)) == 1 && UNMARKED_STRING(EAST(pos))) {
+          && LIBERTIES(EAST(pos)) == 1 && UNMARKED_STRING(EAST(pos))) {
     captures++;
 #if 0
     MARK_STRING(EAST(pos));
@@ -2804,7 +2720,7 @@ is_self_atari(const Goban *goban, int pos, int color)
     return 1;
 
   /* 2. It was not so easy.  We use accuratelib() in this case. */
-  return accuratelib(goban, pos, color, 2, NULL) <= 1;
+  return accuratelib(pos, color, 2, NULL) <= 1;
 }
 
 
@@ -2813,17 +2729,14 @@ is_self_atari(const Goban *goban, int pos, int color)
  */
 
 int
-liberty_of_string(const Goban *goban, int pos, int str)
+liberty_of_string(int pos, int str)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-  ACCESS_BOARD_CONST;
-
-  ASSERT_ON_BOARD1(goban, pos);
-  ASSERT_ON_BOARD1(goban, str);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT_ON_BOARD1(str);
   if (IS_STONE(board[pos]))
     return 0;
 
-  return NEIGHBOR_OF_STRING(pos, STRING_INDEX(str), board[str]);
+  return NEIGHBOR_OF_STRING(pos, string_number[str], board[str]);
 }
 
 
@@ -2831,18 +2744,15 @@ liberty_of_string(const Goban *goban, int pos, int str)
  * Returns true if pos is a second order liberty of the string at str.
  */
 int
-second_order_liberty_of_string(const Goban *goban, int pos, int str)
+second_order_liberty_of_string(int pos, int str)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-  ACCESS_BOARD_CONST;
-
   int k;
-  ASSERT_ON_BOARD1(goban, pos);
-  ASSERT_ON_BOARD1(goban, str);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT_ON_BOARD1(str);
 
   for (k = 0; k < 4; k++)
     if (board[pos + delta[k]] == EMPTY
-	&& NEIGHBOR_OF_STRING(pos + delta[k], STRING_INDEX(str), board[str]))
+	&& NEIGHBOR_OF_STRING(pos + delta[k], string_number[str], board[str]))
       return 1;
 
   return 0;
@@ -2854,17 +2764,14 @@ second_order_liberty_of_string(const Goban *goban, int pos, int str)
  */
 
 int
-neighbor_of_string(const Goban *goban, int pos, int str)
+neighbor_of_string(int pos, int str)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-  ACCESS_BOARD_CONST;
-
   int color = board[str];
 
-  ASSERT1(goban, IS_STONE(color), str);
-  ASSERT_ON_BOARD1(goban, pos);
+  ASSERT1(IS_STONE(color), str);
+  ASSERT_ON_BOARD1(pos);
 
-  return NEIGHBOR_OF_STRING(pos, STRING_INDEX(str), color);
+  return NEIGHBOR_OF_STRING(pos, string_number[str], color);
 }
 
 /*
@@ -2872,17 +2779,15 @@ neighbor_of_string(const Goban *goban, int pos, int str)
  */
 
 int
-has_neighbor(const Goban *goban, int pos, int color)
+has_neighbor(int pos, int color)
 {
-  ACCESS_BOARD_CONST;
-
-  ASSERT_ON_BOARD1(goban, pos);
-  ASSERT1(goban, IS_STONE(color), pos);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(IS_STONE(color), pos);
 
   return (board[SOUTH(pos)] == color
-	  || board[WEST(pos)] == color
-	  || board[NORTH(pos)] == color
-	  || board[EAST(pos)] == color);
+          || board[WEST(pos)] == color
+          || board[NORTH(pos)] == color
+          || board[EAST(pos)] == color);
 }
 
 /*
@@ -2890,16 +2795,14 @@ has_neighbor(const Goban *goban, int pos, int color)
  */
 
 int
-same_string(const Goban *goban, int str1, int str2)
+same_string(int str1, int str2)
 {
-  ACCESS_PRIVATE_DATA_CONST;
+  ASSERT_ON_BOARD1(str1);
+  ASSERT_ON_BOARD1(str2);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT1(IS_STONE(board[str2]), str2);
 
-  ASSERT_ON_BOARD1(goban, str1);
-  ASSERT_ON_BOARD1(goban, str2);
-  ASSERT1(goban, IS_STONE(goban->board[str1]), str1);
-  ASSERT1(goban, IS_STONE(goban->board[str2]), str2);
-
-  return SAME_STRING(str1, str2);
+  return string_number[str1] == string_number[str2];
 }
 
 
@@ -2908,25 +2811,22 @@ same_string(const Goban *goban, int str1, int str2)
  */
 
 int
-adjacent_strings(const Goban *goban, int str1, int str2)
+adjacent_strings(int str1, int str2)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
   int s1, s2;
   int k;
+  
+  ASSERT_ON_BOARD1(str1);
+  ASSERT_ON_BOARD1(str2);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT1(IS_STONE(board[str2]), str2);
 
-  ASSERT_ON_BOARD1(goban, str1);
-  ASSERT_ON_BOARD1(goban, str2);
-  ASSERT1(goban, IS_STONE(goban->board[str1]), str1);
-  ASSERT1(goban, IS_STONE(goban->board[str2]), str2);
+  s1 = string_number[str1];
+  s2 = string_number[str2];
 
-  s1 = STRING_INDEX(str1);
-  s2 = STRING_INDEX(str2);
-
-  for (k = 0; k < COUNT_NEIGHBORS_BY_INDEX(s1); k++) {
-    if (STRING_NEIGHBORS(s1)[k] == s2)
+  for (k = 0; k < string[s1].neighbors; k++)
+    if (string_neighbors[s1].list[k] == s2)
       return 1;
-  }
 
   return 0;
 }
@@ -2945,62 +2845,59 @@ adjacent_strings(const Goban *goban, int str1, int str2)
  */
 
 int
-is_ko(const Goban *goban, int pos, int color, int *ko_pos)
+is_ko(int pos, int color, int *ko_pos)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-  ACCESS_BOARD_CONST;
-
   int other = OTHER_COLOR(color);
   int captures = 0;
   int kpos = 0;
+  
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(color == WHITE || color == BLACK, pos);
 
-  ASSERT_ON_BOARD1(goban, pos);
-  ASSERT1(goban, color == WHITE || color == BLACK, pos);
-
-  if (ON_BOARD(goban, SOUTH(pos))) {
+  if (ON_BOARD(SOUTH(pos))) {
     if (board[SOUTH(pos)] != other)
       return 0;
     else if (LIBERTIES(SOUTH(pos)) == 1) {
       kpos = SOUTH(pos);
-      captures += COUNT_STONES(SOUTH(pos));
+      captures += string[string_number[SOUTH(pos)]].size;
       if (captures > 1)
 	return 0;
     }
   }
-
-  if (ON_BOARD(goban, WEST(pos))) {
+  
+  if (ON_BOARD(WEST(pos))) {
     if (board[WEST(pos)] != other)
       return 0;
     else if (LIBERTIES(WEST(pos)) == 1) {
       kpos = WEST(pos);
-      captures += COUNT_STONES(WEST(pos));
+      captures += string[string_number[WEST(pos)]].size;
       if (captures > 1)
 	return 0;
     }
   }
-
-  if (ON_BOARD(goban, NORTH(pos))) {
+  
+  if (ON_BOARD(NORTH(pos))) {
     if (board[NORTH(pos)] != other)
       return 0;
     else if (LIBERTIES(NORTH(pos)) == 1) {
       kpos = NORTH(pos);
-      captures += COUNT_STONES(NORTH(pos));
+      captures += string[string_number[NORTH(pos)]].size;
       if (captures > 1)
 	return 0;
     }
   }
-
-  if (ON_BOARD(goban, EAST(pos))) {
+  
+  if (ON_BOARD(EAST(pos))) {
     if (board[EAST(pos)] != other)
       return 0;
     else if (LIBERTIES(EAST(pos)) == 1) {
       kpos = EAST(pos);
-      captures += COUNT_STONES(EAST(pos));
+      captures += string[string_number[EAST(pos)]].size;
       if (captures > 1)
 	return 0;
     }
   }
-
+  
   if (captures == 1) {
     if (ko_pos)
       *ko_pos = kpos;
@@ -3014,29 +2911,24 @@ is_ko(const Goban *goban, int pos, int color, int *ko_pos)
  * ko, or if pos is an empty intersection adjacent to a ko stone.
  */
 int
-is_ko_point(const Goban *goban, int pos)
+is_ko_point(int pos)
 {
-  ACCESS_BOARD_CONST;
-
-  ASSERT_ON_BOARD1(goban, pos);
+  ASSERT_ON_BOARD1(pos);
 
   if (board[pos] == EMPTY) {
     int color;
-    if (ON_BOARD(goban, SOUTH(pos)))
+    if (ON_BOARD(SOUTH(pos)))
       color = board[SOUTH(pos)];
     else
       color = board[NORTH(pos)];
-    if (IS_STONE(color) && is_ko(goban, pos, OTHER_COLOR(color), NULL))
+    if (IS_STONE(color) && is_ko(pos, OTHER_COLOR(color), NULL))
       return 1;
   }
   else {
-    ACCESS_PRIVATE_DATA_CONST;
-
-    int string_index = STRING_INDEX(pos);
-    if (LIBERTIES_BY_INDEX(string_index)
-	&& COUNT_STONES_BY_INDEX(string_index) == 1
-	&& is_ko(goban, STRING_LIBERTIES(string_index)[0],
-		 OTHER_COLOR(STRING_DATA_BY_INDEX(string_index)->color), NULL))
+    struct string_data *s = &string[string_number[pos]];
+    struct string_liberties_data *sl = &string_libs[string_number[pos]];
+    if (s->liberties == 1 && s->size == 1
+	&& is_ko(sl->list[0], OTHER_COLOR(s->color), NULL))
       return 1;
   }
 
@@ -3047,24 +2939,21 @@ is_ko_point(const Goban *goban, int pos)
 /* Returns 1 if at least one string is captured when color plays at pos.
  */
 int
-does_capture_something(const Goban *goban, int pos, int color)
+does_capture_something(int pos, int color)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-  ACCESS_BOARD_CONST;
-
   int other = OTHER_COLOR(color);
 
-  ASSERT1(goban, board[pos] == EMPTY, pos);
+  ASSERT1(board[pos] == EMPTY, pos);
 
   if (board[SOUTH(pos)] == other && LIBERTIES(SOUTH(pos)) == 1)
     return 1;
-
+  
   if (board[WEST(pos)] == other && LIBERTIES(WEST(pos)) == 1)
     return 1;
-
+  
   if (board[NORTH(pos)] == other && LIBERTIES(NORTH(pos)) == 1)
     return 1;
-
+  
   if (board[EAST(pos)] == other && LIBERTIES(EAST(pos)) == 1)
     return 1;
 
@@ -3074,13 +2963,11 @@ does_capture_something(const Goban *goban, int pos, int color)
 
 /* For each stone in the string at pos, set mx to value mark. */
 void
-mark_string(const Goban *goban, int str, char mx[BOARDMAX], char mark)
+mark_string(int str, char mx[BOARDMAX], char mark)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
   int pos = str;
 
-  ASSERT1(goban, IS_STONE(goban->board[str]), str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   do {
     mx[pos] = mark;
@@ -3093,14 +2980,11 @@ mark_string(const Goban *goban, int str, char mx[BOARDMAX], char mark)
  * FIXME: Do we want to convert all mark_string() to signed char?
  */
 void
-signed_mark_string(const Goban *goban, int str,
-		   signed char mx[BOARDMAX], signed char mark)
+signed_mark_string(int str, signed char mx[BOARDMAX], signed char mark)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
   int pos = str;
 
-  ASSERT1(goban, IS_STONE(goban->board[str]), str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   do {
     mx[pos] = mark;
@@ -3113,26 +2997,25 @@ signed_mark_string(const Goban *goban, int str,
  * at deeper than level 'cutoff' in the reading tree.
  */
 int
-move_in_stack(const Goban *goban, int pos, int cutoff)
+move_in_stack(int pos, int cutoff)
 {
   int k;
-  for (k = cutoff; k < goban->stackp; k++)
-    if (goban->private->stack[k] == pos)
+  for (k = cutoff; k < stackp; k++)
+    if (stack[k] == pos)
       return 1;
-
+  
   return 0;
 }
 
 
 /* Retrieve a move from the move stack. */
 void
-get_move_from_stack(const Goban *goban, int k, int *move, int *color)
+get_move_from_stack(int k, int *move, int *color)
 {
-  gg_assert(goban, k < goban->stackp);
-  *move	 = goban->private->stack[k];
-  *color = goban->private->move_color[k];
+  gg_assert(k < stackp);
+  *move = stack[k];
+  *color = move_color[k];
 }
-
 
 /* Return the number of stones of the indicated color(s) on the board.
  * This only counts stones in the permanent position, not stones placed
@@ -3143,30 +3026,30 @@ get_move_from_stack(const Goban *goban, int k, int *move, int *color)
  * one. /ab
  */
 int
-stones_on_board(const Goban *goban, int color)
+stones_on_board(int color)
 {
-  ACCESS_PRIVATE_DATA;
+  static int stone_count_for_position = -1;
+  static int white_stones = 0;
+  static int black_stones = 0;
 
-  gg_assert(goban, goban->stackp == 0);
+  gg_assert(stackp == 0);
 
-  if (private->stone_count_for_position != goban->position_number) {
+  if (stone_count_for_position != position_number) {
     int pos;
-
-    private->white_stones_on_board = 0;
-    private->black_stones_on_board = 0;
-
+    white_stones = 0;
+    black_stones = 0;
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (goban->board[pos] == BLACK)
-	private->black_stones_on_board++;
-      else if (goban->board[pos] == WHITE)
-	private->white_stones_on_board++;
+      if (board[pos] == WHITE)
+	white_stones++;
+      else if (board[pos] == BLACK)
+	black_stones++;
     }
-
-    private->stone_count_for_position = goban->position_number;
+    
+    stone_count_for_position = position_number;
   }
 
-  return ((color & WHITE ? private->white_stones_on_board : 0)
-	  + (color & BLACK ? private->black_stones_on_board : 0));
+  return ((color & BLACK ? black_stones : 0) +
+	  (color & WHITE ? white_stones : 0));
 }
 
 
@@ -3175,17 +3058,17 @@ stones_on_board(const Goban *goban, int color)
 
 /* Clear statistics. */
 void
-reset_trymove_counter(const Goban *goban)
+reset_trymove_counter()
 {
-  goban->private->trymove_counter = 0;
+  trymove_counter = 0;
 }
 
 
 /* Retrieve statistics. */
 int
-get_trymove_counter(const Goban *goban)
+get_trymove_counter()
 {
-  return goban->private->trymove_counter;
+  return trymove_counter;
 }
 
 
@@ -3207,58 +3090,48 @@ get_trymove_counter(const Goban *goban)
  */
 
 static void
-new_position(Goban *goban)
+new_position(void)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int pos;
   int s;
 
-  goban->position_number++;
-  private->next_string	= 0;
-  private->liberty_mark = 0;
-  private->string_mark	= 0;
+  position_number++;
+  next_string = 0;
+  liberty_mark = 0;
+  string_mark = 0;
   CLEAR_STACKS();
 
-  /* FIXME: Probably better to explicitly reset necessary fields. */
-  memset(private->strings, 0, sizeof private->strings);
+  memset(string, 0, sizeof(string));
+  memset(string_libs, 0, sizeof(string_libs));
+  memset(string_neighbors, 0, sizeof(string_neighbors));
+  memset(ml, 0, sizeof(ml));
+  VALGRIND_MAKE_WRITABLE(next_stone, sizeof(next_stone));
 
-  memset(private->string_liberties, 0, sizeof private->string_liberties);
-  memset(private->string_neighbors, 0, sizeof private->string_neighbors);
-  memset(private->last_liberty_marks, 0, sizeof private->last_liberty_marks);
-
-  VALGRIND_MAKE_WRITABLE(private->next_stone, sizeof private->next_stone);
-
-  /* propagate_string() relies on non-assigned stones to have
-   * string_index of -1.
+  /* propagate_string relies on non-assigned stones to have
+   * string_number -1.
    */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (ON_BOARD(goban, pos))
-      STRING_INDEX(pos) = -1;
-  }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos))
+      string_number[pos] = -1;
 
   /* Find the existing strings. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(goban, pos))
+    if (!ON_BOARD(pos))
       continue;
-
-    if (IS_STONE(board[pos]) && STRING_INDEX(pos) == -1) {
-      String_data *string_data;
-
-      STRING_INDEX(pos) = private->next_string++;
-      string_data	= STRING_DATA(pos);
-
-      string_data->size   = propagate_string(goban, pos, pos);
-      string_data->color  = board[pos];
-      string_data->origin = pos;
-      string_data->mark   = 0;
+    if (IS_STONE(board[pos]) && string_number[pos] == -1) {
+      string_number[pos] = next_string;
+      string[next_string].size = propagate_string(pos, pos);
+      string[next_string].color = board[pos];
+      string[next_string].origin = pos;
+      string[next_string].mark = 0;
+      next_string++;
     }
   }
-
+  
   /* Fill in liberty and neighbor info. */
-  for (s = 0; s < private->next_string; s++)
-    find_liberties_and_neighbors(goban, s);
+  for (s = 0; s < next_string; s++) {
+    find_liberties_and_neighbors(s);
+  }
 }
 
 
@@ -3269,50 +3142,47 @@ new_position(Goban *goban)
  */
 
 static void
-dump_incremental_board(const Goban *goban)
+dump_incremental_board(void)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-
   int pos;
   int s;
   int i;
-
+  
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(goban, pos))
+    if (!ON_BOARD(pos))
       continue;
-    if (goban->board[pos] == EMPTY)
+    if (board[pos] == EMPTY)
       fprintf(stderr, " . ");
     else
-      fprintf(stderr, "%2d ", STRING_INDEX(pos));
+      fprintf(stderr, "%2d ", string_number[pos]);
     fprintf(stderr, "\n");
   }
 
-  for (s = 0; s < private->next_string; s++) {
-    const String_data *string_data = STRING_DATA_BY_INDEX(s);
-    if (goban->board[string_data->origin] == EMPTY)
+  for (s = 0; s < next_string; s++) {
+    if (board[string[s].origin] == EMPTY)
       continue;
-
-    gprintf(goban, "%o%d %s %1m size %d, %d liberties, %d neighbors\n",
-	    s, color_to_string(string_data->color),
-	    string_data->origin, string_data->size,
-	    string_data->num_liberties, string_data->num_neighbors);
-    gprintf(goban, "%ostones:");
+    
+    gprintf("%o%d %s %1m size %d, %d liberties, %d neighbors\n", s,
+	    color_to_string(string[s].color),
+	    string[s].origin, string[s].size,
+	    string[s].liberties, string[s].neighbors);
+    gprintf("%ostones:");
 
     pos = FIRST_STONE(s);
     do {
-      gprintf(goban, "%o %1m", pos);
+      gprintf("%o %1m", pos);
       pos = NEXT_STONE(pos);
     } while (!BACK_TO_FIRST_STONE(s, pos));
-
-    gprintf(goban, "%o\nliberties:");
-    for (i = 0; i < string_data->num_liberties; i++)
-      gprintf(goban, "%o %1m", string[s].libs[i]);
-
-    gprintf(goban, "%o\nneighbors:");
-    for (i = 0; i < string_data->num_neighbors; i++)
-      gprintf(goban, "%o %d(%1m)", string[s].neighborlist[i],
+    
+    gprintf("%o\nliberties:");
+    for (i = 0; i < string[s].liberties; i++)
+      gprintf("%o %1m", string[s].libs[i]);
+    
+    gprintf("%o\nneighbors:");
+    for (i = 0; i < string[s].neighbors; i++)
+      gprintf("%o %d(%1m)", string[s].neighborlist[i],
 	      string[string[s].neighborlist[i]].origin);
-    gprintf(goban, "%o\n\n");
+    gprintf("%o\n\n");
   }
 }
 #endif
@@ -3326,33 +3196,31 @@ dump_incremental_board(const Goban *goban)
  */
 
 static int
-propagate_string(const Goban *goban, int stone, int str)
+propagate_string(int stone, int str)
 {
-  ACCESS_PRIVATE_DATA;
-
   int size = 1;
   int k;
-
+  
   if (stone == str) {
     /* Start a new string. */
-    NEXT_STONE(stone) = stone;
+    next_stone[stone] = stone;
   }
   else {
     /* Link the stone at (stone) to the string including (str) */
-    STRING_INDEX(stone) = STRING_INDEX(str);
-    NEXT_STONE(stone)	= NEXT_STONE(str);
-    NEXT_STONE(str)	= stone;
+    string_number[stone] = string_number[str];
+    next_stone[stone] = next_stone[str];
+    next_stone[str] = stone;
   }
 
   /* Look in all four directions for more stones to add. */
   for (k = 0; k < 4; k++) {
-    int neighbor = stone + delta[k];
-    if (ON_BOARD(goban, neighbor)
-	&& goban->board[neighbor] == goban->board[stone]
-	&& STRING_INDEX(neighbor) == -1)
-      size += propagate_string(goban, neighbor, str);
+    int d = delta[k];
+    if (ON_BOARD(stone + d)
+	&& board[stone + d] == board[stone]
+	&& string_number[stone + d] == -1)
+      size += propagate_string(stone + d, str);
   }
-
+  
   return size;
 }
 
@@ -3362,54 +3230,55 @@ propagate_string(const Goban *goban, int stone, int str)
  */
 
 static void
-find_liberties_and_neighbors(const Goban *goban, int string_index)
+find_liberties_and_neighbors(int s)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int pos;
-  int other = OTHER_COLOR(STRING_DATA_BY_INDEX(string_index)->color);
+  int other = OTHER_COLOR(string[s].color);
 
   /* Clear the marks. */
-  private->liberty_mark++;
-  private->string_mark++;
+  liberty_mark++;
+  string_mark++;
 
   /* Traverse the stones of the string, by following the cyclic chain. */
-  pos = FIRST_STONE(string_index);
+  pos = FIRST_STONE(s);
   do {
     /* Look in each direction for new liberties or new neighbors. Mark
      * already visited liberties and neighbors.
      */
-    if (UNMARKED_LIBERTY(SOUTH(pos)))
-      ADD_AND_MARK_LIBERTY(string_index, SOUTH(pos));
+    if (UNMARKED_LIBERTY(SOUTH(pos))) {
+      ADD_AND_MARK_LIBERTY(s, SOUTH(pos));
+    }
     else if (UNMARKED_COLOR_STRING(SOUTH(pos), other)) {
-      ADD_NEIGHBOR(string_index, SOUTH(pos));
+      ADD_NEIGHBOR(s, SOUTH(pos));
       MARK_STRING(SOUTH(pos));
     }
-
-    if (UNMARKED_LIBERTY(WEST(pos)))
-      ADD_AND_MARK_LIBERTY(string_index, WEST(pos));
+    
+    if (UNMARKED_LIBERTY(WEST(pos))) {
+      ADD_AND_MARK_LIBERTY(s, WEST(pos));
+    }
     else if (UNMARKED_COLOR_STRING(WEST(pos), other)) {
-      ADD_NEIGHBOR(string_index, WEST(pos));
+      ADD_NEIGHBOR(s, WEST(pos));
       MARK_STRING(WEST(pos));
     }
-
-    if (UNMARKED_LIBERTY(NORTH(pos)))
-      ADD_AND_MARK_LIBERTY(string_index, NORTH(pos));
+    
+    if (UNMARKED_LIBERTY(NORTH(pos))) {
+      ADD_AND_MARK_LIBERTY(s, NORTH(pos));
+    }
     else if (UNMARKED_COLOR_STRING(NORTH(pos), other)) {
-      ADD_NEIGHBOR(string_index, NORTH(pos));
+      ADD_NEIGHBOR(s, NORTH(pos));
       MARK_STRING(NORTH(pos));
     }
-
-    if (UNMARKED_LIBERTY(EAST(pos)))
-      ADD_AND_MARK_LIBERTY(string_index, EAST(pos));
+    
+    if (UNMARKED_LIBERTY(EAST(pos))) {
+      ADD_AND_MARK_LIBERTY(s, EAST(pos));
+    }
     else if (UNMARKED_COLOR_STRING(EAST(pos), other)) {
-      ADD_NEIGHBOR(string_index, EAST(pos));
+      ADD_NEIGHBOR(s, EAST(pos));
       MARK_STRING(EAST(pos));
     }
-
+    
     pos = NEXT_STONE(pos);
-  } while (!BACK_TO_FIRST_STONE(string_index, pos));
+  } while (!BACK_TO_FIRST_STONE(s, pos));
 }
 
 
@@ -3418,42 +3287,43 @@ find_liberties_and_neighbors(const Goban *goban, int string_index)
  */
 
 static void
-update_liberties(const Goban *goban, int s)
+update_liberties(int s)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int pos;
   int k;
 
   /* Push the old information. */
-  PUSH_VALUE(LIBERTIES_BY_INDEX(s));
-  for (k = 0; k < LIBERTIES_BY_INDEX(s) && k < MAX_LIBERTIES; k++)
-    PUSH_VALUE(STRING_LIBERTIES(s)[k]);
-
-  LIBERTIES_BY_INDEX(s) = 0;
+  PUSH_VALUE(string[s].liberties);
+  for (k = 0; k < string[s].liberties && k < MAX_LIBERTIES; k++) {
+    PUSH_VALUE(string_libs[s].list[k]);
+  }
+  string[s].liberties = 0;
 
   /* Clear the liberty mark. */
-  private->liberty_mark++;
+  liberty_mark++;
 
   /* Traverse the stones of the string, by following the cyclic chain. */
   pos = FIRST_STONE(s);
   do {
     /* Look in each direction for new liberties. Mark already visited
-     * liberties.
+     * liberties. 
      */
-    if (UNMARKED_LIBERTY(SOUTH(pos)))
+    if (UNMARKED_LIBERTY(SOUTH(pos))) {
       ADD_AND_MARK_LIBERTY(s, SOUTH(pos));
-
-    if (UNMARKED_LIBERTY(WEST(pos)))
+    }
+    
+    if (UNMARKED_LIBERTY(WEST(pos))) {
       ADD_AND_MARK_LIBERTY(s, WEST(pos));
-
-    if (UNMARKED_LIBERTY(NORTH(pos)))
+    }
+    
+    if (UNMARKED_LIBERTY(NORTH(pos))) {
       ADD_AND_MARK_LIBERTY(s, NORTH(pos));
-
-    if (UNMARKED_LIBERTY(EAST(pos)))
+    }
+    
+    if (UNMARKED_LIBERTY(EAST(pos))) {
       ADD_AND_MARK_LIBERTY(s, EAST(pos));
-
+    }
+    
     pos = NEXT_STONE(pos);
   } while (!BACK_TO_FIRST_STONE(s, pos));
 }
@@ -3464,29 +3334,26 @@ update_liberties(const Goban *goban, int s)
  */
 
 static void
-remove_neighbor(const Goban *goban, int string_index, int n)
+remove_neighbor(int str_number, int n)
 {
-  ACCESS_PRIVATE_DATA;
-
   int k;
-  int *neighbors = STRING_NEIGHBORS(string_index);
-  String_data *string_data = STRING_DATA_BY_INDEX(string_index);
-
-  for (k = 0; k < string_data->num_neighbors; k++) {
-    if (neighbors[k] == n) {
+  int done = 0;
+  struct string_data *s = &string[str_number];
+  struct string_neighbors_data *sn = &string_neighbors[str_number];
+  for (k = 0; k < s->neighbors; k++)
+    if (sn->list[k] == n) {
       /* We need to push the last entry too because it may become
        * destroyed later.
        */
-      PUSH_VALUE(neighbors[string_data->num_neighbors - 1]);
-      PUSH_VALUE(neighbors[k]);
-      PUSH_VALUE(string_data->num_neighbors);
-      neighbors[k] = neighbors[--string_data->num_neighbors];
-
-      return;
+      PUSH_VALUE(sn->list[s->neighbors - 1]);
+      PUSH_VALUE(sn->list[k]);
+      PUSH_VALUE(s->neighbors);
+      sn->list[k] = sn->list[s->neighbors - 1];
+      s->neighbors--;
+      done = 1;
+      break;
     }
-  }
-
-  gg_assert(goban, 0);
+  gg_assert(done);
 }
 
 
@@ -3496,31 +3363,27 @@ remove_neighbor(const Goban *goban, int string_index, int n)
  */
 
 static void
-remove_liberty(const Goban *goban, int string_index, int pos)
+remove_liberty(int str_number, int pos)
 {
-  ACCESS_PRIVATE_DATA;
-
   int k;
-  String_data *string_data = STRING_DATA_BY_INDEX(string_index);
-
-  if (string_data->num_liberties > MAX_LIBERTIES)
-    update_liberties(goban, string_index);
+  struct string_data *s = &string[str_number];
+  struct string_liberties_data *sl = &string_libs[str_number];
+  
+  if (s->liberties > MAX_LIBERTIES)
+    update_liberties(str_number);
   else {
-    int *liberties = STRING_LIBERTIES(string_index);
-
-    for (k = 0; k < string_data->num_liberties; k++) {
-      if (liberties[k] == pos) {
+    for (k = 0; k < s->liberties; k++)
+      if (sl->list[k] == pos) {
 	/* We need to push the last entry too because it may become
 	 * destroyed later.
 	 */
-	PUSH_VALUE(liberties[string_data->num_liberties - 1]);
-	PUSH_VALUE(liberties[k]);
-	PUSH_VALUE(string_data->num_liberties);
-	liberties[k] = liberties[--string_data->num_liberties];
-
+	PUSH_VALUE(sl->list[s->liberties - 1]);
+	PUSH_VALUE(sl->list[k]);
+	PUSH_VALUE(s->liberties);
+	sl->list[k] = sl->list[s->liberties - 1];
+	s->liberties--;
 	break;
       }
-    }
   }
 }
 
@@ -3530,21 +3393,18 @@ remove_liberty(const Goban *goban, int string_index, int pos)
  */
 
 static int
-do_remove_string(Goban *goban, int s)
+do_remove_string(int s)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD;
-
   int pos;
   int k;
-  int size = COUNT_STONES_BY_INDEX(s);
+  int size = string[s].size;
 
   /* Traverse the stones of the string, by following the cyclic chain. */
   pos = FIRST_STONE(s);
   do {
     /* Push color, string number and cyclic chain pointers. */
-    PUSH_VALUE(STRING_INDEX(pos));
-    PUSH_VALUE(NEXT_STONE(pos));
+    PUSH_VALUE(string_number[pos]);
+    PUSH_VALUE(next_stone[pos]);
     DO_REMOVE_STONE(pos);
     pos = NEXT_STONE(pos);
   } while (!BACK_TO_FIRST_STONE(s, pos));
@@ -3555,57 +3415,54 @@ do_remove_string(Goban *goban, int s)
    * update_liberties().
    */
   if (size == 1) {
-    for (k = 0; k < COUNT_NEIGHBORS_BY_INDEX(s); k++) {
-      int neighbor = STRING_NEIGHBORS(s)[k];
+    for (k = 0; k < string[s].neighbors; k++) {
+      int neighbor = string_neighbors[s].list[k];
 
-      remove_neighbor(goban, neighbor, s);
-      PUSH_VALUE(LIBERTIES_BY_INDEX(neighbor));
+      remove_neighbor(neighbor, s);
+      PUSH_VALUE(string[neighbor].liberties);
 
-      if (LIBERTIES_BY_INDEX(neighbor) < MAX_LIBERTIES)
-	STRING_LIBERTIES(neighbor)[LIBERTIES_BY_INDEX(neighbor)] = pos;
-
-      LIBERTIES_BY_INDEX(neighbor)++;
+      if (string[neighbor].liberties < MAX_LIBERTIES)
+	string_libs[neighbor].list[string[neighbor].liberties] = pos;
+      string[neighbor].liberties++;
     }
   }
   else if (size == 2) {
-    int other = OTHER_COLOR(STRING_DATA_BY_INDEX(s)->color);
+    int other = OTHER_COLOR(string[s].color);
     int pos2 = NEXT_STONE(pos);
 
-    for (k = 0; k < COUNT_NEIGHBORS_BY_INDEX(s); k++) {
-      int neighbor = STRING_NEIGHBORS(s)[k];
+    for (k = 0; k < string[s].neighbors; k++) {
+      int neighbor = string_neighbors[s].list[k];      
 
-      remove_neighbor(goban, neighbor, s);
-      PUSH_VALUE(LIBERTIES_BY_INDEX(neighbor));
+      remove_neighbor(neighbor, s);
+      PUSH_VALUE(string[neighbor].liberties);
 
       if (NEIGHBOR_OF_STRING(pos, neighbor, other)) {
-	if (LIBERTIES_BY_INDEX(neighbor) < MAX_LIBERTIES)
-	  STRING_LIBERTIES(neighbor)[LIBERTIES_BY_INDEX(neighbor)] = pos;
-
-	LIBERTIES_BY_INDEX(neighbor)++;
+	if (string[neighbor].liberties < MAX_LIBERTIES)
+	  string_libs[neighbor].list[string[neighbor].liberties] = pos;
+	string[neighbor].liberties++;
       }
 
       if (NEIGHBOR_OF_STRING(pos2, neighbor, other)) {
-	if (LIBERTIES_BY_INDEX(neighbor) < MAX_LIBERTIES)
-	  STRING_LIBERTIES(neighbor)[LIBERTIES_BY_INDEX(neighbor)] = pos2;
-
-	LIBERTIES_BY_INDEX(neighbor)++;
+	if (string[neighbor].liberties < MAX_LIBERTIES)
+	  string_libs[neighbor].list[string[neighbor].liberties] = pos2;
+	string[neighbor].liberties++;
       }
     }
   }
   else {
-    for (k = 0; k < COUNT_NEIGHBORS_BY_INDEX(s); k++) {
-      remove_neighbor(goban, STRING_NEIGHBORS(s)[k], s);
-      update_liberties(goban, STRING_NEIGHBORS(s)[k]);
+    for (k = 0; k < string[s].neighbors; k++) {
+      remove_neighbor(string_neighbors[s].list[k], s);
+      update_liberties(string_neighbors[s].list[k]);
     }
   }
 
   /* Update the number of captured stones. These are assumed to
    * already have been pushed.
    */
-  if (STRING_DATA_BY_INDEX(s)->color == WHITE)
-    goban->white_captured += size;
+  if (string[s].color == WHITE)
+    white_captured += size;
   else
-    goban->black_captured += size;
+    black_captured += size;
 
   return size;
 }
@@ -3615,93 +3472,82 @@ do_remove_string(Goban *goban, int s)
  * string for it.
  */
 static void
-create_new_string(const Goban *goban, int pos)
+create_new_string(int pos)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int s;
-  String_data *string_data;
   int color = board[pos];
   int other = OTHER_COLOR(color);
 
   /* Get the next free string number. */
-  PUSH_VALUE(private->next_string);
-  s = private->next_string++;
-  STRING_INDEX(pos) = s;
-  string_data = STRING_DATA_BY_INDEX(s);
-
+  PUSH_VALUE(next_string);
+  s = next_string++;
+  string_number[pos] = s;
   /* Set up a size one cycle for the string. */
-  NEXT_STONE(pos) = pos;
+  next_stone[pos] = pos;
 
   /* Set trivially known values and initialize the rest to zero. */
-  string_data->color	     = color;
-  string_data->size	     = 1;
-  string_data->origin	     = pos;
-  string_data->num_liberties = 0;
-  string_data->num_neighbors = 0;
-  string_data->mark	     = 0;
+  string[s].color = color;
+  string[s].size = 1;
+  string[s].origin = pos;
+  string[s].liberties = 0;
+  string[s].neighbors = 0;
+  string[s].mark = 0;
 
   /* Clear the string mark. */
-  private->string_mark++;
+  string_mark++;
 
   /* In each direction, look for a liberty or a nonmarked opponent
    * neighbor. Mark visited neighbors. There is no need to mark the
    * liberties since we can't find them twice. */
-  if (LIBERTY(SOUTH(pos)))
+  if (LIBERTY(SOUTH(pos))) {
     ADD_LIBERTY(s, SOUTH(pos));
+  }
   else if (UNMARKED_COLOR_STRING(SOUTH(pos), other)) {
-    int s2 = STRING_INDEX(SOUTH(pos));
-
+    int s2 = string_number[SOUTH(pos)];
     /* Add the neighbor to our list. */
     ADD_NEIGHBOR(s, SOUTH(pos));
-
     /* Add us to our neighbor's list. */
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s2));
+    PUSH_VALUE(string[s2].neighbors);
     ADD_NEIGHBOR(s2, pos);
     MARK_STRING(SOUTH(pos));
   }
-
-  if (LIBERTY(WEST(pos)))
+  
+  if (LIBERTY(WEST(pos))) {
     ADD_LIBERTY(s, WEST(pos));
+  }
   else if (UNMARKED_COLOR_STRING(WEST(pos), other)) {
-    int s2 = STRING_INDEX(WEST(pos));
-
+    int s2 = string_number[WEST(pos)];
     /* Add the neighbor to our list. */
     ADD_NEIGHBOR(s, WEST(pos));
-
     /* Add us to our neighbor's list. */
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s2));
+    PUSH_VALUE(string[s2].neighbors);
     ADD_NEIGHBOR(s2, pos);
     MARK_STRING(WEST(pos));
   }
-
-  if (LIBERTY(NORTH(pos)))
+  
+  if (LIBERTY(NORTH(pos))) {
     ADD_LIBERTY(s, NORTH(pos));
+  }
   else if (UNMARKED_COLOR_STRING(NORTH(pos), other)) {
-    int s2 = STRING_INDEX(NORTH(pos));
-
+    int s2 = string_number[NORTH(pos)];
     /* Add the neighbor to our list. */
     ADD_NEIGHBOR(s, NORTH(pos));
-
     /* Add us to our neighbor's list. */
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s2));
+    PUSH_VALUE(string[s2].neighbors);
     ADD_NEIGHBOR(s2, pos);
     MARK_STRING(NORTH(pos));
   }
-
-  if (LIBERTY(EAST(pos)))
+  
+  if (LIBERTY(EAST(pos))) {
     ADD_LIBERTY(s, EAST(pos));
+  }
   else if (UNMARKED_COLOR_STRING(EAST(pos), other)) {
-    int s2 = STRING_INDEX(EAST(pos));
-
+    int s2 = string_number[EAST(pos)];
     /* Add the neighbor to our list. */
     ADD_NEIGHBOR(s, EAST(pos));
-
     /* Add us to our neighbor's list. */
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s2));
+    PUSH_VALUE(string[s2].neighbors);
     ADD_NEIGHBOR(s2, pos);
-
     /* No need to mark since no visits left. */
 #if 0
     MARK_STRING(EAST(pos));
@@ -3714,54 +3560,49 @@ create_new_string(const Goban *goban, int pos)
  * new stone to that string.
  */
 static void
-extend_neighbor_string(const Goban *goban, int pos, int s)
+extend_neighbor_string(int pos, int s)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int k;
   int liberties_updated = 0;
   int color = board[pos];
   int other = OTHER_COLOR(color);
 
   /* Link in the stone in the cyclic list. */
-  int	pos2	   = ORIGIN_BY_INDEX(s);
-  NEXT_STONE(pos)  = NEXT_STONE(pos2);
-  PUSH_VALUE(NEXT_STONE(pos2));
-  NEXT_STONE(pos2) = pos;
-
+  int pos2 = string[s].origin;
+  next_stone[pos] = next_stone[pos2];
+  PUSH_VALUE(next_stone[pos2]);
+  next_stone[pos2] = pos;
+  
   /* Do we need to update the origin? */
   if (pos < pos2) {
-    PUSH_VALUE(ORIGIN_BY_INDEX(s));
-    ORIGIN_BY_INDEX(s) = pos;
+    PUSH_VALUE(string[s].origin);
+    string[s].origin = pos;
   }
-
-  STRING_INDEX(pos) = s;
+  
+  string_number[pos] = s;
 
   /* The size of the string has increased by one. */
-  PUSH_VALUE(COUNT_STONES_BY_INDEX(s));
-  COUNT_STONES_BY_INDEX(s)++;
+  PUSH_VALUE(string[s].size);
+  string[s].size++;
 
   /* If s has too many liberties, we don't know where they all are and
    * can't update the liberties with the algorithm we otherwise
    * use. In that case we can only recompute the liberties from
    * scratch.
    */
-  if (LIBERTIES_BY_INDEX(s) > MAX_LIBERTIES) {
-    update_liberties(goban, s);
+  if (string[s].liberties > MAX_LIBERTIES) {
+    update_liberties(s);
     liberties_updated = 1;
   }
   else {
     /* The place of the new stone is no longer a liberty. */
-    remove_liberty(goban, s, pos);
+    remove_liberty(s, pos);
   }
 
   /* Mark old neighbors of the string. */
-  private->string_mark++;
-  for (k = 0; k < COUNT_NEIGHBORS_BY_INDEX(s); k++) {
-    STRING_DATA_BY_INDEX(STRING_NEIGHBORS(s)[k])->mark
-      = private->string_mark;
-  }
+  string_mark++;
+  for (k = 0; k < string[s].neighbors; k++)
+    string[string_neighbors[s].list[k]].mark = string_mark;
 
   /* Look at the neighbor locations of pos for new liberties and/or
    * neighbor strings.
@@ -3776,58 +3617,58 @@ extend_neighbor_string(const Goban *goban, int pos, int s)
       ADD_LIBERTY(s, SOUTH(pos));
   }
   else if (UNMARKED_COLOR_STRING(SOUTH(pos), other)) {
-    int s2 = STRING_INDEX(SOUTH(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s));
+    int s2 = string_number[SOUTH(pos)];
+    PUSH_VALUE(string[s].neighbors);
     ADD_NEIGHBOR(s, SOUTH(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s2));
+    PUSH_VALUE(string[s2].neighbors);
     ADD_NEIGHBOR(s2, pos);
     MARK_STRING(SOUTH(pos));
   }
-
+  
   if (LIBERTY(WEST(pos))) {
     if (!liberties_updated
 	&& !NON_WEST_NEIGHBOR_OF_STRING(WEST(pos), s, color))
       ADD_LIBERTY(s, WEST(pos));
   }
   else if (UNMARKED_COLOR_STRING(WEST(pos), other)) {
-    int s2 = STRING_INDEX(WEST(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s));
+    int s2 = string_number[WEST(pos)];
+    PUSH_VALUE(string[s].neighbors);
     ADD_NEIGHBOR(s, WEST(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s2));
+    PUSH_VALUE(string[s2].neighbors);
     ADD_NEIGHBOR(s2, pos);
     MARK_STRING(WEST(pos));
   }
-
+  
   if (LIBERTY(NORTH(pos))) {
     if (!liberties_updated
 	&& !NON_NORTH_NEIGHBOR_OF_STRING(NORTH(pos), s, color))
       ADD_LIBERTY(s, NORTH(pos));
   }
   else if (UNMARKED_COLOR_STRING(NORTH(pos), other)) {
-    int s2 = STRING_INDEX(NORTH(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s));
+    int s2 = string_number[NORTH(pos)];
+    PUSH_VALUE(string[s].neighbors);
     ADD_NEIGHBOR(s, NORTH(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s2));
+    PUSH_VALUE(string[s2].neighbors);
     ADD_NEIGHBOR(s2, pos);
     MARK_STRING(NORTH(pos));
   }
-
+  
   if (LIBERTY(EAST(pos))) {
     if (!liberties_updated
 	&& !NON_EAST_NEIGHBOR_OF_STRING(EAST(pos), s, color))
       ADD_LIBERTY(s, EAST(pos));
   }
   else if (UNMARKED_COLOR_STRING(EAST(pos), other)) {
-    int s2 = STRING_INDEX(EAST(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s));
+    int s2 = string_number[EAST(pos)];
+    PUSH_VALUE(string[s].neighbors);
     ADD_NEIGHBOR(s, EAST(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(s2));
+    PUSH_VALUE(string[s2].neighbors);
     ADD_NEIGHBOR(s2, pos);
 #if 0
     MARK_STRING(EAST(pos));
 #endif
   }
-
+  
 }
 
 
@@ -3835,49 +3676,47 @@ extend_neighbor_string(const Goban *goban, int pos, int s)
  */
 
 static void
-assimilate_string(const Goban *goban, int s, int pos)
+assimilate_string(int s, int pos)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int k;
   int last;
-  int s2 = STRING_INDEX(pos);
-  COUNT_STONES_BY_INDEX(s) += COUNT_STONES_BY_INDEX(s2);
+  int s2 = string_number[pos];
+  string[s].size += string[s2].size;
 
   /* Walk through the s2 stones and change string number. Also pick up
    * the last stone in the cycle for later use.
    */
   pos = FIRST_STONE(s2);
   do {
-    PUSH_VALUE(STRING_INDEX(pos));
-    STRING_INDEX(pos) = s;
+    PUSH_VALUE(string_number[pos]);
+    string_number[pos] = s;
     last = pos;
     pos = NEXT_STONE(pos);
   } while (!BACK_TO_FIRST_STONE(s2, pos));
 
   /* Link the two cycles together. */
   {
-    int pos2 = ORIGIN_BY_INDEX(s);
-    PUSH_VALUE(NEXT_STONE(last));
-    PUSH_VALUE(NEXT_STONE(pos2));
-    NEXT_STONE(last) = NEXT_STONE(pos2);
-    NEXT_STONE(pos2) = ORIGIN_BY_INDEX(s2);
-
+    int pos2 = string[s].origin;
+    PUSH_VALUE(next_stone[last]);
+    PUSH_VALUE(next_stone[pos2]);
+    next_stone[last] = next_stone[pos2];
+    next_stone[pos2] = string[s2].origin;
+    
     /* Do we need to update the origin? */
-    if (ORIGIN_BY_INDEX(s2) < pos2)
-      ORIGIN_BY_INDEX(s) = ORIGIN_BY_INDEX(s2);
+    if (string[s2].origin < pos2)
+      string[s].origin = string[s2].origin;
   }
 
   /* Pick up the liberties of s2 that we don't already have.
    * It is assumed that the liberties of s have been marked before
    * this function is called.
    */
-  if (LIBERTIES_BY_INDEX(s2) <= MAX_LIBERTIES) {
-    for (k = 0; k < LIBERTIES_BY_INDEX(s2); k++) {
-      int pos2 = STRING_LIBERTIES(s2)[k];
-      if (UNMARKED_LIBERTY(pos2))
+  if (string[s2].liberties <= MAX_LIBERTIES) {
+    for (k = 0; k < string[s2].liberties; k++) {
+      int pos2 = string_libs[s2].list[k];
+      if (UNMARKED_LIBERTY(pos2)) {
 	ADD_AND_MARK_LIBERTY(s, pos2);
+      }
     }
   }
   else {
@@ -3889,14 +3728,9 @@ assimilate_string(const Goban *goban, int s, int pos)
      * rebuild the list of liberties for s (including the neighbor
      * strings assimilated so far) from scratch.
      */
-
-    /* Reset the mark. */
-    private->liberty_mark++;
-
-    /* To avoid pushing the current list. */
-    LIBERTIES_BY_INDEX(s) = 0;
-
-    update_liberties(goban, s);
+    liberty_mark++;          /* Reset the mark. */
+    string[s].liberties = 0; /* To avoid pushing the current list. */
+    update_liberties(s);
   }
 
   /* Remove s2 as neighbor to the neighbors of s2 and instead add s if
@@ -3905,14 +3739,14 @@ assimilate_string(const Goban *goban, int s, int pos)
    * known neighbors of s are assumed to have been marked before this
    * function is called.
    */
-  for (k = 0; k < COUNT_NEIGHBORS_BY_INDEX(s2); k++) {
-    int t = STRING_NEIGHBORS(s2)[k];
-    remove_neighbor(goban, t, s2);
-    if (STRING_DATA_BY_INDEX(t)->mark != private->string_mark) {
-      PUSH_VALUE(COUNT_NEIGHBORS_BY_INDEX(t));
-      STRING_NEIGHBORS(t)[COUNT_NEIGHBORS_BY_INDEX(t)++] = s;
-      STRING_NEIGHBORS(s)[COUNT_NEIGHBORS_BY_INDEX(s)++] = t;
-      STRING_DATA_BY_INDEX(t)->mark = private->string_mark;
+  for (k = 0; k < string[s2].neighbors; k++) {
+    int t = string_neighbors[s2].list[k];
+    remove_neighbor(t, s2);
+    if (string[t].mark != string_mark) {
+      PUSH_VALUE(string[t].neighbors);
+      string_neighbors[t].list[string[t].neighbors++] = s;
+      string_neighbors[s].list[string[s].neighbors++] = t;
+      string[t].mark = string_mark;
     }
   }
 }
@@ -3923,39 +3757,33 @@ assimilate_string(const Goban *goban, int s, int pos)
  */
 
 static void
-assimilate_neighbor_strings(const Goban *goban, int pos)
+assimilate_neighbor_strings(int pos)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
   int s;
-  String_data *string_data;
   int color = board[pos];
   int other = OTHER_COLOR(color);
 
   /* Get the next free string number. */
-  PUSH_VALUE(private->next_string);
-  s = private->next_string++;
-  ASSERT1(goban, s < MAX_STRINGS, pos);
-  STRING_INDEX(pos) = s;
-  string_data = STRING_DATA_BY_INDEX(s);
-
+  PUSH_VALUE(next_string);
+  s = next_string++;
+  PARANOID1(s < MAX_STRINGS, pos); 
+  string_number[pos] = s;
   /* Set up a size one cycle for the string. */
-  NEXT_STONE(pos) = pos;
-
+  next_stone[pos] = pos;
+  
   /* Set trivially known values and initialize the rest to zero. */
-  string_data->color	     = color;
-  string_data->size	     = 1;
-  string_data->origin	     = pos;
-  string_data->num_liberties = 0;
-  string_data->num_neighbors = 0;
+  string[s].color = color;
+  string[s].size = 1;
+  string[s].origin = pos;
+  string[s].liberties = 0;
+  string[s].neighbors = 0;
 
   /* Clear the marks. */
-  private->liberty_mark++;
-  private->string_mark++;
+  liberty_mark++;
+  string_mark++;
 
   /* Mark ourselves. */
-  string_data->mark = private->string_mark;
+  string[s].mark = string_mark;
 
   /* Look in each direction for
    *
@@ -3964,39 +3792,45 @@ assimilate_neighbor_strings(const Goban *goban, int pos)
    *    neighbors, unless already visited.
    * 3. friendly string: Assimilate.
    */
-  if (UNMARKED_LIBERTY(SOUTH(pos)))
+  if (UNMARKED_LIBERTY(SOUTH(pos))) {
     ADD_AND_MARK_LIBERTY(s, SOUTH(pos));
+  }
   else if (UNMARKED_COLOR_STRING(SOUTH(pos), other)) {
     ADD_NEIGHBOR(s, SOUTH(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS(SOUTH(pos)));
-    ADD_NEIGHBOR(STRING_INDEX(SOUTH(pos)), pos);
+    PUSH_VALUE(string[string_number[SOUTH(pos)]].neighbors);
+    ADD_NEIGHBOR(string_number[SOUTH(pos)], pos);
     MARK_STRING(SOUTH(pos));
   }
-  else if (UNMARKED_COLOR_STRING(SOUTH(pos), color))
-    assimilate_string(goban, s, SOUTH(pos));
+  else if (UNMARKED_COLOR_STRING(SOUTH(pos), color)) {
+    assimilate_string(s, SOUTH(pos));
+  }
 
-  if (UNMARKED_LIBERTY(WEST(pos)))
+  if (UNMARKED_LIBERTY(WEST(pos))) {
     ADD_AND_MARK_LIBERTY(s, WEST(pos));
+  }
   else if (UNMARKED_COLOR_STRING(WEST(pos), other)) {
     ADD_NEIGHBOR(s, WEST(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS(WEST(pos)));
-    ADD_NEIGHBOR(STRING_INDEX(WEST(pos)), pos);
+    PUSH_VALUE(string[string_number[WEST(pos)]].neighbors);
+    ADD_NEIGHBOR(string_number[WEST(pos)], pos);
     MARK_STRING(WEST(pos));
   }
-  else if (UNMARKED_COLOR_STRING(WEST(pos), color))
-    assimilate_string(goban, s, WEST(pos));
-
-  if (UNMARKED_LIBERTY(NORTH(pos)))
+  else if (UNMARKED_COLOR_STRING(WEST(pos), color)) {
+    assimilate_string(s, WEST(pos));
+  }
+  
+  if (UNMARKED_LIBERTY(NORTH(pos))) {
     ADD_AND_MARK_LIBERTY(s, NORTH(pos));
+  }
   else if (UNMARKED_COLOR_STRING(NORTH(pos), other)) {
     ADD_NEIGHBOR(s, NORTH(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS(NORTH(pos)));
-    ADD_NEIGHBOR(STRING_INDEX(NORTH(pos)), pos);
+    PUSH_VALUE(string[string_number[NORTH(pos)]].neighbors);
+    ADD_NEIGHBOR(string_number[NORTH(pos)], pos);
     MARK_STRING(NORTH(pos));
   }
-  else if (UNMARKED_COLOR_STRING(NORTH(pos), color))
-    assimilate_string(goban, s, NORTH(pos));
-
+  else if (UNMARKED_COLOR_STRING(NORTH(pos), color)) {
+    assimilate_string(s, NORTH(pos));
+  }
+  
   if (UNMARKED_LIBERTY(EAST(pos))) {
 #if 0
     ADD_AND_MARK_LIBERTY(s, EAST(pos));
@@ -4006,14 +3840,15 @@ assimilate_neighbor_strings(const Goban *goban, int pos)
   }
   else if (UNMARKED_COLOR_STRING(EAST(pos), other)) {
     ADD_NEIGHBOR(s, EAST(pos));
-    PUSH_VALUE(COUNT_NEIGHBORS(EAST(pos)));
-    ADD_NEIGHBOR(STRING_INDEX(EAST(pos)), pos);
+    PUSH_VALUE(string[string_number[EAST(pos)]].neighbors);
+    ADD_NEIGHBOR(string_number[EAST(pos)], pos);
 #if 0
     MARK_STRING(EAST(pos));
 #endif
   }
-  else if (UNMARKED_COLOR_STRING(EAST(pos), color))
-    assimilate_string(goban, s, EAST(pos));
+  else if (UNMARKED_COLOR_STRING(EAST(pos), color)) {
+    assimilate_string(s, EAST(pos));
+  }
 }
 
 
@@ -4022,28 +3857,25 @@ assimilate_neighbor_strings(const Goban *goban, int pos)
  */
 
 static void
-do_commit_suicide(Goban *goban, int pos, int color)
+do_commit_suicide(int pos, int color)
 {
-  ACCESS_PRIVATE_DATA_CONST;
-  ACCESS_BOARD_CONST;
-
   if (board[SOUTH(pos)] == color)
-    do_remove_string(goban, STRING_INDEX(SOUTH(pos)));
+    do_remove_string(string_number[SOUTH(pos)]);
 
   if (board[WEST(pos)] == color)
-    do_remove_string(goban, STRING_INDEX(WEST(pos)));
+    do_remove_string(string_number[WEST(pos)]);
 
   if (board[NORTH(pos)] == color)
-    do_remove_string(goban, STRING_INDEX(NORTH(pos)));
+    do_remove_string(string_number[NORTH(pos)]);
 
   if (board[EAST(pos)] == color)
-    do_remove_string(goban, STRING_INDEX(EAST(pos)));
+    do_remove_string(string_number[EAST(pos)]);
 
   /* Count the stone we "played" as captured. */
   if (color == WHITE)
-    goban->white_captured++;
+    white_captured++;
   else
-    goban->black_captured++;
+    black_captured++;
 }
 
 
@@ -4053,25 +3885,22 @@ do_commit_suicide(Goban *goban, int pos, int color)
  */
 
 static void
-do_play_move(Goban *goban, int pos, int color)
+do_play_move(int pos, int color)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD;
-
   int other = OTHER_COLOR(color);
   int captured_stones = 0;
   int neighbor_allies = 0;
   int s = -1;
 
   /* Clear string mark. */
-  private->string_mark++;
+  string_mark++;
 
   /* Put down the stone.  We also set its string number to -1 for a while
    * so that NEIGHBOR_OF_STRING() and friends don't get confused with the
    * stone.
    */
   DO_ADD_STONE(pos, color);
-  STRING_INDEX(pos) = -1;
+  string_number[pos] = -1;
 
   /* Look in all directions. Count the number of neighbor strings of the same
    * color, remove captured strings and remove `pos' as liberty for opponent
@@ -4079,212 +3908,204 @@ do_play_move(Goban *goban, int pos, int color)
    */
   if (board[SOUTH(pos)] == color) {
     neighbor_allies++;
-    s = STRING_INDEX(SOUTH(pos));
+    s = string_number[SOUTH(pos)];
     MARK_STRING(SOUTH(pos));
   }
   else if (board[SOUTH(pos)] == other) {
     if (LIBERTIES(SOUTH(pos)) > 1) {
-      remove_liberty(goban, STRING_INDEX(SOUTH(pos)), pos);
+      remove_liberty(string_number[SOUTH(pos)], pos);
       MARK_STRING(SOUTH(pos));
     }
     else
-      captured_stones += do_remove_string(goban, STRING_INDEX(SOUTH(pos)));
+      captured_stones += do_remove_string(string_number[SOUTH(pos)]);
   }
 
   if (UNMARKED_COLOR_STRING(WEST(pos), color)) {
     neighbor_allies++;
-    s = STRING_INDEX(WEST(pos));
+    s = string_number[WEST(pos)];
     MARK_STRING(WEST(pos));
   }
   else if (UNMARKED_COLOR_STRING(WEST(pos), other)) {
     if (LIBERTIES(WEST(pos)) > 1) {
-      remove_liberty(goban, STRING_INDEX(WEST(pos)), pos);
+      remove_liberty(string_number[WEST(pos)], pos);
       MARK_STRING(WEST(pos));
     }
     else
-      captured_stones += do_remove_string(goban, STRING_INDEX(WEST(pos)));
+      captured_stones += do_remove_string(string_number[WEST(pos)]);
   }
 
   if (UNMARKED_COLOR_STRING(NORTH(pos), color)) {
     neighbor_allies++;
-    s = STRING_INDEX(NORTH(pos));
+    s = string_number[NORTH(pos)];
     MARK_STRING(NORTH(pos));
   }
   else if (UNMARKED_COLOR_STRING(NORTH(pos), other)) {
     if (LIBERTIES(NORTH(pos)) > 1) {
-      remove_liberty(goban, STRING_INDEX(NORTH(pos)), pos);
+      remove_liberty(string_number[NORTH(pos)], pos);
       MARK_STRING(NORTH(pos));
     }
     else
-      captured_stones += do_remove_string(goban, STRING_INDEX(NORTH(pos)));
+      captured_stones += do_remove_string(string_number[NORTH(pos)]);
   }
 
   if (UNMARKED_COLOR_STRING(EAST(pos), color)) {
     neighbor_allies++;
-    s = STRING_INDEX(EAST(pos));
+    s = string_number[EAST(pos)];
 #if 0
     MARK_STRING(EAST(pos));
 #endif
   }
   else if (UNMARKED_COLOR_STRING(EAST(pos), other)) {
     if (LIBERTIES(EAST(pos)) > 1) {
-      remove_liberty(goban, STRING_INDEX(EAST(pos)), pos);
+      remove_liberty(string_number[EAST(pos)], pos);
 #if 0
       MARK_STRING(EAST(pos));
 #endif
     }
     else
-      captured_stones += do_remove_string(goban, STRING_INDEX(EAST(pos)));
+      captured_stones += do_remove_string(string_number[EAST(pos)]);
   }
 
   /* Choose strategy depending on the number of friendly neighbors. */
   if (neighbor_allies == 0)
-    create_new_string(goban, pos);
+    create_new_string(pos);
   else if (neighbor_allies == 1) {
-    gg_assert(goban, s >= 0);
-    extend_neighbor_string(goban, pos, s);
+    gg_assert(s >= 0);
+    extend_neighbor_string(pos, s);
     return; /* can't be a ko, we're done */
   }
   else {
-    assimilate_neighbor_strings(goban, pos);
+    assimilate_neighbor_strings(pos);
     return; /* can't be a ko, we're done */
   }
 
-  /* Check whether this move was a ko capture and if so set
+  /* Check whether this move was a ko capture and if so set 
    * board_ko_pos.
    *
-   * No need to push board_ko_pos on the stack,
+   * No need to push board_ko_pos on the stack, 
    * because this has been done earlier.
    */
-  s = STRING_INDEX(pos);
-  if (LIBERTIES_BY_INDEX(s) == 1
-      && COUNT_STONES_BY_INDEX(s) == 1
+  s = string_number[pos];
+  if (string[s].liberties == 1
+      && string[s].size == 1
       && captured_stones == 1) {
     /* In case of a double ko: clear old ko position first. */
-    if (goban->board_ko_pos != NO_MOVE)
-      hashdata_invert_ko(&goban->board_hash, goban->board_ko_pos);
-    goban->board_ko_pos = STRING_LIBERTIES(s)[0];
-    hashdata_invert_ko(&goban->board_hash, goban->board_ko_pos);
+    if (board_ko_pos != NO_MOVE)
+      hashdata_invert_ko(&board_hash, board_ko_pos);
+    board_ko_pos = string_libs[s].list[0];
+    hashdata_invert_ko(&board_hash, board_ko_pos);
   }
 }
 
 
 
 /* ================================================================ *
- * The following functions don't actually belong here. They are
+ * The following functions don't actually belong here. They are  
  * only here because they are faster here where they have access to
- * the incremental data structures.
+ * the incremental data structures. 
  * ================================================================ */
 
 
 /* Help collect the data needed by order_moves() in reading.c.
  * It's the caller's responsibility to initialize the result parameters.
  */
-
 #define NO_UNROLL 0
-
 void
-incremental_order_moves(const Goban *goban, int move, int color, int str,
+incremental_order_moves(int move, int color, int str,
 			int *number_edges, int *number_same_string,
 			int *number_own, int *number_opponent,
 			int *captured_stones, int *threatened_stones,
 			int *saved_stones, int *number_open)
 {
-  ACCESS_PRIVATE_DATA;
-  ACCESS_BOARD_CONST;
-
 #if NO_UNROLL == 1
-
   int pos;
   int k;
 
   /* Clear the string mark. */
-  private->string_mark++;
+  string_mark++;
 
   for (k = 0; k < 4; k++) {
     pos = move + delta[k];
-    if (!ON_BOARD(goban, pos))
+    if (!ON_BOARD(pos))
       (*number_edges)++;
     else if (board[pos] == EMPTY)
       (*number_open)++;
     else {
-      int s = STRING_INDEX(pos);
-      if (STRING_INDEX(str) == s)
+      int s = string_number[pos];
+      if (string_number[str] == s)
 	(*number_same_string)++;
-
+      
       if (board[pos] == color) {
 	(*number_own)++;
-	if (LIBERTIES_BY_INDEX(s) == 1)
-	  (*saved_stones) += COUNT_STONES_BY_INDEX(s);
+	if (string[s].liberties == 1)
+	  (*saved_stones) += string[s].size;
       }
       else {
 	(*number_opponent)++;
-	if (LIBERTIES_BY_INDEX(s) == 1) {
+	if (string[s].liberties == 1) {
 	  int r;
-	  const String_data *t;
-	  (*captured_stones) += COUNT_STONES_BY_INDEX(s);
-	  for (r = 0; r < COUNT_NEIGHBORS_BY_INDEX(s); r++) {
-	    t = STRING_DATA_BY_INDEX(STRING_NEIGHBORS(s([r]);
-	    if (t->num_liberties == 1)
+	  struct string_data *t;
+	  (*captured_stones) += string[s].size;
+	  for (r = 0; r < string[s].neighbors; r++) {
+	    t = &string[string[s].neighborlist[r]];
+	    if (t->liberties == 1)
 	      (*saved_stones) += t->size;
 	  }
 	}
-	else if (LIBERTIES_BY_INDEX(s) == 2 && UNMARKED_STRING(pos)) {
-	  (*threatened_stones) += COUNT_STONES_BY_INDEX(s);
+	else if (string[s].liberties == 2 && UNMARKED_STRING(pos)) {
+	  (*threatened_stones) += string[s].size;
 	  MARK_STRING(pos);
 	}
       }
     }
   }
-
-#else /* NO_UNROLL != 1 */
-
-#define code1(arg)							\
-  if (!ON_BOARD(goban, arg))						\
-    (*number_edges)++;							\
-  else if (board[arg] == EMPTY)						\
-    (*number_open)++;							\
-  else {								\
-    int s = STRING_INDEX(arg);						\
-    if (STRING_INDEX(str) == s)						\
-      (*number_same_string)++;						\
-    if (board[arg] == color) {						\
-      (*number_own)++;							\
-      if (LIBERTIES_BY_INDEX(s) == 1)					\
-	(*saved_stones) += COUNT_STONES_BY_INDEX(s);			\
-    }									\
-    else {								\
-      (*number_opponent)++;						\
-      if (LIBERTIES_BY_INDEX(s) == 1) {					\
-	int r;								\
-	const String_data *t;						\
-	(*captured_stones) += COUNT_STONES_BY_INDEX(s);			\
-	for (r = 0; r < COUNT_NEIGHBORS_BY_INDEX(s); r++) {		\
-	  t = STRING_DATA_BY_INDEX(STRING_NEIGHBORS(s)[r]);		\
-	  if (t->num_liberties == 1)					\
-	    (*saved_stones) += t->size;					\
-	}								\
-      }									\
-      else if (LIBERTIES_BY_INDEX(s) == 2 && UNMARKED_STRING(arg)) {	\
-	(*threatened_stones) += COUNT_STONES_BY_INDEX(s);		\
-	MARK_STRING(arg);						\
-      }									\
-    }									\
+  
+#else
+#define code1(arg) \
+  if (!ON_BOARD(arg)) \
+    (*number_edges)++; \
+  else if (board[arg] == EMPTY) \
+    (*number_open)++; \
+  else { \
+    int s = string_number[arg]; \
+    if (string_number[str] == s) \
+      (*number_same_string)++; \
+    if (board[arg] == color) { \
+      (*number_own)++; \
+      if (string[s].liberties == 1) \
+	(*saved_stones) += string[s].size; \
+    } \
+    else { \
+      (*number_opponent)++; \
+      if (string[s].liberties == 1) { \
+	int r; \
+	struct string_data *t; \
+	(*captured_stones) += string[s].size; \
+	for (r = 0; r < string[s].neighbors; r++) { \
+	  t = &string[string_neighbors[s].list[r]]; \
+	  if (t->liberties == 1) \
+	    (*saved_stones) += t->size; \
+	} \
+      } \
+      else if (string[s].liberties == 2 && UNMARKED_STRING(arg)) { \
+	(*threatened_stones) += string[s].size; \
+        MARK_STRING(arg); \
+      } \
+    } \
   }
 
   /* Clear the string mark. */
-  private->string_mark++;
+  string_mark++;
 
   code1(SOUTH(move));
   code1(WEST(move));
   code1(NORTH(move));
   code1(EAST(move));
-
-#endif /* NO_UNROLL != 1 */
+#endif
 }
 
 
-int
+int 
 square_dist(int pos1, int pos2)
 {
   int idist = I(pos1) - I(pos2);

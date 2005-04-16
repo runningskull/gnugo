@@ -160,27 +160,19 @@ hashdata_invert_kom_pos(Hash_data *hd, int kom_pos)
 
 /* Compute hash value to identify the goal area. */
 Hash_data
-goal_to_hashvalue(int board_size, const char *goal)
+goal_to_hashvalue(const char *goal)
 {
-  int k;
-  int i;
-  int j;
+  int i, pos;
   Hash_data return_value;
-
-  for (k = 0; k < NUM_HASHVALUES; k++)
-    return_value.hashval[k] = 0;
-
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++) {
-      int pos = POS(i, j);
-
-      if (goal[pos]) {
-	for (k = 0; k < NUM_HASHVALUES; k++) 
-	  return_value.hashval[k] ^= goal_hash[pos].hashval[k];
-      }
-    }
-  }
-
+  
+  for (i = 0; i < NUM_HASHVALUES; i++)
+    return_value.hashval[i] = 0;
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos) && goal[pos])
+      for (i = 0; i < NUM_HASHVALUES; i++) 
+	return_value.hashval[i] ^= goal_hash[pos].hashval[i];
+  
   return return_value;
 }
 
@@ -197,7 +189,7 @@ hashdata_to_string(Hash_data *hashdata)
   for (k = 0; k < NUM_HASHVALUES; k++) {
     n += sprintf(buffer + n, HASHVALUE_PRINT_FORMAT,
 		 HASHVALUE_NUM_DIGITS, hashdata->hashval[k]);
-    gg_assert(NULL, n < BUFFER_SIZE);
+    gg_assert(n < BUFFER_SIZE);
   }
 
   return buffer;

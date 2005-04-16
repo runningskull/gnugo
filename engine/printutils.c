@@ -21,7 +21,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "board.h"
-#include "board-private.h"
 #include "hash.h"
 #include "gg_utils.h"
 #include "sgftree.h"
@@ -42,15 +41,13 @@
  * Nasty bodge: %o at the start means outdent, i.e. cancel indent.
  */
 
-void
-vgprintf(const Goban *goban, FILE *outputfile, const char *fmt, va_list ap)
+void 
+vgprintf(FILE *outputfile, const char *fmt, va_list ap)
 {
   if (fmt[0] == '%' && fmt[1] == 'o')
-    fmt += 2;  /* Cancel indentation. */
-  else if (goban->stackp > 0) {
-    fprintf(outputfile, "%.*s", goban->stackp * 2,
-	    "                                ");
-  }
+    fmt += 2;  /* cancel indent */
+  else if (stackp > 0)
+    fprintf(outputfile, "%.*s", stackp*2, "                                ");
 
   for (; *fmt; ++fmt) {
     if (*fmt == '%') {
@@ -87,12 +84,12 @@ vgprintf(const Goban *goban, FILE *outputfile, const char *fmt, va_list ap)
 	break;
       }
       case '2':
-	fmt++;
-	if (*fmt != 'm' && *fmt != 'M') {
+        fmt++;
+        if (*fmt != 'm' && *fmt != 'M') {
 	  fprintf(outputfile, "\n\nUnknown format string '2%c'\n", *fmt);
 	  break;
-	}
-	/* else fall through - 2 modifier on %m is default. */
+        }
+        /* else fall through - 2 modifier on %m is default. */
       case 'm':
       case 'M':
       {
@@ -101,7 +98,7 @@ vgprintf(const Goban *goban, FILE *outputfile, const char *fmt, va_list ap)
 	int n = va_arg(ap, int);
 	if (m == -1 && n == -1)
 	  fputs("PASS", outputfile);
-	else if (!ON_BOARD2(goban, m, n))
+	else if (!ON_BOARD2(m, n))
 	  fprintf(outputfile, "[%d,%d]", m, n);
 	else {
 	  /* Generate the move name. */
@@ -110,9 +107,9 @@ vgprintf(const Goban *goban, FILE *outputfile, const char *fmt, va_list ap)
 	  else
 	    movename[0] = n + 66;
 	  if (*fmt == 'm')
-	    sprintf(movename+1, "%d", goban->board_size - m);
+	    sprintf(movename+1, "%d", board_size - m);
 	  else
-	    sprintf(movename+1, "%-2d", goban->board_size - m);
+	    sprintf(movename+1, "%-2d", board_size - m);
 	  fputs(movename, outputfile);
 	}
 	break;
@@ -130,7 +127,7 @@ vgprintf(const Goban *goban, FILE *outputfile, const char *fmt, va_list ap)
 	int n = J(pos);
 	if (pos == NO_MOVE)
 	  fputs("PASS", outputfile);
-	else if (!ON_BOARD1(goban, pos))
+	else if (!ON_BOARD1(pos))
 	  fprintf(outputfile, "[%d]", pos);
 	else {
 	  /* Generate the move name. */
@@ -139,9 +136,9 @@ vgprintf(const Goban *goban, FILE *outputfile, const char *fmt, va_list ap)
 	  else
 	    movename[0] = n + 66;
 	  if (*fmt == 'm')
-	    sprintf(movename + 1, "%d", goban->board_size - m);
+	    sprintf(movename + 1, "%d", board_size - m);
 	  else
-	    sprintf(movename + 1, "%-2d", goban->board_size - m);
+	    sprintf(movename + 1, "%-2d", board_size - m);
 	  fputs(movename, outputfile);
 	}
 	break;
@@ -173,12 +170,12 @@ vgprintf(const Goban *goban, FILE *outputfile, const char *fmt, va_list ap)
  * required wrapper around vgprintf, writes to outfile.
  */
 
-void
-gfprintf(const Goban *goban, FILE *outfile, const char *fmt, ...)
+void 
+gfprintf(FILE *outfile, const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
-  vgprintf(goban, outfile, fmt, ap);
+  vgprintf(outfile, fmt, ap);
   va_end(ap);
 }
 
@@ -188,12 +185,12 @@ gfprintf(const Goban *goban, FILE *outfile, const char *fmt, ...)
  * Always returns 1 to allow use in short-circuit logical expressions.
  */
 
-int
-gprintf(const Goban *goban, const char *fmt, ...)
+int 
+gprintf(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
-  vgprintf(goban, stderr, fmt, ap);
+  vgprintf(stderr, fmt, ap);
   va_end(ap);
   return 1;
 }
@@ -205,11 +202,11 @@ gprintf(const Goban *goban, const char *fmt, ...)
  */
 
 void
-mprintf(const Goban *goban, const char *fmt, ...)
+mprintf(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
-  vgprintf(goban, stdout, fmt, ap);
+  vgprintf(stdout, fmt, ap);
   va_end(ap);
 }
 
@@ -218,7 +215,7 @@ mprintf(const Goban *goban, const char *fmt, ...)
  * abortgo(). Anywhere else you should use the normal sgf library.
  */
 static void
-dump_board_sgf(const Goban *goban)
+dump_board_sgf(void)
 {
   int pos;
   int initial_colors_found = EMPTY;
@@ -226,18 +223,17 @@ dump_board_sgf(const Goban *goban)
   int k;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(goban, pos))
-      initial_colors_found |= goban->private->initial_board[pos];
-
+    if (ON_BOARD(pos))
+      initial_colors_found |= initial_board[pos];
+  
   fprintf(stderr, "(;GM[1]FF[4]SZ[%d]KM[%.1f]GN[GNU Go %s stepped on a bug]\n",
-	  goban->board_size, goban->komi, gg_version());
+	  board_size, komi, gg_version());
 
   for (color = WHITE; color <= BLACK; color++) {
     if (initial_colors_found & color) {
       fprintf(stderr, "A%s", color == WHITE ? "W" : "B");
       for (k = 0, pos = BOARDMIN; pos < BOARDMAX; pos++) {
-	if (ON_BOARD(goban, pos)
-	    && goban->private->initial_board[pos] == color) {
+	if (ON_BOARD(pos) && initial_board[pos] == color) {
 	  fprintf(stderr, "[%c%c]", 'a' + J(pos), 'a' + I(pos));
 	  k++;
 	  if (k % 16 == 0)
@@ -249,18 +245,15 @@ dump_board_sgf(const Goban *goban)
     }
   }
 
-  if (goban->private->move_history_pointer > 0) {
-    for (k = 0; k < goban->private->move_history_pointer; k++) {
-      fprintf(stderr, ";%s",
-	      goban->private->move_history_color[k] == WHITE ? "W" : "B");
-      if (goban->private->move_history_pos[k] == PASS_MOVE)
+  if (move_history_pointer > 0) {
+    for (k = 0; k < move_history_pointer; k++) {
+      fprintf(stderr, ";%s", move_history_color[k] == WHITE ? "W" : "B");
+      if (move_history_pos[k] == PASS_MOVE)
 	fprintf(stderr, "[]");
-      else {
-	fprintf(stderr, "[%c%c]",
-		'a' + J(goban->private->move_history_pos[k]),
-		'a' + I(goban->private->move_history_pos[k]));
-      }
-
+      else
+	fprintf(stderr, "[%c%c]", 'a' + J(move_history_pos[k]),
+		'a' + I(move_history_pos[k]));
+      
       if (k % 12 == 11)
 	fprintf(stderr, "\n");
     }
@@ -275,36 +268,26 @@ dump_board_sgf(const Goban *goban)
  * of the problem. (pos) is typically a related move, or NO_MOVE.
  */
 
-void
-abortgo(const Goban *goban, const char *file, int line,
-	const char *msg, int pos)
+void 
+abortgo(const char *file, int line, const char *msg, int pos)
 {
-  if (goban) {
-    gprintf(goban, "%o\n\n***assertion failure:\n%s:%d - %s near %1m***\n\n",
-	    file, line, msg, pos);
+  gprintf("%o\n\n***assertion failure:\n%s:%d - %s near %1m***\n\n",
+	  file, line, msg, pos);
+  dump_stack();
 
-    dump_stack(goban);
+  /* Print the board at the top of the stack. */
+  simple_showboard(stderr);
+  fprintf(stderr, "\n");
 
-    /* Print the board at the top of the stack. */
-    simple_showboard(goban, stderr);
-    fprintf(stderr, "\n");
-
-    dump_board_sgf(goban);
-  }
-  else {
-    fprintf(stderr, "\n\n***assertion failure:\n%s:%d - %s***\n\n",
-	    file, line, msg);
-  }
+  dump_board_sgf();
 
   fprintf(stderr, "gnugo %s (seed %d): You stepped on a bug.\n",
-	  gg_version(), get_random_seed());
-
-  if (goban && goban->board_size >= 9 && goban->board_size <= 19) {
+          gg_version(), get_random_seed());
+  if (board_size >= 9 && board_size <= 19) {
     fprintf(stderr, "\
-Please mail this message, including the debug output above,	\
+Please mail this message, including the debug output above, \
 to gnugo@gnu.org\n");
   }
-
   fprintf(stderr, "\n");
 
   fflush(stderr);
@@ -312,7 +295,6 @@ to gnugo@gnu.org\n");
 
   abort();  /* cause core dump */
 }
-
 
 static const char *color_names[] = {
   COLOR_NAMES
@@ -322,42 +304,30 @@ static const char *color_names[] = {
 const char *
 color_to_string(int color)
 {
-  gg_assert(NULL, color < NUM_KOMASTER_STATES);
+  gg_assert(color < NUM_KOMASTER_STATES);
   return color_names[color];
 }
 
 /* Convert a location to a string. */
 const char *
-location_to_string(int board_size, int pos)
+location_to_string(int pos)
 {
-  static int initialized = 0;
-  static char buffers[MAX_BOARD][MAX_BOARD][5];
-
-  int i;
-  int j;
-
-  if (!initialized) {
-    for (i = 0; i < MAX_BOARD; i++) {
-      for (j = 0; j < MAX_BOARD; j++)
-	location_to_buffer(MAX_BOARD, POS(i, j), buffers[i][j]);
-    }
-
-    initialized = 1;
+  static int init = 0;
+  static char buf[BOARDSIZE][5];
+  if (!init) {
+    int pos;
+    for (pos = 0; pos < BOARDSIZE; pos++)
+      location_to_buffer(pos, buf[pos]);
+    init = 1;
   }
-
-  i = I(pos);
-  j = J(pos);
-
-  ASSERT1(NULL, MIN_BOARD <= board_size && board_size <= MAX_BOARD, pos);
-  ASSERT1(NULL, 0 <= i && i < board_size && 0 <= j && j < board_size, pos);
-
-  return buffers[i + (MAX_BOARD - board_size)][j];
+  ASSERT1(pos >= 0 && pos < BOARDSIZE, pos);
+  return buf[pos];
 }
 
 /* Convert a location to a string, writing to a buffer. */
 
 void
-location_to_buffer(int board_size, int pos, char *buf)
+location_to_buffer(int pos, char *buf)
 {
   char *bufp = buf;
   int i = I(pos);
@@ -419,7 +389,7 @@ string_to_location(int boardsize, const char *str, int *m, int *n)
 
 /* True if the coordinate is a hoshi point. */
 int
-is_hoshi_point(int board_size, int m, int n)
+is_hoshi_point(int m, int n)
 {
   int hoshi;
   int middle;
@@ -454,14 +424,14 @@ is_hoshi_point(int board_size, int m, int n)
     hoshi = 3;
 
   /* Coordinate for midpoint. */
-  middle = board_size / 2;
-
+  middle = board_size/2;
+    
   /* Normalize the coordinates by mirroring to the lower numbers. */
   if (m >= middle)
     m = board_size - 1 - m;
   if (n >= middle)
     n = board_size - 1 - n;
-
+  
   /* Is this a corner hoshi? */
   if (m == hoshi && n == hoshi)
     return 1;
@@ -490,11 +460,11 @@ is_hoshi_point(int board_size, int m, int n)
 
 /* Print a line with coordinate letters above the board. */
 void
-draw_letter_coordinates(int board_size, FILE *outfile)
+draw_letter_coordinates(FILE *outfile)
 {
   int i;
   int ch;
-
+  
   fprintf(outfile, "  ");
   for (i = 0, ch = 'A'; i < board_size; i++, ch++) {
     if (ch == 'I')
@@ -508,61 +478,54 @@ draw_letter_coordinates(int board_size, FILE *outfile)
  * color, and you can choose where to write it.
  */
 void
-simple_showboard(const Goban *goban, FILE *outfile)
+simple_showboard(FILE *outfile)
 {
-  int board_size = goban->board_size;
   int i, j;
 
-  draw_letter_coordinates(board_size, outfile);
-
+  draw_letter_coordinates(outfile);
+  
   for (i = 0; i < board_size; i++) {
     fprintf(outfile, "\n%2d", board_size - i);
-
+    
     for (j = 0; j < board_size; j++) {
-      if (goban->board[POS(i, j)] == EMPTY)
-	fprintf(outfile, " %c", is_hoshi_point(board_size, i, j) ? '+' : '.');
+      if (BOARD(i, j) == EMPTY)
+	fprintf(outfile, " %c", is_hoshi_point(i, j) ? '+' : '.');
       else
-	fprintf(outfile, " %c", goban->board[POS(i, j)] == BLACK ? 'X' : 'O');
+	fprintf(outfile, " %c", BOARD(i, j) == BLACK ? 'X' : 'O');
     }
 
     fprintf(outfile, " %d", board_size - i);
-
-    if ((board_size < 10 && i == board_size - 2)
-	|| (board_size >= 10 && i == 8)) {
-      fprintf(outfile, "     WHITE (O) has captured %d stones",
-	      goban->black_captured);
-    }
-
-    if ((board_size < 10 && i == board_size - 1)
-	|| (board_size >= 10 && i == 9)) {
-      fprintf(outfile, "     BLACK (X) has captured %d stones",
-	      goban->white_captured);
-    }
+    
+    if ((board_size < 10 && i == board_size-2)
+	|| (board_size >= 10 && i == 8))
+      fprintf(outfile, "     WHITE (O) has captured %d stones", black_captured);
+    
+    if ((board_size < 10 && i == board_size-1)
+	|| (board_size >= 10 && i == 9))
+      fprintf(outfile, "     BLACK (X) has captured %d stones", white_captured);
   }
-
+  
   fprintf(outfile, "\n");
-  draw_letter_coordinates(board_size, outfile);
+  draw_letter_coordinates(outfile);
 }
 
 
-/* Adds square marks for each goal intersecion in the
- * `goban->sgf_dumptree'.  This function cannot be in sgf/ as it has
- * to understand the 1-D board.
+/* Adds square marks for each goal intersecion in the current sgf_dumptree.
+ * This function cannot be in sgf/ as it has to understand the 1-D board.
  */
 void
-mark_goal_in_sgf(const Goban *goban, char goal[BOARDMAX])
+mark_goal_in_sgf(char goal[BOARDMAX])
 {
   int pos;
   SGFNode *node;
 
-  if (!goban->sgf_dumptree)
+  if (!sgf_dumptree)
     return;
+  node = sgftreeNodeCheck(sgf_dumptree);
 
-  node = sgftreeNodeCheck(goban->sgf_dumptree);
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (ON_BOARD(goban, pos) && goal[pos])
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos) && goal[pos])
       sgfSquare(node, I(pos), J(pos));
-  }
 }
 
 
