@@ -2,8 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- make fast_defense() aware of under-the-stones tesuji
+- make superstring_break_chain_moves() attack 3-liberty chains
+- owl tuning
+- atari-atari tuning
+- optics tuning
 - unused code to compute genus removed from make_dragons()
-- new tests
+- new and revised tests
 
 3.7.3 released March 22, 2005
 
