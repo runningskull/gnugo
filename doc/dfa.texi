@@ -1,4 +1,4 @@
-In this chapter, we describe the principles of the gnugo DFA
+In this chapter, we describe the principles of the GNU Go DFA
 pattern matcher.  The aim of this system is to permit a fast
 pattern matching when it becomes time critical like in owl
 module (@ref{The Owl Code}). Since GNU Go 3.2, this is enabled
@@ -17,7 +17,7 @@ compile time.
 @menu
 * Introduction to the DFA::  Scanning the board along a path
 * What is a DFA:: A recall of language theory.
-* Pattern matching with DFA:: How to retrieve go patterns with a dfa ?
+* Pattern matching with DFA:: How to retrieve go patterns with a DFA?
 * Building the DFA:: Playing with explosives.
 * Incremental Algorithm:: The joy of determinism.
 * DFA Optimizations:: Some possible optimizations.
@@ -126,11 +126,11 @@ of pattern matching algorithms).
 Basically, 
 a DFA is a set of @dfn{states} connected by labeled @dfn{transitions}.
 The labels are the values read on the board,
-in gnugo these values are EMPTY, WHITE, BLACK or OUT_BOARD, denoted
+in GNU Go these values are EMPTY, WHITE, BLACK or OUT_BOARD, denoted
 respectively by '.','O','X' and '#'.
 
 
-The best way to represent a dfa is to draw its transition graph:
+The best way to represent a DFA is to draw its transition graph:
 the pattern @b{"????..X"} is recognized by the following DFA:
 
 @ifinfo
@@ -280,7 +280,7 @@ the size of the biggest pattern.
 
 Here is an example of scan:
 
-First we build a minimal dfa recognizing these patterns:
+First we build a minimal DFA recognizing these patterns:
 @b{"X..X"}, @b{"X???"}, @b{"X.OX"} and @b{"X?oX"}.
 Note that wildcards like '?','o', or 'x' give multiple out-transitions.
 
@@ -386,8 +386,8 @@ It is possible to construct a special pattern database that
 generates an "explosive" automaton: the size of the DFA is in
 the worst case exponential in the number of patterns it
 recognizes.  But it doesn't occur in pratical situations: 
-the dfa size tends to be @dfn{stable}.  By @dfn{stable} we mean that if we
-add a pattern which greatly increases the size of the dfa it
+the DFA size tends to be @dfn{stable}.  By @dfn{stable} we mean that if we
+add a pattern which greatly increases the size of the DFA it
 also increases the chance that the next added pattern does not
 increase its size at all.  Nevertheless there are many ways to
 reduce the size of the DFA. Good compression methods are
@@ -399,7 +399,7 @@ DFA-based pattern matchers}.
 @section Incremental Algorithm
 
 The incremental version of the DFA pattern matcher is not yet implemented
-in gnugo but we explain here how it will work.
+in GNU Go but we explain here how it will work.
 By definition of a deterministic automaton, scanning the same
 string will reach the same states every time.
 
@@ -432,7 +432,7 @@ top_stack[i][j]. This should speedup a lot pattern matching.
 @node DFA Optimizations
 @section Some DFA Optimizations
 
-The dfa is constructed to minimize jumps in memory making some
+The DFA is constructed to minimize jumps in memory making some
 assumptions about the frequencies of the values: the EMPTY
 value is supposed to appear often on the board, so the the '.'
 transition are almost always successors in memory.  The

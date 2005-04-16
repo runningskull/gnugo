@@ -514,7 +514,7 @@ Clear the internal board.
 @item @code{void dump_stack(void)}
 @findex dump_stack
 @quotation
-for use under gdb prints the move stack.
+for use under GDB prints the move stack.
 @end quotation
 @item @code{void add_stone(int pos, int color)}
 @findex add_stone

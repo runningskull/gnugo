@@ -1395,7 +1395,7 @@ there are implementation details which obscure things slightly.
 
 In GNU Go, the ascii @file{.db} files are precompiled into tables (see
 @file{patterns.h}) by a standalone program @file{mkpat.c}, and the resulting 
-@file{.c} files are compiled and linked into the main gnugo executable.
+@file{.c} files are compiled and linked into the main GNU Go executable.
 
 Each pattern is compiled to a header, and a sequence of elements,
 which are (notionally) checked sequentially at every position and
@@ -1592,7 +1592,7 @@ at a time.
 @section The Joseki Compiler
 
 @cindex joseki
-@cindex how gnugo learn new joseki
+@cindex how GNU Go learns new joseki
 @cindex the joseki compiler
 @cindex teaching josekis to GNU Go
 

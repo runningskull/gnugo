@@ -47,7 +47,7 @@ After running configure and make, you have now made a binary called
 @end example
 
 @noindent
-to install gnugo in @file{/usr/local/bin}.
+to install @file{gnugo} in @file{/usr/local/bin}.
 
 There are different methods of using GNU Go. You may run it from the
 command line by just typing:
@@ -119,10 +119,11 @@ cache size will be 8 MB. You must recompile and reinstall
 GNU Go after reconfiguring it by running @command{make} and
 @command{make install}.
 
-You may override the compile-time defaults by running gnugo with the
-option @option{--cache-size n}, where @code{n} is the size in
+You may override the compile-time defaults by running @file{gnugo}
+with the option @option{--cache-size n}, where @code{n} is the size in
 megabytes of the cache you want, and @option{--level} where n is the
-level desired.  We will discuss setting these parameters next in detail.
+level desired.  We will discuss setting these parameters next in
+detail.
 
 @node Default Level
 @subsection Default Level
@@ -260,7 +261,7 @@ high quality free Unix-environments for Microsoft platforms
 are available.
 
 One benefit of this approach is that it is easier to
-participate in Gnu Go's development. These unix environments
+participate in GNU Go's development. These unix environments
 come for instance with the `diff' and `patch' programs
 necessary to generate and apply patches.
 
@@ -308,7 +309,7 @@ DJGPP ftp archive on simtel:
 @url{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/}
 
 Once you have a working DJGPP environment and you have downloaded
-the gnugo source available as gnugo-3.6.tar.gz you can build the
+the GNU Go source available as gnugo-3.6.tar.gz you can build the
 executable as follows:
 
 @example

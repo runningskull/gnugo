@@ -65,9 +65,9 @@ beautiful graphic user interface under X-Windows.
 Start CGoban. When the CGoban Control panel comes up, select ``Go
 Modem''. You will get the Go Modem Protocol Setup. Choose one (or
 both) of the players to be ``Program,'' and fill out the box with the
-path to gnugo. After clicking OK, you get the Game Setup window.
-Choose ``Rules Set'' to be Japanese (otherwise handicaps won't work).
-Set the board size and handicap if you want.
+path to @file{gnugo}. After clicking OK, you get the Game Setup
+window.  Choose ``Rules Set'' to be Japanese (otherwise handicaps
+won't work).  Set the board size and handicap if you want.
 
 If you want to play with a komi, you should bear in mind that
 the GMP does not have any provision for communicating the komi.

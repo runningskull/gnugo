@@ -796,10 +796,10 @@ levels of tracing. You can set the trace level at
 the command line by @option{-t} for @code{verbose=1}, 
 @option{-t -t} for @code{verbose=2}, etc. But in
 practice if you want more verbose tracing than level
-1 it is better to use gdb to reach the point where
+1 it is better to use GDB to reach the point where
 you want the tracing; you will often find that the
 variable @code{verbose} has been temporarily set to zero
-and you can use the gdb command @command{set var verbose=1}
+and you can use the GDB command @command{set var verbose=1}
 to turn the tracing back on.
 
 @subsection Assertions

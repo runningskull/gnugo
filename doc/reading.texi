@@ -1035,7 +1035,7 @@ Other commands defined in this file:
 
 @example
 
-@cindex gnugo's gdb commands 
+@cindex GNU Go's GDB commands 
 
 @command{dump} will print the move stack.
 @command{nv} moves to the next variation
