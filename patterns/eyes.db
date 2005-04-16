@@ -4563,6 +4563,26 @@ Pattern 70001
 :1122
 
 
+Pattern 70002
+# Special corner shape.
+
+|X*.
+|. ..$
++-----
+
+:1122
+
+
+Pattern 70003
+# Special corner shape.
+
+|XX.
+|. ..$
++-----
+
+:1112
+
+
 Pattern 70010
 
 @..>X.(
@@ -5976,6 +5996,18 @@ Pattern 80000
 
 :1111
 
+
+Pattern 80010
+# Special corner shape.
+
+|)
+|*..
+|. ..$
++-----
+
+:1122
+
+
 #           ....
 # Topology:  ....
 #
@@ -6358,6 +6390,30 @@ Pattern 90800
 ###############################
 #         10 elements         #
 ###############################
+
+
+Pattern 100001
+
+|!
+|.
+|.*.
+|.*..$
++-----
+
+:1122
+
+
+Pattern 100002
+# `analyze_eyegraph' believes it is 0012, but I doubt.  Must be some
+# liberty shortage artifact or something.  /pp
+
+|!
+|.
+|.X.
+|....$
++-----
+
+:0112
 
 
 Pattern 100100
