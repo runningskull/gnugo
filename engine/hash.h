@@ -54,7 +54,7 @@ typedef unsigned long Hashvalue;
 #define SIZEOF_HASHVALUE SIZEOF_LONG
 #define HASHVALUE_PRINT_FORMAT "%0*lx"
 
-/* for testing: Enables a lot of checks. */
+/* For testing: enables a lot of checks. */
 #define CHECK_HASHING 0
 
 /* Dump (almost) all read results. */
@@ -78,9 +78,8 @@ typedef struct {
   Hashvalue hashval[NUM_HASHVALUES];
 } Hash_data;
 
-extern Hash_data board_hash;
 
-Hash_data goal_to_hashvalue(const char *goal);
+Hash_data goal_to_hashvalue(int board_size, const char *goal);
 
 void hash_init_zobrist_array(Hash_data *array, int size);
 void hash_init(void);
