@@ -60,3 +60,8 @@ struct stats_data stats;
 /* Variation tracking in SGF trees: */
 int count_variations  = 0;
 SGFTree *sgf_dumptree = NULL;
+
+
+/* TEMPORARY: Compilation-enabling hack for "old-board.h". */
+static Goban static_unused_goban;
+Goban *goban = &static_unused_goban;

@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -45,7 +46,7 @@ change_dragon_status(int dr, int status)
   int origin = dragon[dr].origin;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos)) {
+    if (ON_BOARD(goban, pos)) {
       if (dragon[pos].origin == origin)
 	dragon[pos].status = status;
     }
@@ -59,12 +60,12 @@ change_dragon_status(int dr, int status)
 int
 defend_against(int move, int color, int apos)
 {
-  if (trymove(move, color, "defend_against", NO_MOVE)) {
+  if (trymove(goban, move, color, "defend_against", NO_MOVE)) {
     if (safe_move(apos, OTHER_COLOR(color)) == 0) {
-      popgo();
+      popgo(goban);
       return 1;
     }
-    popgo();
+    popgo(goban);
   }
   return 0;
 }
@@ -105,24 +106,24 @@ does_attack(int move, int str)
   if (acode != 0 && dcode == 0)
     return 0;
   
-  if (trymove(move, other, "does_attack-A", str)) {
+  if (trymove(goban, move, other, "does_attack-A", str)) {
     if (!board[str])
       result = WIN;
     else
       result = REVERSE_RESULT(find_defense(str, NULL));
     if (result != 0) {
       increase_depth_values();
-      if (spos != NO_MOVE && trymove(spos, color, "does_attack-B", str)) {
+      if (spos != NO_MOVE && trymove(goban, spos, color, "does_attack-B", str)) {
 	if (board[str]) {
 	  int new_result = attack(str, NULL);
 	  if (new_result < result)
 	    result = new_result;
 	}
-	popgo();
+	popgo(goban);
       }
       decrease_depth_values();
     }
-    popgo();
+    popgo(goban);
   }
 
   if (result < acode)
@@ -151,20 +152,20 @@ does_defend(int move, int str)
   if (!attack(str, &spos))
     return 0;
 
-  gg_assert(spos != NO_MOVE);
+  gg_assert(goban, spos != NO_MOVE);
   
-  if (trymove(move, color, "does_defend-A", str)) {
+  if (trymove(goban, move, color, "does_defend-A", str)) {
     if (!attack(str, NULL)) {
       result = 1;
       increase_depth_values();
-      if (trymove(spos, other, "does_defend-B", str)) {
+      if (trymove(goban, spos, other, "does_defend-B", str)) {
 	if (!board[str] || !find_defense(str, NULL))
 	  result = 0;
-	popgo();
+	popgo(goban);
       }
       decrease_depth_values();
     }
-    popgo();
+    popgo(goban);
   }
 
   return result;
@@ -187,7 +188,7 @@ somewhere(int color, int check_alive, int num_moves, ...)
   int pos;
   int k;
 
-  gg_assert(stackp == 0 || !check_alive);
+  gg_assert(goban, stackp == 0 || !check_alive);
   
   va_start(ap, num_moves);
   for (k = 0; k < num_moves; k++) {
@@ -222,7 +223,7 @@ visible_along_edge(int color, int apos, int bpos)
   int pos;
   int forward;
   int up;
-  ASSERT1((ai == bi) ^ (aj == bj), apos);
+  ASSERT1(goban, (ai == bi) ^ (aj == bj), apos);
 
   if (ai == bi) {
     if (aj > bj)
@@ -255,10 +256,10 @@ visible_along_edge(int color, int apos, int bpos)
     }
   }
   
-  for (; ON_BOARD(pos); pos += forward) {
+  for (; ON_BOARD(goban, pos); pos += forward) {
     int k;
     for (k = 4; k >= 0; k--) {
-      ASSERT_ON_BOARD1(pos + k * up);
+      ASSERT_ON_BOARD1(goban, pos + k * up);
       if (board[pos + k * up] == color)
 	return 1;
       else if (board[pos + k * up] == OTHER_COLOR(color))
@@ -286,16 +287,16 @@ test_symmetry_after_move(int move, int color, int strict)
   if (move != PASS_MOVE) {
     if (board[move] != EMPTY)
       return 0;
-    if (!trymove(move, color, "find_mirror_move", NO_MOVE))
+    if (!trymove(goban, move, color, "find_mirror_move", NO_MOVE))
       return 0;
   }
   
-  for (pos = BOARDMIN; pos < MIRROR_MOVE(pos); pos++) {
+  for (pos = BOARDMIN; pos < MIRROR_MOVE(goban, pos); pos++) {
     int sum;
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     
-    sum = board[pos] + board[MIRROR_MOVE(pos)];
+    sum = board[pos] + board[MIRROR_MOVE(goban, pos)];
     if (sum != EMPTY + EMPTY && sum != BLACK + WHITE) {
       if (strict || sum == EMPTY + WHITE || sum == EMPTY + BLACK) {
 	result = 0;
@@ -305,7 +306,7 @@ test_symmetry_after_move(int move, int color, int strict)
   }
 
   if (move != PASS_MOVE)
-    popgo();
+    popgo(goban);
   
   return result;
 }
@@ -349,8 +350,8 @@ play_break_through_n(int color, int num_moves, ...)
     apos = va_arg(ap, int);
 
     if (apos != NO_MOVE
-	&& (trymove(apos, mcolor, "play_break_through_n", NO_MOVE)
-	    || tryko(apos, mcolor, "play_break_through_n")))
+	&& (trymove(goban, apos, mcolor, "play_break_through_n", NO_MOVE)
+	    || tryko(goban, apos, mcolor, "play_break_through_n")))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -380,7 +381,7 @@ play_break_through_n(int color, int num_moves, ...)
   
   /* Pop all the moves we could successfully play. */
   for (i = 0; i < played_moves; i++)
-    popgo();
+    popgo(goban);
 
   va_end(ap);
   return success;
@@ -419,8 +420,8 @@ play_attack_defend_n(int color, int do_attack, int num_moves, ...)
     apos = va_arg(ap, int);
 
     if (apos != NO_MOVE
-	&& (trymove(apos, mcolor, "play_attack_defend_n", NO_MOVE)
-	    || tryko(apos, mcolor, "play_attack_defend_n")))
+	&& (trymove(goban, apos, mcolor, "play_attack_defend_n", NO_MOVE)
+	    || tryko(goban, apos, mcolor, "play_attack_defend_n")))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -463,7 +464,7 @@ play_attack_defend_n(int color, int do_attack, int num_moves, ...)
   
   /* Pop all the moves we could successfully play. */
   for (i = 0; i < played_moves; i++)
-    popgo();
+    popgo(goban);
 
   va_end(ap);
   return success;
@@ -504,8 +505,8 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
     apos = va_arg(ap, int);
 
     if (apos != NO_MOVE
-	&& (trymove(apos, mcolor, "play_attack_defend_n", NO_MOVE)
-	    || tryko(apos, mcolor, "play_attack_defend_n")))
+	&& (trymove(goban, apos, mcolor, "play_attack_defend_n", NO_MOVE)
+	    || tryko(goban, apos, mcolor, "play_attack_defend_n")))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -542,7 +543,7 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
   
   /* Pop all the moves we could successfully play. */
   for (i = 0; i < played_moves; i++)
-    popgo();
+    popgo(goban);
 
   va_end(ap);
   return success;
@@ -579,8 +580,8 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
     apos = va_arg(ap, int);
 
     if (apos != NO_MOVE
-	&& (trymove(apos, mcolor, "play_connect_n", NO_MOVE)
-	    || tryko(apos, mcolor, "play_connect_n")))
+	&& (trymove(goban, apos, mcolor, "play_connect_n", NO_MOVE)
+	    || tryko(goban, apos, mcolor, "play_connect_n")))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -620,7 +621,7 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
   
   /* Pop all the moves we could successfully play. */
   for (i = 0; i < played_moves; i++)
-    popgo();
+    popgo(goban);
 
   va_end(ap);
   return success;
@@ -976,7 +977,7 @@ blunder_size(int move, int color, int *defense_point,
 	     char safe_stones[BOARDMAX])
 {
   int libs[5];
-  int liberties = accuratelib(move, color, 5, libs);
+  int liberties = accuratelib(goban, move, color, 5, libs);
   int trouble = 0;
   int save_verbose = verbose;
   float return_value = 0.0;
@@ -986,7 +987,7 @@ blunder_size(int move, int color, int *defense_point,
   if (defense_point)
     *defense_point = NO_MOVE;
 
-  TRACE("Checking safety of a %s move at %1m\n", color_to_string(color), move);
+  TRACE(goban, "Checking safety of a %s move at %1m\n", color_to_string(color), move);
 
   if (verbose > 0)
     verbose--;
@@ -1024,13 +1025,13 @@ blunder_size(int move, int color, int *defense_point,
       int pos;
       *defense_point = NO_MOVE;
       for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-	if (ON_BOARD(pos) && defense_moves[pos]) {
+	if (ON_BOARD(goban, pos) && defense_moves[pos]) {
 	  *defense_point = pos;
 	  break;
 	}
     }
     verbose = save_verbose;
-    TRACE("Combination attack appears.\n");
+    TRACE(goban, "Combination attack appears.\n");
     return_value += (float) atari;
   }
 
@@ -1108,7 +1109,7 @@ detect_owl_blunder(int move, int color, int *defense_point,
       
       if (acode == 0) {
 	verbose = save_verbose;
-	TRACE("Dragon at %1m becomes attackable.\n", bpos);
+	TRACE(goban, "Dragon at %1m becomes attackable.\n", bpos);
 	verbose = current_verbose;
 	*return_value += 2.0 * dragon[bpos].effective_size;
 	if (safe_stones)
@@ -1116,7 +1117,7 @@ detect_owl_blunder(int move, int color, int *defense_point,
       }
       else if (acode == LOSS) {
 	verbose = save_verbose;
-	TRACE("Dragon at %1m becomes attackable.\n", bpos);
+	TRACE(goban, "Dragon at %1m becomes attackable.\n", bpos);
 	verbose = current_verbose;
 	if (kworm == move) {
 	  int l;
@@ -1127,7 +1128,7 @@ detect_owl_blunder(int move, int color, int *defense_point,
 	      *return_value += 2.0 * worm[kworm].effective_size;
 	      if (safe_stones)
 		for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-		  if (ON_BOARD(ii) && worm[ii].origin == worm[kworm].origin)
+		  if (ON_BOARD(goban, ii) && worm[ii].origin == worm[kworm].origin)
 		    safe_stones[ii] = 0;
 	    }
 	  }
@@ -1136,7 +1137,7 @@ detect_owl_blunder(int move, int color, int *defense_point,
 	  *return_value += 2.0 * worm[kworm].effective_size;
 	  if (safe_stones)
 	    for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-	      if (ON_BOARD(ii) && worm[ii].origin == worm[kworm].origin)
+	      if (ON_BOARD(goban, ii) && worm[ii].origin == worm[kworm].origin)
 		safe_stones[ii] = 0;
 	}
       }
@@ -1160,7 +1161,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
   int ii;
   int current_verbose = verbose;
 
-  if (!trymove(move, color, NULL, NO_MOVE))
+  if (!trymove(goban, move, color, NULL, NO_MOVE))
     return;
   
   /* Need to increase the depth values during this reading to avoid
@@ -1183,7 +1184,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
       if (defense_point)
 	find_defense(pos, defense_point);
       verbose = save_verbose;
-      TRACE("After %1m Worm at %1m becomes attackable.\n", move, pos);
+      TRACE(goban, "After %1m Worm at %1m becomes attackable.\n", move, pos);
       verbose = current_verbose;
       *return_value += worm[pos].effective_size;
       if (safe_stones) /* Can't use mark_string. */
@@ -1199,19 +1200,19 @@ detect_tactical_blunder(int move, int color, int *defense_point,
       /* A dead opponent's worm has become defendable.
        * Also ask the owl code whether the string can live
        * strategically. To do this we need to temporarily undo
-       * the trymove().
+       * the trymove(goban).
        */
       int owl_attacks;
       int defense_effective = 0;
       
-      popgo();
+      popgo(goban);
       decrease_depth_values();
       owl_attacks = owl_does_attack(move, pos, NULL);
       if (owl_attacks != WIN) {
 	*return_value += 2 * worm[pos].effective_size;
 	defense_effective = 1;
 	verbose = save_verbose;
-	TRACE("After %1m worm at %1m becomes defendable - A.\n", move, pos);
+	TRACE(goban, "After %1m worm at %1m becomes defendable - A.\n", move, pos);
 	verbose = current_verbose;
       }
       else if (dragon[pos].status != ALIVE) {
@@ -1226,7 +1227,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
 	int k;
 	int adj[MAXCHAIN];
 	int num_adj;
-	num_adj = extended_chainlinks(pos, adj, 0);
+	num_adj = extended_chainlinks(goban, pos, adj, 0);
 	for (k = 0; k < num_adj; k++) {
 	  int neighbor = adj[k];
 	  int resulta;
@@ -1236,7 +1237,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
 	    *return_value += 2 * worm[pos].effective_size;
 	    defense_effective = 1;
 	    verbose = save_verbose;
-	    TRACE("After %1m worm at %1m becomes defendable - B.\n",
+	    TRACE(goban, "After %1m worm at %1m becomes defendable - B.\n",
 		  move, pos);
 	    verbose = current_verbose;
 	    break;
@@ -1244,7 +1245,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
 	}
       }
       
-      trymove(move, color, NULL, NO_MOVE);
+      trymove(goban, move, color, NULL, NO_MOVE);
       increase_depth_values();
       
       if (defense_effective && defense_point) {
@@ -1255,18 +1256,18 @@ detect_tactical_blunder(int move, int color, int *defense_point,
            * original board, otherwise find a tactical attack there
            * instead.
 	   */
-	  popgo();
+	  popgo(goban);
 	  
-	  if (!is_legal(dpos, color)
+	  if (!is_legal(goban, dpos, color)
 	      || play_attack_defend_n(color, 0, 1, dpos, pos))
 	    attack(pos, defense_point);
 
 	  /* Redo the move, we know that it won't fail. */
-	  trymove(move, color, NULL, NO_MOVE);
+	  trymove(goban, move, color, NULL, NO_MOVE);
 	}
 	else {
 	  verbose = save_verbose;
-	  TRACE("No attack found (unexpectedly) on %1m after move at %1m.\n",
+	  TRACE(goban, "No attack found (unexpectedly) on %1m after move at %1m.\n",
 		pos, move);
 	  verbose = current_verbose;
 	}
@@ -1286,7 +1287,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
 	*defense_point = libs[0];
       *return_value += d_a_blunder_size;
       verbose = save_verbose;
-      TRACE("Double threat appears at %1m.\n", libs[0]);
+      TRACE(goban, "Double threat appears at %1m.\n", libs[0]);
       verbose = current_verbose;
     }
     else if (double_atari(libs[1], other, &d_a_blunder_size, safe_stones)) {
@@ -1294,7 +1295,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
 	*defense_point = libs[1];
       *return_value += d_a_blunder_size;
       verbose = save_verbose;
-      TRACE("Double threat appears at %1m.\n", libs[1]);
+      TRACE(goban, "Double threat appears at %1m.\n", libs[1]);
       verbose = current_verbose;
     }
   }
@@ -1302,7 +1303,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
   /* Reset the depth values. */
   decrease_depth_values();
 
-  popgo();
+  popgo(goban);
 }
 
 
@@ -1332,7 +1333,7 @@ double_atari(int move, int color, float *value, char safe_stones[BOARDMAX])
   int m = I(move);
   int n = J(move);
 
-  if (!ON_BOARD(move))
+  if (!ON_BOARD(goban, move))
     return 0;
 
   /* Loop over the diagonal directions. */
@@ -1341,37 +1342,37 @@ double_atari(int move, int color, float *value, char safe_stones[BOARDMAX])
     int dn = deltaj[k];
     
     /* because (m, n) and (m+dm, n+dn) are opposite
-     * corners of a square, ON_BOARD2(m, n) && ON_BOARD2(m+dm, n+dn)
-     * implies ON_BOARD2(m+dm, n) and ON_BOARD2(n, n+dn)
+     * corners of a square, ON_BOARD2(goban, m, n) && ON_BOARD2(goban, m+dm, n+dn)
+     * implies ON_BOARD2(goban, m+dm, n) and ON_BOARD2(goban, n, n+dn)
      *
      * Only try to attack supposedly safe stones.
      */
-    if (BOARD(m+dm, n+dn) == color
-	&& BOARD(m, n+dn) == other
-	&& BOARD(m+dm, n) == other
+    if (BOARD(goban, m+dm, n+dn) == color
+	&& BOARD(goban, m, n+dn) == other
+	&& BOARD(goban, m+dm, n) == other
 	&& (!safe_stones
 	    || (safe_stones[POS(m, n+dn)] && safe_stones[POS(m+dm, n)]))
-	&& trymove(move, color, "double_atari", NO_MOVE)) {
-      if (countlib(move) > 1
-	  && (BOARD(m, n+dn) == EMPTY || BOARD(m+dm, n) == EMPTY 
+	&& trymove(goban, move, color, "double_atari", NO_MOVE)) {
+      if (countlib(goban, move) > 1
+	  && (BOARD(goban, m, n+dn) == EMPTY || BOARD(goban, m+dm, n) == EMPTY 
 	      || !defend_both(POS(m, n+dn), POS(m+dm, n)))) {
-	popgo();
+	popgo(goban);
 	if (value) {
 	  if (worm[POS(m, n+dn)].effective_size
 	      > worm[POS(m+dm, n)].effective_size) {
 	    *value = 2.0 * worm[POS(m, n+dn)].effective_size;
 	    if (safe_stones)
-	      mark_string(POS(m, n+dn), safe_stones, 0);
+	      mark_string(goban, POS(m, n+dn), safe_stones, 0);
 	  }
 	  else {
 	    *value = 2.0 * worm[POS(m+dm, n)].effective_size;
 	    if (safe_stones)
-	      mark_string(POS(m+dm, n), safe_stones, 0);
+	      mark_string(goban, POS(m+dm, n), safe_stones, 0);
 	  }
 	}
 	return 1;
       }
-      popgo();
+      popgo(goban);
     }
   }
   
@@ -1401,27 +1402,27 @@ send_two_return_one(int move, int color)
   int lib2;
 
   /* Try to play the move. */
-  if (!trymove(move, color, "send_two_return_one-A", NO_MOVE))
+  if (!trymove(goban, move, color, "send_two_return_one-A", NO_MOVE))
     return 0;
 
   /* Does the move leave exactly two stones in atari? */
-  if (findlib(move, 1, &lib1) > 1 || countstones(move) != 2) {
-    popgo();
+  if (findlib(goban, move, 1, &lib1) > 1 || countstones(goban, move) != 2) {
+    popgo(goban);
     return 0;
   }
 
   /* Let the opponent capture. This move is guaranteed to be legal. */
-  trymove(lib1, other, "send_two_return_one-A", NO_MOVE);
+  trymove(goban, lib1, other, "send_two_return_one-A", NO_MOVE);
 
   /* Is the capturing string single and in atari? */
-  if (findlib(lib1, 1, &lib2) > 1 || countstones(lib1) > 1) {
-    popgo();
-    popgo();
+  if (findlib(goban, lib1, 1, &lib2) > 1 || countstones(goban, lib1) > 1) {
+    popgo(goban);
+    popgo(goban);
     return 0;
   }
 
-  popgo();
-  popgo();
+  popgo(goban);
+  popgo(goban);
 
   /* The move to capture back is in lib2. This must be one of the two
    * captured stones, either the move or the adjacent stone. If it is
@@ -1715,7 +1716,7 @@ do_find_superstring(int str, int *num_stones, int *stones,
       int gpos = pos + up;
       int unsafe_move;
       
-      if (!ON_BOARD(apos))
+      if (!ON_BOARD(goban, apos))
 	continue;
       
       /* Case 1. Nothing to do since stones are added string by string. */
@@ -1723,11 +1724,11 @@ do_find_superstring(int str, int *num_stones, int *stones,
       /* Case 2. */
       if (board[apos] == EMPTY) {
 	if (type == 2)
-	  unsafe_move = (approxlib(apos, other, 2, NULL) < 2);
+	  unsafe_move = (approxlib(goban, apos, other, 2, NULL) < 2);
 	else
-	  unsafe_move = is_self_atari(apos, other);
+	  unsafe_move = is_self_atari(goban, apos, other);
 	
-	if (unsafe_move && type == 1 && is_ko(apos, other, NULL))
+	if (unsafe_move && type == 1 && is_ko(goban, apos, other, NULL))
 	  unsafe_move = 0;
 	
 	if (unsafe_move) {
@@ -1794,7 +1795,7 @@ do_find_superstring(int str, int *num_stones, int *stones,
 	  if (board[upos] != other)
 	    continue;
 	  
-	  upos = find_origin(upos);
+	  upos = find_origin(goban, upos);
 	  
 	  /* Only do the reading once. */
 	  if (mx[upos] == 1)
@@ -1805,7 +1806,7 @@ do_find_superstring(int str, int *num_stones, int *stones,
 	  if (attack(upos, NULL)
 	      && !find_defense(upos, NULL)) {
 	    int lunch_stones[MAX_BOARD*MAX_BOARD];
-	    int num_lunch_stones = findstones(upos, MAX_BOARD*MAX_BOARD,
+	    int num_lunch_stones = findstones(goban, upos, MAX_BOARD*MAX_BOARD,
 					      lunch_stones);
 	    int m, n;
 	    for (m = 0; m < num_lunch_stones; m++)
@@ -1848,15 +1849,15 @@ superstring_add_string(int str,
   int new_stones;
   int k;
   
-  ASSERT1(mx[str] == 0, str);
+  ASSERT1(goban, mx[str] == 0, str);
 
   /* Pick up the stones of the new string. */
-  new_stones = findstones(str, board_size * board_size,
+  new_stones = findstones(goban, str, board_size * board_size,
 			  &(my_stones[*num_my_stones]));
   
-  mark_string(str, mx, 1);
+  mark_string(goban, str, mx, 1);
   if (stones) {
-    gg_assert(num_stones);
+    gg_assert(goban, num_stones);
     for (k = 0; k < new_stones; k++) {
       if (do_add) {
 	stones[*num_stones] = my_stones[*num_my_stones + k];
@@ -1868,9 +1869,9 @@ superstring_add_string(int str,
 
   /* Pick up the liberties of the new string. */
   if (libs) {
-    gg_assert(num_libs);
+    gg_assert(goban, num_libs);
     /* Get the liberties of the string. */
-    num_my_libs = findlib(str, MAXLIBS, my_libs);
+    num_my_libs = findlib(goban, str, MAXLIBS, my_libs);
 
     /* Remove this string from the superstring if it has too many
      * liberties.
@@ -1893,10 +1894,10 @@ superstring_add_string(int str,
 
   /* Pick up adjacent strings to the new string. */
   if (adjs) {
-    gg_assert(num_adj);
-    num_my_adj = chainlinks(str, my_adjs);
+    gg_assert(goban, num_adj);
+    num_my_adj = chainlinks(goban, str, my_adjs);
     for (k = 0; k < num_my_adj; k++) {
-      if (liberty_cap > 0 && countlib(my_adjs[k]) > liberty_cap)
+      if (liberty_cap > 0 && countlib(goban, my_adjs[k]) > liberty_cap)
 	continue;
       if (ma[my_adjs[k]])
 	continue;
@@ -1917,7 +1918,7 @@ static double timers[NUMBER_OF_TIMERS];
 void
 start_timer(int n)
 {
-  gg_assert(n >= 0 && n < NUMBER_OF_TIMERS);
+  gg_assert(goban, n >= 0 && n < NUMBER_OF_TIMERS);
   if (!showtime)
     return;
 
@@ -1932,7 +1933,7 @@ time_report(int n, const char *occupation, int move, double mintime)
 {
   double t;
   double dt;
-  gg_assert(n >= 0 && n < NUMBER_OF_TIMERS);
+  gg_assert(goban, n >= 0 && n < NUMBER_OF_TIMERS);
 
   if (!showtime)
     return 0.0;
@@ -1940,9 +1941,9 @@ time_report(int n, const char *occupation, int move, double mintime)
   t = gg_cputime();
   dt = t - timers[n];
   if (dt > mintime) {
-    gprintf("%s", occupation);
+    gprintf(goban, "%s", occupation);
     if (move != NO_MOVE)
-      gprintf("%1m", move);
+      gprintf(goban, "%1m", move);
     fprintf(stderr, ": %.2f sec\n", dt);
   }
   timers[n] = t;
@@ -1961,10 +1962,10 @@ clearstats()
 void
 showstats()
 {
-  gprintf("Nodes:                    %d\n", stats.nodes);
-  gprintf("Read results entered:     %d\n", stats.read_result_entered);
-  gprintf("Read result hits:         %d\n", stats.read_result_hits);
-  gprintf("Trusted read result hits: %d\n", stats.trusted_read_result_hits);
+  gprintf(goban, "Nodes:                    %d\n", stats.nodes);
+  gprintf(goban, "Read results entered:     %d\n", stats.read_result_entered);
+  gprintf(goban, "Read result hits:         %d\n", stats.read_result_hits);
+  gprintf(goban, "Trusted read result hits: %d\n", stats.trusted_read_result_hits);
 }
 
 

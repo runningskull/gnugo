@@ -35,6 +35,7 @@
  */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -100,7 +101,7 @@ void
 start_draw_board()
 {
   gg_init_color();
-  draw_letter_coordinates(stderr);
+  draw_letter_coordinates(goban->board_size, stderr);
 }
 
 /* Draw a colored character. If c has the value EMPTY, either a "." or
@@ -117,7 +118,7 @@ draw_color_char(int m, int n, int c, int color)
 
   /* Do we see a hoshi point? */
   if (c == EMPTY) {
-    if (is_hoshi_point(m, n))
+    if (is_hoshi_point(goban->board_size, m, n))
       c = '+';
     else
       c = '.';
@@ -148,7 +149,7 @@ void
 end_draw_board()
 {
   fprintf(stderr, "\n");
-  draw_letter_coordinates(stderr);
+  draw_letter_coordinates(goban->board_size, stderr);
   fprintf(stderr, "\n");
 }
 
@@ -170,8 +171,8 @@ showchar(int i, int j, int empty, int xo)
   struct dragon_data *d;  /* dragon data at (i, j) */
   struct dragon_data2 *d2;
   int x;
-  ASSERT_ON_BOARD2(i, j);
-  x = BOARD(i, j);
+  ASSERT_ON_BOARD2(goban, i, j);
+  x = BOARD(goban, i, j);
   d = &(dragon[POS(i, j)]);
   d2 = &(dragon2[d->id]);
 
@@ -211,8 +212,8 @@ showchar(int i, int j, int empty, int xo)
   else {
     int w;
 
-    if (xo == 0 || ! ON_BOARD1(d->origin)) {
-      fprintf(stderr, " %c", BOARD(i, j) == BLACK ? 'X' : 'O');
+    if (xo == 0 || ! ON_BOARD1(goban, d->origin)) {
+      fprintf(stderr, " %c", BOARD(goban, i, j) == BLACK ? 'X' : 'O');
       return;
     }
 
@@ -223,27 +224,27 @@ showchar(int i, int j, int empty, int xo)
     if (!w) {
       /* Not yet allocated - allocate next one. */
       /* Count upwards for black, downwards for white to reduce confusion. */
-      if (BOARD(i, j) == BLACK)
+      if (BOARD(goban, i, j) == BLACK)
 	w = dragon_num[d->origin] = next_black++;
       else
 	w = dragon_num[d->origin] = next_white--; 
     }
 
-    w = w%26 + (BOARD(i, j) == BLACK ? 'A' : 'a');
+    w = w%26 + (BOARD(goban, i, j) == BLACK ? 'A' : 'a');
     
     /* Now draw it. */
     if (xo == 1)
-      write_color_char(colors[BOARD(i, j)][d->crude_status], w);
+      write_color_char(colors[BOARD(goban, i, j)][d->crude_status], w);
     else if (xo == 2) {
-      if (BOARD(i, j) == BLACK)
+      if (BOARD(goban, i, j) == BLACK)
 	write_color_char(domain_colors[1], 'X');
       else
 	write_color_char(domain_colors[2], 'O');
     }
     else if (xo == 3)
-      write_color_char(colors[BOARD(i, j)][d2->owl_status], w);
+      write_color_char(colors[BOARD(goban, i, j)][d2->owl_status], w);
     else if (xo == 4)
-      write_color_char(colors[BOARD(i, j)][d->status], w);
+      write_color_char(colors[BOARD(goban, i, j)][d->status], w);
   }
 }
 
@@ -280,7 +281,7 @@ showboard(int xo)
     fprintf(stderr, "\n%2d", ii);
     
     for (j = 0; j < board_size; j++)
-      showchar(i, j, is_hoshi_point(i, j) ? '+' : '.', xo);
+      showchar(i, j, is_hoshi_point(goban->board_size, i, j) ? '+' : '.', xo);
     
     fprintf(stderr, " %d", ii);
     
@@ -354,7 +355,7 @@ DEBUG_func(int flag, const char *fmt, ...)
   if (debug & flag) {
     va_list ap;
     va_start(ap, fmt);
-    vgprintf(stderr, fmt, ap);
+    vgprintf(goban, stderr, fmt, ap);
     va_end(ap);
   }
 

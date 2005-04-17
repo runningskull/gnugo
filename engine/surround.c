@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -123,7 +124,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
     
     if (board[nd] != color) {
       if (0)
-	gprintf("neighbor: %1m\n", nd);
+	gprintf(goban, "neighbor: %1m\n", nd);
       mark_dragon(nd, mn, 1);
     }
   }
@@ -131,16 +132,16 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   /* descend markings from stones lying on the 2nd and third lines */
 
   for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
-    if (ON_BOARD(dpos) && mn[dpos]) {
+    if (ON_BOARD(goban, dpos) && mn[dpos]) {
       for (k = 0; k < 4; k++) {
         int d = delta[k];
-        if (!ON_BOARD(dpos + d))
+        if (!ON_BOARD(goban, dpos + d))
           continue;
-        if (!ON_BOARD(dpos + 2*d)) {
+        if (!ON_BOARD(goban, dpos + 2*d)) {
           if (board[dpos + d] == EMPTY)
             mn[dpos + d] = 1;
         }
-        else if (!ON_BOARD(dpos + 3*d)) {
+        else if (!ON_BOARD(goban, dpos + 3*d)) {
           if (board[dpos + d] == EMPTY
               && board[dpos + 2*d] == EMPTY)
             mn[dpos + 2*d] = 1;
@@ -151,7 +152,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   /* compute minimum distances to the goal */
 
   for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
-    if (ON_BOARD(dpos) && mn[dpos]) 
+    if (ON_BOARD(goban, dpos) && mn[dpos]) 
       sd[dpos] = goal_dist(dpos, mf);
 
   /* revise markings */
@@ -159,7 +160,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   do {
     found_some = 0;
     for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
-      if (ON_BOARD(dpos) && mn[dpos] && sd[dpos] > 8) {
+      if (ON_BOARD(goban, dpos) && mn[dpos] && sd[dpos] > 8) {
         /* discard markings if we can find 2 stones
          * that verify :
          * - it is closer to the goal than we are
@@ -167,11 +168,11 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
          * - they are closer to each other than we are to the goal
          */
         for (i = BOARDMIN; i < BOARDMAX; i++)
-	  if (ON_BOARD(i) && mn[i] && i != dpos
+	  if (ON_BOARD(goban, i) && mn[i] && i != dpos
               && sd[i] < sd[dpos]
               && square_dist(i, dpos) < sd[dpos]) {
             for (j = i + 1; j < BOARDMAX; j++)
-	      if (ON_BOARD(j) && mn[j] && j != dpos
+	      if (ON_BOARD(goban, j) && mn[j] && j != dpos
                   && sd[j] < sd[dpos]
                   && square_dist(j, dpos) < sd[dpos]
                   && square_dist(i, j) < sd[dpos]) {
@@ -188,13 +189,13 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   /* prepare corner array */
 
   for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
-    if (ON_BOARD(dpos) && mn[dpos])
+    if (ON_BOARD(goban, dpos) && mn[dpos])
       corner[corners++] = dpos;
 
   /* compute gravity center of the goal */
 
   for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
-    if (ON_BOARD(dpos) && mf[dpos]) {
+    if (ON_BOARD(goban, dpos) && mf[dpos]) {
       gi += I(dpos);
       gj += J(dpos);
       stones++;
@@ -210,7 +211,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   /* if apos is not NO_MOVE, mark it. */
 
   if (apos != NO_MOVE) {
-    ASSERT_ON_BOARD1(apos);
+    ASSERT_ON_BOARD1(goban, apos);
     mn[apos] = 1;
   }
   
@@ -259,14 +260,14 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	if (mn[POS(i, j)]) {
 	  float slope = ((float) (j - n))/((float) (i - m));
 	  if (0)
-	    gprintf("(left) at %m, last %m, slope=%f\n", i, j, m, n, slope);
+	    gprintf(goban, "(left) at %m, last %m, slope=%f\n", i, j, m, n, slope);
 	  
 	  if (!best_found || slope < best_slope) {
 	    best_found = POS(i, j);
 	    best_slope = slope;
 	  }
 	}
-    ASSERT_ON_BOARD1(best_found);
+    ASSERT_ON_BOARD1(goban, best_found);
     left_corner[left_corners] = best_found;
   }
   
@@ -290,7 +291,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	if (mn[POS(i, j)]) {
 	  float slope = ((float) (j - n))/((float) (i - m));
 	  if (0)
-	    gprintf("(right) at %m, last %m, slope=%f\n", i, j, m, n, slope);
+	    gprintf(goban, "(right) at %m, last %m, slope=%f\n", i, j, m, n, slope);
 	  if (!best_found || slope > best_slope) {
 	    best_found = POS(i, j);
 	    best_slope = slope;
@@ -298,16 +299,16 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	}
       }
     }
-    ASSERT_ON_BOARD1(best_found);
+    ASSERT_ON_BOARD1(goban, best_found);
     right_corner[right_corners] = best_found;
   }
   
   if (0) {
     for (k = 0; k < left_corners; k++)
-      gprintf("left corner %d: %1m\n", k, left_corner[k]);
+      gprintf(goban, "left corner %d: %1m\n", k, left_corner[k]);
     
     for (k = 0; k < right_corners; k++)
-      gprintf("right corner %d: %1m\n", k, right_corner[k]);
+      gprintf(goban, "right corner %d: %1m\n", k, right_corner[k]);
   }
 
   /* Now mark the interior of the convex hull */
@@ -329,7 +330,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	float bj = J(left_corner[k]);
 	
 	if (0)
-	  gprintf("(left) %d: %1m %1m\n", 
+	  gprintf(goban, "(left) %d: %1m %1m\n", 
 		  m, left_corner[k-1], left_corner[k]);
 	/* left edge in this row is on segment (ti,tj) -> (bi, bj) */
 	
@@ -347,7 +348,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	float bj = J(right_corner[k]);
 	
 	if (0)
-	  gprintf("(right) %d: %1m %1m\n", 
+	  gprintf(goban, "(right) %d: %1m %1m\n", 
 		  m, right_corner[k-1], right_corner[k]);
 
 	/* FIXME: Rewrite this to avoid floating point arithmetic */
@@ -363,9 +364,9 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   /* mark the expanded region */
 
   for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
-    if (ON_BOARD(dpos) && mn[dpos] == 1)
+    if (ON_BOARD(goban, dpos) && mn[dpos] == 1)
       for (k = 0; k < 4; k++)
-	if (ON_BOARD(dpos + delta[k]) && !mn[dpos + delta[k]])
+	if (ON_BOARD(goban, dpos + delta[k]) && !mn[dpos + delta[k]])
 	  mn[dpos + delta[k]] = 2;
       
   /* Mark allied dragons that intersect the (unexpanded) hull.
@@ -378,14 +379,14 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 
   for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++) {
     int mpos;
-    if (ON_BOARD(dpos) 
+    if (ON_BOARD(goban, dpos) 
 	&& mn[dpos] == 1
 	&& board[dpos] == color
 	&& are_neighbor_dragons(pos, dpos)
 	&& !mf[dpos]) {
 
       for (mpos = BOARDMIN; mpos < BOARDMAX; mpos++)
-	if (ON_BOARD(mpos) && is_same_dragon(mpos, dpos))
+	if (ON_BOARD(goban, mpos) && is_same_dragon(mpos, dpos))
 	  mf[mpos] = 2;
     }
     /* A special case
@@ -401,18 +402,18 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
      * Consequently, we allow inclusion of the stones at kosumi distance
      * in the mf (friendly) array.
      */
-    if (ON_BOARD(dpos) 
+    if (ON_BOARD(goban, dpos) 
 	&& mn[dpos] == 2
 	&& board[dpos] == color
 	&& are_neighbor_dragons(pos, dpos)
 	&& !mf[dpos]) {
       for (k = 4; k < 8; k++)
-	if (ON_BOARD(dpos + delta[k]) && board[dpos + delta[k]] == color
+	if (ON_BOARD(goban, dpos + delta[k]) && board[dpos + delta[k]] == color
 	    && mn[dpos + delta[k]] == 1
 	    && board[dpos + delta[k-4]] == EMPTY
 	    && board[dpos + delta[(k-3)%4]] == EMPTY) {
 	  for (mpos = BOARDMIN; mpos < BOARDMAX; mpos++)
-	    if (ON_BOARD(mpos) && is_same_dragon(mpos, dpos))
+	    if (ON_BOARD(goban, mpos) && is_same_dragon(mpos, dpos))
 	      mf[mpos] = 2;
 	}
     }
@@ -430,8 +431,8 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
    */
 
   for (k = 0; k < corners - 1; k++) {
-    if (is_edge_vertex(corner[k])
-        && is_edge_vertex(corner[k+1]))
+    if (is_edge_vertex(goban, corner[k])
+        && is_edge_vertex(goban, corner[k+1]))
       continue;
     if (square_dist(corner[k], corner[k+1]) > 60) {
       surrounded = 0;
@@ -441,8 +442,8 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
       surrounded = WEAKLY_SURROUNDED;
   }
   if (surrounded
-      && (!is_edge_vertex(corner[0])
-          || !is_edge_vertex(corner[corners-1]))) {
+      && (!is_edge_vertex(goban, corner[0])
+          || !is_edge_vertex(goban, corner[corners-1]))) {
     if (square_dist(corner[0], corner[corners-1]) > 60)
       surrounded = 0;
     else if (square_dist(corner[0], corner[corners-1]) > 27)
@@ -473,7 +474,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 
   if (surrounded) {
     for (dpos = BOARDMIN; dpos < BOARDMAX && surrounded; dpos++) {
-      if (!ON_BOARD(dpos) || !mf[dpos])
+      if (!ON_BOARD(goban, dpos) || !mf[dpos])
 	continue;
 
       for (k = 0; k < 4; k++) {
@@ -482,9 +483,9 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	if (board[dpos + up] == EMPTY
 	    && board[dpos + 2*up] == color
 	    && mn[dpos + 2*up] != 1
-	    && ON_BOARD(dpos + up + right)
+	    && ON_BOARD(goban, dpos + up + right)
 	    && board[dpos + up + right] != other
-	    && ON_BOARD(dpos + up - right)
+	    && ON_BOARD(goban, dpos + up - right)
 	    && board[dpos + up - right] != other) {
 	  surrounded = 0;
 	  break;
@@ -508,7 +509,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 
     *surround_size = 0;
     for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-      if (ON_BOARD(pos) && mn[pos] == 1)
+      if (ON_BOARD(goban, pos) && mn[pos] == 1)
 	(*surround_size)++;
   }
 
@@ -526,7 +527,7 @@ goal_dist(int pos, char goal[BOARDMAX])
   int ii;
 
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii) && goal[ii])
+    if (ON_BOARD(goban, ii) && goal[ii])
       dist = gg_min(dist, square_dist(ii, pos));
 
   return dist;

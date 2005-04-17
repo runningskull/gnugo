@@ -46,6 +46,7 @@
  */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -223,7 +224,7 @@ verify_stored_board(char p[BOARDMAX])
 {
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     else if (p[pos] == GRAY)
       continue;
@@ -231,8 +232,8 @@ verify_stored_board(char p[BOARDMAX])
       return 0;
     else if (!(p[pos] & (HIGH_LIBERTY_BIT | HIGH_LIBERTY_BIT2)))
       continue;
-    else if (((p[pos] & HIGH_LIBERTY_BIT) && countlib(pos) <= 4)
-             || (p[pos] & HIGH_LIBERTY_BIT2 && countlib(pos) <= 3))
+    else if (((p[pos] & HIGH_LIBERTY_BIT) && countlib(goban, pos) <= 4)
+             || (p[pos] & HIGH_LIBERTY_BIT2 && countlib(goban, pos) <= 3))
       return 0;
   }
   
@@ -248,31 +249,31 @@ print_persistent_cache_entry(struct persistent_cache_entry *entry)
 {
   int r;
 
-  gprintf("%omovenum         = %d\n",  entry->movenum);
-  gprintf("%oscore	     = %d\n",  entry->score);
-  gprintf("%ocost	     = %d\n",  entry->cost);
-  gprintf("%oroutine         = %s\n",  routine_id_to_string(entry->routine));
-  gprintf("%oapos            = %1m\n", entry->apos);
+  gprintf(goban, "%omovenum         = %d\n",  entry->movenum);
+  gprintf(goban, "%oscore	     = %d\n",  entry->score);
+  gprintf(goban, "%ocost	     = %d\n",  entry->cost);
+  gprintf(goban, "%oroutine         = %s\n",  routine_id_to_string(entry->routine));
+  gprintf(goban, "%oapos            = %1m\n", entry->apos);
   if (entry->bpos != NO_MOVE)
-    gprintf("%obpos          = %1m\n", entry->bpos);
+    gprintf(goban, "%obpos          = %1m\n", entry->bpos);
   if (entry->cpos != NO_MOVE)
-    gprintf("%ocpos            = %1m\n", entry->cpos);
-  gprintf("%oresult          = %s\n",  result_to_string(entry->result));
+    gprintf(goban, "%ocpos            = %1m\n", entry->cpos);
+  gprintf(goban, "%oresult          = %s\n",  result_to_string(entry->result));
   if (entry->result2 != 0)
-    gprintf("%oresult2         = %s\n",  result_to_string(entry->result2));
+    gprintf(goban, "%oresult2         = %s\n",  result_to_string(entry->result2));
   if (entry->result_certain != -1)
-    gprintf("%oresult_certain  = %d\n",  entry->result_certain);
+    gprintf(goban, "%oresult_certain  = %d\n",  entry->result_certain);
   if (entry->node_limit != -1)
-    gprintf("%onode_limit      = %d\n",  entry->node_limit);
+    gprintf(goban, "%onode_limit      = %d\n",  entry->node_limit);
   if (entry->move != NO_MOVE)
-    gprintf("%omove            = %1m\n", entry->move);
+    gprintf(goban, "%omove            = %1m\n", entry->move);
   if (entry->move2 != NO_MOVE)
-    gprintf("%omove2           = %1m\n", entry->move2);
+    gprintf(goban, "%omove2           = %1m\n", entry->move2);
   
   for (r = 0; r < MAX_CACHE_DEPTH; r++) {
     if (entry->stack[r] == 0)
       break;
-    gprintf("%ostack[%d]      = %C %1m\n", r, entry->move_color[r],
+    gprintf(goban, "%ostack[%d]      = %C %1m\n", r, entry->move_color[r],
 	    entry->stack[r]);
   }
 
@@ -290,7 +291,7 @@ void
 print_persistent_cache(struct persistent_cache *cache)
 {
   int k;
-  gprintf("Entire content of %s:\n", cache->name);
+  gprintf(goban, "Entire content of %s:\n", cache->name);
   for (k = 0; k < cache->current_size; k++)
     print_persistent_cache_entry(cache->table + k);
 }
@@ -316,7 +317,7 @@ purge_persistent_cache(struct persistent_cache *cache)
 {
   int k;
   int r;
-  gg_assert(stackp == 0);
+  gg_assert(goban, stackp == 0);
 
   /* Never do this more than once per move. */
   if (cache->last_purge_position_number == position_number)
@@ -338,7 +339,7 @@ purge_persistent_cache(struct persistent_cache *cache)
 	if (apos == 0)
 	  break;
 	if (board[apos] == EMPTY
-	    && trymove(apos, color, "purge_persistent_cache", 0))
+	    && trymove(goban, apos, color, "purge_persistent_cache", 0))
 	  played_moves++;
 	else {
 	  entry_ok = 0;
@@ -353,7 +354,7 @@ purge_persistent_cache(struct persistent_cache *cache)
        * counter to redo the test at this position in the cache.
        */
       if (0)
-	gprintf("Purging entry %d from cache.\n", k);
+	gprintf(goban, "Purging entry %d from cache.\n", k);
       if (k < cache->current_size - 1)
 	*entry = cache->table[cache->current_size - 1];
       k--;
@@ -365,7 +366,7 @@ purge_persistent_cache(struct persistent_cache *cache)
     }
 
     while (played_moves > 0) {
-      popgo();
+      popgo(goban);
       played_moves--;
     }
   }
@@ -434,7 +435,7 @@ search_persistent_cache(struct persistent_cache *cache,
   entry->score += entry->cost;
 
   if (debug & DEBUG_PERSISTENT_CACHE) {
-    gprintf("%oRetrieved position from %s:\n", cache->name);
+    gprintf(goban, "%oRetrieved position from %s:\n", cache->name);
     print_persistent_cache_entry(entry);
   }
   /* FIXME: This is an ugly hack. */
@@ -442,14 +443,14 @@ search_persistent_cache(struct persistent_cache *cache,
       && (debug & DEBUG_READING_PERFORMANCE)
       && entry->cost >= MIN_READING_NODES_TO_REPORT) {
     if (entry->result != 0)
-      gprintf("%o%s %1m = %d %1m, cached (%d nodes) ",
+      gprintf(goban, "%o%s %1m = %d %1m, cached (%d nodes) ",
               routine == ATTACK ? "attack" : "defend",
               apos, entry->result, entry->move, entry->cost);
     else
-      gprintf("%o%s %1m = %d, cached (%d nodes) ",
+      gprintf(goban, "%o%s %1m = %d, cached (%d nodes) ",
               routine == ATTACK ? "attack" : "defend",
               apos, entry->result, entry->cost);
-    dump_stack();
+    dump_stack(goban);
   }
   return 1;
 }
@@ -520,7 +521,7 @@ store_persistent_cache(struct persistent_cache *cache,
 
   for (r = 0; r < MAX_CACHE_DEPTH; r++) {
     if (r < stackp)
-      get_move_from_stack(r, &(entry->stack[r]), &(entry->move_color[r]));
+      get_move_from_stack(goban, r, &(entry->stack[r]), &(entry->move_color[r]));
     else {
       entry->stack[r] = 0;
       entry->move_color[r] = EMPTY;
@@ -533,9 +534,9 @@ store_persistent_cache(struct persistent_cache *cache,
   cache->current_size++;
 
   if (debug & DEBUG_PERSISTENT_CACHE) {
-    gprintf("%oEntered position in %s:\n", cache->name);
+    gprintf(goban, "%oEntered position in %s:\n", cache->name);
     print_persistent_cache_entry(entry);
-    gprintf("%oCurrent size: %d\n", cache->current_size);
+    gprintf(goban, "%oCurrent size: %d\n", cache->current_size);
   }
 }
 
@@ -549,7 +550,7 @@ static void
 init_cache(struct persistent_cache *cache)
 {
   cache->table = malloc(cache->max_size*sizeof(struct persistent_cache_entry));
-  gg_assert(cache->table);
+  gg_assert(goban, cache->table);
 }
 
 /* Initializes all persistent caches.
@@ -635,7 +636,7 @@ compute_active_reading_area(struct persistent_cache_entry *entry,
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     active[pos] = goal[pos];
 
-  signed_mark_string(entry->apos, active, 1);
+  signed_mark_string(goban, entry->apos, active, 1);
 
   /* To be safe, also add the successful move. */
   if (entry->result != 0 && entry->move != 0)
@@ -643,16 +644,16 @@ compute_active_reading_area(struct persistent_cache_entry *entry,
 
   /* Add adjacent strings and empty. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     if (active[pos] != 0) 
       continue;
-    if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] == 1)
-	|| (ON_BOARD(WEST(pos)) && active[WEST(pos)] == 1)
-	|| (ON_BOARD(NORTH(pos)) && active[NORTH(pos)] == 1)
-	|| (ON_BOARD(EAST(pos)) && active[EAST(pos)] == 1)) {
+    if ((ON_BOARD(goban, SOUTH(pos)) && active[SOUTH(pos)] == 1)
+	|| (ON_BOARD(goban, WEST(pos)) && active[WEST(pos)] == 1)
+	|| (ON_BOARD(goban, NORTH(pos)) && active[NORTH(pos)] == 1)
+	|| (ON_BOARD(goban, EAST(pos)) && active[EAST(pos)] == 1)) {
       if (IS_STONE(board[pos]))
-	signed_mark_string(pos, active, 2);
+	signed_mark_string(goban, pos, active, 2);
       else
 	active[pos] = 2;
     }
@@ -662,7 +663,7 @@ compute_active_reading_area(struct persistent_cache_entry *entry,
    * neighbors.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     if (IS_STONE(board[pos]) && worm[pos].invincible)
       active[pos] = 0;
@@ -681,17 +682,17 @@ compute_active_reading_area(struct persistent_cache_entry *entry,
   
   /* Add neighbors of active area so far. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     if (active[pos] != 0) 
       continue;
-    if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] > 0
+    if ((ON_BOARD(goban, SOUTH(pos)) && active[SOUTH(pos)] > 0
 	 && active[SOUTH(pos)] < 4)
-	|| (ON_BOARD(WEST(pos)) && active[WEST(pos)] > 0
+	|| (ON_BOARD(goban, WEST(pos)) && active[WEST(pos)] > 0
 	    && active[WEST(pos)] < 4)
-	|| (ON_BOARD(NORTH(pos)) && active[NORTH(pos)] > 0
+	|| (ON_BOARD(goban, NORTH(pos)) && active[NORTH(pos)] > 0
 	    && active[NORTH(pos)] < 4)
-	|| (ON_BOARD(EAST(pos)) && active[EAST(pos)] > 0
+	|| (ON_BOARD(goban, EAST(pos)) && active[EAST(pos)] > 0
 	    && active[EAST(pos)] < 4))
       active[pos] = 4;
   }
@@ -701,7 +702,7 @@ compute_active_reading_area(struct persistent_cache_entry *entry,
     active[entry->stack[r]] = 5;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     entry->board[pos] = 
       active[pos] != 0 ? board[pos] : GRAY;
@@ -719,10 +720,10 @@ mark_string_hotspot_values(float values[BOARDMAX],
   /* If p[m][n] is EMPTY, we just give the contribution to close empty
    * vertices. This is a rough simplification.
    */
-  if (BOARD(m, n) == EMPTY) {
+  if (BOARD(goban, m, n) == EMPTY) {
     for (i = -1; i <= 1; i++)
       for (j = -1; j <= 1; j++)
-	if (BOARD(m+i, n+j) == EMPTY)
+	if (BOARD(goban, m+i, n+j) == EMPTY)
 	  values[POS(m+i, n+j)] += contribution;
     return;
   }
@@ -732,20 +733,20 @@ mark_string_hotspot_values(float values[BOARDMAX],
    */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) != EMPTY)
+      if (BOARD(goban, i, j) != EMPTY)
 	continue;
       for (k = 0; k < 8; k++) {
 	int di = deltai[k];
 	int dj = deltaj[k];
-	if (IS_STONE(BOARD(i+di, j+dj))
-	    && same_string(POS(i+di, j+dj), POS(m, n))) {
+	if (IS_STONE(BOARD(goban, i+di, j+dj))
+	    && same_string(goban, POS(i+di, j+dj), POS(m, n))) {
 	  if (k < 4) {
 	    values[POS(i, j)] += contribution;
 	    break;
 	  }
 	  else {
-	    if (BOARD(i+di, j) == EMPTY || countlib(POS(i+di, j)) <= 2
-		|| BOARD(i, j+dj) == EMPTY || countlib(POS(i, j+dj)) <= 2)
+	    if (BOARD(goban, i+di, j) == EMPTY || countlib(goban, POS(i+di, j)) <= 2
+		|| BOARD(goban, i, j+dj) == EMPTY || countlib(goban, POS(i, j+dj)) <= 2)
 	      values[POS(i, j)] += contribution;
 	    break;
 	  }
@@ -783,7 +784,7 @@ reading_hotspots(float values[BOARDMAX])
     struct persistent_cache_entry *entry = &(reading_cache.table[k]);
     float contribution = entry->cost / (float) sum_nodes;
     if (0) {
-      gprintf("Reading hotspots: %d %1m %f\n", entry->routine, entry->apos,
+      gprintf(goban, "Reading hotspots: %d %1m %f\n", entry->routine, entry->apos,
 	      contribution);
     }
     switch (entry->routine) {
@@ -793,7 +794,7 @@ reading_hotspots(float values[BOARDMAX])
 				 contribution);
       break;
     default:
-      gg_assert(0); /* Shouldn't happen. */
+      gg_assert(goban, 0); /* Shouldn't happen. */
       break;
     }
   }
@@ -858,8 +859,8 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     active[pos] = connection_shadow[pos];
 
-  signed_mark_string(entry->apos, active, 1);
-  signed_mark_string(entry->bpos, active, 1);
+  signed_mark_string(goban, entry->apos, active, 1);
+  signed_mark_string(goban, entry->bpos, active, 1);
 
   /* To be safe, also add the successful move. */
   if (entry->result != 0 && entry->move != 0)
@@ -868,16 +869,16 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
   /* Distance two expansion through empty intersections and own stones. */
   for (k = 1; k < 3; k++) {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (!ON_BOARD(pos) || board[pos] == other || active[pos] != 0) 
+      if (!ON_BOARD(goban, pos) || board[pos] == other || active[pos] != 0) 
 	continue;
-      if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] == k)
-	  || (ON_BOARD(WEST(pos)) && active[WEST(pos)] == k)
-	  || (ON_BOARD(NORTH(pos)) && active[NORTH(pos)] == k)
-	  || (ON_BOARD(EAST(pos)) && active[EAST(pos)] == k)) {
+      if ((ON_BOARD(goban, SOUTH(pos)) && active[SOUTH(pos)] == k)
+	  || (ON_BOARD(goban, WEST(pos)) && active[WEST(pos)] == k)
+	  || (ON_BOARD(goban, NORTH(pos)) && active[NORTH(pos)] == k)
+	  || (ON_BOARD(goban, EAST(pos)) && active[EAST(pos)] == k)) {
 	if (board[pos] == EMPTY)
 	  active[pos] = k + 1;
 	else
-	  signed_mark_string(pos, active, (signed char) (k + 1));
+	  signed_mark_string(goban, pos, active, (signed char) (k + 1));
       }
     }
   }
@@ -888,8 +889,8 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
       continue;
     for (r = 0; r < 4; r++) {
       int pos2 = pos + delta[r];
-      if (ON_BOARD(pos2) && board[pos2] != other && active[pos2] != 0) {
-	signed_mark_string(pos, active, 1);
+      if (ON_BOARD(goban, pos2) && board[pos2] != other && active[pos2] != 0) {
+	signed_mark_string(goban, pos, active, 1);
 	break;
       }
     }
@@ -900,9 +901,9 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
    * with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == other && active[pos] > 0 && countlib(pos) < 5) {
+    if (board[pos] == other && active[pos] > 0 && countlib(goban, pos) < 5) {
       int libs[4];
-      int liberties = findlib(pos, 4, libs);
+      int liberties = findlib(goban, pos, 4, libs);
       int adjs[MAXCHAIN];
       int adj;
       for (r = 0; r < liberties; r++)
@@ -911,19 +912,19 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
       /* Also add liberties of neighbor strings if these are three
        * or less.
        */
-      adj = chainlinks(pos, adjs);
+      adj = chainlinks(goban, pos, adjs);
       for (r = 0; r < adj; r++) {
-	signed_mark_string(adjs[r], active, -1);
-	if (countlib(adjs[r]) <= 3) {
+	signed_mark_string(goban, adjs[r], active, -1);
+	if (countlib(goban, adjs[r]) <= 3) {
 	  int s;
 	  int adjs2[MAXCHAIN];
 	  int adj2;
-	  liberties = findlib(adjs[r], 3, libs);
+	  liberties = findlib(goban, adjs[r], 3, libs);
 	  for (s = 0; s < liberties; s++)
 	    active[libs[s]] = 1;
-	  adj2 = chainlinks(pos, adjs2);
+	  adj2 = chainlinks(goban, pos, adjs2);
 	  for (s = 0; s < adj2; s++)
-	    signed_mark_string(adjs2[s], active, -1);
+	    signed_mark_string(goban, adjs2[s], active, -1);
 	}
       }
     }
@@ -935,11 +936,11 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     int value = board[pos];
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     if (!active[pos])
       value = GRAY;
-    else if (IS_STONE(board[pos]) && countlib(pos) > 4 && active[pos] > 0)
+    else if (IS_STONE(board[pos]) && countlib(goban, pos) > 4 && active[pos] > 0)
       value |= HIGH_LIBERTY_BIT;
     
     entry->board[pos] = value;
@@ -1006,7 +1007,7 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     active[pos] = breakin_shadow[pos];
 
-  signed_mark_string(entry->apos, active, 1);
+  signed_mark_string(goban, entry->apos, active, 1);
 
   /* To be safe, also add the successful move. */
   if (entry->result != 0 && entry->move != 0)
@@ -1015,16 +1016,16 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
   /* Distance two expansion through empty intersections and own stones. */
   for (k = 1; k < 3; k++) {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (!ON_BOARD(pos) || board[pos] == other || active[pos] != 0) 
+      if (!ON_BOARD(goban, pos) || board[pos] == other || active[pos] != 0) 
 	continue;
-      if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] == k)
-	  || (ON_BOARD(WEST(pos)) && active[WEST(pos)] == k)
-	  || (ON_BOARD(NORTH(pos)) && active[NORTH(pos)] == k)
-	  || (ON_BOARD(EAST(pos)) && active[EAST(pos)] == k)) {
+      if ((ON_BOARD(goban, SOUTH(pos)) && active[SOUTH(pos)] == k)
+	  || (ON_BOARD(goban, WEST(pos)) && active[WEST(pos)] == k)
+	  || (ON_BOARD(goban, NORTH(pos)) && active[NORTH(pos)] == k)
+	  || (ON_BOARD(goban, EAST(pos)) && active[EAST(pos)] == k)) {
 	if (board[pos] == EMPTY)
 	  active[pos] = k + 1;
 	else
-	  signed_mark_string(pos, active, (signed char) (k + 1));
+	  signed_mark_string(goban, pos, active, (signed char) (k + 1));
       }
     }
   }
@@ -1035,10 +1036,10 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
       continue;
     for (r = 0; r < 4; r++) {
       int pos2 = pos + delta[r];
-      if (ON_BOARD(pos2)
+      if (ON_BOARD(goban, pos2)
 	  && board[pos2] != other
 	  && active[pos2] && active[pos2] <= 2) {
-	signed_mark_string(pos, active, 1);
+	signed_mark_string(goban, pos, active, 1);
 	break;
       }
     }
@@ -1049,9 +1050,9 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
    * with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == other && active[pos] > 0 && countlib(pos) < 4) {
+    if (board[pos] == other && active[pos] > 0 && countlib(goban, pos) < 4) {
       int libs[4];
-      int liberties = findlib(pos, 3, libs);
+      int liberties = findlib(goban, pos, 3, libs);
       int adjs[MAXCHAIN];
       int adj;
       for (r = 0; r < liberties; r++)
@@ -1060,19 +1061,19 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
       /* Also add liberties of neighbor strings if these are three
        * or less.
        */
-      adj = chainlinks(pos, adjs);
+      adj = chainlinks(goban, pos, adjs);
       for (r = 0; r < adj; r++) {
-	signed_mark_string(adjs[r], active, -1);
-	if (countlib(adjs[r]) <= 3) {
+	signed_mark_string(goban, adjs[r], active, -1);
+	if (countlib(goban, adjs[r]) <= 3) {
 	  int s;
 	  int adjs2[MAXCHAIN];
 	  int adj2;
-	  liberties = findlib(adjs[r], 3, libs);
+	  liberties = findlib(goban, adjs[r], 3, libs);
 	  for (s = 0; s < liberties; s++)
 	    active[libs[s]] = 1;
-	  adj2 = chainlinks(pos, adjs2);
+	  adj2 = chainlinks(goban, pos, adjs2);
 	  for (s = 0; s < adj2; s++)
-	    signed_mark_string(adjs2[s], active, -1);
+	    signed_mark_string(goban, adjs2[s], active, -1);
 	}
       }
     }
@@ -1080,11 +1081,11 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     char value = board[pos];
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     if (!active[pos])
       value = GRAY;
-    else if (IS_STONE(board[pos]) && countlib(pos) > 3 && active[pos] > 0)
+    else if (IS_STONE(board[pos]) && countlib(goban, pos) > 3 && active[pos] > 0)
       value |= HIGH_LIBERTY_BIT2;
     
     entry->board[pos] = value;
@@ -1143,22 +1144,22 @@ compute_active_owl_type_area(const char goal[BOARDMAX], int goal_color,
    * strings with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos) && goal[pos])
+    if (ON_BOARD(goban, pos) && goal[pos])
       active[pos] = 1;
 
   /* Distance four expansion through empty intersections and own stones. */
   for (k = 1; k < 5; k++) {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (!ON_BOARD(pos) || board[pos] == other || active[pos] > 0) 
+      if (!ON_BOARD(goban, pos) || board[pos] == other || active[pos] > 0) 
 	continue;
-      if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] == k)
-	  || (ON_BOARD(WEST(pos)) && active[WEST(pos)] == k)
-	  || (ON_BOARD(NORTH(pos)) && active[NORTH(pos)] == k)
-	  || (ON_BOARD(EAST(pos)) && active[EAST(pos)] == k)) {
+      if ((ON_BOARD(goban, SOUTH(pos)) && active[SOUTH(pos)] == k)
+	  || (ON_BOARD(goban, WEST(pos)) && active[WEST(pos)] == k)
+	  || (ON_BOARD(goban, NORTH(pos)) && active[NORTH(pos)] == k)
+	  || (ON_BOARD(goban, EAST(pos)) && active[EAST(pos)] == k)) {
 	if (board[pos] == EMPTY)
 	  active[pos] = k + 1;
 	else
-	  signed_mark_string(pos, active, (signed char) (k + 1));
+	  signed_mark_string(goban, pos, active, (signed char) (k + 1));
       }
     }
   }
@@ -1169,8 +1170,8 @@ compute_active_owl_type_area(const char goal[BOARDMAX], int goal_color,
       continue;
     for (r = 0; r < 4; r++) {
       int pos2 = pos + delta[r];
-      if (ON_BOARD(pos2) && board[pos2] != other && active[pos2] != 0) {
-	signed_mark_string(pos, active, 1);
+      if (ON_BOARD(goban, pos2) && board[pos2] != other && active[pos2] != 0) {
+	signed_mark_string(goban, pos, active, 1);
 	break;
       }
     }
@@ -1181,9 +1182,9 @@ compute_active_owl_type_area(const char goal[BOARDMAX], int goal_color,
    * with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == other && active[pos] > 0 && countlib(pos) < 5) {
+    if (board[pos] == other && active[pos] > 0 && countlib(goban, pos) < 5) {
       int libs[4];
-      int liberties = findlib(pos, 4, libs);
+      int liberties = findlib(goban, pos, 4, libs);
       int adjs[MAXCHAIN];
       int adj;
       for (r = 0; r < liberties; r++)
@@ -1192,19 +1193,19 @@ compute_active_owl_type_area(const char goal[BOARDMAX], int goal_color,
       /* Also add liberties of neighbor strings if these are three
        * or less.
        */
-      adj = chainlinks(pos, adjs);
+      adj = chainlinks(goban, pos, adjs);
       for (r = 0; r < adj; r++) {
-	signed_mark_string(adjs[r], active, -1);
-	if (countlib(adjs[r]) <= 3) {
+	signed_mark_string(goban, adjs[r], active, -1);
+	if (countlib(goban, adjs[r]) <= 3) {
 	  int s;
 	  int adjs2[MAXCHAIN];
 	  int adj2;
-	  liberties = findlib(adjs[r], 3, libs);
+	  liberties = findlib(goban, adjs[r], 3, libs);
 	  for (s = 0; s < liberties; s++)
 	    active[libs[s]] = 1;
-	  adj2 = chainlinks(pos, adjs2);
+	  adj2 = chainlinks(goban, pos, adjs2);
 	  for (s = 0; s < adj2; s++)
-	    signed_mark_string(adjs2[s], active, -1);
+	    signed_mark_string(goban, adjs2[s], active, -1);
 	}
       }
     }
@@ -1220,21 +1221,21 @@ compute_active_owl_area(struct persistent_cache_entry *entry,
   memset(active, 0, BOARDMAX);
 
   /* Add critical moves to the active area. */
-  if (ON_BOARD1(entry->move))
+  if (ON_BOARD1(goban, entry->move))
     active[entry->move] = 1;
 
-  if (ON_BOARD1(entry->move2))
+  if (ON_BOARD1(goban, entry->move2))
     active[entry->move2] = 1;
 
   compute_active_owl_type_area(goal, goal_color, active);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     int value = board[pos];
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     if (!active[pos])
       value = GRAY;
-    else if (IS_STONE(board[pos]) && countlib(pos) > 4 && active[pos] > 0)
+    else if (IS_STONE(board[pos]) && countlib(goban, pos) > 4 && active[pos] > 0)
       value |= HIGH_LIBERTY_BIT;
     
     entry->board[pos] = value;
@@ -1296,11 +1297,11 @@ compute_active_semeai_area(struct persistent_cache_entry *entry,
   memset(active_w, 0, BOARDMAX);
 
   /* Add critical move to the active area. */
-  if (ON_BOARD1(entry->move)) {
+  if (ON_BOARD1(goban, entry->move)) {
     active_b[entry->move] = 1;
     active_w[entry->move] = 1;
   }
-  if (ON_BOARD1(entry->cpos)) {
+  if (ON_BOARD1(goban, entry->cpos)) {
     active_b[entry->cpos] = 1;
     active_w[entry->cpos] = 1;
   }
@@ -1310,11 +1311,11 @@ compute_active_semeai_area(struct persistent_cache_entry *entry,
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     int value = board[pos];
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     if (!active_b[pos] && !active_w[pos])
       value = GRAY;
-    else if (IS_STONE(board[pos]) && countlib(pos) > 4
+    else if (IS_STONE(board[pos]) && countlib(goban, pos) > 4
 	     && (active_b[pos] > 0 || active_w[pos] > 0))
       value |= HIGH_LIBERTY_BIT;
     
@@ -1342,8 +1343,8 @@ mark_dragon_hotspot_values(float values[BOARDMAX], int dr,
 	  && (is_same_dragon(pos2, dr)
 	      || (are_neighbor_dragons(pos2, dr)
 		  && board[pos2] == board[dr]))
-	  && (countlib(pos2) <= 4
-	      || is_edge_vertex(pos))) {
+	  && (countlib(goban, pos2) <= 4
+	      || is_edge_vertex(goban, pos))) {
 	if (k < 4) {
 	  if (is_same_dragon(pos2, dr))
 	    values[pos] += contribution;
@@ -1359,8 +1360,8 @@ mark_dragon_hotspot_values(float values[BOARDMAX], int dr,
 	   */
 	  int pos3 = pos + delta[k % 4];
 	  int pos4 = pos + delta[(k+1) % 4];
-	  if (board[pos3] == EMPTY || countlib(pos3) <= 2
-	      || board[pos4] == EMPTY || countlib(pos4) <= 2)
+	  if (board[pos3] == EMPTY || countlib(goban, pos3) <= 2
+	      || board[pos4] == EMPTY || countlib(goban, pos4) <= 2)
 	    values[pos] += 0.5 * contribution;
 	  break;
 	}
@@ -1407,7 +1408,7 @@ owl_hotspots(float values[BOARDMAX])
     struct persistent_cache_entry *entry = &(owl_cache.table[k]);
     float contribution = entry->score / (float) sum_tactical_nodes;
     if (debug & DEBUG_PERSISTENT_CACHE) {
-      gprintf("Owl hotspots: %d %1m %f\n", entry->routine, entry->apos,
+      gprintf(goban, "Owl hotspots: %d %1m %f\n", entry->routine, entry->apos,
 	      contribution);
     }
     switch (entry->routine) {
@@ -1434,12 +1435,12 @@ owl_hotspots(float values[BOARDMAX])
       /* Only consider the liberties of (apos). */
       if (!IS_STONE(board[entry->apos]))
 	continue;
-      liberties = findlib(entry->apos, MAXLIBS, libs);
+      liberties = findlib(goban, entry->apos, MAXLIBS, libs);
       for (r = 0; r < liberties; r++)
 	values[libs[r]] += contribution;
       break;
     default:
-      gg_assert(0); /* Shouldn't happen. */
+      gg_assert(goban, 0); /* Shouldn't happen. */
       break;
     }
   }

@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -132,7 +133,7 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 
   /* Initialize eye data and compute the lively array. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos)) {
+    if (ON_BOARD(goban, pos)) {
       if (b_eye)
         clear_eye(&(b_eye[pos]));
       if (w_eye)
@@ -149,7 +150,7 @@ make_domains(struct eye_data b_eye[BOARDMAX],
    */
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     
     if (board[pos] == EMPTY || !lively[pos]) {
@@ -163,7 +164,7 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 	b_eye[pos].color = BLACK;
 	for (k = 0; k < 4; k++) {
 	  int apos = pos + delta[k];
-	  if (ON_BOARD(apos) && white_domain[apos] && !black_domain[apos]) {
+	  if (ON_BOARD(goban, apos) && white_domain[apos] && !black_domain[apos]) {
 	    b_eye[pos].marginal = 1;
 	    break;
 	  }
@@ -173,7 +174,7 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 	w_eye[pos].color = WHITE;
 	for (k = 0; k < 4; k++) {
 	  int apos = pos + delta[k];
-	  if (ON_BOARD(apos) && black_domain[apos] && !white_domain[apos]) {
+	  if (ON_BOARD(goban, apos) && black_domain[apos] && !white_domain[apos]) {
 	    w_eye[pos].marginal = 1;
 	    break;
 	  }
@@ -183,7 +184,7 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 	if (b_eye) {
 	  for (k = 0; k < 4; k++) {
 	    int apos = pos + delta[k];
-	    if (ON_BOARD(apos) && black_domain[apos]
+	    if (ON_BOARD(goban, apos) && black_domain[apos]
 		&& !white_domain[apos]) {
 	      b_eye[pos].marginal = 1;
 	      b_eye[pos].color = BLACK;
@@ -197,7 +198,7 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 	if (w_eye) {
 	  for (k = 0; k < 4; k++) {
 	    int apos = pos + delta[k];
-	    if (ON_BOARD(apos) && white_domain[apos]
+	    if (ON_BOARD(goban, apos) && white_domain[apos]
 		&& !black_domain[apos]) {
 	      w_eye[pos].marginal = 1;
 	      w_eye[pos].color = WHITE;
@@ -226,11 +227,11 @@ partition_eyespaces(struct eye_data eye[BOARDMAX], int color)
     return;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos))
+    if (ON_BOARD(goban, pos))
       eye[pos].origin = NO_MOVE;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     if (eye[pos].origin == NO_MOVE && eye[pos].color == color) {
       int esize = 0;
@@ -295,7 +296,7 @@ partition_eyespaces(struct eye_data eye[BOARDMAX], int color)
  */
 
 #define sufficient_influence(pos, apos, bpos) \
-  (ON_BOARD(bpos) && influence[bpos] > threshold[pos] - influence[apos])
+  (ON_BOARD(goban, bpos) && influence[bpos] > threshold[pos] - influence[apos])
 
 static void
 compute_primary_domains(int color, int domain[BOARDMAX],
@@ -321,7 +322,7 @@ compute_primary_domains(int color, int domain[BOARDMAX],
    * 2. Fill influence[] and threshold[] arrays with initial values.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
    
     if (lively[pos]) {
@@ -337,7 +338,7 @@ compute_primary_domains(int color, int domain[BOARDMAX],
     own = enemy = 0;
     for (k = 0; k < 4; k++) {
       pos2 = pos + delta[k];
-      if (ON_BOARD(pos2) && lively[pos2]) {
+      if (ON_BOARD(goban, pos2) && lively[pos2]) {
         if (board[pos2] == color)
           own = 1;
         else
@@ -372,7 +373,7 @@ compute_primary_domains(int color, int domain[BOARDMAX],
       threshold[pos] = 1;
       influence[pos]--;
     }
-    else if (is_edge_vertex(pos))
+    else if (is_edge_vertex(goban, pos))
       influence[pos]--;
   }
   
@@ -429,7 +430,7 @@ count_neighbours(struct eye_data eyedata[BOARDMAX])
   int k;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos) || eyedata[pos].origin == NO_MOVE) 
+    if (!ON_BOARD(goban, pos) || eyedata[pos].origin == NO_MOVE) 
       continue;
 
     eyedata[pos].esize = eyedata[eyedata[pos].origin].esize;
@@ -439,7 +440,7 @@ count_neighbours(struct eye_data eyedata[BOARDMAX])
     
     for (k = 0; k < 4; k++) {
       int pos2 = pos + delta[k];
-      if (ON_BOARD(pos2) && eyedata[pos2].origin == eyedata[pos].origin) {
+      if (ON_BOARD(goban, pos2) && eyedata[pos2].origin == eyedata[pos].origin) {
 	eyedata[pos].neighbors++;
 	if (eyedata[pos2].marginal)
 	  eyedata[pos].marginal_neighbors++;
@@ -503,7 +504,7 @@ false_margin(int pos, int color, int lively[BOARDMAX])
   
   /* Require neighbors of both colors. */
   for (k = 0; k < 4; k++)
-    if (ON_BOARD(pos + delta[k]))
+    if (ON_BOARD(goban, pos + delta[k]))
 	neighbors |= board[pos + delta[k]];	
 
   if (neighbors != (WHITE | BLACK))
@@ -532,7 +533,7 @@ false_margin(int pos, int color, int lively[BOARDMAX])
   }
   
   if (potential_false_margin && safe_move(pos, other) == 0) {
-    DEBUG(DEBUG_EYES, "False margin for %C at %1m.\n", color, pos);
+    DEBUG(goban, DEBUG_EYES, "False margin for %C at %1m.\n", color, pos);
     return 1;
   }
 
@@ -552,10 +553,10 @@ originate_eye(int origin, int pos,
 	      struct eye_data eye[BOARDMAX])
 {
   int k;
-  ASSERT_ON_BOARD1(origin);
-  ASSERT_ON_BOARD1(pos);
-  gg_assert(esize != NULL);
-  gg_assert(msize != NULL);
+  ASSERT_ON_BOARD1(goban, origin);
+  ASSERT_ON_BOARD1(goban, pos);
+  gg_assert(goban, esize != NULL);
+  gg_assert(goban, msize != NULL);
   
   eye[pos].origin = origin;
   (*esize)++;
@@ -564,7 +565,7 @@ originate_eye(int origin, int pos,
 
   for (k = 0; k < 4; k++) {
     int pos2 = pos + delta[k];
-    if (ON_BOARD(pos2)
+    if (ON_BOARD(goban, pos2)
 	&& eye[pos2].color == eye[pos].color
 	&& eye[pos2].origin == NO_MOVE
 	&& (!eye[pos2].marginal || !eye[pos].marginal))
@@ -584,7 +585,7 @@ propagate_eye(int origin, struct eye_data eye[BOARDMAX])
   int pos;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos) && eye[pos].origin == origin) {
+    if (ON_BOARD(goban, pos) && eye[pos].origin == origin) {
       eye[pos].color         = eye[origin].color;
       eye[pos].esize         = eye[origin].esize;
       eye[pos].msize         = eye[origin].msize;
@@ -608,23 +609,23 @@ find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
   int pos;
 
   memset(mx, 0, sizeof(mx));
-  DEBUG(DEBUG_MISCELLANEOUS, "find_eye_dragons: %1m %C\n", origin, eye_color);
+  DEBUG(goban, DEBUG_MISCELLANEOUS, "find_eye_dragons: %1m %C\n", origin, eye_color);
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] == eye_color
 	&& mx[dragon[pos].origin] == 0
-	&& ((ON_BOARD(SOUTH(pos))
+	&& ((ON_BOARD(goban, SOUTH(pos))
 	     && eye[SOUTH(pos)].origin == origin
 	     && !eye[SOUTH(pos)].marginal)
-	    || (ON_BOARD(WEST(pos))
+	    || (ON_BOARD(goban, WEST(pos))
 		&& eye[WEST(pos)].origin == origin
 		&& !eye[WEST(pos)].marginal)
-	    || (ON_BOARD(NORTH(pos))
+	    || (ON_BOARD(goban, NORTH(pos))
 		&& eye[NORTH(pos)].origin == origin
 		&& !eye[NORTH(pos)].marginal)
-	    || (ON_BOARD(EAST(pos))
+	    || (ON_BOARD(goban, EAST(pos))
 		&& eye[EAST(pos)].origin == origin
 		&& !eye[EAST(pos)].marginal))) {
-      DEBUG(DEBUG_MISCELLANEOUS, 
+      DEBUG(goban, DEBUG_MISCELLANEOUS, 
 	    "  dragon: %1m %1m\n", pos, dragon[pos].origin);
       mx[dragon[pos].origin] = 1;
       if (dragons != NULL && num_dragons < max_dragons)
@@ -649,40 +650,40 @@ print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
   int minj, maxj;
   int origin = eye[pos].origin;
 
-  gprintf("Eyespace at %1m: color=%C, esize=%d, msize=%d\n",
+  gprintf(goban, "Eyespace at %1m: color=%C, esize=%d, msize=%d\n",
 	  pos, eye[pos].color, eye[pos].esize, eye[pos].msize);
   
   for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
-    if (!ON_BOARD(pos2))
+    if (!ON_BOARD(goban, pos2))
       continue;
     
     if (eye[pos2].origin != pos) 
       continue;
     
     if (eye[pos2].marginal && IS_STONE(board[pos2]))
-      gprintf("%1m (X!)\n", pos2);
+      gprintf(goban, "%1m (X!)\n", pos2);
     else if (is_halfeye(heye, pos2) && IS_STONE(board[pos2])) {
       if (heye[pos2].value == 3.0)
-	gprintf("%1m (XH)\n", pos2);
+	gprintf(goban, "%1m (XH)\n", pos2);
       else
-	gprintf("%1m (XH) (topological eye value = %f)\n", pos2,
+	gprintf(goban, "%1m (XH) (topological eye value = %f)\n", pos2,
 		heye[pos2].value);
     }
     else if (!eye[pos2].marginal && IS_STONE(board[pos2]))
-      gprintf("%1m (X)\n", pos2);
+      gprintf(goban, "%1m (X)\n", pos2);
     else if (eye[pos2].marginal && board[pos2] == EMPTY)
-      gprintf("%1m (!)\n", pos2);
+      gprintf(goban, "%1m (!)\n", pos2);
     else if (is_halfeye(heye, pos2) && board[pos2] == EMPTY) {
       if (heye[pos2].value == 3.0)
-	gprintf("%1m (H)\n", pos2);
+	gprintf(goban, "%1m (H)\n", pos2);
       else
-	gprintf("%1m (H) (topological eye value = %f)\n", pos2,
+	gprintf(goban, "%1m (H) (topological eye value = %f)\n", pos2,
 		heye[pos2].value);
     }
     else
-      gprintf("%1m\n", pos2);
+      gprintf(goban, "%1m\n", pos2);
   }
-  gprintf("\n");
+  gprintf(goban, "\n");
   
   /* Determine the size of the eye. */
   mini = board_size;
@@ -707,27 +708,27 @@ print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
    * would be nice, but difficult to implement.
    */
   for (m = mini; m <= maxi; m++) {
-    gprintf(""); /* Get the indentation right. */
+    gprintf(goban, ""); /* Get the indentation right. */
     for (n = minj; n <= maxj; n++) {
       int pos2 = POS(m, n);
       if (eye[pos2].origin == origin) {
 	if (board[pos2] == EMPTY) {
 	  if (eye[pos2].marginal)
-	    gprintf("%o!");
+	    gprintf(goban, "%o!");
 	  else if (is_halfeye(heye, pos2))
-	    gprintf("%oh");
+	    gprintf(goban, "%oh");
 	  else
-	    gprintf("%o.");
+	    gprintf(goban, "%o.");
 	}
 	else if (is_halfeye(heye, pos2))
-	  gprintf("%oH");
+	  gprintf(goban, "%oH");
 	else
-	  gprintf("%oX");
+	  gprintf(goban, "%oX");
       }
       else
-	gprintf("%o ");
+	gprintf(goban, "%o ");
     }
-    gprintf("\n");
+    gprintf(goban, "\n");
   }
 }
 
@@ -756,7 +757,7 @@ compute_eyes(int pos, struct eyevalue *value,
 
   if (debug & DEBUG_EYES) {
     print_eye(eye, heye, pos);
-    DEBUG(DEBUG_EYES, "\n");
+    DEBUG(goban, DEBUG_EYES, "\n");
   }
   
   /* Look up the eye space in the graphs database. */
@@ -810,7 +811,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
     int k;
 
-    if (!ON_BOARD(pos2) || eye[pos2].origin != pos)
+    if (!ON_BOARD(goban, pos2) || eye[pos2].origin != pos)
       continue;
 
     if (eye[pos2].marginal || is_halfeye(heye, pos2)) {
@@ -831,10 +832,10 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
       if (board[neighbor] == eye[pos].color) {
 	if (!chainlinks[neighbor]) {
 	  bulk_score += 4;
-	  mark_string(neighbor, chainlinks, 1);
+	  mark_string(goban, neighbor, chainlinks, 1);
 	}
       }
-      else if (!ON_BOARD(neighbor))
+      else if (!ON_BOARD(goban, neighbor))
 	bulk_score += 2;
     }
   }
@@ -853,7 +854,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 
   if (debug & DEBUG_EYES) {
     print_eye(eye, heye, pos);
-    DEBUG(DEBUG_EYES, "\n");
+    DEBUG(goban, DEBUG_EYES, "\n");
   }
   
   /* Look up the eye space in the graphs database. */
@@ -863,10 +864,10 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 
     /* A single point eye which is part of a ko can't be trusted. */
     if (eye[pos].esize == 1
-	&& is_ko(pos, OTHER_COLOR(eye[pos].color), NULL))
+	&& is_ko(goban, pos, OTHER_COLOR(eye[pos].color), NULL))
       *pessimistic_min = 0;
 
-    DEBUG(DEBUG_EYES, "  graph matching - %s, pessimistic_min=%d\n",
+    DEBUG(goban, DEBUG_EYES, "  graph matching - %s, pessimistic_min=%d\n",
 	  eyevalue_to_string(value), *pessimistic_min);
   }
   
@@ -878,13 +879,13 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   else {
     guess_eye_space(pos, effective_eyesize, margins, bulk_score, eye,
 		    value, pessimistic_min); 
-    DEBUG(DEBUG_EYES, "  guess_eye - %s, pessimistic_min=%d\n",
+    DEBUG(goban, DEBUG_EYES, "  guess_eye - %s, pessimistic_min=%d\n",
 	  eyevalue_to_string(value), *pessimistic_min);
   }
 
   if (*pessimistic_min < 0) {
     *pessimistic_min = 0;
-    DEBUG(DEBUG_EYES, "  pessimistic min revised to 0\n");
+    DEBUG(goban, DEBUG_EYES, "  pessimistic min revised to 0\n");
   }
 
   /* An eyespace with at least two interior stones is assumed to be
@@ -892,7 +893,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
    */
   if (*pessimistic_min < 1 && interior_stones >= 2) {
     *pessimistic_min = 1;
-    DEBUG(DEBUG_EYES, "  pessimistic min revised to 1 (interior stones)\n");
+    DEBUG(goban, DEBUG_EYES, "  pessimistic min revised to 1 (interior stones)\n");
   }
 
   if (attack_point
@@ -910,7 +911,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
     float score = 0.0;
     
     for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
-      if (ON_BOARD(pos2) && eye[pos2].origin == pos) {
+      if (ON_BOARD(goban, pos2) && eye[pos2].origin == pos) {
 	float this_score = 0.0;
 	int this_attack_point = NO_MOVE;
 	int this_defense_point = NO_MOVE;
@@ -919,10 +920,10 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 	  this_attack_point = pos2;
 	  this_defense_point = pos2;
 
-	  if (is_self_atari(pos2, OTHER_COLOR(eye[pos].color)))
+	  if (is_self_atari(goban, pos2, OTHER_COLOR(eye[pos].color)))
 	    this_score -= 0.5;
 	  
-	  if (is_edge_vertex(pos2))
+	  if (is_edge_vertex(goban, pos2))
 	    this_score -= 0.1;
 	}
 	else if (is_halfeye(heye, pos2)) {
@@ -951,10 +952,10 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   }
 
   if (defense_point && *defense_point != NO_MOVE) {
-    ASSERT_ON_BOARD1(*defense_point);
+    ASSERT_ON_BOARD1(goban, *defense_point);
   }
   if (attack_point && *attack_point != NO_MOVE) {
-    ASSERT_ON_BOARD1(*attack_point);
+    ASSERT_ON_BOARD1(goban, *attack_point);
   }
 }
 
@@ -974,7 +975,7 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
       int threshold = (4 * (eye[pos].esize - 2)
 		       + (effective_eyesize - 8) * (effective_eyesize - 9));
 
-      DEBUG(DEBUG_EYES, "size: %d(%d), threshold: %d, bulk score: %d\n",
+      DEBUG(goban, DEBUG_EYES, "size: %d(%d), threshold: %d, bulk score: %d\n",
 	    eye[pos].esize, effective_eyesize, threshold, bulk_score);
 
       if (bulk_score > threshold && effective_eyesize < 15)
@@ -1067,7 +1068,7 @@ read_eye(int pos, int *attack_point, int *defense_point,
 
   /* Find ko half eyes and "combination" half eyes if any. */
   for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
-    if (ON_BOARD(pos2)
+    if (ON_BOARD(goban, pos2)
 	&& eye[pos2].origin == pos
 	&& heye[pos2].type == HALF_EYE) {
       if (combination_halfeye == NO_MOVE) {
@@ -1152,7 +1153,7 @@ read_eye(int pos, int *attack_point, int *defense_point,
       }
 
       if (min_eyes(value) != max_eyes(value)) {
-	ASSERT1(combination_attack || combination_defense, combination_halfeye);
+	ASSERT1(goban, combination_attack || combination_defense, combination_halfeye);
 	if (*attack_point == NO_MOVE) {
 	  *attack_point = combination_attack;
 	  if (*attack_point == NO_MOVE)
@@ -1235,8 +1236,8 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
   int best_score;
   int r;
 
-  gg_assert(attack_point != NULL);
-  gg_assert(defense_point != NULL);
+  gg_assert(goban, attack_point != NULL);
+  gg_assert(goban, defense_point != NULL);
     
   /* Set `eye_color' to the owner of the eye. */
   eye_color = eye[pos].color;
@@ -1249,7 +1250,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 
   /* Create list of eye vertices */
   for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
-    if (!ON_BOARD(pos2))
+    if (!ON_BOARD(goban, pos2))
       continue;
     if (eye[pos2].origin == pos) {
       vpos[eye_size] = pos2;
@@ -1259,15 +1260,15 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
       neighbors[eye_size] = eye[pos2].neighbors;
       if (0) {
 	if (marginal[eye_size])
-	  TRACE("(%1m)", vpos[eye_size]);
+	  TRACE(goban, "(%1m)", vpos[eye_size]);
 	else
-	  TRACE(" %1m ", vpos[eye_size]);
-	TRACE("\n");
+	  TRACE(goban, " %1m ", vpos[eye_size]);
+	TRACE(goban, "\n");
       }
       
-      if (is_corner_vertex(pos2))
+      if (is_corner_vertex(goban, pos2))
 	edge[eye_size] = 2;
-      else if (is_edge_vertex(pos2))
+      else if (is_edge_vertex(goban, pos2))
 	edge[eye_size] = 1;
       else 
 	edge[eye_size] = 0;
@@ -1313,7 +1314,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
       int ok = 1;
 
       if (0)
-	TRACE("q=%d: %d %d %d %d %d %d\n", 
+	TRACE(goban, "q=%d: %d %d %d %d %d %d\n", 
 	      q, map[0], map[1], map[2], map[3], map[4], map[5]);
 
       if (neighbors[mv] != gv->neighbors
@@ -1366,7 +1367,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	  break;
 
 	if (0)
-	  gprintf("  q=%d, esize=%d: %d %d %d %d %d\n",
+	  gprintf(goban, "  q=%d, esize=%d: %d %d %d %d %d\n",
 		  q, eye_size, 
 		  map[0], map[1], map[2], map[3], map[4]);
       }
@@ -1430,7 +1431,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	  }
 	}
 	
-	gg_assert(vp->num_attacks > 0 && vp->num_defenses > 0);
+	gg_assert(goban, vp->num_attacks > 0 && vp->num_defenses > 0);
 
 	/* We now have all vital attack and defense points listed but
          * we are also expected to single out of one of each to return
@@ -1466,7 +1467,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	  int apos = vp->attacks[k];
 	  int score = 0;
 	  for (r = 0; r < 8; r++)
-	    if (ON_BOARD(apos + delta[r])
+	    if (ON_BOARD(goban, apos + delta[r])
 		&& eye[apos + delta[r]].color == eye[pos].color
 		&& !eye[apos + delta[r]].marginal) {
 	      score++;
@@ -1494,7 +1495,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	    score += 2;
 	  
 	  if (0)
-	    gprintf("attack point %1m score %d\n", apos, score);
+	    gprintf(goban, "attack point %1m score %d\n", apos, score);
 	  
 	  if (score > best_score) {
 	    *attack_point = apos;
@@ -1507,7 +1508,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	  int dpos = vp->defenses[k];
 	  int score = 0;
 	  for (r = 0; r < 8; r++)
-	    if (ON_BOARD(dpos + delta[r])
+	    if (ON_BOARD(goban, dpos + delta[r])
 		&& eye[dpos + delta[r]].color == eye[pos].color
 		&& !eye[dpos + delta[r]].marginal) {
 	      score++;
@@ -1529,7 +1530,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	    score += 2;
 
 	  if (0)
-	    gprintf("defense point %1m score %d\n", dpos, score);
+	    gprintf(goban, "defense point %1m score %d\n", dpos, score);
 	  
 	  if (score > best_score) {
 	    *defense_point = dpos;
@@ -1537,12 +1538,12 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	  }
 	}
 	
-	DEBUG(DEBUG_EYES, "  vital points: %1m (attack) %1m (defense)\n",
+	DEBUG(goban, DEBUG_EYES, "  vital points: %1m (attack) %1m (defense)\n",
 	      *attack_point, *defense_point);
-	DEBUG(DEBUG_EYES, "  pattern matched:  %d\n", graphs[graph].patnum);
+	DEBUG(goban, DEBUG_EYES, "  pattern matched:  %d\n", graphs[graph].patnum);
 	
       }
-      TRACE("eye space at %1m of type %d\n", pos, graphs[graph].patnum);
+      TRACE(goban, "eye space at %1m of type %d\n", pos, graphs[graph].patnum);
       
       return eye_color;
     }
@@ -1619,8 +1620,8 @@ add_false_eye(int pos, struct eye_data eye[BOARDMAX],
 	      struct half_eye_data heye[BOARDMAX])
 {
   int k;
-  ASSERT1(heye[pos].type == FALSE_EYE, pos);
-  DEBUG(DEBUG_EYES, "false eye found at %1m\n", pos);
+  ASSERT1(goban, heye[pos].type == FALSE_EYE, pos);
+  DEBUG(goban, DEBUG_EYES, "false eye found at %1m\n", pos);
 
   if (eye[pos].color == GRAY || eye[pos].marginal != 0)
     return;
@@ -1628,7 +1629,7 @@ add_false_eye(int pos, struct eye_data eye[BOARDMAX],
   eye[pos].marginal = 1;
   eye[eye[pos].origin].msize++;
   for (k = 0; k < 4; k++)
-    if (ON_BOARD(pos + delta[k])
+    if (ON_BOARD(goban, pos + delta[k])
 	&& eye[pos + delta[k]].origin == eye[pos].origin)
       eye[pos + delta[k]].marginal_neighbors++;
   propagate_eye(eye[pos].origin, eye);
@@ -1706,7 +1707,7 @@ find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     /* skip eyespaces which owl doesn't want to be searched */
-    if (!ON_BOARD(pos) || (find_mask && find_mask[eye[pos].origin] <= 1))
+    if (!ON_BOARD(goban, pos) || (find_mask && find_mask[eye[pos].origin] <= 1))
       continue;
     
     /* skip every vertex which can't be a false or half eye */
@@ -1720,17 +1721,17 @@ find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
       /* false eye */
       heye[pos].type = FALSE_EYE;
       if (eye[pos].esize == 1
-          || is_legal(pos, OTHER_COLOR(color))
+          || is_legal(goban, pos, OTHER_COLOR(color))
           || board[pos] == OTHER_COLOR(color))
         add_false_eye(pos, eye, heye);
     }
     else if (sum > 2.0) {
       /* half eye */
       heye[pos].type = HALF_EYE;
-      ASSERT1(heye[pos].num_attacks > 0, pos);
-      ASSERT_ON_BOARD1(heye[pos].attack_point[0]);
-      ASSERT1(heye[pos].num_defenses > 0, pos);
-      ASSERT_ON_BOARD1(heye[pos].defense_point[0]);
+      ASSERT1(goban, heye[pos].num_attacks > 0, pos);
+      ASSERT_ON_BOARD1(goban, heye[pos].attack_point[0]);
+      ASSERT1(goban, heye[pos].num_defenses > 0, pos);
+      ASSERT_ON_BOARD1(goban, heye[pos].defense_point[0]);
     }
   }
 }
@@ -1865,8 +1866,8 @@ topological_eye(int pos, int color,
      *           same eyespace.
      */
     if (val < 2.0 && board[pos] == EMPTY && board[diag] == OTHER_COLOR(color)
-	&& !is_edge_vertex(pos) && neighbor_of_string(pos, diag)
-	&& countstones(diag) >= 3) {
+	&& !is_edge_vertex(goban, pos) && neighbor_of_string(goban, pos, diag)
+	&& countstones(goban, diag) >= 3) {
       int strings[3];
       int string_count;
       int s;
@@ -1878,9 +1879,9 @@ topological_eye(int pos, int color,
 	if (board[str] != color)
 	  continue;
 
-	ASSERT1(string_count < 3, pos);
+	ASSERT1(goban, string_count < 3, pos);
 	for (s = 0; s < string_count; s++)
-	  if (same_string(str, strings[s]))
+	  if (same_string(goban, str, strings[s]))
 	    break;
 	if (s != string_count)
 	  continue;
@@ -1893,7 +1894,7 @@ topological_eye(int pos, int color,
 	  int adj_eye_count;
 	  int lib_count;
 	  adj_eye_count = 0;
-	  lib_count = findlib(strings[s], MAX_LIBERTIES, libs);
+	  lib_count = findlib(goban, strings[s], MAX_LIBERTIES, libs);
 	  if (lib_count > MAX_LIBERTIES)
 	    continue;
 
@@ -1916,8 +1917,8 @@ topological_eye(int pos, int color,
        * point.
        */
       if (attack_point != NO_MOVE && defense_point != NO_MOVE) {
-	ASSERT_ON_BOARD1(attack_point);
-	ASSERT_ON_BOARD1(defense_point);
+	ASSERT_ON_BOARD1(goban, attack_point);
+	ASSERT_ON_BOARD1(goban, defense_point);
 	/* Store these in sorted (descending) order. We remap val
          * differently for attack and defense points according to:
 	 *
@@ -2103,7 +2104,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
    if (my_eye[pos].color == color
        && !my_eye[pos].marginal
        && my_eye[pos].marginal_neighbors < 2
-       && !(board[pos] == EMPTY && does_capture_something(pos, other)))
+       && !(board[pos] == EMPTY && does_capture_something(goban, pos, other)))
     return 0.0;
 
   if (board[pos] == EMPTY) {
@@ -2155,7 +2156,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
 	  int diagonal = pos + delta[k];
 	  int lib;
 
-	  if (board[diagonal] == other && findlib(diagonal, 1, &lib) == 1) {
+	  if (board[diagonal] == other && findlib(goban, diagonal, 1, &lib) == 1) {
 	    if (lib != pos && does_secure(color, lib, pos)) {
 	      value = 1.0;
 	      apos = lib;
@@ -2209,8 +2210,8 @@ evaluate_diagonal_intersection(int m, int n, int color,
      * be equally valid. It's not good that we make an arbitrary
      * choice at this point.
      */
-    ASSERT_ON_BOARD1(apos);
-    ASSERT_ON_BOARD1(dpos);
+    ASSERT_ON_BOARD1(goban, apos);
+    ASSERT_ON_BOARD1(goban, dpos);
     /* Notice:
      * The point to ATTACK the half eye is the point which DEFENDS
      * the stones on the diagonal intersection and vice versa. Thus
@@ -2242,12 +2243,12 @@ obvious_false_eye(int pos, int color)
     int di = deltai[k];
     int dj = deltaj[k];
     
-    if (!ON_BOARD2(i+di, j) && !ON_BOARD2(i, j+dj))
+    if (!ON_BOARD2(goban, i+di, j) && !ON_BOARD2(goban, i, j+dj))
       diagonal_sum--;
     
-    if (!ON_BOARD2(i+di, j+dj))
+    if (!ON_BOARD2(goban, i+di, j+dj))
       diagonal_sum++;
-    else if (BOARD(i+di, j+dj) == OTHER_COLOR(color)
+    else if (BOARD(goban, i+di, j+dj) == OTHER_COLOR(color)
 	     && !attack(POS(i+di, j+dj), NULL))
       diagonal_sum += 2;
   }
@@ -2390,26 +2391,26 @@ test_eyeshape(int eyesize, int *eye_vertices)
   int defense_code;
   int defense_point;
   int save_verbose;
-  struct board_state starting_position;
+  Board_state starting_position;
 
   /* Clear the board and initialize the engine properly. */
-  clear_board();
+  clear_board(goban);
   reset_engine();
 
   /* Mark the eyespace in the mx array. */
   memset(mx, 0, sizeof(mx));
   for (k = 0; k < eyesize; k++) {
-    ASSERT_ON_BOARD1(eye_vertices[k]);
+    ASSERT_ON_BOARD1(goban, eye_vertices[k]);
     mx[eye_vertices[k]] = 1;
   }
 
   /* Play white stones surrounding the eyespace, including diagonals. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos) || mx[pos] == 1)
+    if (!ON_BOARD(goban, pos) || mx[pos] == 1)
       continue;
     for (k = 0; k < 8; k++) {
-      if (ON_BOARD(pos + delta[k]) && mx[pos + delta[k]] == 1) {
-	play_move(pos, WHITE);
+      if (ON_BOARD(goban, pos + delta[k]) && mx[pos + delta[k]] == 1) {
+	play_move(goban, pos, WHITE);
 	str = pos;
 	break;
       }
@@ -2420,12 +2421,12 @@ test_eyeshape(int eyesize, int *eye_vertices)
    * liberties empty.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (mx[pos] == 1 || board[pos] != EMPTY || liberty_of_string(pos, str))
+    if (mx[pos] == 1 || board[pos] != EMPTY || liberty_of_string(goban, pos, str))
       continue;
     for (k = 0; k < 8; k++) {
-      if (ON_BOARD(pos + delta[k])
-	  && liberty_of_string(pos + delta[k], str)) {
-	play_move(pos, BLACK);
+      if (ON_BOARD(goban, pos + delta[k])
+	  && liberty_of_string(goban, pos + delta[k], str)) {
+	play_move(goban, pos, BLACK);
 	break;
       }
     }
@@ -2441,7 +2442,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
   
   
   /* Store this position so we can come back to it. */
-  store_board(&starting_position);
+  store_board(goban, &starting_position);
 
   /* Loop over all configurations of black stones inserted in the
    * eyeshape. There are N = 2^(eyesize) configurations and we can
@@ -2452,15 +2453,15 @@ test_eyeshape(int eyesize, int *eye_vertices)
     int valid = 1;
     int internal_stones = 0;
     
-    restore_board(&starting_position);
+    restore_board(goban, &starting_position);
     /* Play the stones for this configuration. */
     for (k = 0; k < eyesize; k++) {
       if (n & (1 << k)) {
-	if (!is_legal(eye_vertices[k], BLACK)) {
+	if (!is_legal(goban, eye_vertices[k], BLACK)) {
 	  valid = 0;
 	  break;
 	}
-	play_move(eye_vertices[k], BLACK);
+	play_move(goban, eye_vertices[k], BLACK);
 	internal_stones++;
       }
     }
@@ -2485,11 +2486,11 @@ test_eyeshape(int eyesize, int *eye_vertices)
        */
       for (k = 0; k < eyesize; k++) {
 	if (board[eye_vertices[k]] == EMPTY
-	    && is_legal(eye_vertices[k], BLACK)
+	    && is_legal(goban, eye_vertices[k], BLACK)
 	    && owl_does_attack(eye_vertices[k], str, NULL)) {
-	  gprintf("%1m alive, but %1m attacks:\n", str, eye_vertices[k]);
+	  gprintf(goban, "%1m alive, but %1m attacks:\n", str, eye_vertices[k]);
 	  showboard(0);
-	  gprintf("\n");
+	  gprintf(goban, "\n");
 	}
       }
 
@@ -2501,7 +2502,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
 	for (k = 0; k < eyesize; k++) {
 	  if (board[eye_vertices[k]] == EMPTY
 	      && !owl_does_defend(eye_vertices[k], str, NULL)) {
-	    gprintf("%1m alive, but almost filled with nakade:\n", str);
+	    gprintf(goban, "%1m alive, but almost filled with nakade:\n", str);
 	    showboard(0);
 	  }
 	}
@@ -2515,11 +2516,11 @@ test_eyeshape(int eyesize, int *eye_vertices)
 	 */
 	for (k = 0; k < eyesize; k++) {
 	  if (board[eye_vertices[k]] == EMPTY
-	      && is_legal(eye_vertices[k], WHITE)
+	      && is_legal(goban, eye_vertices[k], WHITE)
 	      && owl_does_defend(eye_vertices[k], str, NULL)) {
-	    gprintf("%1m dead, but %1m defends:\n", str, eye_vertices[k]);
+	    gprintf(goban, "%1m dead, but %1m defends:\n", str, eye_vertices[k]);
 	    showboard(0);
-	    gprintf("\n");
+	    gprintf(goban, "\n");
 	  }
 	}
       }
@@ -2528,22 +2529,22 @@ test_eyeshape(int eyesize, int *eye_vertices)
          * attack and defense points.
 	 */
 	if (board[attack_point] != EMPTY
-	    || !is_legal(attack_point, BLACK)) {
-	  gprintf("Bad attack point %1m:\n", attack_point);
+	    || !is_legal(goban, attack_point, BLACK)) {
+	  gprintf(goban, "Bad attack point %1m:\n", attack_point);
 	  showboard(0);
 	}
 	else if (!owl_does_attack(attack_point, str, NULL)) {
-	  gprintf("Attack point %1m failed:\n", attack_point);
+	  gprintf(goban, "Attack point %1m failed:\n", attack_point);
 	  showboard(0);
 	}
 
 	if (board[defense_point] != EMPTY
-	    || !is_legal(defense_point, WHITE)) {
-	  gprintf("Bad defense point %1m:\n", defense_point);
+	    || !is_legal(goban, defense_point, WHITE)) {
+	  gprintf(goban, "Bad defense point %1m:\n", defense_point);
 	  showboard(0);
 	}
 	else if (!owl_does_defend(defense_point, str, NULL)) {
-	  gprintf("Defense point %1m failed:\n", defense_point);
+	  gprintf(goban, "Defense point %1m failed:\n", defense_point);
 	  showboard(0);
 	}
       }
@@ -2675,7 +2676,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
  * 3 - result has been computed and was a success (1)
  */
 
-/* Like trymove() except that it does a superko check. This does,
+/* Like trymove(goban) except that it does a superko check. This does,
  * however, only disallow repetition (besides simple ko) if the move
  * does not capture any stones.
  */
@@ -2684,19 +2685,19 @@ eyegraph_trymove(int pos, int color, const char *message, int str)
 {
   static Hash_data remembered_board_hashes[MAXSTACK];
   int k;
-  int does_capture = does_capture_something(pos, color);
+  int does_capture = does_capture_something(goban, pos, color);
   
-  remembered_board_hashes[stackp] = board_hash;
+  remembered_board_hashes[stackp] = goban->board_hash;
   
-  if (!trymove(pos, color, message, str))
+  if (!trymove(goban, pos, color, message, str))
     return 0;
 
   if (does_capture)
     return 1;
 
   for (k = 0; k < stackp; k++)
-    if (hashdata_is_equal(board_hash, remembered_board_hashes[k])) {
-      popgo();
+    if (hashdata_is_equal(goban->board_hash, remembered_board_hashes[k])) {
+      popgo(goban);
       return 0;
     }
 
@@ -2715,10 +2716,10 @@ eyegraph_is_margin_or_outer_liberty(int vertex)
   for (k = 0; k < 4; k++) {
     if (board[vertex + delta[k]] == BLACK) {
       eyes = 0;
-      num_libs = findlib(vertex + delta[k], MAXLIBS, libs);
+      num_libs = findlib(goban, vertex + delta[k], MAXLIBS, libs);
       
       for (r = 0; r < num_libs; r++)
-	if (is_suicide(libs[r], WHITE))
+	if (is_suicide(goban, libs[r], WHITE))
 	  eyes++;
       
       if (eyes >= 2)
@@ -2761,7 +2762,7 @@ eyegraph_order_moves(int num_vertices, int *vertices, int color_to_move, int *mo
 	score = -10; /* outer liberty */
     }
 
-    if (accuratelib(move, color_to_move, 2, NULL) == 1)
+    if (accuratelib(goban, move, color_to_move, 2, NULL) == 1)
       score -= 3;
     
     for (r = 0; r < 4; r++) {
@@ -2816,17 +2817,17 @@ white_area(int mx[BOARDMAX], int pos, int up, int right, int marginpos,
 {
   int u, v;
   int k;
-  int edge = is_edge_vertex(marginpos);
+  int edge = is_edge_vertex(goban, marginpos);
 
   for (k = 1; k < distance; k++)
-    if (!ON_BOARD(marginpos + k * up)
+    if (!ON_BOARD(goban, marginpos + k * up)
 	|| mx[marginpos + k * up] != WHITE)
       return 0;
 
   for (u = -1; u <= 4; u++)
     for (v = -1; v <= 4; v++) {
       int pos2 = pos + u * up + v * right;
-      if (!ON_BOARD(pos2)) {
+      if (!ON_BOARD(goban, pos2)) {
 	if (!edge)
 	  return 0;
 	else if (u >= 0 && u <= 3 && v >= 0 && v <= 3)
@@ -2889,7 +2890,7 @@ tactical_life_attack(int str, int num_vertices, int *vertices,
 
   if (0) {
     showboard(0);
-    gprintf("%d %d (%d)\n", hash, cached_result, results[hash]);
+    gprintf(goban, "%d %d (%d)\n", hash, cached_result, results[hash]);
   }
   
   if (cached_result == 2)
@@ -2917,7 +2918,7 @@ tactical_life_attack(int str, int num_vertices, int *vertices,
       else
 	result = !tactical_life_defend(str, num_vertices, vertices, results);
       
-      popgo();
+      popgo(goban);
 
       if (result == 1) {
 	/* Store the result (success) in the cache. */
@@ -2947,7 +2948,7 @@ tactical_life_defend(int str, int num_vertices, int *vertices,
   /* Compute hash value to index the result cache with. */
   for (k = 0; k < num_vertices; k++) {
     hash *= 3;
-    ASSERT1(board[vertices[k]] <= 2, vertices[k]);
+    ASSERT1(goban, board[vertices[k]] <= 2, vertices[k]);
     hash += board[vertices[k]];
   }
   hash *= 2;
@@ -2958,7 +2959,7 @@ tactical_life_defend(int str, int num_vertices, int *vertices,
 
   if (0) {
     showboard(0);
-    gprintf("%d %d (%d)\n", hash, cached_result, results[hash]);
+    gprintf(goban, "%d %d (%d)\n", hash, cached_result, results[hash]);
   }
 
   if (cached_result == 2)
@@ -2975,13 +2976,13 @@ tactical_life_defend(int str, int num_vertices, int *vertices,
   num_moves = eyegraph_order_moves(num_vertices, vertices, board[str], moves);
   for (k = 0; k < num_moves; k++) {
     int move = moves[k];
-    if ((!is_suicide(move, OTHER_COLOR(board[str]))
-	 || does_capture_something(move, board[str]))
+    if ((!is_suicide(goban, move, OTHER_COLOR(board[str]))
+	 || does_capture_something(goban, move, board[str]))
 	&& eyegraph_trymove(move, board[str], "tactical_life_defend", str)) {
       /* We were successful if no attack can be found. */
       result = !tactical_life_attack(str, num_vertices, vertices, results);
       
-      popgo();
+      popgo(goban);
 
       if (result == 1) {
 	/* Store the result (success) in the cache. */
@@ -3019,7 +3020,7 @@ tactical_life(int have_eye, int num_vertices, int *vertices,
   int num_moves;
   int moves[BOARDMAX];
 
-  gg_assert(attack_code != NULL && defense_code != NULL);
+  gg_assert(goban, attack_code != NULL && defense_code != NULL);
 
   /* We know that the large white group includes A18. This is the
    * vertex we test to determine whether the white stones have been
@@ -3076,7 +3077,7 @@ tactical_life(int have_eye, int num_vertices, int *vertices,
 	  if (board[str] == EMPTY
 	      || !tactical_life_defend(str, num_vertices, vertices, results))
 	    attack_points[(*num_attacks)++] = move;
-	  popgo();
+	  popgo(goban);
 	}
       }
     }
@@ -3090,7 +3091,7 @@ tactical_life(int have_eye, int num_vertices, int *vertices,
 	if (eyegraph_trymove(move, board[str], "tactical_life-C", str)) {
 	  if (!tactical_life_attack(str, num_vertices, vertices, results))
 	    defense_points[(*num_defenses)++] = move;
-	  popgo();
+	  popgo(goban);
 	}
       }
     }
@@ -3098,7 +3099,7 @@ tactical_life(int have_eye, int num_vertices, int *vertices,
 
   /* Unfill the extra eye if we didn't use it. */
   if (!have_eye)
-    popgo();
+    popgo(goban);
 }
 
 /* Determine the eye value of the eyespace for the big white group on
@@ -3185,7 +3186,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 	      sgftreeAddComment(sgf_dumptree, "Ko threat to remove one eye.\n");
 	  }
 	}
-	popgo();
+	popgo(goban);
       }
     }
     set_eyevalue(result, a, 2, 2, 2);
@@ -3239,7 +3240,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 	  }
 	  else if (a == 1)
 	    vital_attacks[(*num_vital_attacks)++] = move;
-	  popgo();
+	  popgo(goban);
 	}
       }
       set_eyevalue(result, a, 1, 2, 2);
@@ -3291,7 +3292,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 		sgftreeAddComment(sgf_dumptree, "Attacking ko threat.\n");
 	    }
 	  }
-	  popgo();
+	  popgo(goban);
 	}
       }
       
@@ -3315,7 +3316,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 		sgftreeAddComment(sgf_dumptree, "Defending ko threat.\n");
 	    }
 	  }
-	  popgo();
+	  popgo(goban);
 	}
       }
       set_eyevalue(result, a, 1, 1, d);
@@ -3359,7 +3360,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 	  }
 	  else if (d == 1)
 	    vital_defenses[(*num_vital_defenses)++] = move;
-	  popgo();
+	  popgo(goban);
 	}
       }
       set_eyevalue(result, 0, 0, 1, d);
@@ -3408,7 +3409,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 				  "Ko threat to make one eye.\n");
 	    }
 	  }
-	  popgo();
+	  popgo(goban);
 	}
       }
       set_eyevalue(result, 0, 0, 0, d);
@@ -3447,12 +3448,12 @@ add_margins(int num_margins, int *margins, int mx[BOARDMAX])
     int up = delta[k];
     int right = delta[(k + 1) % 4];
     
-    if (!ON_BOARD(pos + up))
+    if (!ON_BOARD(goban, pos + up))
       continue;
     
     if (mx[pos + up] == WHITE
-	&& (!ON_BOARD(pos + up + right) || mx[pos + up + right] == WHITE)
-	&& (!ON_BOARD(pos + up - right) || mx[pos + up - right] == WHITE)) {
+	&& (!ON_BOARD(goban, pos + up + right) || mx[pos + up + right] == WHITE)
+	&& (!ON_BOARD(goban, pos + up - right) || mx[pos + up - right] == WHITE)) {
       for (i = -3; i <= 0; i++) {
 	for (j = 2; j < 6; j++) {
 	  if (white_area(mx, pos + j * up + i * right, up, right, pos, j)) {
@@ -3528,13 +3529,13 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
   unsigned char *tactical_life_results;
 
   if (0)
-    gprintf("Analyze eyegraph %s\n", coded_eyegraph);
+    gprintf(goban, "Analyze eyegraph %s\n", coded_eyegraph);
   
   /* Mark the eyespace in the mx array. We construct the position in
    * the mx array and copy it to the actual board later.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos))
+    if (ON_BOARD(goban, pos))
       mx[pos] = WHITE;
 
   /* Find out the size of the eye graph pattern so that we can center
@@ -3601,7 +3602,7 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
     if (c == '!' || c == '@' || c == '(' || c == ')' || c == '$')
       margins[num_margins++] = POS(i, j);
     if (c != '|' && c != '-' && c != '+' && c != '%'
-	&& ON_BOARD(POS(i, j)) && mx[POS(i, j)] != WHITE)
+	&& ON_BOARD(goban, POS(i, j)) && mx[POS(i, j)] != WHITE)
       vertices[num_vertices++] = POS(i, j);
     j++;
   }
@@ -3624,7 +3625,7 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
   mx[SW(pos)] = EMPTY;
   mx[SOUTH(pos)] = BLACK;
   mx[SE(pos)] = BLACK;
-  if (ON_BOARD(NN(pos)))
+  if (ON_BOARD(goban, NN(pos)))
     mx[NN(pos)] = EMPTY;
   else
     mx[SS(pos)] = EMPTY;
@@ -3632,7 +3633,7 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
   /* Add the two outer liberties in the lower left or upper right to
    * the list of vertices.
    */
-  if (ON_BOARD(NN(pos))) {
+  if (ON_BOARD(goban, NN(pos))) {
     vertices[num_vertices++] = NE(pos);
     vertices[num_vertices++] = NN(pos);
   }
@@ -3649,13 +3650,13 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
     return 0;
 
   /* Copy the mx array over to the board. */
-  clear_board();
+  clear_board(goban);
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos)) {
+    if (ON_BOARD(goban, pos)) {
       if (mx[pos] == WHITE)
-	add_stone(pos, WHITE);
+	add_stone(goban, pos, WHITE);
       else if (mx[pos] == BLACK)
-	add_stone(pos, BLACK);
+	add_stone(goban, pos, BLACK);
     }
 
   if (verbose)
@@ -3665,7 +3666,7 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
    * the playable vertices.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (board[pos] == WHITE && !same_string(pos, POS(1, 0))) {
+    if (board[pos] == WHITE && !same_string(goban, pos, POS(1, 0))) {
       vertices[num_vertices] = vertices[num_vertices - 1];
       vertices[num_vertices - 1] = vertices[num_vertices - 2];
       vertices[num_vertices - 2] = vertices[num_vertices - 3];
@@ -3675,19 +3676,19 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
 
   if (verbose) {
     int k;
-    gprintf("\nPlayable vertices:\n");
+    gprintf(goban, "\nPlayable vertices:\n");
     for (k = 0; k < num_vertices; k++)
-      gprintf("%1m ", vertices[k]);
-    gprintf("\n\n");
+      gprintf(goban, "%1m ", vertices[k]);
+    gprintf(goban, "\n\n");
   }
   
   /* Disable this test if you need to evaluate larger eyespaces, have
    * no shortage of memory, and know what you're doing.
    */
   if (num_vertices > 17) {
-    gprintf("analyze_eyegraph: too large eyespace, %d vertices\n",
+    gprintf(goban, "analyze_eyegraph: too large eyespace, %d vertices\n",
 	    num_vertices);
-    gg_assert(num_vertices <= 17);
+    gg_assert(goban, num_vertices <= 17);
   }
 
   /* The cache must have 2*3^num_vertices entries. */
@@ -3698,8 +3699,8 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
   /* Allocate memory for the cache. */
   tactical_life_results = malloc(table_size);
   if (!tactical_life_results) {
-    gprintf("analyze_eyegraph: failed to allocate %d bytes\n", table_size);
-    gg_assert(tactical_life_results != NULL);
+    gprintf(goban, "analyze_eyegraph: failed to allocate %d bytes\n", table_size);
+    gg_assert(goban, tactical_life_results != NULL);
   }
   memset(tactical_life_results, 0, table_size);
 
@@ -3716,11 +3717,11 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
   free(tactical_life_results);
 
   if (verbose) {
-    gprintf("Eyevalue: %s\n", eyevalue_to_string(value));
+    gprintf(goban, "Eyevalue: %s\n", eyevalue_to_string(value));
     for (k = 0; k < num_vital_attacks; k++)
-      gprintf("  vital attack point %1m\n", vital_attacks[k]);
+      gprintf(goban, "  vital attack point %1m\n", vital_attacks[k]);
     for (k = 0; k < num_vital_defenses; k++)
-      gprintf("  vital defense point %1m\n", vital_defenses[k]);
+      gprintf(goban, "  vital defense point %1m\n", vital_defenses[k]);
   }
 
   /* Encode the attack and defense points with symbols in the mg[] array. */

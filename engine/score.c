@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <string.h>
 #include "liberty.h"
@@ -67,13 +68,13 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX], int color)
   int critical_found = 0;
   
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-    if (!ON_BOARD(ii))
+    if (!ON_BOARD(goban, ii))
       continue;
 
     if (board[ii] && dragon[ii].status == CRITICAL
 	&& DRAGON2(ii).safety != INESSENTIAL) {
       critical_found = 1;
-      DEBUG(DEBUG_SCORING, "critical dragon found at %1m\n", ii);
+      DEBUG(goban, DEBUG_SCORING, "critical dragon found at %1m\n", ii);
     }
     if (board[ii] == WHITE && !captured_territory(ii, color))
       gb[ii] = 128;
@@ -87,36 +88,36 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX], int color)
   memcpy(work, gb, sizeof(work));
   for (n = 0; n < dilations; n++) {
     for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-      if (!ON_BOARD(ii))
+      if (!ON_BOARD(goban, ii))
 	continue;
       
       if (gb[ii] >= 0
-	  && (!ON_BOARD(SOUTH(ii)) || gb[SOUTH(ii)] >= 0)
-	  && (!ON_BOARD(WEST(ii))  || gb[WEST(ii)]  >= 0)
-	  && (!ON_BOARD(NORTH(ii)) || gb[NORTH(ii)] >= 0)
-	  && (!ON_BOARD(EAST(ii))  || gb[EAST(ii)]  >= 0)) {
-	if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] > 0)
+	  && (!ON_BOARD(goban, SOUTH(ii)) || gb[SOUTH(ii)] >= 0)
+	  && (!ON_BOARD(goban, WEST(ii))  || gb[WEST(ii)]  >= 0)
+	  && (!ON_BOARD(goban, NORTH(ii)) || gb[NORTH(ii)] >= 0)
+	  && (!ON_BOARD(goban, EAST(ii))  || gb[EAST(ii)]  >= 0)) {
+	if (ON_BOARD(goban, SOUTH(ii)) && gb[SOUTH(ii)] > 0)
 	  work[ii]++;
-	if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  > 0)
+	if (ON_BOARD(goban, WEST(ii))  && gb[WEST(ii)]  > 0)
 	  work[ii]++;
-	if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] > 0)
+	if (ON_BOARD(goban, NORTH(ii)) && gb[NORTH(ii)] > 0)
 	  work[ii]++;
-	if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  > 0)
+	if (ON_BOARD(goban, EAST(ii))  && gb[EAST(ii)]  > 0)
 	  work[ii]++;
       }
 	
       if (gb[ii] <= 0
-	  && (!ON_BOARD(SOUTH(ii)) || gb[SOUTH(ii)] <= 0)
-	  && (!ON_BOARD(WEST(ii))  || gb[WEST(ii)]  <= 0)
-	  && (!ON_BOARD(NORTH(ii)) || gb[NORTH(ii)] <= 0)
-	  && (!ON_BOARD(EAST(ii))  || gb[EAST(ii)]  <= 0)) {
-	if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] < 0)
+	  && (!ON_BOARD(goban, SOUTH(ii)) || gb[SOUTH(ii)] <= 0)
+	  && (!ON_BOARD(goban, WEST(ii))  || gb[WEST(ii)]  <= 0)
+	  && (!ON_BOARD(goban, NORTH(ii)) || gb[NORTH(ii)] <= 0)
+	  && (!ON_BOARD(goban, EAST(ii))  || gb[EAST(ii)]  <= 0)) {
+	if (ON_BOARD(goban, SOUTH(ii)) && gb[SOUTH(ii)] < 0)
 	  work[ii]--;
-	if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  < 0)
+	if (ON_BOARD(goban, WEST(ii))  && gb[WEST(ii)]  < 0)
 	  work[ii]--;
-	if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] < 0)
+	if (ON_BOARD(goban, NORTH(ii)) && gb[NORTH(ii)] < 0)
 	  work[ii]--;
-	if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  < 0)
+	if (ON_BOARD(goban, EAST(ii))  && gb[EAST(ii)]  < 0)
 	  work[ii]--;
       }
     }
@@ -126,28 +127,28 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX], int color)
   /* erode */
   for (n = 0; n < erosions; n++) {
     for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-      if (!ON_BOARD(ii))
+      if (!ON_BOARD(goban, ii))
 	continue;
 
       if (work[ii] > 0) {
-	if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] <= 0)
+	if (ON_BOARD(goban, SOUTH(ii)) && gb[SOUTH(ii)] <= 0)
 	  work[ii]--;
-	if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  <= 0 && work[ii] > 0)
+	if (ON_BOARD(goban, WEST(ii))  && gb[WEST(ii)]  <= 0 && work[ii] > 0)
 	  work[ii]--;
-	if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] <= 0 && work[ii] > 0)
+	if (ON_BOARD(goban, NORTH(ii)) && gb[NORTH(ii)] <= 0 && work[ii] > 0)
 	  work[ii]--;
-	if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  <= 0 && work[ii] > 0)
+	if (ON_BOARD(goban, EAST(ii))  && gb[EAST(ii)]  <= 0 && work[ii] > 0)
 	  work[ii]--;
       }
       
       if (work[ii] < 0) {
-	if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] >= 0)
+	if (ON_BOARD(goban, SOUTH(ii)) && gb[SOUTH(ii)] >= 0)
 	  work[ii]++;
-	if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  >= 0 && work[ii] < 0)
+	if (ON_BOARD(goban, WEST(ii))  && gb[WEST(ii)]  >= 0 && work[ii] < 0)
 	  work[ii]++;
-	if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] >= 0 && work[ii] < 0)
+	if (ON_BOARD(goban, NORTH(ii)) && gb[NORTH(ii)] >= 0 && work[ii] < 0)
 	  work[ii]++;
-	if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  >= 0 && work[ii] < 0)
+	if (ON_BOARD(goban, EAST(ii))  && gb[EAST(ii)]  >= 0 && work[ii] < 0)
 	  work[ii]++;
       }
     }
@@ -187,38 +188,38 @@ close_bubbles(int gb[BOARDMAX])
       int black_neighbor = 0;
       int new_color = 0;
       
-      if (!ON_BOARD(ii) || gb[ii] || bubbles[ii] == GRAY)
+      if (!ON_BOARD(goban, ii) || gb[ii] || bubbles[ii] == GRAY)
 	continue;
 	
       /* If any neighbor is gray, mark the spot gray */
-      if ((ON_BOARD(SOUTH(ii)) && bubbles[SOUTH(ii)] == GRAY)
-	  || (ON_BOARD(WEST(ii)) && bubbles[WEST(ii)] == GRAY)
-	  || (ON_BOARD(NORTH(ii)) && bubbles[NORTH(ii)] == GRAY)
-	  || (ON_BOARD(EAST(ii)) && bubbles[EAST(ii)] == GRAY)) {
+      if ((ON_BOARD(goban, SOUTH(ii)) && bubbles[SOUTH(ii)] == GRAY)
+	  || (ON_BOARD(goban, WEST(ii)) && bubbles[WEST(ii)] == GRAY)
+	  || (ON_BOARD(goban, NORTH(ii)) && bubbles[NORTH(ii)] == GRAY)
+	  || (ON_BOARD(goban, EAST(ii)) && bubbles[EAST(ii)] == GRAY)) {
 	found_one = 1;
 	bubbles[ii] = GRAY;
       }
       else {
 	/* Look for white neighbors, including the spot itself */
 	if (bubbles[ii] == WHITE
-	    || (ON_BOARD(SOUTH(ii))
+	    || (ON_BOARD(goban, SOUTH(ii))
 		&& (gb[SOUTH(ii)] > 0 || bubbles[SOUTH(ii)] == WHITE))
-	    || (ON_BOARD(WEST(ii))
+	    || (ON_BOARD(goban, WEST(ii))
 		&& (gb[WEST(ii)] > 0 || bubbles[WEST(ii)] == WHITE))
-	    || (ON_BOARD(NORTH(ii))
+	    || (ON_BOARD(goban, NORTH(ii))
 		&& (gb[NORTH(ii)] > 0 || bubbles[NORTH(ii)] == WHITE))
-	    || (ON_BOARD(EAST(ii))
+	    || (ON_BOARD(goban, EAST(ii))
 		&& (gb[EAST(ii)] > 0 || bubbles[EAST(ii)] == WHITE)))
 	  white_neighbor = 1;
 	
 	if (bubbles[ii] == BLACK
-	    || (ON_BOARD(SOUTH(ii))
+	    || (ON_BOARD(goban, SOUTH(ii))
 		&& (gb[SOUTH(ii)] < 0 || bubbles[SOUTH(ii)] == BLACK))
-	    || (ON_BOARD(WEST(ii))
+	    || (ON_BOARD(goban, WEST(ii))
 		&& (gb[WEST(ii)] < 0 || bubbles[WEST(ii)] == BLACK))
-	    || (ON_BOARD(NORTH(ii))
+	    || (ON_BOARD(goban, NORTH(ii))
 		&& (gb[NORTH(ii)] < 0 || bubbles[NORTH(ii)] == BLACK))
-	    || (ON_BOARD(EAST(ii))
+	    || (ON_BOARD(goban, EAST(ii))
 		&& (gb[EAST(ii)] < 0 || bubbles[EAST(ii)] == BLACK)))
 	  black_neighbor = 1;
 	
@@ -241,7 +242,7 @@ close_bubbles(int gb[BOARDMAX])
   /* The bubbles are found and classified. Now adjoin them. */
 
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-    if (!ON_BOARD(ii) || gb[ii])
+    if (!ON_BOARD(goban, ii) || gb[ii])
       continue;
     
     if (bubbles[ii] == WHITE)
@@ -411,11 +412,11 @@ old_estimate_score(float *upper, float *lower)
       }
     }
     if (chinese_rules) {
-      DEBUG(DEBUG_SCORING, "in row %d, white area=%d, black=%d\n",
+      DEBUG(goban, DEBUG_SCORING, "in row %d, white area=%d, black=%d\n",
 	    board_size - i, white_area_in_row, black_area_in_row);
     }
     else {
-      DEBUG(DEBUG_SCORING, "in row %d, white territory=%d, black=%d\n",
+      DEBUG(goban, DEBUG_SCORING, "in row %d, white territory=%d, black=%d\n",
 	    board_size - i, white_territory_in_row, black_territory_in_row);
     }
   }
@@ -423,7 +424,7 @@ old_estimate_score(float *upper, float *lower)
   if (chinese_rules)
     u = white_area - black_area + komi;
   else {
-    DEBUG(DEBUG_SCORING,
+    DEBUG(goban, DEBUG_SCORING,
 	  "black captured: %d\nwhite captured: %d\nkomi: %f\n",
 	  black_captured, white_captured, komi);
     u = white_territory 
@@ -485,11 +486,11 @@ old_estimate_score(float *upper, float *lower)
 	}
       }
       if (chinese_rules) {
-	DEBUG(DEBUG_SCORING, "in row %d, white area=%d, black=%d\n",
+	DEBUG(goban, DEBUG_SCORING, "in row %d, white area=%d, black=%d\n",
 	      board_size-i, white_area_in_row, black_area_in_row);
       }
       else {
-	DEBUG(DEBUG_SCORING, "in row %d, white territory=%d, black=%d\n",
+	DEBUG(goban, DEBUG_SCORING, "in row %d, white territory=%d, black=%d\n",
 	      board_size-i, white_territory_in_row, black_territory_in_row);
       }
     }
@@ -497,7 +498,7 @@ old_estimate_score(float *upper, float *lower)
     if (chinese_rules)
       l = white_area - black_area + komi;
     else {
-      DEBUG(DEBUG_SCORING,
+      DEBUG(goban, DEBUG_SCORING,
 	    "black captured: %d\nwhite captured: %d\nkomi: %f\n",
 	    black_captured, white_captured, komi);
       l = white_territory 

@@ -36,6 +36,7 @@
 \* ============================================================= */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include "liberty.h"
 #include "gg_utils.h"
@@ -162,7 +163,7 @@ clock_init(int time, int byo_time, int byo_stones)
 void 
 clock_enable(void)
 {
-  gg_assert(clk.ready);
+  gg_assert(goban, clk.ready);
   clk.clock_on = 1;
 }
 
@@ -172,7 +173,7 @@ clock_enable(void)
 void 
 clock_enable_autolevel(void)
 {
-  gg_assert(clk.clock_on);
+  gg_assert(goban, clk.clock_on);
   clk.autolevel_on = 1;
 }
 
@@ -189,7 +190,7 @@ clock_enable_autolevel(void)
 static void
 clock_byoyomi_update(int color, double dt)
 {
-  gg_assert(clk.moveno > 0);
+  gg_assert(goban, clk.moveno > 0);
 
   /* update byoyomi timer */
   if (clk.byoyomi[color])
@@ -226,7 +227,7 @@ clock_push_button(int color)
     return;
 
   now = gg_gettimeofday();
-  gg_assert(clk.ready);
+  gg_assert(goban, clk.ready);
 
   /* time/move estimation */
   tme = estimate_time_by_move(color, clk.moveno);
@@ -255,7 +256,7 @@ clock_push_button(int color)
 
   /* Other moves (clk. moveno > -1) */
   clk.moveno++;
-  gg_assert(clk.moveno < CLOCK_MAX_MOVES);
+  gg_assert(goban, clk.moveno < CLOCK_MAX_MOVES);
   clk.date[clk.moveno] = now;
 
   /* Update main timer. */
@@ -284,8 +285,8 @@ clock_unpush_button(int color)
   if (!clk.clock_on)
     return;
      
-  gg_assert(clk.ready);
-  gg_assert(color == COLOR(clk.moveno));
+  gg_assert(goban, clk.ready);
+  gg_assert(goban, color == COLOR(clk.moveno));
 
   if (clk.moveno < 1) {
     clock_init(-1, -1, -1);
@@ -319,7 +320,7 @@ clock_get_timer(int color)
 {
   double dt;
 
-  gg_assert(clk.clock_on && clk.ready);
+  gg_assert(goban, clk.clock_on && clk.ready);
 
   dt = gg_gettimeofday() - clk.date[clk.moveno];
 
@@ -359,7 +360,7 @@ clock_get_btimer(int color)
   double dt;
   
   /* sanity check */
-  gg_assert(clk.clock_on && clk.ready);
+  gg_assert(goban, clk.clock_on && clk.ready);
   dt = gg_gettimeofday() - clk.date[clk.moveno];
 
   if (COLOR(clk.moveno) != color)
@@ -401,7 +402,7 @@ clock_print(int color)
   if (!clk.clock_on)
     return;
 
-  gg_assert(clk.ready);
+  gg_assert(goban, clk.ready);
 
   fprintf(stderr, "clock: "); 
   fprintf(stderr, "%s ", pname[color]);
@@ -487,7 +488,7 @@ estimate_time_by_move(int color, int move)
   if (move <= 10)
     return 0;
 
-  gg_assert(COLOR(move) == OTHER_COLOR(color));
+  gg_assert(goban, COLOR(move) == OTHER_COLOR(color));
 
   res = 0;
   for (i = 0; i < 5; i++)

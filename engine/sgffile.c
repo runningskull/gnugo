@@ -30,6 +30,7 @@
  */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -55,7 +56,7 @@ sgffile_add_debuginfo(SGFNode *node, float value)
     return;
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     
     if (IS_STONE(board[pos]) && (output_flags & OUTPUT_MARKDRAGONS)) {
@@ -112,7 +113,7 @@ void
 sgffile_begindump(SGFTree *tree)
 {
   static SGFTree local_tree;
-  gg_assert(sgf_dumptree == NULL);
+  gg_assert(goban, sgf_dumptree == NULL);
 
   if (tree == NULL)
     sgf_dumptree = &local_tree;
@@ -177,7 +178,7 @@ sgffile_printsgf(int color_to_play, const char *filename)
 
     for (m = 0; m < board_size; ++m)
       for (n = 0; n < board_size; ++n)
-        if (BOARD(m, n) == EMPTY && !is_legal(POS(m, n), color_to_play)) {
+        if (BOARD(goban, m, n) == EMPTY && !is_legal(goban, POS(m, n), color_to_play)) {
 	  gg_snprintf(pos, 3, "%c%c", 'a' + n, 'a' + m);
 	  sgfAddProperty(sgftree.lastnode, "IL", pos);
 	}
@@ -197,13 +198,13 @@ sgffile_printboard(SGFTree *tree)
   int i, j;
   SGFNode *node;
   
-  gg_assert(tree);
+  gg_assert(goban, tree);
   node = tree->lastnode;
   
   /* Write the white stones to the file. */
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == WHITE)
+      if (BOARD(goban, i, j) == WHITE)
 	sgfAddStone(node, WHITE, i, j);
     }
   }
@@ -211,7 +212,7 @@ sgffile_printboard(SGFTree *tree)
   /* Write the black stones to the file. */
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == BLACK)
+      if (BOARD(goban, i, j) == BLACK)
 	sgfAddStone(node, BLACK, i, j);
     }
   }
@@ -228,7 +229,7 @@ sgffile_recordboard(SGFNode *node)
   if (node)
     for (i = 0; i < board_size; i++)
       for (j = 0; j < board_size; j++)
-        if (BOARD(i, j) == BLACK)
+        if (BOARD(goban, i, j) == BLACK)
           sgfAddStone(node, BLACK, i, j);
 }
 

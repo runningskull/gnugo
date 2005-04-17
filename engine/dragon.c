@@ -41,6 +41,7 @@
  */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -84,7 +85,7 @@ static int next_worm_list[BOARDMAX];
 struct dragon_data2 *
 dragon2_func(int pos)
 {
-  ASSERT1(ON_BOARD1(pos)
+  ASSERT1(goban, ON_BOARD1(goban, pos)
           && dragon[pos].id >= 0 
           && dragon[pos].id < number_of_dragons, pos);
   return &dragon2[dragon[pos].id];
@@ -161,7 +162,7 @@ make_dragons(int stop_before_owl)
 
   /* Determine status: ALIVE, DEAD, CRITICAL or UNKNOWN */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str))
+    if (ON_BOARD(goban, str))
       if (dragon[str].origin == str && board[str]) {
 	dragon[str].crude_status = compute_crude_status(str);
       }
@@ -170,7 +171,7 @@ make_dragons(int stop_before_owl)
    * call the owl code. This updates all fields.
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
+    if (ON_BOARD(goban, str)) {
       struct dragon_data *dd = &(dragon[str]);
       
       dragon[str] = dragon[dd->origin];
@@ -185,12 +186,12 @@ make_dragons(int stop_before_owl)
     if (dragon2[d].surround_status == SURROUNDED) {
       dragon2[d].escape_route = 0;
       if (debug & DEBUG_DRAGONS)
-	gprintf("surrounded dragon found at %1m\n", dragon2[d].origin);
+	gprintf(goban, "surrounded dragon found at %1m\n", dragon2[d].origin);
     }
     else if (dragon2[d].surround_status == WEAKLY_SURROUNDED) {
       dragon2[d].escape_route /= 2;
       if (debug & DEBUG_DRAGONS)
-	gprintf("weakly surrounded dragon found at %1m\n", dragon2[d].origin);
+	gprintf(goban, "weakly surrounded dragon found at %1m\n", dragon2[d].origin);
     }
   }
 
@@ -202,7 +203,7 @@ make_dragons(int stop_before_owl)
    */
   start_timer(2);
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
+    if (ON_BOARD(goban, str)) {
       int attack_point = NO_MOVE;
       int defense_point = NO_MOVE;
       struct eyevalue no_eyes;
@@ -253,7 +254,7 @@ make_dragons(int stop_before_owl)
 		 * for connection moves to be properly valued.
 		 */
 		DRAGON2(str).owl_status = (acode == GAIN ? ALIVE : CRITICAL);
-		DEBUG(DEBUG_OWL_PERFORMANCE,
+		DEBUG(goban, DEBUG_OWL_PERFORMANCE,
 		      "Inconsistent owl attack and defense results for %1m.\n", 
 		      str);
 		/* Let's see whether the attacking move might be the right
@@ -301,7 +302,7 @@ make_dragons(int stop_before_owl)
    * owl status, if it is available.
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
+    if (ON_BOARD(goban, str)) {
       if (IS_STONE(board[str])) {
 	if (DRAGON2(str).owl_status != UNCHECKED)
 	  dragon[str].status = DRAGON2(str).owl_status;
@@ -328,14 +329,14 @@ make_dragons(int stop_before_owl)
    * we need to copy it to every vertex.  
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
+    if (ON_BOARD(goban, str)) {
       struct dragon_data *dd = &(dragon[str]);
       dragon[str] = dragon[dd->origin];
     }
 
   /* Owl threats. */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str) 
+    if (ON_BOARD(goban, str) 
 	&& board[str] != EMPTY 
 	&& dragon[str].origin == str) {
       struct eyevalue no_eyes;
@@ -386,7 +387,7 @@ make_dragons(int stop_before_owl)
    * but we need to copy it to every vertex.  
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
+    if (ON_BOARD(goban, str)) {
       struct dragon_data *dd = &(dragon[str]);
       dragon[str] = dragon[dd->origin];
     }
@@ -434,7 +435,7 @@ make_dragons(int stop_before_owl)
    * but we need to copy it to every vertex.
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str))
+    if (ON_BOARD(goban, str))
       dragon[str].status = dragon[dragon[str].origin].status;
 
   /* Revise inessentiality of critical worms and dragons. */
@@ -464,7 +465,7 @@ find_lunches()
 {
   int str;
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
+    if (ON_BOARD(goban, str)) {
       int food;
 
       if (worm[str].origin != str
@@ -495,7 +496,7 @@ find_lunches()
 	    || (worm[food].cutstone == worm[lunch].cutstone
 		&& (worm[food].liberties < worm[lunch].liberties))) {
 	  DRAGON2(origin).lunch = worm[food].origin;
-	  TRACE("at %1m setting %1m.lunch to %1m (cutstone=%d)\n",
+	  TRACE(goban, "at %1m setting %1m.lunch to %1m (cutstone=%d)\n",
 		str, origin,
 		worm[food].origin, worm[food].cutstone);
 	}
@@ -514,7 +515,7 @@ eye_computations()
   int str;
 
   for (str = BOARDMIN; str < BOARDMAX; str++) {
-    if (!ON_BOARD(str))
+    if (!ON_BOARD(goban, str))
       continue;
 
     if (black_eye[str].color == BLACK
@@ -524,7 +525,7 @@ eye_computations()
       
       compute_eyes(str, &value, &attack_point, &defense_point, 
 		   black_eye, half_eye, 1);
-      DEBUG(DEBUG_EYES, "Black eyespace at %1m: %s\n", str,
+      DEBUG(goban, DEBUG_EYES, "Black eyespace at %1m: %s\n", str,
 	    eyevalue_to_string(&value));
       black_eye[str].value = value;
       propagate_eye(str, black_eye);
@@ -537,7 +538,7 @@ eye_computations()
       
       compute_eyes(str, &value, &attack_point, &defense_point,
 		   white_eye, half_eye, 1);
-      DEBUG(DEBUG_EYES, "White eyespace at %1m: %s\n", str,
+      DEBUG(goban, DEBUG_EYES, "White eyespace at %1m: %s\n", str,
 	    eyevalue_to_string(&value));
       white_eye[str].value = value;
       propagate_eye(str, white_eye);
@@ -575,8 +576,8 @@ revise_inessentiality()
    * +-----
    *
    * we need to extend "adjacent" to "adjacent or shares a liberty",
-   * which is why we use extended_chainlinks() rather than
-   * chainlinks().
+   * which is why we use extended_chainlinks(goban) rather than
+   * chainlinks(goban).
    *
    * Finally, if the position above is slightly modified to
    *
@@ -596,7 +597,7 @@ revise_inessentiality()
    */
 
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
+    if (ON_BOARD(goban, str)) {
       if (is_worm_origin(str, str)
 	  && worm[str].attack_codes[0] != 0
 	  && worm[str].defense_codes[0] != 0
@@ -606,7 +607,7 @@ revise_inessentiality()
 	int r;
 	int essential = 0;
 	
-	neighbors = extended_chainlinks(str, adjs, 0);
+	neighbors = extended_chainlinks(goban, str, adjs, 0);
 	for (r = 0; r < neighbors; r++)
 	  if (dragon[adjs[r]].status != DEAD) {
 	    essential = 1;
@@ -614,7 +615,7 @@ revise_inessentiality()
 	  }
 
 	if (!essential && neighbors > 0) {
-	  DEBUG(DEBUG_WORMS, "Worm %1m revised to be inessential.\n", str);
+	  DEBUG(goban, DEBUG_WORMS, "Worm %1m revised to be inessential.\n", str);
 	  worm[str].inessential = 1;
 	  propagate_worm(str);
 	}
@@ -626,7 +627,7 @@ revise_inessentiality()
    * INESSENTIAL.
    */
   for (str = BOARDMIN; str < BOARDMAX; str++) {
-    if (ON_BOARD(str)
+    if (ON_BOARD(goban, str)
 	&& board[str] != EMPTY
 	&& dragon[str].origin == str
 	&& DRAGON2(str).safety == CRITICAL) {
@@ -638,7 +639,7 @@ revise_inessentiality()
       }
 
       if (w == NO_MOVE) {
-	DEBUG(DEBUG_DRAGONS, "Dragon %1m revised to be inessential.\n", str);
+	DEBUG(goban, DEBUG_DRAGONS, "Dragon %1m revised to be inessential.\n", str);
 	DRAGON2(str).safety = INESSENTIAL;
       }
     }
@@ -653,7 +654,7 @@ initialize_dragon_data(void)
   int str;
   /* VALGRIND_MAKE_WRITABLE(dragon, BOARDMAX * sizeof(struct dragon_data)); */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
+    if (ON_BOARD(goban, str)) {
 
       dragon[str].id                 = -1;
       dragon[str].size               = worm[str].size;
@@ -666,7 +667,7 @@ initialize_dragon_data(void)
       half_eye[str].value            =  10.0; /* Something big. */
       
       if (IS_STONE(board[str]) && worm[str].origin == str)
-	DEBUG(DEBUG_DRAGONS, 
+	DEBUG(goban, DEBUG_DRAGONS, 
 	      "Initializing dragon from worm at %1m, size %d\n", 
 	      str, worm[str].size);
     }
@@ -699,7 +700,7 @@ initialize_supplementary_dragon_data(void)
    */
   number_of_dragons = 0;
   for (str = BOARDMIN; str < BOARDMAX; str++) {
-    if (!ON_BOARD(str))
+    if (!ON_BOARD(goban, str))
       continue;
     origin = dragon[str].origin;
     
@@ -722,13 +723,13 @@ initialize_supplementary_dragon_data(void)
     free(dragon2);
   
   dragon2 = malloc(number_of_dragons * sizeof(*dragon2));
-  gg_assert(dragon2 != NULL);
+  gg_assert(goban, dragon2 != NULL);
   
   /* Find the origins of the dragons to establish the mapping back to
    * the board. After this the DRAGON macro can be used.
    */
   for (str = BOARDMIN; str < BOARDMAX; str++) {
-    if (!ON_BOARD(str))
+    if (!ON_BOARD(goban, str))
       continue;
     if (IS_STONE(board[str])
 	&& dragon[str].origin == str) {
@@ -792,7 +793,7 @@ find_neighbor_dragons()
   int k;
   int color;
 
-  gg_assert(dragon2_initialized);
+  gg_assert(goban, dragon2_initialized);
   
   /* Initialize the arrays. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -800,7 +801,7 @@ find_neighbor_dragons()
       dragons[pos] = dragon[pos].id;
       distances[pos] = 0;
     }
-    else if (ON_BOARD(pos)) {
+    else if (ON_BOARD(goban, pos)) {
       dragons[pos] = -1;
       distances[pos] = -1;
     }
@@ -813,7 +814,7 @@ find_neighbor_dragons()
     int found_one = 0;
       
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (!ON_BOARD(pos))
+      if (!ON_BOARD(goban, pos))
 	continue;
     
       if (distances[pos] != dist-1 || dragons[pos] < 0)
@@ -823,7 +824,7 @@ find_neighbor_dragons()
       for (k = 0; k < 4; k++) {
 	pos2 = pos + delta[k];
 	
-	if (!ON_BOARD1(pos2))
+	if (!ON_BOARD1(goban, pos2))
 	  continue;
 	
 	/* Consider expansion from (pos) to adjacent intersection
@@ -879,7 +880,7 @@ find_neighbor_dragons()
    * as adjacent to each other.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     if (dragons[pos] == -2) {
       int neighbors = 0;
@@ -888,7 +889,7 @@ find_neighbor_dragons()
       for (k = 0; k < 4; k++) {
 	pos2 = pos + delta[k];
 
-	if (ON_BOARD1(pos2) && dragons[pos2] >= 0)
+	if (ON_BOARD1(goban, pos2) && dragons[pos2] >= 0)
 	  adjacent[neighbors++] = dragons[pos2];
       }
       for (i = 0; i < neighbors; i++)
@@ -896,12 +897,12 @@ find_neighbor_dragons()
 	  add_adjacent_dragons(adjacent[i], adjacent[j]);
     }
     else if (dragons[pos] >= 0) {
-      if (ON_BOARD(NORTH(pos))) {
+      if (ON_BOARD(goban, NORTH(pos))) {
 	if (dragons[NORTH(pos)] >= 0
 	    && dragons[NORTH(pos)] != dragons[pos])
 	  add_adjacent_dragons(dragons[pos], dragons[NORTH(pos)]);
       }
-      if (ON_BOARD(EAST(pos))) {
+      if (ON_BOARD(goban, EAST(pos))) {
 	if (dragons[EAST(pos)] >= 0
 	    && dragons[EAST(pos)] != dragons[pos])
 	  add_adjacent_dragons(dragons[pos], dragons[EAST(pos)]);
@@ -911,11 +912,11 @@ find_neighbor_dragons()
   
   if (0) {
     for (d = 0; d < number_of_dragons; d++) {
-      gprintf("dragon %d at %1m:", d, dragon2[d].origin);
+      gprintf(goban, "dragon %d at %1m:", d, dragon2[d].origin);
       for (i = 0; i < dragon2[d].neighbors; i++)
-	gprintf(" %1m(%d)", dragon2[dragon2[d].adjacent[i]].origin,
+	gprintf(goban, " %1m(%d)", dragon2[dragon2[d].adjacent[i]].origin,
 		dragon2[d].adjacent[i]);
-      gprintf("\n");
+      gprintf(goban, "\n");
     }
   }
 }
@@ -924,7 +925,7 @@ find_neighbor_dragons()
 static void
 add_adjacent_dragons(int a, int b)
 {
-  gg_assert(a >= 0 && a < number_of_dragons
+  gg_assert(goban, a >= 0 && a < number_of_dragons
 	    && b >= 0 && b < number_of_dragons);
   if (a == b)
     return;
@@ -937,7 +938,7 @@ static void
 add_adjacent_dragon(int a, int b)
 {
   int i;
-  gg_assert(a >= 0 && a < number_of_dragons
+  gg_assert(goban, a >= 0 && a < number_of_dragons
 	    && b >= 0 && b < number_of_dragons);
   /* If the array of adjacent dragons already is full, ignore
    * additional neighbors.
@@ -977,11 +978,11 @@ dragon_invincible(int dr)
   int strong_eyes = 0;
   int mx[BOARDMAX];
   
-  ASSERT1(IS_STONE(board[dr]), dr);
+  ASSERT1(goban, IS_STONE(board[dr]), dr);
 
   /* First look for invincible strings in the dragon. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (ON_BOARD(pos) && is_same_dragon(pos, dr) && worm[pos].invincible)
+    if (ON_BOARD(goban, pos) && is_same_dragon(pos, dr) && worm[pos].invincible)
       return 1;
   }
 
@@ -1005,7 +1006,7 @@ dragon_invincible(int dr)
     if (board[pos] == board[dr] && is_same_dragon(pos, dr)) {
       for (k = 0; k < 4; k++) {
 	int pos2 = pos + delta[k];
-	if (ON_BOARD(pos2)
+	if (ON_BOARD(goban, pos2)
 	    && eye[pos2].color == eye_color
 	    && eye[pos2].origin != NO_MOVE) {
 	  if (eye[pos2].marginal
@@ -1128,13 +1129,13 @@ identify_thrashing_dragons()
   thrashing_dragon = 0;
   memset(thrashing_stone, 0, sizeof(thrashing_stone));
 
-  last_move = get_last_move();
+  last_move = get_last_move(goban);
   if (last_move == NO_MOVE
       || dragon[last_move].status != DEAD)
     return;
 
   thrashing_dragon = dragon[last_move].origin;
-  DEBUG(DEBUG_DRAGONS, "thrashing dragon found at %1m\n", thrashing_dragon);
+  DEBUG(goban, DEBUG_DRAGONS, "thrashing dragon found at %1m\n", thrashing_dragon);
   mark_dragon(thrashing_dragon, thrashing_stone, 1);
   color = board[thrashing_dragon];
   
@@ -1151,7 +1152,7 @@ identify_thrashing_dragons()
 	if (DRAGON(d).color == color
 	    && DRAGON(d).status == DEAD
 	    && thrashing_stone[dragon2[d].origin] == 0) {
-	  DEBUG(DEBUG_DRAGONS,
+	  DEBUG(goban, DEBUG_DRAGONS,
 		"neighbor at distance %d of thrashing dragon found at %1m\n",
 		dist + 1, DRAGON(d).origin);
 	  mark_dragon(DRAGON(d).origin, thrashing_stone, (char)(dist + 1));
@@ -1168,9 +1169,9 @@ set_dragon_strengths(const char safe_stones[BOARDMAX],
 {
   int ii;
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
+    if (ON_BOARD(goban, ii)) {
       if (safe_stones[ii]) {
-	ASSERT1(IS_STONE(board[ii]), ii);
+	ASSERT1(goban, IS_STONE(board[ii]), ii);
 	strength[ii] = DEFAULT_STRENGTH
 	  	       * (1.0 - 0.3 * DRAGON2(ii).weakness_pre_owl);
       }
@@ -1205,7 +1206,7 @@ void
 set_strength_data(int color, char safe_stones[BOARDMAX],
     		  float strength[BOARDMAX])
 {
-  gg_assert(IS_STONE(color) || color == EMPTY);
+  gg_assert(goban, IS_STONE(color) || color == EMPTY);
 
   get_alive_stones(color, safe_stones);
   set_dragon_strengths(safe_stones, strength);
@@ -1240,14 +1241,14 @@ compute_dragon_genus(int d, struct eyevalue *genus, int eye_to_exclude)
   int pos;
   int dr;
 
-  ASSERT1(IS_STONE(board[d]), d);
-  gg_assert(eye_to_exclude == NO_MOVE || ON_BOARD1(eye_to_exclude));
+  ASSERT1(goban, IS_STONE(board[d]), d);
+  gg_assert(goban, eye_to_exclude == NO_MOVE || ON_BOARD1(goban, eye_to_exclude));
 
   set_eyevalue(genus, 0, 0, 0, 0);
 
   if (board[d] == BLACK) {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (!ON_BOARD(pos))
+      if (!ON_BOARD(goban, pos))
 	continue;
 
       if (black_eye[pos].color == BLACK
@@ -1256,7 +1257,7 @@ compute_dragon_genus(int d, struct eyevalue *genus, int eye_to_exclude)
 	      || black_eye[eye_to_exclude].origin != pos)
 	  && find_eye_dragons(pos, black_eye, BLACK, &dr, 1) == 1
 	  && is_same_dragon(dr, d)) {
-	TRACE("eye at %1m (%s) found for dragon at %1m--augmenting genus\n",
+	TRACE(goban, "eye at %1m (%s) found for dragon at %1m--augmenting genus\n",
 	      pos, eyevalue_to_string(&black_eye[pos].value), dr);
 
 	if (eye_to_exclude == NO_MOVE
@@ -1270,7 +1271,7 @@ compute_dragon_genus(int d, struct eyevalue *genus, int eye_to_exclude)
   }
   else {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (!ON_BOARD(pos))
+      if (!ON_BOARD(goban, pos))
 	continue;
 
       if (white_eye[pos].color == WHITE
@@ -1279,7 +1280,7 @@ compute_dragon_genus(int d, struct eyevalue *genus, int eye_to_exclude)
 	      || white_eye[eye_to_exclude].origin != pos)
 	  && find_eye_dragons(pos, white_eye, WHITE, &dr, 1) == 1
 	  && is_same_dragon(dr, d)) {
-	TRACE("eye at %1m (%s) found for dragon at %1m--augmenting genus\n",
+	TRACE(goban, "eye at %1m (%s) found for dragon at %1m--augmenting genus\n",
 	      pos, eyevalue_to_string(&white_eye[pos].value), dr);
 
 	if (eye_to_exclude == NO_MOVE
@@ -1330,7 +1331,7 @@ analyze_false_eye_territory(void)
   int k;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     
     false_eye_territory[pos] = 0;
@@ -1363,7 +1364,7 @@ analyze_false_eye_territory(void)
      * disqualify without further analysis. (* is a false eye vertex)
      */
     for (k = 0; k < 4; k++)
-      if (ON_BOARD(pos + delta[k])
+      if (ON_BOARD(goban, pos + delta[k])
 	  && board[pos + delta[k]] != color
 	  && eye[pos + delta[k]].color != eye_color)
 	break;
@@ -1375,7 +1376,7 @@ analyze_false_eye_territory(void)
      * eye.
      */
     for (k = 0; k < 4; k++)
-      if (ON_BOARD(pos + delta[k])
+      if (ON_BOARD(goban, pos + delta[k])
 	  && board[pos + delta[k]] == color
 	  && !connected_to_eye(pos, pos + delta[k], color, eye_color, eye))
 	break;
@@ -1383,7 +1384,7 @@ analyze_false_eye_territory(void)
     if (k == 4) {
       false_eye_territory[pos] = 1;
       if (0)
-	gprintf("False eye territory at %1m\n", pos);
+	gprintf(goban, "False eye territory at %1m\n", pos);
     }
   }
 
@@ -1392,7 +1393,7 @@ analyze_false_eye_territory(void)
    *        The array is eventually filled by the endgame() function.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos))
+    if (ON_BOARD(goban, pos))
       forced_backfilling_moves[pos] = 0;
 }
 
@@ -1425,7 +1426,7 @@ connected_to_eye(int pos, int str, int color, int eye_color,
   memset(me, 0, sizeof(me));
   mx[pos] = 1;
   for (k = 0; k < 8; k++)
-    if (ON_BOARD(pos + delta[k]))
+    if (ON_BOARD(goban, pos + delta[k]))
       mx[pos + delta[k]] = 1;
 
   halfeyes = 0;
@@ -1450,8 +1451,8 @@ connected_to_eye_recurse(int pos, int str, int color, int eye_color,
   int r;
   int k;
 
-  mark_string(str, mx, 1);
-  liberties = findlib(str, MAXLIBS, libs);
+  mark_string(goban, str, mx, 1);
+  liberties = findlib(goban, str, MAXLIBS, libs);
 
   /* Search the liberties of (str) for eyespaces. */
   for (r = 0; r < liberties; r++) {
@@ -1475,7 +1476,7 @@ connected_to_eye_recurse(int pos, int str, int color, int eye_color,
       continue;
     mx[libs[r]] = 1;
     for (k = 0; k < 4; k++) {
-      if (ON_BOARD(libs[r] + delta[k])
+      if (ON_BOARD(goban, libs[r] + delta[k])
 	  && board[libs[r] + delta[k]] == color
 	  && is_same_dragon(str, libs[r] + delta[k])
 	  && !mx[libs[r] + delta[k]])
@@ -1501,7 +1502,7 @@ show_dragons(void)
       continue;
 
     if (w->origin == pos) {
-      gprintf("%1m : (dragon %1m) %s string of size %d (%f), genus %d: (%d,%d,%d,%d)",
+      gprintf(goban, "%1m : (dragon %1m) %s string of size %d (%f), genus %d: (%d,%d,%d,%d)",
 	      pos, dragon[pos].origin,
 	      color_to_string(board[pos]),
 	      w->size,
@@ -1512,58 +1513,58 @@ show_dragons(void)
 	      w->liberties3,
 	      w->liberties4);
       if (w->cutstone == 1)
-	gprintf("%o - is a potential cutting stone\n");
+	gprintf(goban, "%o - is a potential cutting stone\n");
       else if (w->cutstone == 2)
-	gprintf("%o - is a cutting stone\n");
+	gprintf(goban, "%o - is a cutting stone\n");
       else
-	gprintf("%o\n");
+	gprintf(goban, "%o\n");
       
       if (w->cutstone2 > 0)
-	gprintf("- cutstone2 = %d\n", w->cutstone2);
+	gprintf(goban, "- cutstone2 = %d\n", w->cutstone2);
       
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
 	if (w->attack_codes[k] == 0)
 	  break;
-	gprintf("- attackable at %1m, attack code = %d\n",
+	gprintf(goban, "- attackable at %1m, attack code = %d\n",
 		w->attack_points[k], w->attack_codes[k]);
       }
       
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
 	if (w->defense_codes[k] == 0)
 	  break;
-	gprintf("- defendable at %1m, defend code = %d\n",
+	gprintf(goban, "- defendable at %1m, defend code = %d\n",
 		w->defense_points[k], w->defense_codes[k]);
       }
       
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
 	if (w->attack_threat_codes[k] == 0)
 	  break;
-	gprintf("- attack threat at %1m, attack threat code = %d\n",
+	gprintf(goban, "- attack threat at %1m, attack threat code = %d\n",
 		w->attack_threat_points[k], w->attack_threat_codes[k]);
       }
       
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
 	if (w->defense_threat_codes[k] == 0)
 	  break;
-	gprintf("- defense threat at %1m, defense threat code = %d\n",
+	gprintf(goban, "- defense threat at %1m, defense threat code = %d\n",
 		w->defense_threat_points[k], w->defense_threat_codes[k]);
       }
       
       if (w->lunch != NO_MOVE)
-	gprintf("... adjacent worm %1m is lunch\n", w->lunch);
+	gprintf(goban, "... adjacent worm %1m is lunch\n", w->lunch);
       
       if (w->inessential)
-	gprintf("- is inessential\n");
+	gprintf(goban, "- is inessential\n");
       
       if (w->invincible)
-	gprintf("- is invincible\n");
+	gprintf(goban, "- is invincible\n");
       
-      if (is_ko_point(pos))
-	gprintf("- is a ko stone\n");
+      if (is_ko_point(goban, pos))
+	gprintf(goban, "- is a ko stone\n");
     }
   }
     
-  gprintf("%o\n");
+  gprintf(goban, "%o\n");
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     struct dragon_data *dd = &(dragon[pos]);
     struct dragon_data2 *d2;
@@ -1574,7 +1575,7 @@ show_dragons(void)
     d2 = &(dragon2[dd->id]);
     
     if (dd->origin == pos) {
-      gprintf("%1m : %s dragon size %d (%f), genus %s, escape factor %d, crude status %s, status %s, moyo size %d, moyo territory value %f, safety %s, weakness pre owl %f, weakness %f",
+      gprintf(goban, "%1m : %s dragon size %d (%f), genus %s, escape factor %d, crude status %s, status %s, moyo size %d, moyo territory value %f, safety %s, weakness pre owl %f, weakness %f",
 	      pos,
 	      board[pos] == BLACK ? "B" : "W",
 	      dd->size,
@@ -1588,27 +1589,27 @@ show_dragons(void)
 	      status_to_string(d2->safety),
 	      d2->weakness_pre_owl,
 	      d2->weakness);
-      gprintf(", owl status %s\n", status_to_string(d2->owl_status));
+      gprintf(goban, ", owl status %s\n", status_to_string(d2->owl_status));
       if (d2->owl_status == CRITICAL) {
-	gprintf("... owl attackable at %1m, code %d\n",
+	gprintf(goban, "... owl attackable at %1m, code %d\n",
 		d2->owl_attack_point, d2->owl_attack_code);
-	gprintf("... owl defendable at %1m, code %d\n",
+	gprintf(goban, "... owl defendable at %1m, code %d\n",
 		d2->owl_defense_point, d2->owl_defense_code);
       }
       if (dd->status == CRITICAL && d2->semeais) {
 	if (d2->semeai_defense_point)
-	  gprintf("... semeai defense move at %1m\n", d2->semeai_defense_point);
+	  gprintf(goban, "... semeai defense move at %1m\n", d2->semeai_defense_point);
 	if (d2->semeai_attack_point)
-	  gprintf("... semeai attack move at %1m\n", d2->semeai_attack_point);
+	  gprintf(goban, "... semeai attack move at %1m\n", d2->semeai_attack_point);
       }
-      gprintf("... neighbors");
+      gprintf(goban, "... neighbors");
       for (k = 0; k < d2->neighbors; k++) {
 	int d = d2->adjacent[k];
-	gprintf(" %1m", dragon2[d].origin);
+	gprintf(goban, " %1m", dragon2[d].origin);
       }
-      gprintf("\n");
+      gprintf(goban, "\n");
       if (d2->lunch != NO_MOVE)
-	gprintf("... adjacent worm %1m is lunch\n", d2->lunch);
+	gprintf(goban, "... adjacent worm %1m is lunch\n", d2->lunch);
     }
   }
 }
@@ -1630,16 +1631,16 @@ compute_new_dragons(int dragon_origins[BOARDMAX])
    * patterns/helpers.c. On the other hand it shouldn't be very
    * interesting to recompute dragons in the original position.
    */
-  gg_assert(stackp > 0);
+  gg_assert(goban, stackp > 0);
   
   memcpy(saved_cutting_points, cutting_points, sizeof(cutting_points));
   memset(cutting_points, 0, sizeof(cutting_points));
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos)) {
+    if (ON_BOARD(goban, pos)) {
       if (board[pos] == EMPTY)
 	new_dragon_origins[pos] = NO_MOVE;
       else
-	new_dragon_origins[pos] = find_origin(pos);
+	new_dragon_origins[pos] = find_origin(goban, pos);
     }
   
   find_cuts();
@@ -1665,12 +1666,12 @@ join_new_dragons(int d1, int d2)
   if (d1 == d2)
     return;
 
-  ASSERT1(board[d1] == board[d2], d1);
-  ASSERT1(IS_STONE(board[d1]), d1);
+  ASSERT1(goban, board[d1] == board[d2], d1);
+  ASSERT1(goban, IS_STONE(board[d1]), d1);
 
   /* Don't bother to do anything fance with dragon origins. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos) && new_dragon_origins[pos] == d2)
+    if (ON_BOARD(goban, pos) && new_dragon_origins[pos] == d2)
       new_dragon_origins[pos] = d1;
 }
 
@@ -1701,9 +1702,9 @@ join_dragons(int d1, int d2)
   if (d1 == d2)
     return;
   
-  ASSERT1(board[d1] == board[d2], d1);
-  gg_assert(dragon2_initialized == 0);
-  ASSERT1(IS_STONE(board[d1]), d1);
+  ASSERT1(goban, board[d1] == board[d2], d1);
+  gg_assert(goban, dragon2_initialized == 0);
+  ASSERT1(goban, IS_STONE(board[d1]), d1);
 
   /* We want to have the origin pointing to the largest string of
    * the dragon.  If this is not unique, we take the "upper
@@ -1713,11 +1714,11 @@ join_dragons(int d1, int d2)
       || (worm[d1].size == worm[d2].size
 	  && d1 < d2)) {
     origin = d1;
-    DEBUG(DEBUG_DRAGONS, "joining dragon at %1m to dragon at %1m\n", d2, d1);
+    DEBUG(goban, DEBUG_DRAGONS, "joining dragon at %1m to dragon at %1m\n", d2, d1);
   }
   else {
     origin = d2;
-    DEBUG(DEBUG_DRAGONS, "joining dragon at %1m to dragon at %1m\n", d1, d2);
+    DEBUG(goban, DEBUG_DRAGONS, "joining dragon at %1m to dragon at %1m\n", d1, d2);
   }
   
   dragon[origin].size  = dragon[d2].size + dragon[d1].size;
@@ -1736,7 +1737,7 @@ join_dragons(int d1, int d2)
   }
 
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-    if (ON_BOARD(ii)
+    if (ON_BOARD(goban, ii)
 	&& (dragon[ii].origin == d1 || dragon[ii].origin == d2))
       dragon[ii].origin = origin;
   }
@@ -1763,7 +1764,7 @@ compute_crude_status(int pos)
   int true_genus = max_eyes(genus) + min_eyes(genus);
   int lunch = DRAGON2(pos).lunch;
 
-  gg_assert(dragon2_initialized);
+  gg_assert(goban, dragon2_initialized);
   
   /* If it has two sure eyes, everything is just dandy. */
   if (true_genus > 3)
@@ -1862,7 +1863,7 @@ dragon_escape(char goal[BOARDMAX], int color,
   int distance;
   int escape_potential = 0;
 
-  gg_assert(IS_STONE(color));
+  gg_assert(goban, IS_STONE(color));
   
   if (!mx_initialized) {
     memset(mx, 0, sizeof(mx));
@@ -1871,7 +1872,7 @@ dragon_escape(char goal[BOARDMAX], int color,
 
   /* Enter the stones of the dragon in the queue. */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii) && goal[ii])
+    if (ON_BOARD(goban, ii) && goal[ii])
       ENQUEUE(ii);
   
   /* Find points at increasing distances from the dragon. At distance
@@ -1890,40 +1891,40 @@ dragon_escape(char goal[BOARDMAX], int color,
       if (distance == 4)
 	escape_potential += escape_value[ii];
       else {
-	if (ON_BOARD(SOUTH(ii))
+	if (ON_BOARD(goban, SOUTH(ii))
 	    && !mx[SOUTH(ii)]
 	    && (board[SOUTH(ii)] == color
 		|| (board[SOUTH(ii)] == EMPTY
-		    && ON_BOARD(SE(ii)) && board[SE(ii)] != other
-		    && ON_BOARD(SS(ii)) && board[SS(ii)] != other
-		    && ON_BOARD(SW(ii)) && board[SW(ii)] != other)))
+		    && ON_BOARD(goban, SE(ii)) && board[SE(ii)] != other
+		    && ON_BOARD(goban, SS(ii)) && board[SS(ii)] != other
+		    && ON_BOARD(goban, SW(ii)) && board[SW(ii)] != other)))
 	  ENQUEUE(SOUTH(ii));
 	
-	if (ON_BOARD(WEST(ii))
+	if (ON_BOARD(goban, WEST(ii))
 	    && !mx[WEST(ii)]
 	    && (board[WEST(ii)] == color
 		|| (board[WEST(ii)] == EMPTY
-		    && ON_BOARD(SW(ii)) && board[SW(ii)] != other
-		    && ON_BOARD(WW(ii)) && board[WW(ii)] != other
-		    && ON_BOARD(NW(ii)) && board[NW(ii)] != other)))
+		    && ON_BOARD(goban, SW(ii)) && board[SW(ii)] != other
+		    && ON_BOARD(goban, WW(ii)) && board[WW(ii)] != other
+		    && ON_BOARD(goban, NW(ii)) && board[NW(ii)] != other)))
 	  ENQUEUE(WEST(ii));
 	
-	if (ON_BOARD(NORTH(ii))
+	if (ON_BOARD(goban, NORTH(ii))
 	    && !mx[NORTH(ii)]
 	    && (board[NORTH(ii)] == color
 		|| (board[NORTH(ii)] == EMPTY
-		    && ON_BOARD(NW(ii)) && board[NW(ii)] != other
-		    && ON_BOARD(NN(ii)) && board[NN(ii)] != other
-		    && ON_BOARD(NE(ii)) && board[NE(ii)] != other)))
+		    && ON_BOARD(goban, NW(ii)) && board[NW(ii)] != other
+		    && ON_BOARD(goban, NN(ii)) && board[NN(ii)] != other
+		    && ON_BOARD(goban, NE(ii)) && board[NE(ii)] != other)))
 	  ENQUEUE(NORTH(ii));
 	
-	if (ON_BOARD(EAST(ii))
+	if (ON_BOARD(goban, EAST(ii))
 	    && !mx[EAST(ii)]
 	    && (board[EAST(ii)] == color
 		|| (board[EAST(ii)] == EMPTY
-		    && ON_BOARD(NE(ii)) && board[NE(ii)] != other
-		    && ON_BOARD(EE(ii)) && board[EE(ii)] != other
-		    && ON_BOARD(SE(ii)) && board[SE(ii)] != other)))
+		    && ON_BOARD(goban, NE(ii)) && board[NE(ii)] != other
+		    && ON_BOARD(goban, EE(ii)) && board[EE(ii)] != other
+		    && ON_BOARD(goban, SE(ii)) && board[SE(ii)] != other)))
 	  ENQUEUE(EAST(ii));
 	
 	/* For distance one intersections, allow kosumi to move out. I.e.
@@ -1940,9 +1941,9 @@ dragon_escape(char goal[BOARDMAX], int color,
 	      && !mx[SW(ii)]
 	      && (board[SW(ii)] == color
 		  || (board[SW(ii)] == EMPTY
-		      && ON_BOARD(SOUTH(SW(ii)))
+		      && ON_BOARD(goban, SOUTH(SW(ii)))
 		      && board[SOUTH(SW(ii))] != other
-		      && ON_BOARD(WEST(SW(ii)))
+		      && ON_BOARD(goban, WEST(SW(ii)))
 		      && board[WEST(SW(ii))] != other)))
 	    ENQUEUE(SW(ii));
 		      
@@ -1951,9 +1952,9 @@ dragon_escape(char goal[BOARDMAX], int color,
 	      && !mx[NW(ii)]
 	      && (board[NW(ii)] == color
 		  || (board[NW(ii)] == EMPTY
-		      && ON_BOARD(WEST(NW(ii)))
+		      && ON_BOARD(goban, WEST(NW(ii)))
 		      && board[WEST(NW(ii))] != other
-		      && ON_BOARD(NORTH(NW(ii)))
+		      && ON_BOARD(goban, NORTH(NW(ii)))
 		      && board[NORTH(NW(ii))] != other)))
 	    ENQUEUE(NW(ii));
 		      
@@ -1962,9 +1963,9 @@ dragon_escape(char goal[BOARDMAX], int color,
 	      && !mx[NE(ii)]
 	      && (board[NE(ii)] == color
 		  || (board[NE(ii)] == EMPTY
-		      && ON_BOARD(NORTH(NE(ii)))
+		      && ON_BOARD(goban, NORTH(NE(ii)))
 		      && board[NORTH(NE(ii))] != other
-		      && ON_BOARD(EAST(NE(ii)))
+		      && ON_BOARD(goban, EAST(NE(ii)))
 		      && board[EAST(NE(ii))] != other)))
 	    ENQUEUE(NE(ii));
 		      
@@ -1973,9 +1974,9 @@ dragon_escape(char goal[BOARDMAX], int color,
 	      && !mx[SE(ii)]
 	      && (board[SE(ii)] == color
 		  || (board[SE(ii)] == EMPTY
-		      && ON_BOARD(EAST(SE(ii)))
+		      && ON_BOARD(goban, EAST(SE(ii)))
 		      && board[EAST(SE(ii))] != other
-		      && ON_BOARD(SOUTH(SE(ii)))
+		      && ON_BOARD(goban, SOUTH(SE(ii)))
 		      && board[SOUTH(SE(ii))] != other)))
 	    ENQUEUE(SE(ii));
 	}
@@ -1989,7 +1990,7 @@ dragon_escape(char goal[BOARDMAX], int color,
      * twice, which might happen if ENQUEUE() is called without
      * checking mx[].
      */
-    ASSERT1(mx[queue[k]] == 1, queue[k]);
+    ASSERT1(goban, mx[queue[k]] == 1, queue[k]);
     mx[queue[k]] = 0;
   }
 
@@ -2007,10 +2008,10 @@ compute_escape(int pos, int dragon_status_known)
   char escape_value[BOARDMAX];
   char safe_stones[BOARDMAX];
 
-  ASSERT1(IS_STONE(board[pos]), pos);
+  ASSERT1(goban, IS_STONE(board[pos]), pos);
 
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii))
+    if (ON_BOARD(goban, ii))
       goal[ii] = is_same_dragon(ii, pos);
 
   /* Compute escape_value array.  Points are awarded for moyo (4),
@@ -2021,7 +2022,7 @@ compute_escape(int pos, int dragon_status_known)
 
   /* If we can reach a live group, award 6 points. */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-    if (!ON_BOARD(ii))
+    if (!ON_BOARD(goban, ii))
       continue;
 
     if (dragon_status_known) {
@@ -2078,7 +2079,7 @@ compute_surrounding_moyo_sizes(const struct influence_data *q)
   }
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     
     if (moyo_color[pos] == board[pos])
@@ -2148,7 +2149,7 @@ crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
   weakness_value[1] = gg_interpolate(&escape_route2weakness, escape_route);
   weakness_value[2] = gg_interpolate(&genus2weakness, true_genus);
 
-  DEBUG(DEBUG_DRAGONS,
+  DEBUG(goban, DEBUG_DRAGONS,
 	"  moyo value %f -> %f, escape %f -> %f, eyes %f -> %f\n",
 	moyo_value, weakness_value[0],
 	escape_route, weakness_value[1],
@@ -2168,7 +2169,7 @@ crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
   weakness = gg_min(0.7 * weakness_value[0] + 0.3 * weakness_value[1],
                     1.3 * weakness_value[0]);
 
-  gg_assert(weakness >= 0.0 && weakness <= 1.0);
+  gg_assert(goban, weakness >= 0.0 && weakness <= 1.0);
 
   return weakness;
 }
@@ -2198,7 +2199,7 @@ compute_dragon_weakness_value(int d)
    * - possible connections to neighbour dragons
    */
 
-  DEBUG(DEBUG_DRAGONS, "Computing weakness of dragon at %1m:\n", origin);
+  DEBUG(goban, DEBUG_DRAGONS, "Computing weakness of dragon at %1m:\n", origin);
 
   weakness = crude_dragon_weakness(dragon2[d].safety, &dragon2[d].genus,
 				   dragon2[d].lunch != NO_MOVE,
@@ -2218,7 +2219,7 @@ compute_dragon_weakness_value(int d)
   if (weakness > 1.0)
     weakness = 1.0;
 
-  DEBUG(DEBUG_DRAGONS, " result: %f.\n", weakness);
+  DEBUG(goban, DEBUG_DRAGONS, " result: %f.\n", weakness);
   return weakness;
 }
 
@@ -2253,8 +2254,8 @@ is_same_dragon(int d1, int d2)
   if (d1 == NO_MOVE || d2 == NO_MOVE)
     return (d1 == d2);
   
-  ASSERT_ON_BOARD1(d1);
-  ASSERT_ON_BOARD1(d2);
+  ASSERT_ON_BOARD1(goban, d1);
+  ASSERT_ON_BOARD1(goban, d2);
 
   return (dragon[d1].origin == dragon[d2].origin);
 }
@@ -2289,7 +2290,7 @@ mark_dragon(int pos, char mx[BOARDMAX], char mark)
   int w;
   for (w = first_worm_in_dragon(dragon[pos].origin); w != NO_MOVE;
        w = next_worm_in_dragon(w))
-    mark_string(w, mx, mark);
+    mark_string(goban, w, mx, mark);
 }
 
 
@@ -2309,7 +2310,7 @@ first_worm_in_dragon(int d)
 int
 next_worm_in_dragon(int w)
 {
-  ASSERT1(worm[w].origin == w, w);
+  ASSERT1(goban, worm[w].origin == w, w);
   return next_worm_list[w];
 }
 
@@ -2352,7 +2353,7 @@ lively_dragon_exists(int color)
 int 
 dragon_weak(int pos)
 {
-  ASSERT_ON_BOARD1(pos);
+  ASSERT_ON_BOARD1(goban, pos);
   /* FIXME: This should not happen, but avoids a crash.  What is
    *   the proper fix for calling this at stackp != 0 ?
    */
@@ -2371,7 +2372,7 @@ size_of_biggest_critical_dragon(void)
   int max_size = 0;
   
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
+    if (ON_BOARD(goban, str)) {
       
       if (board[str] == EMPTY
 	  || dragon[str].origin != str)
@@ -2410,7 +2411,7 @@ ascii_report_dragon(char *string)
 
   string_to_location(board_size, string, &m, &n);
   pos = POS(m, n);
-  if (!ON_BOARD1(pos))
+  if (!ON_BOARD1(goban, pos))
     fprintf(stderr, "unknown position %s\n", string);
   else
     report_dragon(stderr, pos);
@@ -2426,75 +2427,75 @@ report_dragon(FILE *outfile, int pos)
   struct dragon_data2 *d2 = &(dragon2[d->id]);
 
   if (board[pos] == EMPTY) {
-    gprintf("There is no dragon at %1m\n", pos);
+    gprintf(goban, "There is no dragon at %1m\n", pos);
     return;
   }
 
   if (d->id < 0) {
-    gprintf("Dragon data not available at %1m\n", pos);
+    gprintf(goban, "Dragon data not available at %1m\n", pos);
     return;
   }
 
-  gfprintf(outfile, "color                   %s\n", color_to_string(d->color));
-  gfprintf(outfile, "origin                  %1m\n", d->origin);
-  gfprintf(outfile, "size                    %d\n", d->size);
-  gfprintf(outfile, "effective_size          %f\n", d->effective_size);
-  gfprintf(outfile, "genus                   %s\n",
+  gfprintf(goban, outfile, "color                   %s\n", color_to_string(d->color));
+  gfprintf(goban, outfile, "origin                  %1m\n", d->origin);
+  gfprintf(goban, outfile, "size                    %d\n", d->size);
+  gfprintf(goban, outfile, "effective_size          %f\n", d->effective_size);
+  gfprintf(goban, outfile, "genus                   %s\n",
 	   eyevalue_to_string(&d2->genus));
-  gfprintf(outfile, "heye                    %1m\n", d2->heye);
-  gfprintf(outfile, "escape_route            %d\n", d2->escape_route);
-  gfprintf(outfile, "lunch                   %1m\n", d2->lunch);
-  gfprintf(outfile, "crude_status            %s\n",
+  gfprintf(goban, outfile, "heye                    %1m\n", d2->heye);
+  gfprintf(goban, outfile, "escape_route            %d\n", d2->escape_route);
+  gfprintf(goban, outfile, "lunch                   %1m\n", d2->lunch);
+  gfprintf(goban, outfile, "crude_status            %s\n",
 	   status_to_string(d->crude_status));
-  gfprintf(outfile, "owl_status              %s\n",
+  gfprintf(goban, outfile, "owl_status              %s\n",
 	   status_to_string(d2->owl_status));
-  gfprintf(outfile, "status                  %s\n",
+  gfprintf(goban, outfile, "status                  %s\n",
 	   status_to_string(d->status));
-  gfprintf(outfile, "safety                  %s\n",
+  gfprintf(goban, outfile, "safety                  %s\n",
 	   status_to_string(d2->safety));
-  gfprintf(outfile, "weakness                %f\n", d2->weakness);
-  gfprintf(outfile, "weakness_pre_owl        %f\n", d2->weakness_pre_owl);
-  gfprintf(outfile, "surround_status         %d\n", d2->surround_status);
-  gfprintf(outfile, "surround_size           %d\n", d2->surround_size);
-  gfprintf(outfile, "moyo_size               %d\n", d2->moyo_size);
-  gfprintf(outfile, "moyo_territorial_value  %f\n",
+  gfprintf(goban, outfile, "weakness                %f\n", d2->weakness);
+  gfprintf(goban, outfile, "weakness_pre_owl        %f\n", d2->weakness_pre_owl);
+  gfprintf(goban, outfile, "surround_status         %d\n", d2->surround_status);
+  gfprintf(goban, outfile, "surround_size           %d\n", d2->surround_size);
+  gfprintf(goban, outfile, "moyo_size               %d\n", d2->moyo_size);
+  gfprintf(goban, outfile, "moyo_territorial_value  %f\n",
 	   d2->moyo_territorial_value);
-  gfprintf(outfile, "neighbors               ");
+  gfprintf(goban, outfile, "neighbors               ");
   for (k = 0; k < d2->neighbors; k++)
-    gfprintf(outfile, "%1m ", DRAGON(d2->adjacent[k]).origin);
-  gfprintf(outfile, "\nhostile_neighbors       %d\n", d2->hostile_neighbors);
-  gfprintf(outfile, "owl_attack_code         %d\n", d2->owl_attack_code);
-  gfprintf(outfile, "owl_attack_point        %1m\n", d2->owl_attack_point);
-  gfprintf(outfile, "owl_attack_certain      %s\n",
+    gfprintf(goban, outfile, "%1m ", DRAGON(d2->adjacent[k]).origin);
+  gfprintf(goban, outfile, "\nhostile_neighbors       %d\n", d2->hostile_neighbors);
+  gfprintf(goban, outfile, "owl_attack_code         %d\n", d2->owl_attack_code);
+  gfprintf(goban, outfile, "owl_attack_point        %1m\n", d2->owl_attack_point);
+  gfprintf(goban, outfile, "owl_attack_certain      %s\n",
 	   (d2->owl_attack_certain) ? "YES" : "NO");
-  gfprintf(outfile, "owl_2nd_attack_point    %1m\n",
+  gfprintf(goban, outfile, "owl_2nd_attack_point    %1m\n",
 	   d2->owl_second_attack_point);
-  gfprintf(outfile, "owl_threat_status       %s\n",
+  gfprintf(goban, outfile, "owl_threat_status       %s\n",
 	   status_to_string(d2->owl_threat_status));
-  gfprintf(outfile, "owl_defense_code        %d\n", d2->owl_defense_code);
-  gfprintf(outfile, "owl_defense_point       %1m\n", d2->owl_defense_point);
-  gfprintf(outfile, "owl_defense_certain     %s\n",
+  gfprintf(goban, outfile, "owl_defense_code        %d\n", d2->owl_defense_code);
+  gfprintf(goban, outfile, "owl_defense_point       %1m\n", d2->owl_defense_point);
+  gfprintf(goban, outfile, "owl_defense_certain     %s\n",
 	   (d2->owl_defense_certain) ? "YES" : "NO");
-  gfprintf(outfile, "owl_2nd_defense_point   %1m\n",
+  gfprintf(goban, outfile, "owl_2nd_defense_point   %1m\n",
            d2->owl_second_defense_point);
-  gfprintf(outfile, "owl_attack_kworm        %1m\n", d2->owl_attack_kworm);
-  gfprintf(outfile, "owl_defense_kworm       %1m\n", d2->owl_defense_kworm);
-  gfprintf(outfile, "semeais                 %d\n", d2->semeais);
-  gfprintf(outfile, "semeai_defense_point    %1m\n", d2->semeai_defense_point);
-  gfprintf(outfile, "semeai_defense_certain  %d\n",
+  gfprintf(goban, outfile, "owl_attack_kworm        %1m\n", d2->owl_attack_kworm);
+  gfprintf(goban, outfile, "owl_defense_kworm       %1m\n", d2->owl_defense_kworm);
+  gfprintf(goban, outfile, "semeais                 %d\n", d2->semeais);
+  gfprintf(goban, outfile, "semeai_defense_point    %1m\n", d2->semeai_defense_point);
+  gfprintf(goban, outfile, "semeai_defense_certain  %d\n",
 	   d2->semeai_defense_certain);
-  gfprintf(outfile, "semeai_defense_target   %1m\n",
+  gfprintf(goban, outfile, "semeai_defense_target   %1m\n",
       	   d2->semeai_defense_target);
-  gfprintf(outfile, "semeai_attack_point     %1m\n", d2->semeai_attack_point);
-  gfprintf(outfile, "semeai_attack_certain   %d\n", d2->semeai_attack_certain);
-  gfprintf(outfile, "semeai_attack_target    %1m\n", d2->semeai_attack_target);
-  gfprintf(outfile, "strings                 ");
+  gfprintf(goban, outfile, "semeai_attack_point     %1m\n", d2->semeai_attack_point);
+  gfprintf(goban, outfile, "semeai_attack_certain   %d\n", d2->semeai_attack_certain);
+  gfprintf(goban, outfile, "semeai_attack_target    %1m\n", d2->semeai_attack_target);
+  gfprintf(goban, outfile, "strings                 ");
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)
+    if (ON_BOARD(goban, ii)
 	&& worm[ii].origin == ii
 	&& is_same_dragon(ii, pos))
-	gfprintf(outfile, "%1m ", ii);
-  gfprintf(outfile, "\n");
+	gfprintf(goban, outfile, "%1m ", ii);
+  gfprintf(goban, outfile, "\n");
 }
 
 

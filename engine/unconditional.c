@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -50,17 +51,17 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
 
     /* Visit all friendly strings on the board. */
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (board[pos] != color || find_origin(pos) != pos)
+      if (board[pos] != color || find_origin(goban, pos) != pos)
 	continue;
 
       if (exceptions && exceptions[pos])
 	continue;
       
       /* Try to capture the string at pos. */
-      liberties = findlib(pos, MAXLIBS, libs);
+      liberties = findlib(goban, pos, MAXLIBS, libs);
       save_moves = moves_played;
       for (k = 0; k < liberties; k++) {
-	if (trymove(libs[k], other, "unconditional_life", pos))
+	if (trymove(goban, libs[k], other, "unconditional_life", pos))
 	  moves_played++;
       }
       
@@ -69,7 +70,7 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
        */
       if (board[pos] == EMPTY)
 	something_captured = 1;
-      else if (findlib(pos, 2, libs) == 1) {
+      else if (findlib(goban, pos, 2, libs) == 1) {
 	/* Need to use tryko as a defense against the extreme case
 	 * when the only opponent liberty that is not suicide is an
 	 * illegal ko capture, like in this 5x5 position:
@@ -81,14 +82,14 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
 	 * |.XO.O|
 	 * +-----+
 	 */
-	int success = tryko(libs[0], other, "unconditional_life");
-	gg_assert(success);
+	int success = tryko(goban, libs[0], other, "unconditional_life");
+	gg_assert(goban, success);
 	moves_played++;
 	something_captured = 1;
       }
       else
 	while (moves_played > save_moves) {
-	  popgo();
+	  popgo(goban);
 	  moves_played--;
 	}
     }
@@ -318,17 +319,17 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
     int pos2;
     
     if (board[pos] != color
-	|| find_origin(pos) != pos
-	|| countstones(pos) != 2)
+	|| find_origin(goban, pos) != pos
+	|| countstones(goban, pos) != 2)
       continue;
     
-    findstones(pos, 2, stones);
+    findstones(goban, pos, 2, stones);
     for (k = 0; k < 2 && isolated; k++) {
       for (r = 0; r < 8 && isolated; r++) {
 	pos2 = stones[k] + delta[r];
-	if (!ON_BOARD(pos2)
+	if (!ON_BOARD(goban, pos2)
 	    || (board[pos2] == color
-		&& !same_string(pos, pos2)))
+		&& !same_string(goban, pos, pos2)))
 	  isolated = 0;
       }
     }
@@ -348,13 +349,13 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
    *    alive strings except where illegal.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] != color || potential_sekis[pos] || find_origin(pos) != pos)
+    if (board[pos] != color || potential_sekis[pos] || find_origin(goban, pos) != pos)
       continue;
       
     /* Play as many liberties as we can. */
-    liberties = findlib(pos, MAXLIBS, libs);
+    liberties = findlib(goban, pos, MAXLIBS, libs);
     for (k = 0; k < liberties; k++) {
-      if (trymove(libs[k], other, "unconditional_life", pos))
+      if (trymove(goban, libs[k], other, "unconditional_life", pos))
 	moves_played++;
     }
   }
@@ -368,12 +369,12 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
     found_one = 0;
 
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (board[pos] != other || countlib(pos) > 1)
+      if (board[pos] != other || countlib(goban, pos) > 1)
 	continue;
 	
       /* Try to extend the string at (m, n). */
-      findlib(pos, 1, libs);
-      if (trymove(libs[0], other, "unconditional_life", pos)) {
+      findlib(goban, pos, 1, libs);
+      if (trymove(goban, libs[0], other, "unconditional_life", pos)) {
 	moves_played++;
 	found_one = 1;
       }
@@ -384,7 +385,7 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!potential_sekis[pos]
 	|| board[pos] == EMPTY
-	|| find_origin(pos) != pos)
+	|| find_origin(goban, pos) != pos)
       continue;
     for (r = 0; r < 4; r++) {
       int up = delta[r];
@@ -400,32 +401,32 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
 	if (board[pos + right] != EMPTY || board[pos + up - right] != EMPTY)
 	  continue;
 	if (board[pos - right] == EMPTY
-	    && trymove(pos - right, other, "unconditional_life", pos))
+	    && trymove(goban, pos - right, other, "unconditional_life", pos))
 	  locally_played_moves++;
 	if (board[pos + up + right] == EMPTY
-	    && trymove(pos + up + right, other, "unconditional_life", pos))
+	    && trymove(goban, pos + up + right, other, "unconditional_life", pos))
 	  locally_played_moves++;
 	if (board[pos - right] == other && board[pos + up + right] == other
-	    && same_string(pos - right, pos + up + right)) {
+	    && same_string(goban, pos - right, pos + up + right)) {
 	  /* This is a critical seki. Extend the string with one stone
            * in an arbitrary direction to break the seki.
 	   */
 	  while (locally_played_moves > 0) {
-	    popgo();
+	    popgo(goban);
 	    locally_played_moves--;
 	  }
-	  trymove(pos - up, color, "unconditional_life", pos);
+	  trymove(goban, pos - up, color, "unconditional_life", pos);
 	  moves_played++;
 	  break;
 	}
 	else {
 	  while (locally_played_moves > 0) {
-	    popgo();
+	    popgo(goban);
 	    locally_played_moves--;
 	  }
 	}
       }
-      if (countstones(pos) > 2)
+      if (countstones(goban, pos) > 2)
 	break;
     }
   }
@@ -435,9 +436,9 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
     if (!potential_sekis[pos] || board[pos] == EMPTY)
       continue;
     /* Play as many liberties as we can. */
-    liberties = findlib(pos, MAXLIBS, libs);
+    liberties = findlib(goban, pos, MAXLIBS, libs);
     for (k = 0; k < liberties; k++) {
-      if (trymove(libs[k], other, "unconditional_life", pos))
+      if (trymove(goban, libs[k], other, "unconditional_life", pos))
 	moves_played++;
     }
   }
@@ -448,9 +449,9 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
     int bpos;
     int aopen, bopen;
     int alib, blib;
-    if (board[pos] != other || countlib(pos) != 2)
+    if (board[pos] != other || countlib(goban, pos) != 2)
       continue;
-    findlib(pos, 2, libs);
+    findlib(goban, pos, 2, libs);
     apos = libs[0];
     bpos = libs[1];
     if (abs(I(apos) - I(bpos)) + abs(J(apos) - J(bpos)) != 1)
@@ -469,17 +470,17 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
      * |..OX    |..OO.OX
      * +----    +-------
      */
-    aopen = approxlib(apos, color, 4, NULL);
-    bopen = approxlib(bpos, color, 4, NULL);
-    alib  = approxlib(apos, other, 4, NULL);
-    blib  = approxlib(bpos, other, 4, NULL);
+    aopen = approxlib(goban, apos, color, 4, NULL);
+    bopen = approxlib(goban, bpos, color, 4, NULL);
+    alib  = approxlib(goban, apos, other, 4, NULL);
+    blib  = approxlib(goban, bpos, other, 4, NULL);
     
     if (aopen > bopen || (aopen == bopen && alib >= blib)) {
-      trymove(apos, other, "unconditional_life", pos);
+      trymove(goban, apos, other, "unconditional_life", pos);
       moves_played++;
     }
     else {
-      trymove(bpos, other, "unconditional_life", pos);
+      trymove(goban, bpos, other, "unconditional_life", pos);
       moves_played++;
     }
   }
@@ -489,22 +490,22 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] == color && !potential_sekis[pos]) {
       unconditional_territory[pos] = 1;
-      if (find_origin(pos) == pos) {
-	liberties = findlib(pos, MAXLIBS, libs);
+      if (find_origin(goban, pos) == pos) {
+	liberties = findlib(goban, pos, MAXLIBS, libs);
 	for (k = 0; k < liberties; k++)
 	  unconditional_territory[libs[k]] = 2;
       }
     }
-    else if (board[pos] == other && countlib(pos) == 1) {
+    else if (board[pos] == other && countlib(goban, pos) == 1) {
       unconditional_territory[pos] = 2;
-      findlib(pos, 1, libs);
+      findlib(goban, pos, 1, libs);
       unconditional_territory[libs[0]] = 2;
     }
   }
   
   /* Take back all moves. */
   while (moves_played > 0) {
-    popgo();
+    popgo(goban);
     moves_played--;
   }
 }

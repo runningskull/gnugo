@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -233,12 +234,12 @@ snapback(int str)
   SGFTree *save_sgf_dumptree = sgf_dumptree;
 
   /* if more than one stone captured, not a snapback */
-  stones = countstones(str);
+  stones = countstones(goban, str);
   if (stones > 1)
     return 0;
 
   /* if more than one liberty, not a snapback */
-  liberties = findlib(str, 1, &lib);
+  liberties = findlib(goban, str, 1, &lib);
   if (liberties > 1)
     return 0;
 
@@ -247,11 +248,11 @@ snapback(int str)
   sgf_dumptree = NULL;
   
   /* if only one liberty after capture */
-  if (trymove(lib, OTHER_COLOR(board[str]), "snapback", str)) {
+  if (trymove(goban, lib, OTHER_COLOR(board[str]), "snapback", str)) {
     liberties = 0;
     if (IS_STONE(board[lib]))
-      liberties = countlib(lib);
-    popgo();
+      liberties = countlib(goban, lib);
+    popgo(goban);
     sgf_dumptree = save_sgf_dumptree;
     if (liberties > 1)
       return 0;
@@ -288,31 +289,31 @@ ponnuki_connect(int *moves, int str1, int str2, zone *zn)
    * + + @ + + x +
    * - - - - - - -
    */
-  liberties = findlib(str1, MAXLIBS, libs);
+  liberties = findlib(goban, str1, MAXLIBS, libs);
   for (r = 0; r < liberties; r++)
-    if (is_self_atari(libs[r], OTHER_COLOR(board[str1]))) 
+    if (is_self_atari(goban, libs[r], OTHER_COLOR(board[str1]))) 
       for (k = 0; k < 4; k++) {
 	int pos = libs[r] + delta[k];
 	if (board[pos] == board[str1]
-	    && !same_string(pos, str1)
-	    && !same_string(pos, str2) ) {
+	    && !same_string(goban, pos, str1)
+	    && !same_string(goban, pos, str2) ) {
 	  /* try to connect pos to str2 in one move */
 	  /* play a common liberty */
-	  neighb = findlib(pos, MAXLIBS, neighbs);
+	  neighb = findlib(goban, pos, MAXLIBS, neighbs);
 	  for (s = 0; s < neighb; s++)
-	    if (liberty_of_string(neighbs[s], str2)) {
+	    if (liberty_of_string(goban, neighbs[s], str2)) {
 	      res = 1;
 	      add_zone(zn, libs[r]);
 	      add_zone(zn, neighbs[s]);
 	      add_array(moves, neighbs[s]);
 	    }
 	  /* or capture a common adjacent string */
-	  adj = chainlinks2(pos, adjs, 1);
+	  adj = chainlinks2(goban, pos, adjs, 1);
 	  for (s = 0; s < adj; s++)
-	    if (adjacent_strings(adjs[s], str2)
+	    if (adjacent_strings(goban, adjs[s], str2)
 		&& !snapback(adjs[s])) {
 	      res = 1;
-	      neighb = findlib(adjs[s], 1, neighbs);
+	      neighb = findlib(goban, adjs[s], 1, neighbs);
 	      add_zone(zn, libs[r]);
 	      add_zone(zn, neighbs[0]);
 	      add_array(moves, neighbs[0]);
@@ -338,13 +339,13 @@ moves_connection_one_move(int *moves, int str1, int str2, zone *zn)
     return 0;
 
   /* Common liberties. */
-  if (have_common_lib(str1, str2, NULL))
+  if (have_common_lib(goban, str1, str2, NULL))
     return WIN;
 
   /* Common adjacent string in atari, more than one stone, no snapback. */
-  adj = chainlinks2(str1, adjs, 1);
+  adj = chainlinks2(goban, str1, adjs, 1);
   for (r = 0; r < adj; r++)
-    if (adjacent_strings(adjs[r], str2)
+    if (adjacent_strings(goban, adjs[r], str2)
         && !snapback(adjs[r]))
       return WIN;
   
@@ -389,22 +390,22 @@ prevent_connection_one_move(int *moves, int str1, int str2)
   int adjadj, adjadjs[MAXCHAIN];
   
   /* Common liberties. */
-  if (have_common_lib(str1, str2, libs)) {
+  if (have_common_lib(goban, str1, str2, libs)) {
     add_array(moves, libs[0]);
     return WIN;
   }
   
   /* Save a common adjacent string in atari, more than one stone, no snapback.
    */
-  adj = chainlinks2(str1, adjs, 1);
+  adj = chainlinks2(goban, str1, adjs, 1);
   for (r = 0; r < adj; r++)
-    if (adjacent_strings(adjs[r], str2)
+    if (adjacent_strings(goban, adjs[r], str2)
         && !snapback(adjs[r])) {
-      findlib(adjs[r], MAXLIBS, libs);
+      findlib(goban, adjs[r], MAXLIBS, libs);
       add_array(moves, libs[0]);
-      adjadj = chainlinks2(adjs[r], adjadjs, 1);
+      adjadj = chainlinks2(goban, adjs[r], adjadjs, 1);
       for (s = 0; s < adjadj; s++) {
-	findlib(adjadjs[s], MAXLIBS, libs);
+	findlib(goban, adjadjs[s], MAXLIBS, libs);
 	add_array(moves, libs[0]);
       }
       return WIN;
@@ -440,11 +441,11 @@ connected_one_move(int str1, int str2)
 			   "connected_one_move");
     res = WIN;
     for (r = 1; ((r < moves[0] + 1) && res); r++) {
-      if (trymove(moves[r], OTHER_COLOR(board[str1]),
+      if (trymove(goban, moves[r], OTHER_COLOR(board[str1]),
 		  "connected_one_move", str1)) {
 	if (!connection_one_move(str1, str2))
 	  res = 0;
-	popgo();
+	popgo(goban);
       }
     }
   }
@@ -481,7 +482,7 @@ moves_to_connect_in_two_moves(int *moves, int str1, int str2)
   int move;
   
   /* Common liberties. */
-  if (have_common_lib(str1, str2, libs)) {
+  if (have_common_lib(goban, str1, str2, libs)) {
     add_array(moves, libs[0]);
     return 1;
   }
@@ -489,38 +490,38 @@ moves_to_connect_in_two_moves(int *moves, int str1, int str2)
   /* Capture a common adjacent string or an adjacent liberty of str1
    * that has a common liberty with str2...
    */
-  adj = chainlinks3(str1, adjs, 2);
+  adj = chainlinks3(goban, str1, adjs, 2);
   for (r = 0; r < adj; r++) {
-    liberties = findlib(adjs[r], MAXLIBS, libs);
+    liberties = findlib(goban, adjs[r], MAXLIBS, libs);
     common_adj_liberty = 0;
     for (s = 0; s < liberties; s++)
-      if (liberty_of_string(libs[s], str2))
+      if (liberty_of_string(goban, libs[s], str2))
 	common_adj_liberty = 1;
-    if (common_adj_liberty || adjacent_strings(adjs[r], str2)) {
+    if (common_adj_liberty || adjacent_strings(goban, adjs[r], str2)) {
       for (s = 0; s < liberties; s++)
 	add_array(moves, libs[s]);
-      adjadj = chainlinks2(adjs[r], adjadjs, 1);
+      adjadj = chainlinks2(goban, adjs[r], adjadjs, 1);
       for (s = 0; s < adjadj; s++) {
-	findlib(adjadjs[s], MAXLIBS, libs);
+	findlib(goban, adjadjs[s], MAXLIBS, libs);
 	add_array(moves, libs[0]);
       }
     }
   }
 
   /* ...and vice versa. */
-  adj = chainlinks3(str2, adjs, 2);
+  adj = chainlinks3(goban, str2, adjs, 2);
   for (r = 0; r < adj; r++) {
-    liberties = findlib(adjs[r], MAXLIBS, libs);
+    liberties = findlib(goban, adjs[r], MAXLIBS, libs);
     common_adj_liberty = 0;
     for (s = 0; s < liberties; s++)
-      if (liberty_of_string(libs[s], str1))
+      if (liberty_of_string(goban, libs[s], str1))
 	common_adj_liberty = 1;
-    if (common_adj_liberty || adjacent_strings(adjs[r], str1)) {
+    if (common_adj_liberty || adjacent_strings(goban, adjs[r], str1)) {
       for (s = 0; s < liberties; s++)
 	add_array(moves, libs[s]);
-      adjadj = chainlinks2(adjs[r], adjadjs, 1);
+      adjadj = chainlinks2(goban, adjs[r], adjadjs, 1);
       for (s = 0; s < adjadj; s++) {
-	findlib(adjadjs[s], MAXLIBS, libs);
+	findlib(goban, adjadjs[s], MAXLIBS, libs);
 	add_array(moves, libs[0]);
       }
     }
@@ -529,31 +530,31 @@ moves_to_connect_in_two_moves(int *moves, int str1, int str2)
   /* Liberties of str1 that are second order liberties of str2 and
    * vice versa.
    */
-  liberties = findlib(str1, MAXLIBS, libs);
+  liberties = findlib(goban, str1, MAXLIBS, libs);
   for (r = 0; r < liberties; r++) {
     if (board[SOUTH(libs[r])] == EMPTY) {
-      if (liberty_of_string(SOUTH(libs[r]), str2)) {
+      if (liberty_of_string(goban, SOUTH(libs[r]), str2)) {
 	add_array(moves, libs[r]);
 	add_array(moves, SOUTH(libs[r]));
       }
     }
     
     if (board[WEST(libs[r])] == EMPTY) {
-      if (liberty_of_string(WEST(libs[r]), str2)) {
+      if (liberty_of_string(goban, WEST(libs[r]), str2)) {
 	add_array(moves, libs[r]);
 	add_array(moves, WEST(libs[r]));
       }
     }
 
     if (board[NORTH(libs[r])] == EMPTY) {
-      if (liberty_of_string(NORTH(libs[r]), str2)) {
+      if (liberty_of_string(goban, NORTH(libs[r]), str2)) {
 	add_array(moves, libs[r]);
 	add_array(moves, NORTH(libs[r]));
       }
     }
 
     if (board[EAST(libs[r])] == EMPTY) {
-      if (liberty_of_string(EAST(libs[r]), str2)) {
+      if (liberty_of_string(goban, EAST(libs[r]), str2)) {
 	add_array(moves, libs[r]);
 	add_array(moves, EAST(libs[r]));
       }
@@ -563,12 +564,12 @@ moves_to_connect_in_two_moves(int *moves, int str1, int str2)
   /* Liberties of str1 which are adjacent to a friendly string with
    * common liberty with str2.
    */
-  liberties = findlib(str1, MAXLIBS, libs);
+  liberties = findlib(goban, str1, MAXLIBS, libs);
   for (r = 0; r < liberties; r++) {
     for (k = 0; k < 4; k++) {
       int pos = libs[r] + delta[k];
       if (board[pos] == color
-	  && !same_string(pos, str1)
+	  && !same_string(goban, pos, str1)
 	  && quiescence_connect(pos, str2, &move)) {
 	add_array(moves, libs[r]);
 	add_array(moves, move);
@@ -577,12 +578,12 @@ moves_to_connect_in_two_moves(int *moves, int str1, int str2)
   }
 
   /* And vice versa. */
-  liberties = findlib(str2, MAXLIBS, libs);
+  liberties = findlib(goban, str2, MAXLIBS, libs);
   for (r = 0; r < liberties; r++) {
     for (k = 0; k < 4; k++) {
       int pos = libs[r] + delta[k];
       if (board[pos] == color
-	  && !same_string(pos, str2)
+	  && !same_string(goban, pos, str2)
 	  && quiescence_connect(pos, str1, &move)) {
 	add_array(moves, libs[r]);
 	add_array(moves, move);
@@ -623,10 +624,10 @@ connection_two_moves(int str1, int str2)
   sgf_dumptree = NULL;
   
   for (r = 1; ((r < moves[0] + 1) && !res); r++) {
-    if (trymove(moves[r], board[str1], "connection_two_moves", str1)) {
+    if (trymove(goban, moves[r], board[str1], "connection_two_moves", str1)) {
       if (connected_one_move(str1, str2))
 	res = WIN;
-      popgo();
+      popgo(goban);
     }
   }
   
@@ -679,12 +680,12 @@ prevent_connection_two_moves(int *moves, int str1, int str2)
 			   OTHER_COLOR(board[str1]),
 			   "prevent_connection_two_moves");
     for (r = 1; r < possible_moves[0] + 1; r++) {
-      if (trymove(possible_moves[r], OTHER_COLOR(board[str1]), 
+      if (trymove(goban, possible_moves[r], OTHER_COLOR(board[str1]), 
 		  "prevent_connection_two_moves", str1)) {
 	if (!connection_one_move(str1, str2))
 	  if (!connection_two_moves(str1, str2))
 	    add_array(moves, possible_moves[r]);
-	popgo();
+	popgo(goban);
       }
     }
   }
@@ -735,14 +736,14 @@ moves_to_connect_in_three_moves(int *moves, int str1, int str2,
 
   /* Find second order liberties of str1. */
   memset(secondlib1, 0, sizeof(secondlib1));
-  liberties = findlib(str1, MAXLIBS, libs);
+  liberties = findlib(goban, str1, MAXLIBS, libs);
   for (r = 0; r < liberties; r++)
     for (k = 0; k < 4; k++) {
       pos = libs[r] + delta[k];
       if (board[pos] == EMPTY)
 	secondlib1[pos] = 1;
       else if (board[pos] == board[str1]) {
-	liberties2 = findlib(pos, MAXLIBS, libs2);
+	liberties2 = findlib(goban, pos, MAXLIBS, libs2);
 	for (s = 0; s < liberties2; s++)
 	  secondlib1[libs2[s]] = 1;
       }
@@ -751,14 +752,14 @@ moves_to_connect_in_three_moves(int *moves, int str1, int str2,
   /* Find second order liberties of str2.
    */
   memset(secondlib2, 0, sizeof(secondlib2));
-  liberties = findlib(str2, MAXLIBS, libs);
+  liberties = findlib(goban, str2, MAXLIBS, libs);
   for (r = 0; r < liberties; r++)
     for (k = 0; k < 4; k++) {
       pos = libs[r] + delta[k];
       if (board[pos] == EMPTY)
 	secondlib2[pos] = 1;
       else if (board[pos] == board[str2]) {
-	liberties2 = findlib(pos, MAXLIBS, libs2);
+	liberties2 = findlib(goban, pos, MAXLIBS, libs2);
 	for (s = 0; s < liberties2; s++)
 	  secondlib2[libs2[s]] = 1;
       }
@@ -775,13 +776,13 @@ moves_to_connect_in_three_moves(int *moves, int str1, int str2,
   /* Capture a neighbor of str1 which is in atari. The captured string
    * must in turn have a neighbor which can connect to str2 easily.
    */
-  adj = chainlinks2(str1, adjs, 1);
+  adj = chainlinks2(goban, str1, adjs, 1);
   for (r = 0; r < adj; r++) {
-    adjadj = chainlinks(adjs[r], adjadjs);
+    adjadj = chainlinks(goban, adjs[r], adjadjs);
     for (s = 0; s < adjadj; s++) {
-      if (!same_string(adjadjs[s], str1)
+      if (!same_string(goban, adjadjs[s], str1)
 	  && quiescence_connect(adjadjs[s], str2, &move)) {
-	findlib(adjs[r], 1, libs);
+	findlib(goban, adjs[r], 1, libs);
 	add_array(moves, libs[0]);
 	add_array(moves, move);
       }
@@ -789,13 +790,13 @@ moves_to_connect_in_three_moves(int *moves, int str1, int str2,
   }
 
   /* And vice versa. */
-  adj = chainlinks2(str2, adjs, 1);
+  adj = chainlinks2(goban, str2, adjs, 1);
   for (r = 0; r < adj; r++) {
-    adjadj = chainlinks(adjs[r], adjadjs);
+    adjadj = chainlinks(goban, adjs[r], adjadjs);
     for (s = 0; s < adjadj; s++) {
-      if (!same_string(adjadjs[s], str2)
+      if (!same_string(goban, adjadjs[s], str2)
 	  && quiescence_connect(adjadjs[s], str1, &move)) {
-	findlib(adjs[r], 1, libs);
+	findlib(goban, adjs[r], 1, libs);
 	add_array(moves, libs[0]);
 	add_array(moves, move);
       }
@@ -805,30 +806,30 @@ moves_to_connect_in_three_moves(int *moves, int str1, int str2,
   /* Liberties of neighbor of str1 with at most two liberties, which
    * are second order liberties of str2.
    */
-  adj = chainlinks3(str1, adjs, 2);
+  adj = chainlinks3(goban, str1, adjs, 2);
   for (r = 0; r < adj; r++) {
-    liberties = findlib(adjs[r], 2, libs);
+    liberties = findlib(goban, adjs[r], 2, libs);
     for (s = 0; s < liberties; s++)
-      if (second_order_liberty_of_string(libs[s], str2))
+      if (second_order_liberty_of_string(goban, libs[s], str2))
 	add_array(moves, libs[s]);
   }
 
   /* And vice versa. */
-  adj = chainlinks3(str2, adjs, 2);
+  adj = chainlinks3(goban, str2, adjs, 2);
   for (r = 0; r < adj; r++) {
-    liberties = findlib(adjs[r], 2, libs);
+    liberties = findlib(goban, adjs[r], 2, libs);
     for (s = 0; s < liberties; s++)
-      if (second_order_liberty_of_string(libs[s], str1))
+      if (second_order_liberty_of_string(goban, libs[s], str1))
 	add_array(moves, libs[s]);
   }
   
   /* Move in on a three liberty opponent string which is adjacent to
    * str1 and has a liberty in common with str2.
    */
-  adj = chainlinks2(str1, adjs, 3);
+  adj = chainlinks2(goban, str1, adjs, 3);
   for (r = 0; r < adj; r++) {
-    if (have_common_lib(adjs[r], str2, NULL)) {
-      liberties = findlib(adjs[r], 3, libs);
+    if (have_common_lib(goban, adjs[r], str2, NULL)) {
+      liberties = findlib(goban, adjs[r], 3, libs);
       for (s = 0; s < liberties; s++) {
 	/* If generating a connecting move, require the liberty to be
          * no further than diagonal to a second order liberty of one
@@ -836,7 +837,7 @@ moves_to_connect_in_three_moves(int *moves, int str1, int str2,
 	 */
 	for (k = 0; k < 8; k++) {
 	  if (!does_connect
-	      || (ON_BOARD(libs[s] + delta[k])
+	      || (ON_BOARD(goban, libs[s] + delta[k])
 		  && (secondlib1[libs[s] + delta[k]]
 		      || secondlib2[libs[s] + delta[k]]))) {
 	    add_array(moves, libs[s]);
@@ -848,10 +849,10 @@ moves_to_connect_in_three_moves(int *moves, int str1, int str2,
   }
 
   /* And vice versa. */
-  adj = chainlinks2(str2, adjs, 3);
+  adj = chainlinks2(goban, str2, adjs, 3);
   for (r = 0; r < adj; r++) {
-    if (have_common_lib(adjs[r], str1, NULL)) {
-      liberties = findlib(adjs[r], 3, libs);
+    if (have_common_lib(goban, adjs[r], str1, NULL)) {
+      liberties = findlib(goban, adjs[r], 3, libs);
       for (s = 0; s < liberties; s++) {
 	/* If generating a connecting move, require the liberty to be
          * no further than diagonal to a second order liberty of one
@@ -859,7 +860,7 @@ moves_to_connect_in_three_moves(int *moves, int str1, int str2,
 	 */
 	for (k = 0; k < 8; k++) {
 	  if (!does_connect
-             || (ON_BOARD(libs[s] + delta[k])
+             || (ON_BOARD(goban, libs[s] + delta[k])
                  && (secondlib1[libs[s] + delta[k]]
                      || secondlib2[libs[s] + delta[k]]))) {
 	    add_array(moves, libs[s]);
@@ -920,12 +921,12 @@ simply_connected_two_moves(int str1, int str2)
     order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]),
 			   "simply_connected_two_moves");
     for (r = 1; ((r < moves[0] + 1) && res); r++) {
-      if (trymove(moves[r], OTHER_COLOR(board[str1]),
+      if (trymove(goban, moves[r], OTHER_COLOR(board[str1]),
 		  "simply_connected_two_moves", str1)) {
 	if (!connection_one_move(str1, str2))
 	  if (!connection_two_moves(str1, str2))
 	    res = 0;
-	popgo();
+	popgo(goban);
       }
     }
   }
@@ -957,11 +958,11 @@ simple_connection_three_moves(int str1, int str2)
   order_connection_moves(moves, str1, str2, board[str1],
 			 "simple_connection_three_moves");
   for (r = 1; ((r < moves[0] + 1) && !res); r++) {
-    if (trymove(moves[r], board[str1],
+    if (trymove(goban, moves[r], board[str1],
 		"simple_connection_three_moves", str1)) {
       if (simply_connected_two_moves(str1, str2))
 	res = WIN;
-      popgo();
+      popgo(goban);
     }
   }
   
@@ -1007,13 +1008,13 @@ prevent_simple_connection_three_moves(int *moves, int str1, int str2)
     order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]),
 			   "prevent_simple_connection_three_moves");
     for (r = 1; r < possible_moves[0] + 1; r++) {
-      if (trymove(possible_moves[r], OTHER_COLOR(board[str1]), 
+      if (trymove(goban, possible_moves[r], OTHER_COLOR(board[str1]), 
 		  "prevent_simple_connection_three_moves", str1)) {
 	if (!connection_one_move(str1, str2))
 	  if (!connection_two_moves(str1, str2))
 	    if (!simple_connection_three_moves(str1, str2))
 	      add_array(moves, possible_moves[r]);
-	popgo();
+	popgo(goban);
       }
     }
   }
@@ -1036,24 +1037,24 @@ quiescence_connect(int str1, int str2, int *move)
   int adj, adjs[MAXCHAIN];
 
   /* Common liberties. */
-  if (have_common_lib(str1, str2, &lib)) {
+  if (have_common_lib(goban, str1, str2, &lib)) {
     *move = lib;
     return WIN;
   }
 
   /* Common adjacent string in atari, more than one stone, no snapback. */
-  adj = chainlinks2(str1, adjs, 1);
+  adj = chainlinks2(goban, str1, adjs, 1);
   for (r = 0; r < adj; r++)
-    if (adjacent_strings(adjs[r], str2)
+    if (adjacent_strings(goban, adjs[r], str2)
         && !snapback(adjs[r])) {
-      findlib(adjs[r], 1, move);
+      findlib(goban, adjs[r], 1, move);
       return WIN;
     }
   
   /* Common adjacent string two liberties, read ladder. */
-  adj = chainlinks2(str1, adjs, 2);
+  adj = chainlinks2(goban, str1, adjs, 2);
   for (r = 0; r < adj; r++)
-    if (adjacent_strings(adjs[r], str2))
+    if (adjacent_strings(goban, adjs[r], str2))
       if (quiescence_capture(adjs[r], move))
 	return WIN;
   
@@ -1108,8 +1109,8 @@ string_connect(int str1, int str2, int *move)
 #endif
     if (board[str1] == EMPTY || board[str2] == EMPTY)
       return 0;
-    str1 = find_origin(str1);
-    str2 = find_origin(str2);
+    str1 = find_origin(goban, str1);
+    str2 = find_origin(goban, str2);
     if (str1 > str2) {
       int tmp = str1;
       str1 = str2;
@@ -1121,7 +1122,7 @@ string_connect(int str1, int str2, int *move)
 					    &result2, &move2))
       result2 = -1;
     else if (0)
-      gprintf("Persistent cache found connect %1m %1m: %d %1m\n",
+      gprintf(goban, "Persistent cache found connect %1m %1m: %d %1m\n",
 	      str1, str2, result2, move2);
 #endif
 #if USE_PERSISTENT_CONNECTION_CACHE == 2
@@ -1142,19 +1143,19 @@ string_connect(int str1, int str2, int *move)
     if (result2 != -1
 	&& result2 != result
 	&& *move != move2)
-      gprintf("Persistent cache failure connect %1m %1m: %d %1m != %d %1m\n",
+      gprintf(goban, "Persistent cache failure connect %1m %1m: %d %1m != %d %1m\n",
 	      str1, str2, result, *move, result2, move2);
 #endif
 
     if (0) {
-      gprintf("%oconnect    %1M %1M, result %d %1M (%d, %d nodes, %f seconds)\n",
+      gprintf(goban, "%oconnect    %1M %1M, result %d %1M (%d, %d nodes, %f seconds)\n",
 	      str1, str2, result, *move,
 	      nodes_connect, tactical_nodes, gg_cputime() - start);
-      dump_stack();
+      dump_stack(goban);
     }
     if (0) {
-      gprintf("%oconnect %1m %1m %d %1m ", str1, str2, result, *move);
-      dump_stack();
+      gprintf(goban, "%oconnect %1m %1m %d %1m ", str1, str2, result, *move);
+      dump_stack(goban);
     }
 
 #if USE_PERSISTENT_CONNECTION_CACHE > 0
@@ -1182,7 +1183,7 @@ recursive_connect(int str1, int str2, int *move)
     return 0;
   }
   
-  if (same_string(str1, str2)) {
+  if (same_string(goban, str1, str2)) {
     SGFTRACE2(PASS_MOVE, WIN, "already connected");
     return WIN;
   }
@@ -1240,12 +1241,12 @@ recursive_connect(int str1, int str2, int *move)
   order_connection_moves(Moves, str1, str2, board[str1],
 			 "recursive_connect");
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++) {
-    if (trymove(Moves[i], board[str1], "recursive_connect", str1)) {
+    if (trymove(goban, Moves[i], board[str1], "recursive_connect", str1)) {
       if (!recursive_disconnect(str1, str2, move)) {
 	*move = Moves[i];
 	res = WIN;
       }
-      popgo();
+      popgo(goban);
     }
   }
 
@@ -1289,8 +1290,8 @@ disconnect(int str1, int str2, int *move)
 #endif
     if (board[str1] == EMPTY || board[str2] == EMPTY)
       return WIN;
-    str1 = find_origin(str1);
-    str2 = find_origin(str2);
+    str1 = find_origin(goban, str1);
+    str2 = find_origin(goban, str2);
     if (str1 > str2) {
       int tmp = str1;
       str1 = str2;
@@ -1302,7 +1303,7 @@ disconnect(int str1, int str2, int *move)
 					    &result2, &move2))
       result2 = -1;
     else if (0)
-      gprintf("Persistent cache found disconnect %1m %1m: %d %1m\n",
+      gprintf(goban, "Persistent cache found disconnect %1m %1m: %d %1m\n",
 	      str1, str2, result2, move2);
 #endif
 #if USE_PERSISTENT_CONNECTION_CACHE == 2
@@ -1324,19 +1325,19 @@ disconnect(int str1, int str2, int *move)
     if (result2 != -1
 	&& result2 != result
 	&& *move != move2)
-      gprintf("Persistent cache failure disconnect %1m %1m: %d %1m != %d %1m\n",
+      gprintf(goban, "Persistent cache failure disconnect %1m %1m: %d %1m != %d %1m\n",
 	      str1, str2, result, *move, result2, move2);
 #endif
 
     if (0) {
-      gprintf("%odisconnect %1m %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
+      gprintf(goban, "%odisconnect %1m %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
 	      str1, str2, result, *move,
 	      nodes_connect, tactical_nodes, gg_cputime() - start);
-      dump_stack();
+      dump_stack(goban);
     }
     if (0) {
-      gprintf("%odisconnect %1m %1m %d %1m ", str1, str2, result, *move);
-      dump_stack();
+      gprintf(goban, "%odisconnect %1m %1m %d %1m ", str1, str2, result, *move);
+      dump_stack(goban);
     }
 
 #if USE_PERSISTENT_CONNECTION_CACHE > 0
@@ -1354,13 +1355,13 @@ disconnect(int str1, int str2, int *move)
   order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]),
 			 "disconnect");
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
-    if (trymove(Moves[i], OTHER_COLOR(board[str1]),
+    if (trymove(goban, Moves[i], OTHER_COLOR(board[str1]),
 		"disconnect", str1)) {
       if (!recursive_connect(str1, str2, move)) {
 	*move = Moves[i];
 	res = WIN;
       }
-      popgo();
+      popgo(goban);
     }
   return res;
 }
@@ -1379,8 +1380,8 @@ fast_disconnect(int str1, int str2, int *move)
 
   if (board[str1] == EMPTY || board[str2] == EMPTY)
     return WIN;
-  str1 = find_origin(str1);
-  str2 = find_origin(str2);
+  str1 = find_origin(goban, str1);
+  str2 = find_origin(goban, str2);
   if (str1 > str2) {
     int tmp = str1;
     str1 = str2;
@@ -1426,7 +1427,7 @@ recursive_disconnect(int str1, int str2, int *move)
     return WIN;
   }
 
-  if (same_string(str1, str2)) {
+  if (same_string(goban, str1, str2)) {
     SGFTRACE2(PASS_MOVE, 0, "already connected");
     return 0;
   }
@@ -1462,13 +1463,13 @@ recursive_disconnect(int str1, int str2, int *move)
     order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]),
 			   "recursive_disconnect");
     for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
-      if (trymove(Moves[i], OTHER_COLOR(board[str1]),
+      if (trymove(goban, Moves[i], OTHER_COLOR(board[str1]),
 		  "recursive_disconnect", str1)) {
 	if (!recursive_connect(str1, str2, move)) {
 	  *move = Moves[i];
 	  res = WIN;
 	}
-	popgo();
+	popgo(goban);
       }
 
   if (res == WIN) {
@@ -1497,11 +1498,11 @@ quiescence_capture(int str, int *move)
   sgf_dumptree = NULL;
   count_variations = 0;
 
-  if (countlib(str) == 1) {
-    findlib(str, 1, move);
+  if (countlib(goban, str) == 1) {
+    findlib(goban, str, 1, move);
     result = WIN;
   }
-  else if (countlib(str) == 2)
+  else if (countlib(goban, str) == 2)
     result = simple_ladder(str, move);
 
   /* Turn the sgf traces back on. */
@@ -1515,7 +1516,7 @@ quiescence_capture(int str, int *move)
 static int
 capture_one_move(int str) 
 {
-  if (countlib(str) == 1)
+  if (countlib(goban, str) == 1)
     return 1;
   return 0;
 }
@@ -1534,13 +1535,13 @@ prevent_capture_one_move(int *moves, int str1)
   int liberties, libs[MAXLIBS];
   int adj, adjs[MAXCHAIN];
   
-  liberties = findlib(str1, MAXLIBS, libs);
+  liberties = findlib(goban, str1, MAXLIBS, libs);
   if (liberties == 1) {
     add_array(moves, libs[0]);
     res = WIN;
-    adj = chainlinks2(str1, adjs, 1);
+    adj = chainlinks2(goban, str1, adjs, 1);
     for (r = 0; r < adj; r++) {
-      findlib(adjs[r], 1, libs);
+      findlib(goban, adjs[r], 1, libs);
       add_array(moves, libs[0]);
     }
   }
@@ -1562,7 +1563,7 @@ recursive_transitivity(int str1, int str2, int str3, int *move)
     return 0;
   }
   
-  if (same_string(str1, str2) && same_string(str1, str3)) {
+  if (same_string(goban, str1, str2) && same_string(goban, str1, str3)) {
     SGFTRACE2(PASS_MOVE, WIN, "already connected");
     return WIN;
   }
@@ -1580,13 +1581,13 @@ recursive_transitivity(int str1, int str2, int str3, int *move)
   nodes_connect++;
   global_connection_node_counter++;
   
-  if (same_string(str1, str2))
+  if (same_string(goban, str1, str2))
     if (quiescence_connect (str1, str3, move)) {
       SGFTRACE2(*move, WIN, "quiescence_connect");
       return WIN;
     }
 
-  if (same_string(str2, str3))
+  if (same_string(goban, str2, str3))
     if (quiescence_connect (str1, str2, move)) {
       SGFTRACE2(*move, WIN, "quiescence_connect");
       return WIN;
@@ -1623,12 +1624,12 @@ recursive_transitivity(int str1, int str2, int str3, int *move)
   order_connection_moves(Moves, str1, str2, board[str1],
 			 "recursive_transitivity");
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++) {
-    if (trymove(Moves[i], board[str1], "recursive_transitivity", str1)) {
+    if (trymove(goban, Moves[i], board[str1], "recursive_transitivity", str1)) {
       if (!recursive_non_transitivity(str1, str2, str3, move)) {
 	*move = Moves[i];
 	res = WIN;
       }
-      popgo();
+      popgo(goban);
     }
   }
 
@@ -1672,13 +1673,13 @@ non_transitivity(int str1, int str2, int str3, int *move)
   order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]),
 			 "non_transitivity");
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
-    if (trymove(Moves[i], OTHER_COLOR(board[str1]),
+    if (trymove(goban, Moves[i], OTHER_COLOR(board[str1]),
 		"non_transitivity", str1)) {
       if (!recursive_transitivity(str1, str2, str3, move)) {
 	*move = Moves[i];
 	res = WIN;
       }
-      popgo();
+      popgo(goban);
     }
   return res;
 }
@@ -1711,7 +1712,7 @@ recursive_non_transitivity(int str1, int str2, int str3, int *move)
     return WIN;
   }
 
-  if (same_string(str1, str2) && same_string(str1, str3)) {
+  if (same_string(goban, str1, str2) && same_string(goban, str1, str3)) {
     SGFTRACE2(PASS_MOVE, 0, "already connected");
     return 0;
   }
@@ -1742,13 +1743,13 @@ recursive_non_transitivity(int str1, int str2, int str3, int *move)
     order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]),
 			   "recursive_non_transitivity");
     for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
-      if (trymove(Moves[i], OTHER_COLOR(board[str1]),
+      if (trymove(goban, Moves[i], OTHER_COLOR(board[str1]),
 		  "recursive_non_transitivity", str1)) {
 	if (!recursive_transitivity(str1, str2, str3, move)) {
 	  *move = Moves[i];
 	  res = WIN;
 	}
-	popgo();
+	popgo(goban);
       }
 
   if (res == WIN) {
@@ -1781,7 +1782,7 @@ order_connection_moves(int *moves, int str1, int str2, int color_to_move,
      * the player to move, not to the color of the string.
      *
      * We don't use all these values. They are only here so we can
-     * reuse incremental_order_moves() which was developed for the
+     * reuse incremental_order_moves(goban) which was developed for the
      * tactical reading.
      */
     int number_edges       = 0; /* outside board */
@@ -1795,18 +1796,18 @@ order_connection_moves(int *moves, int str1, int str2, int color_to_move,
     int libs;
 
     /* We let the incremental board code do the heavy work. */
-    incremental_order_moves(move, color_to_move, str1, &number_edges,
+    incremental_order_moves(goban, move, color_to_move, str1, &number_edges,
 			    &number_same_string, &number_own,
 			    &number_opponent, &captured_stones,
 			    &threatened_stones, &saved_stones, &number_open);
 
     if (0)
-      gprintf("%o %1m values: %d %d %d %d %d %d %d %d\n", move, number_edges,
+      gprintf(goban, "%o %1m values: %d %d %d %d %d %d %d %d\n", move, number_edges,
 	      number_same_string, number_own, number_opponent,
 	      captured_stones, threatened_stones, saved_stones, number_open);
 
     scores[r] = 0;
-    libs = approxlib(move, color_to_move, 10, NULL);
+    libs = approxlib(goban, move, color_to_move, 10, NULL);
 
     /* Avoid self atari. */
     if (libs == 1 && captured_stones == 0)
@@ -1864,9 +1865,9 @@ order_connection_moves(int *moves, int str1, int str2, int color_to_move,
   }
 
   if (0) {
-    gprintf("%oVariation %d:\n", count_variations);
+    gprintf(goban, "%oVariation %d:\n", count_variations);
     for (i = 1; i <= moves[0]; i++)
-      gprintf("%o  %1M %d\n", moves[i], scores[i]);
+      gprintf(goban, "%o  %1M %d\n", moves[i], scores[i]);
   }
 
   if (sgf_dumptree) {
@@ -1985,7 +1986,7 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
     return 0;
   }
   
-  if (same_string(str1, str2)) {
+  if (same_string(goban, str1, str2)) {
     SGFTRACE2(PASS_MOVE, WIN, "already connected");
     return WIN;
   }
@@ -2000,8 +2001,8 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
     return 0;
   }
 
-  str1 = find_origin(str1);
-  str2 = find_origin(str2);
+  str1 = find_origin(goban, str1);
+  str2 = find_origin(goban, str2);
 
   if (stackp <= depth && (hashflags & HASH_CONNECT)
       && !has_passed
@@ -2028,14 +2029,14 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
     int ko_move;
     xpos = moves[k];
     
-    if (komaster_trymove(xpos, color, "recursive_connect2", str1,
+    if (komaster_trymove(goban, xpos, color, "recursive_connect2", str1,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       tried_moves++;
       if (!ko_move) {
 	int acode = recursive_disconnect2(str1, str2, NULL,
 					 
 					  has_passed);
-	popgo();
+	popgo(goban);
 	if (acode == 0) {
 	  SGFTRACE2(xpos, WIN, "connection effective");
 	  READ_RETURN_CONN(CONNECT, str1, str2, depth - stackp,
@@ -2053,7 +2054,7 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
 	  savemove = xpos;
 	  savecode = KO_B;
 	}
-	popgo();
+	popgo(goban);
       }
     }
   }
@@ -2124,7 +2125,7 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
     return WIN;
   }
 
-  if (same_string(str1, str2)) {
+  if (same_string(goban, str1, str2)) {
     SGFTRACE2(PASS_MOVE, 0, "already connected");
     return 0;
   }
@@ -2142,8 +2143,8 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
   sgf_dumptree = NULL;
   count_variations = 0;
 
-  str1 = find_origin(str1);
-  str2 = find_origin(str2);
+  str1 = find_origin(goban, str1);
+  str2 = find_origin(goban, str2);
 
   attack_code1 = attack(str1, &attack_pos1);
   if (attack_code1 == WIN) {
@@ -2223,13 +2224,13 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
     int ko_move;
     xpos = moves[k];
     
-    if (komaster_trymove(xpos, other, "recursive_disconnect2", str1,
+    if (komaster_trymove(goban, xpos, other, "recursive_disconnect2", str1,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       tried_moves++;
       if (!ko_move) {
 	int dcode = recursive_connect2(str1, str2, NULL,
 				       has_passed);
-	popgo();
+	popgo(goban);
 	if (dcode == 0) {
 	  SGFTRACE2(xpos, WIN, "disconnection effective");
 	  READ_RETURN_CONN(DISCONNECT, str1, str2, depth - stackp,
@@ -2247,7 +2248,7 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
 	  savemove = xpos;
 	  savecode = KO_B;
 	}
-	popgo();
+	popgo(goban);
       }
     }
   }
@@ -2340,7 +2341,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
       continue;
 
     if (verbose > 0)
-      gprintf("%oMove %1m, (%f, %f, %f, %f)\n", pos, 
+      gprintf(goban, "%oMove %1m, (%f, %f, %f, %f)\n", pos, 
 	      FIXED_TO_FLOAT(dist1), FIXED_TO_FLOAT(deltadist1), 
 	      FIXED_TO_FLOAT(dist2), FIXED_TO_FLOAT(deltadist2));
 
@@ -2353,20 +2354,20 @@ find_connection_moves(int str1, int str2, int color_to_move,
     d2 = dist2 - deltadist2;
     distance = d1 + d2;
     if (verbose > 0)
-      gprintf("%o  %f, primary distance\n", FIXED_TO_FLOAT(distance));
+      gprintf(goban, "%o  %f, primary distance\n", FIXED_TO_FLOAT(distance));
     
     /* Bonus if d1 and d2 are well balanced. */
     if ((3 * d1) / 2 > d2 && (3 * d2) / 2 > d1) {
       distance -= FP(0.1);
       if (verbose > 0)
-	gprintf("%o  -0.1, well balanced\n");
+	gprintf(goban, "%o  -0.1, well balanced\n");
     }
 
     /* Check whether the move is "between" the two strings. */
     if (conn1->coming_from[pos] != NO_MOVE
 	&& conn1->coming_from[pos] == conn2->coming_from[pos]) {
       if (verbose > 0)
-	gprintf("%o  discarded, not between strings\n");
+	gprintf(goban, "%o  discarded, not between strings\n");
       continue;
     }
     
@@ -2376,39 +2377,39 @@ find_connection_moves(int str1, int str2, int color_to_move,
       }
       else {
 	if (verbose > 0)
-	  gprintf("%o  discarded, self atari\n");
+	  gprintf(goban, "%o  discarded, self atari\n");
       }
     }
     else if (board[pos] == other) {
       attack_and_defend(pos, &acode, &attack_move, &dcode, &defense_move);
       if (verbose > 0)
-	gprintf("%o  attack with code %d at %1m, defense with code %d at %1m\n",
+	gprintf(goban, "%o  attack with code %d at %1m, defense with code %d at %1m\n",
 		acode, attack_move, dcode, defense_move);
       
       if (connect_move && acode != 0) {
 	if (dcode == 0) {
 	  distance += FP(0.5);
 	  if (verbose > 0)
-	    gprintf("%o  +0.5, no defense\n");
+	    gprintf(goban, "%o  +0.5, no defense\n");
 	}
 	else {
 	  if (conn1->distances[attack_move]
 	      + conn2->distances[attack_move] > dist1 + dist2) {
 	    distance += FP(0.5);
 	    if (verbose > 0)
-	      gprintf("%o  +0.5, attack point not on shortest path\n");
+	      gprintf(goban, "%o  +0.5, attack point not on shortest path\n");
 	  }
 	}
 	ADD_CANDIDATE_MOVE(attack_move, distance - FP(0.15), moves, distances,
 			   num_moves);
 	if (verbose > 0)
-	  gprintf("%o  -0.15 at %1m, capturing a string\n", attack_move);
+	  gprintf(goban, "%o  -0.15 at %1m, capturing a string\n", attack_move);
       }
       else if (!connect_move && acode != 0 && dcode != 0) {
 	ADD_CANDIDATE_MOVE(defense_move, distance - FP(0.5), moves, distances,
 			   num_moves);
 	if (verbose > 0)
-	  gprintf("%o  -0.5 at %1m, defending a string\n", defense_move);
+	  gprintf(goban, "%o  -0.5 at %1m, defending a string\n", defense_move);
       }
     }
     else if (board[pos] == color) {
@@ -2429,14 +2430,14 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	  if (check_self_atari(apos, color_to_move)) {
 	    ADD_CANDIDATE_MOVE(apos, distance, moves, distances, num_moves);
 	    if (verbose > 0)
-	      gprintf("%o  +0.0 at %1m, vulnerability\n", apos);
+	      gprintf(goban, "%o  +0.0 at %1m, vulnerability\n", apos);
 	  }
 
 	  if (bpos != apos
 	      && check_self_atari(bpos, color_to_move)) {
 	    ADD_CANDIDATE_MOVE(bpos, distance, moves, distances, num_moves);
 	    if (verbose > 0)
-	      gprintf("%o  +0.0 at %1m, vulnerability\n", bpos);
+	      gprintf(goban, "%o  +0.0 at %1m, vulnerability\n", bpos);
 	  }
 	}
       } 
@@ -2455,11 +2456,11 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	adjacent_to_attacker = 1;
 	distances[r] -= FP(0.15);
 	if (verbose > 0)
-	  gprintf("%o%1M -0.15, adjacent to attacker string\n", move);
-	if (countlib(pos) <= 2) {
+	  gprintf(goban, "%o%1M -0.15, adjacent to attacker string\n", move);
+	if (countlib(goban, pos) <= 2) {
 	  distances[r] -= FP(0.2);
 	  if (verbose > 0)
-	    gprintf("%o%1M -0.2, adjacent to attacker string with at most two liberties\n", move);
+	    gprintf(goban, "%o%1M -0.2, adjacent to attacker string with at most two liberties\n", move);
 	  if ((connect_move || !bonus_given)
 	      && (conn1->distances[move] - conn1->deltas[move] <= FP(0.5)
 		  || conn1->distances[pos] - conn1->deltas[pos] <= FP(0.5))
@@ -2470,15 +2471,15 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	    bonus_given = 1;
 	    distances[r] -= FP(0.7);
 	    if (verbose > 0)
-	      gprintf("%o%1M -0.7, capture or atari of immediately connecting string\n", move);
+	      gprintf(goban, "%o%1M -0.7, capture or atari of immediately connecting string\n", move);
 	  }
 	}
       }
       else if (board[pos] == color) {
-	if (countlib(pos) <= 2) {
+	if (countlib(goban, pos) <= 2) {
 	  distances[r] -= FP(0.2);
 	  if (verbose > 0)
-	    gprintf("%o%1M -0.2, adjacent to defender string with at most two liberties\n", move);
+	    gprintf(goban, "%o%1M -0.2, adjacent to defender string with at most two liberties\n", move);
 	}
 	/* The code above (in the 'board[pos] == other' branch) makes
 	 * perfect sense for the defender, but has a tendency to
@@ -2488,45 +2489,45 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	 * The following code compensates in such kind of situations.
 	 * See connection:111 and gunnar:53 for example.
 	 */
-	if (!connect_move && countlib(pos) == 1
+	if (!connect_move && countlib(goban, pos) == 1
 	    /* let's avoid ko and snapbacks */
-	    && accuratelib(move, other, 2, NULL) > 1) {
+	    && accuratelib(goban, move, other, 2, NULL) > 1) {
 	  int adjs[MAXCHAIN];
 	  int bonus;
-	  bonus = FP(0.1) * chainlinks2(pos, adjs, 2);
-	  bonus += FP(0.5) * chainlinks2(pos, adjs, 1);
+	  bonus = FP(0.1) * chainlinks2(goban, pos, adjs, 2);
+	  bonus += FP(0.5) * chainlinks2(goban, pos, adjs, 1);
 	  distances[r] -= bonus;
 	  if (verbose > 0)
-	    gprintf("%o%1M -%f, capture of defender string\n",
+	    gprintf(goban, "%o%1M -%f, capture of defender string\n",
 		    move, FIXED_TO_FLOAT(bonus));
 	}
       }
     }
     if (adjacent_to_attacker
 	&& !connect_move
-	&& is_edge_vertex(move)) {
+	&& is_edge_vertex(goban, move)) {
       distances[r] -= FP(0.1);
       if (verbose > 0)
-	gprintf("%o%1M -0.1, disconnect move on edge\n", move);
+	gprintf(goban, "%o%1M -0.1, disconnect move on edge\n", move);
     }
 
     if (ladder_capturable(move, color_to_move)) {
       distances[r] += FP(0.3);
       if (verbose > 0)
-	gprintf("%o%1M +0.3, can be captured in a ladder\n", move);
+	gprintf(goban, "%o%1M +0.3, can be captured in a ladder\n", move);
     }
 
     /* Bonus for moves adjacent to endpoint strings with 3 liberties.
      * Neighbor strings with less than 3 liberties have already
      * generated a bonus above.
      */
-    if ((liberty_of_string(move, str1)
-	 && countlib(str1) == 3)
-	|| (ON_BOARD(str2) && liberty_of_string(move, str2)
-	    && countlib(str2) == 3)) {
+    if ((liberty_of_string(goban, move, str1)
+	 && countlib(goban, str1) == 3)
+	|| (ON_BOARD(goban, str2) && liberty_of_string(goban, move, str2)
+	    && countlib(goban, str2) == 3)) {
       distances[r] -= FP(0.1);
       if (verbose > 0)
-	gprintf("%o%1M -0.1, liberty of endpoint string with 3 libs\n", move);
+	gprintf(goban, "%o%1M -0.1, liberty of endpoint string with 3 libs\n", move);
     }
   }
 
@@ -2567,9 +2568,9 @@ find_connection_moves(int str1, int str2, int color_to_move,
   }
 
   if (verbose > 0) {
-    gprintf("%oSorted moves:\n");
+    gprintf(goban, "%oSorted moves:\n");
     for (i = 0; i < num_moves; i++)
-      gprintf("%o%1M %f\n", moves[i], FIXED_TO_FLOAT(distances[i]));
+      gprintf(goban, "%o%1M %f\n", moves[i], FIXED_TO_FLOAT(distances[i]));
   }
 
   if (sgf_dumptree) {
@@ -2605,7 +2606,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
    *   1. d    2. d+0.1   3. d+0.2   4. d+1.5
    * it will be discarded.
    */
-  if (num_moves <= 1 || !is_ko(moves[0], color_to_move, NULL))
+  if (num_moves <= 1 || !is_ko(goban, moves[0], color_to_move, NULL))
     distance_limit = distances[0] + FP(1.5);
   else
     distance_limit = distances[1] + FP(1.5);
@@ -2646,14 +2647,14 @@ find_string_connection_moves(int str1, int str2, int color_to_move,
   compute_connection_distances(str1, str2, FP(3.051), &conn1, 1);
   compute_connection_distances(str2, str1, FP(3.051), &conn2, 1);
 
-  if (findlib(str1, 1, &lib) == 1) {
+  if (findlib(goban, str1, 1, &lib) == 1) {
     conn1.distances[lib] = 0;
     conn1.coming_from[lib] = NO_MOVE;
     conn2.distances[lib] = conn2.distances[str1];
     conn2.coming_from[lib] = conn1.coming_from[str1];
   }
 
-  if (findlib(str2, 1, &lib) == 1) {
+  if (findlib(goban, str2, 1, &lib) == 1) {
     conn2.distances[lib] = 0;
     conn1.distances[lib] = conn1.distances[str2];
   }
@@ -2664,8 +2665,8 @@ find_string_connection_moves(int str1, int str2, int color_to_move,
   *total_distance = gg_min(max_dist1, max_dist2);
 
   if (verbose > 0) {
-    gprintf("%oVariation %d\n", save_count_variations);
-    dump_stack();
+    gprintf(goban, "%oVariation %d\n", save_count_variations);
+    dump_stack(goban);
     showboard(0);
     print_connection_distances(&conn1);
     print_connection_distances(&conn2);
@@ -2709,7 +2710,7 @@ init_connection_data(int color, const char goal[BOARDMAX],
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (goal[pos]) {
       if (board[pos] == color) {
-	int origin = find_origin(pos);
+	int origin = find_origin(goban, pos);
 
 	if (!mark[origin]) {
 	  add_to_start_queue(origin, FP(0.0), conn);
@@ -2752,14 +2753,14 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
   for (k = 0; k < conn1.queue_end; k++)
     if (board[conn1.queue[k]] == color) {
       int stones[MAX_BOARD * MAX_BOARD];
-      int num_stones = findstones(conn1.queue[k],
+      int num_stones = findstones(goban, conn1.queue[k],
 	  			  MAX_BOARD * MAX_BOARD, stones);
       int i;
       for (i = 0; i < num_stones; i++) {
 	if (goal[stones[i]]) {
-	  str2 = find_origin(stones[i]);
-	  TRACE("%oUsing %1m as secondary target.\n", str2);
-	  mark_string(str2, breakin_shadow, 1);
+	  str2 = find_origin(goban, stones[i]);
+	  TRACE(goban, "%oUsing %1m as secondary target.\n", str2);
+	  mark_string(goban, str2, breakin_shadow, 1);
 	  break;
 	}
       }
@@ -2777,7 +2778,7 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
 
   spread_connection_distances(color, &conn2);
 
-  if (findlib(str, 1, &lib) == 1) {
+  if (findlib(goban, str, 1, &lib) == 1) {
     conn1.distances[lib] = 0;
     conn1.coming_from[lib] = NO_MOVE;
     conn2.distances[lib] = conn2.distances[str];
@@ -2792,8 +2793,8 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
   count_variations = save_count_variations;
 
   if (verbose > 0) {
-    gprintf("%oVariation %d\n", save_count_variations);
-    dump_stack();
+    gprintf(goban, "%oVariation %d\n", save_count_variations);
+    dump_stack(goban);
     showboard(0);
     print_connection_distances(&conn1);
     print_connection_distances(&conn2);
@@ -2811,7 +2812,7 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
   if (color_to_move != board[str]) {
     int move;
     if (num_moves < MAX_MOVES
-	&& ON_BOARD(str2)
+	&& ON_BOARD(goban, str2)
 	&& ladder_capture(str2, &move)) {
       moves[num_moves++] = move;
     }
@@ -2864,7 +2865,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
     return 0;
   }
 
-  str = find_origin(str);
+  str = find_origin(goban, str);
   if (stackp <= depth
       && (hashflags & HASH_BREAK_IN)
       && !has_passed
@@ -2892,12 +2893,12 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
     int ko_move;
     xpos = moves[k];
     
-    if (komaster_trymove(xpos, color, "recursive_break", str,
+    if (komaster_trymove(goban, xpos, color, "recursive_break", str,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       tried_moves++;
       if (!ko_move) {
 	int acode = recursive_block(str, goal, NULL, has_passed, goal_hash);
-	popgo();
+	popgo(goban);
 	if (acode == 0) {
 	  SGFTRACE(xpos, WIN, "break effective");
 	  READ_RETURN_HASH(BREAK_IN, str, depth - stackp, goal_hash,
@@ -2913,7 +2914,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
 	  savemove = xpos;
 	  savecode = KO_B;
 	}
-	popgo();
+	popgo(goban);
       }
     }
   }
@@ -2969,7 +2970,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
   }
 
 #if 0
-  if (same_string(str1, str2)) {
+  if (same_string(goban, str1, str2)) {
     SGFTRACE(PASS_MOVE, 0, "already connected");
     return 0;
   }
@@ -2985,7 +2986,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
     return WIN;
   }
   
-  str = find_origin(str);
+  str = find_origin(goban, str);
   if (stackp <= depth
       && (hashflags & HASH_BLOCK_OFF)
       && tt_get(&ttable, BLOCK_OFF, str, NO_MOVE,
@@ -3009,12 +3010,12 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
     int ko_move;
     xpos = moves[k];
     
-    if (komaster_trymove(xpos, other, "recursive_block", str,
+    if (komaster_trymove(goban, xpos, other, "recursive_block", str,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       tried_moves++;
       if (!ko_move) {
 	int dcode = recursive_break(str, goal, NULL, has_passed, goal_hash);
-	popgo();
+	popgo(goban);
 	if (dcode == 0) {
 	  SGFTRACE(xpos, WIN, "block effective");
 	  READ_RETURN_HASH(BLOCK_OFF, str, depth - stackp, goal_hash,
@@ -3031,7 +3032,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
 	  savemove = xpos;
 	  savecode = KO_B;
 	}
-	popgo();
+	popgo(goban);
       }
     }
   }
@@ -3072,7 +3073,7 @@ break_in(int str, const char goal[BOARDMAX], int *move)
   int reading_nodes_when_called = get_reading_node_counter();
   double start = 0;
   int tactical_nodes;
-  Hash_data goal_hash = goal_to_hashvalue(goal);
+  Hash_data goal_hash = goal_to_hashvalue(goban->board_size, goal);
 
   if (move == NULL)
     move = &dummy_move;
@@ -3082,14 +3083,14 @@ break_in(int str, const char goal[BOARDMAX], int *move)
   
   if (board[str] == EMPTY)
     return 0;
-  str = find_origin(str);
+  str = find_origin(goban, str);
 
   if (search_persistent_breakin_cache(BREAK_IN, str, &goal_hash,
 				      breakin_node_limit, &result, move)) {
     if (debug & DEBUG_BREAKIN) {
-      gprintf("Break-in from %1m to:\n", str);
+      gprintf(goban, "Break-in from %1m to:\n", str);
       goaldump(goal);
-      gprintf("Result cached: %s %1m\n", result_to_string(result), *move);
+      gprintf(goban, "Result cached: %s %1m\n", result_to_string(result), *move);
     }
     return result;
   }
@@ -3103,15 +3104,15 @@ break_in(int str, const char goal[BOARDMAX], int *move)
   verbose = save_verbose;
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   if (debug & DEBUG_BREAKIN) {
-    gprintf("%obreak_in    %1M, result %s %1M (%d, %d nodes, %f seconds)\n",
+    gprintf(goban, "%obreak_in    %1M, result %s %1M (%d, %d nodes, %f seconds)\n",
 	    str, result_to_string(result), *move,
 	    nodes_connect, tactical_nodes, gg_cputime() - start);
     goaldump(goal);
-    dump_stack();
+    dump_stack(goban);
   }
   if (0) {
-    gprintf("%obreak_in %1m %d %1m ", str, result, *move);
-    dump_stack();
+    gprintf(goban, "%obreak_in %1m %d %1m ", str, result, *move);
+    dump_stack(goban);
     goaldump(goal);
   }
   store_persistent_breakin_cache(BREAK_IN, str, &goal_hash, result, *move,
@@ -3135,7 +3136,7 @@ block_off(int str, const char goal[BOARDMAX], int *move)
   int reading_nodes_when_called = get_reading_node_counter();
   double start = 0;
   int tactical_nodes;
-  Hash_data goal_hash = goal_to_hashvalue(goal);
+  Hash_data goal_hash = goal_to_hashvalue(goban->board_size, goal);
   
   if (move == NULL)
     move = &dummy_move;
@@ -3143,13 +3144,13 @@ block_off(int str, const char goal[BOARDMAX], int *move)
   nodes_connect = 0;
   *move = PASS_MOVE;
   
-  str = find_origin(str);
+  str = find_origin(goban, str);
   if (search_persistent_breakin_cache(BLOCK_OFF, str, &goal_hash,
 				      breakin_node_limit, &result, move)) {
     if (debug & DEBUG_BREAKIN) {
-      gprintf("Blocking off %1m from:\n", str);
+      gprintf(goban, "Blocking off %1m from:\n", str);
       goaldump(goal);
-      gprintf("Result cached: %s %1m\n", result_to_string(result), *move);
+      gprintf(goban, "Result cached: %s %1m\n", result_to_string(result), *move);
     }
     return result;
   }
@@ -3164,16 +3165,16 @@ block_off(int str, const char goal[BOARDMAX], int *move)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
   if (debug & DEBUG_BREAKIN) {
-    gprintf("%oblock_off %1m, result %s %1m (%d, %d nodes, %f seconds)\n",
+    gprintf(goban, "%oblock_off %1m, result %s %1m (%d, %d nodes, %f seconds)\n",
 	    str, result_to_string(result), *move,
 	    nodes_connect, tactical_nodes, gg_cputime() - start);
     goaldump(goal);
-    dump_stack();
+    dump_stack(goban);
   }
   if (0) {
-    gprintf("%oblock_off %1m %d %1m ", str, result, *move);
+    gprintf(goban, "%oblock_off %1m %d %1m ", str, result, *move);
     goaldump(goal);
-    dump_stack();
+    dump_stack(goban);
   }
   store_persistent_breakin_cache(BLOCK_OFF, str, &goal_hash, result, *move,
 				 tactical_nodes, breakin_node_limit,
@@ -3202,8 +3203,8 @@ push_connection_heap_entry(struct connection_data *conn, int distance,
   int parent;
   struct heap_entry *new_entry = &conn->heap_data[conn->heap_data_size];
 
-  gg_assert(conn->heap_data_size < 4 * BOARDMAX);
-  gg_assert(conn->heap_size < BOARDMAX);
+  gg_assert(goban, conn->heap_data_size < 4 * BOARDMAX);
+  gg_assert(goban, conn->heap_size < BOARDMAX);
 
   /* Create new heap entry. */
   new_entry->distance	 = distance;
@@ -3263,7 +3264,7 @@ pop_connection_heap_entry(struct connection_data *conn)
 
 #define ENQUEUE_STONE(conn, from, pos, dist, delta, v1, v2)		\
   do {									\
-    int origin = find_origin(pos);					\
+    int origin = find_origin(goban, pos);					\
     if (dist < conn->distances[origin]) {				\
       if (conn->distances[origin] == HUGE_CONNECTION_DISTANCE)		\
 	conn->queue[conn->queue_end++] = origin;			\
@@ -3290,7 +3291,7 @@ case_6_7_helper(struct connection_data *conn, int color)
     ENQUEUE(conn, pos, apos, data->distance, FP(0.6), apos, NO_MOVE);
   else {
     int this_delta 
-      = FP(0.85) + FP(0.05) * gg_min(approxlib(apos, other, 5, NULL), 5);
+      = FP(0.85) + FP(0.05) * gg_min(approxlib(goban, apos, other, 5, NULL), 5);
     ENQUEUE(conn, pos, apos, data->distance + this_delta - FP(0.6), this_delta,
 	    NO_MOVE, NO_MOVE);
   }
@@ -3340,12 +3341,12 @@ case_16_17_18_helper(struct connection_data *conn, int color)
   else if (conn->distances[bpos] > data->distance + FP(0.3)) {
     if (board[apos] == EMPTY
 	&& board[gpos] == other
-	&& countlib(gpos) <= 3)
+	&& countlib(goban, gpos) <= 3)
       ENQUEUE(conn, pos, bpos, data->distance + FP(0.3), FP(1.0),
 	      apos, NO_MOVE);
     else if (board[gpos] == EMPTY
 	     && board[apos] == other
-	     && countlib(apos) <= 3)
+	     && countlib(goban, apos) <= 3)
       ENQUEUE(conn, pos, bpos, data->distance + FP(0.3), FP(1.0),
 	      gpos, NO_MOVE);
     else
@@ -3462,7 +3463,7 @@ spread_connection_distances(int color, struct connection_data *conn)
 	continue;
       }
 
-      gg_assert(conn->queue_end <= MAX_BOARD * MAX_BOARD);
+      gg_assert(goban, conn->queue_end <= MAX_BOARD * MAX_BOARD);
 
       /* Find the smallest distance among the queued points. */
       for (k = conn->queue_start; k < conn->queue_end; k++) {
@@ -3494,7 +3495,7 @@ spread_connection_distances(int color, struct connection_data *conn)
        */
       pos = conn->queue[conn->queue_start++];
       if (board[pos] != EMPTY) {
-	num_stones = findstones(pos, MAX_BOARD * MAX_BOARD, stones);
+	num_stones = findstones(goban, pos, MAX_BOARD * MAX_BOARD, stones);
 	pos = stones[0];
 	stone = 1;
       }
@@ -3540,32 +3541,32 @@ spread_connection_distances(int color, struct connection_data *conn)
 	int kpos = pos - 2 * right;
 	
 	/* Case 1. "a" is empty and would be suicide for the opponent. */
-	if (board[apos] == EMPTY && is_suicide(apos, other))
+	if (board[apos] == EMPTY && is_suicide(goban, apos, other))
 	  ENQUEUE(conn, pos, apos, distance, FP(0.0), apos, NO_MOVE);
 	
 	/* Case 2. "a" is empty and would be self atari for the opponent. */
 	if (board[apos] == EMPTY
 	    && conn->distances[apos] > distance + FP(0.1)
-	    && is_self_atari(apos, other)) {
+	    && is_self_atari(goban, apos, other)) {
 	  int lib;
 	  int vulnerable1 = NO_MOVE;
 	  int vulnerable2 = NO_MOVE;
-	  if (approxlib(apos, other, 1, &lib) >= 1) {
-	    if (approxlib(lib, other, 2, NULL) > 2)
+	  if (approxlib(goban, apos, other, 1, &lib) >= 1) {
+	    if (approxlib(goban, lib, other, 2, NULL) > 2)
 	      vulnerable1 = lib;
-	    if (countlib(pos) == 2) {
+	    if (countlib(goban, pos) == 2) {
 	      int i;
 	      for (i = 0; i < 4; i++) {
 		if (board[lib + delta[i]] == EMPTY
 		    && lib + delta[i] != apos
-		    && trymove(lib + delta[i], other,
+		    && trymove(goban, lib + delta[i], other,
 			       "compute_connection_distances", pos)) {
 		  if (ladder_capture(pos, NULL)) {
 		    vulnerable2 = lib + delta[i];
-		    popgo();
+		    popgo(goban);
 		    break;
 		  }
-		  popgo();
+		  popgo(goban);
 		}
 	      }
 	    }
@@ -3620,23 +3621,23 @@ spread_connection_distances(int color, struct connection_data *conn)
 	if (board[gpos] == EMPTY
 	    && board[epos] == color
             && conn->distances[epos] > distance + FP(0.2)
-	    && approxlib(gpos, other, 3, NULL) <= 2) {
+	    && approxlib(goban, gpos, other, 3, NULL) <= 2) {
 	  if (board[bpos] == EMPTY
-	      && approxlib(bpos, color, 3, NULL) >= 3
+	      && approxlib(goban, bpos, color, 3, NULL) >= 3
 	      && (board[apos] == color
 		  || (board[apos] == EMPTY
-		      && countlib(pos) > 2
+		      && countlib(goban, pos) > 2
 		      && !common_vulnerabilities(conn->vulnerable1[pos],
 						 conn->vulnerable2[pos],
 						 apos, gpos, color)
-		      && approxlib(apos, other, 3, NULL) <= 2))
+		      && approxlib(goban, apos, other, 3, NULL) <= 2))
 	      && (board[fpos] == color
 		  || (board[fpos] == EMPTY
-		      && countlib(epos) > 2
+		      && countlib(goban, epos) > 2
 		      && !common_vulnerabilities(conn->vulnerable1[pos],
 						 conn->vulnerable2[pos],
 						 fpos, gpos, color)
-		      && approxlib(fpos, other, 3, NULL) <= 2))) {
+		      && approxlib(goban, fpos, other, 3, NULL) <= 2))) {
 	    if (board[apos] == EMPTY && board[fpos] == EMPTY) {
 	      ENQUEUE_STONE(conn, pos, epos, distance + FP(0.2), FP(0.2),
 			    apos, fpos);
@@ -3656,21 +3657,21 @@ spread_connection_distances(int color, struct connection_data *conn)
 	  }
 
 	  if (board[ipos] == EMPTY
-	      && approxlib(ipos, color, 3, NULL) >= 3
+	      && approxlib(goban, ipos, color, 3, NULL) >= 3
 	      && (board[hpos] == color
 		  || (board[hpos] == EMPTY
-		      && countlib(pos) > 2
+		      && countlib(goban, pos) > 2
 		      && !common_vulnerabilities(conn->vulnerable1[pos],
 						 conn->vulnerable2[pos],
 						 hpos, gpos, color)
-		      && approxlib(hpos, other, 3, NULL) <= 2))
+		      && approxlib(goban, hpos, other, 3, NULL) <= 2))
 	      && (board[jpos] == color
 		  || (board[jpos] == EMPTY
-		      && countlib(epos) > 2
+		      && countlib(goban, epos) > 2
 		      && !common_vulnerabilities(conn->vulnerable1[pos],
 						 conn->vulnerable2[pos],
 						 jpos, gpos, color)
-		      && approxlib(jpos, other, 3, NULL) <= 2))) {
+		      && approxlib(goban, jpos, other, 3, NULL) <= 2))) {
 	    if (board[hpos] == EMPTY && board[jpos] == EMPTY) {
 	      ENQUEUE_STONE(conn, pos, epos, distance + FP(0.2), FP(0.2),
 			    hpos, jpos);
@@ -3779,8 +3780,8 @@ spread_connection_distances(int color, struct connection_data *conn)
 	    && board[fpos] == EMPTY
 	    && (conn->distances[fpos] > distance + FP(1.3)
 		|| conn->distances[epos] > distance + FP(1.3))
-	    && countlib(pos) >= 3
-	    && (!ON_BOARD(cpos) || !ON_BOARD(hpos))) {
+	    && countlib(goban, pos) >= 3
+	    && (!ON_BOARD(goban, cpos) || !ON_BOARD(goban, hpos))) {
 	  ENQUEUE(conn, pos, fpos, distance + FP(1.3), FP(1.0),
 		  NO_MOVE, NO_MOVE);
 	  ENQUEUE(conn, pos, epos, distance + FP(1.3), FP(1.0),
@@ -3794,8 +3795,8 @@ spread_connection_distances(int color, struct connection_data *conn)
 	    && board[jpos] == EMPTY
 	    && (conn->distances[jpos] > distance + FP(1.3)
 		|| conn->distances[epos] > distance + FP(1.3))
-	    && countlib(pos) >= 3
-	    && (!ON_BOARD(apos) || !ON_BOARD(kpos))) {
+	    && countlib(goban, pos) >= 3
+	    && (!ON_BOARD(goban, apos) || !ON_BOARD(goban, kpos))) {
 	  ENQUEUE(conn, pos, jpos, distance + FP(1.3), FP(1.0),
 		  NO_MOVE, NO_MOVE);
 	  ENQUEUE(conn, pos, epos, distance + FP(1.3), FP(1.0),
@@ -3824,7 +3825,7 @@ spread_connection_distances(int color, struct connection_data *conn)
 	if (board[gpos] == other
 	    && board[epos] == EMPTY
 	    && conn->distances[epos] > distance + FP(2.0)
-	    && countstones(gpos) == 1) {
+	    && countstones(goban, gpos) == 1) {
 	  ENQUEUE(conn, pos, epos, distance + FP(2.0), FP(1.0),
 		  NO_MOVE, NO_MOVE);
 	}
@@ -3836,7 +3837,7 @@ spread_connection_distances(int color, struct connection_data *conn)
 	    && board[apos] == other
 	    && board[gpos] == other
 	    && conn->distances[bpos] > distance + FP(2.0)
-	    && (countlib(apos) + countlib(gpos) <= 6)) {
+	    && (countlib(goban, apos) + countlib(goban, gpos) <= 6)) {
 	  ENQUEUE(conn, pos, bpos, distance + FP(2.0), FP(1.0),
 		  NO_MOVE, NO_MOVE);
 	}
@@ -3848,7 +3849,7 @@ spread_connection_distances(int color, struct connection_data *conn)
 	    && board[apos] == other
 	    && board[gpos] == other
 	    && conn->distances[bpos] > distance + FP(2.0)
-	    && (countlib(apos) + countlib(gpos) <= 5)) {
+	    && (countlib(goban, apos) + countlib(goban, gpos) <= 5)) {
 	  ENQUEUE_STONE(conn, pos, bpos, distance + FP(2.0), FP(1.0),
 			NO_MOVE, NO_MOVE);
 	}
@@ -3856,7 +3857,7 @@ spread_connection_distances(int color, struct connection_data *conn)
     }
     else if (board[pos] == EMPTY
 	     || (board[pos] == other
-		 && countlib(pos) <= 2
+		 && countlib(goban, pos) <= 2
 		 && no_escape_from_ladder(pos))) {
       for (k = 0; k < 4; k++) {
 	/* List of relative coordinates. (pos) is marked by *.
@@ -3892,7 +3893,7 @@ spread_connection_distances(int color, struct connection_data *conn)
 	}
 	else if (board[apos] == EMPTY) {
 	  int this_delta
-	    = FP(0.8) + FP(0.05) * gg_min(approxlib(apos, other, 6, NULL), 6);
+	    = FP(0.8) + FP(0.05) * gg_min(approxlib(goban, apos, other, 6, NULL), 6);
 	  ENQUEUE(conn, pos, apos, distance + this_delta, this_delta,
 		  NO_MOVE, NO_MOVE);
 	}
@@ -3972,7 +3973,7 @@ expand_connection_queue(struct connection_data *conn)
     if (board[conn->queue[k]] == EMPTY)
       full_queue[full_queue_position++] = conn->queue[k];
     else {
-      full_queue_position += findstones(conn->queue[k],
+      full_queue_position += findstones(goban, conn->queue[k],
 					MAX_BOARD * MAX_BOARD,
 					full_queue + full_queue_position);
     }
@@ -4020,7 +4021,7 @@ compute_connection_distances(int str, int target, int cutoff,
   clear_connection_data(conn);
 
   /* Add the origin of the initial string to the queue. */
-  add_to_start_queue(find_origin(str), FP(0.0), conn);
+  add_to_start_queue(find_origin(goban, str), FP(0.0), conn);
 
   conn->target = target;
   conn->cutoff_distance = cutoff;
@@ -4071,12 +4072,12 @@ print_connection_distances(struct connection_data *conn)
     if (conn->distances[pos] < HUGE_CONNECTION_DISTANCE
 	&& (conn->vulnerable1[pos] != NO_MOVE
 	    || conn->vulnerable2[pos] != NO_MOVE)) {
-      gprintf(" %1m:", pos);
+      gprintf(goban, " %1m:", pos);
       if (conn->vulnerable1[pos] != NO_MOVE)
-	gprintf(" %1m", conn->vulnerable1[pos]);
+	gprintf(goban, " %1m", conn->vulnerable1[pos]);
       if (conn->vulnerable2[pos] != NO_MOVE)
-	gprintf(" %1m", conn->vulnerable2[pos]);
-      gprintf("\n", pos);
+	gprintf(goban, " %1m", conn->vulnerable2[pos]);
+      gprintf(goban, "\n", pos);
     }
 }
 
@@ -4095,10 +4096,10 @@ trivial_connection(int str1, int str2, int *move)
   int r;
   int result = 0;
   
-  if (have_common_lib(str1, str2, move))
+  if (have_common_lib(goban, str1, str2, move))
     return WIN;
 
-  adj = chainlinks(str1, adjs);
+  adj = chainlinks(goban, str1, adjs);
 
   /* We turn off the sgf traces here to avoid cluttering them up with
    * tactical reading moves.
@@ -4107,7 +4108,7 @@ trivial_connection(int str1, int str2, int *move)
   count_variations = 0;
   
   for (r = 0; r < adj; r++)
-    if (adjacent_strings(adjs[r], str2) && attack(adjs[r], move) == WIN) {
+    if (adjacent_strings(goban, adjs[r], str2) && attack(adjs[r], move) == WIN) {
       result = WIN;
       break;
     }
@@ -4128,10 +4129,10 @@ does_secure_through_ladder(int color, int move, int pos)
 {
   int result = 0;
   
-  if (trymove(move, color, NULL, NO_MOVE)) {
+  if (trymove(goban, move, color, NULL, NO_MOVE)) {
     if (ladder_capturable(pos, OTHER_COLOR(color)))
       result = 1;
-    popgo();
+    popgo(goban);
   }
   
   return result;
@@ -4147,7 +4148,7 @@ ladder_capture(int str, int *move)
   int result;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
-  int liberties = countlib(str);
+  int liberties = countlib(goban, str);
   
   /* We turn off the sgf traces here to avoid cluttering them up with
    * tactical reading moves.
@@ -4175,13 +4176,13 @@ ladder_capturable(int pos, int color)
 {
   int result = 0;
   
-  if (trymove(pos, color, NULL, NO_MOVE)) {
-    int liberties = countlib(pos);
+  if (trymove(goban, pos, color, NULL, NO_MOVE)) {
+    int liberties = countlib(goban, pos);
     if (liberties == 1 && attack(pos, NULL) == WIN)
       result = 1;
     else if (liberties == 2 && simple_ladder(pos, NULL) == WIN)
       result = 1;
-    popgo();
+    popgo(goban);
   }
   else
     result = 1;
@@ -4200,14 +4201,14 @@ no_escape_from_atari(int str)
   int lib;
   int adj[MAXCHAIN];
 
-  if (findlib(str, 1, &lib) > 1)
+  if (findlib(goban, str, 1, &lib) > 1)
     return 0;
 
-  if (accuratelib(lib, board[str], 2, NULL) > 1)
+  if (accuratelib(goban, lib, board[str], 2, NULL) > 1)
     return 0;
 
   /* FIXME: Should exclude snapback. */
-  if (chainlinks2(str, adj, 1) > 0)
+  if (chainlinks2(goban, str, adj, 1) > 0)
     return 0;
 
   return 1;
@@ -4234,14 +4235,14 @@ no_escape_from_ladder(int str)
   sgf_dumptree = NULL;
   count_variations = 0;
   
-  if (countlib(str) == 1 && find_defense(str, NULL) == 0)
+  if (countlib(goban, str) == 1 && find_defense(str, NULL) == 0)
     result = 1;
 
-  if (countlib(str) == 2
-      && chainlinks2(str, adj, 1) == 0
-      && findlib(str, 2, libs) == 2
-      && approxlib(libs[0], board[str], 2, NULL) == 1
-      && approxlib(libs[1], board[str], 2, NULL) == 1
+  if (countlib(goban, str) == 2
+      && chainlinks2(goban, str, adj, 1) == 0
+      && findlib(goban, str, 2, libs) == 2
+      && approxlib(goban, libs[0], board[str], 2, NULL) == 1
+      && approxlib(goban, libs[1], board[str], 2, NULL) == 1
       && ladder_capture(str, NULL)
       && !find_defense(str, NULL))
     result = 1;
@@ -4264,10 +4265,10 @@ check_self_atari(int pos, int color_to_move)
   int lib;
 #endif
   
-  if (!is_self_atari(pos, color_to_move))
+  if (!is_self_atari(goban, pos, color_to_move))
     return 1;
 
-  if (is_ko(pos, color_to_move, NULL))
+  if (is_ko(goban, pos, color_to_move, NULL))
     return 1;
 
 #if 1
@@ -4284,8 +4285,8 @@ check_self_atari(int pos, int color_to_move)
    *        becomes when playing a move and use for the isolated stone
    *        test below.
    */
-  if (approxlib(pos, color_to_move, 1, &lib) >= 1
-      && approxlib(lib, OTHER_COLOR(color_to_move), 3, NULL) <= 2
+  if (approxlib(goban, pos, color_to_move, 1, &lib) >= 1
+      && approxlib(goban, lib, OTHER_COLOR(color_to_move), 3, NULL) <= 2
       && ladder_capturable(lib, OTHER_COLOR(color_to_move))) {
     int k;
     for (k = 0; k < 4; k++) {
@@ -4326,8 +4327,8 @@ common_vulnerability(int apos, int bpos, int color)
 
   for (k = 0; k < 4; k++)
     if (board[apos + delta[k]] == color
-	&& countlib(apos + delta[k]) <= 3
-	&& liberty_of_string(bpos, apos + delta[k]))
+	&& countlib(goban, apos + delta[k]) <= 3
+	&& liberty_of_string(goban, bpos, apos + delta[k]))
       return 1;
 
   return 0;

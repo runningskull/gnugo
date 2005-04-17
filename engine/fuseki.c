@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -84,7 +85,7 @@ openregion(int i1, int i2, int j1, int j2)
     
   for (x = i1; x <= i2; x++)
     for (y = j1; y <= j2; y++)
-      if (BOARD(x, y) != EMPTY)
+      if (BOARD(goban, x, y) != EMPTY)
 	return 0;
   return 1;
 }
@@ -252,7 +253,7 @@ announce_move(int move, int value, int color)
   }
   
   if (set_minimum_move_value(move, value))
-    TRACE("Fuseki Player suggests %1m with value %d\n", move, value);
+    TRACE(goban, "Fuseki Player suggests %1m with value %d\n", move, value);
 }
 
 
@@ -266,7 +267,7 @@ static int fuseki_total_value;
 static void
 fuseki_callback(int move, struct fullboard_pattern *pattern, int ll)
 {
-  TRACE("Fuseki database move at %1m with relative weight %d, pattern %s+%d\n",
+  TRACE(goban, "Fuseki database move at %1m with relative weight %d, pattern %s+%d\n",
 	move, (int) pattern->value, pattern->name, ll);
 
   /* Store coordinates and relative weight for the found move. */
@@ -290,7 +291,7 @@ search_fuseki_database(int color)
   /* Disable matching after a certain number of stones are placed on
    * the board.
    */
-  if (stones_on_board(BLACK | WHITE) > MAX_FUSEKI_DATABASE_STONES)
+  if (stones_on_board(goban, BLACK | WHITE) > MAX_FUSEKI_DATABASE_STONES)
     return 0;
 
   /* We only have databases for 9x9, 13x13 and 19x19. */
@@ -319,7 +320,7 @@ search_fuseki_database(int color)
   best_fuseki_value = fuseki_value[0];
   q = gg_rand() % fuseki_total_value;
   for (k = 0; k < num_fuseki_moves; k++) {
-    if (stones_on_board(BLACK | WHITE) > 2
+    if (stones_on_board(goban, BLACK | WHITE) > 2
 	&& fuseki_value[k] < (best_fuseki_value / 5))
       break;
     q -= fuseki_value[k];
@@ -327,7 +328,7 @@ search_fuseki_database(int color)
       break;
   }
 
-  gg_assert(k < num_fuseki_moves);
+  gg_assert(goban, k < num_fuseki_moves);
   /* Give this move an arbitrary value of 75. The actual value doesn't
    * matter much since the intention is that we should play this move
    * whatever the rest of the analysis thinks.
@@ -365,7 +366,7 @@ fuseki(int color)
   /* On 9x9, only play open corners after the first move if nothing
    * else useful is found.
    */
-  if (board_size == 9 && stones_on_board(color) > 0)
+  if (board_size == 9 && stones_on_board(goban, color) > 0)
     empty_corner_value = 5;
   
   if (board_size <= 11) {

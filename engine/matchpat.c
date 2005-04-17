@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -279,7 +280,7 @@ prepare_for_match(int color)
   int other = OTHER_COLOR(color);
 
   /* Basic sanity checks. */
-  gg_assert(color != EMPTY);
+  gg_assert(goban, color != EMPTY);
 
   /* If we set one of class_mask[XXX][color] and
    * class_mask[XXX][other], we have to explicitly set or reset the
@@ -327,7 +328,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
   int merged_val;
 
   /* Basic sanity checks. */
-  ASSERT_ON_BOARD1(anchor);
+  ASSERT_ON_BOARD1(goban, anchor);
 
   /* calculate the merged value around [m][n] for the grid opt */
   {
@@ -341,9 +342,9 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
     for (i = m-1; i <= m+2; ++i)
       for (j = n-1; j <= n+2; shift -= 2, ++j) {
 	unsigned int this;
-	if (!ON_BOARD2(i, j))
+	if (!ON_BOARD2(goban, i, j))
 	  this = 3;
-	else if ((this = BOARD(i, j)) == 0)
+	else if ((this = BOARD(goban, i, j)) == 0)
 	  continue;
 	else if (color == 2)
 	  this = OTHER_COLOR(this);
@@ -352,7 +353,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
   }
 
   /* Try each pattern - NULL pattern marks end of list. Assume at least 1 */
-  gg_assert(pattern->patn);
+  gg_assert(goban, pattern->patn);
 
   do {
     /*
@@ -451,12 +452,12 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	   * to just test enough cases to be safe.
 	   */
 
-	  DEBUG(DEBUG_MATCHER, 
+	  DEBUG(goban, DEBUG_MATCHER, 
 		"---\nconsidering pattern '%s', rotation %d at %1m. Range %d,%d -> %d,%d\n",
 		pattern->name, ll, anchor, mi, mj, xi, xj);
 
 	  /* now do the range-check */
-	  if (!ON_BOARD2(m + mi, n + mj) || !ON_BOARD2(m + xi, n + xj))
+	  if (!ON_BOARD2(goban, m + mi, n + mj) || !ON_BOARD2(goban, m + xi, n + xj))
 	    continue;  /* out of range */
 	}
 
@@ -475,7 +476,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	  /* transform pattern real coordinate... */
 	  pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 
-	  ASSERT_ON_BOARD1(pos);
+	  ASSERT_ON_BOARD1(goban, pos);
 
 	  /* ...and check that board[pos] matches (see above). */
 	  if ((board[pos] & and_mask[color-1][att]) != val_mask[color-1][att])
@@ -497,7 +498,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 #if GRID_OPT == 2
 	/* Make sure the grid optimisation wouldn't have 
            rejected this pattern */
-	ASSERT2((merged_val & pattern->and_mask[ll])
+	ASSERT2(goban, (merged_val & pattern->and_mask[ll])
 		== pattern->val_mask[ll], m, n);
 #endif /* we don't trust the grid optimisation */
 
@@ -528,7 +529,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	
 	/* We jump to here as soon as we discover a pattern has failed. */
       match_failed:
-	DEBUG(DEBUG_MATCHER, 
+	DEBUG(goban, DEBUG_MATCHER, 
 	      "end of pattern '%s', rotation %d at %1m\n---\n", 
 	      pattern->name, ll, anchor);
 	 
@@ -609,7 +610,7 @@ tree_matchpat_loop(matchpat_callback_fn_ptr callback,
 
   for (i = 0; i != board_size; i++)
     for (j = 0; j != board_size; j++)
-      if (BOARD(i, j) == anchor
+      if (BOARD(goban, i, j) == anchor
           && (!anchor_in_goal || goal[POS(i, j)] != 0))
 	tree_do_matchpat(i, j, callback, color, 
 			 pdb, callback_data, goal, anchor_in_goal);
@@ -643,9 +644,9 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
     struct tree_node *node = &(tnl->node);
     int x = m + node->x;
     int y = n + node->y;
-    if (ON_BOARD2(x, y)) {
+    if (ON_BOARD2(goban, x, y)) {
       int att = node->att;
-      int point_color = BOARD(x, y);
+      int point_color = BOARD(goban, x, y);
       if ((att == EMPTY && point_color == EMPTY)
           || (att == ATT_X && point_color == OTHER_COLOR(color))
           || (att == ATT_O && point_color == color)) {
@@ -661,13 +662,13 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
 	    TRANSFORM2(pattern->maxi, pattern->maxj, &xi, &xj, ll);
 	    /* now do the range-check */
             if (!goal_found
-                || !ON_BOARD2(m+mi, n+mj) 
-                || !ON_BOARD2(m+xi, n+xj)) {
+                || !ON_BOARD2(goban, m+mi, n+mj) 
+                || !ON_BOARD2(goban, m+xi, n+xj)) {
 	      ;/* goal not found, or out of range */
             }
 	    else {
               if (0) {
-                gprintf("  P[%s, %d] matches at %m)\n",
+                gprintf(goban, "  P[%s, %d] matches at %m)\n",
 			pattern->name, match->orientation, x, y);
               }
               /* A match! */
@@ -701,7 +702,7 @@ tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
   if (0) {
     if (0)
       showboard(0);
-    gprintf("Trying to match at %m\n", m, n);
+    gprintf(goban, "Trying to match at %m\n", m, n);
   }
   data.callback = callback;
   data.callback_data = callback_data;
@@ -807,27 +808,27 @@ dfa_match_init(void)
   build_spiral_order();
 
   if (owl_vital_apat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "owl_vital_apat --> using dfa\n");
+    DEBUG(goban, DEBUG_MATCHER, "owl_vital_apat --> using dfa\n");
   if (owl_attackpat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "owl_attackpat --> using dfa\n");
+    DEBUG(goban, DEBUG_MATCHER, "owl_attackpat --> using dfa\n");
   if (owl_defendpat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "owl_defendpat --> using dfa\n");
+    DEBUG(goban, DEBUG_MATCHER, "owl_defendpat --> using dfa\n");
   if (pat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "pat --> using dfa\n");
+    DEBUG(goban, DEBUG_MATCHER, "pat --> using dfa\n");
   if (attpat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "attpat --> using dfa\n");
+    DEBUG(goban, DEBUG_MATCHER, "attpat --> using dfa\n");
   if (defpat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "defpat --> using dfa\n");
+    DEBUG(goban, DEBUG_MATCHER, "defpat --> using dfa\n");
   if (endpat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "endpat --> using dfa\n");
+    DEBUG(goban, DEBUG_MATCHER, "endpat --> using dfa\n");
   if (conn_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "conn --> using dfa\n");
+    DEBUG(goban, DEBUG_MATCHER, "conn --> using dfa\n");
   if (influencepat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "influencepat --> using dfa\n");
+    DEBUG(goban, DEBUG_MATCHER, "influencepat --> using dfa\n");
   if (barrierspat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "barrierspat --> using dfa\n");
+    DEBUG(goban, DEBUG_MATCHER, "barrierspat --> using dfa\n");
   if (fusekipat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "barrierspat --> using dfa\n");
+    DEBUG(goban, DEBUG_MATCHER, "barrierspat --> using dfa\n");
 
   /* force out_board initialization */
   dfa_board_size = -1;
@@ -853,7 +854,7 @@ dfa_prepare_for_match(int color)
   /* copy the board */
   for (i = 0; i < dfa_board_size; i++)
     for (j = 0; j < dfa_board_size; j++)
-      dfa_p[DFA_POS(i, j)] = EXPECTED_COLOR(color, BOARD(i, j));
+      dfa_p[DFA_POS(i, j)] = EXPECTED_COLOR(color, BOARD(goban, i, j));
 
   prepare_for_match(color);
 }
@@ -926,7 +927,7 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
   int *dfa_pos = dfa_p + DFA_POS(I(anchor), J(anchor));
 
   /* Basic sanity checks. */
-  ASSERT_ON_BOARD1(anchor);
+  ASSERT_ON_BOARD1(goban, anchor);
 
   /* One scan by transformation */
   for (ll = 0; ll < 8; ll++) {
@@ -935,7 +936,7 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
     patterns[num_matched++] = -1;
   }
 
-  ASSERT1(num_matched <= DFA_MAX_MATCHED + 8, anchor);
+  ASSERT1(goban, num_matched <= DFA_MAX_MATCHED + 8, anchor);
 
   /* Constraints and other tests. */
   for (ll = 0, k = 0; ll < 8; k++) {
@@ -981,7 +982,7 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
 #endif
 
   if (0)
-    gprintf("check_pattern_light @ %1m rot:%d pattern: %s\n", 
+    gprintf(goban, "check_pattern_light @ %1m rot:%d pattern: %s\n", 
 	    anchor, ll, pattern->name);
 
   /* Throw out duplicating orientations of symmetric patterns. */
@@ -1003,7 +1004,7 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
 
     /* transform pattern real coordinate... */
     pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
-    ASSERT_ON_BOARD1(pos);
+    ASSERT_ON_BOARD1(goban, pos);
 
     if (!anchor_in_goal) { 
       /* goal check */
@@ -1012,7 +1013,7 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
     }
 
     /* class check */
-    ASSERT1(dragon[pos].status < 4, anchor);
+    ASSERT1(goban, dragon[pos].status < 4, anchor);
     if ((pattern->class & class_mask[dragon[pos].status][board[pos]]) != 0)
       goto match_failed;
     
@@ -1042,7 +1043,7 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
   
   /* We jump to here as soon as we discover a pattern has failed. */
  match_failed:
-  DEBUG(DEBUG_MATCHER, "end of pattern '%s', rotation %d at %1m\n---\n",
+  DEBUG(goban, DEBUG_MATCHER, "end of pattern '%s', rotation %d at %1m\n---\n",
 	pattern->name, ll, anchor);
   
 } /* check_pattern_light */
@@ -1167,11 +1168,11 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
   int k;    /* Iterate over elements of pattern */
   /* We transform around the center point. */
   int mid = POS((board_size-1)/2, (board_size-1)/2);
-  int number_of_stones_on_board = stones_on_board(BLACK | WHITE);
+  int number_of_stones_on_board = stones_on_board(goban, BLACK | WHITE);
   
   /* Basic sanity check. */
-  gg_assert(color != EMPTY);
-  gg_assert(board_size % 2 == 1);
+  gg_assert(goban, color != EMPTY);
+  gg_assert(goban, board_size % 2 == 1);
 
   /* Try each pattern - NULL pattern marks end of list. */
   for (; pattern->patn; pattern++) { 
@@ -1192,7 +1193,7 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
 	/* Work out the position on the board of this pattern element. */
 	pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, mid);
 
-        ASSERT_ON_BOARD1(pos);
+        ASSERT_ON_BOARD1(goban, pos);
 
 	if ((att == ATT_O && board[pos] != color)
 	    || (att == ATT_X && board[pos] != other))
@@ -1267,7 +1268,7 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
       if (NUM_STONES(second_corner) == stones
 	  && (!pattern->symmetric || trans < 4)) {
 	/* We have found a matching pattern. */
-	ASSERT1(board[move] == EMPTY, move);
+	ASSERT1(goban, board[move] == EMPTY, move);
 
 	callback(move, callback_color, pattern, trans, pattern_stones, stones);
 	continue;
@@ -1315,7 +1316,7 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
     pos = anchor;
     for (i = 1; i < database->max_height; i++) {
       pos += dx;
-      if (!ON_BOARD(pos)) {
+      if (!ON_BOARD(goban, pos)) {
 	do {
 	  NUM_STONES(pos) = BOARDMAX;
 	  pos += dx;
@@ -1330,7 +1331,7 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
     pos = anchor;
     for (j = 1; j < database->max_width; j++) {
       pos += dy;
-      if (!ON_BOARD(pos)) {
+      if (!ON_BOARD(goban, pos)) {
 	do {
 	  NUM_STONES(pos) = BOARDMAX;
 	  pos += dy;
@@ -1348,7 +1349,7 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
 	pos += dx;
 	NUM_STONES(pos) = NUM_STONES(pos - dx) + NUM_STONES(pos - dy)
 			- NUM_STONES(pos - dx - dy);
-	if (ON_BOARD1(pos) && IS_STONE(board[pos]))
+	if (ON_BOARD1(goban, pos) && IS_STONE(board[pos]))
 	  NUM_STONES(pos)++;
       }
     }

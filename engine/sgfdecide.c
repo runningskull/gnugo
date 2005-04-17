@@ -25,6 +25,7 @@
 /* ================================================================ */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -61,17 +62,17 @@ decide_string(int pos)
   acode = attack(pos, &aa);
   if (acode) {
     if (acode == WIN)
-      gprintf("%1m can be attacked at %1m (%d variations)\n", 
+      gprintf(goban, "%1m can be attacked at %1m (%d variations)\n", 
 	      pos, aa, count_variations);
     else if (acode == KO_A)
-	gprintf("%1m can be attacked with ko (good) at %1m (%d variations)\n", 
+	gprintf(goban, "%1m can be attacked with ko (good) at %1m (%d variations)\n", 
 	      pos, aa, count_variations);
     else if (acode == KO_B)
-	gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)\n", 
+	gprintf(goban, "%1m can be attacked with ko (bad) at %1m (%d variations)\n", 
 		pos, aa, count_variations);
 
     if (debug & DEBUG_READING_PERFORMANCE) {
-      gprintf("Reading shadow: \n");
+      gprintf(goban, "Reading shadow: \n");
       draw_reading_shadow();
     }
 
@@ -79,29 +80,29 @@ decide_string(int pos)
     dcode = find_defense(pos, &dd);
     if (dcode) {
       if (dcode == WIN)
-	gprintf("%1m can be defended at %1m (%d variations)\n", 
+	gprintf(goban, "%1m can be defended at %1m (%d variations)\n", 
 		pos, dd, count_variations);
       else if (dcode == KO_A)
-	gprintf("%1m can be defended with ko (good) at %1m (%d variations)\n", 
+	gprintf(goban, "%1m can be defended with ko (good) at %1m (%d variations)\n", 
 		pos, dd, count_variations);
       else if (dcode == KO_B)
-	gprintf("%1m can be defended with ko (bad) at %1m (%d variations)\n", 
+	gprintf(goban, "%1m can be defended with ko (bad) at %1m (%d variations)\n", 
 		pos, dd, count_variations);
     }
     else
-      gprintf("%1m cannot be defended (%d variations)\n", 
+      gprintf(goban, "%1m cannot be defended (%d variations)\n", 
 	      pos, count_variations);
     if (debug & DEBUG_READING_PERFORMANCE) {
-      gprintf("Reading shadow: \n");
+      gprintf(goban, "Reading shadow: \n");
       draw_reading_shadow();
     }
 
   }
   else {
-    gprintf("%1m cannot be attacked (%d variations)\n", 
+    gprintf(goban, "%1m cannot be attacked (%d variations)\n", 
 	    pos, count_variations);
     if (debug & DEBUG_READING_PERFORMANCE) {
-      gprintf("Reading shadow: \n");
+      gprintf(goban, "Reading shadow: \n");
       draw_reading_shadow();
     }
   }
@@ -124,8 +125,8 @@ decide_connection(int apos, int bpos)
   int result;
   SGFTree tree;
 
-  ASSERT_ON_BOARD1(apos);
-  ASSERT_ON_BOARD1(bpos);
+  ASSERT_ON_BOARD1(goban, apos);
+  ASSERT_ON_BOARD1(goban, bpos);
   
   if (board[apos] == EMPTY || board[bpos] == EMPTY) {
     fprintf(stderr, "gnugo: --decide-connection called on an empty vertex\n");
@@ -147,40 +148,40 @@ decide_connection(int apos, int bpos)
   result = string_connect(apos, bpos, &move);
   if (result == WIN) {
     if (move == NO_MOVE)
-      gprintf("%1m and %1m are connected as it stands (%d variations)\n", 
+      gprintf(goban, "%1m and %1m are connected as it stands (%d variations)\n", 
 	      apos, bpos, count_variations);
     else
-	gprintf("%1m and %1m can be connected at %1m (%d variations)\n", 
+	gprintf(goban, "%1m and %1m can be connected at %1m (%d variations)\n", 
 		apos, bpos, move, count_variations);
   }
   else if (result == KO_A)
-    gprintf("%1m and %1m can be connected with ko (good) at %1m (%d variations)\n", 
+    gprintf(goban, "%1m and %1m can be connected with ko (good) at %1m (%d variations)\n", 
 	    apos, bpos, move, count_variations);
   else if (result == KO_B)
-    gprintf("%1m and %1m can be connected with ko (bad) at %1m (%d variations)\n", 
+    gprintf(goban, "%1m and %1m can be connected with ko (bad) at %1m (%d variations)\n", 
 	    apos, bpos, move, count_variations);
   else
-    gprintf("%1m and %1m cannot be connected (%d variations)\n", 
+    gprintf(goban, "%1m and %1m cannot be connected (%d variations)\n", 
 	    apos, bpos, count_variations);
   
   count_variations = 1;
   result = disconnect(apos, bpos, &move);
   if (result == WIN) {
     if (move == NO_MOVE)
-      gprintf("%1m and %1m are disconnected as it stands (%d variations)\n", 
+      gprintf(goban, "%1m and %1m are disconnected as it stands (%d variations)\n", 
 	      apos, bpos, count_variations);
     else
-	gprintf("%1m and %1m can be disconnected at %1m (%d variations)\n", 
+	gprintf(goban, "%1m and %1m can be disconnected at %1m (%d variations)\n", 
 		apos, bpos, move, count_variations);
   }
   else if (result == KO_A)
-    gprintf("%1m and %1m can be disconnected with ko (good) at %1m (%d variations)\n", 
+    gprintf(goban, "%1m and %1m can be disconnected with ko (good) at %1m (%d variations)\n", 
 	    apos, bpos, move, count_variations);
   else if (result == KO_B)
-    gprintf("%1m and %1m can be disconnected with ko (bad) at %1m (%d variations)\n", 
+    gprintf(goban, "%1m and %1m can be disconnected with ko (bad) at %1m (%d variations)\n", 
 	    apos, bpos, move, count_variations);
   else
-    gprintf("%1m and %1m cannot be disconnected (%d variations)\n", 
+    gprintf(goban, "%1m and %1m cannot be disconnected (%d variations)\n", 
 	    apos, bpos, count_variations);
   
   sgffile_enddump(outfilename);
@@ -212,7 +213,7 @@ decide_owl(int pos)
   reset_engine();
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  gprintf("finished examine_position\n");
+  gprintf(goban, "finished examine_position\n");
 
   /* We want to see the reading performed, not just a result picked
    * from the cache. Thus we clear the cache here.
@@ -227,28 +228,28 @@ decide_owl(int pos)
   if (acode) {
     if (acode == WIN) {
       if (move == NO_MOVE)
-	gprintf("%1m is dead as it stands", pos);
+	gprintf(goban, "%1m is dead as it stands", pos);
       else
-	gprintf("%1m can be attacked at %1m (%d variations)", 
+	gprintf(goban, "%1m can be attacked at %1m (%d variations)", 
 		pos, move, count_variations);
     }
     else if (acode == KO_A)
-      gprintf("%1m can be attacked with ko (good) at %1m (%d variations)", 
+      gprintf(goban, "%1m can be attacked with ko (good) at %1m (%d variations)", 
 	      pos, move, count_variations);
     else if (acode == KO_B)
-      gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)", 
+      gprintf(goban, "%1m can be attacked with ko (bad) at %1m (%d variations)", 
 	      pos, move, count_variations);
     else if (acode == GAIN)
-      gprintf("%1m can be attacked with gain (captures %1m) at %1m (%d variations)", 
+      gprintf(goban, "%1m can be attacked with gain (captures %1m) at %1m (%d variations)", 
 	      pos, kworm, move, count_variations);
   }
   else 
-    gprintf("%1m cannot be attacked (%d variations)", pos, count_variations);
+    gprintf(goban, "%1m cannot be attacked (%d variations)", pos, count_variations);
   
   if (result_certain)
-    gprintf("\n");
+    gprintf(goban, "\n");
   else
-    gprintf(" result uncertain\n");
+    gprintf(goban, " result uncertain\n");
 
   reading_cache_clear();
   count_variations = 1;
@@ -257,29 +258,29 @@ decide_owl(int pos)
   if (dcode) {
     if (dcode == WIN) {
       if (move == NO_MOVE)
-	gprintf("%1m is alive as it stands", pos);
+	gprintf(goban, "%1m is alive as it stands", pos);
       else 
-	gprintf("%1m can be defended at %1m (%d variations)", 
+	gprintf(goban, "%1m can be defended at %1m (%d variations)", 
 		pos, move, count_variations);
     }
     else if (dcode == KO_A)
-      gprintf("%1m can be defended with ko (good) at %1m (%d variations)", 
+      gprintf(goban, "%1m can be defended with ko (good) at %1m (%d variations)", 
 	      pos, move, count_variations);
     else if (dcode == KO_B)
-      gprintf("%1m can be defended with ko (bad) at %1m (%d variations)", 
+      gprintf(goban, "%1m can be defended with ko (bad) at %1m (%d variations)", 
 	      pos, move, count_variations);
     else if (dcode == LOSS)
-      gprintf("%1m can be defended with loss (loses %1m) at %1m (%d variations)", 
+      gprintf(goban, "%1m can be defended with loss (loses %1m) at %1m (%d variations)", 
 	      pos, kworm, move, count_variations);
   }
   else
-    gprintf("%1m cannot be defended (%d variations)",
+    gprintf(goban, "%1m cannot be defended (%d variations)",
 	    pos, count_variations);
 
   if (result_certain)
-    gprintf("\n");
+    gprintf(goban, "\n");
   else
-    gprintf(" result uncertain\n");
+    gprintf(goban, " result uncertain\n");
   
   sgffile_enddump(outfilename);
   count_variations = 0;
@@ -300,7 +301,7 @@ decide_dragon_data(int pos)
   reset_engine();
   silent_examine_position(FULL_EXAMINE_DRAGONS);
 
-  gprintf("Dragon at %1m:\n", pos);
+  gprintf(goban, "Dragon at %1m:\n", pos);
   report_dragon(stderr, pos);
 }
 
@@ -317,7 +318,7 @@ decide_semeai(int apos, int bpos)
   int color = board[apos];
 
   if (color == EMPTY || board[bpos] != OTHER_COLOR(color)) {
-    gprintf("gnugo: --decide-semeai called on invalid data\n");
+    gprintf(goban, "gnugo: --decide-semeai called on invalid data\n");
     return;
   }
 
@@ -325,7 +326,7 @@ decide_semeai(int apos, int bpos)
   reset_engine();
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  gprintf("finished examine_position\n");
+  gprintf(goban, "finished examine_position\n");
   count_variations = 1;
 
   /* We want to see the reading performed, not just a result picked
@@ -335,26 +336,26 @@ decide_semeai(int apos, int bpos)
   if (*outfilename)
     sgffile_begindump(&tree);
 
-  gprintf("Analyzing semeai between %1m and %1m, %C moves first\n",
+  gprintf(goban, "Analyzing semeai between %1m and %1m, %C moves first\n",
 	  apos, bpos, board[apos]);
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 1,
 		     &result_certain);
-  gprintf("Semeai defense of %1m: result %s %1m\n",
+  gprintf(goban, "Semeai defense of %1m: result %s %1m\n",
 	  apos, result_to_string(resulta), move);
-  gprintf("Semeai attack of %1m: result %s %1m\n",
+  gprintf(goban, "Semeai attack of %1m: result %s %1m\n",
 	  bpos, result_to_string(resultb), move);
-  gprintf("%d nodes%s\n\n", count_variations,
+  gprintf(goban, "%d nodes%s\n\n", count_variations,
 	  result_certain ? "" : ", uncertain result");
   
-  gprintf("Analyzing semeai between %1m and %1m, %C moves first\n",
+  gprintf(goban, "Analyzing semeai between %1m and %1m, %C moves first\n",
 	  bpos, apos, board[bpos]);
   owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 1,
 		     &result_certain);
-  gprintf("Semeai defense of %1m: result %s %1m\n",
+  gprintf(goban, "Semeai defense of %1m: result %s %1m\n",
 	  bpos, result_to_string(resultb), move);
-  gprintf("Semeai attack of %1m: result %s %1m\n",
+  gprintf(goban, "Semeai attack of %1m: result %s %1m\n",
 	  apos, result_to_string(resulta), move);
-  gprintf("%d nodes%s\n", count_variations,
+  gprintf(goban, "%d nodes%s\n", count_variations,
 	  result_certain ? "" : ", uncertain result");
 
   sgffile_enddump(outfilename);
@@ -370,7 +371,7 @@ decide_tactical_semeai(int apos, int bpos)
   int color = board[apos];
 
   if (color == EMPTY || board[bpos] != OTHER_COLOR(color)) {
-    gprintf("gnugo: --decide-semeai called on invalid data\n");
+    gprintf(goban, "gnugo: --decide-semeai called on invalid data\n");
     return;
   }
 
@@ -378,7 +379,7 @@ decide_tactical_semeai(int apos, int bpos)
   reset_engine();
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  gprintf("finished examine_position\n");
+  gprintf(goban, "finished examine_position\n");
   count_variations = 1;
 
   /* We want to see the reading performed, not just a result picked
@@ -389,14 +390,14 @@ decide_tactical_semeai(int apos, int bpos)
     sgffile_begindump(&tree);
 
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0, &dummy);
-  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
+  gprintf(goban, "After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
 	  color_to_string(color),
 	  move,
 	  apos, status_to_string(resulta),
   	  bpos, status_to_string(resultb),
 	  count_variations);
   owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 0, &dummy);
-  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
+  gprintf(goban, "After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
 	  color_to_string(color),
 	  move,
 	  apos, status_to_string(resulta),
@@ -438,32 +439,32 @@ decide_position()
   count_variations = 1;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos)
+    if (!ON_BOARD(goban, pos)
 	|| dragon[pos].origin != pos
 	|| board[pos] == EMPTY
 	|| DRAGON2(pos).escape_route >= 6)
       continue;
 
-    gprintf("\nanalyzing %1m\n", pos);
-    gprintf("status=%s, escape=%d\n", 
+    gprintf(goban, "\nanalyzing %1m\n", pos);
+    gprintf(goban, "status=%s, escape=%d\n", 
 	    snames[dragon[pos].crude_status], DRAGON2(pos).escape_route);
     acode = owl_attack(pos, &move, NULL, &kworm);
     if (acode) {
       if (acode == WIN) {
 	if (move == NO_MOVE)
-	  gprintf("%1m is dead as it stands\n", pos);
+	  gprintf(goban, "%1m is dead as it stands\n", pos);
 	else
-	  gprintf("%1m can be attacked at %1m (%d variations)\n", 
+	  gprintf(goban, "%1m can be attacked at %1m (%d variations)\n", 
 		  pos, move, count_variations);
       }
       else if (acode == KO_A)
-	gprintf("%1m can be attacked with ko (good) at %1m (%d variations)\n", 
+	gprintf(goban, "%1m can be attacked with ko (good) at %1m (%d variations)\n", 
 		pos, move, count_variations);
       else if (acode == KO_B)
-	gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)\n", 
+	gprintf(goban, "%1m can be attacked with ko (bad) at %1m (%d variations)\n", 
 		pos, move, count_variations);
       else if (acode == GAIN)
-	gprintf("%1m can be attacked with gain (captures %1m) at %1m (%d variations)", 
+	gprintf(goban, "%1m can be attacked with gain (captures %1m) at %1m (%d variations)", 
 		pos, kworm, move, count_variations);
       
       count_variations = 1;
@@ -471,37 +472,37 @@ decide_position()
       if (dcode) {
 	if (dcode == WIN) {
 	  if (move == NO_MOVE)
-	    gprintf("%1m is alive as it stands\n", pos);
+	    gprintf(goban, "%1m is alive as it stands\n", pos);
 	  else 
-	    gprintf("%1m can be defended at %1m (%d variations)\n", 
+	    gprintf(goban, "%1m can be defended at %1m (%d variations)\n", 
 		    pos, move, count_variations);
 	}
 	else if (dcode == KO_A)
-	  gprintf("%1m can be defended with ko (good) at %1m (%d variations)\n", 
+	  gprintf(goban, "%1m can be defended with ko (good) at %1m (%d variations)\n", 
 		  pos, move, count_variations);
 	else if (dcode == KO_B)
-	  gprintf("%1m can be defended with ko (bad) at %1m (%d variations)\n",
+	  gprintf(goban, "%1m can be defended with ko (bad) at %1m (%d variations)\n",
 		  pos, move, count_variations);
 	else if (dcode == LOSS)
-	  gprintf("%1m can be defended with loss (loses %1m) at %1m (%d variations)", 
+	  gprintf(goban, "%1m can be defended with loss (loses %1m) at %1m (%d variations)", 
 		  pos, kworm, move, count_variations);
       }
       else
-	gprintf("%1m cannot be defended (%d variations)\n", 
+	gprintf(goban, "%1m cannot be defended (%d variations)\n", 
 		pos, count_variations);
     }
     else 
-      gprintf("%1m cannot be attacked (%d variations)\n", 
+      gprintf(goban, "%1m cannot be attacked (%d variations)\n", 
 	      pos, count_variations);
     
     if (acode) {
       if (dcode)
-	gprintf("status of %1m revised to CRITICAL\n", pos);
+	gprintf(goban, "status of %1m revised to CRITICAL\n", pos);
       else
-	gprintf("status of %1m revised to DEAD\n", pos);
+	gprintf(goban, "status of %1m revised to DEAD\n", pos);
     }
     else
-      gprintf("status of %1m revised to ALIVE\n", pos);
+      gprintf(goban, "status of %1m revised to ALIVE\n", pos);
   }
   
   sgffile_enddump(outfilename);
@@ -529,7 +530,7 @@ decide_eye(int pos)
   
   color = black_eye[pos].color;
   if (!IS_STONE(color)) {
-    gprintf("The eye at %1m is not of a single color.\n", pos);
+    gprintf(goban, "The eye at %1m is not of a single color.\n", pos);
     return;
   }
 
@@ -545,9 +546,9 @@ decide_eye(int pos)
     eyepos = black_eye[pos].origin;
     compute_eyes(eyepos, &value, &attack_point, &defense_point,
 		 black_eye, half_eye, 0);
-    gprintf("Black eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
+    gprintf(goban, "Black eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
     if (eye_move_urgency(&value) > 0) {
-      gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
+      gprintf(goban, "  vital points: %1m (attack) %1m (defense)\n", attack_point,
 	      defense_point);
     }
   }
@@ -556,9 +557,9 @@ decide_eye(int pos)
     eyepos = white_eye[pos].origin;
     compute_eyes(eyepos, &value, &attack_point, &defense_point,
 		 white_eye, half_eye, 0);
-    gprintf("White eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
+    gprintf(goban, "White eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
     if (eye_move_urgency(&value) > 0) {
-      gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
+      gprintf(goban, "  vital points: %1m (attack) %1m (defense)\n", attack_point,
 	      defense_point);
     }
   }
@@ -593,21 +594,21 @@ decide_combination(int color)
   count_variations = 1;
 
   if (atari_atari(color, &attack_move, defense_moves, verbose)) {
-    gprintf("Combination attack for %C at %1m, defense at ", color,
+    gprintf(goban, "Combination attack for %C at %1m, defense at ", color,
 	    attack_move);
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (ON_BOARD(pos) && defense_moves[pos]) {
+      if (ON_BOARD(goban, pos) && defense_moves[pos]) {
 	if (first)
 	  first = 0;
 	else
-	  gprintf(", ");
-	gprintf("%1m", pos);
+	  gprintf(goban, ", ");
+	gprintf(goban, "%1m", pos);
       }
     }
-    gprintf("\n");
+    gprintf(goban, "\n");
   }
   else
-    gprintf("No Combination attack for %C\n", color);
+    gprintf(goban, "No Combination attack for %C\n", color);
   
   sgffile_enddump(outfilename);
   count_variations = 0;
@@ -630,11 +631,11 @@ decide_surrounded(int pos)
   silent_examine_position(EXAMINE_ALL);
   surround_status = compute_surroundings(pos, NO_MOVE, 1, NULL);
   if (surround_status == 1)
-    gprintf("the dragon at %1m is SURROUNDED!\n", pos);
+    gprintf(goban, "the dragon at %1m is SURROUNDED!\n", pos);
   else if (surround_status == 2)
-    gprintf("the dragon at %1m is WEAKLY SURROUNDED!\n", pos);
+    gprintf(goban, "the dragon at %1m is WEAKLY SURROUNDED!\n", pos);
   else
-    gprintf("the dragon at %1m is not surrounded.\n", pos);
+    gprintf(goban, "the dragon at %1m is not surrounded.\n", pos);
 }  
 
 

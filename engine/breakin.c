@@ -20,6 +20,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 #include "liberty.h"
 #include "readconnect.h"
 
@@ -114,7 +115,7 @@ compute_smaller_goal(int owner, int color_to_move,
 	if (!goal[pos] && board[pos] == OTHER_COLOR(owner)) {
 	  int i;
 	  int stones[MAX_BOARD * MAX_BOARD];
-	  int num_stones = findstones(pos, MAX_BOARD * MAX_BOARD, stones);
+	  int num_stones = findstones(goban, pos, MAX_BOARD * MAX_BOARD, stones);
 	  int smallest_distance = 3;
 
 	  for (i = 0; i < num_stones; i++) {
@@ -143,13 +144,13 @@ compute_smaller_goal(int owner, int color_to_move,
      * or that is on an edge and has only two goal neighbors.
      */
     for (j = 0; j < 4; j++)
-      if (ON_BOARD(pos + delta[j])
+      if (ON_BOARD(goban, pos + delta[j])
 	  && goal[pos + delta[j]]
 	  && (board[pos] == EMPTY || goal[pos] == OTHER_COLOR(owner)))
 	goal_neighbors++;
 #if 0
     if (goal_neighbors > 2
-	|| goal_neighbors == 2 && !is_edge_vertex(pos))
+	|| goal_neighbors == 2 && !is_edge_vertex(goban, pos))
 #else
     if (goal_neighbors >= 2)
       smaller_goal[pos] = 1;
@@ -167,7 +168,7 @@ compute_smaller_goal(int owner, int color_to_move,
     memset(marked, 0, BOARDMAX);
     for (k = 0; k < conn->queue_end; k++) {
       int pos = conn->queue[k];
-      if (ON_BOARD(pos) && smaller_goal[pos] && !marked[pos]) {
+      if (ON_BOARD(goban, pos) && smaller_goal[pos] && !marked[pos]) {
 	/* Floodfill the connected component of (pos) in the goal. */
 	int queue_start = 0;
 	int queue_end = 1;
@@ -177,12 +178,12 @@ compute_smaller_goal(int owner, int color_to_move,
 	marked[pos] = mark;
 	queue[0] = pos;
 	while (queue_start < queue_end) {
-	  test_gray_border();
+	  test_gray_border(goban);
 	  for (k = 0; k < 4; k++) {
 	    int pos2 = queue[queue_start] + delta[k];
-	    if (!ON_BOARD(pos2))
+	    if (!ON_BOARD(goban, pos2))
 	      continue;
-	    ASSERT1(marked[pos2] == 0 || marked[pos2] == mark, pos2);
+	    ASSERT1(goban, marked[pos2] == 0 || marked[pos2] == mark, pos2);
 	    if (smaller_goal[pos2]
 		&& !marked[pos2]) {
 	      sizes[(int) mark]++;
@@ -237,7 +238,7 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
       		       &conn, goal, smaller_goal);
   if (0 && (debug & DEBUG_BREAKIN))
     print_connection_distances(&conn);
-  DEBUG(DEBUG_BREAKIN, "Trying to break in from %1m to:\n", str);
+  DEBUG(goban, DEBUG_BREAKIN, "Trying to break in from %1m to:\n", str);
   if (debug & DEBUG_BREAKIN)
     goaldump(smaller_goal);
   while ((color_to_move == board[str]
@@ -254,13 +255,13 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
     int save_num = *num_non_territory;
     int affected_size = 0;
     int cut_off_distance = FP(3.5);
-    if (ON_BOARD(move) && goal[move]) {
+    if (ON_BOARD(goban, move) && goal[move]) {
       non_territory[(*num_non_territory)++] = move;
       if (info_pos)
-	DEBUG(DEBUG_TERRITORY, "%1m: Erasing territory at %1m -a.\n",
+	DEBUG(goban, DEBUG_TERRITORY, "%1m: Erasing territory at %1m -a.\n",
 	      info_pos, move);
       else
-	DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -a.\n", move);
+	DEBUG(goban, DEBUG_TERRITORY, "Erasing territory at %1m -a.\n", move);
     }
 
     for (k = 0; k < conn.queue_end; k++) {
@@ -268,14 +269,14 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
       if (conn.distances[pos] > cut_off_distance + FP(0.31))
 	break;
       if (goal[pos]
-	  && (!ON_BOARD(conn.coming_from[pos])
+	  && (!ON_BOARD(goban, conn.coming_from[pos])
 	      || !goal[conn.coming_from[pos]])) {
 	non_territory[(*num_non_territory)++] = pos;
 	if (info_pos)
-	  DEBUG(DEBUG_TERRITORY, "%1m: Erasing territory at %1m -b.\n",
+	  DEBUG(goban, DEBUG_TERRITORY, "%1m: Erasing territory at %1m -b.\n",
 		info_pos, pos);
 	else
-	  DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -b.\n", pos);
+	  DEBUG(goban, DEBUG_TERRITORY, "Erasing territory at %1m -b.\n", pos);
 	if (conn.distances[pos] < cut_off_distance)
 	  cut_off_distance = conn.distances[pos];
       }
@@ -295,7 +296,7 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
 	goal[pos] = 0;
       }
       for (j = 0; j < 4; j++)
-	if (ON_BOARD(pos + delta[j]) && goal[pos + delta[j]])
+	if (ON_BOARD(goban, pos + delta[j]) && goal[pos + delta[j]])
 	  affected_size++;
       /* Don't kill too much territory at a time. */
       if (affected_size >= 5) {
@@ -306,7 +307,7 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
 
     compute_smaller_goal(OTHER_COLOR(board[str]), color_to_move,
 			 &conn, goal, smaller_goal);
-    DEBUG(DEBUG_BREAKIN, "Now trying to break to smaller goal:\n", str);
+    DEBUG(goban, DEBUG_BREAKIN, "Now trying to break to smaller goal:\n", str);
     if (debug & DEBUG_BREAKIN)
       goaldump(smaller_goal);
 
@@ -332,7 +333,7 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
   int candidates = 0;
   int min_distance = FP(5.0);
 
-  DEBUG(DEBUG_BREAKIN,
+  DEBUG(goban, DEBUG_BREAKIN,
         "Trying to break (%C to move) %C's territory ", color_to_move, owner);
   if (debug & DEBUG_BREAKIN)
     goaldump(goal);
@@ -356,17 +357,17 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
        * that we have in the candidate list already.
        */
       int pos2 = pos;
-      while (ON_BOARD(pos2)) {
+      while (ON_BOARD(goban, pos2)) {
         pos2 = conn.coming_from[pos2];
 	if (IS_STONE(board[pos2]))
-	  pos2 = find_origin(pos2);
+	  pos2 = find_origin(goban, pos2);
 
 	if (used[pos2])
 	  break;
       }
 
       used[pos] = 1;
-      if (ON_BOARD(pos2))
+      if (ON_BOARD(goban, pos2))
 	continue;
       if (candidates == 0)
 	min_distance = conn.distances[pos];
@@ -382,7 +383,7 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
     int move = break_in_goal_from_str(candidate_strings[k], goal,
   		                     &num_non_territory, non_territory,
 				     color_to_move, info_pos);
-    if (store && ON_BOARD(move) && num_break_ins < MAX_BREAK_INS) {
+    if (store && ON_BOARD(goban, move) && num_break_ins < MAX_BREAK_INS) {
       /* Remember the move as a possible move candidate for later. */
       break_in_list[num_break_ins].str = candidate_strings[k];
       break_in_list[num_break_ins].move = move;
@@ -421,7 +422,7 @@ break_territories(int color_to_move, struct influence_data *q, int store,
 
     memset(goal, 0, BOARDMAX);
     for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-      if (ON_BOARD(pos) && territories.segmentation[pos] == k) {
+      if (ON_BOARD(goban, pos) && territories.segmentation[pos] == k) {
 	goal[pos] = 1;
 	if (board[pos] != territories.owner[k])
 	  size++;

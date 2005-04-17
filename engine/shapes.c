@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,13 +55,13 @@ handle_joseki_patterns(struct pattern_attribute *attributes,
    * moyo, and require the value at least J_value.
    */
   if (class & CLASS_J) {
-    TRACE("...joseki standard move\n");
+    TRACE(goban, "...joseki standard move\n");
     add_expand_territory_move(move);
-    TRACE("...expands territory\n");
+    TRACE(goban, "...expands territory\n");
     add_expand_moyo_move(move);
-    TRACE("...expands moyo\n");
+    TRACE(goban, "...expands moyo\n");
     set_minimum_move_value(move, J_VALUE);
-    TRACE("... minimum move value %f\n", J_VALUE);
+    TRACE(goban, "... minimum move value %f\n", J_VALUE);
   }
 
   /* Class `j' and `t' patterns are treated similarly. */
@@ -70,15 +71,15 @@ handle_joseki_patterns(struct pattern_attribute *attributes,
 
     if (class & CLASS_j) {
       min_value = j_VALUE;
-      TRACE("...less urgent joseki move\n");
+      TRACE(goban, "...less urgent joseki move\n");
       add_expand_territory_move(move);
-      TRACE("...expands territory\n");
+      TRACE(goban, "...expands territory\n");
       add_expand_moyo_move(move);
-      TRACE("...expands moyo\n");
+      TRACE(goban, "...expands moyo\n");
     }
     else {
       min_value = t_VALUE;
-      TRACE("...minor joseki move\n");
+      TRACE(goban, "...minor joseki move\n");
     }
 
     /* Board size modification. */
@@ -101,10 +102,10 @@ handle_joseki_patterns(struct pattern_attribute *attributes,
 
       set_maximum_move_value(move, min_value);
       scale_randomness(move, 5.0);
-      TRACE("...move value %f (shape %f)\n", min_value, shape_value);
+      TRACE(goban, "...move value %f (shape %f)\n", min_value, shape_value);
     }
     else
-      TRACE("...minimum move value %f (shape %f)\n", min_value, shape_value);
+      TRACE(goban, "...minimum move value %f (shape %f)\n", min_value, shape_value);
 
     set_minimum_move_value(move, min_value);
   }
@@ -115,28 +116,28 @@ handle_joseki_patterns(struct pattern_attribute *attributes,
   if (class & CLASS_U) {
     int k;
 
-    TRACE("...joseki urgent move\n");
+    TRACE(goban, "...joseki urgent move\n");
     for (k = 0; k < my_ndragons; k++) {
       add_strategical_defense_move(move, my_dragons[k]);
-      TRACE("...strategical defense of %1m\n", my_dragons[k]);
+      TRACE(goban, "...strategical defense of %1m\n", my_dragons[k]);
     }
     for (k = 0; k < your_ndragons; k++) {
       add_strategical_attack_move(move, your_dragons[k]);
-      TRACE("...strategical attack on %1m\n", your_dragons[k]);
+      TRACE(goban, "...strategical attack on %1m\n", your_dragons[k]);
     }
     add_shape_value(move, 15);
-    TRACE("...shape value 15\n");
+    TRACE(goban, "...shape value 15\n");
     set_minimum_move_value(move, U_VALUE);
-    TRACE("...(min) move value %f\n", U_VALUE);
+    TRACE(goban, "...(min) move value %f\n", U_VALUE);
   }
 
   /* Pattern class T, joseki trick move. For the moment we never play
    * these.
    */
   if (class & CLASS_T) {
-    TRACE("...joseki trick move\n");
+    TRACE(goban, "...joseki trick move\n");
     add_antisuji_move(move);
-    TRACE("...antisuji\n");
+    TRACE(goban, "...antisuji\n");
   }
 
   for (attribute = attributes; attribute->type != LAST_ATTRIBUTE;
@@ -144,22 +145,22 @@ handle_joseki_patterns(struct pattern_attribute *attributes,
     switch (attribute->type) {
     case MIN_VALUE:
       set_minimum_move_value(move, attribute->value);
-      TRACE("...(min) move value %f\n", attribute->value);
+      TRACE(goban, "...(min) move value %f\n", attribute->value);
       break;
 
     case MAX_VALUE:
       set_maximum_move_value(move, attribute->value);
-      TRACE("...max move value %f\n", attribute->value);
+      TRACE(goban, "...max move value %f\n", attribute->value);
       break;
 
     case MIN_TERRITORY:
       set_minimum_territorial_value(move, attribute->value);
-      TRACE("...(min) territorial value %f\n", attribute->value);
+      TRACE(goban, "...(min) territorial value %f\n", attribute->value);
       break;
 
     case MAX_TERRITORY:
       set_maximum_territorial_value(move, attribute->value);
-      TRACE("...max territorial value %f\n", attribute->value);
+      TRACE(goban, "...max territorial value %f\n", attribute->value);
       break;
 
     case SHAPE:
@@ -168,24 +169,24 @@ handle_joseki_patterns(struct pattern_attribute *attributes,
        */
       if (!(class & (CLASS_j | CLASS_t))) {
 	add_shape_value(move, attribute->value);
-	TRACE("...shape value %f\n", attribute->value);
+	TRACE(goban, "...shape value %f\n", attribute->value);
       }
 
       break;
 
     case FOLLOWUP:
       add_followup_value(move, attribute->value);
-      TRACE("...followup value %f\n", attribute->value);
+      TRACE(goban, "...followup value %f\n", attribute->value);
       break;
 
     case REVERSE_FOLLOWUP:
       add_reverse_followup_value(move, attribute->value);
-      TRACE("...reverse followup value %f\n", attribute->value);
+      TRACE(goban, "...reverse followup value %f\n", attribute->value);
       break;
 
     default:
       /* Must not happen. */
-      gg_assert(0);
+      gg_assert(goban, 0);
     }
   }
 }
@@ -301,7 +302,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
       }
       
       if (pattern->patn[k].att == ATT_O || pattern->patn[k].att == ATT_X) {
-	origin = find_origin(pos);
+	origin = find_origin(goban, pos);
 	if (board[pos] == color && my_nstrings < MAX_STRINGS_PER_PATTERN) {
 	  for (l = 0; l < my_nstrings; l++) {
 	    if (my_strings[l] == origin)
@@ -365,15 +366,15 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
     /* Don't allow ko unsafety. */
     if (safe_move(move, color) != WIN) {
       if (0)
-	TRACE("  move at %1m wasn't safe, discarded\n", move);
+	TRACE(goban, "  move at %1m wasn't safe, discarded\n", move);
       return;
     }
   }
   else {
     /* Allow illegal ko captures at this stage. */
-    if (!is_ko(move, color, NULL) && !is_legal(move, color)) {
+    if (!is_ko(goban, move, color, NULL) && !is_legal(goban, move, color)) {
       if (0)
-	TRACE("  move at %1m wasn't legal, discarded\n", move);
+	TRACE(goban, "  move at %1m wasn't legal, discarded\n", move);
       return;
     }
   }
@@ -385,7 +386,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
     /* Allow ko unsafety. */
     if (safe_move(move, other) == 0) {
       if (0)
-	TRACE("  opponent can't play safely at %1m, move discarded\n", move);
+	TRACE(goban, "  opponent can't play safely at %1m, move discarded\n", move);
       return;
     }
   }
@@ -402,16 +403,16 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   if (pattern->helper) {
     /* ask helper function to consider the move */
     int accepted;
-    DEBUG(DEBUG_HELPER, "  asking helper to consider '%s'+%d at %1m\n", 
+    DEBUG(goban, DEBUG_HELPER, "  asking helper to consider '%s'+%d at %1m\n", 
 	  pattern->name, ll, move);
     accepted = pattern->helper(pattern, ll, move, color);
     
     if (accepted) {
-      DEBUG(DEBUG_HELPER, "helper likes pattern '%s' at %1m\n",
+      DEBUG(goban, DEBUG_HELPER, "helper likes pattern '%s' at %1m\n",
 	    pattern->name, move);
     }
     else {
-      DEBUG(DEBUG_HELPER, "  helper does not like pattern '%s' at %1m\n", 
+      DEBUG(goban, DEBUG_HELPER, "  helper does not like pattern '%s' at %1m\n", 
 	    pattern->name, move);
       return;  /* pattern matcher does not like it */
     }
@@ -419,7 +420,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
       
   /* If using -a, want to see all matches even if not -v */
   if (allpats || verbose) {
-    TRACE("pattern '%s'+%d matched at %1m\n", pattern->name, ll, move);
+    TRACE(goban, "pattern '%s'+%d matched at %1m\n", pattern->name, ll, move);
   }
   
   /* does the pattern have an action? */
@@ -434,7 +435,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
 	    && !play_connect_n(color, 1, 1, move,
 			       your_strings[k], your_strings[l])) {
 	  add_cut_move(move, your_strings[k], your_strings[l]);
-	  TRACE("...cuts strings %1m, %1m\n",
+	  TRACE(goban, "...cuts strings %1m, %1m\n",
 		your_strings[k], your_strings[l]);
 	}
       }
@@ -448,7 +449,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
 	    && !play_connect_n(color, 0, 1, move,
 			       my_strings[k], my_strings[l])) {
 	  add_connection_move(move, my_strings[k], my_strings[l]);
-	  TRACE("...connects strings %1m, %1m\n",
+	  TRACE(goban, "...connects strings %1m, %1m\n",
 		my_strings[k], my_strings[l]);
 	}
       }
@@ -463,39 +464,39 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   if (class & CLASS_c) {
     for (k = 0; k < my_ndragons; k++) {
       add_strategical_defense_move(move, my_dragons[k]);
-      TRACE("...strategical defense (weak connection) of %1m\n",
+      TRACE(goban, "...strategical defense (weak connection) of %1m\n",
 	    my_dragons[k]);
     }
     add_shape_value(move, 1);
-    TRACE("...shape value 1\n");
+    TRACE(goban, "...shape value 1\n");
   }
 
   /* Pattern class b is obsolete in the pattern databases handled here. */
-  gg_assert(!(class & CLASS_b));
+  gg_assert(goban, !(class & CLASS_b));
 
   /* Pattern class e, expand to make territory. */
   if (class & CLASS_e) {
     add_expand_territory_move(move);
-    TRACE("...expands territory\n");
+    TRACE(goban, "...expands territory\n");
   }
 
   /* Pattern class E, expand to make moyo. */
   if (class & CLASS_E) {
     add_expand_moyo_move(move);
-    TRACE("...expands moyo\n");
+    TRACE(goban, "...expands moyo\n");
   }
 
   /* Pattern class i, an invasion. */
   if (class & CLASS_I) {
     add_invasion_move(move);
-    TRACE("...is an invasion\n");
+    TRACE(goban, "...is an invasion\n");
   }
 
   /* Pattern class a, strategical level attack on all opponent dragons. */
   if (class & CLASS_a) {
     for (k = 0; k < your_ndragons; k++) {
       add_strategical_attack_move(move, your_dragons[k]);
-      TRACE("...strategical attack on %1m\n", your_dragons[k]);
+      TRACE(goban, "...strategical attack on %1m\n", your_dragons[k]);
     }
   }
   
@@ -503,13 +504,13 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   if (class & CLASS_d) {
     for (k = 0; k < my_ndragons; k++) {
       add_strategical_defense_move(move, my_dragons[k]);
-      TRACE("...strategical defense of %1m\n", my_dragons[k]);
+      TRACE(goban, "...strategical defense of %1m\n", my_dragons[k]);
     }
   }
 
   /* Pattern class W, worthwhile threat move. */
   if (class & CLASS_W) {
-    TRACE("...worthwhile threat move\n");
+    TRACE(goban, "...worthwhile threat move\n");
     add_worthwhile_threat_move(move);
   }
 
@@ -598,7 +599,7 @@ joseki_callback(int move, int color, struct corner_pattern *pattern,
 
   /* If using -a, want to see all matches even if not -v. */
   if (allpats || verbose)
-    TRACE("pattern '%s'+%d matched at %1m\n", pattern->name, trans, move);
+    TRACE(goban, "pattern '%s'+%d matched at %1m\n", pattern->name, trans, move);
 
   /* Does the pattern have an action? */
   if (pattern->autohelper_flag & HAVE_ACTION)
@@ -606,7 +607,7 @@ joseki_callback(int move, int color, struct corner_pattern *pattern,
 
   /* Pattern class N, antisuji move. */
   if (class & CLASS_N) {
-    TRACE("...antisuji move\n");
+    TRACE(goban, "...antisuji move\n");
     add_antisuji_move(move);
   }
 
@@ -624,7 +625,7 @@ joseki_callback(int move, int color, struct corner_pattern *pattern,
 void
 shapes(int color)
 {
-  TRACE("\nPattern matcher is looking for move reasons for %s!\n",
+  TRACE(goban, "\nPattern matcher is looking for move reasons for %s!\n",
 	color_to_string(color));
 
   matchpat(shapes_callback, color, &pat_db, NULL, NULL);
@@ -648,7 +649,7 @@ shapes(int color)
 void
 endgame_shapes(int color)
 {
-  TRACE("\nEndgame pattern matcher is looking for move reasons for %s!\n",
+  TRACE(goban, "\nEndgame pattern matcher is looking for move reasons for %s!\n",
 	color_to_string(color));
 
   matchpat(shapes_callback, color, &endpat_db, NULL, NULL);

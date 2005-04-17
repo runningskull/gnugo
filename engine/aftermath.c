@@ -22,6 +22,7 @@
 
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -163,7 +164,7 @@ do_aftermath_genmove(int color,
   
   /* As a preparation we compute a distance map to the invincible strings. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     else if (board[pos] == color && worm[pos].invincible)
       distance[pos] = 0;
@@ -181,10 +182,10 @@ do_aftermath_genmove(int color,
   do {
     something_found = 0;
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (ON_BOARD(pos) && distance[pos] == -1) {
+      if (ON_BOARD(goban, pos) && distance[pos] == -1) {
 	for (k = 0; k < 4; k++) {
 	  int pos2 = pos + delta[k];
-	  if (!ON_BOARD(pos2))
+	  if (!ON_BOARD(goban, pos2))
 	    continue;
 	  if ((d == 0 || board[pos2] == EMPTY)
 	      && distance[pos2] == d) {
@@ -212,7 +213,7 @@ do_aftermath_genmove(int color,
 
   if (under_control) {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (!ON_BOARD(pos))
+      if (!ON_BOARD(goban, pos))
 	continue;
       else if (distance[pos] == -1)
 	under_control[pos] = 0;
@@ -230,35 +231,35 @@ do_aftermath_genmove(int color,
 	  fprintf(stderr, "%2d", distance[pos]);
 	else if (distance[pos] == 0) {
 	  if (board[pos] == WHITE)
-	    gprintf(" o");
+	    gprintf(goban, " o");
 	  else if (board[pos] == BLACK)
-	    gprintf(" x");
+	    gprintf(goban, " x");
 	  else
-	    gprintf(" ?");
+	    gprintf(goban, " ?");
 	}
 	else {
 	  if (board[pos] == WHITE)
-	    gprintf(" O");
+	    gprintf(goban, " O");
 	  else if (board[pos] == BLACK)
-	    gprintf(" X");
+	    gprintf(goban, " X");
 	  else
-	    gprintf(" .");
+	    gprintf(goban, " .");
 	}
       }
-      gprintf("\n");
+      gprintf(goban, "\n");
     }
   
-    gprintf("Closest opponent %1m", closest_opponent);
+    gprintf(goban, "Closest opponent %1m", closest_opponent);
     if (closest_opponent != NO_MOVE)
-      gprintf(", distance %d\n", distance[closest_opponent]);
+      gprintf(goban, ", distance %d\n", distance[closest_opponent]);
     else
-      gprintf("\n");
+      gprintf(goban, "\n");
 
-    gprintf("Closest own %1m", closest_own);
+    gprintf(goban, "Closest own %1m", closest_own);
     if (closest_own != NO_MOVE)
-      gprintf(", distance %d\n", distance[closest_own]);
+      gprintf(goban, ", distance %d\n", distance[closest_own]);
     else
-      gprintf("\n");
+      gprintf(goban, "\n");
   }
 
   /* Case 0. This is a special measure to avoid a certain kind of
@@ -281,23 +282,23 @@ do_aftermath_genmove(int color,
 	|| distance[pos] == 0)
       continue;
 
-    libs = approxlib(pos, color, 3, NULL);
+    libs = approxlib(goban, pos, color, 3, NULL);
     if (libs < 3)
       continue;
 
-    if (is_self_atari(pos, other))
+    if (is_self_atari(goban, pos, other))
       continue;
     
     for (k = 0; k < 4; k++) {
       int dir = delta[k];
       int right = delta[(k+1)%4];
-      if (!ON_BOARD(pos - dir)
+      if (!ON_BOARD(goban, pos - dir)
 	  && board[pos + dir] == color
 	  && board[pos + dir + right] == other
 	  && board[pos + dir - right] == other
-	  && (libs > countlib(pos + dir)
+	  && (libs > countlib(goban, pos + dir)
 	      || (libs > 4
-		  && libs == countlib(pos + dir)))
+		  && libs == countlib(goban, pos + dir)))
 	  && (DRAGON2(pos + dir).safety == INVINCIBLE
 	      || DRAGON2(pos + dir).safety == STRONGLY_ALIVE)) {
 	int this_score = 20 * (owl_hotspot[pos] + reading_hotspot[pos]);
@@ -311,7 +312,7 @@ do_aftermath_genmove(int color,
   
   if (best_scoring_move != NO_MOVE
       && safe_move(best_scoring_move, color) == WIN) {
-    DEBUG(DEBUG_AFTERMATH, "Closing edge at %1m\n", best_scoring_move);
+    DEBUG(goban, DEBUG_AFTERMATH, "Closing edge at %1m\n", best_scoring_move);
     return best_scoring_move;
   }
 
@@ -320,14 +321,14 @@ do_aftermath_genmove(int color,
     int lib;
     if (board[pos] == other
 	&& worm[pos].unconditional_status != DEAD
-	&& countlib(pos) == 1
-	&& ((ON_BOARD(SOUTH(pos))    && distance[SOUTH(pos)] == 0)
-	    || (ON_BOARD(WEST(pos))  && distance[WEST(pos)]  == 0)
-	    || (ON_BOARD(NORTH(pos)) && distance[NORTH(pos)] == 0)
-	    || (ON_BOARD(EAST(pos))  && distance[EAST(pos)]  == 0))) {
-      findlib(pos, 1, &lib);
+	&& countlib(goban, pos) == 1
+	&& ((ON_BOARD(goban, SOUTH(pos))    && distance[SOUTH(pos)] == 0)
+	    || (ON_BOARD(goban, WEST(pos))  && distance[WEST(pos)]  == 0)
+	    || (ON_BOARD(goban, NORTH(pos)) && distance[NORTH(pos)] == 0)
+	    || (ON_BOARD(goban, EAST(pos))  && distance[EAST(pos)]  == 0))) {
+      findlib(goban, pos, 1, &lib);
       /* Make sure we don't play into a ko or a (proper) snapback. */
-      if (countstones(pos) > 1 || !is_self_atari(lib, color)) {
+      if (countstones(goban, pos) > 1 || !is_self_atari(goban, lib, color)) {
 	return lib;
       }
     }
@@ -351,12 +352,12 @@ do_aftermath_genmove(int color,
       for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
 	int score = 0;
 	int move_ok = 0;
-	if (!ON_BOARD(pos) || distance[pos] != 1)
+	if (!ON_BOARD(goban, pos) || distance[pos] != 1)
 	  continue;
 	mark++;
 	for (k = 0; k < 4; k++) {
 	  int pos2 = pos + delta[k];
-	  if (!ON_BOARD(pos2))
+	  if (!ON_BOARD(goban, pos2))
 	    continue;
 	  if (distance[pos2] < 1)
 	    score--;
@@ -368,18 +369,18 @@ do_aftermath_genmove(int color,
 	    if (board[pos2] == color) {
 	      move_ok = 1;
 	      score += 7;
-	      if (countstones(pos2) > 2)
+	      if (countstones(goban, pos2) > 2)
 		score++;
-	      if (countstones(pos2) > 4)
+	      if (countstones(goban, pos2) > 4)
 		score++;
-	      if (countlib(pos2) < 4)
+	      if (countlib(goban, pos2) < 4)
 		score++;
-	      if (countlib(pos2) < 3)
+	      if (countlib(goban, pos2) < 3)
 		score++;
 	    }
 	    else {
-	      int deltalib = (approxlib(pos, other, MAXLIBS, NULL)
-			      - countlib(pos2));
+	      int deltalib = (approxlib(goban, pos, other, MAXLIBS, NULL)
+			      - countlib(goban, pos2));
 	      move_ok = 1;
 	      score++;
 	      if (deltalib >= 0)
@@ -387,14 +388,14 @@ do_aftermath_genmove(int color,
 	      if (deltalib > 0)
 		score++;
 	    }
-	    mark_string(pos2, mx, mark);
+	    mark_string(goban, pos2, mx, mark);
 	  }
 	}
-	if (is_suicide(pos, other))
+	if (is_suicide(goban, pos, other))
 	  score -= 3;
 	
 	if (0)
-	  gprintf("Score %1m = %d\n", pos, score);
+	  gprintf(goban, "Score %1m = %d\n", pos, score);
 	
 	if (move_ok && score > best_score) {
 	  best_score = score;
@@ -407,7 +408,7 @@ do_aftermath_genmove(int color,
     while (distance[move] > 1) {
       for (k = 0; k < 4; k++) {
 	int pos2 = move + delta[k];
-	if (ON_BOARD(pos2)
+	if (ON_BOARD(goban, pos2)
 	    && board[pos2] == EMPTY
 	    && distance[pos2] == distance[move] - 1) {
 	  move = pos2;
@@ -444,7 +445,7 @@ do_aftermath_genmove(int color,
     
     for (k = 0; k < 8; k++) {
       int pos2 = pos + delta[k];
-      if (!ON_BOARD(pos2))
+      if (!ON_BOARD(goban, pos2))
 	continue;
       
       if (board[pos2] == EMPTY) {
@@ -470,11 +471,11 @@ do_aftermath_genmove(int color,
 	if (!mx[origin] && dragon[pos2].status == DEAD) {
 	  bonus++;
 	  if (k < 4 
-	      && countlib(pos2) <= 2 
-	      && countstones(pos2) >= 3)
+	      && countlib(goban, pos2) <= 2 
+	      && countstones(goban, pos2) >= 3)
 	    bonus++;
 	  
-	  if (k < 4 && countlib(pos2) == 1)
+	  if (k < 4 && countlib(goban, pos2) == 1)
 	    bonus += 3;
 	}
 	mx[origin] = 1;
@@ -493,30 +494,30 @@ do_aftermath_genmove(int color,
 	  
 	  if (!mx[apos]) {
 	    own_worms++;
-	    if (countstones(apos) == 1)
+	    if (countstones(goban, apos) == 1)
 	      bonus += 2;
-	    if (countlib(apos) < 6
-		&& approxlib(pos, color, 5, NULL) < countlib(apos))
+	    if (countlib(goban, apos) < 6
+		&& approxlib(goban, pos, color, 5, NULL) < countlib(goban, apos))
 	      bonus -= 5;
 	    mx[apos] = 1;
 	  }
 	  
-	  if (countlib(apos) <= 2) {
+	  if (countlib(goban, apos) <= 2) {
 	    int r;
 	    int important = 0;
 	    int safe_atari = 0;
 	    for (r = 0; r < 4; r++) {
 	      d = delta[r];
-	      if (!ON_BOARD(apos+d))
+	      if (!ON_BOARD(goban, apos+d))
 		continue;
 	      if (board[apos+d] == other
 		  && dragon[apos+d].status == DEAD)
 		important = 1;
 	      else if (board[apos+d] == EMPTY
-		       && !is_self_atari(apos+d, other))
+		       && !is_self_atari(goban, apos+d, other))
 		safe_atari = 1;
 	    }
-	    if (approxlib(pos, color, 3, NULL) > 2) {
+	    if (approxlib(goban, pos, color, 3, NULL) > 2) {
 	      bonus++;
 	      if (important) {
 		bonus += 2;
@@ -570,12 +571,12 @@ do_aftermath_genmove(int color,
       score[pos] += hotspot_bonus;
       
       if (1 && (debug & DEBUG_AFTERMATH))
-	gprintf("Score %1M = %d (hotspot bonus %d + %d)\n", pos, score[pos],
+	gprintf(goban, "Score %1M = %d (hotspot bonus %d + %d)\n", pos, score[pos],
 		owl_hotspot_bonus, reading_hotspot_bonus);
     }
     
     /* Avoid taking ko. */
-    if (is_ko(pos, color, NULL))
+    if (is_ko(goban, pos, color, NULL))
       score[pos] = (score[pos] + 1) / 2;
   }
   
@@ -584,7 +585,7 @@ do_aftermath_genmove(int color,
     best_score = 0;
     move = NO_MOVE;
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (ON_BOARD(pos) && score[pos] > best_score) {
+      if (ON_BOARD(goban, pos) && score[pos] > best_score) {
 	best_score = score[pos];
 	move = pos;
       }
@@ -594,7 +595,7 @@ do_aftermath_genmove(int color,
       break;
 
     bb = dragons[move];
-    if (is_illegal_ko_capture(move, color)
+    if (is_illegal_ko_capture(goban, move, color)
 	|| !safe_move(move, color)
 	|| (DRAGON2(bb).safety != INVINCIBLE
 	    && DRAGON2(bb).safety != STRONGLY_ALIVE
@@ -607,35 +608,35 @@ do_aftermath_genmove(int color,
        * Check that no adjacent string or dragon gets more alive by
        * the move.
        */
-      int libs = approxlib(move, color, 5, NULL);
+      int libs = approxlib(goban, move, color, 5, NULL);
       int move_ok = 1;
       if (libs < 5) {
 	for (k = 0; k < 4; k++) {
 	  if (board[move + delta[k]] == color
-	      && countlib(move + delta[k]) > libs)
+	      && countlib(goban, move + delta[k]) > libs)
 	    break;
 	}
 	if (k < 4) {
-	  if (trymove(move, color, "aftermath-B", move + delta[k])) {
+	  if (trymove(goban, move, color, "aftermath-B", move + delta[k])) {
 	    int adjs[MAXCHAIN];
 	    int neighbors;
 	    int r;
-	    neighbors = chainlinks(move, adjs);
+	    neighbors = chainlinks(goban, move, adjs);
 	    for (r = 0; r < neighbors; r++) {
 	      if (worm[adjs[r]].attack_codes[0] != 0
 		  && (find_defense(adjs[r], NULL)
 		      > worm[adjs[r]].defense_codes[0])) {
-		DEBUG(DEBUG_AFTERMATH,
+		DEBUG(goban, DEBUG_AFTERMATH,
 		      "Blunder: %1m becomes tactically safer after %1m\n",
 		      adjs[r], move);
 		move_ok = 0;
 	      }
 	    }
-	    popgo();
+	    popgo(goban);
 	    for (r = 0; r < neighbors && move_ok; r++) {
 	      if (dragon[adjs[r]].status == DEAD
 		  && !owl_does_attack(move, adjs[r], NULL)) {
-		DEBUG(DEBUG_AFTERMATH,
+		DEBUG(goban, DEBUG_AFTERMATH,
 		      "Blunder: %1m becomes more alive after %1m\n",
 		      adjs[r], move);
 		move_ok = 0;
@@ -648,7 +649,7 @@ do_aftermath_genmove(int color,
       if (!move_ok)
 	score[move] = 0;
       else {
-	DEBUG(DEBUG_AFTERMATH, "Splitting eyespace at %1m\n", move);
+	DEBUG(goban, DEBUG_AFTERMATH, "Splitting eyespace at %1m\n", move);
 	return move;
       }
     }
@@ -667,7 +668,7 @@ do_aftermath_genmove(int color,
     target = NO_MOVE;
     for (k = 0; k < 8; k++) {
       int pos2 = pos + delta[k];
-      if (!ON_BOARD(pos2))
+      if (!ON_BOARD(goban, pos2))
 	continue;
       if (board[pos2] == other 
 	  && dragon[pos2].status != ALIVE
@@ -687,7 +688,7 @@ do_aftermath_genmove(int color,
      * a dead opponent string at (target).
      */
     
-    if (!trymove(pos, color, "aftermath-A", target))
+    if (!trymove(goban, pos, color, "aftermath-A", target))
       continue;
     
     /* It is frequently necessary to sacrifice own stones in order
@@ -731,20 +732,20 @@ do_aftermath_genmove(int color,
      * potential move possible.
      */
     if (!self_atari_ok) {
-      while (countlib(pos) == 1) {
+      while (countlib(goban, pos) == 1) {
 	int lib;
-	findlib(pos, 1, &lib);
+	findlib(goban, pos, 1, &lib);
 	move = lib;
-	if (!trymove(move, color, "aftermath-B", target))
+	if (!trymove(goban, move, color, "aftermath-B", target))
 	  break;
       }
       
-      if (countlib(pos) == 1)
+      if (countlib(goban, pos) == 1)
 	move = NO_MOVE;
     }
 
     while (stackp > 0)
-      popgo();
+      popgo(goban);
     
     if (move == NO_MOVE)
       continue;
@@ -754,7 +755,7 @@ do_aftermath_genmove(int color,
      * could happen (because the backfilling moves happened to
      * capture some stones).
      */
-    if (!self_atari_ok && is_self_atari(move, color))
+    if (!self_atari_ok && is_self_atari(goban, move, color))
       continue;
     
     /* Consult the owl code to determine whether the considered move
@@ -778,7 +779,7 @@ do_aftermath_genmove(int color,
       if (!self_atari_ok && !confirm_safety(move, color, NULL, NULL))
 	continue;
 	  
-      DEBUG(DEBUG_AFTERMATH, "Filling opponent liberty at %1m\n", move);
+      DEBUG(goban, DEBUG_AFTERMATH, "Filling opponent liberty at %1m\n", move);
       return move;
     }
   }
@@ -809,8 +810,8 @@ do_aftermath_genmove(int color,
 	&& (DRAGON2(pos).safety == DEAD
 	    || DRAGON2(pos).safety == TACTICALLY_DEAD)
 	&& worm[pos].attack_codes[0] != 0
-	&& !is_illegal_ko_capture(worm[pos].attack_points[0], color)) {
-      DEBUG(DEBUG_AFTERMATH, "Tactically attack %1m at %1m\n",
+	&& !is_illegal_ko_capture(goban, worm[pos].attack_points[0], color)) {
+      DEBUG(goban, DEBUG_AFTERMATH, "Tactically attack %1m at %1m\n",
 	    pos, worm[pos].attack_points[0]);
       return worm[pos].attack_points[0];
     }
@@ -852,7 +853,7 @@ reduced_genmove(int color)
   else
     our_score = -white_score;
 
-  gg_assert(stackp == 0);
+  gg_assert(goban, stackp == 0);
   
   /*
    * Ok, information gathering is complete. Now start to find some moves!
@@ -867,18 +868,18 @@ reduced_genmove(int color)
   
   /* Look for combination attacks and defenses against them. */
   combinations(color);
-  gg_assert(stackp == 0);
+  gg_assert(goban, stackp == 0);
 
   /* Review the move reasons and estimate move values. */
   if (review_move_reasons(&move, &value, color, 0.0, our_score, NULL, 0))
-    TRACE("Move generation likes %1m with value %f\n", move, value);
-  gg_assert(stackp == 0);
+    TRACE(goban, "Move generation likes %1m with value %f\n", move, value);
+  gg_assert(goban, stackp == 0);
 
   /* If no move is found then pass. */
   if (move == PASS_MOVE)
-    TRACE("I pass.\n");
+    TRACE(goban, "I pass.\n");
   else
-    TRACE("reduced_genmove() recommends %1m with value %f\n", move, value);
+    TRACE(goban, "reduced_genmove() recommends %1m with value %f\n", move, value);
  
   return move;
 }
@@ -891,7 +892,7 @@ do_play_aftermath(int color, struct aftermath_data *a)
   int pass = 0;
   int moves = 0;
   int color_to_play = color;
-  DEBUG(DEBUG_AFTERMATH, "The aftermath starts.\n");
+  DEBUG(goban, DEBUG_AFTERMATH, "The aftermath starts.\n");
 
   /* Disable computing worm and owl threats. */
   disable_threat_computation = 1;
@@ -912,11 +913,11 @@ do_play_aftermath(int color, struct aftermath_data *a)
 				  0);
       verbose = save_verbose;
     }
-    play_move(move, color_to_play);
+    play_move(goban, move, color_to_play);
     if (aftermath_sgftree)
       sgftreeAddPlay(aftermath_sgftree, color_to_play, I(move), J(move));
     moves++;
-    DEBUG(DEBUG_AFTERMATH, "%d %C move %1m (nodes %d, %d  total %d, %d)\n",
+    DEBUG(goban, DEBUG_AFTERMATH, "%d %C move %1m (nodes %d, %d  total %d, %d)\n",
 	  movenum, color_to_play, move, get_owl_node_counter() - owl_nodes,
 	  get_reading_node_counter() - reading_nodes,
 	  get_owl_node_counter(), get_reading_node_counter());
@@ -938,12 +939,12 @@ static void
 play_aftermath(int color)
 {
   int pos;
-  struct board_state saved_board;
+  Board_state saved_board;
   struct aftermath_data *a = &aftermath;
   static int current_board[BOARDMAX];
   static int current_color = EMPTY;
   int cached_board = 1;
-  gg_assert(color == BLACK || color == WHITE);
+  gg_assert(goban, color == BLACK || color == WHITE);
 
   if (current_color != color) {
     current_color = color;
@@ -951,7 +952,7 @@ play_aftermath(int color)
   }
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (ON_BOARD(pos) && board[pos] != current_board[pos]) {
+    if (ON_BOARD(goban, pos) && board[pos] != current_board[pos]) {
       current_board[pos] = board[pos];
       cached_board = 0;
     }
@@ -972,12 +973,12 @@ play_aftermath(int color)
   a->white_area = 0;
   a->black_area = 0;
   
-  store_board(&saved_board);
+  store_board(goban, &saved_board);
   do_play_aftermath(color, a);
-  restore_board(&saved_board);
+  restore_board(goban, &saved_board);
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
+    if (!ON_BOARD(goban, pos))
       continue;
     if (a->black_control[pos]) {
       a->black_area++;
@@ -1021,14 +1022,14 @@ play_aftermath(int color)
   }
 
   if (debug & DEBUG_AFTERMATH) {
-    gprintf("White captured: %d\n", a->white_captured);
-    gprintf("Black captured: %d\n", a->black_captured);
-    gprintf("White prisoners: %d\n", a->white_prisoners);
-    gprintf("Black prisoners: %d\n", a->black_prisoners);
-    gprintf("White territory: %d\n", a->white_territory);
-    gprintf("Black territory: %d\n", a->black_territory);
-    gprintf("White area: %d\n", a->white_area);
-    gprintf("Black area: %d\n", a->black_area);
+    gprintf(goban, "White captured: %d\n", a->white_captured);
+    gprintf(goban, "Black captured: %d\n", a->black_captured);
+    gprintf(goban, "White prisoners: %d\n", a->white_prisoners);
+    gprintf(goban, "Black prisoners: %d\n", a->black_prisoners);
+    gprintf(goban, "White territory: %d\n", a->white_territory);
+    gprintf(goban, "Black territory: %d\n", a->black_territory);
+    gprintf(goban, "White area: %d\n", a->white_area);
+    gprintf(goban, "Black area: %d\n", a->black_area);
   }
 }
 
@@ -1059,7 +1060,7 @@ aftermath_compute_score(int color, float komi, SGFTree *tree)
 enum dragon_status
 aftermath_final_status(int color, int pos)
 {
-  ASSERT_ON_BOARD1(pos);
+  ASSERT_ON_BOARD1(goban, pos);
   aftermath_sgftree = NULL;
   play_aftermath(color);
   return aftermath.final_status[pos];

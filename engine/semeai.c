@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,7 +59,7 @@ semeai()
   int num_dragons = number_of_dragons;
 
   if (num_dragons > MAX_DRAGONS) {
-    TRACE("Too many dragons!!! Might disregard some semeais.");
+    TRACE(goban, "Too many dragons!!! Might disregard some semeais.");
     num_dragons = MAX_DRAGONS;
   }
 
@@ -110,13 +111,13 @@ semeai()
        * of d1 after the d1 d2 semeai, giving d2 the first move.
        */
       
-      DEBUG(DEBUG_SEMEAI, "Considering semeai between %1m and %1m\n",
+      DEBUG(goban, DEBUG_SEMEAI, "Considering semeai between %1m and %1m\n",
 	    apos, bpos);
       owl_analyze_semeai(apos, bpos,
 			 &(semeai_results_first[d1][d2]), 
 			 &(semeai_results_second[d1][d2]),
 			 &(semeai_move[d1][d2]), 1, &result_certain);
-      DEBUG(DEBUG_SEMEAI, "results if %s moves first: %s %s, %1m%s\n",
+      DEBUG(goban, DEBUG_SEMEAI, "results if %s moves first: %s %s, %1m%s\n",
 	    board[apos] == BLACK ? "black" : "white",
 	    result_to_string(semeai_results_first[d1][d2]),
 	    result_to_string(semeai_results_second[d1][d2]),
@@ -182,7 +183,7 @@ semeai()
     for (d2 = 0; d2 < num_dragons; d2++) {
       if (semeai_results_first[d1][d2] == -1)
 	continue;
-      gg_assert(semeai_results_second[d1][d2] != -1);
+      gg_assert(goban, semeai_results_second[d1][d2] != -1);
       semeais_found++;
 
       if (best_defense < semeai_results_first[d1][d2]
@@ -255,7 +256,7 @@ find_moves_to_make_seki()
 	  break;
       }
 
-      ASSERT1(opponent != NO_MOVE, opponent);
+      ASSERT1(goban, opponent != NO_MOVE, opponent);
 
       if (dragon[opponent].status != ALIVE)
 	continue;
@@ -278,7 +279,7 @@ find_moves_to_make_seki()
        */
       if (resultb != WIN && certain) {
 	int d = dragon[str].id;
-	DEBUG(DEBUG_SEMEAI, "Move to make seki at %1m (%1m vs %1m)\n",
+	DEBUG(goban, DEBUG_SEMEAI, "Move to make seki at %1m (%1m vs %1m)\n",
 	      defend_move, str, opponent);
 	dragon2[d].semeais++;
 	update_status(str, CRITICAL, CRITICAL);
@@ -298,7 +299,7 @@ find_moves_to_make_seki()
 	else {
 	  int k;
 	  int libs[MAXLIBS];
-	  int liberties = findlib(str, MAXLIBS, libs);
+	  int liberties = findlib(goban, str, MAXLIBS, libs);
 
 	  for (k = 0; k < liberties; k++) {
 	    owl_analyze_semeai_after_move(libs[k], OTHER_COLOR(color),
@@ -311,7 +312,7 @@ find_moves_to_make_seki()
 	  }
 
 	  if (k == liberties) {
-	    DEBUG(DEBUG_SEMEAI,
+	    DEBUG(goban, DEBUG_SEMEAI,
 		  "No move to attack in semeai (%1m vs %1m), seki assumed.\n",
 		  str, opponent);
 	    dragon2[d].semeai_attack_point = NO_MOVE;
@@ -319,7 +320,7 @@ find_moves_to_make_seki()
 	  }
 	}
 
-	DEBUG(DEBUG_SEMEAI, "Move to prevent seki at %1m (%1m vs %1m)\n",
+	DEBUG(goban, DEBUG_SEMEAI, "Move to prevent seki at %1m (%1m vs %1m)\n",
 	      dragon2[d].semeai_attack_point, opponent, str);
 
 	dragon2[d].semeai_attack_certain = certain;
@@ -352,7 +353,7 @@ find_moves_to_make_seki()
 	  break;
       }
 
-      ASSERT1(opponent != NO_MOVE, opponent);
+      ASSERT1(goban, opponent != NO_MOVE, opponent);
 
       if (dragon[opponent].status != ALIVE)
 	continue;
@@ -375,7 +376,7 @@ find_moves_to_make_seki()
        */
       if (resulta != 0 && certain) {
 	int d = dragon[str].id;
-	DEBUG(DEBUG_SEMEAI, "Move to make seki at %1m (%1m vs %1m)\n",
+	DEBUG(goban, DEBUG_SEMEAI, "Move to make seki at %1m (%1m vs %1m)\n",
 	      defend_move, str, opponent);
 	dragon2[d].semeais++;
 	update_status(str, CRITICAL, CRITICAL);
@@ -395,7 +396,7 @@ find_moves_to_make_seki()
 	else {
 	  int k;
 	  int libs[MAXLIBS];
-	  int liberties = findlib(str, MAXLIBS, libs);
+	  int liberties = findlib(goban, str, MAXLIBS, libs);
 
 	  for (k = 0; k < liberties; k++) {
 	    owl_analyze_semeai_after_move(libs[k], OTHER_COLOR(color),
@@ -408,7 +409,7 @@ find_moves_to_make_seki()
 	  }
 
 	  if (k == liberties) {
-	    DEBUG(DEBUG_SEMEAI,
+	    DEBUG(goban, DEBUG_SEMEAI,
 		  "No move to attack in semeai (%1m vs %1m), seki assumed.\n",
 		  str, opponent);
 	    dragon2[d].semeai_attack_point = NO_MOVE;
@@ -416,7 +417,7 @@ find_moves_to_make_seki()
 	  }
 	}
 
-	DEBUG(DEBUG_SEMEAI, "Move to prevent seki at %1m (%1m vs %1m)\n",
+	DEBUG(goban, DEBUG_SEMEAI, "Move to prevent seki at %1m (%1m vs %1m)\n",
 	      dragon2[d].semeai_attack_point, opponent, str);
 
 	dragon2[d].semeai_attack_certain = certain;
@@ -438,7 +439,7 @@ neighbor_of_dragon(int pos, int origin)
     return 0;
 
   for (k = 0; k < 4; k++)
-    if (ON_BOARD(pos + delta[k]) && dragon[pos + delta[k]].origin == origin)
+    if (ON_BOARD(goban, pos + delta[k]) && dragon[pos + delta[k]].origin == origin)
       return 1;
 
   return 0;
@@ -491,24 +492,24 @@ semeai_move_reasons(int color)
 	         dragon2[d].owl_defense_certain)) {
 	/* My dragon can be defended. */
 	add_semeai_move(dragon2[d].semeai_defense_point, dragon2[d].origin);
-	DEBUG(DEBUG_SEMEAI, "Adding semeai defense move for %1m at %1m\n",
+	DEBUG(goban, DEBUG_SEMEAI, "Adding semeai defense move for %1m at %1m\n",
 	      DRAGON(d).origin, dragon2[d].semeai_defense_point);
 	if (neighbor_of_dragon(dragon2[d].semeai_defense_point,
 			       dragon2[d].semeai_defense_target)
 	    && !neighbor_of_dragon(dragon2[d].semeai_defense_point,
 				   dragon2[d].origin)
-	    && !is_self_atari(dragon2[d].semeai_defense_point, color)) {
+	    && !is_self_atari(goban, dragon2[d].semeai_defense_point, color)) {
 	  
 	  /* If this is a move to fill the non-common liberties of the
 	   * target, and is not a ko or snap-back, then we mark all
 	   * non-common liberties of the target as potential semeai moves.
 	   */
 
-          liberties = findlib(dragon2[d].semeai_defense_target, MAXLIBS, libs);
+          liberties = findlib(goban, dragon2[d].semeai_defense_target, MAXLIBS, libs);
 
           for (r = 0; r < liberties; r++) {
             if (!neighbor_of_dragon(libs[r], dragon2[d].origin)
-		&& !is_self_atari(libs[r], color)
+		&& !is_self_atari(goban, libs[r], color)
 		&& libs[r] != dragon2[d].semeai_defense_point)
 	      add_potential_semeai_defense(libs[r], dragon2[d].origin,
 					   dragon2[d].semeai_defense_target);
@@ -523,19 +524,19 @@ semeai_move_reasons(int color)
 		      dragon2[d].owl_attack_certain)) {
 	/* Your dragon can be attacked. */
 	add_semeai_move(dragon2[d].semeai_attack_point, dragon2[d].origin);
-	DEBUG(DEBUG_SEMEAI, "Adding semeai attack move for %1m at %1m\n",
+	DEBUG(goban, DEBUG_SEMEAI, "Adding semeai attack move for %1m at %1m\n",
 	      DRAGON(d).origin, dragon2[d].semeai_attack_point);
 	if (neighbor_of_dragon(dragon2[d].semeai_attack_point,
 			       dragon2[d].origin)
 	    && !neighbor_of_dragon(dragon2[d].semeai_attack_point,
 				  dragon2[d].semeai_attack_target)
-	    && !is_self_atari(dragon2[d].semeai_attack_point, color)) {
+	    && !is_self_atari(goban, dragon2[d].semeai_attack_point, color)) {
 
-          liberties = findlib(dragon2[d].origin, MAXLIBS, libs);
+          liberties = findlib(goban, dragon2[d].origin, MAXLIBS, libs);
 
           for (r = 0; r < liberties; r++) {
             if (!neighbor_of_dragon(libs[r], dragon2[d].semeai_attack_target)
-		&& !is_self_atari(libs[r], color)
+		&& !is_self_atari(goban, libs[r], color)
 		&& libs[r] != dragon2[d].semeai_attack_point)
 	      add_potential_semeai_attack(libs[r], dragon2[d].origin,
 					  dragon2[d].semeai_attack_target);
@@ -558,7 +559,7 @@ update_status(int dr, enum dragon_status new_status,
 
   if (dragon[dr].status != new_status
       && (dragon[dr].status != CRITICAL || new_status != DEAD)) {
-    DEBUG(DEBUG_SEMEAI, "Changing status of %1m from %s to %s.\n", dr,
+    DEBUG(goban, DEBUG_SEMEAI, "Changing status of %1m from %s to %s.\n", dr,
 	  status_to_string(dragon[dr].status),
 	  status_to_string(new_status));
     for (pos = BOARDMIN; pos < BOARDMAX; pos++)
@@ -571,7 +572,7 @@ update_status(int dr, enum dragon_status new_status,
 
   if (DRAGON2(dr).safety != new_safety
       && (DRAGON2(dr).safety != CRITICAL || new_safety != DEAD)) {
-    DEBUG(DEBUG_SEMEAI, "Changing safety of %1m from %s to %s.\n", dr,
+    DEBUG(goban, DEBUG_SEMEAI, "Changing safety of %1m from %s to %s.\n", dr,
 	  status_to_string(DRAGON2(dr).safety), status_to_string(new_safety));
     DRAGON2(dr).safety = new_safety;
   }

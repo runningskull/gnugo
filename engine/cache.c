@@ -23,6 +23,7 @@
 
 #include "random.h"
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,7 +73,7 @@ static void
 calculate_hashval_for_tt(Hash_data *hashdata, int routine, int target1,
 			 int target2, Hash_data *extra_hash)
 { 
-  *hashdata = board_hash;                /* from globals.c */
+  *hashdata = goban->board_hash;                /* from globals.c */
   hashdata_xor(*hashdata, routine_hash[routine]);
   hashdata_xor(*hashdata, target1_hash[target1]);
   if (target2 != NO_MOVE)
@@ -201,7 +202,7 @@ tt_update(Transposition_table *table,
   unsigned int data;
   /* Get routine costs definitions from liberty.h. */
   static const int routine_costs[] = { ROUTINE_COSTS };
-  gg_assert(routine_costs[NUM_CACHE_ROUTINES] == -1);
+  gg_assert(goban, routine_costs[NUM_CACHE_ROUTINES] == -1);
 
   /* Sanity check. */
   if (remaining_depth < 0 || remaining_depth > HN_MAX_REMAINING_DEPTH)
@@ -307,7 +308,7 @@ sgf_trace(const char *func, int str, int move, int result,
   
   if (result == 0)
     sprintf(buf + strlen(buf), "0");
-  else if (ON_BOARD(move))
+  else if (ON_BOARD(goban, move))
     sprintf(buf + strlen(buf), "%s %c%d", result_to_string(result), 
 	    J(move) + 'A' + (J(move) >= 8),
 	    board_size - I(move));
@@ -336,7 +337,7 @@ sgf_trace2(const char *func, int str1, int str2, int move,
 	  J(str1) + 'A' + (J(str1) >= 8), board_size - I(str1),
 	  J(str2) + 'A' + (J(str2) >= 8), board_size - I(str2));
   
-  if (ON_BOARD(move))
+  if (ON_BOARD(goban, move))
     sprintf(buf + strlen(buf), "%s %c%d", result,
 	    J(move) + 'A' + (J(move) >= 8),
 	    board_size - I(move));
@@ -365,7 +366,7 @@ sgf_trace_semeai(const char *func, int str1, int str2, int move,
 	  J(str1) + 'A' + (J(str1) >= 8), board_size - I(str1),
 	  J(str2) + 'A' + (J(str2) >= 8), board_size - I(str2));
   
-  if (ON_BOARD(move))
+  if (ON_BOARD(goban, move))
     sprintf(buf + strlen(buf), "%s %s %c%d",
 	    result_to_string(result1), result_to_string(result2),
 	    J(move) + 'A' + (J(move) >= 8), board_size - I(move));

@@ -90,7 +90,7 @@ void gnugo_add_stone(int i, int j, int color);
 void gnugo_remove_stone(int i, int j);
 int  gnugo_is_pass(int i, int j);
 void gnugo_play_move(int i, int j, int color);
-int  gnugo_undo_move(int n);
+int  gnugo_undo_moves(int n);
 int  gnugo_play_sgfnode(SGFNode *node, int to_move);
 int  gnugo_play_sgftree(SGFNode *root, int *until, SGFNode **curnode);
 int  gnugo_is_legal(int i, int j, int color);
@@ -298,8 +298,11 @@ void debug_influence_move(int i, int j);
 #ifdef HAVE_VARIADIC_DEFINE
 
 /* gnuc allows variadic macros, so the tests can be done inline */
-#define DEBUG(level, fmt, args...) \
-    do { if ((debug & (level))) gprintf(fmt, ##args); } while (0)
+#define DEBUG(goban, level, fmt, args...)				\
+  do {									\
+    if ((debug & (level)))						\
+      gprintf((goban), (fmt), ##args);					\
+  } while (0)
 
 #else /*HAVE_VARIADIC_DEFINE*/
 

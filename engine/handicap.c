@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include "liberty.h"
 #include "patterns.h"
@@ -169,7 +170,7 @@ place_fixed_handicap(int handicap)
 
   /* special cases: 5 and 7 */
   if (handicap == 5 || handicap == 7) {
-    add_stone(POS(mid, mid), BLACK);
+    add_stone(goban, POS(mid, mid), BLACK);
     handicap--;
   }
 
@@ -190,7 +191,7 @@ place_fixed_handicap(int handicap)
     if (i < 0) i += board_size-1;
     if (j < 0) j += board_size-1;
 
-    add_stone(POS(i, j), BLACK);
+    add_stone(goban, POS(i, j), BLACK);
   }
 
   return retval;
@@ -218,7 +219,7 @@ static void free_handicap_callback(int anchor, int color,
 int
 place_free_handicap(int handicap)
 {
-  gg_assert(handicap == 0 || handicap >= 2);
+  gg_assert(goban, handicap == 0 || handicap >= 2);
 
   if (handicap == 0)
     return 0;
@@ -229,10 +230,10 @@ place_free_handicap(int handicap)
   /* First place black stones in the four corners to enable the
    * pattern matching scheme.
    */
-  add_stone(POS(0, 0), BLACK);
-  add_stone(POS(0, board_size - 1), BLACK);
-  add_stone(POS(board_size - 1, 0), BLACK);
-  add_stone(POS(board_size - 1, board_size - 1), BLACK);
+  add_stone(goban, POS(0, 0), BLACK);
+  add_stone(goban, POS(0, board_size - 1), BLACK);
+  add_stone(goban, POS(board_size - 1, 0), BLACK);
+  add_stone(goban, POS(board_size - 1, board_size - 1), BLACK);
 
   /* Find and place free handicap stones by pattern matching. */
   while (remaining_handicap_stones > 0) {
@@ -241,10 +242,10 @@ place_free_handicap(int handicap)
   }
 
   /* Remove the artificial corner stones. */
-  remove_stone(POS(0, 0));
-  remove_stone(POS(0, board_size - 1));
-  remove_stone(POS(board_size - 1, 0));
-  remove_stone(POS(board_size - 1, board_size - 1));
+  remove_stone(goban, POS(0, 0));
+  remove_stone(goban, POS(0, board_size - 1));
+  remove_stone(goban, POS(board_size - 1, 0));
+  remove_stone(goban, POS(board_size - 1, board_size - 1));
 
   /* Find and place additional free handicap stones by the aftermath
    * algorithm.
@@ -257,7 +258,7 @@ place_free_handicap(int handicap)
     genmove_conservative(BLACK, NULL);
     move = aftermath_genmove(BLACK, 0, NULL);
     if (move != PASS_MOVE) {
-      add_stone(move, BLACK);
+      add_stone(goban, move, BLACK);
       remaining_handicap_stones--;
     }
     else
@@ -343,14 +344,14 @@ find_free_handicap_pattern()
   
   /* Pick up the location of the move */
   move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
-  add_stone(move, BLACK);
+  add_stone(goban, move, BLACK);
   remaining_handicap_stones--;
 
   /* Add stones at all '!' in the pattern. */
   for (k = 0; k < pattern->patlen; k++) { 
     if (pattern->patn[k].att == ATT_not) {
       int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
-      add_stone(pos, BLACK);
+      add_stone(goban, pos, BLACK);
       remaining_handicap_stones--;
     }
   }
@@ -402,7 +403,7 @@ free_handicap_callback(int anchor, int color, struct pattern *pattern,
       }
     }
   }
-  gg_assert(r >= 0 && r < MAX_HANDICAP_MATCHES);
+  gg_assert(goban, r >= 0 && r < MAX_HANDICAP_MATCHES);
   handicap_matches[r].value   = pattern->value;
   handicap_matches[r].anchor  = anchor;
   handicap_matches[r].pattern = pattern;
@@ -412,14 +413,14 @@ free_handicap_callback(int anchor, int color, struct pattern *pattern,
 int
 free_handicap_remaining_stones()
 {
-  gg_assert(remaining_handicap_stones >= 0);
+  gg_assert(goban, remaining_handicap_stones >= 0);
   return remaining_handicap_stones;
 }
 
 int
 free_handicap_total_stones()
 {
-  gg_assert(total_handicap_stones >= 0);
+  gg_assert(goban, total_handicap_stones >= 0);
   return total_handicap_stones;
 }
 

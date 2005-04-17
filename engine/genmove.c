@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -78,7 +79,7 @@ reset_engine()
   /* Initialize things for hashing of positions. */
   reading_cache_clear();
 
-  hashdata_recalc(&board_hash, board, board_ko_pos);
+  hashdata_recalc(&goban->board_hash, board, board_ko_pos);
 
   worms_examined = -1;
   initial_influence_examined = -1;
@@ -126,16 +127,16 @@ examine_position(int how_much)
 
   if (how_much == EXAMINE_WORMS) {
     verbose = save_verbose;
-    gg_assert(test_gray_border() < 0);
+    gg_assert(goban, test_gray_border(goban) < 0);
     return;
   }
 
-  if (stones_on_board(BLACK | WHITE) != 0) {
+  if (stones_on_board(goban, BLACK | WHITE) != 0) {
     if (NEEDS_UPDATE(initial_influence_examined))
       compute_worm_influence();
     if (how_much == EXAMINE_INITIAL_INFLUENCE) {
       verbose = save_verbose;
-      gg_assert(test_gray_border() < 0);
+      gg_assert(goban, test_gray_border(goban) < 0);
       return;
     }
 
@@ -143,7 +144,7 @@ examine_position(int how_much)
       if (NEEDS_UPDATE(dragons_examined_without_owl))
 	make_dragons(1);
       verbose = save_verbose;
-      gg_assert(test_gray_border() < 0);
+      gg_assert(goban, test_gray_border(goban) < 0);
       return;
     }
     
@@ -155,7 +156,7 @@ examine_position(int how_much)
     }
     if (how_much == EXAMINE_DRAGONS) {
       verbose = save_verbose;
-      gg_assert(test_gray_border() < 0);
+      gg_assert(goban, test_gray_border(goban) < 0);
       return;
     }
   }
@@ -165,7 +166,7 @@ examine_position(int how_much)
     initialize_dragon_data();
     compute_scores();
     verbose = save_verbose;
-    gg_assert(test_gray_border() < 0);
+    gg_assert(goban, test_gray_border(goban) < 0);
     return;
   }
   
@@ -175,7 +176,7 @@ examine_position(int how_much)
     compute_dragon_influence();
   }
   if (how_much == EXAMINE_INITIAL_INFLUENCE2) {
-    gg_assert(test_gray_border() < 0);
+    gg_assert(goban, test_gray_border(goban) < 0);
     return;
   }
 
@@ -183,7 +184,7 @@ examine_position(int how_much)
     compute_refined_dragon_weaknesses();
   }
   if (how_much == FULL_EXAMINE_DRAGONS) {
-    gg_assert(test_gray_border() < 0);
+    gg_assert(goban, test_gray_border(goban) < 0);
     return;
   }
 
@@ -236,14 +237,14 @@ genmove(int color, float *value, int *resign)
 #if ORACLE
   if (metamachine) {
     move = metamachine_genmove(color, value);
-    gg_assert(stackp == 0);
+    gg_assert(goban, stackp == 0);
     if (move != PASS_MOVE)
       return move;
   }
 #endif
 
   move = do_genmove(color, 0.4, NULL, value, resign);
-  gg_assert(move == PASS_MOVE || ON_BOARD(move));
+  gg_assert(goban, move == PASS_MOVE || ON_BOARD(goban, move));
 
   return move;
 }
@@ -335,9 +336,9 @@ do_genmove(int color, float pure_threat_value,
   /* If in mirror mode, try to find a mirror move. */
   if (play_mirror_go
       && (mirror_stones_limit < 0
-	  || stones_on_board(WHITE | BLACK) <= mirror_stones_limit)
+	  || stones_on_board(goban, WHITE | BLACK) <= mirror_stones_limit)
       && find_mirror_move(&move, color)) {
-    TRACE("genmove() recommends mirror move at %1m\n", move);
+    TRACE(goban, "genmove() recommends mirror move at %1m\n", move);
     *value = 1.0;
     return move;
   }
@@ -383,7 +384,7 @@ do_genmove(int color, float pure_threat_value,
     }
   }
   
-  gg_assert(stackp == 0);
+  gg_assert(goban, stackp == 0);
   
   /*
    * Ok, information gathering is complete. Now start to find some moves!
@@ -401,7 +402,7 @@ do_genmove(int color, float pure_threat_value,
   /* Try to find empty corner moves. */
   if (!limit_search)
     fuseki(color);
-  gg_assert(stackp == 0);
+  gg_assert(goban, stackp == 0);
 
   /* Look for moves to break mirror play by the opponent. */
   break_mirror_go(color);
@@ -417,19 +418,19 @@ do_genmove(int color, float pure_threat_value,
   /* The general pattern database. */
   shapes(color);
   time_report(1, "shapes", NO_MOVE, 1.0);
-  gg_assert(stackp == 0);
+  gg_assert(goban, stackp == 0);
 
   /* Look for combination attacks and defenses against them. */
   combinations(color);
   time_report(1, "combinations", NO_MOVE, 1.0);
-  gg_assert(stackp == 0);
+  gg_assert(goban, stackp == 0);
 
   /* Review the move reasons and estimate move values. */
   if (review_move_reasons(&move, value, color, 
 			  pure_threat_value, pessimistic_score, allowed_moves,
 			  use_thrashing_dragon_heuristics))
-    TRACE("Move generation likes %1m with value %f\n", move, *value);
-  gg_assert(stackp == 0);
+    TRACE(goban, "Move generation likes %1m with value %f\n", move, *value);
+  gg_assert(goban, stackp == 0);
   time_report(1, "review move reasons", NO_MOVE, 1.0);
 
 
@@ -437,12 +438,12 @@ do_genmove(int color, float pure_threat_value,
   if (*value <= 6.0 && !disable_endgame_patterns && !limit_search) {
     endgame_shapes(color);
     endgame(color);
-    gg_assert(stackp == 0);
+    gg_assert(goban, stackp == 0);
     if (review_move_reasons(&move, value, color, pure_threat_value,
 	  		    pessimistic_score, allowed_moves,
 			    use_thrashing_dragon_heuristics))
-      TRACE("Move generation likes %1m with value %f\n", move, *value);
-    gg_assert(stackp == 0);
+      TRACE(goban, "Move generation likes %1m with value %f\n", move, *value);
+    gg_assert(goban, stackp == 0);
     time_report(1, "endgame", NO_MOVE, 1.0);
   }
   
@@ -457,7 +458,7 @@ do_genmove(int color, float pure_threat_value,
       if (review_move_reasons(&move, value, color, pure_threat_value,
 			      pessimistic_score, allowed_moves,
 			      use_thrashing_dragon_heuristics)) {
-	TRACE("Upon reconsideration move generation likes %1m with value %f\n",
+	TRACE(goban, "Upon reconsideration move generation likes %1m with value %f\n",
 	      move, *value); 
       }
     }
@@ -472,7 +473,7 @@ do_genmove(int color, float pure_threat_value,
       && fill_liberty(&move, color)
       && (!allowed_moves || allowed_moves[move])) {
     *value = 1.0;
-    TRACE("Filling a liberty at %1m\n", move);
+    TRACE(goban, "Filling a liberty at %1m\n", move);
     record_top_move(move, *value);
     move_considered(move, *value);
     time_report(1, "fill liberty", NO_MOVE, 1.0);
@@ -495,9 +496,9 @@ do_genmove(int color, float pure_threat_value,
       move = aftermath_genmove(color, 1, allowed_moves);
 
     if (move != PASS_MOVE) {
-      ASSERT1(is_legal(move, color), move);
+      ASSERT1(goban, is_legal(goban, move, color), move);
       *value = 1.0;
-      TRACE("Aftermath move at %1m\n", move);
+      TRACE(goban, "Aftermath move at %1m\n", move);
       record_top_move(move, *value);
       move_considered(move, *value);
       time_report(1, "aftermath_genmove", NO_MOVE, 1.0);
@@ -506,17 +507,17 @@ do_genmove(int color, float pure_threat_value,
 
   /* If no move is found then pass. */
   if (move == PASS_MOVE) {
-    TRACE("I pass.\n");
+    TRACE(goban, "I pass.\n");
   }
   else {
-    TRACE("genmove() recommends %1m with value %f\n", move, *value);
+    TRACE(goban, "genmove() recommends %1m with value %f\n", move, *value);
   }
   
   /* Maybe time to resign...
    */
   if (resign && resign_allowed
       && *value < 10.0 && should_resign(color, optimistic_score, move)) {
-    TRACE("... though, genmove() thinks the position is hopeless\n");
+    TRACE(goban, "... though, genmove() thinks the position is hopeless\n");
     *resign = 1;
   }
   
@@ -537,9 +538,9 @@ do_genmove(int color, float pure_threat_value,
   /* Some consistency checks to verify that things are properly
    * restored and/or have not been corrupted.
    */
-  gg_assert(stackp == 0);
-  gg_assert(test_gray_border() < 0);
-  gg_assert(depth == save_depth);
+  gg_assert(goban, stackp == 0);
+  gg_assert(goban, test_gray_border(goban) < 0);
+  gg_assert(goban, depth == save_depth);
 
   return move;
 }
@@ -597,23 +598,23 @@ revise_semeai(int color)
   int found_one = 0;
   int other = OTHER_COLOR(color);
 
-  if (stones_on_board(BLACK | WHITE) == 0)
+  if (stones_on_board(goban, BLACK | WHITE) == 0)
     return 0;
 
   if (doing_scoring)
     return 0;
   
-  gg_assert(dragon2 != NULL);
+  gg_assert(goban, dragon2 != NULL);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (ON_BOARD(pos)
+    if (ON_BOARD(goban, pos)
 	&& dragon[pos].color == other
 	&& DRAGON2(pos).semeais
 	&& dragon[pos].status == DEAD) {
       found_one = 1;
       dragon[pos].status = UNKNOWN;
       if (dragon[pos].origin == pos)
-	TRACE("revise_semeai: changed status of dragon %1m from DEAD to UNKNOWN\n",
+	TRACE(goban, "revise_semeai: changed status of dragon %1m from DEAD to UNKNOWN\n",
 	      pos);
     }
   }
@@ -645,7 +646,7 @@ revise_thrashing_dragon(int color, float our_score, float advantage)
     return 0;
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos) && thrashing_stone[pos]
+    if (ON_BOARD(goban, pos) && thrashing_stone[pos]
 	&& worm[pos].unconditional_status != DEAD) {
       dragon[pos].status = UNKNOWN;
       DRAGON2(pos).safety = ALIVE;
@@ -672,10 +673,10 @@ revise_thrashing_dragon(int color, float our_score, float advantage)
 static int
 find_mirror_move(int *move, int color)
 {
-  int last_move = get_last_move();
+  int last_move = get_last_move(goban);
   int mirror_move;
   if (last_move != NO_MOVE) {
-    mirror_move = MIRROR_MOVE(last_move);
+    mirror_move = MIRROR_MOVE(goban, last_move);
     if (test_symmetry_after_move(mirror_move, color, 0)) {
       *move = mirror_move;
       return 1;
@@ -683,7 +684,7 @@ find_mirror_move(int *move, int color)
   }
   else {
     for (mirror_move = BOARDMIN; mirror_move < BOARDMAX; mirror_move++) {
-      if (ON_BOARD(mirror_move)
+      if (ON_BOARD(goban, mirror_move)
 	  && test_symmetry_after_move(mirror_move, color, 0)) {
 	*move = mirror_move;
 	return 1;
@@ -715,10 +716,10 @@ compute_scores()
 
   if (verbose || showscore) {
     if (white_score == black_score)
-      gprintf("Score estimate: %s %f\n",
+      gprintf(goban, "Score estimate: %s %f\n",
 	      black_score > 0 ? "W " : "B ", gg_abs(black_score));
     else
-      gprintf("Score estimate: %s %f to %s %f\n",
+      gprintf(goban, "Score estimate: %s %f to %s %f\n",
 	      black_score > 0 ? "W " : "B ", gg_abs(black_score),
 	      white_score > 0 ? "W " : "B ", gg_abs(white_score));
     fflush(stderr);
@@ -738,10 +739,10 @@ break_mirror_go(int color)
   int tengen = POS((board_size - 1) / 2, (board_size - 1) / 2);
   if (board[tengen] == EMPTY
       && color == BLACK
-      && stones_on_board(BLACK | WHITE) > 10
+      && stones_on_board(goban, BLACK | WHITE) > 10
       && test_symmetry_after_move(tengen, color, 1)) {
     set_minimum_move_value(tengen, 30.0);
-    TRACE("Play %1m to break mirror go, value 30.\n", tengen);
+    TRACE(goban, "Play %1m to break mirror go, value 30.\n", tengen);
   }
 }
 
