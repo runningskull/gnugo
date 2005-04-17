@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -84,7 +85,7 @@ make_letterbar(int boardsize, char *letterbar)
   if (boardsize <= 25)
     strcpy(spaces, " ");
   strcpy(letterbar, "   ");
-  
+
   for (i = 0; i < boardsize; i++) {
     letteroffset = 'A';
     if (i+letteroffset >= 'I')
@@ -114,9 +115,9 @@ set_handicap_spots(int boardsize)
 {
   if (hspot_size == boardsize)
     return;
-  
+
   hspot_size = boardsize;
-  
+
   memset(hspots, '.', sizeof(hspots));
 
   if (boardsize == 5) {
@@ -193,8 +194,8 @@ ascii_showboard(void)
   int last_pos_was_move;
   int pos_is_move;
   int dead;
-  int last_move = get_last_move();
-  
+  int last_move = get_last_move(goban);
+
   make_letterbar(board_size, letterbar);
   set_handicap_spots(board_size);
 
@@ -213,21 +214,21 @@ ascii_showboard(void)
     else
       printf("    Estimated score: Even!\n");
   }
-   
+
   printf("\n");
 
   fflush(stdout);
   printf("%s", letterbar);
 
-  if (get_last_player() != EMPTY) {
-    gfprintf(stdout, "        Last move: %s %1m",
-	     get_last_player() == WHITE ? "White" : "Black",
+  if (get_last_player(goban) != EMPTY) {
+    gfprintf(goban, stdout, "        Last move: %s %1m",
+	     get_last_player(goban) == WHITE ? "White" : "Black",
 	     last_move);
   }
 
   printf("\n");
   fflush(stdout);
-  
+
   for (i = 0; i < board_size; i++) {
     printf(" %2d", board_size - i);
     last_pos_was_move = 0;
@@ -237,7 +238,7 @@ ascii_showboard(void)
       else
 	pos_is_move = 0;
       dead = (dragon_status(POS(i, j)) == DEAD) && showdead;
-      switch (BOARD(i, j) + pos_is_move + last_pos_was_move) {
+      switch (BOARD(goban, i, j) + pos_is_move + last_pos_was_move) {
 	case EMPTY+128:
 	case EMPTY:
 	  printf(" %c", hspots[i][j]);
@@ -271,13 +272,13 @@ ascii_showboard(void)
 	  printf("%c", dead ? 'o' : 'O');
 	  last_pos_was_move = 0;
 	  break;
-	default: 
-	  fprintf(stderr, "Illegal board value %d\n", (int) BOARD(i, j));
+	default:
+	  fprintf(stderr, "Illegal board value %d\n", (int) BOARD(goban, i, j));
 	  exit(EXIT_FAILURE);
 	  break;
       }
     }
-    
+
     if (last_pos_was_move == 0) {
       if (board_size > 10)
 	printf(" %2d", board_size - i);
@@ -292,11 +293,11 @@ ascii_showboard(void)
     }
     printf("\n");
   }
-  
+
   fflush(stdout);
   printf("%s\n\n", letterbar);
   fflush(stdout);
-  
+
 }  /* end ascii_showboard */
 
 /*
@@ -341,16 +342,16 @@ show_commands(void)
   printf("\n");
 }
 
-enum commands {INVALID = -1, END, EXIT, QUIT, RESIGN, 
+enum commands {INVALID = -1, END, EXIT, QUIT, RESIGN,
 	       PASS, MOVE, FORCE, SWITCH,
 	       PLAY, PLAYBLACK, PLAYWHITE,
 	       SETHANDICAP, FREEHANDICAP, SETBOARDSIZE, SETKOMI,
 	       SETDEPTH,
-               INFO, DISPLAY, SHOWBOARD, HELP, UNDO, COMMENT, SCORE,
-               CMD_DEAD, CMD_BACK, CMD_FORWARD, CMD_LAST,
-               CMD_CAPTURE, CMD_DEFEND,
-               CMD_HELPDEBUG, CMD_SHOWAREA, CMD_SHOWMOYO, CMD_SHOWTERRI,
-               CMD_GOTO, CMD_SAVE, CMD_LOAD, CMD_SHOWDRAGONS, CMD_LISTDRAGONS,
+	       INFO, DISPLAY, SHOWBOARD, HELP, UNDO, COMMENT, SCORE,
+	       CMD_DEAD, CMD_BACK, CMD_FORWARD, CMD_LAST,
+	       CMD_CAPTURE, CMD_DEFEND,
+	       CMD_HELPDEBUG, CMD_SHOWAREA, CMD_SHOWMOYO, CMD_SHOWTERRI,
+	       CMD_GOTO, CMD_SAVE, CMD_LOAD, CMD_SHOWDRAGONS, CMD_LISTDRAGONS,
 	       SETHURRY, SETLEVEL, NEW, COUNT, CONTINUE
 };
 
@@ -430,7 +431,7 @@ get_command(char *command)
 
 
 /*
- * Write sgf root node. 
+ * Write sgf root node.
  */
 
 static void
@@ -441,7 +442,7 @@ init_sgf(Gameinfo *ginfo)
   sgf_initialized = 1;
 
   sgf_write_header(sgftree.root, 1, get_random_seed(), komi,
-      		   level, chinese_rules);
+		   level, chinese_rules);
   sgfOverwritePropertyInt(sgftree.root, "HA", ginfo->handicap);
   if (ginfo->handicap > 0)
     gnugo_recordboard(sgftree.root);
@@ -449,7 +450,7 @@ init_sgf(Gameinfo *ginfo)
 
 
 /*
- * Generate the computer move. 
+ * Generate the computer move.
  */
 
 static int
@@ -479,8 +480,8 @@ computer_move(Gameinfo *gameinfo, int *passes)
     gnugo_estimate_score(&upper_bound, &lower_bound);
     current_score_estimate = (int) ((lower_bound + upper_bound) / 2.0);
   }
-  
-  mprintf("%s(%d): %m\n", color_to_string(gameinfo->to_move),
+
+  mprintf(goban, "%s(%d): %m\n", color_to_string(gameinfo->to_move),
 	  movenum+1, i, j);
   if (is_pass(POS(i, j)))
     (*passes)++;
@@ -512,20 +513,20 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
     printf("\nInvalid move: %s\n", command);
     return 0;
   }
-  
+
   if (!gnugo_is_legal(i, j, gameinfo->to_move)) {
     printf("\nIllegal move: %s", command);
     return 0;
   }
 
   *passes = 0;
-  TRACE("\nyour move: %m\n\n", i, j);
+  TRACE(goban, "\nyour move: %m\n\n", i, j);
   init_sgf(gameinfo);
   gnugo_play_move(i, j, gameinfo->to_move);
   sgffile_add_debuginfo(sgftree.lastnode, 0.0);
   sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
   sgffile_output(&sgftree);
-  
+
   if (opt_showboard) {
     ascii_showboard();
     printf("GNU Go is thinking...\n");
@@ -576,9 +577,9 @@ void
 play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 {
   int sz;
-  
+
   setvbuf(stdout, (char *)NULL, _IONBF, 0); /* No buffering. */
-  
+
   sgftree = *tree;
 
   if (filename) {
@@ -587,7 +588,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
     sgf_initialized = 1;
   }
   else {
-    if (sgfGetIntProperty(sgftree.root, "SZ", &sz)) 
+    if (sgfGetIntProperty(sgftree.root, "SZ", &sz))
       gnugo_clear_board(sz);
     if (gameinfo->handicap == 0)
       gameinfo->to_move = BLACK;
@@ -646,7 +647,7 @@ do_play_ascii(Gameinfo *gameinfo)
 
 #ifndef READLINE
       /* Print the prompt */
-      mprintf("%s(%d): ", color_to_string(gameinfo->to_move), movenum + 1);
+      mprintf(goban, "%s(%d): ", color_to_string(gameinfo->to_move), movenum + 1);
 
       /* Read a line of input. */
       line_ptr = line;
@@ -730,11 +731,11 @@ do_play_ascii(Gameinfo *gameinfo)
 	  }
 	  /* Init board. */
 	  gnugo_clear_board(board_size);
-	  /* Place stones on board but don't record sgf 
+	  /* Place stones on board but don't record sgf
 	   * in case we change more info. */
 	  gameinfo->handicap = gnugo_placehand(num);
 	  printf("\nSet handicap to %d\n", gameinfo->handicap);
-          gameinfo->to_move = (gameinfo->handicap ? WHITE : BLACK);
+	  gameinfo->to_move = (gameinfo->handicap ? WHITE : BLACK);
 	  break;
 
 	case FREEHANDICAP:
@@ -782,7 +783,7 @@ do_play_ascii(Gameinfo *gameinfo)
 	  break;
 
 	  /* Level replaces hurry as of 2.7.204. This option is retained
-	   * for compatibility with gnugoclient. 
+	   * for compatibility with gnugoclient.
 	   */
 	case SETHURRY:
 	  command += 6;
@@ -831,7 +832,7 @@ do_play_ascii(Gameinfo *gameinfo)
 	  }
 	  if (num >= 0)
 	    for (m = 0; m < num; m++) {
-	      gameinfo->computer_player 
+	      gameinfo->computer_player
 		= OTHER_COLOR(gameinfo->computer_player);
 	      state = computer_move(gameinfo, &passes);
 	      if (state)
@@ -866,8 +867,8 @@ do_play_ascii(Gameinfo *gameinfo)
 
 	case UNDO:
 	case CMD_BACK:
-	  if (gnugo_undo_move(1)) {
-            sgftreeAddComment(&sgftree, "undone");
+	  if (gnugo_undo_moves(1)) {
+	    sgftreeAddComment(&sgftree, "undone");
 	    sgftreeBack(&sgftree);
 	    gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
 	  }
@@ -876,16 +877,16 @@ do_play_ascii(Gameinfo *gameinfo)
 	  break;
 
 	case CMD_FORWARD:
-         if (sgftreeForward(&sgftree))
-           gameinfo->to_move = gnugo_play_sgfnode(sgftree.lastnode,
+	 if (sgftreeForward(&sgftree))
+	   gameinfo->to_move = gnugo_play_sgfnode(sgftree.lastnode,
 						  gameinfo->to_move);
 	  else
 	    printf("\nEnd of game tree.\n");
 	  break;
 
 	case CMD_LAST:
-         while (sgftreeForward(&sgftree))
-           gameinfo->to_move = gnugo_play_sgfnode(sgftree.lastnode,
+	 while (sgftreeForward(&sgftree))
+	   gameinfo->to_move = gnugo_play_sgfnode(sgftree.lastnode,
 						  gameinfo->to_move);
 	  break;
 
@@ -974,10 +975,10 @@ do_play_ascii(Gameinfo *gameinfo)
 	      fprintf(stderr, "Cannot open or parse '%s'\n", tmpstring);
 	      break;
 	    }
-            /* to avoid changing handicap etc. */
-            sgf_initialized = 1;
-            gameinfo_load_sgfheader(gameinfo, sgftree.root);
-            gameinfo_play_sgftree(gameinfo, &sgftree, NULL);
+	    /* to avoid changing handicap etc. */
+	    sgf_initialized = 1;
+	    gameinfo_load_sgfheader(gameinfo, sgftree.root);
+	    gameinfo_play_sgftree(gameinfo, &sgftree, NULL);
 	    sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 	  }
 	  else
@@ -1005,7 +1006,7 @@ do_play_ascii(Gameinfo *gameinfo)
 
     sgffile_output(&sgftree);
     passes = 0;
-    
+
     /* Play a different game next time. */
     update_random_seed();
 
@@ -1112,8 +1113,8 @@ ascii_count(Gameinfo *gameinfo)
   int done = 0;
   int i, j;
   int xyzzy = 1;
-  
-  printf("\nGame over. Let's count!.\n");  
+
+  printf("\nGame over. Let's count!.\n");
   showdead = 1;
   ascii_showboard();
   while (!done) {
@@ -1123,7 +1124,7 @@ ascii_count(Gameinfo *gameinfo)
 
     if (!fgets(line, 12, stdin))
       return; /* EOF or some error */
-    
+
     for (i = 0; i < 12; i++)
       line[i] = tolower((int) line[i]);
     if (!strncmp(line, "done", 4))
@@ -1148,7 +1149,7 @@ ascii_count(Gameinfo *gameinfo)
       printf("\nIf there are dead stones on the board I will remove them.\n");
       printf("You must tell me where they are. Type the coordinates of a\n");
       printf("dead group, or type \"done\"\n");
-    }      
+    }
     else if (!strncmp(line, "undo", 4)) {
       printf("UNDO not allowed anymore. The status of the stones now\n");
       printf("toggles after entering the location of it.\n");
@@ -1156,7 +1157,7 @@ ascii_count(Gameinfo *gameinfo)
     }
     else {
       if (!string_to_location(board_size, line, &i, &j)
-	  || BOARD(i, j) == EMPTY)
+	  || BOARD(goban, i, j) == EMPTY)
 	printf("\ninvalid!\n");
       else {
 	int status = dragon_status(POS(i, j));
@@ -1176,15 +1177,15 @@ showcapture(char *line)
   int i, j, x, y;
   if (line)
     if (!string_to_location(board_size, line, &i, &j)
-	|| BOARD(i, j) == EMPTY) {
+	|| BOARD(goban, i, j) == EMPTY) {
       printf("\ninvalid point!\n");
       return;
     }
-  
+
   if (gnugo_attack(i, j, &x, &y))
-    mprintf("\nSuccessfull attack of %m at %m\n", i, j, x, y);
+    mprintf(goban, "\nSuccessfull attack of %m at %m\n", i, j, x, y);
   else
-    mprintf("\n%m cannot be attacked\n", i, j);
+    mprintf(goban, "\n%m cannot be attacked\n", i, j);
 }
 
 
@@ -1194,19 +1195,19 @@ showdefense(char *line)
   int i, j, x, y;
   if (line)
     if (!string_to_location(board_size, line, &i, &j)
-	|| BOARD(i, j) == EMPTY) {
+	|| BOARD(goban, i, j) == EMPTY) {
       printf("\ninvalid point!\n");
       return;
     }
 
     if (gnugo_attack(i, j, &x, &y)) {
       if (gnugo_find_defense(i, j, &x, &y))
-        mprintf("\nSuccessfull defense of %m at %m\n", i, j, x, y);
+	mprintf(goban, "\nSuccessfull defense of %m at %m\n", i, j, x, y);
       else
-        mprintf("\n%m cannot be defended\n", i, j);
+	mprintf(goban, "\n%m cannot be defended\n", i, j);
     }
     else
-      mprintf("\nThere is no need to defend %m\n", i, j);
+      mprintf(goban, "\nThere is no need to defend %m\n", i, j);
 }
 
 
@@ -1217,12 +1218,12 @@ ascii_goto(Gameinfo *gameinfo, char *line)
 
   if (!line)
     return;
-  
+
   if (!strncmp(line, "last", 4))
     movenumber = "9999";
   else if (!strncmp(line, "first", 4))
     movenumber = "1";
-  
+
   printf("goto %s\n", movenumber);
   gameinfo_play_sgftree(gameinfo, &sgftree, movenumber);
 }
@@ -1261,22 +1262,22 @@ ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
       printf("You have placed %d handicap stone(s) so far.\n\n", handi);
 
       if (!fgets(line, 80, stdin))
-        return; /* EOF or some error */
+	return; /* EOF or some error */
       for (i = 0; i < 80; i++)
-        line[i] = tolower((int) line[i]);
+	line[i] = tolower((int) line[i]);
 
       if (!strncmp(line, "undo", 4)) {
-        if (!handi)
+	if (!handi)
 	  printf("\nNothing to undo.\n");
 	else {
-	  remove_stone(stones[--handi]);
-	  gprintf("\nRemoved the stone at %m.\n", I(stones[handi]),
+	  remove_stone(goban, stones[--handi]);
+	  gprintf(goban, "\nRemoved the stone at %m.\n", I(stones[handi]),
 		  J(stones[handi]));
 	}
       }
       else if (!strncmp(line, "clear", 5)) {
-        gnugo_clear_board(board_size);
-        handi = 0;
+	gnugo_clear_board(board_size);
+	handi = 0;
       }
       else if (!strncmp(line, "done", 4)) {
 	if (handi == 1) /* Don't bother with checks later */
@@ -1290,7 +1291,7 @@ ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
 	if (board[pos] != EMPTY)
 	  printf("\nThere's already a stone there.\n");
 	else {
-	  add_stone(pos, BLACK);
+	  add_stone(goban, pos, BLACK);
 	  stones[handi++] = pos;
 	}
       }

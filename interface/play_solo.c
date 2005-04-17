@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,7 +99,7 @@ play_solo(Gameinfo *gameinfo, int moves)
     }
     else {
       passes = 0;
-      gprintf("%s(%d): %m\n", gameinfo->to_move == BLACK ? "Black" : "White",
+      gprintf(goban, "%s(%d): %m\n", gameinfo->to_move == BLACK ? "Black" : "White",
 	      movenum, i, j);
     }
 
@@ -156,9 +157,9 @@ load_and_analyze_sgf_file(Gameinfo *gameinfo)
   move_value = gnugo_genmove(&i, &j, next, NULL);
 
   if (is_pass(POS(i, j)))
-    gprintf("%s move: PASS!\n", next == WHITE ? "white (O)" : "black (X)");
+    gprintf(goban, "%s move: PASS!\n", next == WHITE ? "white (O)" : "black (X)");
   else
-    gprintf("%s move %m\n", next == WHITE ? "white (O)" : "black (X)", i, j);
+    gprintf(goban, "%s move %m\n", next == WHITE ? "white (O)" : "black (X)", i, j);
 
   if (metamachine)
     sgffile_enddump(outfilename);
@@ -239,15 +240,15 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
       move = genmove_conservative(next, &move_value);
       if (move != PASS_MOVE) {
 	pass = 0;
-	gprintf("%d %s move %1m\n", movenum,
+	gprintf(goban, "%d %s move %1m\n", movenum,
 		next == WHITE ? "white (O)" : "black (X)", move);
       }
       else {
 	pass++;
-	gprintf("%d %s move : PASS!\n", movenum, 
+	gprintf(goban, "%d %s move : PASS!\n", movenum, 
 		next == WHITE ? "white (O)" : "black (X)");
       }
-      play_move(move, next);
+      play_move(goban, move, next);
       sgffile_add_debuginfo(score_tree->lastnode, move_value);
       sgftreeAddPlay(score_tree, next, I(move), J(move));
       sgffile_output(score_tree);

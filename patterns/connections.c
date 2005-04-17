@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include "liberty.h"
 #include "patterns.h"
+#include "old-board.h"
 
 
 /* Try to match all (permutations of) connection patterns at (m,n).
@@ -108,12 +109,12 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
 
   /* Get here => Pattern matches. */
   if (pattern->class & CLASS_B) {
-    DEBUG(DEBUG_DRAGONS, "Cutting pattern %s+%d found at %1m\n",
+    DEBUG(goban, DEBUG_DRAGONS, "Cutting pattern %s+%d found at %1m\n",
 	  pattern->name, ll, anchor);
-    DEBUG(DEBUG_DRAGONS, "cutting point %1m\n", move);
+    DEBUG(goban, DEBUG_DRAGONS, "cutting point %1m\n", move);
   }
   else if (pattern->class & CLASS_C)
-    DEBUG(DEBUG_DRAGONS, "Connecting pattern %s+%d found at %1m\n",
+    DEBUG(goban, DEBUG_DRAGONS, "Connecting pattern %s+%d found at %1m\n",
 	  pattern->name, ll, anchor);
 
   /* does the pattern have an action? */
@@ -155,7 +156,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
 	/* A second dragon found, we amalgamate them at once. */
 	/* Want this output if verbose or DEBUG_DRAGONS is on. */
 	if (verbose || (debug & DEBUG_DRAGONS))
-	  gprintf("Pattern %s joins %C dragons %1m, %1m\n",
+	  gprintf(goban, "Pattern %s joins %C dragons %1m, %1m\n",
 		  pattern->name, color, first_dragon, second_dragon);
 	join_dragons(second_dragon, first_dragon);
 	/* Now look for another second dragon. */
@@ -169,7 +170,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
       if (pattern->patn[k].att != ATT_not)
 	break; /* The inhibition points are guaranteed to come first. */
       cutting_points[pos] |= color;
-      DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
+      DEBUG(goban, DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
     }
   } /* loop over elements */
 }

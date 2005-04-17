@@ -22,6 +22,7 @@
 
 #include "gnugo.h"
 #include "liberty.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,7 +61,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
   sgftreeCreateHeaderNode(&sgftree, gnugo_get_boardsize(), gnugo_get_komi());
 
   ge = gmp_create(0, 1);
-  TRACE("board size=%d\n", gnugo_get_boardsize());
+  TRACE(goban, "board size=%d\n", gnugo_get_boardsize());
 
   /* 
    * The specification of the go modem protocol doesn't even discuss
@@ -114,7 +115,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
 
   sgfOverwritePropertyInt(sgftree.root, "SZ", gnugo_get_boardsize());
 
-  TRACE("size=%d, handicap=%d, komi=%f\n", gnugo_get_boardsize(),
+  TRACE(goban, "size=%d, handicap=%d, komi=%f\n", gnugo_get_boardsize(),
 	gameinfo->handicap, gnugo_get_komi());
 
   if (gameinfo->handicap)
@@ -156,7 +157,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
 	assert(j > 0);
 	
 	for (k = 0; k < j; k++) {
-	  if (!gnugo_undo_move(1)) {
+	  if (!gnugo_undo_moves(1)) {
 	    fprintf(stderr, "GNU Go: play_gmp UNDO: can't undo %d moves\n",
 		    j - k);
 	    break;
@@ -178,7 +179,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
 	/* not pass */
 	passes = 0;
         sgftreeAddPlay(&sgftree, to_move, i, j);
-	TRACE("\nyour move: %m\n\n", i, j);
+	TRACE(goban, "\nyour move: %m\n\n", i, j);
 	gnugo_play_move(i, j, yourcolor);
 	sgffile_output(&sgftree);
       }
@@ -201,7 +202,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
         sgftreeAddPlay(&sgftree, to_move, i, j);
 	gmp_sendMove(ge, j, i);
 	passes = 0;
-	TRACE("\nmy move: %m\n\n", i, j);
+	TRACE(goban, "\nmy move: %m\n\n", i, j);
       }
       sgffile_add_debuginfo(sgftree.lastnode, 0.0);
       sgffile_output(&sgftree);
@@ -218,7 +219,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
   who_wins(mycolor, stderr);
 
   if (showtime) {
-    gprintf("\nSLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
+    gprintf(goban, "\nSLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
     fprintf(stderr, "(%.2f seconds)\n", slowest_time);
     fprintf(stderr, "\nAVERAGE TIME: %.2f seconds per move\n",
 	    total_time / movenum);

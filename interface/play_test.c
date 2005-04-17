@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -102,7 +103,7 @@ play_replay(Gameinfo *gameinfo, int color_to_replay)
   }
 
   if (showtime) {
-      gprintf("\nSLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
+      gprintf(goban, "\nSLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
       fprintf(stderr, "(%.2f seconds)\n", slowest_time);
       fprintf(stderr, "\nAVERAGE TIME: %.2f seconds per move\n",
 	      total_time / movenum);
@@ -167,16 +168,16 @@ replay_node(SGFNode *node, int color_to_replay)
     gnugo_genmove(&i, &j, color, &resign);
     /* Now report on how well the computer generated the move. */
     if (i != m || j != n || !quiet) {
-      mprintf("Move %d (%C): ", movenum + 1, color);
+      mprintf(goban, "Move %d (%C): ", movenum + 1, color);
     
       if (resign)
 	printf("GNU Go resigns ");
       else {
-	mprintf("GNU Go plays %m ", i, j);
+	mprintf(goban, "GNU Go plays %m ", i, j);
 	if (!gnugo_is_pass(i, j))
 	  printf("(%.2f) ", potential_moves[POS(i, j)]);
       }
-      mprintf("- Game move %m ", m, n);
+      mprintf(goban, "- Game move %m ", m, n);
       if (!gnugo_is_pass(m, n) && potential_moves[POS(m, n)] > 0.0)
 	printf("(%.2f) ", potential_moves[POS(m, n)]);
       printf("\n");
@@ -189,15 +190,15 @@ replay_node(SGFNode *node, int color_to_replay)
     if (i != m || j != n) {
       if (resign)
 	gg_snprintf(buf, 127, "GNU Go resigns - Game move %s (%.2f)",
-		    location_to_string(POS(m, n)),
+		    location_to_string(goban->board_size, POS(m, n)),
 		    gnugo_is_pass(m, n)
 		    && potential_moves[POS(m, n)] < 0.0 ?
 			0 : potential_moves[POS(m, n)]);
       else {      
 	gg_snprintf(buf, 127, "GNU Go plays %s (%.2f) - Game move %s (%.2f)",
-		    location_to_string(POS(i, j)),
+		    location_to_string(goban->board_size, POS(i, j)),
 		    gnugo_is_pass(i, j) ? 0 : potential_moves[POS(i, j)],
-		    location_to_string(POS(m, n)),
+		    location_to_string(goban->board_size, POS(m, n)),
 		    gnugo_is_pass(m, n)
 		    && potential_moves[POS(m, n)] < 0.0 ?
 			0 : potential_moves[POS(m, n)]);
@@ -206,8 +207,8 @@ replay_node(SGFNode *node, int color_to_replay)
     }
     else
       gg_snprintf(buf, 127, "GNU Go plays the same move %s (%.2f)",
-                 location_to_string(POS(i, j)),
-                 gnugo_is_pass(i, j) ? 0 : potential_moves[POS(i, j)]);
+		  location_to_string(goban->board_size, POS(i, j)),
+		  gnugo_is_pass(i, j) ? 0 : potential_moves[POS(i, j)]);
     sgfAddComment(node, buf);
     sgffile_add_debuginfo(node, 0.0);
   }
