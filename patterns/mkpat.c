@@ -115,9 +115,7 @@ If output file is not specified, writes to stdout.\n\
 #define MAXNAME			80
 
 /* Avoid compiler warnings with unused parameters */
-#ifndef UNUSED
 #define UNUSED(x)  (void)x
-#endif
 
 /* valid characters that can appear in a pattern
  * position in string is att value to store
@@ -279,7 +277,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"lib3",			1, 0, 0.01, "worm[%s].liberties3"},
   {"lib4",			1, 0, 0.01, "worm[%s].liberties4"},
   {"goallib",			0, 0, 0.01, "goallib"},
-  {"lib",			1, 0, 0.01, "countlib(goban, %s)"},
+  {"lib",			1, 0, 0.01, "countlib(%s)"},
   {"alive",			1, 0, 0.01,
 		"(dragon[%s].status == ALIVE)"},
   {"unknown",			1, 0, 0.01,
@@ -288,7 +286,7 @@ static struct autohelper_func autohelper_functions[] = {
 		"(dragon[%s].status == CRITICAL)"},
   {"dead",			1, 0, 0.01, "(dragon[%s].status == DEAD)"},
   {"status",			1, 0, 0.01, "dragon[%s].status"},
-  {"ko", 			1, 0, 0.01, "is_ko_point(goban, %s)"},
+  {"ko", 			1, 0, 0.01, "is_ko_point(%s)"},
   {"xdefend_against",		2, 0, 1.00,
 		"defend_against(%s, OTHER_COLOR(color), %s)"},
   {"odefend_against",		2, 0, 1.00, "defend_against(%s, color, %s)"},
@@ -302,10 +300,10 @@ static struct autohelper_func autohelper_functions[] = {
   {"weak",			1, 0, 0.01, "dragon_weak(%s)"},
   {"safe_xmove", 		1, 0, 1.00, "safe_move(%s, OTHER_COLOR(color))"},
   {"safe_omove", 		1, 0, 1.00, "safe_move(%s, color)"},
-  {"legal_xmove",		1, 0, 0.05, "is_legal(goban, %s, OTHER_COLOR(color))"},
-  {"legal_omove",		1, 0, 0.05, "is_legal(goban, %s, color)"},
-  {"x_suicide",			1, 0, 0.05, "is_suicide(goban, %s, OTHER_COLOR(color))"},
-  {"o_suicide",			1, 0, 0.05, "is_suicide(goban, %s, color)"},
+  {"legal_xmove",		1, 0, 0.05, "is_legal(%s, OTHER_COLOR(color))"},
+  {"legal_omove",		1, 0, 0.05, "is_legal(%s, color)"},
+  {"x_suicide",			1, 0, 0.05, "is_suicide(%s, OTHER_COLOR(color))"},
+  {"o_suicide",			1, 0, 0.05, "is_suicide(%s, color)"},
   {"x_alive_somewhere",		0, 1, 0.01,
 		"somewhere(OTHER_COLOR(color), 1, %d"},
   {"o_alive_somewhere",		0, 1, 0.01, "somewhere(color, 1, %d"},
@@ -330,13 +328,13 @@ static struct autohelper_func autohelper_functions[] = {
       "(whose_territory(OPPOSITE_INFLUENCE(color), %s) == color)"},
   {"genus",			1, 0, 0.01, "dragon[%s].genus"},
   {"approx_xlib",		1, 0, 0.03,
-		"approxlib(goban, %s, OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
+		"approxlib(%s, OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
   {"approx_olib",		1, 0, 0.03,
-		"approxlib(goban, %s, color, MAX_LIBERTIES, NULL)"},
+		"approxlib(%s, color, MAX_LIBERTIES, NULL)"},
   {"xlib",			1, 0, 0.05,
-	"accuratelib(goban, %s, OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
+	"accuratelib(%s, OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
   {"olib",			1, 0, 0.05,
-	"accuratelib(goban, %s, color, MAX_LIBERTIES, NULL)"},
+	"accuratelib(%s, color, MAX_LIBERTIES, NULL)"},
   {"xcut",			1, 0, 0.01,
     	"cut_possible(%s, OTHER_COLOR(color))"},
   {"ocut",			1, 0, 0.05, "cut_possible(%s, color)"},
@@ -386,9 +384,9 @@ static struct autohelper_func autohelper_functions[] = {
   {"add_defend_both_move",	2, 0, 0.0,
 		"add_all_move(move, DEFEND_STRING, %s, DEFEND_STRING, %s)"},
   {"same_dragon",		2, 0, 0.01, "is_same_dragon(%s, %s)"},
-  {"same_string",		2, 0, 0.01, "same_string(goban, %s, %s)"},
+  {"same_string",		2, 0, 0.01, "same_string(%s, %s)"},
   {"dragonsize", 		1, 0, 0.01, "dragon[%s].size"},
-  {"wormsize",			1, 0, 0.01, "countstones(goban, %s)"},
+  {"wormsize",			1, 0, 0.01, "countstones(%s)"},
   {"effective_size",		1, 0, 0.01, "dragon[%s].effective_size"},
   {"vital_chain",		1, 0, 0.05, "vital_chain(%s)"},
   {"potential_cutstone",	1, 0, 0.01, "worm[%s].cutstone2 > 1"},
@@ -422,10 +420,9 @@ static struct autohelper_func autohelper_functions[] = {
 		"influence_mark_non_territory(%s, OTHER_COLOR(color))"},
   {"remaining_handicap_stones",	0, 0, 0.0,  "free_handicap_remaining_stones()"},
   {"total_handicap_stones",	0, 0, 0.0,  "free_handicap_total_stones()"},
-  {"o_captures_something", 	1, 0, 0.02,
-		"does_capture_something(goban, %s, color)"},
+  {"o_captures_something", 	1, 0, 0.02, "does_capture_something(%s, color)"},
   {"x_captures_something", 	1, 0, 0.02,
-		"does_capture_something(goban, %s, OTHER_COLOR(color))"},
+		"does_capture_something(%s, OTHER_COLOR(color))"},
   {"false_eye_territory",	1, 0, 0.0, "false_eye_territory[%s]"},
   {"false_eye",			1, 0, 0.01, "is_false_eye(half_eye, %s)"},
   {"o_visible_along_edge",	2, 0, 0.05, "visible_along_edge(color,%s,%s)"},
@@ -479,8 +476,7 @@ dummyhelper(int transformation, int move, int color, int action)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */\n\n\
 #include <stdio.h> /* for NULL */\n\
 #include \"liberty.h\"\n\
-#include \"patterns.h\"\n\
-#include \"old-board.h\"\n\n\
+#include \"patterns.h\"\n\n\
 "
 
 static int fatal_errors = 0;

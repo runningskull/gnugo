@@ -60,7 +60,7 @@ identify_move_type(char *text)
 {
   if (!text)
     return STANDARD;
-
+  
   switch ((int) *text) {
   case 'u':
   case 'U':
@@ -135,12 +135,11 @@ selected_line_exists(char *text, char start_char)
  * case, pass a NULL pointer for labels.
  */
 static void
-write_diagram(const Goban *goban,
-	      int movei, int movej, int color, int marki, int markj,
+write_diagram(int movei, int movej, int color, int marki, int markj,
 	      char labels[MAX_BOARD][MAX_BOARD])
 {
   int i, j;
-
+  
   for (i = -1; i <= marki; i++) {
     for (j = markj; j >= 0; j--) {
       if (i == -1)
@@ -149,10 +148,10 @@ write_diagram(const Goban *goban,
 	printf("%c", labels[i][j]);
       else if (i == movei && j == movej)
 	printf("*");
-      else if (BOARD(goban, i, j) == color)
+      else if (BOARD(i, j) == color)
 	printf("O");
-      else if (BOARD(goban, i, j) == OTHER_COLOR(color))
-	printf("X");
+      else if (BOARD(i, j) == OTHER_COLOR(color))
+	printf("X");               
       else
 	printf(".");
     }
@@ -218,15 +217,14 @@ write_colon_line(int move_type, char symmetry, char *text)
 
 /* Check if the board and labels are symmetric. */
 static int
-board_is_symmetric(const Goban *goban, int n,
-		   char labels[MAX_BOARD][MAX_BOARD])
+board_is_symmetric(int n, char labels[MAX_BOARD][MAX_BOARD])
 {
   int i;
   int j;
 
   for (i = 0; i <= n; i++) {
     for (j = 0; j < i; j++) {
-      if (BOARD(goban, i, j) != BOARD(goban, j, i)
+      if (BOARD(i, j) != BOARD(j, i)
 	  || (labels && labels[i][j] != labels[j][i]))
 	return 0;
     }
@@ -237,7 +235,7 @@ board_is_symmetric(const Goban *goban, int n,
 
 /* Write a pattern to stdout. */
 static void
-make_pattern(const Goban *goban, int movei, int movej, int color,
+make_pattern(int movei, int movej, int color,
 	     int marki, int markj, int multiple_marks,
 	     char labels[MAX_BOARD][MAX_BOARD], char *text,
 	     const char *prefix)
@@ -256,12 +254,11 @@ make_pattern(const Goban *goban, int movei, int movej, int color,
   printf("\n");
 
   /* Write the main diagram. */
-  write_diagram(goban, movei, movej, color, marki, markj, NULL);
+  write_diagram(movei, movej, color, marki, markj, NULL);
   printf("\n");
 
   /* Write the colon line. */
-  if (movei == movej && marki == markj
-      && board_is_symmetric(goban, marki, labels))
+  if (movei == movej && marki == markj && board_is_symmetric(marki, labels))
     symmetry = '/';
   write_colon_line(move_type, symmetry, text);
   printf("\n");
@@ -272,7 +269,7 @@ make_pattern(const Goban *goban, int movei, int movej, int color,
   if (labels
       || selected_line_exists(text, ';')
       || selected_line_exists(text, '>')) {
-    write_diagram(goban, movei, movej, color, marki, markj, labels);
+    write_diagram(movei, movej, color, marki, markj, labels);
 
     printf("\n");
 
@@ -289,11 +286,11 @@ make_pattern(const Goban *goban, int movei, int movej, int color,
     fprintf(stderr, "Warning: Multiple square marks in pattern %s%d\n",
 	    prefix, pattern_number);
 
-  if (is_suicide(goban, POS(movei, movej), color)) {
+  if (is_suicide(POS(movei, movej), color)) {
     fprintf(stderr, "Error: Illegal move in pattern %s%d\n",
 	    prefix, pattern_number);
     exit(EXIT_FAILURE);
-  }
+  }  
 }
 
 
@@ -301,7 +298,7 @@ make_pattern(const Goban *goban, int movei, int movej, int color,
  * recursive calls for child node and siblings.
  */
 static void
-analyze_node(Goban *goban, SGFNode *node, const char *prefix)
+analyze_node(SGFNode *node, const char *prefix)
 {
   SGFProperty *prop;
   int i, j;
@@ -317,7 +314,7 @@ analyze_node(Goban *goban, SGFNode *node, const char *prefix)
 
   /* Clear the labels array. */
   memset(labels, 0, MAX_BOARD * MAX_BOARD);
-
+  
   /* Check the node properties for a move, a square mark, labels, and
    * a comment.
    */
@@ -332,13 +329,13 @@ analyze_node(Goban *goban, SGFNode *node, const char *prefix)
 	markj = boardsize - 1 - markj;
       }
       break;
-
+      
     case SGFW: /* White move */
       color = WHITE;
       get_moveXY(prop, &movei, &movej, boardsize);
       movej = boardsize - 1 - movej;
       break;
-
+      
     case SGFB: /* Black move */
       color = BLACK;
       get_moveXY(prop, &movei, &movej, boardsize);
@@ -348,8 +345,8 @@ analyze_node(Goban *goban, SGFNode *node, const char *prefix)
     case SGFLB: /* Label, with value like "mh:A" */
       get_moveXY(prop, &i, &j, boardsize);
       j = boardsize - 1 - j;
-      gg_assert(goban, prop->value[2] == ':');
-      if (ON_BOARD2(goban, i, j)) {
+      gg_assert(prop->value[2] == ':');
+      if (ON_BOARD2(i, j)) {
 	labels[i][j] = prop->value[3];
 	label_found = 1;
       }
@@ -362,22 +359,22 @@ analyze_node(Goban *goban, SGFNode *node, const char *prefix)
   }
 
   /* If we have a move and a square mark, produce a pattern. */
-  if (SAFE_ON_BOARD(movei, movej) && ON_BOARD2(goban, marki, markj))
-    make_pattern(goban, movei, movej, color, marki, markj, multiple_marks,
+  if (SAFE_ON_BOARD(movei, movej) && ON_BOARD2(marki, markj))
+    make_pattern(movei, movej, color, marki, markj, multiple_marks,
 		 (label_found ? labels : NULL), comment, prefix);
 
   /* Traverse child, if any. */
   if (node->child) {
     if (SAFE_ON_BOARD(movei, movej))
-      tryko(goban, POS(movei, movej), color, NULL);
-    analyze_node(goban, node->child, prefix);
+      tryko(POS(movei, movej), color, NULL);
+    analyze_node(node->child, prefix);
     if (SAFE_ON_BOARD(movei, movej))
-      popgo(goban);
+      popgo();
   }
 
   /* Traverse sibling, if any. */
   if (node->next)
-    analyze_node(goban, node->next, prefix);
+    analyze_node(node->next, prefix);
 }
 
 
@@ -387,7 +384,6 @@ main(int argc, char *argv[])
   const char *filename;
   const char *prefix;
   SGFNode *sgf;
-  Goban *goban;
 
   /* Check number of arguments. */
   if (argc != 3) {
@@ -437,21 +433,22 @@ main(int argc, char *argv[])
   printf("attribute_map general\n\n");
 
   /* Call the engine to setup and clear the board. */
-  goban = create_goban(MAX_BOARD);
-
+  board_size = MAX_BOARD;
+  clear_board();
+  
   /* Determine board size of the file. */
   if (!sgfGetIntProperty(sgf, "SZ", &boardsize)) {
     fprintf(stderr, "joseki: error: can't determine file board size\n");
     return 1;
   }
-
+  
   /* Walk through the tree and make patterns. */
-  analyze_node(goban, sgf, prefix);
-
+  analyze_node(sgf, prefix);
+    
   return 0;
 }
 
-
+      
 /*
  * Local Variables:
  * tab-width: 8

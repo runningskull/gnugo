@@ -21,7 +21,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
