@@ -61,12 +61,12 @@ analyze_neighbor(int pos, int *found_black, int *found_white)
     case EMPTY:
       if (!(*found_black)
 	  && living_neighbor(pos, BLACK)
-	  && safe_move(pos, WHITE) != WIN)
+	  && safe_move(goban, pos, WHITE) != WIN)
 	*found_black = 1;
       
       if (!(*found_white)
 	  && living_neighbor(pos, WHITE)
-	  && safe_move(pos, BLACK) != WIN)
+	  && safe_move(goban, pos, BLACK) != WIN)
 	*found_white = 1;
       
       break;
@@ -194,7 +194,7 @@ fill_liberty(int *move, int color)
      * confirm_safety test, i.e. that it isn't a blunder which
      * causes problems for other strings.
      */
-    if (safe_move(pos, color) == WIN) {
+    if (safe_move(goban, pos, color) == WIN) {
       DEBUG(goban, DEBUG_FILLLIB, "Filllib: Tactically safe.\n");
       if (filllib_confirm_safety(pos, color, &defense_point)) {
 	/* Safety confirmed. */
@@ -389,7 +389,7 @@ find_backfilling_move(int move, int color, int *backfill_move,
   /* The move wasn't safe, so there must be an attack for the
    * opponent. Save it for later use.
    */
-  acode = attack(move, &apos);
+  acode = attack(goban, move, &apos);
   gg_assert(goban, acode != 0 && apos != NO_MOVE);
   
   /* Find liberties. */
@@ -429,7 +429,7 @@ find_backfilling_move(int move, int color, int *backfill_move,
     for (k = 0; k < neighbors; k++) {
       if (opponent_libs < 5 && countlib(goban, adjs[k]) != opponent_libs)
 	continue;
-      if (attack(adjs[k], &bpos) == WIN) {
+      if (attack(goban, adjs[k], &bpos) == WIN) {
 	if (forbidden_moves[bpos])
 	  continue;
 	if (liberty_of_string(goban, bpos, adjs[k])) {
@@ -445,7 +445,8 @@ find_backfilling_move(int move, int color, int *backfill_move,
   /* Otherwise look for a safe move at a liberty. */
   if (!found_one) {
     for (k = 0; k < liberties; k++) {
-      if (!forbidden_moves[libs[k]] && safe_move(libs[k], color) == WIN) {
+      if (!forbidden_moves[libs[k]]
+	  && safe_move(goban, libs[k], color) == WIN) {
 	*backfill_move = libs[k];
 	found_one = 1;
 	break;
@@ -458,7 +459,7 @@ find_backfilling_move(int move, int color, int *backfill_move,
       for (k = 0; k < neighbors; k++) {
 	if (opponent_libs < 5 && countlib(goban, adjs[k]) != opponent_libs)
 	  continue;
-	if (attack(adjs[k], &bpos) == WIN) {
+	if (attack(goban, adjs[k], &bpos) == WIN) {
 	  if (forbidden_moves[bpos])
 	    continue;
 	  if (liberty_of_string(goban, bpos, adjs[k])) {
@@ -475,10 +476,11 @@ find_backfilling_move(int move, int color, int *backfill_move,
   /* If no luck so far, try with superstring liberties. */
   if (!found_one) {
     trymove(goban, move, color, "find_backfilling_move", move);
-    find_proper_superstring_liberties(move, &liberties, libs, 0);
+    find_proper_superstring_liberties(goban, move, &liberties, libs, 0);
     popgo(goban);
     for (k = 0; k < liberties; k++) {
-      if (!forbidden_moves[libs[k]] && safe_move(libs[k], color) == WIN) {
+      if (!forbidden_moves[libs[k]]
+	  && safe_move(goban, libs[k], color) == WIN) {
 	*backfill_move = libs[k];
 	found_one = 1;
 	break;
@@ -489,10 +491,10 @@ find_backfilling_move(int move, int color, int *backfill_move,
   /* If no luck so far, try attacking superstring neighbors. */
   if (!found_one) {
     trymove(goban, move, color, "find_backfilling_move", move);
-    superstring_chainlinks(move, &neighbors, adjs, 4);
+    superstring_chainlinks(goban, move, &neighbors, adjs, 4);
     popgo(goban);
     for (k = 0; k < neighbors; k++) {
-      if (attack(adjs[k], &bpos) == WIN) {
+      if (attack(goban, adjs[k], &bpos) == WIN) {
 	if (!forbidden_moves[bpos] && liberty_of_string(goban, bpos, adjs[k])) {
 	  *backfill_move = bpos;
 	  return 1;
@@ -512,7 +514,7 @@ find_backfilling_move(int move, int color, int *backfill_move,
       extra_pop = 1;
     
     /* If still not safe, recurse to find a new backfilling move. */
-    if (safe_move(move, color) == WIN)
+    if (safe_move(goban, move, color) == WIN)
       success = 1;
     else
       success = find_backfilling_move(move, color, backfill_move,
@@ -563,7 +565,7 @@ filllib_confirm_safety(int move, int color, int *defense_point)
     for (k = 0; k < 4; k++) {
       int pos2 = move + delta[k];
       if (board[pos2] == OTHER_COLOR(color)
-	  && !play_attack_defend_n(color, 0, 1, move, pos2)) {
+	  && !play_attack_defend_n(goban, color, 0, 1, move, pos2)) {
 	int adj;
 	adj = chainlinks(goban, pos2, adjs);
 	/* It seems unlikely that we would ever get no adjacent strings
@@ -611,7 +613,7 @@ filllib_confirm_safety(int move, int color, int *defense_point)
     return 0;
   verbose = save_verbose;
   
-  return confirm_safety(move, color, defense_point, NULL);
+  return confirm_safety(goban, move, color, defense_point, NULL);
 }
 
 

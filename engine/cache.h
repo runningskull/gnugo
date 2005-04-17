@@ -97,13 +97,13 @@ typedef struct {
 extern Transposition_table ttable;
 
 void tt_free(Transposition_table *table);
-int  tt_get(Transposition_table *table, enum routine_id routine,
-	    int target1, int target2, int remaining_depth,
-	    Hash_data *extra_hash,
+int  tt_get(const Goban *goban, Transposition_table *table,
+	    enum routine_id routine, int target1, int target2,
+	    int remaining_depth, Hash_data *extra_hash,
 	    int *value1, int *value2, int *move);
-void tt_update(Transposition_table *table, enum routine_id routine,
-	       int target, int target2, int remaining_depth,
-	       Hash_data *extra_hash,
+void tt_update(const Goban *goban, Transposition_table *table,
+	       enum routine_id routine, int target, int target2,
+	       int remaining_depth, Hash_data *extra_hash,
 	       int value1, int value2, int move);
 
 
@@ -153,13 +153,15 @@ void tt_update(Transposition_table *table, enum routine_id routine,
 #endif
 
 /* Trace messages in decidestring/decidedragon sgf file. */
-void sgf_trace(const char *func, int str, int move, int result,
-	       const char *message);
+void sgf_trace(const Goban *goban, const char *func,
+	       int str, int move, int result, const char *message);
 /* Trace messages in decideconnection sgf file. */
-void sgf_trace2(const char *func, int str1, int str2, int move, 
-	        const char *result, const char *message);
+void sgf_trace2(const Goban *goban, const char *func,
+		int str1, int str2, int move, const char *result,
+		const char *message);
 /* Trace messages in decidesemeai sgf file. */
-void sgf_trace_semeai(const char *func, int str1, int str2, int move, 
+void sgf_trace_semeai(const Goban *goban, const char *func,
+		      int str1, int str2, int move,
 		      int result1, int result2, const char *message);
 
 /* Macro to hide the call to sgf_trace(). Notice that a little black
@@ -168,22 +170,29 @@ void sgf_trace_semeai(const char *func, int str1, int str2, int move,
  * and q. These must of course not be used for anything else in
  * the function.
  */
-#define SGFTRACE(move, result, message) \
-  if (sgf_dumptree) \
-    sgf_trace(read_function_name, q, move, result, message)
+#define SGFTRACE(goban, move, result, message)				\
+  do {									\
+    if ((goban)->sgf_dumptree)						\
+      sgf_trace((goban), read_function_name,				\
+		q, (move), (result), (message));			\
+  } while (0)
 
 /* Corresponding macro for use in connection or semeai reading, where
  * two groups are involved.
  */
-#define SGFTRACE2(move, result, message) \
-  if (sgf_dumptree) \
-    sgf_trace2(read_function_name, q1, q2, move, \
-	       result_to_string(result), message)
+#define SGFTRACE2(goban, move, result, message)				\
+  do {									\
+    if ((goban)->sgf_dumptree)						\
+      sgf_trace2((goban), read_function_name, q1, q2, (move),		\
+		 result_to_string(result), (message));			\
+  } while (0)
 
-#define SGFTRACE_SEMEAI(move, result1, result2, message) \
-  if (sgf_dumptree) \
-    sgf_trace_semeai(read_function_name, q1, q2, move, \
-	             result1, result2, message)
+#define SGFTRACE_SEMEAI(goban, move, result1, result2, message)		\
+  do {									\
+    if ((goban)->sgf_dumptree)						\
+      sgf_trace_semeai((goban), read_function_name, q1, q2, (move),	\
+		       (result1), (result2), (message));		\
+  } while (0)
 
 
 /* ================================================================ */
@@ -196,117 +205,140 @@ void sgf_trace_semeai(const char *func, int str1, int str2, int move,
 
 #if !TRACE_READ_RESULTS
 
-#define READ_RETURN0(routine, str, remaining_depth) \
-  do { \
-    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
-	      0, 0, NO_MOVE);\
-    return 0; \
+#define READ_RETURN0(goban, routine, str, remaining_depth)		\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str), NO_MOVE,		\
+	      (remaining_depth), NULL, 0, 0, NO_MOVE);			\
+    return 0;								\
   } while (0)
 
-#define READ_RETURN(routine, str, remaining_depth, point, move, value) \
-  do { \
-    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
-              value, 0, move);\
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    return (value); \
+#define READ_RETURN(goban, routine, str, remaining_depth,		\
+		    point, move, value)					\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str), NO_MOVE,		\
+	      (remaining_depth), NULL, (value), 0, (move));		\
+    if ((value) != 0 && (point) != 0)					\
+      *(point) = (move);						\
+    return (value);							\
   } while (0)
 
-#define READ_RETURN_SEMEAI(routine, str1, str2, remaining_depth, point, move, value1, value2) \
-  do { \
-    tt_update(&ttable, routine, str1, str2, remaining_depth, NULL, \
-              value1, value2, move); \
-    if ((value1) != 0 && (point) != 0) *(point) = (move); \
-    return; \
+#define READ_RETURN_SEMEAI(goban, routine, str1, str2, remaining_depth,	\
+			   point, move, value1, value2)			\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str1), (str2),		\
+	      (remaining_depth), NULL, (value1), (value2), (move));	\
+    if ((value1) != 0 && (point) != 0)					\
+      *(point) = (move);						\
+    return;								\
   } while (0)
 
-#define READ_RETURN_CONN(routine, str1, str2, remaining_depth, point, move, value) \
-  do { \
-    tt_update(&ttable, routine, str1, str2, remaining_depth, NULL,\
-              value, 0, move);\
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    return (value); \
+#define READ_RETURN_CONN(goban, routine, str1, str2, remaining_depth,	\
+			 point, move, value)				\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str1), (str2),		\
+	      (remaining_depth), NULL, (value), 0, (move));		\
+    if ((value) != 0 && (point) != 0)					\
+      *(point) = (move);						\
+    return (value);							\
   } while (0)
 
-#define READ_RETURN_HASH(routine, str, remaining_depth, hash, point, move, value) \
-  do { \
-    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, hash,\
-              value, 0, move);\
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    return (value); \
+#define READ_RETURN_HASH(goban, routine, str, remaining_depth,		\
+			 hash, point, move, value)			\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str), NO_MOVE,		\
+	      (remaining_depth), (hash), (value), 0, (move));		\
+    if ((value) != 0 && (point) != 0)					\
+      *(point) = (move);						\
+    return (value);							\
   } while (0)
 
-#define READ_RETURN2(routine, str, remaining_depth, point, move, value1, value2) \
-  do { \
-    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
-              value1, value2, move);\
-    if ((value1) != 0 && (point) != 0) *(point) = (move); \
-    return (value1); \
+#define READ_RETURN2(goban, routine, str, remaining_depth,		\
+		     point, move, value1, value2)			\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str), NO_MOVE,		\
+	      (remaining_depth), NULL, (value1), (value2), (move));	\
+    if ((value1) != 0 && (point) != 0)					\
+      *(point) = (move);						\
+    return (value1);							\
   } while (0)
 
-#else /* !TRACE_READ_RESULTS */
+#else /*TRACE_READ_RESULTS */
 
-#define READ_RETURN0(routine, str, remaining_depth) \
-  do { \
-    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
-	      0, 0, NO_MOVE);\
-    gprintf("%o%s %1m %d 0 0 ", read_function_name, q, stackp); \
-    dump_stack(); \
-    return 0; \
+#define READ_RETURN0(goban, routine, str, remaining_depth)		\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str), NO_MOVE,		\
+	      (remaining_depth), NULL, 0, 0, NO_MOVE);			\
+    gprintf((goban), "%o%s %1m %d 0 0 ",				\
+	    read_function_name, q, (goban)->stackp);			\
+    dump_stack(goban);							\
+    return 0;								\
   } while (0)
 
-#define READ_RETURN(routine, str, remaining_depth, point, move, value) \
-  do { \
-    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
-              value, 0, move);\
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
-	    (value), (move)); \
-    dump_stack(); \
-    return (value); \
+#define READ_RETURN(goban, routine, str, remaining_depth,		\
+		    point, move, value)					\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str), NO_MOVE,		\
+	      (remaining_depth), NULL, (value), 0, (move));		\
+    if ((value) != 0 && (point) != 0)					\
+      *(point) = (move);						\
+    gprintf((goban), "%o%s %1m %d %d %1m ",				\
+	    read_function_name, q, (goban)->stackp, (value), (move));	\
+    dump_stack(goban);							\
+    return (value);							\
   } while (0)
 
-#define READ_RETURN_SEMEAI(routine, str1, str2, remaining_depth, point, move, value1, value2) \
-  do { \
-    tt_update(&ttable, routine, str1, str2, remaining_depth, NULL, \
-              value1, value2, move); \
-    if ((value1) != 0 && (point) != 0) *(point) = (move); \
-    gprintf("%o%s %1m %1m %d %d %d %1m ", read_function_name, q1, q2, stackp, \
-	    (value1), (value2), (move)); \
-    dump_stack(); \
-    return; \
+#define READ_RETURN_SEMEAI(goban, routine, str1, str2, remaining_depth,	\
+			   point, move, value1, value2)			\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str1), (str2),		\
+	      (remaining_depth), NULL, (value1), (value2), (move));	\
+    if ((value1) != 0 && (point) != 0)					\
+      *(point) = (move);						\
+    gprintf((goban), "%o%s %1m %1m %d %d %d %1m ",			\
+	    read_function_name, q1, q2, (goban)->stackp,		\
+	    (value1), (value2), (move));				\
+    dump_stack(goban);							\
+    return;								\
   } while (0)
 
-#define READ_RETURN_CONN(routine, str1, str2, remaining_depth, point, move, value) \
-  do { \
-    tt_update(&ttable, routine, str1, str2, remaining_depth, NULL,\
-              value, 0, move);\
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    gprintf("%o%s %1m %1m %d %d %1m ", read_function_name, q1, q2, stackp, \
-	    (value), (move)); \
-    dump_stack(); \
-    return (value); \
+#define READ_RETURN_CONN(goban, routine, str1, str2, remaining_depth,	\
+			 point, move, value)				\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str1), (str2),		\
+	      (remaining_depth), NULL, (value), 0, (move));		\
+    if ((value) != 0 && (point) != 0)					\
+      *(point) = (move);						\
+    gprintf((goban), "%o%s %1m %1m %d %d %1m ",				\
+	    read_function_name, q1, q2, (goban)->stackp,		\
+	    (value), (move));						\
+    dump_stack(goban);							\
+    return (value);							\
   } while (0)
 
-#define READ_RETURN_HASH(routine, str, remaining_depth, hash, point, move, value) \
-  do { \
-    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, hash,\
-              value, 0, move);\
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
-	    (value), (move)); \
-    dump_stack(); \
-    return (value); \
+#define READ_RETURN_HASH(goban, routine, str, remaining_depth,		\
+			 hash, point, move, value)			\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str), NO_MOVE,		\
+	      (remaining_depth), (hash), (value), 0, (move));		\
+    if ((value) != 0 && (point) != 0)					\
+      *(point) = (move);						\
+    gprintf((goban), "%o%s %1m %d %d %1m ",				\
+	    read_function_name, q, (goban)->stackp, (value), (move));	\
+    dump_stack(goban);							\
+    return (value);							\
   } while (0)
 
-#define READ_RETURN2(routine, str, remaining_depth, point, move, value1, value2) \
-  do { \
-    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
-              value1, value2, move);\
-    if ((value1) != 0 && (point) != 0) *(point) = (move); \
-    gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
-	    (value1), (move)); \
-    dump_stack(); \
-    return (value1); \
+#define READ_RETURN2(goban, routine, str, remaining_depth,		\
+		     point, move, value1, value2)			\
+  do {									\
+    tt_update((goban), &ttable, (routine), (str), NO_MOVE,		\
+	      (remaining_depth), NULL, (value1), (value2), (move));	\
+    if ((value1) != 0 && (point) != 0)					\
+      *(point) = (move);						\
+    gprintf((goban), "%o%s %1m %d %d %1m ",				\
+	    read_function_name, q, (goban)->stackp, (value1), (move));	\
+    dump_stack(goban);							\
+    return (value1);							\
   } while (0)
 
 #endif

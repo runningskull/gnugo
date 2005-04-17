@@ -136,7 +136,7 @@ find_double_threats(int color)
 	     */
 	    if (board[a_threatened_groups[k]] == EMPTY
 		|| board[a_threatened_groups[l]] == EMPTY) {
-	      if (!attack(ii, NULL)) {
+	      if (!attack(goban, ii, NULL)) {
 		TRACE(goban, "Double threat at %1m, either %1m or %1m attacked.\n",
 		      ii, a_threatened_groups[k], a_threatened_groups[l]);
 		add_either_move(ii, ATTACK_STRING, a_threatened_groups[k],
@@ -145,7 +145,7 @@ find_double_threats(int color)
 		remove_attack_threat_move(ii, a_threatened_groups[l]);
 	      }
 	    }
-	    else if (!defend_both(a_threatened_groups[k],
+	    else if (!defend_both(goban, a_threatened_groups[k],
 				  a_threatened_groups[l])) {
 	      TRACE(goban, "Double threat at %1m, either %1m or %1m attacked.\n",
 		    ii, a_threatened_groups[k], a_threatened_groups[l]);
@@ -322,7 +322,7 @@ atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
 	continue;
       }
 
-      if (attack(pos, NULL)) {
+      if (attack(goban, pos, NULL)) {
 	defense_moves[pos] = 0;
 	popgo(goban);
 	if (save_verbose)
@@ -481,7 +481,7 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
       }
       increase_depth_values();
 
-      if (attack(pos, NULL)) {
+      if (attack(goban, pos, NULL)) {
 	defense_moves[pos] = 0;
 	decrease_depth_values();
 	popgo(goban);
@@ -837,14 +837,15 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
       sgf_dumptree = NULL;
       count_variations = 0;
 
-      if (!find_defense(str, defense_point))
+      if (!find_defense(goban, str, defense_point))
 	*defense_point = NO_MOVE;
 
       /* If no defense point is known and (apos) is a safe
        * move for other, it probably defends the combination.
        */
-      if ((*defense_point == NO_MOVE || !safe_move(*defense_point, other))
-	  && safe_move(apos, other))
+      if ((*defense_point == NO_MOVE
+	   || !safe_move(goban, *defense_point, other))
+	  && safe_move(goban, apos, other))
 	*defense_point = apos;
 
       sgf_dumptree = save_sgf_dumptree;
@@ -893,7 +894,7 @@ atari_atari_succeeded(int color, int *attack_point, int *defense_point,
     if (debug & DEBUG_ATARI_ATARI)
       gprintf(goban, "Considering attack of %1m. depth = %d.\n", pos, depth);
     
-    if (attack(pos, &apos) && !forbidden[apos]) {
+    if (attack(goban, pos, &apos) && !forbidden[apos]) {
       if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
 	gprintf(goban, "%oThe worm %1m can be attacked at %1m after ", pos, apos);
 	dump_stack(goban);
@@ -907,8 +908,8 @@ atari_atari_succeeded(int color, int *attack_point, int *defense_point,
        * it probably defends.
        */
       if (defense_point) {
-	if (!find_defense(pos, defense_point)) {
-	  if (safe_move(apos, other))
+	if (!find_defense(goban, pos, defense_point)) {
+	  if (safe_move(goban, apos, other))
 	    *defense_point = apos;
 	  else
 	    *defense_point = NO_MOVE;
@@ -1050,7 +1051,7 @@ atari_atari_attack_callback(int anchor, int color,
 	if (countlib(goban, str) > 2)
 	  continue;
 
-	if (!safe_move(move, color))
+	if (!safe_move(goban, move, color))
 	  continue;
       }
       
@@ -1064,7 +1065,7 @@ atari_atari_attack_callback(int anchor, int color,
 	if (!board[str])
 	  acode = WIN;
 	else
-	  acode = attack(str, &attack_point);
+	  acode = attack(goban, str, &attack_point);
 
 	popgo(goban);
 
@@ -1125,7 +1126,7 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
      * would need to call attack_and_defend() to be certain of
      * this.
      */
-    if (!find_defense(str, &move))
+    if (!find_defense(goban, str, &move))
       continue;
     moves[num_moves++] = move;
     if (num_moves == AA_MAX_MOVES)
@@ -1137,7 +1138,7 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
     for (k = 0; k < liberties; k++) {
       if (!mx[libs[k]]
 	  && trymove(goban, libs[k], board[str], "aa_defend-A", str)) {
-	if (attack(str, NULL) == 0) {
+	if (attack(goban, str, NULL) == 0) {
 	  moves[num_moves++] = libs[k];
 	  mx[libs[k]] = 1;
 	}
@@ -1150,7 +1151,7 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
     neighbors = chainlinks(goban, str, adjs);
     for (k = 0; k < neighbors; k++) {
       int attack_point;
-      if (attack(adjs[k], &attack_point) == WIN
+      if (attack(goban, adjs[k], &attack_point) == WIN
 	  && !mx[attack_point]) {
 	moves[num_moves++] = attack_point;
 	if (num_moves == AA_MAX_MOVES)
@@ -1167,7 +1168,7 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
 	  if (!mx[libs[s]]
 	      && !is_self_atari(goban, libs[s], board[str])
 	      && trymove(goban, libs[s], board[str], "aa_defend-B", str)) {
-	    if (attack(str, NULL) == 0) {
+	    if (attack(goban, str, NULL) == 0) {
 	      moves[num_moves++] = libs[s];
 	      mx[libs[s]] = 1;
 	    }

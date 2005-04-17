@@ -33,7 +33,8 @@
 
 void play_ascii(SGFTree *tree, Gameinfo *gameinfo, 
 		char *filename, char *until);
-void play_gtp(FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands,
+void play_gtp(Goban *_goban,
+	      FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands,
 	      int gtp_initial_orientation);
 void play_gmp(Gameinfo *gameinfo, int simplified);
 void play_solo(Gameinfo *gameinfo, int benchmark);

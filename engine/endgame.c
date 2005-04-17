@@ -137,7 +137,7 @@ endgame_analyze_worm_liberties(int pos, int color)
    * color. This is just a guess, we'll have to check the results later.
    */
   for (k = 0; k < inessential_liberties; k++) {
-    if (!safe_move(inessential_libs[k], other)
+    if (!safe_move(goban, inessential_libs[k], other)
 	|| !trymove(goban, inessential_libs[k], other, "endgame", pos))
       break;
   }
@@ -154,12 +154,13 @@ endgame_analyze_worm_liberties(int pos, int color)
       for (k = 0; k < essential_liberties; k++) {
 	int lib = essential_libs[k];
 
-	if (safe_move(lib, worm_color) && safe_move(lib, other)
+	if (safe_move(goban, lib, worm_color)
+	    && safe_move(goban, lib, other)
 	    && trymove(goban, lib, other, "endgame", pos)) {
-	  if (attack(pos, NULL) != 0) {
+	  if (attack(goban, pos, NULL) != 0) {
 	    int dpos;
 
-	    if (find_defense(pos, &dpos) && is_proper_eye_space(dpos)) {
+	    if (find_defense(goban, pos, &dpos) && is_proper_eye_space(dpos)) {
 	      int i;
 
 	      /* If the attack cannot be defended against by playing on
@@ -169,13 +170,13 @@ endgame_analyze_worm_liberties(int pos, int color)
 	       */
 	      for (i = 0; i < essential_liberties; i++) {
 		if (i != k && essential_libs[i] != dpos
-		    && does_defend(essential_libs[i], pos))
+		    && does_defend(goban, essential_libs[i], pos))
 		  break;
 	      }
 
 	      if (i == essential_liberties) {
 		for (i = 0; i < false_eye_liberties; i++) {
-		  if (does_defend(false_eye_libs[i], pos))
+		  if (does_defend(goban, false_eye_libs[i], pos))
 		    break;
 		}
 
@@ -188,7 +189,7 @@ endgame_analyze_worm_liberties(int pos, int color)
 		    int lib2;
 		    findlib(goban, adj[i], 1, &lib2);
 		    if (lib2 != dpos && !is_proper_eye_space(lib2)
-			&& does_defend(lib2, pos))
+			&& does_defend(goban, lib2, pos))
 		      break;
 		  }
 
@@ -214,20 +215,21 @@ endgame_analyze_worm_liberties(int pos, int color)
     }
 
     /* Try to find moves as in position 2. */
-    if (attack(pos, &apos) != 0) {
+    if (attack(goban, pos, &apos) != 0) {
       if (is_proper_eye_space(apos)) {
 	/* The attack point is in someone's eye (must be an eye which the worm
 	 * bounds). This looks promising. If this attack cannot be averted by
 	 * playing on an essential liberty, keep it for further analyzis.
 	 */
 	for (k = 0; k < essential_liberties; k++) {
-	  if (does_defend(essential_libs[k], pos)) {
+	  if (does_defend(goban, essential_libs[k], pos)) {
 	    apos = NO_MOVE;
 	    break;
 	  }
 	}
 
-	if (apos != NO_MOVE && worm_color == color && !does_defend(apos, pos))
+	if (apos != NO_MOVE && worm_color == color
+	    && !does_defend(goban, apos, pos))
 	  apos = NO_MOVE;
       }
       else
@@ -253,7 +255,7 @@ endgame_analyze_worm_liberties(int pos, int color)
      * pointless. Note that checks for safety on previous step were not
      * sufficient since we had additional stones on board then.
      */
-    if (safe_move(attacks[k], other)) {
+    if (safe_move(goban, attacks[k], other)) {
       if (defenses[k] != NO_MOVE) {
 	int i;
 
@@ -276,7 +278,7 @@ endgame_analyze_worm_liberties(int pos, int color)
 	  if (board[pos2] == EMPTY) {
 	    int m;
 
-	    if (!is_proper_eye_space(pos2) && safe_move(pos2, other))
+	    if (!is_proper_eye_space(pos2) && safe_move(goban, pos2, other))
 	      break;
 
 	    for (m = 0; m < inessential_liberties; m++) {
@@ -336,7 +338,7 @@ endgame_analyze_worm_liberties(int pos, int color)
     if (countlib(goban, pos) > 1) {
       for (k = 0; k < num_attacks2; k++) {
 	if (trymove(goban, attacks[k], other, "endgame", pos)) {
-	  if (attack(pos, NULL) != 0) {
+	  if (attack(goban, pos, NULL) != 0) {
 	    TRACE(goban, "  endgame move with territorial value %d.0 found at %1m\n",
 		  1, attacks[k]);
 	    add_expand_territory_move(attacks[k]);
@@ -360,7 +362,7 @@ endgame_analyze_worm_liberties(int pos, int color)
       set_minimum_territorial_value(attacks[0], 1.0);
     }
 
-    if (value > 0 && does_attack(apos, pos)) {
+    if (value > 0 && does_attack(goban, apos, pos)) {
       TRACE(goban, "  endgame move with territorial value %d.0 found at %1m\n",
 	    value, apos);
       add_expand_territory_move(apos);
@@ -411,13 +413,13 @@ endgame_find_backfilling_dame(int str, int color_to_move)
 				&false_eye_liberties, false_eye_libs))
       break;
     for (k = 0; k < inessential_liberties; k++) {
-      if (!safe_move(inessential_libs[k], other)
+      if (!safe_move(goban, inessential_libs[k], other)
 	  || !trymove(goban, inessential_libs[k], other, "endgame", str))
 	continue;
       increase_depth_values();
       if (board[str] == EMPTY)
 	break;
-      if (attack_and_defend(str, NULL, NULL, NULL, &dpos)) {
+      if (attack_and_defend(goban, str, NULL, NULL, NULL, &dpos)) {
 	if (worm[dpos].color == EMPTY) {
 	  potential_moves[num_potential_moves] = dpos;
 	  num_potential_moves++;
@@ -437,7 +439,7 @@ endgame_find_backfilling_dame(int str, int color_to_move)
   }
 
   for (k = num_potential_moves - 1; k >= 0; k--)
-    if (safe_move(potential_moves[k], color)) {
+    if (safe_move(goban, potential_moves[k], color)) {
       move = potential_moves[k];
       TRACE(goban, "  backfilling dame found at %1m for string %1m\n", move, str);
       if (color == color_to_move) {

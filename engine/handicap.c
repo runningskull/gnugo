@@ -21,7 +21,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include "liberty.h"
 #include "patterns.h"
@@ -139,12 +138,13 @@ static const int places[][2] = {
  */
 
 int
-place_fixed_handicap(int handicap)
+place_fixed_handicap(Goban *goban, int handicap)
 {
+  int board_size = goban->board_size;
   int x;
   int maxhand;
   int three = board_size > 11 ? 3 : 2;
-  int mid = board_size/2;
+  int mid = board_size / 2;
   int retval = handicap;
 
   /* A handicap of 1 just means that B plays first, no komi.
@@ -211,14 +211,16 @@ place_fixed_handicap(int handicap)
 static int remaining_handicap_stones = -1;
 static int total_handicap_stones = -1;
 
-static int find_free_handicap_pattern(void);
+static int find_free_handicap_pattern(Goban *goban);
 static void free_handicap_callback(int anchor, int color,
 				   struct pattern *pattern,
 				   int ll, void *data);
 
 int
-place_free_handicap(int handicap)
+place_free_handicap(Goban *goban, int handicap)
 {
+  int board_size = goban->board_size;
+
   gg_assert(goban, handicap == 0 || handicap >= 2);
 
   if (handicap == 0)
@@ -237,7 +239,7 @@ place_free_handicap(int handicap)
 
   /* Find and place free handicap stones by pattern matching. */
   while (remaining_handicap_stones > 0) {
-    if (!find_free_handicap_pattern())
+    if (!find_free_handicap_pattern(goban))
       break;
   }
 
@@ -290,7 +292,7 @@ static struct handicap_match handicap_matches[MAX_HANDICAP_MATCHES];
 static int number_of_matches;
 
 static int
-find_free_handicap_pattern()
+find_free_handicap_pattern(Goban *goban)
 {
   int k;
   int highest_value = -1;
@@ -403,24 +405,26 @@ free_handicap_callback(int anchor, int color, struct pattern *pattern,
       }
     }
   }
-  gg_assert(goban, r >= 0 && r < MAX_HANDICAP_MATCHES);
+  gg_assert(NULL, r >= 0 && r < MAX_HANDICAP_MATCHES);
   handicap_matches[r].value   = pattern->value;
   handicap_matches[r].anchor  = anchor;
   handicap_matches[r].pattern = pattern;
   handicap_matches[r].ll      = ll;
 }
 
+
 int
-free_handicap_remaining_stones()
+free_handicap_remaining_stones(void)
 {
-  gg_assert(goban, remaining_handicap_stones >= 0);
+  gg_assert(NULL, remaining_handicap_stones >= 0);
   return remaining_handicap_stones;
 }
 
+
 int
-free_handicap_total_stones()
+free_handicap_total_stones(void)
 {
-  gg_assert(goban, total_handicap_stones >= 0);
+  gg_assert(NULL, total_handicap_stones >= 0);
   return total_handicap_stones;
 }
 

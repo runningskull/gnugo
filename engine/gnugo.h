@@ -84,34 +84,35 @@ const char *result_to_string(int result);
 /* ================================================================ */
 
 
-void gnugo_clear_board(int boardsize);
-void gnugo_set_komi(float new_komi);
-void gnugo_add_stone(int i, int j, int color);
-void gnugo_remove_stone(int i, int j);
+void gnugo_clear_board(Goban *goban, int board_size);
+void gnugo_set_komi(Goban *goban, float new_komi);
+void gnugo_add_stone(Goban *goban, int i, int j, int color);
+void gnugo_remove_stone(Goban *goban, int i, int j);
 int  gnugo_is_pass(int i, int j);
-void gnugo_play_move(int i, int j, int color);
-int  gnugo_undo_moves(int n);
-int  gnugo_play_sgfnode(SGFNode *node, int to_move);
-int  gnugo_play_sgftree(SGFNode *root, int *until, SGFNode **curnode);
-int  gnugo_is_legal(int i, int j, int color);
-int  gnugo_is_suicide(int i, int j, int color);
+void gnugo_play_move(Goban *goban, int i, int j, int color);
+int  gnugo_undo_moves(Goban *goban, int n);
+int  gnugo_play_sgfnode(Goban *goban, SGFNode *node, int to_move);
+int  gnugo_play_sgftree(Goban *goban, SGFNode *root, int *until,
+			SGFNode **curnode);
+int  gnugo_is_legal(const Goban *goban, int i, int j, int color);
+int  gnugo_is_suicide(const Goban *goban, int i, int j, int color);
 
-int  gnugo_placehand(int handicap);
-int  gnugo_sethand(int handicap, SGFNode *root);
-void gnugo_recordboard(SGFNode *node);
+int  gnugo_placehand(Goban *goban, int handicap);
+int  gnugo_sethand(Goban *goban, int handicap, SGFNode *root);
+void gnugo_recordboard(const Goban *goban, SGFNode *node);
 
 float gnugo_genmove(int *i, int *j, int color, int *resign);
 
-int  gnugo_attack(int m, int n, int *i, int *j);
-int  gnugo_find_defense(int m, int n, int *i, int *j);
+int  gnugo_attack(Goban *goban, int m, int n, int *i, int *j);
+int  gnugo_find_defense(Goban *goban, int m, int n, int *i, int *j);
 
 void  gnugo_who_wins(int color, FILE *outfile);
 float gnugo_estimate_score(float *upper, float *lower);
 
-float gnugo_get_komi(void);
-void  gnugo_get_board(int b[MAX_BOARD][MAX_BOARD]);
-int   gnugo_get_boardsize(void);
-int   gnugo_get_move_number(void);
+float gnugo_get_komi(const Goban *goban);
+void  gnugo_get_board(const Goban *goban, int board[MAX_BOARD][MAX_BOARD]);
+int   gnugo_get_board_size(const Goban *goban);
+int   gnugo_get_move_number(const Goban *goban);
 
 /* ================================================================ */
 /*                           Game handling                          */
@@ -127,13 +128,13 @@ typedef struct {
   int computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
 } Gameinfo;
 
-void gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi);
-void gameinfo_print(Gameinfo *ginfo);
-void gameinfo_load_sgfheader(Gameinfo *gameinfo, SGFNode *head);
-void gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color);
-int gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
+void gameinfo_clear(Gameinfo *ginfo);
+void gameinfo_print(Gameinfo *ginfo, const Goban *goban);
+void gameinfo_load_sgfheader(Gameinfo *gameinfo, SGFNode *head, Goban *goban);
+void gameinfo_play_move(Gameinfo *ginfo, Goban *goban, int i, int j, int color);
+int gameinfo_play_sgftree_rot(Gameinfo *gameinfo, Goban *goban, SGFTree *tree,
 			      const char *untilstr, int orientation);
-int gameinfo_play_sgftree(Gameinfo *gameinfo, SGFTree *tree,
+int gameinfo_play_sgftree(Gameinfo *gameinfo, Goban *goban, SGFTree *tree,
 			  const char *untilstr);
 
 
@@ -350,7 +351,7 @@ void change_owl_node_limit(int new_limit, int *old_value);
 /* ================================================================ */
 
 /* utils.c */
-void change_dragon_status(int dr, int status);
+void change_dragon_status(const Goban *goban, int dr, int status);
 void who_wins(int color, FILE *outfile);
 
 /* high-level routine to generate the best move for the given color */
@@ -378,12 +379,13 @@ void prepare_pattern_profiling(void);
 void report_pattern_profiling(void);
 
 /* sgffile.c */
-void sgffile_add_debuginfo(SGFNode *node, float value);
+void sgffile_add_debuginfo(const Goban *goban, SGFNode *node, float value);
 void sgffile_output(SGFTree *tree);
 
-void sgffile_printsgf(int color_to_play, const char *filename);
-void sgffile_printboard(SGFTree *tree);
-void sgffile_recordboard(SGFNode *node);
+void sgffile_printsgf(const Goban *goban, int color_to_play,
+		      const char *filename);
+void sgffile_printboard(const Goban *goban, SGFTree *tree);
+void sgffile_recordboard(const Goban *goban, SGFNode *node);
 
 /* sgfdecide.c */
 void decide_string(int pos);

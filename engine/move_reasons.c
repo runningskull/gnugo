@@ -1527,9 +1527,9 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
 	    || defense_move_reason_known(pos, ii))
 	  worm_is_safe = 1;
 	else if (trymove(goban, pos, color, "mark-changed-dragon", ii)) {
-	    if (REVERSE_RESULT(attack(ii, NULL)) >= result_to_beat)
-	      worm_is_safe = 1;
-	    popgo(goban);
+	  if (REVERSE_RESULT(attack(goban, ii, NULL)) >= result_to_beat)
+	    worm_is_safe = 1;
+	  popgo(goban);
 	}
 	if (worm_is_safe || move_reason_type == SEMEAI_MOVE) {
 	  /* This string can now be considered safe. Hence we mark the

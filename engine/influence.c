@@ -773,7 +773,7 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
 	/* FIXME: This test is probably not necessary any more. */
 	else if (!(pattern->class & (CLASS_D | CLASS_B | CLASS_t))) {
 	  if ((stackp == 0 && worm[ii].attack_codes[0] != 0)
-	      || attack(ii, NULL) != 0)
+	      || attack(goban, ii, NULL) != 0)
 	    return; /* Match failed */
 	}
 	/* One test left for class B and t. */

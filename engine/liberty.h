@@ -213,70 +213,78 @@ void reading_cache_init(int bytes);
 void reading_cache_clear(void);
 
 /* reading.c */
-int attack(int str, int *move);
-int find_defense(int str, int *move);
-int attack_and_defend(int str,
+int attack(Goban *goban, int str, int *move);
+int find_defense(Goban *goban, int str, int *move);
+int attack_and_defend(Goban *goban, int str,
 		      int *attack_code, int *attack_point,
 		      int *defend_code, int *defense_point);
-int attack_either(int astr, int bstr);
-int defend_both(int astr, int bstr);
-int break_through(int apos, int bpos, int cpos);
-int attack_threats(int pos, int max_points, int moves[], int codes[]);
+int attack_either(Goban *goban, int astr, int bstr);
+int defend_both(Goban *goban, int astr, int bstr);
+int break_through(Goban *goban, int apos, int bpos, int cpos);
+int attack_threats(Goban *goban, int pos, int max_points,
+		   int moves[], int codes[]);
 
-int restricted_defend1(int str, int *move,
+int restricted_defend1(Goban *goban, int str, int *move,
 		       int num_forbidden_moves, int *forbidden_moves);
-int restricted_attack2(int str, int *move,
+int restricted_attack2(Goban *goban, int str, int *move,
 		       int num_forbidden_moves, int *forbidden_moves);
 
-int simple_ladder(int str, int *move);
+int simple_ladder(Goban *goban, int str, int *move);
+
 #define MOVE_ORDERING_PARAMETERS 67
 void tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS]);
-void draw_reading_shadow(void);
+void draw_reading_shadow(const Goban *goban);
 
 /* persistent.c */
 void persistent_cache_init(void);
-void purge_persistent_caches(void);
+void purge_persistent_caches(Goban *goban);
 void clear_persistent_caches(void);
 
-int search_persistent_reading_cache(enum routine_id routine, int str,
+int search_persistent_reading_cache(const Goban *goban,
+				    enum routine_id routine, int str,
 				    int *result, int *move);
-void store_persistent_reading_cache(enum routine_id routine, int str,
+void store_persistent_reading_cache(const Goban *goban,
+				    enum routine_id routine, int str,
 				    int result, int move, int nodes);
-void reading_hotspots(float values[BOARDMAX]);
-int search_persistent_connection_cache(enum routine_id routine,
+void reading_hotspots(const Goban *goban, float values[BOARDMAX]);
+int search_persistent_connection_cache(const Goban *goban,
+				       enum routine_id routine,
 				       int str1, int str2,
 				       int *result, int *move);
-void store_persistent_connection_cache(enum routine_id routine,
+void store_persistent_connection_cache(const Goban *goban,
+				       enum routine_id routine,
 				       int str1, int str2,
 				       int result, int move,
 				       int tactical_nodes,
 				       char connection_shadow[BOARDMAX]);
-int search_persistent_breakin_cache(enum routine_id routine,
+int search_persistent_breakin_cache(const Goban *goban,
+				    enum routine_id routine,
 				    int str, Hash_data *goal_hash,
 				    int breakin_node_limit,
 				    int *result, int *move);
-void store_persistent_breakin_cache(enum routine_id routine,
+void store_persistent_breakin_cache(const Goban *goban,
+				    enum routine_id routine,
 				    int str, Hash_data *goal_hash,
 				    int result, int move,
 				    int tactical_nodes,
 				    int breakin_node_limit,
 				    char breakin_shadow[BOARDMAX]);
-int search_persistent_owl_cache(enum routine_id routine,
+int search_persistent_owl_cache(const Goban *goban, enum routine_id routine,
 				int apos, int bpos, int cpos,
 				int *result, int *move, int *move2,
 				int *certain);
-void store_persistent_owl_cache(enum routine_id routine,
+void store_persistent_owl_cache(const Goban *goban, enum routine_id routine,
 				int apos, int bpos, int cpos,
 				int result, int move, int move2, int certain,
 				int tactical_nodes, char goal[BOARDMAX],
 				int goal_color);
-void owl_hotspots(float values[BOARDMAX]);
-int search_persistent_semeai_cache(enum routine_id routine,
+void owl_hotspots(const Goban *goban, float values[BOARDMAX]);
+int search_persistent_semeai_cache(const Goban *goban, enum routine_id routine,
 			           int apos, int bpos, int cpos, int color,
 				   Hash_data *goal_hash,
 				   int *resulta, int *resultb,
 				   int *move, int *certain);
-void store_persistent_semeai_cache(enum routine_id routine,
+void store_persistent_semeai_cache(const Goban *goban, enum routine_id routine,
 				   int apos, int bpos, int cpos, int color,
 				   Hash_data *goal_hash,
 				   int resulta, int resultb,
@@ -298,12 +306,12 @@ void estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
 			      int appreciate_one_two_lunches);
 int owl_topological_eye(int pos, int color);
 int vital_chain(int pos);
-int confirm_safety(int move, int color, int *defense_point,
+int confirm_safety(Goban *goban, int move, int color, int *defense_point,
 		   char safe_stones[BOARDMAX]);
 int dragon_weak(int pos);
 float dragon_weakness(int pos, int ignore_dead_dragons);
 int size_of_biggest_critical_dragon(void);
-float blunder_size(int move, int color, int *defense_point,
+float blunder_size(Goban *goban, int move, int color, int *defense_point,
 		   char safe_stones[BOARDMAX]);
 void set_depth_values(int level, int report_levels);
 void modify_depth_values(int n);
@@ -313,8 +321,8 @@ void set_temporary_depth_values(int d, int b, int b2, int bc,
 				int ss, int br, int f, int k);
 void restore_depth_values(void);
 
-int safe_move(int move, int color);
-int does_secure(int color, int move, int pos);
+int safe_move(Goban *goban, int move, int color);
+int does_secure(Goban *goban, int color, int move, int pos);
 
 void compute_new_dragons(int dragon_origins[BOARDMAX]);
 void join_dragons(int d1, int d2);
@@ -446,22 +454,25 @@ int owl_strong_dragon(int pos);
 void owl_reasons(int color);
 
 void unconditional_life(int unconditional_territory[BOARDMAX], int color);
-void find_superstring(int str, int *num_stones, int *stones);
-void find_superstring_conservative(int str, int *num_stones, int *stones);
-void find_superstring_liberties(int str, int *liberties, int *libs,
-                                int liberty_cap);
-void find_proper_superstring_liberties(int str, int *liberties, int *libs, 
+void find_superstring(Goban *goban, int str, int *num_stones, int *stones);
+void find_superstring_conservative(Goban *goban, int str,
+				   int *num_stones, int *stones);
+void find_superstring_liberties(Goban *goban, int str,
+				int *liberties, int *libs, int liberty_cap);
+void find_proper_superstring_liberties(Goban *goban, int str,
+				       int *liberties, int *libs, 
                                        int liberty_cap);
-void find_superstring_stones_and_liberties(int str, int *num_stones,
-					   int *stones, int *liberties,
-					   int *libs, int liberty_cap);
-void superstring_chainlinks(int str, int *num_adj, int adj[MAXCHAIN],
-                            int liberty_cap);
-void proper_superstring_chainlinks(int str, int *num_adj, 
+void find_superstring_stones_and_liberties(Goban *goban, int str,
+					   int *num_stones, int *stones,
+					   int *liberties, int *libs,
+					   int liberty_cap);
+void superstring_chainlinks(Goban *goban, int str,
+			    int *num_adj, int adj[MAXCHAIN], int liberty_cap);
+void proper_superstring_chainlinks(Goban *goban, int str, int *num_adj, 
                                    int adj[MAXCHAIN], int liberty_cap);
 
-int place_fixed_handicap(int handicap); /* place stones on board only */
-int place_free_handicap(int handicap); /* place stones on board only */
+int place_fixed_handicap(Goban *goban, int handicap);
+int place_free_handicap(Goban *goban, int handicap);
 int free_handicap_remaining_stones(void);
 int free_handicap_total_stones(void);
 
@@ -538,20 +549,24 @@ void worm_reasons(int color);
 
 int semeai_move_reason_known(int move, int dr);
 
-int does_attack(int move, int str);
-int does_defend(int move, int str);
-int double_atari(int move, int color, float *value,
+int does_attack(Goban *goban, int move, int str);
+int does_defend(Goban *goban, int move, int str);
+int double_atari(Goban *goban, int move, int color, float *value,
 		 char safe_stones[BOARDMAX]);
-int send_two_return_one(int move, int color);
-int play_attack_defend_n(int color, int do_attack, int num_moves, ...);
-int play_attack_defend2_n(int color, int do_attack, int num_moves, ...);
-int play_break_through_n(int color, int num_moves, ...);
-int play_connect_n(int color, int do_connect, int num_moves, ...);
+int send_two_return_one(Goban *goban, int move, int color);
+int play_attack_defend_n(Goban *goban, int color, int do_attack,
+			 int num_moves, ...);
+int play_attack_defend2_n(Goban *goban, int color, int do_attack,
+			  int num_moves, ...);
+int play_break_through_n(Goban *goban, int color, int num_moves, ...);
+int play_connect_n(Goban *goban, int color, int do_connect,
+		   int num_moves, ...);
 int cut_possible(int pos, int color);
-int defend_against(int move, int color, int apos);
-int somewhere(int color, int check_alive, int num_moves, ...);
-int visible_along_edge(int color, int apos, int bpos);
-int test_symmetry_after_move(int move, int color, int strict);
+int defend_against(Goban *goban, int move, int color, int apos);
+int somewhere(const Goban *goban, int color,
+	      int check_alive, int num_moves, ...);
+int visible_along_edge(const Goban *goban, int color, int apos, int bpos);
+int test_symmetry_after_move(Goban *goban, int move, int color, int strict);
 
 /* Printmoyo values, specified by -m flag. */
 #define PRINTMOYO_TERRITORY         0x01

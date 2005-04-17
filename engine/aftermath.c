@@ -159,8 +159,8 @@ do_aftermath_genmove(int color,
   int best_score;
   int best_scoring_move;
   
-  owl_hotspots(owl_hotspot);
-  reading_hotspots(reading_hotspot);
+  owl_hotspots(goban, owl_hotspot);
+  reading_hotspots(goban, reading_hotspot);
   
   /* As a preparation we compute a distance map to the invincible strings. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -311,7 +311,7 @@ do_aftermath_genmove(int color,
   }
   
   if (best_scoring_move != NO_MOVE
-      && safe_move(best_scoring_move, color) == WIN) {
+      && safe_move(goban, best_scoring_move, color) == WIN) {
     DEBUG(goban, DEBUG_AFTERMATH, "Closing edge at %1m\n", best_scoring_move);
     return best_scoring_move;
   }
@@ -596,11 +596,11 @@ do_aftermath_genmove(int color,
 
     bb = dragons[move];
     if (is_illegal_ko_capture(goban, move, color)
-	|| !safe_move(move, color)
+	|| !safe_move(goban, move, color)
 	|| (DRAGON2(bb).safety != INVINCIBLE
 	    && DRAGON2(bb).safety != STRONGLY_ALIVE
 	    && owl_does_defend(move, bb, NULL) != WIN)
-	|| (!confirm_safety(move, color, NULL, NULL))) {
+	|| (!confirm_safety(goban, move, color, NULL, NULL))) {
       score[move] = 0;
     }
     else {
@@ -624,7 +624,7 @@ do_aftermath_genmove(int color,
 	    neighbors = chainlinks(goban, move, adjs);
 	    for (r = 0; r < neighbors; r++) {
 	      if (worm[adjs[r]].attack_codes[0] != 0
-		  && (find_defense(adjs[r], NULL)
+		  && (find_defense(goban, adjs[r], NULL)
 		      > worm[adjs[r]].defense_codes[0])) {
 		DEBUG(goban, DEBUG_AFTERMATH,
 		      "Blunder: %1m becomes tactically safer after %1m\n",
@@ -776,7 +776,7 @@ do_aftermath_genmove(int color,
       /* If we don't allow self atari, also call confirm safety to
        * avoid setting up combination attacks.
        */
-      if (!self_atari_ok && !confirm_safety(move, color, NULL, NULL))
+      if (!self_atari_ok && !confirm_safety(goban, move, color, NULL, NULL))
 	continue;
 	  
       DEBUG(goban, DEBUG_AFTERMATH, "Filling opponent liberty at %1m\n", move);

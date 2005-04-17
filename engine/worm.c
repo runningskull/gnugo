@@ -299,7 +299,7 @@ make_worms(void)
 	  if (worm[str].color == OTHER_COLOR(color)
 	      && worm[str].attack_codes[0] != 0
 	      && worm[str].defense_codes[0] != 0) {
-	    int dcode = find_defense(str, NULL);
+	    int dcode = find_defense(goban, str, NULL);
 	    if (dcode < worm[str].defense_codes[0]) {
 	      int attack_works = 1;
 
@@ -311,11 +311,11 @@ make_worms(void)
 	       * because we could, for instance, drive the worm into
 	       * seki with our move.
 	       */
-	      if (attack(str, NULL) >= worm[str].attack_codes[0]) {
+	      if (attack(goban, str, NULL) >= worm[str].attack_codes[0]) {
 		if (worm[str].defense_codes[0] != 0
 		    && trymove(goban, worm[str].defense_points[0],
 			       OTHER_COLOR(color), "make_worms", 0)) {
-		  int this_dcode = REVERSE_RESULT(attack(str, NULL));
+		  int this_dcode = REVERSE_RESULT(attack(goban, str, NULL));
 		  if (this_dcode > dcode) {
 		    dcode = this_dcode;
 		    if (dcode >= worm[str].defense_codes[0])
@@ -344,7 +344,7 @@ make_worms(void)
 	   */
 	  else if (worm[str].color == color
 		   && worm[str].attack_codes[0] != 0) {
-	    int acode = attack(str, NULL);
+	    int acode = attack(goban, str, NULL);
 	    if (acode < worm[str].attack_codes[0]) {
 	      int defense_works = 1;
 	      /* Sometimes attack() fails to find an
@@ -358,7 +358,7 @@ make_worms(void)
 		if (board[str] == EMPTY)
 		  this_acode = WIN;
 		else
-		  this_acode = REVERSE_RESULT(find_defense(str, NULL));
+		  this_acode = REVERSE_RESULT(find_defense(goban, str, NULL));
 		if (this_acode > acode) {
 		  acode = this_acode;
 		  if (acode >= worm[str].attack_codes[0])
@@ -410,12 +410,12 @@ make_worms(void)
       if (worm[pos].attack_codes[0] != 0
 	  && worm[SOUTH(pos)].attack_codes[0] != 0) {
 	if (worm[pos].defense_codes[0] == 0
-	    && does_defend(worm[SOUTH(pos)].attack_points[0], pos)) {
+	    && does_defend(goban, worm[SOUTH(pos)].attack_points[0], pos)) {
 	  /* FIXME: need to check ko relationship here */
 	  change_defense(pos, worm[SOUTH(pos)].attack_points[0], WIN);
 	}
 	if (worm[SOUTH(pos)].defense_codes[0] == 0
-	    && does_defend(worm[pos].attack_points[0], SOUTH(pos))) {
+	    && does_defend(goban, worm[pos].attack_points[0], SOUTH(pos))) {
 	  /* FIXME: need to check ko relationship here */	    
 	  change_defense(SOUTH(pos), worm[pos].attack_points[0], WIN);
 	}
@@ -431,12 +431,12 @@ make_worms(void)
       if (worm[pos].attack_codes[0] != 0
 	  && worm[EAST(pos)].attack_codes[0] != 0) {
 	if (worm[pos].defense_codes[0] == 0
-	    && does_defend(worm[EAST(pos)].attack_points[0], pos)) {
+	    && does_defend(goban, worm[EAST(pos)].attack_points[0], pos)) {
 	  /* FIXME: need to check ko relationship here */	    
 	  change_defense(pos, worm[EAST(pos)].attack_points[0], WIN);
 	}
 	if (worm[EAST(pos)].defense_codes[0] == 0
-	    && does_defend(worm[pos].attack_points[0], EAST(pos))) {
+	    && does_defend(goban, worm[pos].attack_points[0], EAST(pos))) {
 	  /* FIXME: need to check ko relationship here */	    
 	  change_defense(EAST(pos), worm[pos].attack_points[0], WIN);
 	}
@@ -756,7 +756,7 @@ find_worm_attacks_and_defenses()
     }
     propagate_worm(str);
     
-    acode = attack(str, &attack_point);
+    acode = attack(goban, str, &attack_point);
     if (acode != 0) {
       DEBUG(goban, DEBUG_WORMS, "worm at %1m can be attacked at %1m\n",
 	    str, attack_point);
@@ -777,7 +777,7 @@ find_worm_attacks_and_defenses()
     if (worm[str].attack_codes[0] != 0) {
 
       TRACE(goban, "considering defense of %1m\n", str);
-      dcode = find_defense(str, &defense_point);
+      dcode = find_defense(goban, str, &defense_point);
       if (dcode != 0) {
 	TRACE(goban, "worm at %1m can be defended at %1m\n", str, defense_point);
 	if (defense_point != NO_MOVE)
@@ -791,7 +791,7 @@ find_worm_attacks_and_defenses()
 	attack_point = worm[str].attack_points[0];
 	if (!liberty_of_string(goban, attack_point, str))
 	  if (trymove(goban, attack_point, worm[str].color, "make_worms", NO_MOVE)) {
-	    int acode = attack(str, NULL);
+	    int acode = attack(goban, str, NULL);
 	    if (acode != WIN) {
 	      change_defense(str, attack_point, REVERSE_RESULT(acode));
 	      TRACE(goban, "worm at %1m can be defended at %1m with code %d\n",
@@ -834,11 +834,11 @@ find_worm_attacks_and_defenses()
       if (!attack_move_known(pos, str)) {
 	/* Try to attack on the liberty. */
 	if (trymove(goban, pos, other, "make_worms", str)) {
-	  if (board[str] == EMPTY || attack(str, NULL)) {
+	  if (board[str] == EMPTY || attack(goban, str, NULL)) {
 	    if (board[str] == EMPTY)
 	      dcode = 0;
 	    else
-	      dcode = find_defense(str, NULL);
+	      dcode = find_defense(goban, str, NULL);
 	    
 	    if (dcode != WIN)
 	      change_attack(str, pos, REVERSE_RESULT(dcode));
@@ -850,7 +850,7 @@ find_worm_attacks_and_defenses()
       if (!defense_move_known(pos, str)) {
 	if (worm[str].defense_codes[0] != 0)
 	  if (trymove(goban, pos, color, "make_worms", NO_MOVE)) {
-	    acode = attack(str, NULL);
+	    acode = attack(goban, str, NULL);
 	    if (acode != WIN)
 	      change_defense(str, pos, REVERSE_RESULT(acode));
 	    popgo(goban);
@@ -885,7 +885,7 @@ find_worm_threats()
     /* 1. Start with finding attack threats. */
     /* Only try those worms that have no attack. */
     if (worm[str].attack_codes[0] == 0) {
-      attack_threats(str, MAX_TACTICAL_POINTS,
+      attack_threats(goban, str, MAX_TACTICAL_POINTS,
 		     worm[str].attack_threat_points,
 		     worm[str].attack_threat_codes);
 #if 0
@@ -906,7 +906,7 @@ find_worm_threats()
 	      if (board[str] == EMPTY)
 		acode = WIN;
 	      else
-		acode = attack(str, NULL);
+		acode = attack(goban, str, NULL);
 	      if (acode != 0)
 		change_attack_threat(str, bb, acode);
 	      popgo(goban);
@@ -929,8 +929,8 @@ find_worm_threats()
 	
 	/* Try to threaten on the liberty. */
 	if (trymove(goban, aa, color, "threaten defense", NO_MOVE)) {
-	  if (attack(str, NULL) == WIN) {
-	    int dcode = find_defense(str, NULL);
+	  if (attack(goban, str, NULL) == WIN) {
+	    int dcode = find_defense(goban, str, NULL);
 	    if (dcode != 0)
 	      change_defense_threat(str, aa, dcode);
 	  }
@@ -947,8 +947,8 @@ find_worm_threats()
 	    continue;
 	  
 	  if (trymove(goban, bb, color, "threaten defense", str)) {
-	    if (attack(str, NULL) == WIN) {
-	      int dcode = find_defense(str, NULL);
+	    if (attack(goban, str, NULL) == WIN) {
+	      int dcode = find_defense(goban, str, NULL);
 	      if (dcode != 0)
 		change_defense_threat(str, bb, dcode);
 	    }
@@ -1609,10 +1609,10 @@ attack_callback(int anchor, int color, struct pattern *pattern, int ll,
 	int dcode;
 	if (!board[str])
 	  dcode = 0;
-	else if (!attack(str, NULL))
+	else if (!attack(goban, str, NULL))
 	  dcode = WIN;
 	else
-	  dcode = find_defense(str, NULL);
+	  dcode = find_defense(goban, str, NULL);
 
 	popgo(goban);
 
@@ -1685,7 +1685,7 @@ defense_callback(int anchor, int color, struct pattern *pattern, int ll,
        * Play (move) and see if there is an attack.
        */
       if (trymove(goban, move, color, "defense_callback", str)) {
-	int acode = attack(str, NULL);
+	int acode = attack(goban, str, NULL);
 
 	popgo(goban);
 	

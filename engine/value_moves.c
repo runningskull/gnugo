@@ -115,13 +115,13 @@ value_moves_get_blunder_size(int move, int color)
 
   mark_safe_stones(color, move, saved_dragons, saved_worms, safe_stones);
   
-  return blunder_size(move, color, NULL, safe_stones);
+  return blunder_size(goban, move, color, NULL, safe_stones);
 }
 
 static int
 value_moves_confirm_safety(int move, int color)
 {
-  return (value_moves_get_blunder_size(move, color) == 0.0);
+  return value_moves_get_blunder_size(move, color) == 0.0;
 }
 
 
@@ -195,7 +195,7 @@ find_more_attack_and_defense_moves(int color)
 	 */
 	if (board[aa] == color
 	    && !defense_move_reason_known(ii, unstable_worms[k])) {
-	  int acode = attack(aa, NULL);
+	  int acode = attack(goban, aa, NULL);
 	  if (acode < worm[aa].attack_codes[0]) {
 	    /* Maybe attack() doesn't find the attack. Try to
 	     * attack with the stored attack move.
@@ -207,7 +207,7 @@ find_more_attack_and_defense_moves(int color)
 	      if (!board[aa])
 		defense_works = 0;
 	      else {
-		int this_acode = REVERSE_RESULT(find_defense(aa, NULL));
+		int this_acode = REVERSE_RESULT(find_defense(goban, aa, NULL));
 		if (this_acode > acode) {
 		  acode = this_acode;
 		  if (acode >= worm[aa].attack_codes[0])
@@ -234,7 +234,7 @@ find_more_attack_and_defense_moves(int color)
 	if (board[aa] == other
 	    && !attack_move_reason_known(ii, unstable_worms[k])) {
 	  
-	  int dcode = find_defense(aa, NULL);
+	  int dcode = find_defense(goban, aa, NULL);
 	  if (dcode < worm[aa].defense_codes[0]) {
 	    /* Maybe find_defense() doesn't find the defense. Try to
 	     * defend with the stored defense move.
@@ -245,10 +245,10 @@ find_more_attack_and_defense_moves(int color)
 	     */
 	    int attack_works = 1;
 
-	    if (attack(aa, NULL) >= worm[aa].attack_codes[0]) {
+	    if (attack(goban, aa, NULL) >= worm[aa].attack_codes[0]) {
 	      if (trymove(goban, worm[aa].defense_points[0], other, 
 			  "find_more_attack_and_defense_moves", 0)) {
-		int this_dcode = REVERSE_RESULT(attack(aa, NULL));
+		int this_dcode = REVERSE_RESULT(attack(goban, aa, NULL));
 		if (this_dcode > dcode) {
 		  dcode = this_dcode;
 		  if (dcode >= worm[aa].defense_codes[0])
@@ -295,7 +295,7 @@ do_find_more_owl_attack_and_defense_moves(int color, int pos,
   int save_verbose;
 
   /* Never consider moves of the send-two-return-one type here. */
-  if (send_two_return_one(pos, color))
+  if (send_two_return_one(goban, pos, color))
     return;
 
   save_verbose = verbose;
@@ -1096,7 +1096,7 @@ examine_move_safety(int color)
 	  int ii;
 	  for (ii = first_worm_in_dragon(what); ii != NO_MOVE; 
 	       ii = next_worm_in_dragon(ii)) {
-	    if (!play_connect_n(color, 0, 1, pos, ii, pos))
+	    if (!play_connect_n(goban, color, 0, 1, pos, ii, pos))
 	      break;
 	  }
 	  if (ii != NO_MOVE) {
@@ -1277,7 +1277,7 @@ examine_move_safety(int color)
 	     */
 	    safety = 1;
 	  
-	  else if (!play_connect_n(color, 0, 1, pos, aa, pos)
+	  else if (!play_connect_n(goban, color, 0, 1, pos, aa, pos)
 		   && owl_does_defend(pos, aa, NULL))
 	    safety = 1;
 	  break;
@@ -1316,11 +1316,12 @@ examine_move_safety(int color)
 	  break;
 	}
       }
-      if (safety == 1 && (tactical_safety == 1 || safe_move(pos, color)))
+      if (safety == 1
+	  && (tactical_safety == 1 || safe_move(goban, pos, color)))
 	break;
     }
       
-    if (safety == 1 && (tactical_safety || safe_move(pos, color)))
+    if (safety == 1 && (tactical_safety || safe_move(goban, pos, color)))
       move[pos].move_safety = 1;
     else
       move[pos].move_safety = 0;
@@ -1578,7 +1579,7 @@ adjusted_worm_attack_value(int pos, int ww)
       adjustment_up = 2*dragon[adj].effective_size;
 
     if (worm[adj].attack_codes[0] != 0
-	&& !does_defend(pos, adj)
+	&& !does_defend(goban, pos, adj)
 	&& 2*worm[adj].effective_size > adjustment_down)
       adjustment_down = 2*worm[adj].effective_size;
   }
@@ -2009,17 +2010,17 @@ estimate_territorial_value(int pos, int color, float our_score,
 	    && (move[pos].move_safety == 1
 		|| adjacent_to_nondead_stone(pos, color)
 		|| owl_defense_move_reason_known(pos, -1))
-	    && find_defense(aa, &defense_move) == WIN
+	    && find_defense(goban, aa, &defense_move) == WIN
 	    && defense_move != NO_MOVE) {
 	  int bad_followup;
 	  int attack_move;
 
-	  if (attack(pos, &attack_move) != WIN) {
+	  if (attack(goban, pos, &attack_move) != WIN) {
 	    int i;
 
 	    if (trymove(goban, defense_move, other,
 			"estimate_territorial_value-b", NO_MOVE)) {
-	      if (board[pos] == EMPTY || attack(pos, NULL) != 0) {
+	      if (board[pos] == EMPTY || attack(goban, pos, NULL) != 0) {
 		popgo(goban);
 		popgo(goban);
 		break;
@@ -2044,7 +2045,7 @@ estimate_territorial_value(int pos, int color, float our_score,
 		attacked_string = move_reasons[reason].what;
 		if (move_reasons[reason].type == ATTACK_MOVE
 		    && board[attacked_string] == other) {
-		  int defense_code = find_defense(attacked_string, NULL);
+		  int defense_code = find_defense(goban, attacked_string, NULL);
 		  double down_coefficient = 0.0;
 
 		  switch (defense_code) {
@@ -2080,7 +2081,7 @@ estimate_territorial_value(int pos, int color, float our_score,
 	     */
 	    if (trymove(goban, attack_move, other,
 			"estimate_territorial_value-c", NO_MOVE)) {
-	      if (attack(aa, NULL) == 0) {
+	      if (attack(goban, aa, NULL) == 0) {
 		/* It is sufficient, no followup. */
 		popgo(goban);
 		popgo(goban);
@@ -2104,8 +2105,8 @@ estimate_territorial_value(int pos, int color, float our_score,
 	      findlib(goban, adjs[s], 1, &lib);
 	      if (trymove(goban, lib, other,
 		    	  "estimate_territorial_value-d", NO_MOVE)) {
-		if (!attack(aa, NULL)
-		    && (board[pos] == EMPTY || attack(pos, NULL) != 0)) {
+		if (!attack(goban, aa, NULL)
+		    && (board[pos] == EMPTY || attack(goban, pos, NULL) != 0)) {
 		  popgo(goban);
 		  bad_followup = 1;
 		  break;
@@ -2130,7 +2131,7 @@ estimate_territorial_value(int pos, int color, float our_score,
 	      && 2*dragon[adj].effective_size > adjustment_up)
 	    adjustment_up = 2*dragon[adj].effective_size;
 	  if (dragon[adj].color == color
-	      && attack(adj, NULL)
+	      && attack(goban, adj, NULL)
 	      && 2*worm[adj].effective_size > adjustment_down)
 	    adjustment_down = 2*worm[adj].effective_size;
 	}
@@ -2183,11 +2184,11 @@ estimate_territorial_value(int pos, int color, float our_score,
       if (trymove(goban, pos, color, "estimate_territorial_value-A", NO_MOVE)) {
 	int attack_move;
 	if (move[pos].move_safety == 1
-	    && attack(aa, &attack_move) == WIN
+	    && attack(goban, aa, &attack_move) == WIN
 	    && attack_move != NO_MOVE) {
 	  if (trymove(goban, attack_move, other,
 		      "estimate_territorial_value-b", NO_MOVE)) {
-	    if (board[pos] == EMPTY || attack(pos, NULL) != 0) {
+	    if (board[pos] == EMPTY || attack(goban, pos, NULL) != 0) {
 	      popgo(goban);
 	      popgo(goban);
 	      break;
@@ -2456,7 +2457,7 @@ estimate_territorial_value(int pos, int color, float our_score,
 
   mark_inessential_stones(OTHER_COLOR(color), safe_stones);
 
-  if (move[pos].move_safety == 1 && safe_move(pos, color) == WIN) {
+  if (move[pos].move_safety == 1 && safe_move(goban, pos, color) == WIN) {
     safe_stones[pos] = INFLUENCE_SAVED_STONE;
     strength[pos] = DEFAULT_STRENGTH;
     if (0)
@@ -2655,9 +2656,9 @@ estimate_strategical_value(int pos, int color, float our_score,
              * does not defend or attack, no points.
 	     */
 	    if (worm[bb].attack_codes[0] != 0
-		&& ((color == board[bb] && !does_defend(pos, bb))
+		&& ((color == board[bb] && !does_defend(goban, pos, bb))
 		    || (color == OTHER_COLOR(board[bb])
-			&& !does_attack(pos, bb))))
+			&& !does_attack(goban, pos, bb))))
 	      this_value = 0.0;
 
 	    /* If we are doing scoring, are alive, and the move loses
@@ -3504,7 +3505,7 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
     else {
       if (trymove(goban, pos, color, "reevaluate_ko_threats", ko_move)) {
 	ASSERT_ON_BOARD1(goban, ko_stone);
-	if (!find_defense(ko_stone, &opp_ko_move))
+	if (!find_defense(goban, ko_stone, &opp_ko_move))
 	  threat_does_work = 1;
 	else {
 	  int threat_wastes_point = 0;
@@ -3515,11 +3516,11 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
 		      "reevaluate_ko_threats", ko_move)) {
 	    switch (type) {
 	    case ATTACK_THREAT:
-	      threat_does_work = attack(what, NULL);
+	      threat_does_work = attack(goban, what, NULL);
 	      break;
 	    case DEFEND_THREAT:
 	      threat_does_work = (board[what] != EMPTY
-				  && find_defense(what, NULL));
+				  && find_defense(goban, what, NULL));
 	      break;
 	    case OWL_ATTACK_THREAT:
 	    case OWL_DEFEND_THREAT:
@@ -3535,8 +3536,8 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
 	    /* Is this a losing ko threat? */
 	    if (threat_does_work && type == ATTACK_THREAT) {
 	      int apos;
-	      if (attack(pos, &apos)
-		  && does_defend(apos, what)
+	      if (attack(goban, pos, &apos)
+		  && does_defend(goban, apos, what)
 		  && (forced_backfilling_moves[apos]
 		      || (!is_proper_eye_space(apos)
 			 && !false_eye_territory[apos]))) {
@@ -3556,9 +3557,9 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
 	      int averting_pos;
 
 	      if (type == ATTACK_THREAT)
-		find_defense(what, &averting_pos);
+		find_defense(goban, what, &averting_pos);
 	      else
-		attack(what, &averting_pos);
+		attack(goban, what, &averting_pos);
 
 	      /* `averting_pos' can be NO_MOVE sometimes, at least when
 	       * when the the threat is a threat to attack. It is not

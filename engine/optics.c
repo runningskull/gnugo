@@ -528,11 +528,11 @@ false_margin(int pos, int color, int lively[BOARDMAX])
     if (stackp == 0 && worm[apos].attack_codes[0] == 0)
       potential_false_margin = 1;
     
-    if (stackp > 0 && !attack(apos, NULL))
+    if (stackp > 0 && !attack(goban, apos, NULL))
       potential_false_margin = 1;
   }
   
-  if (potential_false_margin && safe_move(pos, other) == 0) {
+  if (potential_false_margin && safe_move(goban, pos, other) == 0) {
     DEBUG(goban, DEBUG_EYES, "False margin for %C at %1m.\n", color, pos);
     return 1;
   }
@@ -1522,7 +1522,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	  /* If possible, choose a non-sacrificial defense point.
 	   * Compare white T8 and T6 in lazarus:21.
 	   */
-	  if (safe_move(dpos, eye_color) != WIN)
+	  if (safe_move(goban, dpos, eye_color) != WIN)
 	    score -= 5;
 
 	  /* See comment to the same code for attack points. */
@@ -2108,7 +2108,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
     return 0.0;
 
   if (board[pos] == EMPTY) {
-    int your_safety = safe_move(pos, other);
+    int your_safety = safe_move(goban, pos, other);
 
     apos = pos;
     dpos = pos;
@@ -2131,7 +2131,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
     else if (your_safety != WIN)
       value = a;
     else {                           /* So your_safety == WIN. */
-      int our_safety = safe_move(pos, color);
+      int our_safety = safe_move(goban, pos, color);
       
       if (our_safety == 0) {
 	int k;
@@ -2157,7 +2157,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
 	  int lib;
 
 	  if (board[diagonal] == other && findlib(goban, diagonal, 1, &lib) == 1) {
-	    if (lib != pos && does_secure(color, lib, pos)) {
+	    if (lib != pos && does_secure(goban, color, lib, pos)) {
 	      value = 1.0;
 	      apos = lib;
 	      break;
@@ -2185,7 +2185,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
       dpos  = worm[pos].defense_points[0];
     }
     else
-      attack_and_defend(pos, &acode, &apos, &dcode, &dpos);
+      attack_and_defend(goban, pos, &acode, &apos, &dcode, &dpos);
 
     /* Must test acode first since dcode only is reliable if acode is
      * non-zero.
@@ -2249,7 +2249,7 @@ obvious_false_eye(int pos, int color)
     if (!ON_BOARD2(goban, i+di, j+dj))
       diagonal_sum++;
     else if (BOARD(goban, i+di, j+dj) == OTHER_COLOR(color)
-	     && !attack(POS(i+di, j+dj), NULL))
+	     && !attack(goban, POS(i+di, j+dj), NULL))
       diagonal_sum += 2;
   }
   
@@ -3705,7 +3705,7 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
   memset(tactical_life_results, 0, table_size);
 
   if (sgf_dumptree)
-    sgffile_printboard(sgf_dumptree);
+    sgffile_printboard(goban, sgf_dumptree);
   
   /* Evaluate the eyespace on the board. */
   evaluate_eyespace(value, num_vertices, vertices,

@@ -111,8 +111,8 @@ examine_position(int how_much)
 {
   int save_verbose = verbose;
 
-  purge_persistent_caches();
-  
+  purge_persistent_caches(goban);
+
   /* Don't print reading traces during make_worms and make_dragons unless 
    * the user really wants it (verbose == 3). 
    */
@@ -677,7 +677,7 @@ find_mirror_move(int *move, int color)
   int mirror_move;
   if (last_move != NO_MOVE) {
     mirror_move = MIRROR_MOVE(goban, last_move);
-    if (test_symmetry_after_move(mirror_move, color, 0)) {
+    if (test_symmetry_after_move(goban, mirror_move, color, 0)) {
       *move = mirror_move;
       return 1;
     }
@@ -685,7 +685,7 @@ find_mirror_move(int *move, int color)
   else {
     for (mirror_move = BOARDMIN; mirror_move < BOARDMAX; mirror_move++) {
       if (ON_BOARD(goban, mirror_move)
-	  && test_symmetry_after_move(mirror_move, color, 0)) {
+	  && test_symmetry_after_move(goban, mirror_move, color, 0)) {
 	*move = mirror_move;
 	return 1;
       }
@@ -740,7 +740,7 @@ break_mirror_go(int color)
   if (board[tengen] == EMPTY
       && color == BLACK
       && stones_on_board(goban, BLACK | WHITE) > 10
-      && test_symmetry_after_move(tengen, color, 1)) {
+      && test_symmetry_after_move(goban, tengen, color, 1)) {
     set_minimum_move_value(tengen, 30.0);
     TRACE(goban, "Play %1m to break mirror go, value 30.\n", tengen);
   }

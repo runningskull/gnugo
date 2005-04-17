@@ -1118,7 +1118,7 @@ string_connect(int str1, int str2, int *move)
     }
 
 #if USE_PERSISTENT_CONNECTION_CACHE == 1
-    if (!search_persistent_connection_cache(CONNECT, str1, str2,
+    if (!search_persistent_connection_cache(goban, CONNECT, str1, str2,
 					    &result2, &move2))
       result2 = -1;
     else if (0)
@@ -1126,7 +1126,8 @@ string_connect(int str1, int str2, int *move)
 	      str1, str2, result2, move2);
 #endif
 #if USE_PERSISTENT_CONNECTION_CACHE == 2
-    if (search_persistent_connection_cache(CONNECT, str1, str2, &result, move))
+    if (search_persistent_connection_cache(goban, CONNECT,
+					   str1, str2, &result, move))
       return result;
 #endif
 
@@ -1159,7 +1160,7 @@ string_connect(int str1, int str2, int *move)
     }
 
 #if USE_PERSISTENT_CONNECTION_CACHE > 0
-    store_persistent_connection_cache(CONNECT, str1, str2, result, *move,
+    store_persistent_connection_cache(goban, CONNECT, str1, str2, result, *move,
 				      tactical_nodes, connection_shadow);
 #endif
   
@@ -1179,22 +1180,22 @@ recursive_connect(int str1, int str2, int *move)
   SETUP_TRACE_INFO2("recursive_connect", str1, str2);
   
   if (board[str1] == EMPTY || board[str2] == EMPTY) {
-    SGFTRACE2(PASS_MOVE, 0, "one string already captured");
+    SGFTRACE2(goban, PASS_MOVE, 0, "one string already captured");
     return 0;
   }
   
   if (same_string(goban, str1, str2)) {
-    SGFTRACE2(PASS_MOVE, WIN, "already connected");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "already connected");
     return WIN;
   }
 
   if (nodes_connect > connection_node_limit) {
-    SGFTRACE2(PASS_MOVE, 0, "connection node limit reached");
+    SGFTRACE2(goban, PASS_MOVE, 0, "connection node limit reached");
     return 0;
   }
   
   if (stackp == connect_depth) {
-    SGFTRACE2(PASS_MOVE, 0, "connection depth limit reached");
+    SGFTRACE2(goban, PASS_MOVE, 0, "connection depth limit reached");
     return 0;
   }
 
@@ -1202,7 +1203,7 @@ recursive_connect(int str1, int str2, int *move)
   global_connection_node_counter++;
   
   if (quiescence_connect (str1, str2, move)) {
-    SGFTRACE2(*move, WIN, "quiescence_connect");
+    SGFTRACE2(goban, *move, WIN, "quiescence_connect");
     return WIN;
   }
 
@@ -1251,10 +1252,10 @@ recursive_connect(int str1, int str2, int *move)
   }
 
   if (res == WIN) {
-    SGFTRACE2(*move, WIN, "success");
+    SGFTRACE2(goban, *move, WIN, "success");
   }
   else {
-    SGFTRACE2(PASS_MOVE, 0, "failure");
+    SGFTRACE2(goban, PASS_MOVE, 0, "failure");
   }
   
   return res;
@@ -1299,7 +1300,7 @@ disconnect(int str1, int str2, int *move)
     }
 
 #if USE_PERSISTENT_CONNECTION_CACHE == 1
-    if (!search_persistent_connection_cache(DISCONNECT, str1, str2,
+    if (!search_persistent_connection_cache(goban, DISCONNECT, str1, str2,
 					    &result2, &move2))
       result2 = -1;
     else if (0)
@@ -1307,7 +1308,7 @@ disconnect(int str1, int str2, int *move)
 	      str1, str2, result2, move2);
 #endif
 #if USE_PERSISTENT_CONNECTION_CACHE == 2
-    if (search_persistent_connection_cache(DISCONNECT, str1, str2,
+    if (search_persistent_connection_cache(goban, DISCONNECT, str1, str2,
 					   &result, move))
       return result;
 #endif
@@ -1341,7 +1342,7 @@ disconnect(int str1, int str2, int *move)
     }
 
 #if USE_PERSISTENT_CONNECTION_CACHE > 0
-    store_persistent_connection_cache(DISCONNECT, str1, str2, result, *move,
+    store_persistent_connection_cache(goban, DISCONNECT, str1, str2, result, *move,
 				      tactical_nodes, connection_shadow);
 #endif
 
@@ -1414,31 +1415,31 @@ recursive_disconnect(int str1, int str2, int *move)
   SETUP_TRACE_INFO2("recursive_disconnect", str1, str2);
   
   if (board[str1] == EMPTY || board[str2] == EMPTY) {
-    SGFTRACE2(PASS_MOVE, WIN, "one string already captured");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "one string already captured");
     return WIN;
   }
 
   if (quiescence_capture(str1, move)) {
-    SGFTRACE2(*move, WIN, "first string capturable");
+    SGFTRACE2(goban, *move, WIN, "first string capturable");
     return WIN;
   }
   if (quiescence_capture(str2, move)) {
-    SGFTRACE2(*move, WIN, "second string capturable");
+    SGFTRACE2(goban, *move, WIN, "second string capturable");
     return WIN;
   }
 
   if (same_string(goban, str1, str2)) {
-    SGFTRACE2(PASS_MOVE, 0, "already connected");
+    SGFTRACE2(goban, PASS_MOVE, 0, "already connected");
     return 0;
   }
   
   if (nodes_connect > connection_node_limit) {
-    SGFTRACE2(PASS_MOVE, WIN, "connection node limit reached");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "connection node limit reached");
     return WIN;
   }
   
   if (stackp == connect_depth) {
-    SGFTRACE2(PASS_MOVE, WIN, "connection depth limit reached");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "connection depth limit reached");
     return WIN;
   }
   
@@ -1473,10 +1474,10 @@ recursive_disconnect(int str1, int str2, int *move)
       }
 
   if (res == WIN) {
-    SGFTRACE2(*move, WIN, "success");
+    SGFTRACE2(goban, *move, WIN, "success");
   }
   else {
-    SGFTRACE2(PASS_MOVE, 0, "failure");
+    SGFTRACE2(goban, PASS_MOVE, 0, "failure");
   }
   
   return res;
@@ -1503,7 +1504,7 @@ quiescence_capture(int str, int *move)
     result = WIN;
   }
   else if (countlib(goban, str) == 2)
-    result = simple_ladder(str, move);
+    result = simple_ladder(goban, str, move);
 
   /* Turn the sgf traces back on. */
   sgf_dumptree = save_sgf_dumptree;
@@ -1559,22 +1560,22 @@ recursive_transitivity(int str1, int str2, int str3, int *move)
   SETUP_TRACE_INFO2("recursive_transitivity", str1, str3);
   
   if (board[str1] == EMPTY || board[str2] == EMPTY || board[str3] == EMPTY) {
-    SGFTRACE2(PASS_MOVE, 0, "one string already captured");
+    SGFTRACE2(goban, PASS_MOVE, 0, "one string already captured");
     return 0;
   }
   
   if (same_string(goban, str1, str2) && same_string(goban, str1, str3)) {
-    SGFTRACE2(PASS_MOVE, WIN, "already connected");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "already connected");
     return WIN;
   }
 
   if (nodes_connect > connection_node_limit) {
-    SGFTRACE2(PASS_MOVE, 0, "connection node limit reached");
+    SGFTRACE2(goban, PASS_MOVE, 0, "connection node limit reached");
     return 0;
   }
   
   if (stackp == connect_depth) {
-    SGFTRACE2(PASS_MOVE, 0, "connection depth limit reached");
+    SGFTRACE2(goban, PASS_MOVE, 0, "connection depth limit reached");
     return 0;
   }
 
@@ -1583,13 +1584,13 @@ recursive_transitivity(int str1, int str2, int str3, int *move)
   
   if (same_string(goban, str1, str2))
     if (quiescence_connect (str1, str3, move)) {
-      SGFTRACE2(*move, WIN, "quiescence_connect");
+      SGFTRACE2(goban, *move, WIN, "quiescence_connect");
       return WIN;
     }
 
   if (same_string(goban, str2, str3))
     if (quiescence_connect (str1, str2, move)) {
-      SGFTRACE2(*move, WIN, "quiescence_connect");
+      SGFTRACE2(goban, *move, WIN, "quiescence_connect");
       return WIN;
     }
 
@@ -1634,10 +1635,10 @@ recursive_transitivity(int str1, int str2, int str3, int *move)
   }
 
   if (res == WIN) {
-    SGFTRACE2(*move, WIN, "success");
+    SGFTRACE2(goban, *move, WIN, "success");
   }
   else {
-    SGFTRACE2(PASS_MOVE, 0, "failure");
+    SGFTRACE2(goban, PASS_MOVE, 0, "failure");
   }
   
   return res;
@@ -1695,35 +1696,35 @@ recursive_non_transitivity(int str1, int str2, int str3, int *move)
   
   if (board[str1] == EMPTY || board[str2] == EMPTY
       || board[str3] == EMPTY) {
-    SGFTRACE2(PASS_MOVE, WIN, "one string already captured");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "one string already captured");
     return WIN;
   }
 
   if (quiescence_capture(str1, move)) {
-    SGFTRACE2(*move, WIN, "first string capturable");
+    SGFTRACE2(goban, *move, WIN, "first string capturable");
     return WIN;
   }
   if (quiescence_capture(str2, move)) {
-    SGFTRACE2(*move, WIN, "second string capturable");
+    SGFTRACE2(goban, *move, WIN, "second string capturable");
     return WIN;
   }
   if (quiescence_capture(str3, move)) {
-    SGFTRACE2(*move, WIN, "third string capturable");
+    SGFTRACE2(goban, *move, WIN, "third string capturable");
     return WIN;
   }
 
   if (same_string(goban, str1, str2) && same_string(goban, str1, str3)) {
-    SGFTRACE2(PASS_MOVE, 0, "already connected");
+    SGFTRACE2(goban, PASS_MOVE, 0, "already connected");
     return 0;
   }
   
   if (nodes_connect > connection_node_limit) {
-    SGFTRACE2(PASS_MOVE, WIN, "connection node limit reached");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "connection node limit reached");
     return WIN;
   }
   
   if (stackp == connect_depth) {
-    SGFTRACE2(PASS_MOVE, WIN, "connection depth limit reached");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "connection depth limit reached");
     return WIN;
   }
   
@@ -1753,10 +1754,10 @@ recursive_non_transitivity(int str1, int str2, int str3, int *move)
       }
 
   if (res == WIN) {
-    SGFTRACE2(*move, WIN, "success");
+    SGFTRACE2(goban, *move, WIN, "success");
   }
   else {
-    SGFTRACE2(PASS_MOVE, 0, "failure");
+    SGFTRACE2(goban, PASS_MOVE, 0, "failure");
   }
   
   return res;
@@ -1982,22 +1983,22 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
   global_connection_node_counter++;
   
   if (board[str1] == EMPTY || board[str2] == EMPTY) {
-    SGFTRACE2(PASS_MOVE, 0, "one string already captured");
+    SGFTRACE2(goban, PASS_MOVE, 0, "one string already captured");
     return 0;
   }
   
   if (same_string(goban, str1, str2)) {
-    SGFTRACE2(PASS_MOVE, WIN, "already connected");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "already connected");
     return WIN;
   }
 
   if (nodes_connect > connection_node_limit) {
-    SGFTRACE2(PASS_MOVE, 0, "connection node limit reached");
+    SGFTRACE2(goban, PASS_MOVE, 0, "connection node limit reached");
     return 0;
   }
   
   if (stackp > connect_depth2) {
-    SGFTRACE2(PASS_MOVE, 0, "connection depth limit reached");
+    SGFTRACE2(goban, PASS_MOVE, 0, "connection depth limit reached");
     return 0;
   }
 
@@ -2006,20 +2007,20 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
 
   if (stackp <= depth && (hashflags & HASH_CONNECT)
       && !has_passed
-      && tt_get(&ttable, CONNECT, str1, str2, depth - stackp, NULL,
+      && tt_get(goban, &ttable, CONNECT, str1, str2, depth - stackp, NULL,
 		&value, NULL, &xpos) == 2) {
     TRACE_CACHED_RESULT2(value, value, xpos);
     if (value != 0)
       if (move)
 	*move = xpos;
 
-    SGFTRACE2(xpos, value, "cached");
+    SGFTRACE2(goban, xpos, value, "cached");
     return value;
   }
   
   if (trivial_connection(str1, str2, &xpos) == WIN) {
-    SGFTRACE2(xpos, WIN, "trivial connection");
-    READ_RETURN_CONN(CONNECT, str1, str2, depth - stackp, move, xpos, WIN);
+    SGFTRACE2(goban, xpos, WIN, "trivial connection");
+    READ_RETURN_CONN(goban, CONNECT, str1, str2, depth - stackp, move, xpos, WIN);
   }
   
   num_moves = find_string_connection_moves(str1, str2, color,
@@ -2038,8 +2039,8 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
 					  has_passed);
 	popgo(goban);
 	if (acode == 0) {
-	  SGFTRACE2(xpos, WIN, "connection effective");
-	  READ_RETURN_CONN(CONNECT, str1, str2, depth - stackp,
+	  SGFTRACE2(goban, xpos, WIN, "connection effective");
+	  READ_RETURN_CONN(goban, CONNECT, str1, str2, depth - stackp,
 			   move, xpos, WIN);
 	}
 	/* if the move works with ko we save it, then look for something
@@ -2060,18 +2061,19 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
   }
 
   if (tried_moves == 0 && distance < FP(1.0)) {
-    SGFTRACE2(NO_MOVE, WIN, "no move, probably connected");
-    READ_RETURN_CONN(CONNECT, str1, str2, depth - stackp, move, NO_MOVE, WIN);
+    SGFTRACE2(goban, NO_MOVE, WIN, "no move, probably connected");
+    READ_RETURN_CONN(goban, CONNECT, str1, str2, depth - stackp,
+		     move, NO_MOVE, WIN);
   }
   
   if (savecode != 0) {
-    SGFTRACE2(savemove, savecode, "saved move");
-    READ_RETURN_CONN(CONNECT, str1, str2, depth - stackp,
+    SGFTRACE2(goban, savemove, savecode, "saved move");
+    READ_RETURN_CONN(goban, CONNECT, str1, str2, depth - stackp,
 		     move, savemove, savecode);
   }
 
-  SGFTRACE2(0, 0, NULL);
-  READ_RETURN_CONN(CONNECT, str1, str2, depth - stackp, move, NO_MOVE, 0);
+  SGFTRACE2(goban, 0, 0, NULL);
+  READ_RETURN_CONN(goban, CONNECT, str1, str2, depth - stackp, move, NO_MOVE, 0);
 }
 
 
@@ -2121,22 +2123,22 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
     *move = NO_MOVE;
   
   if (board[str1] == EMPTY || board[str2] == EMPTY) {
-    SGFTRACE2(PASS_MOVE, WIN, "one string already captured");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "one string already captured");
     return WIN;
   }
 
   if (same_string(goban, str1, str2)) {
-    SGFTRACE2(PASS_MOVE, 0, "already connected");
+    SGFTRACE2(goban, PASS_MOVE, 0, "already connected");
     return 0;
   }
   
   if (nodes_connect > connection_node_limit) {
-    SGFTRACE2(PASS_MOVE, WIN, "connection node limit reached");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "connection node limit reached");
     return WIN;
   }
   
   if (stackp > connect_depth2) {
-    SGFTRACE2(PASS_MOVE, WIN, "connection depth limit reached");
+    SGFTRACE2(goban, PASS_MOVE, WIN, "connection depth limit reached");
     return WIN;
   }
 
@@ -2146,24 +2148,24 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
   str1 = find_origin(goban, str1);
   str2 = find_origin(goban, str2);
 
-  attack_code1 = attack(str1, &attack_pos1);
+  attack_code1 = attack(goban, str1, &attack_pos1);
   if (attack_code1 == WIN) {
     sgf_dumptree = save_sgf_dumptree;
     count_variations = save_count_variations;
 
-    SGFTRACE2(attack_pos1, WIN, "one string is capturable");
+    SGFTRACE2(goban, attack_pos1, WIN, "one string is capturable");
     if (move)
       *move = attack_pos1;
 
     return WIN;
   }
 
-  attack_code2 = attack(str2, &attack_pos2);
+  attack_code2 = attack(goban, str2, &attack_pos2);
   if (attack_code2 == WIN) {
     sgf_dumptree = save_sgf_dumptree;
     count_variations = save_count_variations;
 
-    SGFTRACE2(attack_pos2, WIN, "one string is capturable");
+    SGFTRACE2(goban, attack_pos2, WIN, "one string is capturable");
     if (move)
       *move = attack_pos2;
 
@@ -2175,7 +2177,7 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
 
   if (stackp <= depth
       && (hashflags & HASH_DISCONNECT)
-      && tt_get(&ttable, DISCONNECT, str1, str2,
+      && tt_get(goban, &ttable, DISCONNECT, str1, str2,
 		depth - stackp, NULL,
 		&value, NULL, &xpos) == 2) {
     TRACE_CACHED_RESULT2(value, value, xpos);
@@ -2183,18 +2185,20 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
       if (move)
 	*move = xpos;
 
-    SGFTRACE2(xpos, value, "cached");
+    SGFTRACE2(goban, xpos, value, "cached");
     return value;
   }
 
   if (ladder_capture(str1, &xpos) == WIN) {
-    SGFTRACE2(xpos, WIN, "first string capturable");
-    READ_RETURN_CONN(DISCONNECT, str1, str2, depth - stackp, move, xpos, WIN);
+    SGFTRACE2(goban, xpos, WIN, "first string capturable");
+    READ_RETURN_CONN(goban, DISCONNECT, str1, str2, depth - stackp,
+		     move, xpos, WIN);
   }
   
   if (ladder_capture(str2, &xpos) == WIN) {
-    SGFTRACE2(xpos, WIN, "second string capturable");
-    READ_RETURN_CONN(DISCONNECT, str1, str2, depth - stackp, move, xpos, WIN);
+    SGFTRACE2(goban, xpos, WIN, "second string capturable");
+    READ_RETURN_CONN(goban, DISCONNECT, str1, str2, depth - stackp,
+		     move, xpos, WIN);
   }
 
   num_moves = find_string_connection_moves(str1, str2, other,
@@ -2232,8 +2236,8 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
 				       has_passed);
 	popgo(goban);
 	if (dcode == 0) {
-	  SGFTRACE2(xpos, WIN, "disconnection effective");
-	  READ_RETURN_CONN(DISCONNECT, str1, str2, depth - stackp,
+	  SGFTRACE2(goban, xpos, WIN, "disconnection effective");
+	  READ_RETURN_CONN(goban, DISCONNECT, str1, str2, depth - stackp,
 			   move, xpos, WIN);
 	}
 	/* if the move works with ko we save it, then look for something
@@ -2257,19 +2261,20 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
       && distance >= FP(1.0)
       && (has_passed
 	  || !recursive_connect2(str1, str2, NULL, 1))) {
-    SGFTRACE2(NO_MOVE, WIN, "no move, probably disconnected");
-    READ_RETURN_CONN(DISCONNECT, str1, str2, depth - stackp,
+    SGFTRACE2(goban, NO_MOVE, WIN, "no move, probably disconnected");
+    READ_RETURN_CONN(goban, DISCONNECT, str1, str2, depth - stackp,
 		     move, NO_MOVE, WIN);
   }
   
   if (savecode != 0) {
-    SGFTRACE2(savemove, savecode, "saved move");
-    READ_RETURN_CONN(DISCONNECT, str1, str2, depth - stackp, 
+    SGFTRACE2(goban, savemove, savecode, "saved move");
+    READ_RETURN_CONN(goban, DISCONNECT, str1, str2, depth - stackp, 
 		     move, savemove, savecode);
   }
 
-  SGFTRACE2(0, 0, NULL);
-  READ_RETURN_CONN(DISCONNECT, str1, str2, depth - stackp, move, NO_MOVE, 0);
+  SGFTRACE2(goban, 0, 0, NULL);
+  READ_RETURN_CONN(goban, DISCONNECT, str1, str2, depth - stackp,
+		   move, NO_MOVE, 0);
 }
 
 
@@ -2381,7 +2386,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
       }
     }
     else if (board[pos] == other) {
-      attack_and_defend(pos, &acode, &attack_move, &dcode, &defense_move);
+      attack_and_defend(goban, pos,
+			&acode, &attack_move, &dcode, &defense_move);
       if (verbose > 0)
 	gprintf(goban, "%o  attack with code %d at %1m, defense with code %d at %1m\n",
 		acode, attack_move, dcode, defense_move);
@@ -2851,17 +2857,17 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   global_connection_node_counter++;
   
   if (board[str] == EMPTY) {
-    SGFTRACE(PASS_MOVE, 0, "one string already captured");
+    SGFTRACE(goban, PASS_MOVE, 0, "one string already captured");
     return 0;
   }
   
   if (nodes_connect > breakin_node_limit) {
-    SGFTRACE(PASS_MOVE, 0, "connection node limit reached");
+    SGFTRACE(goban, PASS_MOVE, 0, "connection node limit reached");
     return 0;
   }
   
   if (stackp > breakin_depth) {
-    SGFTRACE(PASS_MOVE, 0, "connection depth limit reached");
+    SGFTRACE(goban, PASS_MOVE, 0, "connection depth limit reached");
     return 0;
   }
 
@@ -2869,11 +2875,11 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   if (stackp <= depth
       && (hashflags & HASH_BREAK_IN)
       && !has_passed
-      && tt_get(&ttable, BREAK_IN, str, NO_MOVE, depth - stackp, goal_hash,
-		&retval, NULL, &xpos) == 2) {
+      && tt_get(goban, &ttable, BREAK_IN, str, NO_MOVE, depth - stackp,
+		goal_hash, &retval, NULL, &xpos) == 2) {
     /* FIXME: Use move for move ordering if tt_get() returned 1 */
     TRACE_CACHED_RESULT(retval, xpos);
-    SGFTRACE(xpos, retval, "cached");
+    SGFTRACE(goban, xpos, retval, "cached");
     if (move)
       *move = xpos;
     return retval;
@@ -2881,8 +2887,8 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   
 #if 0
   if (trivial_connection(str1, str2, &xpos) == WIN) {
-    SGFTRACE2(xpos, WIN, "trivial connection");
-    READ_RETURN_HASH(BREAK_IN, str, depth - stackp, goal_hash,
+    SGFTRACE2(goban, xpos, WIN, "trivial connection");
+    READ_RETURN_HASH(goban, BREAK_IN, str, depth - stackp, goal_hash,
 		     move, xpos, WIN);
   }
 #endif
@@ -2900,8 +2906,8 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
 	int acode = recursive_block(str, goal, NULL, has_passed, goal_hash);
 	popgo(goban);
 	if (acode == 0) {
-	  SGFTRACE(xpos, WIN, "break effective");
-	  READ_RETURN_HASH(BREAK_IN, str, depth - stackp, goal_hash,
+	  SGFTRACE(goban, xpos, WIN, "break effective");
+	  READ_RETURN_HASH(goban, BREAK_IN, str, depth - stackp, goal_hash,
 			   move, xpos, WIN);
 	}
 	/* if the move works with ko we save it, then look for something
@@ -2924,19 +2930,20 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
    * as in recursive_connect2() here. See nando:32
    */
   if (tried_moves == 0 && distance < FP(0.89)) {
-    SGFTRACE(NO_MOVE, WIN, "no move, probably connected");
-    READ_RETURN_HASH(BREAK_IN, str, depth - stackp, goal_hash,
+    SGFTRACE(goban, NO_MOVE, WIN, "no move, probably connected");
+    READ_RETURN_HASH(goban, BREAK_IN, str, depth - stackp, goal_hash,
 		     move, NO_MOVE, WIN);
   }
   
   if (savecode != 0) {
-    SGFTRACE(savemove, savecode, "saved move");
-    READ_RETURN_HASH(BREAK_IN, str, depth - stackp, goal_hash,
+    SGFTRACE(goban, savemove, savecode, "saved move");
+    READ_RETURN_HASH(goban, BREAK_IN, str, depth - stackp, goal_hash,
 		     move, savemove, savecode);
   }
 
-  SGFTRACE(0, 0, NULL);
-  READ_RETURN_HASH(BREAK_IN, str, depth - stackp, goal_hash, move, NO_MOVE, 0);
+  SGFTRACE(goban, 0, 0, NULL);
+  READ_RETURN_HASH(goban, BREAK_IN, str, depth - stackp, goal_hash,
+		   move, NO_MOVE, 0);
 }
 
 
@@ -2965,42 +2972,42 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
     *move = NO_MOVE;
   
   if (board[str] == EMPTY) {
-    SGFTRACE(PASS_MOVE, WIN, "string already captured");
+    SGFTRACE(goban, PASS_MOVE, WIN, "string already captured");
     return WIN;
   }
 
 #if 0
   if (same_string(goban, str1, str2)) {
-    SGFTRACE(PASS_MOVE, 0, "already connected");
+    SGFTRACE(goban, PASS_MOVE, 0, "already connected");
     return 0;
   }
 #endif
   
   if (nodes_connect > breakin_node_limit) {
-    SGFTRACE(PASS_MOVE, WIN, "connection node limit reached");
+    SGFTRACE(goban, PASS_MOVE, WIN, "connection node limit reached");
     return WIN;
   }
   
   if (stackp > breakin_depth) {
-    SGFTRACE(PASS_MOVE, WIN, "connection depth limit reached");
+    SGFTRACE(goban, PASS_MOVE, WIN, "connection depth limit reached");
     return WIN;
   }
   
   str = find_origin(goban, str);
   if (stackp <= depth
       && (hashflags & HASH_BLOCK_OFF)
-      && tt_get(&ttable, BLOCK_OFF, str, NO_MOVE,
+      && tt_get(goban, &ttable, BLOCK_OFF, str, NO_MOVE,
 		depth - stackp, goal_hash, &retval, NULL, &xpos) == 2) {
     TRACE_CACHED_RESULT(retval, xpos);
-    SGFTRACE(xpos, retval, "cached");
+    SGFTRACE(goban, xpos, retval, "cached");
     if (move)
       *move = xpos;
     return retval;
   }
 
   if (ladder_capture(str, &xpos) == WIN) {
-    SGFTRACE(xpos, WIN, "string capturable");
-    READ_RETURN_HASH(BLOCK_OFF, str, depth - stackp, goal_hash,
+    SGFTRACE(goban, xpos, WIN, "string capturable");
+    READ_RETURN_HASH(goban, BLOCK_OFF, str, depth - stackp, goal_hash,
 		     move, xpos, WIN);
   }
   
@@ -3017,8 +3024,8 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
 	int dcode = recursive_break(str, goal, NULL, has_passed, goal_hash);
 	popgo(goban);
 	if (dcode == 0) {
-	  SGFTRACE(xpos, WIN, "block effective");
-	  READ_RETURN_HASH(BLOCK_OFF, str, depth - stackp, goal_hash,
+	  SGFTRACE(goban, xpos, WIN, "block effective");
+	  READ_RETURN_HASH(goban, BLOCK_OFF, str, depth - stackp, goal_hash,
 			   move, xpos, WIN);
 	}
 	/* if the move works with ko we save it, then look for something
@@ -3042,19 +3049,19 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
       && (has_passed
 	  || !recursive_break(str, goal, NULL, 1,
 	                      goal_hash))) {
-    SGFTRACE(NO_MOVE, WIN, "no move, probably disconnected");
-    READ_RETURN_HASH(BLOCK_OFF, str, depth - stackp, goal_hash,
+    SGFTRACE(goban, NO_MOVE, WIN, "no move, probably disconnected");
+    READ_RETURN_HASH(goban, BLOCK_OFF, str, depth - stackp, goal_hash,
 		     move, NO_MOVE, WIN);
   }
   
   if (savecode != 0) {
-    SGFTRACE(savemove, savecode, "saved move");
-    READ_RETURN_HASH(BLOCK_OFF, str, depth - stackp, goal_hash,
+    SGFTRACE(goban, savemove, savecode, "saved move");
+    READ_RETURN_HASH(goban, BLOCK_OFF, str, depth - stackp, goal_hash,
 		     move, savemove, savecode);
   }
 
-  SGFTRACE(0, 0, NULL);
-  READ_RETURN_HASH(BLOCK_OFF, str, depth - stackp, goal_hash,
+  SGFTRACE(goban, 0, 0, NULL);
+  READ_RETURN_HASH(goban, BLOCK_OFF, str, depth - stackp, goal_hash,
 		   move, NO_MOVE, 0);
 }
 
@@ -3085,7 +3092,7 @@ break_in(int str, const char goal[BOARDMAX], int *move)
     return 0;
   str = find_origin(goban, str);
 
-  if (search_persistent_breakin_cache(BREAK_IN, str, &goal_hash,
+  if (search_persistent_breakin_cache(goban, BREAK_IN, str, &goal_hash,
 				      breakin_node_limit, &result, move)) {
     if (debug & DEBUG_BREAKIN) {
       gprintf(goban, "Break-in from %1m to:\n", str);
@@ -3115,7 +3122,7 @@ break_in(int str, const char goal[BOARDMAX], int *move)
     dump_stack(goban);
     goaldump(goal);
   }
-  store_persistent_breakin_cache(BREAK_IN, str, &goal_hash, result, *move,
+  store_persistent_breakin_cache(goban, BREAK_IN, str, &goal_hash, result, *move,
       				 tactical_nodes, breakin_node_limit,
 				 breakin_shadow);
 
@@ -3145,7 +3152,7 @@ block_off(int str, const char goal[BOARDMAX], int *move)
   *move = PASS_MOVE;
   
   str = find_origin(goban, str);
-  if (search_persistent_breakin_cache(BLOCK_OFF, str, &goal_hash,
+  if (search_persistent_breakin_cache(goban, BLOCK_OFF, str, &goal_hash,
 				      breakin_node_limit, &result, move)) {
     if (debug & DEBUG_BREAKIN) {
       gprintf(goban, "Blocking off %1m from:\n", str);
@@ -3176,7 +3183,7 @@ block_off(int str, const char goal[BOARDMAX], int *move)
     goaldump(goal);
     dump_stack(goban);
   }
-  store_persistent_breakin_cache(BLOCK_OFF, str, &goal_hash, result, *move,
+  store_persistent_breakin_cache(goban, BLOCK_OFF, str, &goal_hash, result, *move,
 				 tactical_nodes, breakin_node_limit,
 				 breakin_shadow);
 
@@ -3727,14 +3734,14 @@ spread_connection_distances(int color, struct connection_data *conn)
 	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY
 	    && conn->distances[bpos] > distance + FP(1.1)
-	    && does_secure(color, bpos, apos)) {
+	    && does_secure(goban, color, bpos, apos)) {
 	  ENQUEUE(conn, pos, bpos, distance + FP(1.1), FP(1.0), apos, NO_MOVE);
 	}
 
 	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && conn->distances[bpos] > distance + FP(1.1)
-	    && does_secure(color, bpos, gpos)) {
+	    && does_secure(goban, color, bpos, gpos)) {
 	  ENQUEUE(conn, pos, bpos, distance + FP(1.1), FP(1.0), gpos, NO_MOVE);
 	}
 
@@ -3744,7 +3751,7 @@ spread_connection_distances(int color, struct connection_data *conn)
 	if (board[gpos] == EMPTY
 	    && board[epos] == EMPTY
 	    && conn->distances[epos] > distance + FP(1.1)
-	    && does_secure(color, epos, gpos)) {
+	    && does_secure(goban, color, epos, gpos)) {
 	  ENQUEUE(conn, pos, epos, distance + FP(1.1), FP(1.0), gpos, NO_MOVE);
 	}
 
@@ -4108,7 +4115,8 @@ trivial_connection(int str1, int str2, int *move)
   count_variations = 0;
   
   for (r = 0; r < adj; r++)
-    if (adjacent_strings(goban, adjs[r], str2) && attack(adjs[r], move) == WIN) {
+    if (adjacent_strings(goban, adjs[r], str2)
+	&& attack(goban, adjs[r], move) == WIN) {
       result = WIN;
       break;
     }
@@ -4157,9 +4165,9 @@ ladder_capture(int str, int *move)
   count_variations = 0;
 
   if (liberties == 1)
-    result = attack(str, move);
+    result = attack(goban, str, move);
   else if (liberties == 2)
-    result = simple_ladder(str, move);
+    result = simple_ladder(goban, str, move);
   else
     result = 0;
   
@@ -4178,9 +4186,9 @@ ladder_capturable(int pos, int color)
   
   if (trymove(goban, pos, color, NULL, NO_MOVE)) {
     int liberties = countlib(goban, pos);
-    if (liberties == 1 && attack(pos, NULL) == WIN)
+    if (liberties == 1 && attack(goban, pos, NULL) == WIN)
       result = 1;
-    else if (liberties == 2 && simple_ladder(pos, NULL) == WIN)
+    else if (liberties == 2 && simple_ladder(goban, pos, NULL) == WIN)
       result = 1;
     popgo(goban);
   }
@@ -4235,7 +4243,7 @@ no_escape_from_ladder(int str)
   sgf_dumptree = NULL;
   count_variations = 0;
   
-  if (countlib(goban, str) == 1 && find_defense(str, NULL) == 0)
+  if (countlib(goban, str) == 1 && find_defense(goban, str, NULL) == 0)
     result = 1;
 
   if (countlib(goban, str) == 2
@@ -4244,7 +4252,7 @@ no_escape_from_ladder(int str)
       && approxlib(goban, libs[0], board[str], 2, NULL) == 1
       && approxlib(goban, libs[1], board[str], 2, NULL) == 1
       && ladder_capture(str, NULL)
-      && !find_defense(str, NULL))
+      && !find_defense(goban, str, NULL))
     result = 1;
       
   

@@ -266,7 +266,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
       if ((class & CLASS_O)
 	  && board[pos] == color
 	  && worm[pos].attack_points[0] != 0
-	  && !does_defend(move, pos))
+	  && !does_defend(goban, move, pos))
 	return;
 
       origin = dragon[pos].origin;
@@ -281,7 +281,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
            * captured before adding it to the list of my_dragons.  
 	   */
 	  if (worm[pos].attack_codes[0] == 0
-	      || does_defend(move, pos)) {
+	      || does_defend(goban, move, pos)) {
 	    /* Ok, add the dragon to the list. */
 	    my_dragons[l] = origin;
 	    my_ndragons++;
@@ -314,7 +314,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
 	     * list of my_strings.
 	     */
 	    if (worm[pos].attack_codes[0] == 0
-		|| does_defend(move, pos)) {
+		|| does_defend(goban, move, pos)) {
 	      /* Ok, add the string to the list. */
 	      my_strings[l] = origin;
 	      my_nstrings++;
@@ -364,7 +364,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
    */
   if (!(class & CLASS_s)) {
     /* Don't allow ko unsafety. */
-    if (safe_move(move, color) != WIN) {
+    if (safe_move(goban, move, color) != WIN) {
       if (0)
 	TRACE(goban, "  move at %1m wasn't safe, discarded\n", move);
       return;
@@ -384,7 +384,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
    */
   if (class & CLASS_n) {
     /* Allow ko unsafety. */
-    if (safe_move(move, other) == 0) {
+    if (safe_move(goban, move, other) == 0) {
       if (0)
 	TRACE(goban, "  opponent can't play safely at %1m, move discarded\n", move);
       return;
@@ -432,7 +432,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
     for (k = 0; k < your_nstrings; k++)
       for (l = k+1; l < your_nstrings; l++) {
 	if (string_connect(your_strings[k], your_strings[l], NULL)
-	    && !play_connect_n(color, 1, 1, move,
+	    && !play_connect_n(goban, color, 1, 1, move,
 			       your_strings[k], your_strings[l])) {
 	  add_cut_move(move, your_strings[k], your_strings[l]);
 	  TRACE(goban, "...cuts strings %1m, %1m\n",
@@ -446,7 +446,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
     for (k = 0; k < my_nstrings; k++)
       for (l = k+1; l < my_nstrings; l++) {
 	if (disconnect(my_strings[k], my_strings[l], NULL)
-	    && !play_connect_n(color, 0, 1, move,
+	    && !play_connect_n(goban, color, 0, 1, move,
 			       my_strings[k], my_strings[l])) {
 	  add_connection_move(move, my_strings[k], my_strings[l]);
 	  TRACE(goban, "...connects strings %1m, %1m\n",
@@ -564,7 +564,8 @@ joseki_callback(int move, int color, struct corner_pattern *pattern,
            * rather the underlying worm) cannot be tactically
            * captured before adding it to the list of my_dragons.
 	   */
-	  if (worm[pos].attack_codes[0] == 0 || does_defend(move, pos)) {
+	  if (worm[pos].attack_codes[0] == 0
+	      || does_defend(goban, move, pos)) {
 	    /* Ok, add the dragon to the list. */
 	    my_dragons[l] = origin;
 	    my_ndragons++;

@@ -333,6 +333,10 @@ main(int argc, char *argv[])
   int benchmark = 0;  /* benchmarking mode (-b) */
   FILE *output_check;
   int orientation = 0;
+  int board_size  = DEFAULT_BOARD_SIZE;
+  float komi	  = 0.0;
+  int allow_suicide = 0;
+  Goban *goban;
 
   float memory = (float) DEFAULT_MEMORY; /* Megabytes used for hash table. */
 
@@ -342,8 +346,6 @@ main(int argc, char *argv[])
    */
   int seed = 0;
   int seed_specified = 0;
-
-  komi = 0.0;
   
   level = DEFAULT_LEVEL;
   min_level = 0;
@@ -381,7 +383,6 @@ main(int argc, char *argv[])
   large_scale = LARGE_SCALE;
   resign_allowed = RESIGNATION_ALLOWED;
 
-  allow_suicide = 0;
   capture_all_dead = 0;
   play_out_aftermath = 0;
   limit_search = 0;
@@ -390,7 +391,7 @@ main(int argc, char *argv[])
   clock_init(3600, 0, 0);      /* One hour sudden death. */
 
   sgftree_clear(&sgftree);
-  gameinfo_clear(&gameinfo, board_size, komi);
+  gameinfo_clear(&gameinfo);
   
   /* Weed through all of the command line options. */
   while ((i = gg_getopt_long(argc, argv, 
@@ -553,14 +554,13 @@ main(int argc, char *argv[])
       
       case OPT_BOARDSIZE:
         {
-	  int boardsize = atoi(gg_optarg);
-	  
-	  if (boardsize < MIN_BOARD || boardsize > MAX_BOARD) {
-	    fprintf(stderr, "Unsupported board size: %d.\n", boardsize);
+	  board_size = atoi(gg_optarg);
+	  if (board_size < MIN_BOARD || board_size > MAX_BOARD) {
+	    fprintf(stderr, "Unsupported board size: %d.\n", board_size);
 	    fprintf(stderr, "Try `gnugo --help' for more information.\n");
-	    exit(EXIT_FAILURE);
+	    return EXIT_FAILURE;
 	  }
-	  gnugo_clear_board(boardsize);
+
 	  break;
 	}
 	
@@ -1016,14 +1016,18 @@ main(int argc, char *argv[])
   /* Initialize the GNU Go engine. */
   init_gnugo(memory, seed);
 
+  goban = create_goban(board_size);
+  set_game_data(goban, komi, chinese_rules, allow_suicide);
+
   /* Read the infile if there is one. Also play up the position. */
   if (infilename) {
     if (!sgftree_readfile(&sgftree, infilename)) {
       fprintf(stderr, "Cannot open or parse '%s'\n", infilename);
-      exit(EXIT_FAILURE);
+      return EXIT_FAILURE;
     }
-    
-    gameinfo_play_sgftree_rot(&gameinfo, &sgftree, untilstring, orientation);
+
+    gameinfo_play_sgftree_rot(&gameinfo, goban,
+			      &sgftree, untilstring, orientation);
   }
   else
   /* Initialize and empty sgf tree if there was no infile. */
@@ -1054,7 +1058,7 @@ main(int argc, char *argv[])
     output_check = fopen(outfile, "w");
     if (!output_check) {
       fprintf(stderr, "Error: could not open '%s' for writing\n", outfile);
-      exit(EXIT_FAILURE);
+      return EXIT_FAILURE;
     }
     fclose(output_check);
   }
@@ -1089,7 +1093,7 @@ main(int argc, char *argv[])
   case MODE_REPLAY:    
     if (!infilename) {
       fprintf(stderr, "You must use -l infile with replay mode.\n");
-      exit(EXIT_FAILURE);
+      return EXIT_FAILURE;
     }
     play_replay(&gameinfo, replay_color);
     break;
@@ -1100,7 +1104,7 @@ main(int argc, char *argv[])
     
     if (!infilename) {
       fprintf(stderr, "You must use -l infile with load and analyze mode.\n");
-      exit(EXIT_FAILURE);
+      return EXIT_FAILURE;
     }
 
 #if ORACLE
@@ -1124,7 +1128,7 @@ main(int argc, char *argv[])
 
     if (!infilename) {
       fprintf(stderr, "gnugo: --score must be used with -l\n");
-      exit(EXIT_FAILURE);
+      return EXIT_FAILURE;
     }
     load_and_score_sgf_file(&sgftree, &gameinfo, scoringmode);
     break;
@@ -1132,14 +1136,14 @@ main(int argc, char *argv[])
   case MODE_LOAD_AND_PRINT:
     if (!infilename) {
       fprintf(stderr, "gnugo: --printsgf must be used with -l\n");
-      exit(EXIT_FAILURE);
+      return EXIT_FAILURE;
     }
 
     else {
       if (mandated_color != EMPTY)
         gameinfo.to_move = mandated_color;
 
-      sgffile_printsgf(gameinfo.to_move, printsgffile);
+      sgffile_printsgf(goban, gameinfo.to_move, printsgffile);
     }
     break;
     
@@ -1349,7 +1353,7 @@ main(int argc, char *argv[])
       
       if (!infilename) {
 	fprintf(stderr, "You must use -l infile with load and analyze mode.\n");
-	exit(EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
 
       decide_oracle(&gameinfo, infilename, untilstring);
@@ -1386,7 +1390,7 @@ main(int argc, char *argv[])
 
 	if (port > 65535) {
 	  fprintf(stderr, "A valid TCP/IP port number expected\n");
-	  exit(EXIT_FAILURE);
+	  return EXIT_FAILURE;
 	}
 
 	if (gtp_tcp_ip_mode == OPT_GTP_CONNECT) {
@@ -1408,7 +1412,7 @@ main(int argc, char *argv[])
 	}
       }
 
-      play_gtp(gtp_input_FILE, gtp_output_FILE, gtp_dump_commands_FILE,
+      play_gtp(goban, gtp_input_FILE, gtp_output_FILE, gtp_dump_commands_FILE,
 	       orientation);
 
       if (gtp_dump_commands_FILE)
@@ -1436,7 +1440,9 @@ main(int argc, char *argv[])
     play_ascii(&sgftree, &gameinfo, infilename, untilstring);
     break;
   }
-  
+
+  destroy_goban(goban);
+
   if (profile_patterns)
     report_pattern_profiling();
 

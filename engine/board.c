@@ -355,6 +355,23 @@ create_goban(int board_size)
 }
 
 
+void
+destroy_goban(Goban *goban)
+{
+  free(goban->private);
+  free(goban);
+}
+
+
+void
+set_game_data(Goban *goban, float komi, int chinese_rules, int allow_suicide)
+{
+  goban->komi	       = komi;
+  goban->chinese_rules = chinese_rules;
+  goban->allow_suicide = allow_suicide;
+}
+
+
 /* Save board state. */
 void
 store_board(const Goban *goban, Board_state *state)
@@ -1108,11 +1125,7 @@ undo_moves(Goban *goban, int n)
 int
 get_last_move(const Goban *goban)
 {
-  ACCESS_PRIVATE_DATA;
-  if (private->move_history_pointer == 0)
-    return PASS_MOVE;
-
-  return private->move_history_pos[private->move_history_pointer - 1];
+  return get_numbered_move(goban, 0);
 }
 
 /* Return the color of the player doing the last move. If no move was
@@ -1121,11 +1134,7 @@ get_last_move(const Goban *goban)
 int
 get_last_player(const Goban *goban)
 {
-  ACCESS_PRIVATE_DATA;
-  if (private->move_history_pointer == 0)
-    return EMPTY;
-
-  return private->move_history_color[private->move_history_pointer - 1];
+  return get_numbered_move_player(goban, 0);
 }
 
 
@@ -1135,15 +1144,51 @@ get_last_player(const Goban *goban)
 int
 get_last_opponent_move(const Goban *goban, int color)
 {
-  ACCESS_PRIVATE_DATA;
   int k;
 
-  for (k = private->move_history_pointer - 1; k >= 0; k--) {
-    if (private->move_history_color[k] == OTHER_COLOR(color))
-      return private->move_history_pos[k];
-  }
+  for (k = 0; ; k++) {
+    int move_color = get_numbered_move_player(goban, k);
 
-  return PASS_MOVE;
+    if (move_color == EMPTY)
+      return NO_MOVE;
+
+    if (move_color == OTHER_COLOR(color))
+      return get_numbered_move(goban, k);
+  }
+}
+
+
+/* Return the position of the move.  Move is specified by the offset
+ * from the current position.  Thus, 0 means the last move, 1 --- the
+ * move before last and so on.  If the `move_offset' is to large,
+ * NO_MOVE is returned.
+ */
+int
+get_numbered_move(const Goban *goban, int move_offset)
+{
+  ACCESS_PRIVATE_DATA;
+  if (private->move_history_pointer <= move_offset)
+    return NO_MOVE;
+
+  return private->move_history_pos[(private->move_history_pointer - 1)
+				   - move_offset];
+}
+
+
+/* Return the color of the player doing specified move.  Move is
+ * specified by the offset from the current position.  Thus, 0 means
+ * the last move, 1 --- the move before last and so on.  If the
+ * `move_offset' is to large, EMPTY is returned.
+ */
+int
+get_numbered_move_player(const Goban *goban, int move_offset)
+{
+  ACCESS_PRIVATE_DATA;
+  if (private->move_history_pointer <= move_offset)
+    return EMPTY;
+
+  return private->move_history_color[(private->move_history_pointer - 1)
+				     - move_offset];
 }
 
 

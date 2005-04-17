@@ -241,7 +241,7 @@ find_moves_to_make_seki()
   
   for (str = BOARDMIN; str < BOARDMAX; str++) {
     if (IS_STONE(board[str]) && is_worm_origin(str, str)
-	&& attack_and_defend(str, NULL, NULL, NULL, &defend_move)
+	&& attack_and_defend(goban, str, NULL, NULL, NULL, &defend_move)
 	&& dragon[str].status == DEAD
 	&& DRAGON2(str).hostile_neighbors == 1) {
       int k;
@@ -338,7 +338,7 @@ find_moves_to_make_seki()
    */
   for (str = BOARDMIN; str < BOARDMAX; str++) {
     if (IS_STONE(board[str]) && is_worm_origin(str, str)
-	&& !find_defense(str, NULL)
+	&& !find_defense(goban, str, NULL)
 	&& dragon[str].status == DEAD
 	&& DRAGON2(str).hostile_neighbors == 1) {
       int k;

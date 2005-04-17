@@ -23,7 +23,6 @@
 
 #include "random.h"
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,7 +72,6 @@ static void
 calculate_hashval_for_tt(Hash_data *hashdata, int routine, int target1,
 			 int target2, Hash_data *extra_hash)
 { 
-  *hashdata = goban->board_hash;                /* from globals.c */
   hashdata_xor(*hashdata, routine_hash[routine]);
   hashdata_xor(*hashdata, target1_hash[target1]);
   if (target2 != NO_MOVE)
@@ -139,7 +137,7 @@ tt_free(Transposition_table *table)
  */
  
 int
-tt_get(Transposition_table *table, 
+tt_get(const Goban *goban, Transposition_table *table, 
        enum routine_id routine, 
        int target1, int target2, int remaining_depth,
        Hash_data *extra_hash,
@@ -154,6 +152,7 @@ tt_get(Transposition_table *table,
     return 0;
 
   /* Get the combined hash value. */
+  hashval = goban->board_hash;
   calculate_hashval_for_tt(&hashval, routine, target1, target2, extra_hash);
 
   /* Get the correct entry and node. */
@@ -190,7 +189,7 @@ tt_get(Transposition_table *table,
  */
 
 void
-tt_update(Transposition_table *table,
+tt_update(const Goban *goban, Transposition_table *table,
 	  enum routine_id routine, int target1, int target2,
 	  int remaining_depth, Hash_data *extra_hash, 
 	  int value1, int value2, int move)
@@ -209,6 +208,7 @@ tt_update(Transposition_table *table,
     return;
 
   /* Get the combined hash value. */
+  hashval = goban->board_hash;
   calculate_hashval_for_tt(&hashval, routine, target1, target2, extra_hash);
 
   data = hn_create_data(remaining_depth, value1, value2, move,
@@ -298,20 +298,20 @@ reading_cache_clear()
  */
 
 void
-sgf_trace(const char *func, int str, int move, int result,
+sgf_trace(const Goban *goban, const char *func, int str, int move, int result,
 	  const char *message)
 {
   char buf[100];
 
   sprintf(buf, "%s %c%d: ", func, J(str) + 'A' + (J(str) >= 8),
-	  board_size - I(str));
+	  goban->board_size - I(str));
   
   if (result == 0)
     sprintf(buf + strlen(buf), "0");
   else if (ON_BOARD(goban, move))
     sprintf(buf + strlen(buf), "%s %c%d", result_to_string(result), 
 	    J(move) + 'A' + (J(move) >= 8),
-	    board_size - I(move));
+	    goban->board_size - I(move));
   else if (is_pass(move))
     sprintf(buf + strlen(buf), "%s PASS", result_to_string(result));
   else
@@ -320,7 +320,7 @@ sgf_trace(const char *func, int str, int move, int result,
   if (message)
     sprintf(buf + strlen(buf), " (%s)", message);
   
-  sgftreeAddComment(sgf_dumptree, buf);
+  sgftreeAddComment(goban->sgf_dumptree, buf);
 }
 
 /* Write two group reading (connection) trace data to an SGF file.
@@ -328,19 +328,19 @@ sgf_trace(const char *func, int str, int move, int result,
  */
 
 void
-sgf_trace2(const char *func, int str1, int str2, int move, 
+sgf_trace2(const Goban *goban, const char *func, int str1, int str2, int move, 
            const char *result, const char *message)
 {
   char buf[100];
 
   sprintf(buf, "%s %c%d %c%d: ", func,
-	  J(str1) + 'A' + (J(str1) >= 8), board_size - I(str1),
-	  J(str2) + 'A' + (J(str2) >= 8), board_size - I(str2));
+	  J(str1) + 'A' + (J(str1) >= 8), goban->board_size - I(str1),
+	  J(str2) + 'A' + (J(str2) >= 8), goban->board_size - I(str2));
   
   if (ON_BOARD(goban, move))
     sprintf(buf + strlen(buf), "%s %c%d", result,
 	    J(move) + 'A' + (J(move) >= 8),
-	    board_size - I(move));
+	    goban->board_size - I(move));
   else if (is_pass(move))
     sprintf(buf + strlen(buf), "%s PASS", result);
   else
@@ -349,7 +349,7 @@ sgf_trace2(const char *func, int str1, int str2, int move,
   if (message)
     sprintf(buf + strlen(buf), " (%s)", message);
   
-  sgftreeAddComment(sgf_dumptree, buf);
+  sgftreeAddComment(goban->sgf_dumptree, buf);
 }
 
 /* Write semeai reading trace data to an SGF file. Normally called
@@ -357,19 +357,20 @@ sgf_trace2(const char *func, int str1, int str2, int move,
  */
 
 void
-sgf_trace_semeai(const char *func, int str1, int str2, int move, 
+sgf_trace_semeai(const Goban *goban, const char *func,
+		 int str1, int str2, int move, 
 		 int result1, int result2, const char *message)
 {
   char buf[100];
 
   sprintf(buf, "%s %c%d %c%d: ", func,
-	  J(str1) + 'A' + (J(str1) >= 8), board_size - I(str1),
-	  J(str2) + 'A' + (J(str2) >= 8), board_size - I(str2));
+	  J(str1) + 'A' + (J(str1) >= 8), goban->board_size - I(str1),
+	  J(str2) + 'A' + (J(str2) >= 8), goban->board_size - I(str2));
   
   if (ON_BOARD(goban, move))
     sprintf(buf + strlen(buf), "%s %s %c%d",
 	    result_to_string(result1), result_to_string(result2),
-	    J(move) + 'A' + (J(move) >= 8), board_size - I(move));
+	    J(move) + 'A' + (J(move) >= 8), goban->board_size - I(move));
   else if (is_pass(move))
     sprintf(buf + strlen(buf), "%s %s PASS",
 	    result_to_string(result1), result_to_string(result2));
@@ -381,7 +382,7 @@ sgf_trace_semeai(const char *func, int str1, int str2, int move,
   if (message)
     sprintf(buf + strlen(buf), " (%s)", message);
   
-  sgftreeAddComment(sgf_dumptree, buf);
+  sgftreeAddComment(goban->sgf_dumptree, buf);
 }
 
 /*

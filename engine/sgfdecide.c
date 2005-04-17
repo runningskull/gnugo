@@ -53,13 +53,13 @@ decide_string(int pos)
   }
 
   if (*outfilename)
-    sgffile_begindump(&tree);
+    sgffile_begindump(goban, &tree);
 
   /* Prepare pattern matcher and reading code. */
   reset_engine();
 
   count_variations = 1;
-  acode = attack(pos, &aa);
+  acode = attack(goban, pos, &aa);
   if (acode) {
     if (acode == WIN)
       gprintf(goban, "%1m can be attacked at %1m (%d variations)\n", 
@@ -73,11 +73,11 @@ decide_string(int pos)
 
     if (debug & DEBUG_READING_PERFORMANCE) {
       gprintf(goban, "Reading shadow: \n");
-      draw_reading_shadow();
+      draw_reading_shadow(goban);
     }
 
     count_variations = 1;
-    dcode = find_defense(pos, &dd);
+    dcode = find_defense(goban, pos, &dd);
     if (dcode) {
       if (dcode == WIN)
 	gprintf(goban, "%1m can be defended at %1m (%d variations)\n", 
@@ -94,7 +94,7 @@ decide_string(int pos)
 	      pos, count_variations);
     if (debug & DEBUG_READING_PERFORMANCE) {
       gprintf(goban, "Reading shadow: \n");
-      draw_reading_shadow();
+      draw_reading_shadow(goban);
     }
 
   }
@@ -103,11 +103,11 @@ decide_string(int pos)
 	    pos, count_variations);
     if (debug & DEBUG_READING_PERFORMANCE) {
       gprintf(goban, "Reading shadow: \n");
-      draw_reading_shadow();
+      draw_reading_shadow(goban);
     }
   }
 
-  sgffile_enddump(outfilename);
+  sgffile_enddump(goban, outfilename);
   count_variations = 0;
 }
 
@@ -139,7 +139,7 @@ decide_connection(int apos, int bpos)
   }
 
   if (*outfilename)
-    sgffile_begindump(&tree);
+    sgffile_begindump(goban, &tree);
 
   /* Prepare pattern matcher and reading code. */
   reset_engine();
@@ -184,7 +184,7 @@ decide_connection(int apos, int bpos)
     gprintf(goban, "%1m and %1m cannot be disconnected (%d variations)\n", 
 	    apos, bpos, count_variations);
   
-  sgffile_enddump(outfilename);
+  sgffile_enddump(goban, outfilename);
   count_variations = 0;
 }
 
@@ -221,7 +221,7 @@ decide_owl(int pos)
   reading_cache_clear();
   
   if (*outfilename)
-    sgffile_begindump(&tree);
+    sgffile_begindump(goban, &tree);
 
   count_variations = 1;
   acode = owl_attack(pos, &move, &result_certain, &kworm);
@@ -282,7 +282,7 @@ decide_owl(int pos)
   else
     gprintf(goban, " result uncertain\n");
   
-  sgffile_enddump(outfilename);
+  sgffile_enddump(goban, outfilename);
   count_variations = 0;
 }
 
@@ -334,7 +334,7 @@ decide_semeai(int apos, int bpos)
   reading_cache_clear();
   
   if (*outfilename)
-    sgffile_begindump(&tree);
+    sgffile_begindump(goban, &tree);
 
   gprintf(goban, "Analyzing semeai between %1m and %1m, %C moves first\n",
 	  apos, bpos, board[apos]);
@@ -358,7 +358,7 @@ decide_semeai(int apos, int bpos)
   gprintf(goban, "%d nodes%s\n", count_variations,
 	  result_certain ? "" : ", uncertain result");
 
-  sgffile_enddump(outfilename);
+  sgffile_enddump(goban, outfilename);
   count_variations = 0;
 }
 
@@ -387,7 +387,7 @@ decide_tactical_semeai(int apos, int bpos)
   reading_cache_clear();
   
   if (*outfilename)
-    sgffile_begindump(&tree);
+    sgffile_begindump(goban, &tree);
 
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0, &dummy);
   gprintf(goban, "After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
@@ -404,7 +404,7 @@ decide_tactical_semeai(int apos, int bpos)
   	  bpos, status_to_string(resultb),
 	  count_variations);
 
-  sgffile_enddump(outfilename);
+  sgffile_enddump(goban, outfilename);
   count_variations = 0;
 }
 
@@ -434,7 +434,7 @@ decide_position()
   reading_cache_clear();
 
   if (*outfilename)
-    sgffile_begindump(&tree);
+    sgffile_begindump(goban, &tree);
 
   count_variations = 1;
 
@@ -505,7 +505,7 @@ decide_position()
       gprintf(goban, "status of %1m revised to ALIVE\n", pos);
   }
   
-  sgffile_enddump(outfilename);
+  sgffile_enddump(goban, outfilename);
   count_variations = 0;
 }
 
@@ -539,7 +539,7 @@ decide_eye(int pos)
 
   /* Enable sgf output. */
   if (*outfilename)
-    sgffile_begindump(&tree);
+    sgffile_begindump(goban, &tree);
   count_variations = 1;
   
   if (black_eye[pos].color == BLACK) {
@@ -565,7 +565,7 @@ decide_eye(int pos)
   }
   
   /* Finish sgf output. */
-  sgffile_enddump(outfilename);
+  sgffile_enddump(goban, outfilename);
   count_variations = 0;
 }
 
@@ -590,7 +590,7 @@ decide_combination(int color)
   silent_examine_position(EXAMINE_ALL);
 
   if (*outfilename)
-    sgffile_begindump(&tree);
+    sgffile_begindump(goban, &tree);
   count_variations = 1;
 
   if (atari_atari(color, &attack_move, defense_moves, verbose)) {
@@ -610,7 +610,7 @@ decide_combination(int color)
   else
     gprintf(goban, "No Combination attack for %C\n", color);
   
-  sgffile_enddump(outfilename);
+  sgffile_enddump(goban, outfilename);
   count_variations = 0;
 }
 
@@ -648,13 +648,13 @@ decide_oracle(Gameinfo *gameinfo, char *infilename, char *untilstring)
 
   reset_engine();
   if (*outfilename)
-    sgffile_begindump(&tree);
+    sgffile_begindump(goban, &tree);
 
   count_variations = 1;
   summon_oracle();
   oracle_loadsgf(infilename, untilstring);
   consult_oracle(gameinfo->to_move);
-  sgffile_enddump(outfilename);
+  sgffile_enddump(goban, outfilename);
   dismiss_oracle();
   count_variations = 0;
 }

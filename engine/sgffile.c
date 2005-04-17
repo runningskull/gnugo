@@ -30,7 +30,6 @@
  */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -47,7 +46,7 @@
  */
 
 void
-sgffile_add_debuginfo(SGFNode *node, float value)
+sgffile_add_debuginfo(const Goban *goban, SGFNode *node, float value)
 {
   int pos;
   char comment[24];
@@ -59,7 +58,7 @@ sgffile_add_debuginfo(SGFNode *node, float value)
     if (!ON_BOARD(goban, pos))
       continue;
     
-    if (IS_STONE(board[pos]) && (output_flags & OUTPUT_MARKDRAGONS)) {
+    if (IS_STONE(goban->board[pos]) && (output_flags & OUTPUT_MARKDRAGONS)) {
       if (dragon[pos].crude_status == DEAD)
 	sgfLabel(node, "X", I(pos), J(pos));
       else if (dragon[pos].crude_status == CRITICAL)
@@ -110,19 +109,19 @@ sgffile_output(SGFTree *tree)
  */
 
 void
-sgffile_begindump(SGFTree *tree)
+sgffile_begindump(Goban *goban, SGFTree *tree)
 {
   static SGFTree local_tree;
-  gg_assert(goban, sgf_dumptree == NULL);
+  gg_assert(goban, goban->sgf_dumptree == NULL);
 
   if (tree == NULL)
-    sgf_dumptree = &local_tree;
+    goban->sgf_dumptree = &local_tree;
   else 
-    sgf_dumptree = tree;
-  
-  sgftree_clear(sgf_dumptree);
-  sgftreeCreateHeaderNode(sgf_dumptree, board_size, 0.0);
-  sgffile_printboard(sgf_dumptree);
+    goban->sgf_dumptree = tree;
+
+  sgftree_clear(goban->sgf_dumptree);
+  sgftreeCreateHeaderNode(goban->sgf_dumptree, goban->board_size, 0.0);
+  sgffile_printboard(goban, goban->sgf_dumptree);
 }
 
 
@@ -131,16 +130,16 @@ sgffile_begindump(SGFTree *tree)
  */
 
 void 
-sgffile_enddump(const char *filename)
+sgffile_enddump(Goban *goban, const char *filename)
 {
   /* Check if we have a valid filename and a tree. */
-  if (filename && *filename && sgf_dumptree) {
-    if (writesgf(sgf_dumptree->root, filename)) {
+  if (filename && *filename && goban->sgf_dumptree) {
+    if (writesgf(goban->sgf_dumptree->root, filename)) {
       /* Only delete the tree if writesgf() succeeds. If it doesn't, one
        * will most likely wish to save into another (writable) file.
        */
-      sgfFreeNode(sgf_dumptree->root);
-      sgf_dumptree = NULL;
+      sgfFreeNode(goban->sgf_dumptree->root);
+      goban->sgf_dumptree = NULL;
     }
   }
 }
@@ -153,7 +152,7 @@ sgffile_enddump(const char *filename)
  */
 
 void
-sgffile_printsgf(int color_to_play, const char *filename)
+sgffile_printsgf(const Goban *goban, int color_to_play, const char *filename)
 {
   SGFTree sgftree;
   int m, n;
@@ -161,24 +160,25 @@ sgffile_printsgf(int color_to_play, const char *filename)
   char str[128];
   float relative_komi;
 
-  relative_komi = komi + black_captured - white_captured;
+  relative_komi = goban->komi + goban->black_captured - goban->white_captured;
   
   sgftree_clear(&sgftree);
-  sgftreeCreateHeaderNode(&sgftree, board_size, relative_komi);
+  sgftreeCreateHeaderNode(&sgftree, goban->board_size, relative_komi);
   sgf_write_header(sgftree.root, 1, get_random_seed(), relative_komi,
-		   level, chinese_rules);
+		   level, goban->chinese_rules);
   gg_snprintf(str, 128, "GNU Go %s load and print", gg_version());
   sgfOverwriteProperty(sgftree.root, "GN", str);
   
-  sgffile_printboard(&sgftree);
+  sgffile_printboard(goban, &sgftree);
   
   if (color_to_play != EMPTY) {
     sgfAddProperty(sgftree.lastnode, "PL",
 		   (color_to_play == WHITE ? "W" : "B"));
 
-    for (m = 0; m < board_size; ++m)
-      for (n = 0; n < board_size; ++n)
-        if (BOARD(goban, m, n) == EMPTY && !is_legal(goban, POS(m, n), color_to_play)) {
+    for (m = 0; m < goban->board_size; ++m)
+      for (n = 0; n < goban->board_size; ++n)
+        if (BOARD(goban, m, n) == EMPTY
+	    && !is_legal(goban, POS(m, n), color_to_play)) {
 	  gg_snprintf(pos, 3, "%c%c", 'a' + n, 'a' + m);
 	  sgfAddProperty(sgftree.lastnode, "IL", pos);
 	}
@@ -193,7 +193,7 @@ sgffile_printsgf(int color_to_play, const char *filename)
  */
 
 void
-sgffile_printboard(SGFTree *tree)
+sgffile_printboard(const Goban *goban, SGFTree *tree)
 {
   int i, j;
   SGFNode *node;
@@ -202,16 +202,16 @@ sgffile_printboard(SGFTree *tree)
   node = tree->lastnode;
   
   /* Write the white stones to the file. */
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++) {
+  for (i = 0; i < goban->board_size; i++) {
+    for (j = 0; j < goban->board_size; j++) {
       if (BOARD(goban, i, j) == WHITE)
 	sgfAddStone(node, WHITE, i, j);
     }
   }
 
   /* Write the black stones to the file. */
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++) {
+  for (i = 0; i < goban->board_size; i++) {
+    for (j = 0; j < goban->board_size; j++) {
       if (BOARD(goban, i, j) == BLACK)
 	sgfAddStone(node, BLACK, i, j);
     }
@@ -222,13 +222,13 @@ sgffile_printboard(SGFTree *tree)
 
 
 void
-sgffile_recordboard(SGFNode *node)
+sgffile_recordboard(const Goban *goban, SGFNode *node)
 {
   int i, j;
 
   if (node)
-    for (i = 0; i < board_size; i++)
-      for (j = 0; j < board_size; j++)
+    for (i = 0; i < goban->board_size; i++)
+      for (j = 0; j < goban->board_size; j++)
         if (BOARD(goban, i, j) == BLACK)
           sgfAddStone(node, BLACK, i, j);
 }

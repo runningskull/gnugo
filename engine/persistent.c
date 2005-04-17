@@ -46,7 +46,6 @@
  */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -111,7 +110,8 @@ struct persistent_cache_entry {
 /* Callback function that implements the computation of the active area.
  * This function has to be provided by each cache.
  */
-typedef void (*compute_active_area_fn)(struct persistent_cache_entry *entry,
+typedef void (*compute_active_area_fn)(const Goban *goban,
+				       struct persistent_cache_entry *entry,
 				       const char goal[BOARDMAX],
 				       int goal_color);
 
@@ -126,20 +126,25 @@ struct persistent_cache {
   int last_purge_position_number;
 };
 
-static void compute_active_owl_area(struct persistent_cache_entry *entry,
+static void compute_active_owl_area(const Goban *goban,
+				    struct persistent_cache_entry *entry,
 				    const char goal[BOARDMAX],
 				    int goal_color);
-static void compute_active_semeai_area(struct persistent_cache_entry *entry,
+static void compute_active_semeai_area(const Goban *goban,
+				       struct persistent_cache_entry *entry,
 				       const char goal[BOARDMAX],
 				       int dummy);
-static void compute_active_reading_area(struct persistent_cache_entry *entry,
+static void compute_active_reading_area(const Goban *goban,
+					struct persistent_cache_entry *entry,
 					const char reading_shadow[BOARDMAX],
 					int dummy);
-static void compute_active_connection_area(struct persistent_cache_entry *entry,
+static void compute_active_connection_area(const Goban *goban,
+					   struct persistent_cache_entry *entry,
 					   const char
-					   	connection_shadow[BOARDMAX],
+					     connection_shadow[BOARDMAX],
 					   int goal_color);
-static void compute_active_breakin_area(struct persistent_cache_entry *entry,
+static void compute_active_breakin_area(const Goban *goban,
+					struct persistent_cache_entry *entry,
 				        const char breakin_shadow[BOARDMAX],
 				        int dummy);
 
@@ -173,7 +178,7 @@ static struct persistent_cache semeai_cache =
 
 
 static void
-draw_active_area(char board[BOARDMAX], int apos)
+draw_active_area(const Goban *goban, char board[BOARDMAX], int apos)
 {
   int i, j, ii;
   int c = ' ';
@@ -182,11 +187,11 @@ draw_active_area(char board[BOARDMAX], int apos)
 
   start_draw_board();
   
-  for (i = 0; i < board_size; i++) {
-    ii = board_size - i;
+  for (i = 0; i < goban->board_size; i++) {
+    ii = goban->board_size - i;
     fprintf(stderr, "\n%2d", ii);
     
-    for (j = 0; j < board_size; j++) {
+    for (j = 0; j < goban->board_size; j++) {
       int pos = POS(i, j);
       if (board[pos] == EMPTY)
 	c = '.';
@@ -220,20 +225,22 @@ draw_active_area(char board[BOARDMAX], int apos)
  * 0 otherwise.
  */
 static int
-verify_stored_board(char p[BOARDMAX])
+verify_stored_board(const Goban *goban, char stored_board[BOARDMAX])
 {
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!ON_BOARD(goban, pos))
       continue;
-    else if (p[pos] == GRAY)
+    if (stored_board[pos] == GRAY)
       continue;
-    else if ((p[pos] & 3) != board[pos])
+    if ((stored_board[pos] & 3) != goban->board[pos])
       return 0;
-    else if (!(p[pos] & (HIGH_LIBERTY_BIT | HIGH_LIBERTY_BIT2)))
+    if (!(stored_board[pos] & (HIGH_LIBERTY_BIT | HIGH_LIBERTY_BIT2)))
       continue;
-    else if (((p[pos] & HIGH_LIBERTY_BIT) && countlib(goban, pos) <= 4)
-             || (p[pos] & HIGH_LIBERTY_BIT2 && countlib(goban, pos) <= 3))
+    if (((stored_board[pos] & HIGH_LIBERTY_BIT)
+	 && countlib(goban, pos) <= 4)
+	|| (stored_board[pos] & HIGH_LIBERTY_BIT2
+	    && countlib(goban, pos) <= 3))
       return 0;
   }
   
@@ -245,7 +252,8 @@ verify_stored_board(char p[BOARDMAX])
  * a board showing the active area.
  */
 static void
-print_persistent_cache_entry(struct persistent_cache_entry *entry)
+print_persistent_cache_entry(const Goban *goban,
+			     struct persistent_cache_entry *entry)
 {
   int r;
 
@@ -277,23 +285,24 @@ print_persistent_cache_entry(struct persistent_cache_entry *entry)
 	    entry->stack[r]);
   }
 
-  draw_active_area(entry->board, entry->apos);
+  draw_active_area(goban, entry->board, entry->apos);
 }
 
-/* To keep GCC happy and have the function included in the
- * gnugo executable. Can be used from gdb.
+/* To keep GCC happy and have the function included in the gnugo
+ * executable. Can be used from GDB.
  */
-void print_persistent_cache(struct persistent_cache *cache);
+void print_persistent_cache(const Goban *goban,
+			    struct persistent_cache *cache);
 
 
-/* Can be used from gdb. */
+/* Can be used from GDB. */
 void
-print_persistent_cache(struct persistent_cache *cache)
+print_persistent_cache(const Goban *goban, struct persistent_cache *cache)
 {
   int k;
   gprintf(goban, "Entire content of %s:\n", cache->name);
   for (k = 0; k < cache->current_size; k++)
-    print_persistent_cache_entry(cache->table + k);
+    print_persistent_cache_entry(goban, cache->table + k);
 }
 
 
@@ -313,24 +322,24 @@ print_persistent_cache(struct persistent_cache *cache)
  * not required for correct operation though. 
  */
 static void
-purge_persistent_cache(struct persistent_cache *cache)
+purge_persistent_cache(Goban *goban, struct persistent_cache *cache)
 {
   int k;
   int r;
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
 
   /* Never do this more than once per move. */
-  if (cache->last_purge_position_number == position_number)
+  if (cache->last_purge_position_number == goban->position_number)
     return;
   else
-    cache->last_purge_position_number = position_number;
+    cache->last_purge_position_number = goban->position_number;
 
   for (k = 0; k < cache->current_size; k++) {
     int played_moves = 0;
     int entry_ok = 1;
     struct persistent_cache_entry *entry = &(cache->table[k]);
 
-    if (entry->boardsize != board_size)
+    if (entry->boardsize != goban->board_size)
       entry_ok = 0;
     else {
       for (r = 0; r < MAX_CACHE_DEPTH; r++) {
@@ -338,7 +347,7 @@ purge_persistent_cache(struct persistent_cache *cache)
 	int color = entry->move_color[r];
 	if (apos == 0)
 	  break;
-	if (board[apos] == EMPTY
+	if (goban->board[apos] == EMPTY
 	    && trymove(goban, apos, color, "purge_persistent_cache", 0))
 	  played_moves++;
 	else {
@@ -349,7 +358,7 @@ purge_persistent_cache(struct persistent_cache *cache)
     }
 
     if (!entry_ok 
-	|| !verify_stored_board(entry->board)) {
+	|| !verify_stored_board(goban, entry->board)) {
       /* Move the last entry in the cache here and back up the loop
        * counter to redo the test at this position in the cache.
        */
@@ -378,7 +387,7 @@ purge_persistent_cache(struct persistent_cache *cache)
  * when storing or retrieving, so that we can ignore them here.
  */ 
 static struct persistent_cache_entry *
-find_persistent_cache_entry(struct persistent_cache *cache,
+find_persistent_cache_entry(const Goban *goban, struct persistent_cache *cache,
 			    enum routine_id routine, int apos, int bpos,
 			    int cpos, int color,
 			    Hash_data *goal_hash, int node_limit)
@@ -391,11 +400,11 @@ find_persistent_cache_entry(struct persistent_cache *cache,
 	&& entry->bpos == bpos
 	&& entry->cpos == cpos
 	&& entry->color == color
-        && depth - stackp <= entry->remaining_depth
+        && depth - goban->stackp <= entry->remaining_depth
         && (entry->node_limit >= node_limit || entry->result_certain)
         && (goal_hash == NULL
 	    || hashdata_is_equal(entry->goal_hash, *goal_hash))
-        && verify_stored_board(entry->board))
+        && verify_stored_board(goban, entry->board))
       return entry;
   }
   return NULL;
@@ -406,7 +415,7 @@ find_persistent_cache_entry(struct persistent_cache *cache,
  * comment above find_persistent_cache_entry() about unused parameters.
  */
 static int 
-search_persistent_cache(struct persistent_cache *cache,
+search_persistent_cache(const Goban *goban, struct persistent_cache *cache,
 			enum routine_id routine, int apos, int bpos,
 			int cpos, int color,
 			Hash_data *goal_hash, int node_limit, 
@@ -415,7 +424,8 @@ search_persistent_cache(struct persistent_cache *cache,
 {
   /* Try to find entry. */
   struct persistent_cache_entry *entry;
-  entry = find_persistent_cache_entry(cache, routine, apos, bpos, cpos, color,
+  entry = find_persistent_cache_entry(goban, cache, routine,
+				      apos, bpos, cpos, color,
 				      goal_hash, node_limit);
   if (entry == NULL)
     return 0;
@@ -436,8 +446,9 @@ search_persistent_cache(struct persistent_cache *cache,
 
   if (debug & DEBUG_PERSISTENT_CACHE) {
     gprintf(goban, "%oRetrieved position from %s:\n", cache->name);
-    print_persistent_cache_entry(entry);
+    print_persistent_cache_entry(goban, entry);
   }
+
   /* FIXME: This is an ugly hack. */
   if (cache->name == "reading cache"
       && (debug & DEBUG_READING_PERFORMANCE)
@@ -462,7 +473,7 @@ search_persistent_cache(struct persistent_cache *cache,
  * function.
  */
 static void
-store_persistent_cache(struct persistent_cache *cache,
+store_persistent_cache(const Goban *goban, struct persistent_cache *cache,
 		       enum routine_id routine,
 		       int apos, int bpos, int cpos, int color,
 		       Hash_data *goal_hash,
@@ -472,7 +483,7 @@ store_persistent_cache(struct persistent_cache *cache,
 {
   int r;
   struct persistent_cache_entry *entry;
-  if (stackp > cache->max_stackp)
+  if (goban->stackp > cache->max_stackp)
     return;
 
   /* If cache is still full, consider kicking out an old entry. */
@@ -500,7 +511,7 @@ store_persistent_cache(struct persistent_cache *cache,
   }
 
   entry = &(cache->table[cache->current_size]);
-  entry->boardsize  	 = board_size;
+  entry->boardsize  	 = goban->board_size;
   entry->routine    	 = routine;
   entry->apos	     	 = apos;
   entry->bpos	     	 = bpos;
@@ -512,15 +523,15 @@ store_persistent_cache(struct persistent_cache *cache,
   entry->result2     	 = result2;
   entry->result_certain  = certain;
   entry->node_limit      = node_limit;
-  entry->remaining_depth = depth - stackp;
+  entry->remaining_depth = depth - goban->stackp;
   entry->move	         = move;
   entry->move2	         = move2;
   entry->score 		 = cost;
   entry->cost 		 = cost;
-  entry->movenum 	 = movenum;
+  entry->movenum 	 = goban->move_number;
 
   for (r = 0; r < MAX_CACHE_DEPTH; r++) {
-    if (r < stackp)
+    if (r < goban->stackp)
       get_move_from_stack(goban, r, &(entry->stack[r]), &(entry->move_color[r]));
     else {
       entry->stack[r] = 0;
@@ -529,13 +540,13 @@ store_persistent_cache(struct persistent_cache *cache,
   }
   
   /* Remains to set the board. */
-  cache->compute_active_area(&(cache->table[cache->current_size]),
+  cache->compute_active_area(goban, &(cache->table[cache->current_size]),
       			     goal, goal_color);
   cache->current_size++;
 
   if (debug & DEBUG_PERSISTENT_CACHE) {
     gprintf(goban, "%oEntered position in %s:\n", cache->name);
-    print_persistent_cache_entry(entry);
+    print_persistent_cache_entry(goban, entry);
     gprintf(goban, "%oCurrent size: %d\n", cache->current_size);
   }
 }
@@ -550,7 +561,7 @@ static void
 init_cache(struct persistent_cache *cache)
 {
   cache->table = malloc(cache->max_size*sizeof(struct persistent_cache_entry));
-  gg_assert(goban, cache->table);
+  gg_assert(NULL, cache->table);
 }
 
 /* Initializes all persistent caches.
@@ -583,13 +594,13 @@ clear_persistent_caches()
  * necessary for proper operation).
  */
 void
-purge_persistent_caches()
+purge_persistent_caches(Goban *goban)
 {
-  purge_persistent_cache(&reading_cache);
-  purge_persistent_cache(&connection_cache);
-  purge_persistent_cache(&breakin_cache);
-  purge_persistent_cache(&owl_cache);
-  purge_persistent_cache(&semeai_cache);
+  purge_persistent_cache(goban, &reading_cache);
+  purge_persistent_cache(goban, &connection_cache);
+  purge_persistent_cache(goban, &breakin_cache);
+  purge_persistent_cache(goban, &owl_cache);
+  purge_persistent_cache(goban, &semeai_cache);
 }
 
 /* ================================================================ */
@@ -600,10 +611,11 @@ purge_persistent_caches()
  * Return 1 if found, 0 otherwise.
  */
 int
-search_persistent_reading_cache(enum routine_id routine, int str,
+search_persistent_reading_cache(const Goban *goban,
+				enum routine_id routine, int str,
     				int *result, int *move)
 {
-  return search_persistent_cache(&reading_cache,
+  return search_persistent_cache(goban, &reading_cache,
 				 routine, str, NO_MOVE, NO_MOVE, EMPTY, NULL,
 				 -1, result, NULL, move, NULL, NULL);
 }
@@ -611,19 +623,22 @@ search_persistent_reading_cache(enum routine_id routine, int str,
 
 /* Store a new read result in the persistent cache. */
 void
-store_persistent_reading_cache(enum routine_id routine, int str,
+store_persistent_reading_cache(const Goban *goban,
+			       enum routine_id routine, int str,
     			       int result, int move, int nodes)
 {
-  store_persistent_cache(&reading_cache, routine,
+  store_persistent_cache(goban, &reading_cache, routine,
       			 str, NO_MOVE, NO_MOVE, EMPTY, NULL,
 			 result, NO_MOVE, move, NO_MOVE, -1, -1,
-			 nodes, shadow, EMPTY);
+			 nodes, goban->shadow, EMPTY);
 }
 
 static void
-compute_active_reading_area(struct persistent_cache_entry *entry,
+compute_active_reading_area(const Goban *goban,
+			    struct persistent_cache_entry *entry,
 			    const char goal[BOARDMAX], int dummy)
 {
+  const Intersection *const board = goban->board;
   signed char active[BOARDMAX];
   int pos, r;
   UNUSED(dummy);
@@ -698,7 +713,7 @@ compute_active_reading_area(struct persistent_cache_entry *entry,
   }
 
   /* Also add the previously played stones to the active area. */
-  for (r = 0; r < stackp; r++)
+  for (r = 0; r < goban->stackp; r++)
     active[entry->stack[r]] = 5;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -712,7 +727,7 @@ compute_active_reading_area(struct persistent_cache_entry *entry,
 
 /* Helper for the reading_hotspots() function below. */
 static void
-mark_string_hotspot_values(float values[BOARDMAX],
+mark_string_hotspot_values(const Goban *goban, float values[BOARDMAX],
 			   int m, int n, float contribution)
 {
   int i, j, k;
@@ -731,8 +746,8 @@ mark_string_hotspot_values(float values[BOARDMAX],
   /* Otherwise we give contribution to liberties and diagonal
    * neighbors of the string at (m, n).
    */
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
+  for (i = 0; i < goban->board_size; i++)
+    for (j = 0; j < goban->board_size; j++) {
       if (BOARD(goban, i, j) != EMPTY)
 	continue;
       for (k = 0; k < 8; k++) {
@@ -745,8 +760,10 @@ mark_string_hotspot_values(float values[BOARDMAX],
 	    break;
 	  }
 	  else {
-	    if (BOARD(goban, i+di, j) == EMPTY || countlib(goban, POS(i+di, j)) <= 2
-		|| BOARD(goban, i, j+dj) == EMPTY || countlib(goban, POS(i, j+dj)) <= 2)
+	    if (BOARD(goban, i+di, j) == EMPTY
+		|| countlib(goban, POS(i+di, j)) <= 2
+		|| BOARD(goban, i, j+dj) == EMPTY
+		|| countlib(goban, POS(i, j+dj)) <= 2)
 	      values[POS(i, j)] += contribution;
 	    break;
 	  }
@@ -761,7 +778,7 @@ mark_string_hotspot_values(float values[BOARDMAX],
  * going on.
  */
 void
-reading_hotspots(float values[BOARDMAX])
+reading_hotspots(const Goban *goban, float values[BOARDMAX])
 {
   int pos;
   int k;
@@ -784,13 +801,13 @@ reading_hotspots(float values[BOARDMAX])
     struct persistent_cache_entry *entry = &(reading_cache.table[k]);
     float contribution = entry->cost / (float) sum_nodes;
     if (0) {
-      gprintf(goban, "Reading hotspots: %d %1m %f\n", entry->routine, entry->apos,
-	      contribution);
+      gprintf(goban, "Reading hotspots: %d %1m %f\n",
+	      entry->routine, entry->apos, contribution);
     }
     switch (entry->routine) {
     case ATTACK:
     case FIND_DEFENSE:
-      mark_string_hotspot_values(values, I(entry->apos), J(entry->apos),
+      mark_string_hotspot_values(goban, values, I(entry->apos), J(entry->apos),
 				 contribution);
       break;
     default:
@@ -809,10 +826,11 @@ reading_hotspots(float values[BOARDMAX])
  * Return 1 if found, 0 otherwise.
  */
 int
-search_persistent_connection_cache(enum routine_id routine, int str1,
+search_persistent_connection_cache(const Goban *goban,
+				   enum routine_id routine, int str1,
     				   int str2, int *result, int *move)
 {
-  return search_persistent_cache(&connection_cache, routine,
+  return search_persistent_cache(goban, &connection_cache, routine,
       				 str1, str2, NO_MOVE, EMPTY, NULL,
 				 connection_node_limit,
 				 result, NULL, move, NULL, NULL);
@@ -820,12 +838,13 @@ search_persistent_connection_cache(enum routine_id routine, int str1,
 
 /* Store a new connection result in the persistent cache. */
 void
-store_persistent_connection_cache(enum routine_id routine,
+store_persistent_connection_cache(const Goban *goban,
+				  enum routine_id routine,
     				  int str1, int str2,
 				  int result, int move, int tactical_nodes,
 				  char connection_shadow[BOARDMAX])
 {
-  store_persistent_cache(&connection_cache, routine,
+  store_persistent_cache(goban, &connection_cache, routine,
       			 str1, str2, NO_MOVE, EMPTY, NULL,
       			 result, NO_MOVE, move, NO_MOVE, -1,
 			 connection_node_limit,
@@ -836,10 +855,12 @@ store_persistent_connection_cache(enum routine_id routine,
  * connection read result that has just been stored in *entry.
  */
 static void
-compute_active_connection_area(struct persistent_cache_entry *entry,
+compute_active_connection_area(const Goban *goban,
+			       struct persistent_cache_entry *entry,
 			       const char connection_shadow[BOARDMAX],
 			       int dummy)
 {
+  const Intersection *const board = goban->board;
   int pos;
   int k, r;
   signed char active[BOARDMAX];
@@ -931,7 +952,7 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
   }
   
   /* Also add the previously played stones to the active area. */
-  for (r = 0; r < stackp; r++)
+  for (r = 0; r < goban->stackp; r++)
     active[entry->stack[r]] = 1;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -957,24 +978,26 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
  * Return 1 if found, 0 otherwise.
  */
 int
-search_persistent_breakin_cache(enum routine_id routine,
+search_persistent_breakin_cache(const Goban *goban,
+				enum routine_id routine,
     				int str, Hash_data *goal_hash,
 				int node_limit, int *result, int *move)
 {
-  return search_persistent_cache(&breakin_cache, routine,
+  return search_persistent_cache(goban, &breakin_cache, routine,
       				 str, NO_MOVE, NO_MOVE, EMPTY, goal_hash, 
 				 node_limit, result, NULL, move, NULL, NULL);
 }
       		          
 /* Store a new breakin result in the persistent cache. */
 void
-store_persistent_breakin_cache(enum routine_id routine,
+store_persistent_breakin_cache(const Goban *goban,
+			       enum routine_id routine,
     			       int str, Hash_data *goal_hash,
 			       int result, int move, int tactical_nodes,
 			       int breakin_node_limit,
 			       char breakin_shadow[BOARDMAX])
 {
-  store_persistent_cache(&breakin_cache, routine,
+  store_persistent_cache(goban, &breakin_cache, routine,
       			 str, NO_MOVE, NO_MOVE, EMPTY, goal_hash,
       			 result, NO_MOVE, move, NO_MOVE, -1, breakin_node_limit,
 			 tactical_nodes, breakin_shadow, EMPTY);
@@ -985,9 +1008,11 @@ store_persistent_breakin_cache(enum routine_id routine,
  * read result that has just been stored in *entry.
  */
 static void
-compute_active_breakin_area(struct persistent_cache_entry *entry,
+compute_active_breakin_area(const Goban *goban,
+			    struct persistent_cache_entry *entry,
 			    const char breakin_shadow[BOARDMAX], int dummy)
 {
+  const Intersection *const board = goban->board;
   int pos;
   int k, r;
   signed char active[BOARDMAX];
@@ -1097,11 +1122,11 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
 /*                    Owl reading functions                         */
 /* ================================================================ */
 int
-search_persistent_owl_cache(enum routine_id routine,
+search_persistent_owl_cache(const Goban *goban, enum routine_id routine,
     			    int apos, int bpos, int cpos,
 			    int *result, int *move, int *move2, int *certain)
 {
-  return search_persistent_cache(&owl_cache,
+  return search_persistent_cache(goban, &owl_cache,
       				 routine, apos, bpos, cpos, EMPTY, NULL,
 				 owl_node_limit,
 				 result, NULL, move, move2, certain);
@@ -1109,13 +1134,14 @@ search_persistent_owl_cache(enum routine_id routine,
   
 
 void
-store_persistent_owl_cache(enum routine_id routine,
+store_persistent_owl_cache(const Goban *goban, enum routine_id routine,
     			   int apos, int bpos, int cpos,
 			   int result, int move, int move2, int certain,
 			   int tactical_nodes,
 			   char goal[BOARDMAX], int goal_color)
 {
-  store_persistent_cache(&owl_cache, routine, apos, bpos, cpos, EMPTY, NULL,
+  store_persistent_cache(goban, &owl_cache,
+			 routine, apos, bpos, cpos, EMPTY, NULL,
       			 result, NO_MOVE, move, move2, certain, owl_node_limit,
 			 tactical_nodes, goal, goal_color);
 }
@@ -1128,9 +1154,11 @@ store_persistent_owl_cache(enum routine_id routine,
  * some intersection to be active.
  */
 static void
-compute_active_owl_type_area(const char goal[BOARDMAX], int goal_color,
+compute_active_owl_type_area(const Goban *goban,
+			     const char goal[BOARDMAX], int goal_color,
 			     signed char active[BOARDMAX])
 {
+  const Intersection *const board = goban->board;
   int k, r;
   int pos;
   int other = OTHER_COLOR(goal_color);
@@ -1213,7 +1241,8 @@ compute_active_owl_type_area(const char goal[BOARDMAX], int goal_color,
 }
 
 static void
-compute_active_owl_area(struct persistent_cache_entry *entry,
+compute_active_owl_area(const Goban *goban,
+			struct persistent_cache_entry *entry,
 			const char goal[BOARDMAX], int goal_color)
 {
   int pos;
@@ -1227,15 +1256,16 @@ compute_active_owl_area(struct persistent_cache_entry *entry,
   if (ON_BOARD1(goban, entry->move2))
     active[entry->move2] = 1;
 
-  compute_active_owl_type_area(goal, goal_color, active);
+  compute_active_owl_type_area(goban, goal, goal_color, active);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    int value = board[pos];
+    int value = goban->board[pos];
     if (!ON_BOARD(goban, pos))
       continue;
     if (!active[pos])
       value = GRAY;
-    else if (IS_STONE(board[pos]) && countlib(goban, pos) > 4 && active[pos] > 0)
+    else if (IS_STONE(goban->board[pos])
+	     && countlib(goban, pos) > 4 && active[pos] > 0)
       value |= HIGH_LIBERTY_BIT;
     
     entry->board[pos] = value;
@@ -1251,13 +1281,14 @@ compute_active_owl_area(struct persistent_cache_entry *entry,
  * otherwise.
  */
 int
-search_persistent_semeai_cache(enum routine_id routine,
+search_persistent_semeai_cache(const Goban *goban, enum routine_id routine,
     			       int apos, int bpos, int cpos, int color,
 			       Hash_data *goal_hash,
     			       int *resulta, int *resultb,
 			       int *move, int *certain)
 {
-  return search_persistent_cache(&semeai_cache, routine, apos, bpos, cpos,
+  return search_persistent_cache(goban, &semeai_cache,
+				 routine, apos, bpos, cpos,
       				 color, goal_hash, semeai_node_limit,
 				 resulta, resultb, move, NULL, certain);
 }
@@ -1265,7 +1296,7 @@ search_persistent_semeai_cache(enum routine_id routine,
 
 /* Store a new read result in the persistent semeai cache. */
 void
-store_persistent_semeai_cache(enum routine_id routine,
+store_persistent_semeai_cache(const Goban *goban, enum routine_id routine,
     			      int apos, int bpos, int cpos, int color,
 			      Hash_data *goal_hash,
     			      int resulta, int resultb, int move, int certain,
@@ -1277,7 +1308,7 @@ store_persistent_semeai_cache(enum routine_id routine,
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     goal[pos] = goala[pos] || goalb[pos];
-  store_persistent_cache(&semeai_cache, routine,
+  store_persistent_cache(goban, &semeai_cache, routine,
       			 apos, bpos, cpos, color, goal_hash,
 			 resulta, resultb, move, NO_MOVE,
 			 certain, semeai_node_limit,
@@ -1286,7 +1317,8 @@ store_persistent_semeai_cache(enum routine_id routine,
 
 
 static void
-compute_active_semeai_area(struct persistent_cache_entry *entry,
+compute_active_semeai_area(const Goban *goban,
+			   struct persistent_cache_entry *entry,
 			   const char goal[BOARDMAX], int dummy)
 {
   int pos;
@@ -1306,16 +1338,16 @@ compute_active_semeai_area(struct persistent_cache_entry *entry,
     active_w[entry->cpos] = 1;
   }
 
-  compute_active_owl_type_area(goal, BLACK, active_b);
-  compute_active_owl_type_area(goal, WHITE, active_b);
+  compute_active_owl_type_area(goban, goal, BLACK, active_b);
+  compute_active_owl_type_area(goban, goal, WHITE, active_b);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    int value = board[pos];
+    int value = goban->board[pos];
     if (!ON_BOARD(goban, pos))
       continue;
     if (!active_b[pos] && !active_w[pos])
       value = GRAY;
-    else if (IS_STONE(board[pos]) && countlib(goban, pos) > 4
+    else if (IS_STONE(goban->board[pos]) && countlib(goban, pos) > 4
 	     && (active_b[pos] > 0 || active_w[pos] > 0))
       value |= HIGH_LIBERTY_BIT;
     
@@ -1327,13 +1359,16 @@ compute_active_semeai_area(struct persistent_cache_entry *entry,
 
 /* Helper for the owl_hotspots() function below. */
 static void
-mark_dragon_hotspot_values(float values[BOARDMAX], int dr,
+mark_dragon_hotspot_values(const Goban *goban, float values[BOARDMAX], int dr,
 			   float contribution, char active_board[BOARDMAX])
 {
+  const Intersection *const board = goban->board;
   int pos;
   int k;
+
   if (!IS_STONE(board[dr]))
     return;
+
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] != EMPTY)
       continue;
@@ -1382,7 +1417,7 @@ mark_dragon_hotspot_values(float values[BOARDMAX], int dr,
  * going on.
  */
 void
-owl_hotspots(float values[BOARDMAX])
+owl_hotspots(const Goban *goban, float values[BOARDMAX])
 {
   int pos;
   int k, r;
@@ -1416,24 +1451,24 @@ owl_hotspots(float values[BOARDMAX])
     case OWL_THREATEN_ATTACK:
     case OWL_DEFEND:
     case OWL_THREATEN_DEFENSE:
-      mark_dragon_hotspot_values(values, entry->apos,
+      mark_dragon_hotspot_values(goban, values, entry->apos,
 				 contribution, entry->board);
       break;
     case OWL_DOES_DEFEND:
     case OWL_DOES_ATTACK:
     case OWL_CONFIRM_SAFETY:
-      mark_dragon_hotspot_values(values, entry->bpos,
+      mark_dragon_hotspot_values(goban, values, entry->bpos,
 				 contribution, entry->board);
       break;
     case OWL_CONNECTION_DEFENDS:
-      mark_dragon_hotspot_values(values, entry->bpos,
+      mark_dragon_hotspot_values(goban, values, entry->bpos,
 				 contribution, entry->board);
-      mark_dragon_hotspot_values(values, entry->cpos,
+      mark_dragon_hotspot_values(goban, values, entry->cpos,
 				 contribution, entry->board);
       break;
     case OWL_SUBSTANTIAL:
       /* Only consider the liberties of (apos). */
-      if (!IS_STONE(board[entry->apos]))
+      if (!IS_STONE(goban->board[entry->apos]))
 	continue;
       liberties = findlib(goban, entry->apos, MAXLIBS, libs);
       for (r = 0; r < liberties; r++)

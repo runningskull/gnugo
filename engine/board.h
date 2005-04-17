@@ -254,12 +254,38 @@ struct _Board_state {
 };
 
 
+typedef struct _SGF_dump_data	SGF_dump_data;
+
+struct _SGF_dump_data {
+  SGFTree      *sgf_dumptree;
+  int		variations_counter;
+};
+
+
+#define SAVE_SGF_DUMP_DATA(goban, sgf_dump_save)			\
+  do {									\
+    (sgf_dump_save)->sgf_dumptree	= (goban)->sgf_dumptree;	\
+    (sgf_dump_save)->variations_counter = (goban)->variations_counter;	\
+    (goban)->sgf_dumptree		= NULL;				\
+    (goban)->variations_counter		= 0;				\
+  } while (0)
+
+#define RESTORE_SGF_DUMP_DATA(goban, sgf_dump_save)			\
+  do {									\
+    (goban)->sgf_dumptree	= (sgf_dump_save)->sgf_dumptree;	\
+    (goban)->variations_counter = (sgf_dump_save)->variations_counter;	\
+  } while (0)
+
+
 /* ================================================================ */
 /*                        board.c functions                         */
 /* ================================================================ */
 
 
 Goban * create_goban(int board_size);
+void    destroy_goban(Goban *goban);
+void	set_game_data(Goban *goban,
+		      float komi, int chinese_rules, int allow_suicide);
 
 
 /* Functions handling the permanent board state. */
@@ -282,6 +308,8 @@ int  undo_moves(Goban *goban, int n);
 int  get_last_move(const Goban *goban);
 int  get_last_player(const Goban *goban);
 int  get_last_opponent_move(const Goban *goban, int color);
+int  get_numbered_move(const Goban *goban, int move_offset);
+int  get_numbered_move_player(const Goban *goban, int move_offset);
 int  stones_on_board(const Goban *goban, int color);
 
 /* Functions handling the variable board state. */
@@ -415,8 +443,8 @@ extern int delta[8];  /* = { NS, -1, -NS, 1, NS-1, -NS-1, -NS+1, NS+1}; */
 
 
 /* SGF routines for debugging purposes in sgffile.c */
-void sgffile_begindump(struct SGFTree_t *tree);
-void sgffile_enddump(const char *filename);
+void sgffile_begindump(Goban *goban, struct SGFTree_t *tree);
+void sgffile_enddump(Goban *goban, const char *filename);
 
 
 /* Hashing and Caching statistics. */

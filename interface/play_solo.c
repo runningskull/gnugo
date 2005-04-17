@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,7 +44,7 @@ play_solo(Gameinfo *gameinfo, int moves)
   float move_value;
   double t1, t2;
   int save_moves = moves;
-  int boardsize = gnugo_get_boardsize();
+  int boardsize = gnugo_get_board_size(goban);
 
   struct stats_data totalstats;
   int total_owl_count = 0;
@@ -57,10 +58,11 @@ play_solo(Gameinfo *gameinfo, int moves)
   int n = 6 + 2*gg_rand()%5;
   int i, j;
 
-  gnugo_set_komi(5.5);
+  gnugo_set_komi(goban, 5.5);
 
   sgftree_clear(&sgftree);
-  sgftreeCreateHeaderNode(&sgftree, gnugo_get_boardsize(), gnugo_get_komi());
+  sgftreeCreateHeaderNode(&sgftree, gnugo_get_board_size(goban),
+			  gnugo_get_komi(goban));
   sgf_write_header(sgftree.root, 1, get_random_seed(), 5.5,
                    level, chinese_rules);
  
@@ -70,9 +72,9 @@ play_solo(Gameinfo *gameinfo, int moves)
       do {
 	i = (gg_rand() % 4) + (gg_rand() % (boardsize - 4));
 	j = (gg_rand() % 4) + (gg_rand() % (boardsize - 4));
-      } while (!gnugo_is_legal(i, j, gameinfo->to_move));
+      } while (!gnugo_is_legal(goban, i, j, gameinfo->to_move));
 
-      gnugo_play_move(i, j, gameinfo->to_move);
+      gnugo_play_move(goban, i, j, gameinfo->to_move);
       sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
       sgftreeAddComment(&sgftree, "random move");
       gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
@@ -85,8 +87,8 @@ play_solo(Gameinfo *gameinfo, int moves)
     reset_owl_node_counter();
     move_value = gnugo_genmove(&i, &j, gameinfo->to_move, NULL);
 
-    gnugo_play_move(i, j, gameinfo->to_move);
-    sgffile_add_debuginfo(sgftree.lastnode, move_value);
+    gnugo_play_move(goban, i, j, gameinfo->to_move);
+    sgffile_add_debuginfo(goban, sgftree.lastnode, move_value);
     sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
     sgffile_output(&sgftree);
     gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
@@ -98,7 +100,7 @@ play_solo(Gameinfo *gameinfo, int moves)
     }
     else {
       passes = 0;
-      gprintf("%s(%d): %m\n", gameinfo->to_move == BLACK ? "Black" : "White",
+      gprintf(goban, "%s(%d): %m\n", gameinfo->to_move == BLACK ? "Black" : "White",
 	      movenum, i, j);
     }
 
@@ -151,22 +153,22 @@ load_and_analyze_sgf_file(Gameinfo *gameinfo)
   sgftree = gameinfo->game_record;
 
   if (metamachine)
-    sgffile_begindump(&sgftree);
+    sgffile_begindump(goban, &sgftree);
 
   move_value = gnugo_genmove(&i, &j, next, NULL);
 
   if (is_pass(POS(i, j)))
-    gprintf("%s move: PASS!\n", next == WHITE ? "white (O)" : "black (X)");
+    gprintf(goban, "%s move: PASS!\n", next == WHITE ? "white (O)" : "black (X)");
   else
-    gprintf("%s move %m\n", next == WHITE ? "white (O)" : "black (X)", i, j);
+    gprintf(goban, "%s move %m\n", next == WHITE ? "white (O)" : "black (X)", i, j);
 
   if (metamachine)
-    sgffile_enddump(outfilename);
+    sgffile_enddump(goban, outfilename);
   else {
-    gnugo_play_move(i, j, next);
+    gnugo_play_move(goban, i, j, next);
     sgftreeAddPlay(&sgftree, next, i, j);
     sgftreeAddComment(&sgftree, "load and analyze mode");
-    sgffile_add_debuginfo(sgftree.lastnode, move_value);
+    sgffile_add_debuginfo(goban, sgftree.lastnode, move_value);
     sgffile_output(&sgftree);
   }
 }
@@ -223,7 +225,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
      */
     sgftreeCreateHeaderNode(&local_tree, board_size,
 			    komi + black_captured - white_captured);
-    sgffile_printboard(&local_tree);
+    sgffile_printboard(goban, &local_tree);
     sgfAddProperty(local_tree.lastnode, "PL",
 		   gameinfo->to_move == WHITE ? "W" : "B");
     score_tree = &local_tree;
@@ -239,16 +241,16 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
       move = genmove_conservative(next, &move_value);
       if (move != PASS_MOVE) {
 	pass = 0;
-	gprintf("%d %s move %1m\n", movenum,
+	gprintf(goban, "%d %s move %1m\n", movenum,
 		next == WHITE ? "white (O)" : "black (X)", move);
       }
       else {
 	pass++;
-	gprintf("%d %s move : PASS!\n", movenum, 
+	gprintf(goban, "%d %s move : PASS!\n", movenum, 
 		next == WHITE ? "white (O)" : "black (X)");
       }
-      play_move(move, next);
-      sgffile_add_debuginfo(score_tree->lastnode, move_value);
+      play_move(goban, move, next);
+      sgffile_add_debuginfo(goban, score_tree->lastnode, move_value);
       sgftreeAddPlay(score_tree, next, I(move), J(move));
       sgffile_output(score_tree);
       next = OTHER_COLOR(next);

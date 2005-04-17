@@ -1016,7 +1016,8 @@ dragon_invincible(int dr)
 	    mx[eye[pos2].origin] = 1; /* good eye */
 	  
 	  if (board[pos2] == OTHER_COLOR(board[dr])
-	      && (!attack(pos2, NULL) || find_defense(pos2, NULL)))
+	      && (!attack(goban, pos2, NULL)
+		  || find_defense(goban, pos2, NULL)))
 	    mx[eye[pos2].origin] = 2; /* bad eye */
 	}
       }
