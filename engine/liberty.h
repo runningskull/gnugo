@@ -293,13 +293,13 @@ void store_persistent_semeai_cache(const Goban *goban, enum routine_id routine,
 
 
 /* readconnect.c */
-int string_connect(int str1, int str2, int *move);
-int disconnect(int str1, int str2, int *move);
-int fast_disconnect(int str1, int str2, int *move);
-int non_transitivity(int str1, int str2, int str3, int *move);
+int string_connect(Goban *goban, int str1, int str2, int *move);
+int disconnect(Goban *goban, int str1, int str2, int *move);
+int fast_disconnect(Goban *goban, int str1, int str2, int *move);
+int non_transitivity(Goban *goban, int str1, int str2, int str3, int *move);
 
-int break_in(int str, const char goal[BOARDMAX], int *move);
-int block_off(int str1, const char goal[BOARDMAX], int *move);
+int break_in(Goban *goban, int str, const char goal[BOARDMAX], int *move);
+int block_off(Goban *goban, int str1, const char goal[BOARDMAX], int *move);
 
 int obvious_false_eye(int pos, int color);
 void estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
@@ -679,10 +679,10 @@ void influence_mark_non_territory(int pos, int color);
 int influence_considered_lively(const struct influence_data *q, int pos);
 void influence_erase_territory(struct influence_data *q, int pos, int color);
 
-void break_territories(int color_to_move, struct influence_data *q,
-		       int store, int pos);
+void break_territories(Goban *goban, int color_to_move,
+		       struct influence_data *q, int store, int pos);
 void clear_break_in_list(void);
-void break_in_move_reasons(int color);
+void break_in_move_reasons(const Goban *goban, int color);
 
 void choose_strategy(int color, float our_score, float game_status);
 

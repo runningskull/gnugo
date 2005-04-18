@@ -27,7 +27,8 @@ struct connection_data;
 /* Expensive functions that we try to evaluate as late as possible
  * when spreading connection distances.
  */
-typedef void (*connection_helper_fn_ptr) (struct connection_data *conn,
+typedef void (*connection_helper_fn_ptr) (Goban *goban,
+					  struct connection_data *conn,
 					  int color);
 
 /* This heap contains a list of positions where we have delayed a
@@ -70,16 +71,19 @@ struct connection_data {
 };
 
 
-void compute_connection_distances(int str, int target, int cutoff,
+void compute_connection_distances(Goban *goban, int str,
+				  int target, int cutoff,
 				  struct connection_data *conn,
 				  int speculative);
-void init_connection_data(int color, const char goal[BOARDMAX],
-			  int target, int cutoff,
+void init_connection_data(const Goban *goban, int color,
+			  const char goal[BOARDMAX], int target, int cutoff,
 			  struct connection_data *conn, int speculative);
-void spread_connection_distances(int color, struct connection_data *conn);
+void spread_connection_distances(Goban *goban, int color,
+				 struct connection_data *conn);
 void sort_connection_queue_tail(struct connection_data *conn);
-void expand_connection_queue(struct connection_data *conn);
-void print_connection_distances(struct connection_data *conn);
+void expand_connection_queue(const Goban *goban, struct connection_data *conn);
+void print_connection_distances(const Goban *goban,
+				struct connection_data *conn);
 
 
 /*

@@ -2019,7 +2019,7 @@ gtp_connect(char *s)
   if (BOARD(goban, ai, aj) != BOARD(goban, bi, bj))
     return gtp_failure("vertices must have same color");
 
-  result = string_connect(POS(ai, aj), POS(bi, bj), &connect_move);
+  result = string_connect(goban, POS(ai, aj), POS(bi, bj), &connect_move);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(result);
   if (result != 0)
@@ -2056,7 +2056,7 @@ gtp_disconnect(char *s)
   if (BOARD(goban, ai, aj) != BOARD(goban, bi, bj))
     return gtp_failure("vertices must have same color");
 
-  result = disconnect(POS(ai, aj), POS(bi, bj), &disconnect_move);
+  result = disconnect(goban, POS(ai, aj), POS(bi, bj), &disconnect_move);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(result);
   if (result != 0)
@@ -2104,7 +2104,7 @@ gtp_break_in(char *s)
   if (BOARD(goban, ai, aj) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  result = break_in(POS(ai, aj), goal, &break_move);
+  result = break_in(goban, POS(ai, aj), goal, &break_move);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(result);
   if (result != 0)
@@ -2151,7 +2151,7 @@ gtp_block_off(char *s)
   if (BOARD(goban, ai, aj) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  result = block_off(POS(ai, aj), goal, &block_move);
+  result = block_off(goban, POS(ai, aj), goal, &block_move);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(result);
   if (result != 0)

@@ -1224,12 +1224,12 @@ compute_dragon_influence()
   set_strength_data(BLACK, safe_stones, strength);
   compute_influence(BLACK, safe_stones, strength, &initial_black_influence,
                     NO_MOVE, "initial black influence, dragons known");
-  break_territories(BLACK, &initial_black_influence, 1, NO_MOVE);
+  break_territories(goban, BLACK, &initial_black_influence, 1, NO_MOVE);
 
   set_strength_data(WHITE, safe_stones, strength);
   compute_influence(WHITE, safe_stones, strength, &initial_white_influence,
                     NO_MOVE, "initial white influence, dragons known");
-  break_territories(WHITE, &initial_white_influence, 1, NO_MOVE);
+  break_territories(goban, WHITE, &initial_white_influence, 1, NO_MOVE);
 }
 
 

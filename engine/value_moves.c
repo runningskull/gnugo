@@ -891,25 +891,25 @@ induce_secondary_move_reasons(int color)
 	      continue;
 	    if (attack_move
 		&& board[adj1] != board[aa]
-		&& !disconnect(adj1, adj2, NULL))
+		&& !disconnect(goban, adj1, adj2, NULL))
 	      continue;
 	    if (!attack_move
 		&& board[adj1] != board[aa]
-		&& !string_connect(adj1, adj2, NULL))
+		&& !string_connect(goban, adj1, adj2, NULL))
 	      continue;
 	    if (attack_move
 		&& board[adj1] == board[aa])
 	      continue;
 	    if (!attack_move
 		&& board[adj1] == board[aa]
-		&& !disconnect(adj1, adj2, NULL))
+		&& !disconnect(goban, adj1, adj2, NULL))
 	      continue;
 
 	    if (trymove(goban, pos, color_to_move, "induce_secondary_move_reasons",
 			aa)) {
 	      if (attack_move
 		  && board[adj1] != board[aa]
-		  && !disconnect(adj1, adj2, NULL)) {
+		  && !disconnect(goban, adj1, adj2, NULL)) {
 		DEBUG(goban, DEBUG_MOVE_REASONS,
 		      "Connection move at %1m induced for %1m/%1m due to attack of %1m\n",
 		      pos, adj1, adj2, aa);
@@ -920,7 +920,7 @@ induce_secondary_move_reasons(int color)
 
 	      if (!attack_move
 		  && board[adj1] != board[aa]
-		  && !string_connect(adj1, adj2, NULL)) {
+		  && !string_connect(goban, adj1, adj2, NULL)) {
 		DEBUG(goban, DEBUG_MOVE_REASONS,
 		      "Cut move at %1m induced for %1m/%1m due to defense of %1m\n",
 		      pos, adj1, adj2, aa);
@@ -929,7 +929,7 @@ induce_secondary_move_reasons(int color)
 
 	      if (!attack_move
 		  && board[adj1] == board[aa]
-		  && !disconnect(adj1, adj2, NULL)) {
+		  && !disconnect(goban, adj1, adj2, NULL)) {
 		DEBUG(goban, DEBUG_MOVE_REASONS,
 		      "Connection move at %1m induced for %1m/%1m due to defense of %1m\n",
 		      pos, adj1, adj2, aa);
@@ -1028,14 +1028,14 @@ induce_secondary_move_reasons(int color)
 		  && !is_same_worm(pos3, worm2)) {
 		if (trymove(goban, pos, color, "induce_secondary_move_reasons-B",
 			    worm1)) {
-		  if (!disconnect(pos3, worm1, NULL)) {
+		  if (!disconnect(goban, pos3, worm1, NULL)) {
 		    add_connection_move(pos, pos3, worm1);
 		    do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
 							      find_connection(pos3, worm1));
 		    DEBUG(goban, DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m\n",
 			  pos, worm1, worm2, pos3, worm1);
 		  }
-		  if (!disconnect(pos3, worm2, NULL)) {
+		  if (!disconnect(goban, pos3, worm2, NULL)) {
 		    add_connection_move(pos, pos3, worm2);
 		    do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
 							      find_connection(pos3, worm2));
@@ -1753,7 +1753,7 @@ adjacent_to_nondead_stone(int pos, int color)
       if (ON_BOARD(goban, pos2)
 	  && worm[pos2].color == color
 	  && dragon[pos2].status != DEAD
-	  && !disconnect(pos, pos2, NULL)) {
+	  && !disconnect(goban, pos, pos2, NULL)) {
 	result = 1;
 	break;
       }
@@ -2493,7 +2493,7 @@ estimate_territorial_value(int pos, int color, float our_score,
       compute_influence(OTHER_COLOR(color), safe_stones, strength, 
 	  		&move_influence, pos, "after move");
       increase_depth_values();
-      break_territories(OTHER_COLOR(color), &move_influence, 0, pos);
+      break_territories(goban, OTHER_COLOR(color), &move_influence, 0, pos);
       decrease_depth_values();
       this_value = influence_delta_territory(OPPOSITE_INFLUENCE(color),
 	   				     &move_influence, color, pos);

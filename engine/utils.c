@@ -607,13 +607,13 @@ play_connect_n(Goban *goban, int color, int do_connect, int num_moves, ...)
     if (goban->board[ypos] == EMPTY || goban->board[zpos] == EMPTY)
       success = 0;
     else
-      success = string_connect(ypos, zpos, NULL);
+      success = string_connect(goban, ypos, zpos, NULL);
   }
   else {
     if (goban->board[ypos] == EMPTY || goban->board[zpos] == EMPTY)
       success = WIN;
     else
-      success = disconnect(ypos, zpos, NULL);
+      success = disconnect(goban, ypos, zpos, NULL);
   }
 
 #if 0

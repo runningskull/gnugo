@@ -4713,7 +4713,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
   for (k = 0; k < num_cuts; k++) {
     ASSERT1(goban, board[cuts[k]] == color, cuts[k]);
     for (j = k + 1; j < num_cuts; j++)
-      if (fast_disconnect(cuts[k], cuts[j], NULL) == WIN) {
+      if (fast_disconnect(goban, cuts[k], cuts[j], NULL) == WIN) {
 	found_cut = 1;
 	connected[k][j] = 0;
 	connected[j][k] = 0;
@@ -4758,9 +4758,9 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
 	  mark_string(goban, cuts[k], this_goal, 1);
 	  mark_string(goban, cuts[k], component2, c_id);
 	}
-      init_connection_data(color, this_goal, NO_MOVE, FP(3.01),
+      init_connection_data(goban, color, this_goal, NO_MOVE, FP(3.01),
 	  		   conn_data + c_id, 1);
-      spread_connection_distances(color, conn_data + c_id);
+      spread_connection_distances(goban, color, conn_data + c_id);
     }
 
     /* Now put each goal string to the component to which it has the

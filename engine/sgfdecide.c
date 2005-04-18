@@ -145,7 +145,7 @@ decide_connection(int apos, int bpos)
   reset_engine();
 
   count_variations = 1;
-  result = string_connect(apos, bpos, &move);
+  result = string_connect(goban, apos, bpos, &move);
   if (result == WIN) {
     if (move == NO_MOVE)
       gprintf(goban, "%1m and %1m are connected as it stands (%d variations)\n", 
@@ -165,7 +165,7 @@ decide_connection(int apos, int bpos)
 	    apos, bpos, count_variations);
   
   count_variations = 1;
-  result = disconnect(apos, bpos, &move);
+  result = disconnect(goban, apos, bpos, &move);
   if (result == WIN) {
     if (move == NO_MOVE)
       gprintf(goban, "%1m and %1m are disconnected as it stands (%d variations)\n", 

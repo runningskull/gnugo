@@ -431,7 +431,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   if (class & CLASS_B) {
     for (k = 0; k < your_nstrings; k++)
       for (l = k+1; l < your_nstrings; l++) {
-	if (string_connect(your_strings[k], your_strings[l], NULL)
+	if (string_connect(goban, your_strings[k], your_strings[l], NULL)
 	    && !play_connect_n(goban, color, 1, 1, move,
 			       your_strings[k], your_strings[l])) {
 	  add_cut_move(move, your_strings[k], your_strings[l]);
@@ -445,7 +445,7 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   if (class & CLASS_C) {
     for (k = 0; k < my_nstrings; k++)
       for (l = k+1; l < my_nstrings; l++) {
-	if (disconnect(my_strings[k], my_strings[l], NULL)
+	if (disconnect(goban, my_strings[k], my_strings[l], NULL)
 	    && !play_connect_n(goban, color, 0, 1, move,
 			       my_strings[k], my_strings[l])) {
 	  add_connection_move(move, my_strings[k], my_strings[l]);

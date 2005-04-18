@@ -20,7 +20,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
-#include "old-board.h"
 #include "liberty.h"
 #include "readconnect.h"
 
@@ -59,21 +58,23 @@ struct break_in_data {
 };
 
 #define MAX_BREAK_INS 50
+
+/* THREAD-FIXME: Static variables are unacceptable. */
 static struct break_in_data break_in_list[MAX_BREAK_INS];
 static int num_break_ins;
 
 
 /* Adds all empty intersections that have two goal neighbors to the goal. */
 static void
-enlarge_goal(char goal[BOARDMAX])
+enlarge_goal(const Goban *goban, char goal[BOARDMAX])
 {
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == EMPTY && !goal[pos]) {
+    if (goban->board[pos] == EMPTY && !goal[pos]) {
       int k;
       int goal_neighbors = 0;
       for (k = 0; k < 4; k++)
-	if (board[pos + delta[k]] == EMPTY && goal[pos + delta[k]] == 1)
+	if (goban->board[pos + delta[k]] == EMPTY && goal[pos + delta[k]] == 1)
 	  goal_neighbors++;
       if (goal_neighbors >= 2)
 	goal[pos] = 2;
@@ -88,7 +89,7 @@ enlarge_goal(char goal[BOARDMAX])
  * of "blocking off", i.e. when color_to_move == owner.
  */
 static void
-compute_smaller_goal(int owner, int color_to_move,
+compute_smaller_goal(const Goban *goban, int owner, int color_to_move,
     		     const struct connection_data *conn,
     		     const char goal[BOARDMAX], char smaller_goal[BOARDMAX])
 {
@@ -112,7 +113,7 @@ compute_smaller_goal(int owner, int color_to_move,
 	/* How many stones have we used to jump from coming_from to pos?
 	 * Use Manhattan metric as a guess.
 	 */
-	if (!goal[pos] && board[pos] == OTHER_COLOR(owner)) {
+	if (!goal[pos] && goban->board[pos] == OTHER_COLOR(owner)) {
 	  int i;
 	  int stones[MAX_BOARD * MAX_BOARD];
 	  int num_stones = findstones(goban, pos, MAX_BOARD * MAX_BOARD, stones);
@@ -146,7 +147,7 @@ compute_smaller_goal(int owner, int color_to_move,
     for (j = 0; j < 4; j++)
       if (ON_BOARD(goban, pos + delta[j])
 	  && goal[pos + delta[j]]
-	  && (board[pos] == EMPTY || goal[pos] == OTHER_COLOR(owner)))
+	  && (goban->board[pos] == EMPTY || goal[pos] == OTHER_COLOR(owner)))
 	goal_neighbors++;
 #if 0
     if (goal_neighbors > 2
@@ -217,9 +218,9 @@ compute_smaller_goal(int owner, int color_to_move,
  * try again.
  */
 static int
-break_in_goal_from_str(int str, char goal[BOARDMAX],
-    		      int *num_non_territory, int non_territory[BOARDMAX],
-    		      int color_to_move, int info_pos)
+break_in_goal_from_str(Goban *goban, int str, char goal[BOARDMAX],
+		       int *num_non_territory, int non_territory[BOARDMAX],
+		       int color_to_move, int info_pos)
 {
   int move = NO_MOVE;
   int saved_move = NO_MOVE;
@@ -227,24 +228,25 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
   struct connection_data conn;
 
   /* When blocking off, we use a somewhat smaller goal area. */
-  if (color_to_move == board[str])
-    compute_connection_distances(str, NO_MOVE, FP(3.01), &conn, 1);
+  if (color_to_move == goban->board[str])
+    compute_connection_distances(goban, str, NO_MOVE, FP(3.01), &conn, 1);
   else
-    compute_connection_distances(str, NO_MOVE, FP(2.81), &conn, 1);
+    compute_connection_distances(goban, str, NO_MOVE, FP(2.81), &conn, 1);
 
   sort_connection_queue_tail(&conn);
-  expand_connection_queue(&conn);
-  compute_smaller_goal(OTHER_COLOR(board[str]), color_to_move,
+  expand_connection_queue(goban, &conn);
+  compute_smaller_goal(goban, OTHER_COLOR(goban->board[str]), color_to_move,
       		       &conn, goal, smaller_goal);
   if (0 && (debug & DEBUG_BREAKIN))
-    print_connection_distances(&conn);
+    print_connection_distances(goban, &conn);
   DEBUG(goban, DEBUG_BREAKIN, "Trying to break in from %1m to:\n", str);
   if (debug & DEBUG_BREAKIN)
     goaldump(smaller_goal);
-  while ((color_to_move == board[str]
-          && break_in(str, smaller_goal, &move))
-         || (color_to_move == OTHER_COLOR(board[str])
-	     && !block_off(str, smaller_goal, NULL))) { 
+
+  while ((color_to_move == goban->board[str]
+          && break_in(goban, str, smaller_goal, &move))
+         || (color_to_move == OTHER_COLOR(goban->board[str])
+	     && !block_off(goban, str, smaller_goal, NULL))) { 
     /* Successful break-in/unsuccessful block. Now where exactly can we
      * erase territory? This is difficult, and the method here is very
      * crude: Wherever we enter the territory when computing the closest
@@ -305,7 +307,7 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
       }
     }
 
-    compute_smaller_goal(OTHER_COLOR(board[str]), color_to_move,
+    compute_smaller_goal(goban, OTHER_COLOR(goban->board[str]), color_to_move,
 			 &conn, goal, smaller_goal);
     DEBUG(goban, DEBUG_BREAKIN, "Now trying to break to smaller goal:\n", str);
     if (debug & DEBUG_BREAKIN)
@@ -314,13 +316,15 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
     if (saved_move == NO_MOVE)
       saved_move = move;
   }
+
   return saved_move;
 }
+
 
 #define MAX_TRIES 10
 
 static void
-break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
+break_in_goal(Goban *goban, int color_to_move, int owner, char goal[BOARDMAX],
     	      struct influence_data *q, int store, int info_pos)
 {
   struct connection_data conn;
@@ -337,13 +341,14 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
         "Trying to break (%C to move) %C's territory ", color_to_move, owner);
   if (debug & DEBUG_BREAKIN)
     goaldump(goal);
+
   /* Compute nearby fields of goal. */
-  init_connection_data(intruder, goal, NO_MOVE, FP(3.01), &conn, 1);
+  init_connection_data(goban, intruder, goal, NO_MOVE, FP(3.01), &conn, 1);
   k = conn.queue_end;
-  spread_connection_distances(intruder, &conn);
+  spread_connection_distances(goban, intruder, &conn);
   sort_connection_queue_tail(&conn);
   if (0 && (debug & DEBUG_BREAKIN))
-    print_connection_distances(&conn);
+    print_connection_distances(goban, &conn);
 
   /* Look for nearby stones. */
   memset(used, 0, BOARDMAX);
@@ -351,7 +356,7 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
     int pos = conn.queue[k];
     if (conn.distances[pos] > min_distance + FP(1.001))
       break;
-    if (board[pos] == intruder
+    if (goban->board[pos] == intruder
 	&& influence_considered_lively(q, pos)) {
       /* Discard this string in case the shortest path goes via a string
        * that we have in the candidate list already.
@@ -359,7 +364,7 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
       int pos2 = pos;
       while (ON_BOARD(goban, pos2)) {
         pos2 = conn.coming_from[pos2];
-	if (IS_STONE(board[pos2]))
+	if (IS_STONE(goban->board[pos2]))
 	  pos2 = find_origin(goban, pos2);
 
 	if (used[pos2])
@@ -380,9 +385,9 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
   /* Finally, try the break-ins. */
   memset(non_territory, 0, BOARDMAX);
   for (k = 0; k < candidates; k++) {
-    int move = break_in_goal_from_str(candidate_strings[k], goal,
-  		                     &num_non_territory, non_territory,
-				     color_to_move, info_pos);
+    int move = break_in_goal_from_str(goban, candidate_strings[k], goal,
+				      &num_non_territory, non_territory,
+				      color_to_move, info_pos);
     if (store && ON_BOARD(goban, move) && num_break_ins < MAX_BREAK_INS) {
       /* Remember the move as a possible move candidate for later. */
       break_in_list[num_break_ins].str = candidate_strings[k];
@@ -405,8 +410,8 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
  * later gets used to generate move reasons).
  */
 void
-break_territories(int color_to_move, struct influence_data *q, int store,
-    		  int info_pos)
+break_territories(Goban *goban, int color_to_move,
+		  struct influence_data *q, int store, int info_pos)
 {
   struct moyo_data territories;
   int k;
@@ -424,15 +429,15 @@ break_territories(int color_to_move, struct influence_data *q, int store,
     for (pos = BOARDMIN; pos < BOARDMAX; pos++)
       if (ON_BOARD(goban, pos) && territories.segmentation[pos] == k) {
 	goal[pos] = 1;
-	if (board[pos] != territories.owner[k])
+	if (goban->board[pos] != territories.owner[k])
 	  size++;
       }
     if (size < 10)
       continue;
 
     if (color_to_move == OTHER_COLOR(territories.owner[k]))
-      enlarge_goal(goal);
-    break_in_goal(color_to_move, territories.owner[k], goal, q, store,
+      enlarge_goal(goban, goal);
+    break_in_goal(goban, color_to_move, territories.owner[k], goal, q, store,
 		  info_pos);
   }
 }
@@ -451,10 +456,10 @@ clear_break_in_list()
  * otherwise.)
  */
 void
-break_in_move_reasons(int color)
+break_in_move_reasons(const Goban *goban, int color)
 {
   int k;
   for (k = 0; k < num_break_ins; k++)
-    if (board[break_in_list[k].str] == color)
+    if (goban->board[break_in_list[k].str] == color)
       add_expand_territory_move(break_in_list[k].move);
 }
