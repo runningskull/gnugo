@@ -79,7 +79,8 @@ double clock_get_time_left(int color);
 double clock_get_btime_left(int color, int *stones);
 
 /* adaptative system */
-void clock_adapt_level(int *p_level, int color);
+void clock_adapt_level(int board_size, int move_number,
+		       int *p_level, int color);
 
 /* output */
 void clock_print(int color);
@@ -87,5 +88,3 @@ void clock_report_autolevel(FILE *f, int color);
 
 
 #endif  /* _CLOCK_H_ */
-
-

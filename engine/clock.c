@@ -36,7 +36,6 @@
 \* ============================================================= */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include "liberty.h"
 #include "gg_utils.h"
@@ -163,7 +162,7 @@ clock_init(int time, int byo_time, int byo_stones)
 void 
 clock_enable(void)
 {
-  gg_assert(goban, clk.ready);
+  gg_assert(NULL, clk.ready);
   clk.clock_on = 1;
 }
 
@@ -173,7 +172,7 @@ clock_enable(void)
 void 
 clock_enable_autolevel(void)
 {
-  gg_assert(goban, clk.clock_on);
+  gg_assert(NULL, clk.clock_on);
   clk.autolevel_on = 1;
 }
 
@@ -190,7 +189,7 @@ clock_enable_autolevel(void)
 static void
 clock_byoyomi_update(int color, double dt)
 {
-  gg_assert(goban, clk.moveno > 0);
+  gg_assert(NULL, clk.moveno > 0);
 
   /* update byoyomi timer */
   if (clk.byoyomi[color])
@@ -227,7 +226,7 @@ clock_push_button(int color)
     return;
 
   now = gg_gettimeofday();
-  gg_assert(goban, clk.ready);
+  gg_assert(NULL, clk.ready);
 
   /* time/move estimation */
   tme = estimate_time_by_move(color, clk.moveno);
@@ -256,7 +255,7 @@ clock_push_button(int color)
 
   /* Other moves (clk. moveno > -1) */
   clk.moveno++;
-  gg_assert(goban, clk.moveno < CLOCK_MAX_MOVES);
+  gg_assert(NULL, clk.moveno < CLOCK_MAX_MOVES);
   clk.date[clk.moveno] = now;
 
   /* Update main timer. */
@@ -285,8 +284,8 @@ clock_unpush_button(int color)
   if (!clk.clock_on)
     return;
      
-  gg_assert(goban, clk.ready);
-  gg_assert(goban, color == COLOR(clk.moveno));
+  gg_assert(NULL, clk.ready);
+  gg_assert(NULL, color == COLOR(clk.moveno));
 
   if (clk.moveno < 1) {
     clock_init(-1, -1, -1);
@@ -320,7 +319,7 @@ clock_get_timer(int color)
 {
   double dt;
 
-  gg_assert(goban, clk.clock_on && clk.ready);
+  gg_assert(NULL, clk.clock_on && clk.ready);
 
   dt = gg_gettimeofday() - clk.date[clk.moveno];
 
@@ -360,7 +359,7 @@ clock_get_btimer(int color)
   double dt;
   
   /* sanity check */
-  gg_assert(goban, clk.clock_on && clk.ready);
+  gg_assert(NULL, clk.clock_on && clk.ready);
   dt = gg_gettimeofday() - clk.date[clk.moveno];
 
   if (COLOR(clk.moveno) != color)
@@ -402,7 +401,7 @@ clock_print(int color)
   if (!clk.clock_on)
     return;
 
-  gg_assert(goban, clk.ready);
+  gg_assert(NULL, clk.ready);
 
   fprintf(stderr, "clock: "); 
   fprintf(stderr, "%s ", pname[color]);
@@ -488,7 +487,7 @@ estimate_time_by_move(int color, int move)
   if (move <= 10)
     return 0;
 
-  gg_assert(goban, COLOR(move) == OTHER_COLOR(color));
+  gg_assert(NULL, COLOR(move) == OTHER_COLOR(color));
 
   res = 0;
   for (i = 0; i < 5; i++)
@@ -502,7 +501,7 @@ estimate_time_by_move(int color, int move)
  * Try to respect a "time contract". 
  */
 static void 
-respect_time_contract(int color)
+respect_time_contract(int board_size, int color)
 {
   double time_left, expected_tm, predicted_tm;
   double moves_left;
@@ -574,7 +573,7 @@ keep_ahead(int color)
  * Modify the level during a game to avoid losing by time.
  */
 void
-clock_adapt_level(int *p_level, int color)
+clock_adapt_level(int board_size, int move_number, int *p_level, int color)
 {
   double hurry_limit, safe_limit;
 
@@ -605,7 +604,7 @@ clock_adapt_level(int *p_level, int color)
    * try to respect the time of a standard game. 
    */
   if (clk.moveno < CLOCK_MOVE_CONTRACT(board_size))
-    respect_time_contract(color);
+    respect_time_contract(board_size, color);
 
   /* 
    * Keep ahead strategy:
@@ -624,7 +623,7 @@ clock_adapt_level(int *p_level, int color)
   clk.levels[clk.moveno + 1] = clk.level;
   *p_level = clk.level;
   
-  fprintf(stderr, "level %4.1f at move %d\n", clk.level, movenum);
+  fprintf(stderr, "level %4.1f at move %d\n", clk.level, move_number);
 }
 
 

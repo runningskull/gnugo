@@ -165,7 +165,7 @@ replay_node(SGFNode *node, int color_to_replay)
   if (color == color_to_replay || color_to_replay == GRAY) {
     /* Get a move from the engine for color. */
     int resign;
-    gnugo_genmove(&i, &j, color, &resign);
+    gnugo_genmove(goban, &i, &j, color, &resign);
     /* Now report on how well the computer generated the move. */
     if (i != m || j != n || !quiet) {
       mprintf(goban, "Move %d (%C): ", movenum + 1, color);

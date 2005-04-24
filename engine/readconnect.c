@@ -2685,7 +2685,7 @@ find_string_connection_moves(Goban *goban,
   if (verbose > 0) {
     gprintf(goban, "%oVariation %d\n", sgf_dump_save.variations_counter);
     dump_stack(goban);
-    showboard(0);
+    showboard(goban, 0);
     print_connection_distances(goban, &conn1);
     print_connection_distances(goban, &conn2);
   }
@@ -2810,7 +2810,7 @@ find_break_moves(Goban *goban, int str, const char goal[BOARDMAX],
   if (verbose > 0) {
     gprintf(goban, "%oVariation %d\n", sgf_dump_save.variations_counter);
     dump_stack(goban);
-    showboard(0);
+    showboard(goban, 0);
     print_connection_distances(goban, &conn1);
     print_connection_distances(goban, &conn2);
   }
@@ -3108,7 +3108,7 @@ break_in(Goban *goban, int str, const char goal[BOARDMAX], int *move)
 				      breakin_node_limit, &result, move)) {
     if (debug & DEBUG_BREAKIN) {
       gprintf(goban, "Break-in from %1m to:\n", str);
-      goaldump(goal);
+      goaldump(goban, goal);
       gprintf(goban, "Result cached: %s %1m\n", result_to_string(result), *move);
     }
     return result;
@@ -3126,13 +3126,13 @@ break_in(Goban *goban, int str, const char goal[BOARDMAX], int *move)
     gprintf(goban, "%obreak_in    %1M, result %s %1M (%d, %d nodes, %f seconds)\n",
 	    str, result_to_string(result), *move,
 	    nodes_connect, tactical_nodes, gg_cputime() - start);
-    goaldump(goal);
+    goaldump(goban, goal);
     dump_stack(goban);
   }
   if (0) {
     gprintf(goban, "%obreak_in %1m %d %1m ", str, result, *move);
     dump_stack(goban);
-    goaldump(goal);
+    goaldump(goban, goal);
   }
   store_persistent_breakin_cache(goban, BREAK_IN, str, &goal_hash, result, *move,
 				 tactical_nodes, breakin_node_limit,
@@ -3168,7 +3168,7 @@ block_off(Goban *goban, int str, const char goal[BOARDMAX], int *move)
 				      breakin_node_limit, &result, move)) {
     if (debug & DEBUG_BREAKIN) {
       gprintf(goban, "Blocking off %1m from:\n", str);
-      goaldump(goal);
+      goaldump(goban, goal);
       gprintf(goban, "Result cached: %s %1m\n", result_to_string(result), *move);
     }
     return result;
@@ -3187,12 +3187,12 @@ block_off(Goban *goban, int str, const char goal[BOARDMAX], int *move)
     gprintf(goban, "%oblock_off %1m, result %s %1m (%d, %d nodes, %f seconds)\n",
 	    str, result_to_string(result), *move,
 	    nodes_connect, tactical_nodes, gg_cputime() - start);
-    goaldump(goal);
+    goaldump(goban, goal);
     dump_stack(goban);
   }
   if (0) {
     gprintf(goban, "%oblock_off %1m %d %1m ", str, result, *move);
-    goaldump(goal);
+    goaldump(goban, goal);
     dump_stack(goban);
   }
   store_persistent_breakin_cache(goban, BLOCK_OFF, str, &goal_hash, result, *move,

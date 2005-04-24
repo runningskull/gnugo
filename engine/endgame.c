@@ -22,13 +22,13 @@
 
 
 #include "gnugo.h"
-#include "old-board.h"
 #include "liberty.h"
 
 
-static void endgame_analyze_worm_liberties(int pos, int color);
-static void endgame_find_backfilling_dame(int str, int color);
-static int endgame_find_liberties(int str, int *essential_liberties,
+static void endgame_analyze_worm_liberties(Goban *goban, int pos, int color);
+static void endgame_find_backfilling_dame(Goban *goban, int str, int color);
+static int endgame_find_liberties(const Goban *goban, int str,
+				  int *essential_liberties,
 				  int essential_libs[MAXLIBS],
 				  int *inessential_liberties,
 				  int inessential_libs[MAXLIBS],
@@ -42,7 +42,7 @@ static int endgame_find_liberties(int str, int *essential_liberties,
  * called when no move of value higher than 6.0 has been found on board.
  */
 void
-endgame(int color)
+endgame(Goban *goban, int color)
 {
   int pos;
 
@@ -55,14 +55,14 @@ endgame(int color)
     /* We are only interested in alive, but not invincible worms which are
      * parts of alive dragons. That is, the position must be stable.
      */
-    if (IS_STONE(board[pos])
+    if (IS_STONE(goban->board[pos])
 	&& worm[pos].origin == pos
 	&& dragon[pos].status == ALIVE
 	&& !worm[pos].invincible
 	&& !worm[pos].inessential
 	&& worm[pos].attack_codes[0] == 0) {
-      endgame_analyze_worm_liberties(pos, color);
-      endgame_find_backfilling_dame(pos, color);
+      endgame_analyze_worm_liberties(goban, pos, color);
+      endgame_find_backfilling_dame(goban, pos, color);
     }
   }
 }
@@ -106,10 +106,10 @@ endgame(int color)
  * FIXME: This function can probably be improved to handle more cases.
  */
 static void
-endgame_analyze_worm_liberties(int pos, int color)
+endgame_analyze_worm_liberties(Goban *goban, int pos, int color)
 {
   int k;
-  int worm_color = board[pos];
+  int worm_color = goban->board[pos];
   int other = OTHER_COLOR(worm_color);
   int essential_liberties;
   int essential_libs[MAXLIBS];
@@ -124,7 +124,7 @@ endgame_analyze_worm_liberties(int pos, int color)
   int apos;
   int value;
 
-  if (!endgame_find_liberties(pos, &essential_liberties, essential_libs,
+  if (!endgame_find_liberties(goban, pos, &essential_liberties, essential_libs,
 			      &inessential_liberties, inessential_libs,
 			      &false_eye_liberties, false_eye_libs))
     return;
@@ -145,7 +145,7 @@ endgame_analyze_worm_liberties(int pos, int color)
   /* If we haven't eaten the worm accidentally, look if any attacks on the
    * worm have appeared.
    */
-  if (k == inessential_liberties && board[pos] != EMPTY) {
+  if (k == inessential_liberties && goban->board[pos] != EMPTY) {
     /* Try to look for moves as in position 1. If the worm still has
      * more than one liberty, try to play on every essential liberty
      * and see if an attack appears.
@@ -247,7 +247,7 @@ endgame_analyze_worm_liberties(int pos, int color)
   /* Undo all the moves made to fill inessential liberties. */
   for (k = 0; k < inessential_liberties; k++)
     popgo(goban);
-  ASSERT1(goban, stackp == 0, pos);
+  ASSERT1(goban, goban->stackp == 0, pos);
 
   num_attacks2 = 0;
   for (k = 0; k < num_attacks; k++) {
@@ -275,7 +275,7 @@ endgame_analyze_worm_liberties(int pos, int color)
 	for (i = 0; i < 4; i++) {
 	  int pos2 = defenses[k] + delta[i];
 
-	  if (board[pos2] == EMPTY) {
+	  if (goban->board[pos2] == EMPTY) {
 	    int m;
 
 	    if (!is_proper_eye_space(pos2) && safe_move(goban, pos2, other))
@@ -334,18 +334,18 @@ endgame_analyze_worm_liberties(int pos, int color)
   }
 
   /* GNU Go currently doesn't allow suicide, but let's assume it does. */
-  if (k == inessential_liberties && board[pos] != EMPTY) {
+  if (k == inessential_liberties && goban->board[pos] != EMPTY) {
     if (countlib(goban, pos) > 1) {
       for (k = 0; k < num_attacks2; k++) {
 	if (trymove(goban, attacks[k], other, "endgame", pos)) {
 	  if (attack(goban, pos, NULL) != 0) {
 	    TRACE(goban, "  endgame move with territorial value %d.0 found at %1m\n",
 		  1, attacks[k]);
-	    add_expand_territory_move(attacks[k]);
+	    add_expand_territory_move(goban, attacks[k]);
 	    /* FIXME: We just guess the value here. Find a way to calculate it
 	     *	      (more) precisely.
 	     */
-	    set_minimum_territorial_value(attacks[k], 1.0);
+	    set_minimum_territorial_value(goban, attacks[k], 1.0);
 	  }
 
 	  popgo(goban);
@@ -355,18 +355,18 @@ endgame_analyze_worm_liberties(int pos, int color)
     else if (essential_liberties > 0  && essential_libs[0] == attacks[0]) {
       TRACE(goban, "  endgame move with territorial value %d.0 found at %1m\n",
 	    1, attacks[k]);
-      add_expand_territory_move(attacks[0]);
+      add_expand_territory_move(goban, attacks[0]);
       /* FIXME: We just guess the value here. Find a way to calculate it
        *	(more) precisely.
        */
-      set_minimum_territorial_value(attacks[0], 1.0);
+      set_minimum_territorial_value(goban, attacks[0], 1.0);
     }
 
     if (value > 0 && does_attack(goban, apos, pos)) {
       TRACE(goban, "  endgame move with territorial value %d.0 found at %1m\n",
 	    value, apos);
-      add_expand_territory_move(apos);
-      set_minimum_territorial_value(apos, (float) value);
+      add_expand_territory_move(goban, apos);
+      set_minimum_territorial_value(goban, apos, (float) value);
     }
   }
   else {
@@ -377,8 +377,9 @@ endgame_analyze_worm_liberties(int pos, int color)
   /* Undo all the moves made at the third step. */
   for (k = 0; k < inessential_liberties; k++)
     popgo(goban);
-  ASSERT1(goban, stackp == 0, pos);
+  ASSERT1(goban, goban->stackp == 0, pos);
 }
+
 
 /* A backfilling dame is a defense move, usually within potential own
  * territory, which does not have to be played immediately but after
@@ -389,10 +390,10 @@ endgame_analyze_worm_liberties(int pos, int color)
  * blunders while filling dame.
  */
 static void
-endgame_find_backfilling_dame(int str, int color_to_move)
+endgame_find_backfilling_dame(Goban *goban, int str, int color_to_move)
 {
   int k;
-  int color = board[str];
+  int color = goban->board[str];
   int other = OTHER_COLOR(color);
   int essential_liberties;
   int essential_libs[MAXLIBS];
@@ -408,7 +409,8 @@ endgame_find_backfilling_dame(int str, int color_to_move)
 
   while (loop_again) {
     loop_again = 0;
-    if (!endgame_find_liberties(str, &essential_liberties, essential_libs,
+    if (!endgame_find_liberties(goban, str,
+				&essential_liberties, essential_libs,
 				&inessential_liberties, inessential_libs,
 				&false_eye_liberties, false_eye_libs))
       break;
@@ -417,7 +419,7 @@ endgame_find_backfilling_dame(int str, int color_to_move)
 	  || !trymove(goban, inessential_libs[k], other, "endgame", str))
 	continue;
       increase_depth_values();
-      if (board[str] == EMPTY)
+      if (goban->board[str] == EMPTY)
 	break;
       if (attack_and_defend(goban, str, NULL, NULL, NULL, &dpos)) {
 	if (worm[dpos].color == EMPTY) {
@@ -433,7 +435,7 @@ endgame_find_backfilling_dame(int str, int color_to_move)
     }
   }
   
-  while (stackp > 0) {
+  while (goban->stackp > 0) {
     popgo(goban);
     decrease_depth_values();
   }
@@ -443,19 +445,20 @@ endgame_find_backfilling_dame(int str, int color_to_move)
       move = potential_moves[k];
       TRACE(goban, "  backfilling dame found at %1m for string %1m\n", move, str);
       if (color == color_to_move) {
-	add_expand_territory_move(move);
-	set_minimum_territorial_value(move, 0.1);
+	add_expand_territory_move(goban, move);
+	set_minimum_territorial_value(goban, move, 0.1);
       }
       break;
     }
 }
+
 
 /* Find liberties of the string str with various characteristics. See
  * the comments above endgame_analyze_worm_liberties() for more
  * information.
  */
 static int
-endgame_find_liberties(int str,
+endgame_find_liberties(const Goban *goban, int str,
 		       int *essential_liberties, int essential_libs[MAXLIBS],
 		       int *inessential_liberties,
 		       int inessential_libs[MAXLIBS],
@@ -465,7 +468,7 @@ endgame_find_liberties(int str,
   int libs[MAXLIBS];
   int k;
 
-  ASSERT1(goban, IS_STONE(board[str]), str);
+  ASSERT1(goban, IS_STONE(goban->board[str]), str);
 
   *essential_liberties = 0;
   *inessential_liberties = 0;
@@ -491,13 +494,13 @@ endgame_find_liberties(int str,
       for (i = 0; i < 4; i++) {
 	int pos = lib + delta[i];
 
-	if (!IS_STONE(board[pos]) || !IS_STONE(worm[pos].color))
+	if (!IS_STONE(goban->board[pos]) || !IS_STONE(worm[pos].color))
 	  continue;
 
 	if (worm[pos].attack_codes[0] != 0 || dragon[pos].status != ALIVE)
 	  return 0;
 
-	if (board[pos] == board[str]) {
+	if (goban->board[pos] == goban->board[str]) {
 	  if (find_origin(goban, pos) != find_origin(goban, str))
 	    essential = 1;
 	}
@@ -520,6 +523,7 @@ endgame_find_liberties(int str,
   }
   return 1;
 }
+
 
 /*
  * Local Variables:

@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include "liberty.h"
 #include "patterns.h"
-#include "old-board.h"
 
 
 /* Try to match all (permutations of) connection patterns at (m,n).
@@ -33,8 +32,8 @@
  */
 
 static void
-cut_connect_callback(int anchor, int color, struct pattern *pattern,
-		     int ll, void *data)
+cut_connect_callback(Goban *goban, int anchor, int color,
+		     struct pattern *pattern, int ll, void *data)
 {
   int move;
   int k;
@@ -79,7 +78,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(ll, move, color, 0))
+    if (!pattern->autohelper(goban, ll, move, color, 0))
       return;
   }
 
@@ -87,7 +86,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
    * be rejected.
    */
   if (pattern->helper) {
-    if (!pattern->helper(pattern, ll, move, color))
+    if (!pattern->helper(goban, pattern, ll, move, color))
       return;
   }
 
@@ -119,7 +118,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
 
   /* does the pattern have an action? */
   if (pattern->autohelper_flag & HAVE_ACTION) {
-    pattern->autohelper(ll, move, color, 1);
+    pattern->autohelper(goban, ll, move, color, 1);
   }
 
   /* If it is a B pattern, set cutting point. */
@@ -145,7 +144,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
      * can be attacked.
      */
     if ((pattern->class & CLASS_C)
-	&& board[pos] == color
+	&& goban->board[pos] == color
 	&& pattern->patn[k].att == ATT_O
 	&& ((pattern->class & CLASS_s) || attack(goban, pos, NULL) == 0)) {
       if (first_dragon == NO_MOVE)
@@ -158,7 +157,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
 	if (verbose || (debug & DEBUG_DRAGONS))
 	  gprintf(goban, "Pattern %s joins %C dragons %1m, %1m\n",
 		  pattern->name, color, first_dragon, second_dragon);
-	join_dragons(second_dragon, first_dragon);
+	join_dragons(goban, second_dragon, first_dragon);
 	/* Now look for another second dragon. */
 	second_dragon = NO_MOVE;
 	first_dragon = dragon[pos].origin;
@@ -178,37 +177,37 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
 
 /* Only consider B patterns. */
 static void
-cut_callback(int anchor, int color, struct pattern *pattern, int ll,
-	     void *data)
+cut_callback(Goban *goban, int anchor, int color,
+	     struct pattern *pattern, int ll, void *data)
 {
   if (pattern->class & CLASS_B)
-    cut_connect_callback(anchor, color, pattern, ll, data);
+    cut_connect_callback(goban, anchor, color, pattern, ll, data);
 }
   
 
 /* Consider C patterns and those without classification. */
 static void
-conn_callback(int anchor, int color, struct pattern *pattern, int ll,
-	      void *data)
+conn_callback(Goban *goban, int anchor, int color,
+	      struct pattern *pattern, int ll, void *data)
 {
   if (!(pattern->class & CLASS_B))
-    cut_connect_callback(anchor, color, pattern, ll, data);
+    cut_connect_callback(goban, anchor, color, pattern, ll, data);
 }
   
 /* Find cutting points which should inhibit amalgamations and sever
  * the adjacent eye space.
  */
 void
-find_cuts(void)
+find_cuts(Goban *goban)
 {
-  matchpat(cut_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
+  matchpat(goban, cut_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
 }
 
 /* Find explicit connection patterns and amalgamate the involved dragons. */
 void
-find_connections(void)
+find_connections(Goban *goban)
 {
-  matchpat(conn_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
+  matchpat(goban, conn_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
 }
 
 

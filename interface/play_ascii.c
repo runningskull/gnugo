@@ -465,7 +465,7 @@ computer_move(Gameinfo *gameinfo, int *passes)
   init_sgf(gameinfo);
 
   /* Generate computer move. */
-  move_value = gnugo_genmove(&i, &j, gameinfo->to_move, &resign);
+  move_value = gnugo_genmove(goban, &i, &j, gameinfo->to_move, &resign);
   if (resignation_allowed && resign) {
     int state = ascii_endgame(gameinfo, 2);
     if (state != -1)
@@ -477,7 +477,7 @@ computer_move(Gameinfo *gameinfo, int *passes)
   }
 
   if (showscore) {
-    gnugo_estimate_score(&upper_bound, &lower_bound);
+    gnugo_estimate_score(goban, &upper_bound, &lower_bound);
     current_score_estimate = (int) ((lower_bound + upper_bound) / 2.0);
   }
 
@@ -904,7 +904,7 @@ do_play_ascii(Gameinfo *gameinfo)
 	  break;
 
 	case CMD_DEAD:
-	  examine_position(FULL_EXAMINE_DRAGONS);
+	  examine_position(goban, FULL_EXAMINE_DRAGONS);
 	  showdead = !showdead;
 	  break;
 
@@ -921,27 +921,27 @@ do_play_ascii(Gameinfo *gameinfo)
 	case CMD_SHOWMOYO:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_MOYO;
-	  examine_position(EXAMINE_DRAGONS);
+	  examine_position(goban, EXAMINE_DRAGONS);
 	  printmoyo = tmp;
 	  break;
 
 	case CMD_SHOWTERRI:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_TERRITORY;
-	  examine_position(EXAMINE_DRAGONS);
+	  examine_position(goban, EXAMINE_DRAGONS);
 	  printmoyo = tmp;
 	  break;
 
 	case CMD_SHOWAREA:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_AREA;
-	  examine_position(EXAMINE_DRAGONS);
+	  examine_position(goban, EXAMINE_DRAGONS);
 	  printmoyo = tmp;
 	  break;
 
 	case CMD_SHOWDRAGONS:
-	  examine_position(EXAMINE_DRAGONS);
-	  showboard(1);
+	  examine_position(goban, EXAMINE_DRAGONS);
+	  showboard(goban, 1);
 	  break;
 
 	case CMD_GOTO:
@@ -987,8 +987,8 @@ do_play_ascii(Gameinfo *gameinfo)
 	  break;
 
 	case CMD_LISTDRAGONS:
-	  examine_position(EXAMINE_DRAGONS);
-	  show_dragons();
+	  examine_position(goban, EXAMINE_DRAGONS);
+	  show_dragons(goban);
 	  break;
 
 	default:
@@ -1033,7 +1033,7 @@ ascii_endgame(Gameinfo *gameinfo, int reason)
   int state = 0;
 
   if (reason == 0) {		/* Two passes, game is over. */
-    gnugo_who_wins(gameinfo->computer_player, stdout);
+    gnugo_who_wins(goban, gameinfo->computer_player, stdout);
     printf("\nIf you disagree, we may count the game together.\n");
 
     sgftreeWriteResult(&sgftree, (white_score + black_score)/2.0, 1);
@@ -1168,7 +1168,7 @@ ascii_count(Gameinfo *gameinfo)
       }
     }
   }
-  gnugo_who_wins(gameinfo->computer_player, stdout);
+  gnugo_who_wins(goban, gameinfo->computer_player, stdout);
 }
 
 

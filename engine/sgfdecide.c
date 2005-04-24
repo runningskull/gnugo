@@ -56,7 +56,7 @@ decide_string(int pos)
     sgffile_begindump(goban, &tree);
 
   /* Prepare pattern matcher and reading code. */
-  reset_engine();
+  reset_engine(goban);
 
   count_variations = 1;
   acode = attack(goban, pos, &aa);
@@ -142,7 +142,7 @@ decide_connection(int apos, int bpos)
     sgffile_begindump(goban, &tree);
 
   /* Prepare pattern matcher and reading code. */
-  reset_engine();
+  reset_engine(goban);
 
   count_variations = 1;
   result = string_connect(goban, apos, bpos, &move);
@@ -210,9 +210,9 @@ decide_owl(int pos)
   }
 
   /* Prepare pattern matcher and reading code. */
-  reset_engine();
+  reset_engine(goban);
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf(goban, "finished examine_position\n");
 
   /* We want to see the reading performed, not just a result picked
@@ -224,7 +224,7 @@ decide_owl(int pos)
     sgffile_begindump(goban, &tree);
 
   count_variations = 1;
-  acode = owl_attack(pos, &move, &result_certain, &kworm);
+  acode = owl_attack(goban, pos, &move, &result_certain, &kworm);
   if (acode) {
     if (acode == WIN) {
       if (move == NO_MOVE)
@@ -253,7 +253,7 @@ decide_owl(int pos)
 
   reading_cache_clear();
   count_variations = 1;
-  dcode = owl_defend(pos, &move, &result_certain, &kworm);
+  dcode = owl_defend(goban, pos, &move, &result_certain, &kworm);
 
   if (dcode) {
     if (dcode == WIN) {
@@ -298,11 +298,11 @@ decide_dragon_data(int pos)
     fprintf(stderr, "gnugo: --decide-dragon-data called on an empty vertex\n");
     return;
   }
-  reset_engine();
-  silent_examine_position(FULL_EXAMINE_DRAGONS);
+  reset_engine(goban);
+  silent_examine_position(goban, FULL_EXAMINE_DRAGONS);
 
   gprintf(goban, "Dragon at %1m:\n", pos);
-  report_dragon(stderr, pos);
+  report_dragon(goban, stderr, pos);
 }
 
 
@@ -323,9 +323,9 @@ decide_semeai(int apos, int bpos)
   }
 
   /* Prepare pattern matcher and reading code. */
-  reset_engine();
+  reset_engine(goban);
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf(goban, "finished examine_position\n");
   count_variations = 1;
 
@@ -338,7 +338,7 @@ decide_semeai(int apos, int bpos)
 
   gprintf(goban, "Analyzing semeai between %1m and %1m, %C moves first\n",
 	  apos, bpos, board[apos]);
-  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 1,
+  owl_analyze_semeai(goban, apos, bpos, &resulta, &resultb, &move, 1,
 		     &result_certain);
   gprintf(goban, "Semeai defense of %1m: result %s %1m\n",
 	  apos, result_to_string(resulta), move);
@@ -349,7 +349,7 @@ decide_semeai(int apos, int bpos)
   
   gprintf(goban, "Analyzing semeai between %1m and %1m, %C moves first\n",
 	  bpos, apos, board[bpos]);
-  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 1,
+  owl_analyze_semeai(goban, bpos, apos, &resultb, &resulta, &move, 1,
 		     &result_certain);
   gprintf(goban, "Semeai defense of %1m: result %s %1m\n",
 	  bpos, result_to_string(resultb), move);
@@ -376,9 +376,9 @@ decide_tactical_semeai(int apos, int bpos)
   }
 
   /* Prepare pattern matcher and reading code. */
-  reset_engine();
+  reset_engine(goban);
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf(goban, "finished examine_position\n");
   count_variations = 1;
 
@@ -389,14 +389,14 @@ decide_tactical_semeai(int apos, int bpos)
   if (*outfilename)
     sgffile_begindump(goban, &tree);
 
-  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0, &dummy);
+  owl_analyze_semeai(goban, apos, bpos, &resulta, &resultb, &move, 0, &dummy);
   gprintf(goban, "After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
 	  color_to_string(color),
 	  move,
 	  apos, status_to_string(resulta),
   	  bpos, status_to_string(resultb),
 	  count_variations);
-  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 0, &dummy);
+  owl_analyze_semeai(goban, bpos, apos, &resultb, &resulta, &move, 0, &dummy);
   gprintf(goban, "After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
 	  color_to_string(color),
 	  move,
@@ -425,9 +425,9 @@ decide_position()
   SGFTree tree;
 
   /* Prepare pattern matcher and reading code. */
-  reset_engine();
+  reset_engine(goban);
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
 
   /* We want to see the reading performed, not just a result picked
    * from the cache. Thus we clear the cache here. */
@@ -448,7 +448,7 @@ decide_position()
     gprintf(goban, "\nanalyzing %1m\n", pos);
     gprintf(goban, "status=%s, escape=%d\n", 
 	    snames[dragon[pos].crude_status], DRAGON2(pos).escape_route);
-    acode = owl_attack(pos, &move, NULL, &kworm);
+    acode = owl_attack(goban, pos, &move, NULL, &kworm);
     if (acode) {
       if (acode == WIN) {
 	if (move == NO_MOVE)
@@ -468,7 +468,7 @@ decide_position()
 		pos, kworm, move, count_variations);
       
       count_variations = 1;
-      dcode = owl_defend(pos, &move, NULL, &kworm);
+      dcode = owl_defend(goban, pos, &move, NULL, &kworm);
       if (dcode) {
 	if (dcode == WIN) {
 	  if (move == NO_MOVE)
@@ -525,8 +525,8 @@ decide_eye(int pos)
   int eyepos;
   SGFTree tree;
 
-  reset_engine();
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  reset_engine(goban);
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
   
   color = black_eye[pos].color;
   if (!IS_STONE(color)) {
@@ -535,7 +535,7 @@ decide_eye(int pos)
   }
 
   if (printboard)
-    showboard(0);
+    showboard(goban, 0);
 
   /* Enable sgf output. */
   if (*outfilename)
@@ -544,7 +544,7 @@ decide_eye(int pos)
   
   if (black_eye[pos].color == BLACK) {
     eyepos = black_eye[pos].origin;
-    compute_eyes(eyepos, &value, &attack_point, &defense_point,
+    compute_eyes(goban, eyepos, &value, &attack_point, &defense_point,
 		 black_eye, half_eye, 0);
     gprintf(goban, "Black eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
     if (eye_move_urgency(&value) > 0) {
@@ -555,7 +555,7 @@ decide_eye(int pos)
   
   if (white_eye[pos].color == WHITE) {
     eyepos = white_eye[pos].origin;
-    compute_eyes(eyepos, &value, &attack_point, &defense_point,
+    compute_eyes(goban, eyepos, &value, &attack_point, &defense_point,
 		 white_eye, half_eye, 0);
     gprintf(goban, "White eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
     if (eye_move_urgency(&value) > 0) {
@@ -585,15 +585,15 @@ decide_combination(int color)
   int pos;
 
   /* Prepare pattern matcher and reading code. */
-  reset_engine();
+  reset_engine(goban);
 
-  silent_examine_position(EXAMINE_ALL);
+  silent_examine_position(goban, EXAMINE_ALL);
 
   if (*outfilename)
     sgffile_begindump(goban, &tree);
   count_variations = 1;
 
-  if (atari_atari(color, &attack_move, defense_moves, verbose)) {
+  if (atari_atari(goban, color, &attack_move, defense_moves, verbose)) {
     gprintf(goban, "Combination attack for %C at %1m, defense at ", color,
 	    attack_move);
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -626,10 +626,10 @@ decide_surrounded(int pos)
   }
 
   /* Prepare pattern matcher and reading code. */
-  reset_engine();
+  reset_engine(goban);
 
-  silent_examine_position(EXAMINE_ALL);
-  surround_status = compute_surroundings(pos, NO_MOVE, 1, NULL);
+  silent_examine_position(goban, EXAMINE_ALL);
+  surround_status = compute_surroundings(goban, pos, NO_MOVE, 1, NULL);
   if (surround_status == 1)
     gprintf(goban, "the dragon at %1m is SURROUNDED!\n", pos);
   else if (surround_status == 2)
@@ -646,7 +646,7 @@ decide_oracle(Gameinfo *gameinfo, char *infilename, char *untilstring)
 {
   SGFTree tree;
 
-  reset_engine();
+  reset_engine(goban);
   if (*outfilename)
     sgffile_begindump(goban, &tree);
 

@@ -21,7 +21,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -31,11 +30,13 @@
 #include "gg_utils.h"
 
 /* Forward declarations */
-static int goal_dist(int pos, char goal[BOARDMAX]);
+static int goal_dist(const Goban *goban, int pos, char goal[BOARDMAX]);
 static int compare_angles(const void *a, const void *b);
-static void show_surround_map(char mf[BOARDMAX], char mn[BOARDMAX]);
+static void show_surround_map(const Goban *goban, char mf[BOARDMAX],
+			      char mn[BOARDMAX]);
 
 /* Globals */
+/* THREAD-FIXME: Static variables are unacceptable. */
 static int gg;      /* stores the gravity center of the goal */
 
 
@@ -83,8 +84,11 @@ static int gg;      /* stores the gravity center of the goal */
  */
 
 int
-compute_surroundings(int pos, int apos, int showboard, int *surround_size)
+compute_surroundings(const Goban *goban, int pos, int apos, int showboard,
+		     int *surround_size)
 {
+  const Intersection *const board = goban->board;
+  const int board_size = goban->board_size;
   int i, j;
   int m, n;
   int k;
@@ -111,11 +115,11 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   if (DRAGON2(pos).hostile_neighbors == 0)
     return(0);
   
-  memset(mf, 0, sizeof(mf));
-  memset(mn, 0, sizeof(mn));
-  memset(sd, 0, sizeof(sd));
+  memset(mf, 0, sizeof mf);
+  memset(mn, 0, sizeof mn);
+  memset(sd, 0, sizeof sd);
   
-  mark_dragon(pos, mf, 1);
+  mark_dragon(goban, pos, mf, 1);
 
   /* mark hostile neighbors */
 
@@ -125,7 +129,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
     if (board[nd] != color) {
       if (0)
 	gprintf(goban, "neighbor: %1m\n", nd);
-      mark_dragon(nd, mn, 1);
+      mark_dragon(goban, nd, mn, 1);
     }
   }
 
@@ -153,7 +157,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 
   for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
     if (ON_BOARD(goban, dpos) && mn[dpos]) 
-      sd[dpos] = goal_dist(dpos, mf);
+      sd[dpos] = goal_dist(goban, dpos, mf);
 
   /* revise markings */
 
@@ -216,7 +220,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   }
   
   if (showboard == 1) {
-    show_surround_map(mf, mn);
+    show_surround_map(goban, mf, mn);
   }
 
   /* find top row of surrounding polyhedron */
@@ -386,7 +390,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	&& !mf[dpos]) {
 
       for (mpos = BOARDMIN; mpos < BOARDMAX; mpos++)
-	if (ON_BOARD(goban, mpos) && is_same_dragon(mpos, dpos))
+	if (ON_BOARD(goban, mpos) && is_same_dragon(goban, mpos, dpos))
 	  mf[mpos] = 2;
     }
     /* A special case
@@ -413,7 +417,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	    && board[dpos + delta[k-4]] == EMPTY
 	    && board[dpos + delta[(k-3)%4]] == EMPTY) {
 	  for (mpos = BOARDMIN; mpos < BOARDMAX; mpos++)
-	    if (ON_BOARD(goban, mpos) && is_same_dragon(mpos, dpos))
+	    if (ON_BOARD(goban, mpos) && is_same_dragon(goban, mpos, dpos))
 	      mf[mpos] = 2;
 	}
     }
@@ -495,7 +499,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   }
 
   if (showboard == 1 || (showboard == 2 && surrounded)) {
-    show_surround_map(mf, mn);
+    show_surround_map(goban, mf, mn);
   }
 
   if (!apos && surrounded && surround_pointer < MAX_SURROUND) {
@@ -521,7 +525,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
  */
 
 static int
-goal_dist(int pos, char goal[BOARDMAX])
+goal_dist(const Goban *goban, int pos, char goal[BOARDMAX])
 {
   int dist = 10000;
   int ii;
@@ -598,13 +602,13 @@ compare_angles(const void *a, const void *b)
 
 
 static void
-show_surround_map(char mf[BOARDMAX], char mn[BOARDMAX])
+show_surround_map(const Goban *goban, char mf[BOARDMAX], char mn[BOARDMAX])
 {
   int m, n;
 
-  start_draw_board();
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
+  start_draw_board(goban->board_size);
+  for (m = 0; m < goban->board_size; m++)
+    for (n = 0; n < goban->board_size; n++) {
       int col, c;
       
       if (mf[POS(m, n)]) {
@@ -621,17 +625,19 @@ show_surround_map(char mf[BOARDMAX], char mn[BOARDMAX])
 	col = GG_COLOR_CYAN;
       else
 	col = GG_COLOR_BLACK;
-      if (board[POS(m, n)] == BLACK)
+      if (BOARD(goban, m, n) == BLACK)
 	c = 'X';
-      else if (board[POS(m, n)] == WHITE)
+      else if (BOARD(goban, m, n) == WHITE)
 	c = 'O';
       else if (mn[POS(m, n)])
 	c = '*';
       else
 	c = '.';
-      draw_color_char(m, n, c, col);
+
+      draw_color_char(goban->board_size, m, n, c, col);
     }
-  end_draw_board();
+
+  end_draw_board(goban->board_size);
 }
 
 
@@ -646,11 +652,11 @@ is_surrounded(int dr)
  */
 
 int
-does_surround(int move, int dr)
+does_surround(const Goban *goban, int move, int dr)
 {
   if (DRAGON2(dr).surround_status)
     return 0;
-  return compute_surroundings(dr, move, 0, NULL);
+  return compute_surroundings(goban, dr, move, 0, NULL);
 }
 
 

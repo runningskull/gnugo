@@ -185,8 +185,8 @@ draw_active_area(const Goban *goban, char board[BOARDMAX], int apos)
   int cw = (apos == NO_MOVE) ? 'O' : 'o';
   int cb = (apos == NO_MOVE) ? 'X' : 'x';
 
-  start_draw_board();
-  
+  start_draw_board(goban->board_size);
+
   for (i = 0; i < goban->board_size; i++) {
     ii = goban->board_size - i;
     fprintf(stderr, "\n%2d", ii);
@@ -217,7 +217,7 @@ draw_active_area(const Goban *goban, char board[BOARDMAX], int apos)
     fprintf(stderr, " %d", ii);
   }
 
-  end_draw_board();
+  end_draw_board(goban->board_size);
 }
 
 
@@ -1375,13 +1375,13 @@ mark_dragon_hotspot_values(const Goban *goban, float values[BOARDMAX], int dr,
     for (k = 0; k < 8; k++) {
       int pos2 = pos + delta[k];
       if (IS_STONE(board[pos2])
-	  && (is_same_dragon(pos2, dr)
+	  && (is_same_dragon(goban, pos2, dr)
 	      || (are_neighbor_dragons(pos2, dr)
 		  && board[pos2] == board[dr]))
 	  && (countlib(goban, pos2) <= 4
 	      || is_edge_vertex(goban, pos))) {
 	if (k < 4) {
-	  if (is_same_dragon(pos2, dr))
+	  if (is_same_dragon(goban, pos2, dr))
 	    values[pos] += contribution;
 	  else
 	    values[pos] += 0.5 * contribution;

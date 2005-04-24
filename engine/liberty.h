@@ -50,11 +50,11 @@ void clearstats(void);
 
 void transformation_init(void);
 
-void report_worm(int m, int n);
-void ascii_report_worm(char *string);
-void report_dragon(FILE *outfile, int pos);
-void ascii_report_dragon(char *string);
-struct dragon_data2 *dragon2_func(int pos);
+void report_worm(const Goban *goban, int m, int n);
+void ascii_report_worm(const Goban *goban, char *string);
+void report_dragon(const Goban *goban, FILE *outfile, int pos);
+void ascii_report_dragon(const Goban *goban, char *string);
+struct dragon_data2 *dragon2_func(const Goban *goban, int pos);
 
 /* prototypes for reorientation functions */
 
@@ -182,26 +182,30 @@ struct match_node;
  * Try to match a pattern in the database to the board. Callbacks for
  * each match.
  */
-typedef void (*matchpat_callback_fn_ptr)(int anchor, int color,
-                                         struct pattern *, int rotation,
-                                         void *data);
-typedef void (*fullboard_matchpat_callback_fn_ptr)(int move,
-                                                   struct fullboard_pattern *,
-                                                   int rotation);
-typedef void (*corner_matchpat_callback_fn_ptr)(int move, int color,
-						struct corner_pattern *pattern,
-						int trans,
-						int *stones, int num_stones);
-void matchpat(matchpat_callback_fn_ptr callback, int color,
+typedef void (* matchpat_callback_fn_ptr)
+  (Goban *goban, int anchor, int color, struct pattern *, int rotation,
+   void *data);
+
+typedef void (* fullboard_matchpat_callback_fn_ptr)
+  (const Goban *goban, int move, struct fullboard_pattern *, int rotation);
+
+typedef void (* corner_matchpat_callback_fn_ptr)
+  (Goban *goban, int move, int color, struct corner_pattern *pattern,
+   int trans, int *stones, int num_stones);
+
+
+void matchpat(Goban *goban, matchpat_callback_fn_ptr callback, int color,
 	      struct pattern_db *pdb, void *callback_data,
 	      char goal[BOARDMAX]);
-void matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
-	      struct pattern_db *pdb, void *callback_data,
-	      char goal[BOARDMAX], int anchor_in_goal);
-void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
+void matchpat_goal_anchor(Goban *goban,
+			  matchpat_callback_fn_ptr callback, int color,
+			  struct pattern_db *pdb, void *callback_data,
+			  char goal[BOARDMAX], int anchor_in_goal);
+void fullboard_matchpat(Goban *goban,
+			fullboard_matchpat_callback_fn_ptr callback,
 			int color, struct fullboard_pattern *pattern);
-void corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
-		     struct corner_db *database);
+void corner_matchpat(Goban *goban, corner_matchpat_callback_fn_ptr callback,
+		     int color, struct corner_db *database);
 void dfa_match_init(void);
 void tree_match_init(void);
 void tree_initialize_pointers(struct tree_node_list *tnl,
@@ -301,16 +305,17 @@ int non_transitivity(Goban *goban, int str1, int str2, int str3, int *move);
 int break_in(Goban *goban, int str, const char goal[BOARDMAX], int *move);
 int block_off(Goban *goban, int str1, const char goal[BOARDMAX], int *move);
 
-int obvious_false_eye(int pos, int color);
-void estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
+int obvious_false_eye(Goban *goban, int pos, int color);
+void estimate_lunch_eye_value(Goban *goban, int lunch,
+			      int *min, int *probable, int *max,
 			      int appreciate_one_two_lunches);
 int owl_topological_eye(int pos, int color);
-int vital_chain(int pos);
+int vital_chain(Goban *goban, int pos);
 int confirm_safety(Goban *goban, int move, int color, int *defense_point,
 		   char safe_stones[BOARDMAX]);
-int dragon_weak(int pos);
+int dragon_weak(const Goban *goban, int pos);
 float dragon_weakness(int pos, int ignore_dead_dragons);
-int size_of_biggest_critical_dragon(void);
+int size_of_biggest_critical_dragon(const Goban *goban);
 float blunder_size(Goban *goban, int move, int color, int *defense_point,
 		   char safe_stones[BOARDMAX]);
 void set_depth_values(int level, int report_levels);
@@ -324,34 +329,39 @@ void restore_depth_values(void);
 int safe_move(Goban *goban, int move, int color);
 int does_secure(Goban *goban, int color, int move, int pos);
 
-void compute_new_dragons(int dragon_origins[BOARDMAX]);
-void join_dragons(int d1, int d2);
-int dragon_escape(char goal[BOARDMAX], int color, char escape_value[BOARDMAX]);
-void compute_refined_dragon_weaknesses(void);
+void compute_new_dragons(Goban *goban, int dragon_origins[BOARDMAX]);
+void join_dragons(const Goban *goban, int d1, int d2);
+int dragon_escape(const Goban *goban, char goal[BOARDMAX], int color,
+		  char escape_value[BOARDMAX]);
+void compute_refined_dragon_weaknesses(const Goban *goban);
 
 struct eyevalue;
-void compute_dragon_genus(int d, struct eyevalue *genus, int eye_to_exclude);
-float crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
+void compute_dragon_genus(const Goban *goban, int d, struct eyevalue *genus,
+			  int eye_to_exclude);
+float crude_dragon_weakness(const Goban *goban, int safety,
+			    struct eyevalue *genus, int has_lunch,
 			    float moyo_value, float escape_route);
 
-int is_same_dragon(int d1, int d2);
+int is_same_dragon(const Goban *goban, int d1, int d2);
 int are_neighbor_dragons(int d1, int d2);
-void mark_dragon(int pos, char mx[BOARDMAX], char mark);
+void mark_dragon(const Goban *goban, int pos, char mx[BOARDMAX], char mark);
 int first_worm_in_dragon(int d);
-int next_worm_in_dragon(int w);
+int next_worm_in_dragon(const Goban *goban, int w);
 int lively_dragon_exists(int color);
-void compute_dragon_influence(void);
-void set_strength_data(int color, char safe_stones[BOARDMAX],
-		       float strength[BOARDMAX]);
-void mark_inessential_stones(int color, char safe_stones[BOARDMAX]);
+void compute_dragon_influence(Goban *goban);
+void set_strength_data(const Goban *goban, int color,
+		       char safe_stones[BOARDMAX], float strength[BOARDMAX]);
+void mark_inessential_stones(const Goban *goban, int color,
+			     char safe_stones[BOARDMAX]);
 
-void get_lively_stones(int color, char safe_stones[BOARDMAX]);
+void get_lively_stones(const Goban *goban, int color,
+		       char safe_stones[BOARDMAX]);
 int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
-void propagate_worm(int pos);
+void propagate_worm(const Goban *goban, int pos);
 void transform2(int i, int j, int *ti, int *tj, int trans);
-void find_cuts(void);
-void find_connections(void);
+void find_cuts(Goban *goban);
+void find_connections(Goban *goban);
 
 /* movelist.c */
 int movelist_move_known(int move, int max_points, int points[], int codes[]);
@@ -359,101 +369,108 @@ void movelist_change_point(int move, int code, int max_points,
 			   int points[], int codes[]);
 
 /* surround.c */
-int compute_surroundings(int pos, int apos, int showboard,
+int compute_surroundings(const Goban *goban, int pos, int apos, int showboard,
 			 int *surround_size);
 int is_surrounded(int pos);
-int does_surround(int move, int dragon);
+int does_surround(const Goban *goban, int move, int dragon);
 void reset_surround_data(void);
 int surround_map(int dr, int pos);
 
 /* functions to add (or remove) move reasons */
-void collect_move_reasons(int color);
+void collect_move_reasons(Goban *goban, int color);
 
-void clear_move_reasons(void);
-void add_lunch(int eater, int food);
-void add_attack_move(int pos, int ww, int code);
-void add_defense_move(int pos, int ww, int code);
-void add_attack_threat_move(int pos, int ww, int code);
-void remove_attack_threat_move(int pos, int ww);
-void add_defense_threat_move(int pos, int ww, int code);
-void add_connection_move(int pos, int dr1, int dr2);
-void add_cut_move(int pos, int dr1, int dr2);
-void add_antisuji_move(int pos);
-void add_semeai_move(int pos, int dr);
-void add_potential_semeai_attack(int pos, int dr1, int dr2);
-void add_potential_semeai_defense(int pos, int dr1, int dr2);
-void add_semeai_threat(int pos, int dr);
+void clear_move_reasons(const Goban *goban);
+void add_lunch(const Goban *goban, int eater, int food);
+void add_attack_move(const Goban *goban, int pos, int ww, int code);
+void add_defense_move(const Goban *goban, int pos, int ww, int code);
+void add_attack_threat_move(const Goban *goban, int pos, int ww, int code);
+void remove_attack_threat_move(const Goban *goban, int pos, int ww);
+void add_defense_threat_move(const Goban *goban, int pos, int ww, int code);
+void add_connection_move(const Goban *goban, int pos, int dr1, int dr2);
+void add_cut_move(const Goban *goban, int pos, int dr1, int dr2);
+void add_antisuji_move(const Goban *goban, int pos);
+void add_semeai_move(const Goban *goban, int pos, int dr);
+void add_potential_semeai_attack(const Goban *goban, int pos,
+				 int dr1, int dr2);
+void add_potential_semeai_defense(const Goban *goban, int pos,
+				  int dr1, int dr2);
+void add_semeai_threat(const Goban *goban, int pos, int dr);
 
-void add_owl_attack_move(int pos, int dr, int kworm, int code);
-void add_owl_defense_move(int pos, int dr, int code);
-void add_owl_attack_threat_move(int pos, int dr, int code);
-void add_owl_defense_threat_move(int pos, int dr, int code);
-void add_owl_prevent_threat_move(int pos, int dr);
-void add_owl_uncertain_defense_move(int pos, int dr);
-void add_owl_uncertain_attack_move(int pos, int dr);
-void add_gain_move(int pos, int target1, int target2);
-void add_loss_move(int pos, int target1, int target2);
+void add_owl_attack_move(const Goban *goban, int pos, int dr,
+			 int kworm, int code);
+void add_owl_defense_move(const Goban *goban, int pos, int dr, int code);
+void add_owl_attack_threat_move(const Goban *goban, int pos, int dr, int code);
+void add_owl_defense_threat_move(const Goban *goban, int pos,
+				 int dr, int code);
+void add_owl_prevent_threat_move(const Goban *goban, int pos, int dr);
+void add_owl_uncertain_defense_move(const Goban *goban, int pos, int dr);
+void add_owl_uncertain_attack_move(const Goban *goban, int pos, int dr);
+void add_gain_move(const Goban *goban, int pos, int target1, int target2);
+void add_loss_move(const Goban *goban, int pos, int target1, int target2);
 
-void add_my_atari_atari_move(int pos, int size);
-void add_your_atari_atari_move(int pos, int size);
-void add_vital_eye_move(int pos, int eyespace, int color);
-void add_invasion_move(int pos);
-void add_expand_territory_move(int pos);
-void add_expand_moyo_move(int pos);
-void add_strategical_attack_move(int pos, int dr);
-void add_strategical_defense_move(int pos, int dr);
+void add_my_atari_atari_move(const Goban *goban, int pos, int size);
+void add_your_atari_atari_move(const Goban *goban, int pos, int size);
+void add_vital_eye_move(const Goban *goban, int pos, int eyespace, int color);
+void add_invasion_move(const Goban *goban, int pos);
+void add_expand_territory_move(const Goban *goban, int pos);
+void add_expand_moyo_move(const Goban *goban, int pos);
+void add_strategical_attack_move(const Goban *goban, int pos, int dr);
+void add_strategical_defense_move(const Goban *goban, int pos, int dr);
 void add_worthwhile_threat_move(int pos);
-void add_replacement_move(int from, int to);
+void add_replacement_move(const Goban *goban, int from, int to);
 
 /* Parameters to add_either_move and add_all_move */
 #define ATTACK_STRING  1
 #define DEFEND_STRING  2
-void add_either_move(int pos, int reason1, int target1,
+
+void add_either_move(const Goban *goban, int pos, int reason1, int target1,
 		     int reason2, int target2);
-void add_all_move(int pos, int reason1, int target1,
+void add_all_move(const Goban *goban, int pos, int reason1, int target1,
 		  int reason2, int target2);
 
-int set_minimum_move_value(int pos, float value);
-void set_maximum_move_value(int pos, float value);
-void set_minimum_territorial_value(int pos, float value);
-void set_maximum_territorial_value(int pos, float value);
-void add_shape_value(int pos, float value);
-void add_followup_value(int pos, float value);
-void add_reverse_followup_value(int pos, float value);
-int list_move_reasons(FILE *out, int pos);
-void print_all_move_values(FILE *output);
+int set_minimum_move_value(const Goban *goban, int pos, float value);
+void set_maximum_move_value(const Goban *goban, int pos, float value);
+void set_minimum_territorial_value(const Goban *goban, int pos, float value);
+void set_maximum_territorial_value(const Goban *goban, int pos, float value);
+void add_shape_value(const Goban *goban, int pos, float value);
+void add_followup_value(const Goban *goban, int pos, float value);
+void add_reverse_followup_value(const Goban *goban, int pos, float value);
+int list_move_reasons(const Goban *goban, FILE *out, int pos);
+void print_all_move_values(const Goban *goban, FILE *output);
 void record_top_move(int move, float val);
 void remove_top_move(int move);
 void scale_randomness(int pos, float scaling);
-void compute_move_probabilities(float probabilities[BOARDMAX]);
+void compute_move_probabilities(const Goban *goban,
+				float probabilities[BOARDMAX]);
 
-void register_good_attack_threat(int move, int target);
-int is_known_good_attack_threat(int move, int target);
+void register_good_attack_threat(const Goban *goban, int move, int target);
+int is_known_good_attack_threat(const Goban *goban, int move, int target);
 
 int get_attack_threats(int pos, int max_strings, int strings[]);
 int get_defense_threats(int pos, int max_strings, int strings[]);
-void get_saved_worms(int pos, char saved[BOARDMAX]);
-void get_saved_dragons(int pos, char saved[BOARDMAX]);
-void mark_safe_stones(int color, int move_pos,
+void get_saved_worms(const Goban *goban, int pos, char saved[BOARDMAX]);
+void get_saved_dragons(const Goban *goban, int pos, char saved[BOARDMAX]);
+void mark_safe_stones(const Goban *goban, int color, int move_pos,
 		      const char saved_dragons[BOARDMAX],
 		      const char saved_worms[BOARDMAX],
 		      char safe_stones[BOARDMAX]);
 
 
-int owl_lively(int pos);
-int owl_escape_value(int pos);
+int owl_lively(const Goban *goban, int pos);
+int owl_escape_value(Goban *goban, int pos);
 int owl_goal_dragon(int pos);
-int owl_eyespace(int pos);
-int owl_big_eyespace(int pos);
-int owl_mineye(int pos);
-int owl_maxeye(int pos);
-int owl_proper_eye(int pos);
-int owl_eye_size(int pos);
-int owl_lunch(int str);
-int owl_strong_dragon(int pos);
-void owl_reasons(int color);
+int owl_eyespace(const Goban *goban, int pos);
+int owl_big_eyespace(const Goban *goban, int pos);
+int owl_mineye(const Goban *goban, int pos);
+int owl_maxeye(const Goban *goban, int pos);
+int owl_proper_eye(const Goban *goban, int pos);
+int owl_eye_size(const Goban *goban, int pos);
+int owl_lunch(const Goban *goban, int str);
+int owl_strong_dragon(const Goban *goban, int pos);
+void owl_reasons(Goban *goban, int color);
 
-void unconditional_life(int unconditional_territory[BOARDMAX], int color);
+void unconditional_life(Goban *goban, int unconditional_territory[BOARDMAX],
+			int color);
 void find_superstring(Goban *goban, int str, int *num_stones, int *stones);
 void find_superstring_conservative(Goban *goban, int str,
 				   int *num_stones, int *stones);
@@ -478,52 +495,59 @@ int free_handicap_total_stones(void);
 
 
 /* Various different strategies for finding a move */
-void fuseki(int color);
-void semeai(void);
-void semeai_move_reasons(int color);
-void shapes(int color);
-void endgame(int color);
-void endgame_shapes(int color);
+void fuseki(Goban *goban, int color);
+void semeai(Goban *goban);
+void semeai_move_reasons(const Goban *goban, int color);
+void shapes(Goban *goban, int color);
+void endgame(Goban *goban, int color);
+void endgame_shapes(Goban *goban, int color);
 
-void combinations(int color);
-int atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
+void combinations(Goban *goban, int color);
+int atari_atari(Goban *goban,
+		int color, int *attack_move, char defense_moves[BOARDMAX],
 		int save_verbose);
-int atari_atari_confirm_safety(int color, int tpos, int *move, int minsize,
+int atari_atari_confirm_safety(Goban *goban, int color, int tpos, int *move,
+			       int minsize,
 			       const char saved_dragons[BOARDMAX],
 			       const char saved_worms[BOARDMAX]);
 
-int atari_atari_blunder_size(int color, int tpos, char defense_moves[BOARDMAX],
+int atari_atari_blunder_size(Goban *goban, int color, int tpos,
+			     char defense_moves[BOARDMAX],
 			     const char safe_stones[BOARDMAX]);
 
-int review_move_reasons(int *move, float *value, int color,
+int review_move_reasons(Goban *goban, int *move, float *value, int color,
 			float pure_threat_value, float our_score,
 			int allowed_moves[BOARDMAX],
 			int use_thrashing_dragon_heuristics);
-void prepare_move_influence_debugging(int pos, int color);
-int fill_liberty(int *move, int color);
-int aftermath_genmove(int color, int do_capture_dead_stones,
+void prepare_move_influence_debugging(Goban *goban, int pos, int color);
+int fill_liberty(Goban *goban, int *move, int color);
+int aftermath_genmove(Goban *goban, int color, int do_capture_dead_stones,
 		      int allowed_moves[BOARDMAX]);
-enum dragon_status aftermath_final_status(int color, int pos);
+enum dragon_status aftermath_final_status(Goban *goban, int color, int pos);
 
-int owl_attack(int target, int *attack_point, int *certain, int *kworm);
-int owl_defend(int target, int *defense_point, int *certain, int *kworm);
-int owl_threaten_attack(int target, int *attack1, int *attack2);
-int owl_threaten_defense(int target, int *defend1, int *defend2);
-int owl_does_defend(int move, int target, int *kworm);
-int owl_confirm_safety(int move, int target, int *defense_point, int *kworm);
-int owl_does_attack(int move, int target, int *kworm);
-int owl_connection_defends(int move, int target1, int target2);
-int owl_substantial(int str);
-void owl_analyze_semeai(int apos, int bpos, 
+int owl_attack(Goban *goban, int target, int *attack_point, int *certain,
+	       int *kworm);
+int owl_defend(Goban *goban, int target, int *defense_point, int *certain,
+	       int *kworm);
+int owl_threaten_attack(Goban *goban, int target, int *attack1, int *attack2);
+int owl_threaten_defense(Goban *goban, int target, int *defend1, int *defend2);
+int owl_does_defend(Goban *goban, int move, int target, int *kworm);
+int owl_confirm_safety(Goban *goban, int move, int target, int *defense_point,
+		       int *kworm);
+int owl_does_attack(Goban *goban, int move, int target, int *kworm);
+int owl_connection_defends(Goban *goban, int move, int target1, int target2);
+int owl_substantial(Goban *goban, int str);
+void owl_analyze_semeai(Goban *goban, int apos, int bpos, 
 			int *resulta, int *resultb, int *semeai_move,
 			int owl, int *semeai_result_certain);
-void owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
+void owl_analyze_semeai_after_move(Goban *goban, int move, int color,
+				   int apos, int bpos,
 				   int *resulta, int *resultb,
 				   int *semeai_move, int owl,
 				   int *semeai_result_certain,
 				   int recompute_dragons);
 
-void set_search_diamond(int pos);
+void set_search_diamond(const Goban *goban, int pos);
 void reset_search_mask(void);
 void set_search_limit(int pos, int value);
 int oracle_play_move(int pos, int color);
@@ -532,22 +556,22 @@ void summon_oracle(void);
 void oracle_loadsgf(char *infilename, char *untilstring);
 int oracle_threatens(int move, int target);
 int within_search_area(int pos);
-int metamachine_genmove(int color, float *value);
-void draw_search_area(void);
+int metamachine_genmove(Goban *goban, int color, float *value);
+void draw_search_area(const Goban *goban);
 
-int genmove_restricted(int color, int allowed_moves[BOARDMAX]);
+int genmove_restricted(Goban *goban, int color, int allowed_moves[BOARDMAX]);
 
-void change_attack(int str, int move, int acode);
-void change_defense(int str, int move, int dcode);
-void change_attack_threat(int str, int move, int acode);
-void change_defense_threat(int str, int move, int dcode);
+void change_attack(const Goban *goban, int str, int move, int acode);
+void change_defense(const Goban *goban, int str, int move, int dcode);
+void change_attack_threat(const Goban *goban, int str, int move, int acode);
+void change_defense_threat(const Goban *goban, int str, int move, int dcode);
 int attack_move_known(int move, int str);
 int defense_move_known(int move, int str);
 int attack_threat_move_known(int move, int str);
 int defense_threat_move_known(int move, int str);
-void worm_reasons(int color);
+void worm_reasons(const Goban *goban, int color);
 
-int semeai_move_reason_known(int move, int dr);
+int semeai_move_reason_known(const Goban *goban, int move, int dr);
 
 int does_attack(Goban *goban, int move, int str);
 int does_defend(Goban *goban, int move, int str);
@@ -624,43 +648,55 @@ extern struct influence_data followup_influence;
 #define DEFAULT_STRENGTH 100.0
 
 /* Influence functions. */
-void compute_influence(int color, const char safe_stones[BOARDMAX],
+void compute_influence(Goban *goban, int color,
+		       const char safe_stones[BOARDMAX],
 		       const float strength[BOARDMAX],
 		       struct influence_data *q,
 		       int move, const char *trace_message);
-void compute_followup_influence(const struct influence_data *base,
+void compute_followup_influence(Goban *goban,
+				const struct influence_data *base,
 			        struct influence_data *q, 
 		                int move, const char *trace_message);
-void compute_escape_influence(int color, const char safe_stones[BOARDMAX],
+void compute_escape_influence(Goban *goban, int color,
+			      const char safe_stones[BOARDMAX],
 			      const char goal[BOARDMAX],
 			      const float strength[BOARDMAX],
                               char escape_value[BOARDMAX]);
 
-float influence_delta_territory(const struct influence_data *base,
+float influence_delta_territory(const Goban *goban,
+				const struct influence_data *base,
 	                        const struct influence_data *q, int color,
 				int move);
-int retrieve_delta_territory_cache(int pos, int color, float *move_value,
+int retrieve_delta_territory_cache(const Goban *goban,
+				   int pos, int color, float *move_value,
 			           float *followup_value,
 				   const struct influence_data *base,
 				   Hash_data safety_hash);
-void store_delta_territory_cache(int pos, int color, float move_value,
+void store_delta_territory_cache(const Goban *goban, int pos, int color,
+				 float move_value,
 				 float followup_value,
 				 const struct influence_data *base,
 			         Hash_data safety_hash);
 
-int whose_territory(const struct influence_data *q, int pos);
-int whose_loose_territory(const struct influence_data *q, int pos);
-int whose_moyo(const struct influence_data *q, int pos);
-int whose_area(const struct influence_data *q, int pos);
+int whose_territory(const Goban *goban,
+		    const struct influence_data *q, int pos);
+int whose_loose_territory(const Goban *goban,
+			  const struct influence_data *q, int pos);
+int whose_moyo(const Goban *goban,const struct influence_data *q, int pos);
+int whose_area(const Goban *goban, const struct influence_data *q, int pos);
+
 float influence_territory(const struct influence_data *q, int pos, int color);
-void influence_get_moyo_segmentation(const struct influence_data *q,
+void influence_get_moyo_segmentation(const Goban *goban,
+				     const struct influence_data *q,
 	       			     struct moyo_data *moyo);
-void influence_get_territory_segmentation(const struct influence_data *q,
+void influence_get_territory_segmentation(const Goban *goban,
+					  const struct influence_data *q,
 	       			          struct moyo_data *moyo);
-void influence_get_moyo_data(const struct influence_data *q,
+void influence_get_moyo_data(const Goban *goban,
+			     const struct influence_data *q,
 			     int moyo_color[BOARDMAX],
 			     float territory_value[BOARDMAX]);
-void get_influence(const struct influence_data *q,
+void get_influence(const Goban *goban, const struct influence_data *q,
 		   float white_influence[BOARDMAX],
 		   float black_influence[BOARDMAX],
 		   float white_strength[BOARDMAX],
@@ -672,12 +708,14 @@ void get_influence(const struct influence_data *q,
 		   float territory_value[BOARDMAX],
 		   int influence_regions[BOARDMAX],
 		   int non_territory[BOARDMAX]);
-float influence_score(const struct influence_data *q);
-float game_status(int color);
-void resegment_initial_influence(void);
-void influence_mark_non_territory(int pos, int color);
-int influence_considered_lively(const struct influence_data *q, int pos);
-void influence_erase_territory(struct influence_data *q, int pos, int color);
+float influence_score(const Goban *goban, const struct influence_data *q);
+float game_status(const Goban *goban, int color);
+void resegment_initial_influence(const Goban *goban);
+void influence_mark_non_territory(const Goban *goban, int pos, int color);
+int influence_considered_lively(const Goban *goban,
+				const struct influence_data *q, int pos);
+void influence_erase_territory(const Goban *goban, struct influence_data *q,
+			       int pos, int color);
 
 void break_territories(Goban *goban, int color_to_move,
 		       struct influence_data *q, int store, int pos);
@@ -691,13 +729,13 @@ int is_eye_space(int pos);
 int is_proper_eye_space(int pos);
 int is_marginal_eye_space(int pos);
 int max_eye_value(int pos);
-void test_eyeshape(int eyesize, int *eye_vertices);
+void test_eyeshape(int board_size, int eyesize, int *eye_vertices);
 int analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
 		     char *analyzed_eyegraph);
 
 
 /* debugging support */
-void goaldump(const char goal[BOARDMAX]);
+void goaldump(const Goban *goban, const char goal[BOARDMAX]);
 void move_considered(int move, float value);
 
 
@@ -1031,24 +1069,28 @@ extern int cutting_points[BOARDMAX];
  * definition of struct eye_data or struct half_eye_data.
  */
 
-void compute_eyes(int pos, struct eyevalue *value,
+void compute_eyes(Goban *goban, int pos, struct eyevalue *value,
                   int *attack_point, int *defense_point,
                   struct eye_data eye[BOARDMAX],
                   struct half_eye_data heye[BOARDMAX],
 		  int add_moves);
-void compute_eyes_pessimistic(int pos, struct eyevalue *value,
+void compute_eyes_pessimistic(Goban *goban, int pos, struct eyevalue *value,
                               int *pessimistic_min,
                               int *attack_point, int *defense_point,
                               struct eye_data eye[BOARDMAX],
                               struct half_eye_data heye[BOARDMAX]);
-void propagate_eye(int pos, struct eye_data eye[BOARDMAX]);
-int find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
+void propagate_eye(const Goban *goban, int pos, struct eye_data eye[BOARDMAX]);
+int find_eye_dragons(const Goban *goban, int origin,
+		     struct eye_data eye[BOARDMAX], int eye_color,
 		     int dragons[], int max_dragons);
-void make_domains(struct eye_data b_eye[BOARDMAX],
+void make_domains(Goban *goban,
+		  struct eye_data b_eye[BOARDMAX],
                   struct eye_data w_eye[BOARDMAX],
 		  int owl_call);
-void partition_eyespaces(struct eye_data eye[BOARDMAX], int color);
-void find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
+void partition_eyespaces(const Goban *goban, struct eye_data eye[BOARDMAX],
+			 int color);
+void find_half_and_false_eyes(Goban *goban, int color,
+			      struct eye_data eye[BOARDMAX],
 			      struct half_eye_data heye[BOARDMAX],
 			      int find_mask[BOARDMAX]);
 

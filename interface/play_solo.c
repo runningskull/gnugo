@@ -85,7 +85,7 @@ play_solo(Gameinfo *gameinfo, int moves)
   memset(&totalstats, '\0', sizeof(totalstats));
   while (passes < 2 && --moves >= 0) {
     reset_owl_node_counter();
-    move_value = gnugo_genmove(&i, &j, gameinfo->to_move, NULL);
+    move_value = gnugo_genmove(goban, &i, &j, gameinfo->to_move, NULL);
 
     gnugo_play_move(goban, i, j, gameinfo->to_move);
     sgffile_add_debuginfo(goban, sgftree.lastnode, move_value);
@@ -113,10 +113,10 @@ play_solo(Gameinfo *gameinfo, int moves)
   t2 = gg_cputime();
   
   /* Two passes and it's over. (EMPTY == BOTH) */
-  gnugo_who_wins(EMPTY, stdout);
+  gnugo_who_wins(goban, EMPTY, stdout);
 
   {
-    float score = gnugo_estimate_score(NULL, NULL);
+    float score = gnugo_estimate_score(goban, NULL, NULL);
     sgfWriteResult(sgftree.root, score, 1);
   }
   sgffile_output(&sgftree);
@@ -155,7 +155,7 @@ load_and_analyze_sgf_file(Gameinfo *gameinfo)
   if (metamachine)
     sgffile_begindump(goban, &sgftree);
 
-  move_value = gnugo_genmove(&i, &j, next, NULL);
+  move_value = gnugo_genmove(goban, &i, &j, next, NULL);
 
   if (is_pass(POS(i, j)))
     gprintf(goban, "%s move: PASS!\n", next == WHITE ? "white (O)" : "black (X)");
@@ -232,13 +232,13 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
   }
   
   next = gameinfo->to_move;
-  reset_engine();
+  reset_engine(goban);
   
   /* Complete the game by selfplay for the finish and aftermath methods. */
   if (method != ESTIMATE) {
     doing_scoring = 1;
     while (pass < 2) {
-      move = genmove_conservative(next, &move_value);
+      move = genmove_conservative(goban, next, &move_value);
       if (move != PASS_MOVE) {
 	pass = 0;
 	gprintf(goban, "%d %s move %1m\n", movenum,
@@ -260,14 +260,14 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
   
   /* Calculate the score. */
   if (method == AFTERMATH)
-    score = aftermath_compute_score(next, komi, score_tree);
+    score = aftermath_compute_score(goban, next, komi, score_tree);
   else {
     /* Before we call estimate_score() we must make sure that the
      * dragon status is computed. Therefore the call to
      * examine_position().
      */
-    examine_position(EXAMINE_ALL);
-    score = gnugo_estimate_score(NULL, NULL);
+    examine_position(goban, EXAMINE_ALL);
+    score = gnugo_estimate_score(goban, NULL, NULL);
   }
   
   if (score < 0.0) {

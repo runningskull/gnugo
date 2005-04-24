@@ -101,13 +101,13 @@ int  gnugo_placehand(Goban *goban, int handicap);
 int  gnugo_sethand(Goban *goban, int handicap, SGFNode *root);
 void gnugo_recordboard(const Goban *goban, SGFNode *node);
 
-float gnugo_genmove(int *i, int *j, int color, int *resign);
+float gnugo_genmove(Goban *goban, int *i, int *j, int color, int *resign);
 
 int  gnugo_attack(Goban *goban, int m, int n, int *i, int *j);
 int  gnugo_find_defense(Goban *goban, int m, int n, int *i, int *j);
 
-void  gnugo_who_wins(int color, FILE *outfile);
-float gnugo_estimate_score(float *upper, float *lower);
+void  gnugo_who_wins(Goban *goban, int color, FILE *outfile);
+float gnugo_estimate_score(Goban *goban, float *upper, float *lower);
 
 float gnugo_get_komi(const Goban *goban);
 void  gnugo_get_board(const Goban *goban, int board[MAX_BOARD][MAX_BOARD]);
@@ -281,11 +281,11 @@ extern int metamachine;   /* use metamachine_genmove                     */
 #define GG_COLOR_WHITE   7
 
 /* showbord.c */
-void start_draw_board(void);
-void draw_color_char(int m, int n, int c, int color);
-void draw_char(int m, int n, int c);
-void end_draw_board(void);
-void showboard(int xo);  /* ascii rep. of board to stderr */
+void start_draw_board(int board_size);
+void draw_color_char(int board_size, int m, int n, int c, int color);
+void draw_char(int board_size, int m, int n, int c);
+void end_draw_board(int board_size);
+void showboard(const Goban *goban, int xo);  /* ascii rep. of board to stderr */
 
 double gg_gettimeofday(void);
 
@@ -325,9 +325,9 @@ int DEBUG_func(int level, const char *fmt, ...);
 
 #define EXAMINE_ALL                 99
 
-void reset_engine(void);
-void examine_position(int how_much);
-void silent_examine_position(int how_much);
+void reset_engine(Goban *goban);
+void examine_position(Goban *goban, int how_much);
+void silent_examine_position(Goban *goban, int how_much);
 
 
 /* ================================================================ */
@@ -352,24 +352,25 @@ void change_owl_node_limit(int new_limit, int *old_value);
 
 /* utils.c */
 void change_dragon_status(const Goban *goban, int dr, int status);
-void who_wins(int color, FILE *outfile);
+void who_wins(Goban *goban, int color, FILE *outfile);
 
 /* high-level routine to generate the best move for the given color */
-int genmove(int color, float *value, int *resign);
-int genmove_conservative(int color, float *value);
+int genmove(Goban *goban, int color, float *value, int *resign);
+int genmove_conservative(Goban *goban, int color, float *value);
 
 /* Play through the aftermath. */
-float aftermath_compute_score(int color, float komi, SGFTree *tree);
+float aftermath_compute_score(Goban *goban, int color, float komi,
+			      SGFTree *tree);
 
 /* Basic information gathering. */
 /* worm.c */
-void make_worms(void);
-void compute_worm_influence(void);
+void make_worms(Goban *goban);
+void compute_worm_influence(Goban *goban);
 
 /* dragon.c */
-void make_dragons(int stop_before_owl);
-void initialize_dragon_data(void);
-void show_dragons(void);
+void make_dragons(Goban *goban, int stop_before_owl);
+void initialize_dragon_data(const Goban *goban);
+void show_dragons(const Goban *goban);
 int crude_status(int pos);
 int dragon_status(int pos);
 int same_dragon(int dr1, int dr2);

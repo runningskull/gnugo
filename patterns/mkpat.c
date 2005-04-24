@@ -294,13 +294,13 @@ static struct autohelper_func autohelper_functions[] = {
   {"odefend_against",		2, 0, 1.00,
 		"defend_against(goban, %s, color, %s)"},
   {"defend_against_atari",	1, 0, 1.00,
-		"defend_against_atari_helper(move, %s)"},
+		"defend_against_atari_helper(goban, move, %s)"},
   {"does_defend",		2, 0, 1.00, "does_defend(goban, %s, %s)"},
   {"does_attack",		2, 0, 1.00, "does_attack(goban, %s, %s)"},
-  {"attack",			1, 0, 1.00, "ATTACK_MACRO(%s)"},
-  {"defend",			1, 0, 1.00, "DEFEND_MACRO(%s)"},
+  {"attack",			1, 0, 1.00, "ATTACK_MACRO(goban, %s)"},
+  {"defend",			1, 0, 1.00, "DEFEND_MACRO(goban, %s)"},
   {"weakness",			1, 0, 0.01, "dragon_weakness(%s, 0)"},
-  {"weak",			1, 0, 0.01, "dragon_weak(%s)"},
+  {"weak",			1, 0, 0.01, "dragon_weak(goban, %s)"},
   {"safe_xmove", 		1, 0, 1.00,
 		"safe_move(goban, %s, OTHER_COLOR(color))"},
   {"safe_omove", 		1, 0, 1.00,
@@ -316,21 +316,21 @@ static struct autohelper_func autohelper_functions[] = {
 		"somewhere(goban, OTHER_COLOR(color), 0, %d"},
   {"o_somewhere",		0, 1, 0.01, "somewhere(goban, color, 0, %d"},
   {"xmoyo_opposite",		1, 0, 0.01,
-      "(whose_moyo(INITIAL_INFLUENCE(color), %s) == OTHER_COLOR(color))"},
+      "(whose_moyo(goban, INITIAL_INFLUENCE(color), %s) == OTHER_COLOR(color))"},
   {"omoyo_opposite",		1, 0, 0.01,
-      "(whose_moyo(INITIAL_INFLUENCE(color), %s) == color)"},
+      "(whose_moyo(goban, INITIAL_INFLUENCE(color), %s) == color)"},
   {"xmoyo",			1, 0, 0.01,
-      "(whose_moyo(OPPOSITE_INFLUENCE(color), %s) == OTHER_COLOR(color))"},
+      "(whose_moyo(goban, OPPOSITE_INFLUENCE(color), %s) == OTHER_COLOR(color))"},
   {"omoyo",			1, 0, 0.01,
-      "(whose_moyo(OPPOSITE_INFLUENCE(color), %s) == color)"},
+      "(whose_moyo(goban, OPPOSITE_INFLUENCE(color), %s) == color)"},
   {"xarea",			1, 0, 0.01,
-      "(whose_area(OPPOSITE_INFLUENCE(color), %s) == OTHER_COLOR(color))"},
+      "(whose_area(goban, OPPOSITE_INFLUENCE(color), %s) == OTHER_COLOR(color))"},
   {"oarea",			1, 0, 0.01, 
-      "(whose_area(OPPOSITE_INFLUENCE(color), %s) == color)"},
+      "(whose_area(goban, OPPOSITE_INFLUENCE(color), %s) == color)"},
   {"xterri",			1, 0, 0.01,
-      "(whose_territory(OPPOSITE_INFLUENCE(color), %s) == OTHER_COLOR(color))"},
+      "(whose_territory(goban, OPPOSITE_INFLUENCE(color), %s) == OTHER_COLOR(color))"},
   {"oterri",			1, 0, 0.01,
-      "(whose_territory(OPPOSITE_INFLUENCE(color), %s) == color)"},
+      "(whose_territory(goban, OPPOSITE_INFLUENCE(color), %s) == color)"},
   {"genus",			1, 0, 0.01, "dragon[%s].genus"},
   {"approx_xlib",		1, 0, 0.03,
 		"approxlib(goban, %s, OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
@@ -344,7 +344,7 @@ static struct autohelper_func autohelper_functions[] = {
     	"cut_possible(%s, OTHER_COLOR(color))"},
   {"ocut",			1, 0, 0.05, "cut_possible(%s, color)"},
   {"edge_double_sente", 	4, 1, 3.00,
-		"edge_double_sente_helper(%s, %s, %s, %s)"},
+		"edge_double_sente_helper(goban, %s, %s, %s, %s)"},
   {"xplay_defend_both",		2, 1, 3.00,
 		"play_attack_defend2_n(goban, OTHER_COLOR(color), 0, %d"},
   {"oplay_defend_both",		2, 1, 3.00,
@@ -373,63 +373,71 @@ static struct autohelper_func autohelper_functions[] = {
 		"play_connect_n(goban, color, 0, %d"},
   {"xplay_disconnect",		2, 1, 10.00,
 		"play_connect_n(goban, OTHER_COLOR(color), 0, %d"},
-  {"seki_helper",		1, 0, 0.0, "seki_helper(%s)"},
-  {"threaten_to_save",		1, 0, 0.0, "threaten_to_save_helper(move,%s)"},
+  {"seki_helper",		1, 0, 0.0, "seki_helper(goban, %s)"},
+  {"threaten_to_save",		1, 0, 0.0,
+		"threaten_to_save_helper(goban, move,%s)"},
   {"threaten_to_capture",	1, 0, 0.0,
-    		"threaten_to_capture_helper(move,%s)"},
+    		"threaten_to_capture_helper(goban, move,%s)"},
   {"prevent_attack_threat",	1, 0, 0.0,
-		"prevent_attack_threat_helper(move, %s)"},
+		"prevent_attack_threat_helper(goban, move, %s)"},
   {"eye",			1, 0, 0.01, "is_eye_space(%s)"},
   {"proper_eye", 		1, 0, 0.01, "is_proper_eye_space(%s)"},
   {"marginal_eye",		1, 0, 0.01, "is_marginal_eye_space(%s)"},
   {"halfeye",			1, 0, 0.01, "is_halfeye(half_eye,%s)"},
   {"max_eye_value",		1, 0, 0.01, "max_eye_value(%s)"},
-  {"owl_topological_eye",	2, 0, 0.01, "owl_topological_eye(%s, board[%s])"},
-  {"obvious_false_oeye",	1, 0, 0.01, "obvious_false_eye(%s, color)"},
+  {"owl_topological_eye",	2, 0, 0.01,
+		"owl_topological_eye(%s, goban->board[%s])"},
+  {"obvious_false_oeye",	1, 0, 0.01,
+		"obvious_false_eye(goban, %s, color)"},
   {"obvious_false_xeye",	1, 0, 0.01,
-		"obvious_false_eye(%s, OTHER_COLOR(color))"},
-  {"antisuji",			1, 0, 0.0, "add_antisuji_move(%s)"},
-  {"add_connect_move",		2, 0, 0.0, "add_connection_move(move,%s, %s)"},
-  {"add_cut_move",		2, 0, 0.0, "add_cut_move(move, %s, %s)"},
+		"obvious_false_eye(goban, %s, OTHER_COLOR(color))"},
+  {"antisuji",			1, 0, 0.0, "add_antisuji_move(goban, %s)"},
+  {"add_connect_move",		2, 0, 0.0,
+		"add_connection_move(goban, move, %s,  %s)"},
+  {"add_cut_move",		2, 0, 0.0,
+		"add_cut_move(goban, move, %s, %s)"},
   {"test_attack_either_move",	2, 0, 0.0,
-		"test_attack_either_move(move, color, %s, %s)"},
+		"test_attack_either_move(goban, move, color, %s, %s)"},
   {"add_defend_both_move",	2, 0, 0.0,
-		"add_all_move(move, DEFEND_STRING, %s, DEFEND_STRING, %s)"},
-  {"same_dragon",		2, 0, 0.01, "is_same_dragon(%s, %s)"},
+		"add_all_move(goban, move, DEFEND_STRING, %s, DEFEND_STRING, %s)"},
+  {"same_dragon",		2, 0, 0.01, "is_same_dragon(goban, %s, %s)"},
   {"same_string",		2, 0, 0.01, "same_string(goban, %s, %s)"},
   {"dragonsize", 		1, 0, 0.01, "dragon[%s].size"},
   {"wormsize",			1, 0, 0.01, "countstones(goban, %s)"},
   {"effective_size",		1, 0, 0.01, "dragon[%s].effective_size"},
-  {"vital_chain",		1, 0, 0.05, "vital_chain(%s)"},
+  {"vital_chain",		1, 0, 0.05, "vital_chain(goban, %s)"},
   {"potential_cutstone",	1, 0, 0.01, "worm[%s].cutstone2 > 1"},
   {"amalgamate_most_valuable_helper", 3, 0, 0.0,
-   		"amalgamate_most_valuable_helper(%s, %s, %s)"},
-  {"amalgamate", 		2, 0, 0.0, "join_dragons(%s, %s)"},
-  {"owl_escape_value",		1, 0, 0.01, "owl_escape_value(%s)"},
+   		"amalgamate_most_valuable_helper(goban, %s, %s, %s)"},
+  {"amalgamate", 		2, 0, 0.0, "join_dragons(goban, %s, %s)"},
+  {"owl_escape_value",		1, 0, 0.01, "owl_escape_value(goban, %s)"},
   {"owl_goal_dragon",		1, 0, 0.01, "owl_goal_dragon(%s)"},
-  {"owl_eyespace",		1, 0, 0.01, "owl_eyespace(%s)"},
-  {"owl_big_eyespace",		1, 0, 0.01, "owl_big_eyespace(%s)"},
-  {"owl_mineye",		1, 0, 0.01, "owl_mineye(%s)"},
-  {"owl_maxeye",		1, 0, 0.01, "owl_maxeye(%s)"},
-  {"owl_proper_eye",		1, 0, 0.01, "owl_proper_eye(%s)"},
-  {"owl_eye_size",		1, 0, 0.01, "owl_eye_size(%s)"},
-  {"owl_lunch",                 1, 0, 0.01, "owl_lunch(%s)"},
-  {"owl_strong_dragon",		1, 0, 0.01, "owl_strong_dragon(%s)"},
+  {"owl_eyespace",		1, 0, 0.01, "owl_eyespace(goban, %s)"},
+  {"owl_big_eyespace",		1, 0, 0.01, "owl_big_eyespace(goban, %s)"},
+  {"owl_mineye",		1, 0, 0.01, "owl_mineye(goban, %s)"},
+  {"owl_maxeye",		1, 0, 0.01, "owl_maxeye(goban, %s)"},
+  {"owl_proper_eye",		1, 0, 0.01, "owl_proper_eye(goban, %s)"},
+  {"owl_eye_size",		1, 0, 0.01, "owl_eye_size(goban, %s)"},
+  {"owl_lunch",                 1, 0, 0.01, "owl_lunch(goban, %s)"},
+  {"owl_strong_dragon",		1, 0, 0.01, "owl_strong_dragon(goban, %s)"},
   {"has_aji",			1, 0, 0.01,
 		"(dragon[%s].owl_threat_status == CAN_THREATEN_DEFENSE)"},
-  {"finish_ko_helper",		1, 0, 0.05, "finish_ko_helper(%s)"},
-  {"squeeze_ko_helper",		1, 0, 0.03, "squeeze_ko_helper(%s)"},
-  {"backfill_helper",		3, 0, 1.50, "backfill_helper(%s, %s, %s)"},
+  {"finish_ko_helper",		1, 0, 0.05, "finish_ko_helper(goban, %s)"},
+  {"squeeze_ko_helper",		1, 0, 0.03, "squeeze_ko_helper(goban, %s)"},
+  {"backfill_helper",		3, 0, 1.50,
+		"backfill_helper(goban, %s, %s, %s)"},
   {"connect_and_cut_helper2",	3, 0, 3.00,
-		"connect_and_cut_helper2(%s, %s, %s, color)"},
-  {"connect_and_cut_helper",	3, 0, 3.00, "connect_and_cut_helper(%s, %s, %s)"},
+		"connect_and_cut_helper2(goban, %s, %s, %s, color)"},
+  {"connect_and_cut_helper",	3, 0, 3.00,
+		"connect_and_cut_helper(goban, %s, %s, %s)"},
   {"owl_threatens",		2, 0, 0.01, "owl_threatens_attack(%s, %s)"},
-  {"replace",			2, 0, 0.0,  "add_replacement_move(%s, %s)"},
-  {"backfill_replace",		2, 0, 0.0,  "backfill_replace(%s, %s)"},
+  {"replace",			2, 0, 0.0,
+		"add_replacement_move(goban, %s, %s)"},
+  {"backfill_replace",		2, 0, 0.0,  "backfill_replace(goban, %s, %s)"},
   {"non_oterritory",		1, 0, 0.0,
-		"influence_mark_non_territory(%s, color)"},
+		"influence_mark_non_territory(goban, %s, color)"},
   {"non_xterritory",		1, 0, 0.0,
-		"influence_mark_non_territory(%s, OTHER_COLOR(color))"},
+		"influence_mark_non_territory(goban, %s, OTHER_COLOR(color))"},
   {"remaining_handicap_stones",	0, 0, 0.0,  "free_handicap_remaining_stones()"},
   {"total_handicap_stones",	0, 0, 0.0,  "free_handicap_total_stones()"},
   {"o_captures_something", 	1, 0, 0.02,
@@ -448,19 +456,24 @@ static struct autohelper_func autohelper_functions[] = {
   {"oracle_threatens",		2, 0, 0.01, "oracle_threatens(%s, %s)"},
   {"value",			0, 2, 0.0,  "(%s->value)"},
   {"adjacent_to_stone_in_atari", 1, 0, 1.0,
-                "adjacent_to_stone_in_atari(%s)"},
+                "adjacent_to_stone_in_atari(goban, %s)"},
   {"adjacent_to_defendable_stone_in_atari", 1, 0, 1.0,
-                "adjacent_to_defendable_stone_in_atari(%s)"},
-  {"good_attack_threat",	2, 0, 0.01, "register_good_attack_threat(%s, %s)"},
-  {"break_mirror_helper",	1, 0, 0.01, "break_mirror_helper(%s, color)"}
+                "adjacent_to_defendable_stone_in_atari(goban, %s)"},
+  {"good_attack_threat",	2, 0, 0.01,
+		"register_good_attack_threat(goban, %s, %s)"},
+  {"break_mirror_helper",	1, 0, 0.01,
+		"break_mirror_helper(goban, %s, color)"}
 };
 
 
 /* To get a valid function pointer different from NULL. */
 static int
-dummyhelper(int transformation, int move, int color, int action)
+dummyhelper(Goban *goban, int transformation, int move, int color, int action)
 {
-  UNUSED(transformation); UNUSED(move); UNUSED(color);
+  UNUSED(goban);
+  UNUSED(transformation);
+  UNUSED(move);
+  UNUSED(color);
   UNUSED(action);
   return 0;
 }
@@ -490,8 +503,7 @@ dummyhelper(int transformation, int move, int color, int action)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */\n\n\
 #include <stdio.h> /* for NULL */\n\
 #include \"liberty.h\"\n\
-#include \"patterns.h\"\n\
-#include \"old-board.h\"\n\n\
+#include \"patterns.h\"\n\n\
 "
 
 static int fatal_errors = 0;
@@ -1689,7 +1701,7 @@ finish_constraint_and_action(void)
   
   /* Generate autohelper function declaration. */
   code_pos += sprintf(code_pos, 
-		      "static int\nautohelper%s%d(int trans, int move, int color, int action)\n{\n  int",
+		      "static int\nautohelper%s%d(Goban *goban, int trans, int move, int color, int action)\n{\n  int",
 		      prefix, patno);
 
   /* Generate variable declarations. */
@@ -1709,7 +1721,7 @@ finish_constraint_and_action(void)
   }
 
   /* Include UNUSED statements for two parameters */
-  code_pos += sprintf(code_pos, "\n  UNUSED(color);\n");
+  code_pos += sprintf(code_pos, "\n  UNUSED(goban);\n  UNUSED(color);\n");
   if (!have_constraint || !have_action)
     code_pos += sprintf(code_pos, "  UNUSED(action);\n");
   

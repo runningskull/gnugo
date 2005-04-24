@@ -131,7 +131,8 @@ struct influence_data
 /* Typedef for pointer to either of the functions whose_territory(),
  * whose_loose_territory(), whose_moyo(), and whose_area().
  */
-typedef int (*owner_function_ptr)(const struct influence_data *q, int pos);
+typedef int (*owner_function_ptr) (const Goban *goban,
+				   const struct influence_data *q, int pos);
 
 /* Used for tuning game advancement algorythm */
 #define WEIGHT_TERRITORY 10

@@ -66,6 +66,13 @@ float gg_normalize_float(float x, float a);
 int gg_normalize_float2int(float x, float a);
 void gg_sort(void *base, size_t nel, size_t width,
 	     int (*compar)(const void *, const void *));
+void gg_sort_with_data(void *base, size_t nel, size_t width, void *user_data,
+		       int (*compar)(void *, const void *, const void *));
+void gg_sort_with_const_data(void *base, size_t nel, size_t width,
+			     const void *user_data,
+			     int (*compar)(const void *,
+					   const void *, const void *));
+
 
 #define MAX_INTERPOLATION_STEPS 20
 struct interpolation_data
@@ -76,7 +83,7 @@ struct interpolation_data
   float values[MAX_INTERPOLATION_STEPS + 1];
 };
 
-float gg_interpolate(struct interpolation_data *f, float x);
+float gg_interpolate(const struct interpolation_data *f, float x);
 float soft_cap(float a, float b);
 
 const char *gg_version(void);

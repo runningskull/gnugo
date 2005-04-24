@@ -21,7 +21,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -34,7 +33,8 @@
  * unconditional_life() below for a full explanation of the algorithm.
  */
 static int
-capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
+capture_non_invincible_strings(Goban *goban, int color,
+			       int exceptions[BOARDMAX])
 {
   int other = OTHER_COLOR(color);
   int something_captured = 1; /* To get into the first turn of the loop. */
@@ -51,7 +51,7 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
 
     /* Visit all friendly strings on the board. */
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (board[pos] != color || find_origin(goban, pos) != pos)
+      if (goban->board[pos] != color || find_origin(goban, pos) != pos)
 	continue;
 
       if (exceptions && exceptions[pos])
@@ -68,7 +68,7 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
       /* Successful if already captured or a single liberty remains.
        * Otherwise we must rewind and take back the last batch of moves.
        */
-      if (board[pos] == EMPTY)
+      if (goban->board[pos] == EMPTY)
 	something_captured = 1;
       else if (findlib(goban, pos, 2, libs) == 1) {
 	/* Need to use tryko as a defense against the extreme case
@@ -298,8 +298,10 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
  */
 
 void
-unconditional_life(int unconditional_territory[BOARDMAX], int color)
+unconditional_life(Goban *goban, int unconditional_territory[BOARDMAX],
+		   int color)
 {
+  const Intersection *const board = goban->board;
   int found_one;
   int other = OTHER_COLOR(color);
   int libs[MAXLIBS];
@@ -340,7 +342,7 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
     }
   }
   
-  moves_played = capture_non_invincible_strings(color, potential_sekis);
+  moves_played = capture_non_invincible_strings(goban, color, potential_sekis);
   /* The strings still remaining except those marked in
    * potential_sekis[] are uncapturable. Now see which opponent
    * strings can survive.

@@ -87,7 +87,7 @@ Status:    GTP version 2 standard command.
 @verbatim
 Arguments: none
 Fails:     never
-Returns:   Komi 
+Returns:   Komi
 @end verbatim
 @cindex black
 @item black: Play a black stone at the given vertex.
@@ -151,7 +151,7 @@ Fails:     never
 Returns:   handicap
 @end verbatim
 @cindex loadsgf
-@item loadsgf: Load an sgf file, possibly up to a move number or the first occurence of a move.           
+@item loadsgf: Load an sgf file, possibly up to a move number or the first occurence of a move.
 @verbatim
 Arguments: filename + move number, vertex, or nothing
 Fails:     missing filename or failure to open or parse file
@@ -237,7 +237,7 @@ Returns:   Color and vertex of last move.
 @verbatim
 Arguments: none
 Fails:     never
-Returns:   List of moves played in reverse order in format: 
+Returns:   List of moves played in reverse order in format:
            color move (one move per line)
 @end verbatim
 @cindex trymove
@@ -248,7 +248,7 @@ Fails:     invalid color, invalid vertex, illegal move
 Returns:   nothing
 @end verbatim
 @cindex tryko
-@item tryko: Play a stone of the given color at the given vertex,  allowing illegal ko capture.
+@item tryko: Play a stone of the given color at the given vertex, allowing illegal ko capture.
 @verbatim
 Arguments: move (color + vertex)
 Fails:     invalid color, invalid vertex, illegal move
@@ -796,8 +796,8 @@ Arguments: color to move, what information
 Fails:     never
 Returns:   Influence data formatted like:
 
-  0.51   1.34   3.20   6.60   9.09   8.06   1.96   0.00   0.00 
-  0.45   1.65   4.92  12.19  17.47  15.92   4.03   0.00   0.00 
+  0.51   1.34   3.20   6.60   9.09   8.06   1.96   0.00   0.00
+  0.45   1.65   4.92  12.19  17.47  15.92   4.03   0.00   0.00
                   .
                   .
                   .
@@ -937,7 +937,7 @@ Fails:     never
 Returns:   half eye data fields and values, one pair per row
 @end verbatim
 @cindex start_sgftrace
-@item start_sgftrace: Start storing moves executed during reading in an sgf tree in memory. 
+@item start_sgftrace: Start storing moves executed during reading in an sgf tree in memory.
 @verbatim
 Arguments: none
 Fails:     never
@@ -947,7 +947,7 @@ Warning: You had better know what you're doing if you try to use this
          command.
 @end verbatim
 @cindex finish_sgftrace
-@item finish_sgftrace: Finish storing moves in an sgf tree and write it to file. 
+@item finish_sgftrace: Finish storing moves in an sgf tree and write it to file.
 @verbatim
 Arguments: filename
 Fails:     never
@@ -957,7 +957,7 @@ Warning: You had better know what you're doing if you try to use this
          command.
 @end verbatim
 @cindex printsgf
-@item printsgf: Dump the current position as a static sgf file to filename, or as output if filename is missing or "-" 
+@item printsgf: Dump the current position as a static sgf file to filename, or as output if filename is missing or "-"
 @verbatim
 Arguments: optional filename
 Fails:     never

@@ -279,8 +279,8 @@ aO
 B*
 
 ;rgoal[a] == 1 && lib(B) == 2 && olib(*) >= 2 && xlib(*) >= 2
-;&& ((goallib() == 3 && stackp <= backfill2_depth)
-;    || (goallib() == 2 && stackp <= backfill_depth))
+;&& ((goallib() == 3 && goban->stackp <= backfill2_depth)
+;    || (goallib() == 2 && goban->stackp <= backfill_depth))
 
 
 Pattern RA202
@@ -432,8 +432,8 @@ Pattern RA302
 >   value = 79;
 > else if (lib(a) == 1)
 >   value = 48;
-> else if (stackp <= backfill_depth
->          && stackp <= superstring_depth /* || !atari_possible*/)
+> else if (goban->stackp <= backfill_depth
+>          && goban->stackp <= superstring_depth /* || !atari_possible*/)
 >   value = 12;
 > else
 >   value = 0;

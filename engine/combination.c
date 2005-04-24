@@ -26,7 +26,6 @@
  */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <string.h>
 
@@ -35,7 +34,7 @@
 #include "patterns.h"
 
 
-static void find_double_threats(int color);
+static void find_double_threats(Goban *goban, int color);
 
 /* Generate move reasons for combination attacks and defenses against
  * them.
@@ -44,7 +43,7 @@ static void find_double_threats(int color);
  */
 
 void
-combinations(int color)
+combinations(Goban *goban, int color)
 {
   int save_verbose;
   int attack_point;
@@ -53,7 +52,7 @@ combinations(int color)
   int aa_val;
 
   /* Find intersections with multiple threats. */
-  find_double_threats(color);
+  find_double_threats(goban, color);
 
   save_verbose = verbose;
   if (verbose > 0)
@@ -62,15 +61,16 @@ combinations(int color)
   if (save_verbose)
     gprintf(goban, "\nlooking for combination attacks ...\n");
   
-  aa_val = atari_atari(color, &attack_point, NULL, save_verbose);
+  aa_val = atari_atari(goban, color, &attack_point, NULL, save_verbose);
   if (aa_val > 0) {
     if (save_verbose)
       gprintf(goban, "Combination attack for %C with size %d found at %1m\n",
 	      color, aa_val, attack_point);
-    add_my_atari_atari_move(attack_point, aa_val);
+    add_my_atari_atari_move(goban, attack_point, aa_val);
   }
   
-  aa_val = atari_atari(other, &attack_point, defense_points, save_verbose);
+  aa_val = atari_atari(goban, other, &attack_point,
+		       defense_points, save_verbose);
   if (aa_val > 0) {
     int pos;
     if (save_verbose)
@@ -79,7 +79,7 @@ combinations(int color)
     
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (ON_BOARD(goban, pos) && defense_points[pos]) {
-	add_your_atari_atari_move(pos, aa_val);
+	add_your_atari_atari_move(goban, pos, aa_val);
 	if (save_verbose)
 	  gprintf(goban, "- defense at %1m\n", pos);
       }
@@ -92,7 +92,7 @@ combinations(int color)
 #define MAX_THREATENED_STRINGS  10  /* Should be enough for one intersection */
 
 static void
-find_double_threats(int color)
+find_double_threats(Goban *goban, int color)
 {
   int ii;
   int k;
@@ -134,27 +134,28 @@ find_double_threats(int color)
 	     * The call to attack() is intended to detect the case
 	     * where the move at ii is a snapback capture.
 	     */
-	    if (board[a_threatened_groups[k]] == EMPTY
-		|| board[a_threatened_groups[l]] == EMPTY) {
+	    if (goban->board[a_threatened_groups[k]] == EMPTY
+		|| goban->board[a_threatened_groups[l]] == EMPTY) {
 	      if (!attack(goban, ii, NULL)) {
 		TRACE(goban, "Double threat at %1m, either %1m or %1m attacked.\n",
 		      ii, a_threatened_groups[k], a_threatened_groups[l]);
-		add_either_move(ii, ATTACK_STRING, a_threatened_groups[k],
+		add_either_move(goban, ii, ATTACK_STRING, a_threatened_groups[k],
 				ATTACK_STRING, a_threatened_groups[l]);
-		remove_attack_threat_move(ii, a_threatened_groups[k]);
-		remove_attack_threat_move(ii, a_threatened_groups[l]);
+		remove_attack_threat_move(goban, ii, a_threatened_groups[k]);
+		remove_attack_threat_move(goban, ii, a_threatened_groups[l]);
 	      }
 	    }
 	    else if (!defend_both(goban, a_threatened_groups[k],
 				  a_threatened_groups[l])) {
 	      TRACE(goban, "Double threat at %1m, either %1m or %1m attacked.\n",
 		    ii, a_threatened_groups[k], a_threatened_groups[l]);
-	      add_either_move(ii, ATTACK_STRING, a_threatened_groups[k],
+	      add_either_move(goban, ii, ATTACK_STRING, a_threatened_groups[k],
 			      ATTACK_STRING, a_threatened_groups[l]);
-	      remove_attack_threat_move(ii, a_threatened_groups[k]);
-	      remove_attack_threat_move(ii, a_threatened_groups[l]);
+	      remove_attack_threat_move(goban, ii, a_threatened_groups[k]);
+	      remove_attack_threat_move(goban, ii, a_threatened_groups[l]);
 	    }
 	  }
+
 	popgo(goban);
       }
     }
@@ -208,46 +209,56 @@ struct aa_move {
   int target[AA_MAX_TARGETS_PER_MOVE];
 };
 
-#define AA_MAX_MOVES MAX_BOARD * MAX_BOARD  
+#define AA_MAX_MOVES MAX_BOARD * MAX_BOARD
+
+/* THREAD-FIXME: Static variables are unacceptable. */
 static int aa_status[BOARDMAX]; /* ALIVE, DEAD or CRITICAL */
 static int forbidden[BOARDMAX];
 static int aa_values[BOARDMAX];
-static void compute_aa_status(int color, const char safe_stones[BOARDMAX]);
-static void compute_aa_values(int color);
-static int get_aa_status(int pos);
-static int do_atari_atari(int color, int *attack_point, int *defense_point,
+
+
+static void compute_aa_status(Goban *goban, int color,
+			      const char safe_stones[BOARDMAX]);
+static void compute_aa_values(const Goban *goban, int color);
+static int get_aa_status(const Goban *goban, int pos);
+static int do_atari_atari(Goban *goban,
+			  int color, int *attack_point, int *defense_point,
 			  char all_potential_defenses[BOARDMAX],
 			  int last_friendly, int save_verbose, int minsize,
 			  char goal[BOARDMAX]);
-static int atari_atari_succeeded(int color, int *attack_point,
+static int atari_atari_succeeded(Goban *goban, int color, int *attack_point,
                                 int *defense_point, int last_friendly,
                                 int save_verbose, int minsize);
-static void atari_atari_find_attack_moves(int color, int minsize,
+static void atari_atari_find_attack_moves(Goban *goban, int color, int minsize,
 					  struct aa_move attacks[AA_MAX_MOVES],
 					  char goal[BOARDMAX]);
-static void atari_atari_attack_patterns(int color, int minsize,
+static void atari_atari_attack_patterns(Goban *goban, int color, int minsize,
 					struct aa_move attacks[AA_MAX_MOVES],
 					char goal[BOARDMAX]);
-static void atari_atari_attack_callback(int anchor, int color,
+static void atari_atari_attack_callback(Goban *goban, int anchor, int color,
 					struct pattern *pattern,
 					int ll, void *data);
-static int atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
+static int atari_atari_find_defense_moves(Goban *goban,
+					  int targets[AA_MAX_TARGETS_PER_MOVE],
 					  int moves[AA_MAX_MOVES]);
-static int get_aa_value(int str);
-static int update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX],
-			  int apos, int color);
+static int get_aa_value(const Goban *goban, int str);
+static int update_aa_goal(const Goban *goban, char goal[BOARDMAX],
+			  char new_goal[BOARDMAX], int apos, int color);
 static void aa_init_moves(struct aa_move attacks[AA_MAX_MOVES]);
-static void aa_add_move(struct aa_move attacks[AA_MAX_MOVES],
+static void aa_add_move(const Goban *goban,
+			struct aa_move attacks[AA_MAX_MOVES],
 			int move, int target);
-static int aa_move_known(struct aa_move attacks[AA_MAX_MOVES],
+static int aa_move_known(const Goban *goban,
+			 struct aa_move attacks[AA_MAX_MOVES],
 			 int move, int target);
-static void aa_sort_moves(struct aa_move attacks[AA_MAX_MOVES]);
+static void aa_sort_moves(const Goban *goban,
+			  struct aa_move attacks[AA_MAX_MOVES]);
 
 /* Set to 1 if you want verbose traces from this function. */
 
 int
-atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
-	    int save_verbose)
+atari_atari(Goban *goban, int color, int *attack_move,
+	    char defense_moves[BOARDMAX], int save_verbose)
 {
   int other = OTHER_COLOR(color);
   int apos;
@@ -266,12 +277,12 @@ atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
     return 0;
   memset(forbidden, 0, sizeof(forbidden));
 
-  compute_aa_status(color, NULL);
-  compute_aa_values(color);
+  compute_aa_status(goban, color, NULL);
+  compute_aa_values(goban, color);
   
   if (defense_moves)
     memset(defense_moves, 0, BOARDMAX);
-  aa_val = do_atari_atari(color, &apos, &dpos, defense_moves, NO_MOVE,
+  aa_val = do_atari_atari(goban, color, &apos, &dpos, defense_moves, NO_MOVE,
 			  save_verbose, 0, NULL);
 
   if (aa_val == 0)
@@ -291,8 +302,8 @@ atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
       memcpy(saved_defense_moves, defense_moves, BOARDMAX);
       memset(defense_moves, 0, BOARDMAX);
     }
-    new_aa_val = do_atari_atari(color, &apos, &dpos, defense_moves, NO_MOVE,
-				save_verbose, aa_val, NULL);
+    new_aa_val = do_atari_atari(goban, color, &apos, &dpos, defense_moves,
+				NO_MOVE, save_verbose, aa_val, NULL);
 
     /* The last do_atari_atari call fails. When do_atari_atari fails,
      * it does not change the value of (apos), so these correspond
@@ -330,7 +341,7 @@ atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
 	continue;
       }
       
-      if (do_atari_atari(color, &apos, &dpos, NULL, NO_MOVE,
+      if (do_atari_atari(goban, color, &apos, &dpos, NULL, NO_MOVE,
 			 save_verbose, aa_val, NULL) > 0) {
 	if (save_verbose)
 	  gprintf(goban, "%1m deleted defense point, didn't work\n", pos);
@@ -355,7 +366,8 @@ atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
  *        function to return all defense moves.
  */
 int
-atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
+atari_atari_confirm_safety(Goban *goban, int color, int move, int *defense,
+			   int minsize,
 			   const char saved_dragons[BOARDMAX],
 			   const char saved_worms[BOARDMAX])
 {
@@ -364,8 +376,9 @@ atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
   int pos;
   int blunder_size;
 
-  mark_safe_stones(color, move, saved_dragons, saved_worms, safe_stones);
-  blunder_size = atari_atari_blunder_size(color, move, defense_moves,
+  mark_safe_stones(goban, color, move,
+		   saved_dragons, saved_worms, safe_stones);
+  blunder_size = atari_atari_blunder_size(goban, color, move, defense_moves,
 					  safe_stones);
 
   if (defense) {
@@ -387,7 +400,8 @@ atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
  * safe_stones marks which of our stones are supposedly safe after this move.
  */
 int
-atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
+atari_atari_blunder_size(Goban *goban, int color, int move,
+			 char defense_moves[BOARDMAX],
 			 const char safe_stones[BOARDMAX])
 {
   int apos;
@@ -407,8 +421,8 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
   memset(defense_points, 0, sizeof(defense_points));
 
   /* FIXME: Maybe these should be moved after the tryko(goban) below? */
-  compute_aa_status(other, safe_stones);
-  compute_aa_values(other);
+  compute_aa_status(goban, other, safe_stones);
+  compute_aa_values(goban, other);
 
   /* Accept illegal ko capture here. */
   if (!tryko(goban, move, color, NULL))
@@ -416,7 +430,7 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
     abortgo(goban, __FILE__, __LINE__, "trymove", move);
   increase_depth_values();
 
-  aa_val = do_atari_atari(other, &apos, &defense_point, defense_points,
+  aa_val = do_atari_atari(goban, other, &apos, &defense_point, defense_points,
 			  NO_MOVE, 0, 0, NULL);
   after_aa_val = aa_val;
 
@@ -442,7 +456,7 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
      */
     forbidden[apos] = 1;
     last_forbidden = apos;
-    aa_val = do_atari_atari(other, &apos, &defense_point, NULL,
+    aa_val = do_atari_atari(goban, other, &apos, &defense_point, NULL,
 			    NO_MOVE, 0, aa_val, NULL);
   }
 
@@ -452,10 +466,10 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
    * the original move at (aa) was really relevant. So we
    * try omitting it and see if a combination is still found.
    */
-  compute_aa_status(other, NULL);
-  compute_aa_values(other);
+  compute_aa_status(goban, other, NULL);
+  compute_aa_values(goban, other);
   forbidden[last_forbidden] = 0;
-  aa_val = do_atari_atari(other, NULL, NULL, NULL, NO_MOVE, 0, 0, NULL);
+  aa_val = do_atari_atari(goban, other, NULL, NULL, NULL, NO_MOVE, 0, 0, NULL);
   if (aa_val >= after_aa_val)
     return 0;
 
@@ -467,8 +481,8 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
      */
     
     /* FIXME: Maybe these should be moved after the tryko(goban) below? */
-    compute_aa_status(other, safe_stones);
-    compute_aa_values(other);
+    compute_aa_status(goban, other, safe_stones);
+    compute_aa_values(goban, other);
       
     memcpy(defense_moves, defense_points, sizeof(defense_points));
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -494,7 +508,7 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
 	abortgo(goban, __FILE__, __LINE__, "trymove", move);
       increase_depth_values();
       
-      if (do_atari_atari(other, &apos, &defense_point, NULL, NO_MOVE,
+      if (do_atari_atari(goban, other, &apos, &defense_point, NULL, NO_MOVE,
 			 0, after_aa_val, NULL) >= after_aa_val)
 	defense_moves[pos] = 0;
 
@@ -519,15 +533,14 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
  */
 
 static void
-compute_aa_status(int color, const char safe_stones[BOARDMAX])
+compute_aa_status(Goban *goban, int color, const char safe_stones[BOARDMAX])
 {
   int other = OTHER_COLOR(color);
   int pos;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
   int save_verbose = verbose;
-  sgf_dumptree = NULL;
-  count_variations = 0;
+  SGF_dump_data sgf_dump_save;
+
+  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
   if (verbose)
     verbose--;
   
@@ -539,7 +552,7 @@ compute_aa_status(int color, const char safe_stones[BOARDMAX])
    * that stones added along the way need special attention.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == other) {
+    if (goban->board[pos] == other) {
       if (safe_stones) {
 	if (safe_stones[pos])
 	  aa_status[pos] = ALIVE;
@@ -569,7 +582,7 @@ compute_aa_status(int color, const char safe_stones[BOARDMAX])
    * it does not result in a live group.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == other
+    if (goban->board[pos] == other
 	&& worm[pos].origin == pos
 	&& worm[pos].liberties == 2
 	&& aa_status[pos] == ALIVE) {
@@ -582,7 +595,7 @@ compute_aa_status(int color, const char safe_stones[BOARDMAX])
 	  && is_self_atari(goban, libs[1], color))
 	continue;
       
-      if (!owl_substantial(pos)) {
+      if (!owl_substantial(goban, pos)) {
 	int pos2;
 	for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
 	  if (ON_BOARD(goban, pos2) && is_worm_origin(pos2, pos))
@@ -595,7 +608,7 @@ compute_aa_status(int color, const char safe_stones[BOARDMAX])
     gprintf(goban, "compute_aa_status() for %C\n", color);
     gprintf(goban, "aa_status: (ALIVE worms not listed)\n");
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (board[pos] == other && is_worm_origin(pos, pos)) {
+      if (goban->board[pos] == other && is_worm_origin(pos, pos)) {
 	const char *status = "UNKNOWN (shouldn't happen)";
 	if (aa_status[pos] == DEAD)
 	  status = "DEAD";
@@ -610,8 +623,7 @@ compute_aa_status(int color, const char safe_stones[BOARDMAX])
     }
   }
 
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
+  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
   verbose = save_verbose;
 }
 
@@ -625,7 +637,7 @@ compute_aa_status(int color, const char safe_stones[BOARDMAX])
  */
 
 static int
-get_aa_status(int pos)
+get_aa_status(const Goban *goban, int pos)
 {
   int stones[MAX_BOARD * MAX_BOARD];
   int num_stones;
@@ -668,7 +680,7 @@ get_aa_status(int pos)
  */
 
 static int
-do_atari_atari(int color, int *attack_point, int *defense_point,
+do_atari_atari(Goban *goban, int color, int *attack_point, int *defense_point,
 	       char all_potential_defenses[BOARDMAX], int last_friendly,
 	       int save_verbose, int minsize, char goal[BOARDMAX])
 {
@@ -678,8 +690,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
   int num_defense_moves;
   int defense_moves[AA_MAX_MOVES];
   int pos;
-  SGFTree *save_sgf_dumptree;
-  int save_count_variations;
+  SGF_dump_data sgf_dump_save;
   
   if (debug & DEBUG_ATARI_ATARI) {
     gprintf(goban, "%odo_atari_atari: ");
@@ -707,35 +718,29 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
    */
   if (last_friendly != NO_MOVE) {
     int retval;
-    save_sgf_dumptree = sgf_dumptree;
-    save_count_variations = count_variations;
-    sgf_dumptree = NULL;
-    count_variations = 0;
-    retval = atari_atari_succeeded(color, attack_point, defense_point,
+
+    SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+    retval = atari_atari_succeeded(goban, color, attack_point, defense_point,
 				   last_friendly, save_verbose, minsize);
-    sgf_dumptree = save_sgf_dumptree;
-    count_variations = save_count_variations;
+    RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+
     if (retval != 0) {
-      if (sgf_dumptree)
+      if (goban->sgf_dumptree)
 	/* FIXME: Better message. */
-	sgftreeAddComment(sgf_dumptree, "attack found");
+	sgftreeAddComment(goban->sgf_dumptree, "attack found");
       return retval;
     }
   }
 
-  if (stackp > aa_depth)
+  if (goban->stackp > aa_depth)
     return 0;
 
   /* Find attack moves. These are typically ataris but may also be
    * more general.
    */
-  save_sgf_dumptree = sgf_dumptree;
-  save_count_variations = count_variations;
-  sgf_dumptree = NULL;
-  count_variations = 0;
-  atari_atari_find_attack_moves(color, minsize, attacks, goal);
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
+  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+  atari_atari_find_attack_moves(goban, color, minsize, attacks, goal);
+  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 
   /* Try the attacking moves and let the opponent defend. Then call
    * ourselves recursively.
@@ -761,7 +766,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
       }
     }
 
-    if (!IS_STONE(board[str])) {
+    if (!IS_STONE(goban->board[str])) {
       /* Error situation. This could be caused by a wrong matcher status. */
       if (save_verbose || (debug & DEBUG_ATARI_ATARI))
 	gprintf(goban, "%oError condition found by atari_atari\n");
@@ -770,17 +775,14 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
     }
 
     /* Try to defend the stone (str) which is threatened. */
-    aa_val = get_aa_value(str);
+    aa_val = get_aa_value(goban, str);
 
     /* Pick up defense moves. */
-    save_sgf_dumptree = sgf_dumptree;
-    save_count_variations = count_variations;
-    sgf_dumptree = NULL;
-    count_variations = 0;
-    num_defense_moves = atari_atari_find_defense_moves(attacks[k].target,
+    SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+    num_defense_moves = atari_atari_find_defense_moves(goban,
+						       attacks[k].target,
 						       defense_moves);
-    sgf_dumptree = save_sgf_dumptree;
-    count_variations = save_count_variations;
+    RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
     
     for (r = 0; r < num_defense_moves; r++) {
       bpos = defense_moves[r];
@@ -796,8 +798,8 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 	 * need to temporarily increase the depth values.
 	 */
 	modify_depth_values(2);
-	update_aa_goal(goal, new_goal, apos, color);
-	new_aa_val = do_atari_atari(color, NULL, defense_point,
+	update_aa_goal(goban, goal, new_goal, apos, color);
+	new_aa_val = do_atari_atari(goban, color, NULL, defense_point,
 				    all_potential_defenses,
 				    apos, save_verbose, minsize, new_goal);
 	modify_depth_values(-2);
@@ -823,19 +825,16 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 	gprintf(goban, "%oThe worm %1m can be attacked at %1m after ", str, apos);
 	dump_stack(goban);
       }
-      if (sgf_dumptree)
+      if (goban->sgf_dumptree)
 	/* FIXME: Better message. */
-	sgftreeAddComment(sgf_dumptree, "attack found");
+	sgftreeAddComment(goban->sgf_dumptree, "attack found");
     }
 
     if (attack_point)
       *attack_point = apos;
 
     if (defense_point) {
-      save_sgf_dumptree = sgf_dumptree;
-      save_count_variations = count_variations;
-      sgf_dumptree = NULL;
-      count_variations = 0;
+      SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 
       if (!find_defense(goban, str, defense_point))
 	*defense_point = NO_MOVE;
@@ -848,8 +847,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 	  && safe_move(goban, apos, other))
 	*defense_point = apos;
 
-      sgf_dumptree = save_sgf_dumptree;
-      count_variations = save_count_variations;
+      RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
     }
     
     DEBUG(goban, DEBUG_ATARI_ATARI, "%oreturn value:%d (%1m)\n", aa_val, str);
@@ -862,7 +860,8 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 
 
 static int
-atari_atari_succeeded(int color, int *attack_point, int *defense_point,
+atari_atari_succeeded(Goban *goban, int color,
+		      int *attack_point, int *defense_point,
 		      int last_friendly, int save_verbose, int minsize)
 {
   int pos;
@@ -870,24 +869,24 @@ atari_atari_succeeded(int color, int *attack_point, int *defense_point,
   int other = OTHER_COLOR(color);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] != other)
+    if (goban->board[pos] != other)
       continue;
     
     if (pos != find_origin(goban, pos))
       continue;
     
     if (minsize > 0
-	&& get_aa_value(pos) < minsize)
+	&& get_aa_value(goban, pos) < minsize)
       continue;
     
-    if (get_aa_status(pos) != ALIVE)
+    if (get_aa_status(goban, pos) != ALIVE)
       continue;
     
-    if (board[last_friendly] != EMPTY
+    if (goban->board[last_friendly] != EMPTY
 	&& !adjacent_strings(goban, last_friendly, pos))
       continue;
     
-    if (board[last_friendly] == EMPTY
+    if (goban->board[last_friendly] == EMPTY
 	&& !liberty_of_string(goban, last_friendly, pos))
       continue;
     
@@ -917,8 +916,8 @@ atari_atari_succeeded(int color, int *attack_point, int *defense_point,
       }
       
       DEBUG(goban, DEBUG_ATARI_ATARI, "%oreturn value:%d (%1m)\n",
-	    get_aa_value(pos), pos);
-      return get_aa_value(pos);
+	    get_aa_value(goban, pos), pos);
+      return get_aa_value(goban, pos);
     }
   }
   
@@ -928,7 +927,7 @@ atari_atari_succeeded(int color, int *attack_point, int *defense_point,
 #define MAX_THREAT_MOVES  MAX_TACTICAL_POINTS
 
 static void
-atari_atari_find_attack_moves(int color, int minsize,
+atari_atari_find_attack_moves(Goban *goban, int color, int minsize,
 			      struct aa_move attacks[AA_MAX_MOVES],
 			      char goal[BOARDMAX])
 {
@@ -937,10 +936,10 @@ atari_atari_find_attack_moves(int color, int minsize,
 
   aa_init_moves(attacks);
 
-  atari_atari_attack_patterns(color, minsize, attacks, goal);
+  atari_atari_attack_patterns(goban, color, minsize, attacks, goal);
 
   /* Sort the attack moves. */
-  aa_sort_moves(attacks);
+  aa_sort_moves(goban, attacks);
   
   if (debug & DEBUG_ATARI_ATARI) {
     gprintf(goban, "Attack moves:");
@@ -959,13 +958,15 @@ atari_atari_find_attack_moves(int color, int minsize,
 
 /* FIXME: Move these to a struct and pass to callback through the
  * *data parameter.
+ *
+ * THREAD-FIXME: Static variables are unacceptable.
  */
 static int current_minsize;
 static struct aa_move *current_attacks;
 static int conditional_attack_point[BOARDMAX];
 
 static void
-atari_atari_attack_patterns(int color, int minsize,
+atari_atari_attack_patterns(Goban *goban, int color, int minsize,
 			    struct aa_move attacks[AA_MAX_MOVES],
 			    char goal[BOARDMAX])
 {
@@ -977,7 +978,8 @@ atari_atari_attack_patterns(int color, int minsize,
   /* If goal is NULL and there are forbidden moves we need to compute
    * a new goal around the forbidden moves.
    */
-  if (goal == NULL && update_aa_goal(goal, revised_goal, NO_MOVE, color))
+  if (goal == NULL && update_aa_goal(goban, goal, revised_goal,
+				     NO_MOVE, color))
     goal = revised_goal;
 
 #if 0
@@ -991,14 +993,15 @@ atari_atari_attack_patterns(int color, int minsize,
   }
 #endif
   
-  matchpat(atari_atari_attack_callback, color, &aa_attackpat_db, NULL, goal);
+  matchpat(goban, atari_atari_attack_callback, color, &aa_attackpat_db,
+	   NULL, goal);
 }
 
 /* Try to attack every X string in the pattern, whether there is an attack
  * before or not. Only exclude already known attacking moves.
  */
 static void
-atari_atari_attack_callback(int anchor, int color,
+atari_atari_attack_callback(Goban *goban, int anchor, int color,
 			    struct pattern *pattern, int ll, void *data)
 {
   int move;
@@ -1014,14 +1017,14 @@ atari_atari_attack_callback(int anchor, int color,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT)
-    if (!pattern->autohelper(ll, move, color, 0))
+    if (!pattern->autohelper(goban, ll, move, color, 0))
       return;
 
   /* If the pattern has a helper, call it to see if the pattern must
    * be rejected.
    */
   if (pattern->helper)
-    if (!pattern->helper(pattern, ll, move, color))
+    if (!pattern->helper(goban, pattern, ll, move, color))
       return;
 
   /* Loop through pattern elements in search of X strings to
@@ -1034,13 +1037,13 @@ atari_atari_attack_callback(int anchor, int color,
 					     ll, anchor));
 
       if (current_minsize > 0
-	  && get_aa_value(str) < current_minsize)
+	  && get_aa_value(goban, str) < current_minsize)
 	continue;
 
-      if (aa_move_known(current_attacks, move, str))
+      if (aa_move_known(goban, current_attacks, move, str))
 	continue;
 
-      if (get_aa_status(str) != ALIVE)
+      if (get_aa_status(goban, str) != ALIVE)
 	continue;
 
       /* Usually we don't want to play self atari. However, if we
@@ -1062,7 +1065,7 @@ atari_atari_attack_callback(int anchor, int color,
 	int acode;
 	int attack_point = NO_MOVE;
 
-	if (!board[str])
+	if (!goban->board[str])
 	  acode = WIN;
 	else
 	  acode = attack(goban, str, &attack_point);
@@ -1071,7 +1074,7 @@ atari_atari_attack_callback(int anchor, int color,
 
 	if (acode != 0) {
 	  if ((pattern->class & CLASS_c)
-	      && !aa_move_known(current_attacks, move, NO_MOVE)) {
+	      && !aa_move_known(goban, current_attacks, move, NO_MOVE)) {
 	    /* Conditional pattern. */
 	    DEBUG(goban, DEBUG_ATARI_ATARI,
 		  "aa_attack pattern %s+%d (conditional) found threat on %1m at %1m with code %d\n",
@@ -1079,13 +1082,13 @@ atari_atari_attack_callback(int anchor, int color,
 	    if (conditional_attack_point[move] == NO_MOVE)
 	      conditional_attack_point[move] = str;
 	    else if (conditional_attack_point[move] != str) {
-	      aa_add_move(current_attacks, move,
+	      aa_add_move(goban, current_attacks, move,
 			  conditional_attack_point[move]);
-	      aa_add_move(current_attacks, move, str);
+	      aa_add_move(goban, current_attacks, move, str);
 	    }
 	  }
 	  else {
-	    aa_add_move(current_attacks, move, str);
+	    aa_add_move(goban, current_attacks, move, str);
 	    DEBUG(goban, DEBUG_ATARI_ATARI,
 		  "aa_attack pattern %s+%d found threat on %1m at %1m with code %d\n",
 		  pattern->name, ll, str, move, acode);
@@ -1098,7 +1101,8 @@ atari_atari_attack_callback(int anchor, int color,
 
 
 static int
-atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
+atari_atari_find_defense_moves(Goban *goban,
+			       int targets[AA_MAX_TARGETS_PER_MOVE],
 			       int moves[AA_MAX_MOVES])
 {
   int num_moves = 0;
@@ -1117,7 +1121,7 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
     int str = targets[r];
 
     /* If the attack move happened to remove (str), there's no defense. */
-    if (board[str] == EMPTY)
+    if (goban->board[str] == EMPTY)
       continue;
     
     /* Because we know (str) is threatened there is an
@@ -1137,7 +1141,7 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
     liberties = findlib(goban, str, 4, libs);
     for (k = 0; k < liberties; k++) {
       if (!mx[libs[k]]
-	  && trymove(goban, libs[k], board[str], "aa_defend-A", str)) {
+	  && trymove(goban, libs[k], goban->board[str], "aa_defend-A", str)) {
 	if (attack(goban, str, NULL) == 0) {
 	  moves[num_moves++] = libs[k];
 	  mx[libs[k]] = 1;
@@ -1166,8 +1170,9 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
       if (liberties <= 3) {
 	for (s = 0; s < liberties; s++) {
 	  if (!mx[libs[s]]
-	      && !is_self_atari(goban, libs[s], board[str])
-	      && trymove(goban, libs[s], board[str], "aa_defend-B", str)) {
+	      && !is_self_atari(goban, libs[s], goban->board[str])
+	      && trymove(goban, libs[s], goban->board[str],
+			 "aa_defend-B", str)) {
 	    if (attack(goban, str, NULL) == 0) {
 	      moves[num_moves++] = libs[s];
 	      mx[libs[s]] = 1;
@@ -1199,7 +1204,7 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
  * effects, e.g. a string being cutting stones. 
  */
 static void
-compute_aa_values(int color)
+compute_aa_values(const Goban *goban, int color)
 {
   int other = OTHER_COLOR(color);
   int pos;
@@ -1210,7 +1215,7 @@ compute_aa_values(int color)
   int r, k;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] != other
+    if (goban->board[pos] != other
 	|| pos != find_origin(goban, pos)
 	|| aa_status[pos] != ALIVE) {
       aa_values[pos] = 0;
@@ -1223,8 +1228,10 @@ compute_aa_values(int color)
 
     for (r = 0; r < liberties; r++) {
       if (!mx[libs[r]]
-	  && (whose_moyo(&initial_black_influence, libs[r]) == other
-	      || whose_moyo(&initial_white_influence, libs[r]) == other)) {
+	  && ((whose_moyo(goban, &initial_black_influence, libs[r])
+	       == other)
+	      || (whose_moyo(goban, &initial_white_influence, libs[r])
+		  == other))) {
 	mx[libs[r]] = 1;
 	value++;
       }
@@ -1233,9 +1240,11 @@ compute_aa_values(int color)
 	if (!ON_BOARD1(goban, librd) || mx[librd])
 	  continue;
 	mx[librd] = 1;
-	if (board[librd] == EMPTY
-	    && (whose_moyo(&initial_black_influence, librd) == other
-		|| (whose_moyo(&initial_white_influence, librd) == other)))
+	if (goban->board[librd] == EMPTY
+	    && ((whose_moyo(goban, &initial_black_influence, librd)
+		 == other)
+		|| (whose_moyo(goban, &initial_white_influence, librd)
+		    == other)))
 	  value++;
       }
     }
@@ -1253,7 +1262,7 @@ compute_aa_values(int color)
  * first and then sacrifice it later.
  */
 static int
-get_aa_value(int str)
+get_aa_value(const Goban *goban, int str)
 {
   int stones[MAX_BOARD * MAX_BOARD];
   int k;
@@ -1267,9 +1276,9 @@ get_aa_value(int str)
 }
 
 
-/* update_aa_goal(goal, new_goal, apos, color) extends the goal array
- * with vertices in a neighborhood of apos. The algorithm is that
- * starting at apos, a distance measure is computed to nearby
+/* update_aa_goal(goban, goal, new_goal, apos, color) extends the goal
+ * array with vertices in a neighborhood of apos. The algorithm is
+ * that starting at apos, a distance measure is computed to nearby
  * vertices. The distance increases with one for each step through
  * empty vertices and by a liberty depending number when passing
  * through strings of the attacked color. Strings with 3 or fewer
@@ -1283,21 +1292,21 @@ get_aa_value(int str)
  * decide which moves are relevant to the combination.
  */
 
-#define ENQUEUE(pos, dist) \
-    do { \
-      if ((dist) <= MAX_AA_DIST) { \
-        if (dists[pos] == 0) { \
-          queue[queue_end++] = (pos); \
-          dists[pos] = (dist); \
-        } \
-        else if (dists[pos] < (dist)) \
-          dists[pos] = (dist); \
-      } \
-    } while (0);
+#define ENQUEUE(pos, dist)			\
+  do {						\
+    if ((dist) <= MAX_AA_DIST) {		\
+      if (dists[pos] == 0) {			\
+	queue[queue_end++] = (pos);		\
+	dists[pos] = (dist);			\
+      }						\
+      else if (dists[pos] < (dist))		\
+	dists[pos] = (dist);			\
+    }						\
+  } while (0);
 
 static int
-update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX], int apos,
-	       int color)
+update_aa_goal(const Goban *goban, char goal[BOARDMAX],
+	       char new_goal[BOARDMAX], int apos, int color)
 {
   int other = OTHER_COLOR(color);
   int dists[BOARDMAX];
@@ -1356,7 +1365,7 @@ update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX], int apos,
     }
     
     pos = queue[r];
-    if (board[pos] == other)
+    if (goban->board[pos] == other)
       new_goal[pos] = 1;
 
     /* FIXME: We shouldn't let dead opponent stones stop the
@@ -1368,10 +1377,11 @@ update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX], int apos,
       int pos2 = pos + delta[k];
       if (!ON_BOARD(goban, pos2))
        continue;
-      if ((board[pos] != color || pos == apos) && board[pos2] == EMPTY) {
+      if ((goban->board[pos] != color || pos == apos)
+	  && goban->board[pos2] == EMPTY) {
         ENQUEUE(pos2, dists[pos] + 1);
       }
-      else if (board[pos] != other && board[pos2] == other) {
+      else if (goban->board[pos] != other && goban->board[pos2] == other) {
 	int stones[MAX_BOARD * MAX_BOARD];
 	int size = findstones(goban, pos2, MAX_BOARD * MAX_BOARD, stones);
 	int libs = countlib(goban, pos2);
@@ -1401,7 +1411,8 @@ aa_init_moves(struct aa_move attacks[AA_MAX_MOVES])
  * also is known for that move and add it if not.
  */
 static void
-aa_add_move(struct aa_move attacks[AA_MAX_MOVES], int move, int target)
+aa_add_move(const Goban *goban, struct aa_move attacks[AA_MAX_MOVES],
+	    int move, int target)
 {
   int k;
   int r;
@@ -1453,7 +1464,8 @@ aa_add_move(struct aa_move attacks[AA_MAX_MOVES], int move, int target)
  * target is known for the move.
  */
 static int
-aa_move_known(struct aa_move attacks[AA_MAX_MOVES], int move, int target)
+aa_move_known(const Goban *goban, struct aa_move attacks[AA_MAX_MOVES],
+	      int move, int target)
 {
   int k;
   int r;
@@ -1496,31 +1508,35 @@ aa_move_known(struct aa_move attacks[AA_MAX_MOVES], int move, int target)
 
 /* Auxiliary function for aa_sort_moves(). */
 static int
-target_comp_func(const void *a, const void *b)
+target_comp_func(const void *goban, const void *a, const void *b)
 {
-  int asize = get_aa_value(*((const int *) a));
-  int bsize = get_aa_value(*((const int *) b));
+  int asize = get_aa_value((const Goban *) goban, *((const int *) a));
+  int bsize = get_aa_value((const Goban *) goban, *((const int *) b));
+
   return asize - bsize;
 }
 
 
 /* Auxiliary function for aa_sort_moves(). */
 static int
-move_comp_func(const void *a, const void *b)
+move_comp_func(const void *goban, const void *a, const void *b)
 {
   const struct aa_move *aa = a;
   const struct aa_move *bb = b;
-  int asize = get_aa_value(aa->target[0]);
-  int bsize = get_aa_value(bb->target[0]);
+
+  int asize = get_aa_value((const Goban *) goban, aa->target[0]);
+  int bsize = get_aa_value((const Goban *) goban, bb->target[0]);
+
   return asize - bsize;
 }
+
 
 /* Sort the attack moves. For each move the targets are sorted in
  * decreasing size. Then the moves are sorted with increasing size
  * of their first target.
  */
 static void
-aa_sort_moves(struct aa_move attacks[AA_MAX_MOVES])
+aa_sort_moves(const Goban *goban, struct aa_move attacks[AA_MAX_MOVES])
 {
   int k;
   int r;
@@ -1532,11 +1548,14 @@ aa_sort_moves(struct aa_move attacks[AA_MAX_MOVES])
       if (attacks[k].target[r] == NO_MOVE)
 	break;
     number_of_targets = r;
-    gg_sort(attacks[k].target, number_of_targets,
-	    sizeof(attacks[k].target[0]), target_comp_func);
+    gg_sort_with_const_data(attacks[k].target, number_of_targets,
+			    sizeof attacks[k].target[0],
+			    goban, target_comp_func);
   }
+
   number_of_attacks = k;
-  gg_sort(attacks, number_of_attacks, sizeof(attacks[0]), move_comp_func);
+  gg_sort_with_const_data(attacks, number_of_attacks, sizeof attacks[0],
+			  goban, move_comp_func);
 }
 
 
@@ -1547,29 +1566,29 @@ aa_sort_moves(struct aa_move attacks[AA_MAX_MOVES])
  */
 
 static int
-is_atari(int pos, int color)
+is_atari(const Goban *goban, int pos, int color)
 {
   int other = OTHER_COLOR(color);
 
   if (!is_legal(goban, pos, color))
     return 0;
-  
-  if (board[SOUTH(pos)] == other 
+
+  if (goban->board[SOUTH(pos)] == other 
       && countlib(goban, SOUTH(pos)) == 2)
     return 1;
-  
-  if (board[WEST(pos)] == other 
+
+  if (goban->board[WEST(pos)] == other 
       && countlib(goban, WEST(pos)) == 2)
     return 1;
-  
-  if (board[NORTH(pos)] == other 
+
+  if (goban->board[NORTH(pos)] == other 
       && countlib(goban, NORTH(pos)) == 2)
     return 1;
-  
-  if (board[EAST(pos)] == other 
+
+  if (goban->board[EAST(pos)] == other 
       && countlib(goban, EAST(pos)) == 2)
     return 1;
-  
+
   return 0;
 }
 

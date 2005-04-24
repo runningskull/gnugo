@@ -47,7 +47,7 @@ vgprintf(const Goban *goban, FILE *outputfile, const char *fmt, va_list ap)
 {
   if (fmt[0] == '%' && fmt[1] == 'o')
     fmt += 2;  /* Cancel indentation. */
-  else if (goban->stackp > 0) {
+  else if (goban && goban->stackp > 0) {
     fprintf(outputfile, "%.*s", goban->stackp * 2,
 	    "                                ");
   }
@@ -510,7 +510,7 @@ draw_letter_coordinates(int board_size, FILE *outfile)
 void
 simple_showboard(const Goban *goban, FILE *outfile)
 {
-  int board_size = goban->board_size;
+  const int board_size = goban->board_size;
   int i, j;
 
   draw_letter_coordinates(board_size, outfile);

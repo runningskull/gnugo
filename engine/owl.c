@@ -40,13 +40,12 @@
  *                            \|   |/
  *                            =#===#=
  *                            /___/
- * 
- *                The owl is noted for its keen vision 
+ *
+ *                The owl is noted for its keen vision
  *                       and (purported) wisdom.
  */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,9 +62,9 @@
 #define MAX_SEMEAI_DEPTH 100  /* Don't read below this depth */
 #define MAX_LUNCHES 10
 #define MAX_GOAL_WORMS 15  /* maximum number of worms in a dragon to be */
-                           /*   cataloged.  NOTE: Must fit in value2 in hashnode! */
+			   /*   cataloged.  NOTE: Must fit in value2 in hashnode! */
 #define MAX_ESCAPE 3  /* After this many escape moves, owl_determine_life is */
-                      /*    not called                                       */
+		      /*    not called                                       */
 
 struct local_owl_data {
   char goal[BOARDMAX];
@@ -84,15 +83,15 @@ struct local_owl_data {
   struct eye_data my_eye[BOARDMAX];
   /* array of half-eye data for use during owl reading */
   struct half_eye_data half_eye[BOARDMAX];
-  
+
   int lunch[MAX_LUNCHES];
   int lunch_attack_code[MAX_LUNCHES];
   int lunch_attack_point[MAX_LUNCHES];
   int lunch_defend_code[MAX_LUNCHES];
   int lunch_defense_point[MAX_LUNCHES];
   char inessential[BOARDMAX];
-  
-  int lunches_are_current; /* If true, owl lunch data is current */  
+
+  int lunches_are_current; /* If true, owl lunch data is current */
 
   char safe_move_cache[BOARDMAX];
 
@@ -101,6 +100,7 @@ struct local_owl_data {
 };
 
 
+/* THREAD-FIXME */
 static int result_certain;
 
 /* Statistics. */
@@ -143,12 +143,12 @@ struct matched_pattern_data {
   /* To link combinable patterns in chains. */
   int next_pattern_index;
 };
-  
+
 struct matched_patterns_list_data {
   int initialized;
-  int counter; 		/* Number of patterns in the list. */
+  int counter;		/* Number of patterns in the list. */
   int used;		/* How many patterns have already been used?*/
-  int list_size;	
+  int list_size;
   struct matched_pattern_data *pattern_list;
   int first_pattern_index[BOARDMAX];
 
@@ -156,88 +156,99 @@ struct matched_patterns_list_data {
   struct matched_pattern_data **pattern_heap;
 };
 
-void dump_pattern_list(struct matched_patterns_list_data *list);
+void dump_pattern_list(const Goban *goban,
+		       struct matched_patterns_list_data *list);
 
 
-static int do_owl_attack(int str, int *move, int *wormid,
+static int do_owl_attack(Goban *goban, int str, int *move, int *wormid,
 			 struct local_owl_data *owl, int escape);
-static int do_owl_defend(int str, int *move, int *wormid,
+static int do_owl_defend(Goban *goban, int str, int *move, int *wormid,
 			 struct local_owl_data *owl, int escape);
-static void owl_shapes(struct matched_patterns_list_data *list,
-                       struct owl_move_data moves[MAX_MOVES], int color,
+static void owl_shapes(Goban *goban, struct matched_patterns_list_data *list,
+		       struct owl_move_data moves[MAX_MOVES], int color,
 		       struct local_owl_data *owl, struct pattern_db *type);
-static void collect_owl_shapes_callbacks(int anchor, int color,
-	  			         struct pattern *pattern_db,
-				         int ll, void *data);
+static void collect_owl_shapes_callbacks(Goban *goban, int anchor, int color,
+					 struct pattern *pattern_db,
+					 int ll, void *data);
 
-static void pattern_list_prepare(struct matched_patterns_list_data *list);
+static void pattern_list_prepare(const Goban *goban,
+				 struct matched_patterns_list_data *list);
 static void pattern_list_build_heap(struct matched_patterns_list_data *list);
-static void pattern_list_pop_heap_once(struct matched_patterns_list_data *list);
-static void pattern_list_sink_heap_top_element(struct matched_patterns_list_data
-					       *list);
+static void pattern_list_pop_heap_once
+		(struct matched_patterns_list_data *list);
+static void pattern_list_sink_heap_top_element
+		(struct matched_patterns_list_data *list);
 
-static int get_next_move_from_list(struct matched_patterns_list_data *list,
-                                   int color, struct owl_move_data *moves,
+static int get_next_move_from_list(Goban *goban,
+				   struct matched_patterns_list_data *list,
+				   int color, struct owl_move_data *moves,
 				   int cutoff, struct local_owl_data *owl);
 static void init_pattern_list(struct matched_patterns_list_data *list);
-static void close_pattern_list(int color,
+static void close_pattern_list(Goban *goban, int color,
 			       struct matched_patterns_list_data *list);
-static void owl_shapes_callback(int anchor, int color,
+static void owl_shapes_callback(Goban *goban, int anchor, int color,
 				struct pattern *pattern_db,
 				int ll, void *data);
 static void owl_add_move(struct owl_move_data *moves, int move, int value,
 			 const char *reason, int same_dragon, int lunch,
 			 int escape, int defense_pos, int max_moves);
-static void owl_determine_life(struct local_owl_data *owl,
+static void owl_determine_life(Goban *goban, struct local_owl_data *owl,
 			       struct local_owl_data *second_owl,
 			       int does_attack,
 			       struct owl_move_data *moves,
 			       struct eyevalue *probable_eyes,
 			       int *eyemin, int *eyemax);
-static void owl_find_relevant_eyespaces(struct local_owl_data *owl,
+static void owl_find_relevant_eyespaces(const Goban *goban,
+					struct local_owl_data *owl,
 					int mw[BOARDMAX], int mz[BOARDMAX]);
-static int owl_estimate_life(struct local_owl_data *owl,
+static int owl_estimate_life(Goban *goban, struct local_owl_data *owl,
 			     struct local_owl_data *second_owl,
-    		  	     struct owl_move_data vital_moves[MAX_MOVES],
-		  	     const char **live_reason,
+			     struct owl_move_data vital_moves[MAX_MOVES],
+			     const char **live_reason,
 			     int does_attack,
-		  	     struct eyevalue *probable_eyes,
+			     struct eyevalue *probable_eyes,
 			     int *eyemin, int *eyemax);
-static int modify_stupid_eye_vital_point(struct local_owl_data *owl,
+static int modify_stupid_eye_vital_point(Goban *goban,
+					 struct local_owl_data *owl,
 					 int *vital_point,
 					 int is_attack_point);
-static int estimate_lunch_half_eye_bonus(int lunch,
-			struct half_eye_data half_eye[BOARDMAX]);
-static void owl_mark_dragon(int apos, int bpos,
+static int estimate_lunch_half_eye_bonus(const Goban *goban, int lunch,
+					 struct half_eye_data
+					   half_eye[BOARDMAX]);
+static void owl_mark_dragon(const Goban *goban, int apos, int bpos,
 			    struct local_owl_data *owl,
 			    int new_dragons[BOARDMAX]);
-static void owl_mark_worm(int apos, int bpos,
+static void owl_mark_worm(const Goban *goban, int apos, int bpos,
 			  struct local_owl_data *owl);
-static void owl_mark_boundary(struct local_owl_data *owl);
-static void owl_update_goal(int pos, int same_dragon, int lunch,
+static void owl_mark_boundary(const Goban *goban, struct local_owl_data *owl);
+static void owl_update_goal(Goban *goban, int pos, int same_dragon, int lunch,
 			    struct local_owl_data *owl, int semeai_call);
-static void owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS]);
-static void componentdump(const char goal[BOARDMAX]);
-static void owl_update_boundary_marks(int pos, struct local_owl_data *owl);
-static void owl_find_lunches(struct local_owl_data *owl);
-static int improve_lunch_attack(int lunch, int attack_point);
-static int improve_lunch_defense(int lunch, int defense_point);
-static void owl_make_domains(struct local_owl_data *owla,
+static void owl_test_cuts(Goban *goban, char goal[BOARDMAX], int color,
+			  int cuts[MAX_CUTS]);
+static void componentdump(const Goban *goban, const char goal[BOARDMAX]);
+static void owl_update_boundary_marks(const Goban *goban, int pos,
+				      struct local_owl_data *owl);
+static void owl_find_lunches(Goban *goban, struct local_owl_data *owl);
+static int improve_lunch_attack(Goban *goban, int lunch, int attack_point);
+static int improve_lunch_defense(Goban *goban, int lunch, int defense_point);
+static void owl_make_domains(Goban *goban, struct local_owl_data *owla,
 			     struct local_owl_data *owlb);
-static int owl_safe_move(int move, int color);
-static void sniff_lunch(int lunch, int *min, int *probable, int *max,
-			struct local_owl_data *owl);
-static void eat_lunch_escape_bonus(int lunch, int *min, int *probable,
-				   int *max, struct local_owl_data *owl);
-static void compute_owl_escape_values(struct local_owl_data *owl);
-static int owl_escape_route(struct local_owl_data *owl);
-static void do_owl_analyze_semeai(int apos, int bpos, 
+static int owl_safe_move(Goban *goban, int move, int color);
+static void sniff_lunch(Goban *goban, int lunch, int *min, int *probable,
+			int *max, struct local_owl_data *owl);
+static void eat_lunch_escape_bonus(Goban *goban, int lunch,
+				   int *min, int *probable, int *max,
+				   struct local_owl_data *owl);
+static void compute_owl_escape_values(Goban *goban,
+				      struct local_owl_data *owl);
+static int owl_escape_route(Goban *goban, struct local_owl_data *owl);
+static void do_owl_analyze_semeai(Goban *goban, int apos, int bpos,
 				  struct local_owl_data *owla,
 				  struct local_owl_data *owlb,
-				   
+
 				  int *resulta, int *resultb,
 				  int *move, int pass, int owl_phase);
-static int semeai_trymove_and_recurse(int apos, int bpos,
+static int semeai_trymove_and_recurse(Goban *goban, int apos, int bpos,
 				      struct local_owl_data *owla,
 				      struct local_owl_data *owlb,
 				      int owl_phase,
@@ -246,32 +257,40 @@ static int semeai_trymove_and_recurse(int apos, int bpos,
 				      int same_dragon, int lunch,
 				      int *semeai_move,
 				      int *this_resulta, int *this_resultb);
-static void semeai_add_sgf_comment(int value, int owl_phase);
-static int semeai_trust_tactical_attack(int str);
-static int semeai_propose_eyespace_filling_move(struct local_owl_data *owla,
+static void semeai_add_sgf_comment(const Goban *goban,
+				   int value, int owl_phase);
+static int semeai_trust_tactical_attack(const Goban *goban, int str);
+static int semeai_propose_eyespace_filling_move(Goban *goban,
+						struct local_owl_data *owla,
 						struct local_owl_data *owlb);
-static void semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
+static void semeai_review_owl_moves(Goban *goban,
+				    struct owl_move_data owl_moves[MAX_MOVES],
 				    struct local_owl_data *owla,
 				    struct local_owl_data *owlb, int color,
 				    int *safe_outside_liberty_found,
 				    int *safe_common_liberty_found,
 				    char mw[BOARDMAX],
-				    struct owl_move_data semeai_moves[MAX_SEMEAI_MOVES],
+				    struct owl_move_data
+				      semeai_moves[MAX_SEMEAI_MOVES],
 				    int guess_same_dragon, int value_bonus,
 				    int *critical_semeai_worms);
-static int semeai_move_value(int move, struct local_owl_data *owla,
+static int semeai_move_value(Goban *goban, int move,
+			     struct local_owl_data *owla,
 			     struct local_owl_data *owlb, int raw_value,
 			     int *critical_semeai_worms);
-static int find_semeai_backfilling_move(int worm, int liberty);
-static int liberty_of_goal(int pos, struct local_owl_data *owl);
-static int second_liberty_of_goal(int pos, struct local_owl_data *owl);
+static int find_semeai_backfilling_move(Goban *goban, int worm, int liberty);
+static int liberty_of_goal(const Goban *goban, int pos,
+			   struct local_owl_data *owl);
+static int second_liberty_of_goal(const Goban *goban, int pos,
+				  struct local_owl_data *owl);
 static int matches_found;
 static char found_matches[BOARDMAX];
 
 static void reduced_init_owl(struct local_owl_data **owl,
-    			     int at_bottom_of_stack);
-static void init_owl(struct local_owl_data **owl, int target1, int target2,
-		     int move, int use_stack, int new_dragons[BOARDMAX]);
+			     int at_bottom_of_stack);
+static void init_owl(Goban *goban, struct local_owl_data **owl,
+		     int target1, int target2, int move, int use_stack,
+		     int new_dragons[BOARDMAX]);
 
 static struct local_owl_data *owl_stack[2 * MAXSTACK];
 static int owl_stack_size = 0;
@@ -283,19 +302,20 @@ static void pop_owl(struct local_owl_data **owl);
 
 #if 0
 static int catalog_goal(struct local_owl_data *owl,
-    			int goal_worm[MAX_GOAL_WORMS]);
+			int goal_worm[MAX_GOAL_WORMS]);
 #endif
 
-static int list_goal_worms(struct local_owl_data *owl,
-    			   int goal_worm[MAX_GOAL_WORMS]);
+static int list_goal_worms(const Goban *goban, struct local_owl_data *owl,
+			   int goal_worm[MAX_GOAL_WORMS]);
 
 /* FIXME: taken from move_reasons.h */
 #define MAX_DRAGONS       2*MAX_BOARD*MAX_BOARD/3
 
+/* THREAD-FIXME */
 static int dragon_goal_worms[MAX_DRAGONS][MAX_GOAL_WORMS];
 
 static void
-prepare_goal_list(int str, struct local_owl_data *owl,
+prepare_goal_list(const Goban *goban, int str, struct local_owl_data *owl,
 		  int list[MAX_GOAL_WORMS], int *flag, int *kworm,
 		  int do_list);
 static void
@@ -305,6 +325,8 @@ finish_goal_list(int *flag, int *wpos, int list[MAX_GOAL_WORMS], int index);
 /* Semeai worms are worms whose capture wins the semeai. */
 
 #define MAX_SEMEAI_WORMS 20
+
+/* THREAD-FIXME */
 static int s_worms = 0;
 static int semeai_worms[MAX_SEMEAI_WORMS];
 static int important_semeai_worms[MAX_SEMEAI_WORMS];
@@ -320,6 +342,8 @@ static int prefer_ko;
  *
  * FIXME: We should implement a nicer mechanism to propagate this
  *        information to owl_lively(), where it's used.
+ *
+ * THREAD-FIXME
  */
 static int include_semeai_worms_in_eyespace = 0;
 
@@ -339,7 +363,7 @@ clear_cut_list(int cuts[MAX_CUTS])
  * of the opposite color, both with matcher_status DEAD or
  * CRITICAL, analyzes the semeai, assuming that the player
  * of the (apos) dragon moves first. The results returned
- * by *resulta and *resultb are the results of the defense 
+ * by *resulta and *resultb are the results of the defense
  * of the apos dragon and the attack of the bpos dragon,
  * respectively. Thus if these results are 1 and 0,
  * respectively, the usual meaning is that a move by the
@@ -351,26 +375,28 @@ clear_cut_list(int cuts[MAX_CUTS])
  */
 
 void
-owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb,
+owl_analyze_semeai(Goban *goban, int apos, int bpos, int *resulta, int *resultb,
 		   int *semeai_move, int owl, int *semeai_result_certain)
 {
-  owl_analyze_semeai_after_move(PASS_MOVE, EMPTY, apos, bpos, resulta, resultb,
-				semeai_move, owl, semeai_result_certain, 0);
+  owl_analyze_semeai_after_move(goban, PASS_MOVE, EMPTY, apos, bpos,
+				resulta, resultb, semeai_move, owl,
+				semeai_result_certain, 0);
 }
 
 /* Same as the function above with the addition that an arbitrary move
  * may be made before the analysis is performed.
  */
 void
-owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
-			      int *resulta, int *resultb, int *semeai_move, 
-			      int owl, int *semeai_result_certain,
+owl_analyze_semeai_after_move(Goban *goban, int move, int color,
+			      int apos, int bpos, int *resulta, int *resultb,
+			      int *semeai_move, int owl,
+			      int *semeai_result_certain,
 			      int recompute_dragons)
 {
   char ms[BOARDMAX];
   int w1, w2;
   int str;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  SGF_dump_data sgf_dump_save;
   int save_verbose = verbose;
   int dummy_resulta;
   int dummy_resultb;
@@ -379,11 +405,11 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   int reading_nodes_when_called = get_reading_node_counter();
   int nodes_used;
   int new_dragons[BOARDMAX];
-  
+
   struct local_owl_data *owla;
   struct local_owl_data *owlb;
   Hash_data goal_hash;
-  
+
   if (!resulta)
     resulta = &dummy_resulta;
   if (!resultb)
@@ -396,14 +422,14 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
 
   if (recompute_dragons) {
     if (tryko(goban, move, color, "Recompute dragons for semeai.")) {
-      compute_new_dragons(new_dragons);
+      compute_new_dragons(goban, new_dragons);
       popgo(goban);
     }
     else
       recompute_dragons = 0;
   }
-  
-  
+
+
   /* Look for owl substantial worms of either dragon adjoining
    * the other dragon. Capturing such a worm wins the semeai.
    * These are the semeai_worms. This code must come before
@@ -415,23 +441,23 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   memset(ms, 0, sizeof(ms));
   for (w1 = first_worm_in_dragon(apos);
        w1 != NO_MOVE;
-       w1 = next_worm_in_dragon(w1)) {
+       w1 = next_worm_in_dragon(goban, w1)) {
     for (w2 = first_worm_in_dragon(bpos);
 	 w2 != NO_MOVE;
-	 w2 = next_worm_in_dragon(w2)) {
-      if (adjacent_strings(goban, w1, w2) || have_common_lib(goban, w1, w2, NULL)) {
+	 w2 = next_worm_in_dragon(goban, w2)) {
+      if (adjacent_strings(goban, w1, w2)
+	  || have_common_lib(goban, w1, w2, NULL)) {
 	mark_string(goban, w1, ms, 1);
 	mark_string(goban, w2, ms, 1);
       }
     }
   }
 
-
-  
-  sgf_dumptree = NULL;
+  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
   if (verbose > 0)
     verbose--;
-  for (str = BOARDMIN; str < BOARDMAX; str++) 
+
+  for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(goban, str) && ms[str] && worm[str].origin == str) {
       int adj;
       int adjs[MAXCHAIN];
@@ -454,52 +480,57 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
        */
       adj = chainlinks(goban, str, adjs);
       for (k = 0; k < adj; k++) {
-	if (!is_same_dragon(adjs[k], apos)
-	    && !is_same_dragon(adjs[k], bpos)
+	if (!is_same_dragon(goban, adjs[k], apos)
+	    && !is_same_dragon(goban, adjs[k], bpos)
 	    && dragon[adjs[k]].crude_status == ALIVE)
 	  adjacent_to_outside = 1;
       }
-      
+
       if ((adjacent_to_outside || countstones(goban, str) > 6)
 	  && s_worms < MAX_SEMEAI_WORMS) {
 	important_semeai_worms[s_worms] = 1;
 	semeai_worms[s_worms++] = str;
 	DEBUG(goban, DEBUG_SEMEAI, "important semeai worm: %1m\n", str);
       }
-      else if (owl_substantial(str) && s_worms < MAX_SEMEAI_WORMS) {
+      else if (owl_substantial(goban, str) && s_worms < MAX_SEMEAI_WORMS) {
 	important_semeai_worms[s_worms] = 0;
 	semeai_worms[s_worms++] = str;
 	DEBUG(goban, DEBUG_SEMEAI, "semeai worm: %1m\n", str);
       }
     }
-  verbose = save_verbose;
-  sgf_dumptree = save_sgf_dumptree;
 
-  ASSERT1(goban, board[apos] == OTHER_COLOR(board[bpos]), apos);
-  count_variations = 1;
-  if (move == PASS_MOVE)
-    DEBUG(goban, DEBUG_SEMEAI, "owl_analyze_semeai: %1m vs. %1m\n", apos, bpos);
-  else
-    DEBUG(goban, DEBUG_SEMEAI, "owl_analyze_semeai_after_move %C %1m: %1m vs. %1m\n",
+  verbose = save_verbose;
+  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+
+  ASSERT1(goban, goban->board[apos] == OTHER_COLOR(goban->board[bpos]), apos);
+  goban->variations_counter = 1;
+  if (move == PASS_MOVE) {
+    DEBUG(goban, DEBUG_SEMEAI, "owl_analyze_semeai: %1m vs. %1m\n",
+	  apos, bpos);
+  }
+  else {
+    DEBUG(goban, DEBUG_SEMEAI,
+	  "owl_analyze_semeai_after_move %C %1m: %1m vs. %1m\n",
 	  color, move, apos, bpos);
-  
+  }
+
   if (owl) {
     if (recompute_dragons) {
-      init_owl(&owla, apos, NO_MOVE, NO_MOVE, 1, new_dragons);
-      init_owl(&owlb, bpos, NO_MOVE, NO_MOVE, 0, new_dragons);
+      init_owl(goban, &owla, apos, NO_MOVE, NO_MOVE, 1, new_dragons);
+      init_owl(goban, &owlb, bpos, NO_MOVE, NO_MOVE, 0, new_dragons);
     }
     else {
-      init_owl(&owla, apos, NO_MOVE, NO_MOVE, 1, NULL);
-      init_owl(&owlb, bpos, NO_MOVE, NO_MOVE, 0, NULL);
+      init_owl(goban, &owla, apos, NO_MOVE, NO_MOVE, 1, NULL);
+      init_owl(goban, &owlb, bpos, NO_MOVE, NO_MOVE, 0, NULL);
     }
-    owl_make_domains(owla, owlb);
+    owl_make_domains(goban, owla, owlb);
   }
   else {
     reduced_init_owl(&owla, 1);
     reduced_init_owl(&owlb, 0);
     local_owl_node_counter = 0;
-    owl_mark_worm(apos, NO_MOVE, owla);
-    owl_mark_worm(bpos, NO_MOVE, owlb);
+    owl_mark_worm(goban, apos, NO_MOVE, owla);
+    owl_mark_worm(goban, bpos, NO_MOVE, owlb);
   }
 
   result_certain = 1;
@@ -540,17 +571,17 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
    * color, if any, prefers to get ko.
    */
   if (dragon[apos].size <= 5 && dragon[bpos].size > 3 * dragon[apos].size)
-    prefer_ko = board[apos];
+    prefer_ko = goban->board[apos];
   else if (dragon[bpos].size <= 5 && dragon[apos].size > 3 * dragon[bpos].size)
-    prefer_ko = board[bpos];
+    prefer_ko = goban->board[bpos];
   else
     prefer_ko = EMPTY;
-  
+
   if (move == PASS_MOVE)
-    do_owl_analyze_semeai(apos, bpos, owla, owlb,
+    do_owl_analyze_semeai(goban, apos, bpos, owla, owlb,
 			  resulta, resultb, semeai_move, 0, owl);
   else {
-    semeai_trymove_and_recurse(bpos, apos, owlb, owla, owl,
+    semeai_trymove_and_recurse(goban, bpos, apos, owlb, owla, owl,
 			       move, color, 1, 0, "mandatory move", 1, NO_MOVE,
 			       semeai_move, resultb, resulta);
     *resulta = REVERSE_RESULT(*resulta);
@@ -571,7 +602,7 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
 	  local_owl_node_counter,
 	  nodes_used, gg_cputime() - start);
   }
-  
+
   if (semeai_result_certain)
     *semeai_result_certain = result_certain;
 
@@ -597,12 +628,13 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
  */
 
 static void
-do_owl_analyze_semeai(int apos, int bpos, 
+do_owl_analyze_semeai(Goban *goban, int apos, int bpos,
 		      struct local_owl_data *owla,
 		      struct local_owl_data *owlb,
 		      int *resulta, int *resultb,
 		      int *move, int pass, int owl_phase)
 {
+  const Intersection *const board = goban->board;
   int color = board[apos];
   int other = OTHER_COLOR(color);
 #if 0
@@ -622,10 +654,9 @@ do_owl_analyze_semeai(int apos, int bpos,
   struct owl_move_data backfill_common_liberty;
   int safe_outside_liberty_found = 0;
   int safe_common_liberty_found = 0;
-  char mw[BOARDMAX];  
+  char mw[BOARDMAX];
   int k;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
+  SGF_dump_data sgf_dump_save;
   int move_value;
   int best_resulta = 0;
   int best_resultb = 0;
@@ -636,7 +667,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   int xpos;
   int value1;
   int value2;
-  int this_variation_number = count_variations - 1;
+  int this_variation_number = goban->variations_counter - 1;
   int you_look_alive = 0;
   int I_look_alive = 0;
   int dummy_move;
@@ -647,26 +678,26 @@ do_owl_analyze_semeai(int apos, int bpos,
   struct eyevalue probable_eyes_a;
   struct eyevalue probable_eyes_b;
   struct eyevalue dummy_eyes;
-  
+
   SETUP_TRACE_INFO2("do_owl_analyze_semeai", apos, bpos);
 
   if (!move)
     move = &dummy_move;
-  
+
   ASSERT1(goban, board[apos] == owla->color, apos);
   ASSERT1(goban, board[bpos] == owlb->color, bpos);
 
   apos = find_origin(goban, apos);
   bpos = find_origin(goban, bpos);
 
-  if (stackp <= semeai_branch_depth && (hashflags & HASH_SEMEAI)
+  if (goban->stackp <= semeai_branch_depth && (hashflags & HASH_SEMEAI)
       && !pass && owl_phase
-      && tt_get(goban, &ttable, SEMEAI, apos, bpos, depth - stackp, NULL,
-		&value1, &value2, &xpos) == 2) {
+      && tt_get(goban, &ttable, SEMEAI, apos, bpos, depth - goban->stackp,
+		NULL, &value1, &value2, &xpos) == 2) {
     TRACE_CACHED_RESULT2(value1, value2, xpos);
     if (value1 != 0)
       *move = xpos;
-      
+
     *resulta = value1;
     *resultb = value2;
 
@@ -684,12 +715,12 @@ do_owl_analyze_semeai(int apos, int bpos,
 
   shape_offensive_patterns.initialized = 0;
   shape_defensive_patterns.initialized = 0;
-  
+
 #if 0
   wormsa = catalog_goal(owla, goal_wormsa);
   wormsb = catalog_goal(owlb, goal_wormsb);
 #endif
-  
+
   outside_liberty.pos = NO_MOVE;
   common_liberty.pos = NO_MOVE;
   backfill_outside_liberty.pos = NO_MOVE;
@@ -705,10 +736,9 @@ do_owl_analyze_semeai(int apos, int bpos,
   ASSERT1(goban, other == board[bpos], bpos);
   memset(mw, 0, sizeof(mw));
 
-  /* Turn off the sgf file and variation counting. */
-  sgf_dumptree = NULL;
-  count_variations = 0;
-  
+  /* Turn off the SGF file and variation counting. */
+  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+
   /* Look for a tactical attack. We seek a semeai worm of owlb which
    * can be attacked. If such exists and is considered critical, we
    * declare victory. If it's not considered critical we add the
@@ -717,28 +747,27 @@ do_owl_analyze_semeai(int apos, int bpos,
 
   {
     int upos;
-    
+
     for (sworm = 0; sworm < s_worms; sworm++) {
       critical_semeai_worms[sworm] = 0;
       if (board[semeai_worms[sworm]] == other) {
 	int acode = attack(goban, semeai_worms[sworm], &upos);
 	if (acode == WIN
-	    && semeai_trust_tactical_attack(semeai_worms[sworm])
+	    && semeai_trust_tactical_attack(goban, semeai_worms[sworm])
 	    && important_semeai_worms[sworm]) {
 	  *resulta = WIN;
 	  *resultb = WIN;
 	  *move = upos;
-	  sgf_dumptree = save_sgf_dumptree;
-	  count_variations = save_count_variations;
+	  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 	  SGFTRACE_SEMEAI(goban, upos, WIN, WIN, "tactical win found");
-	  READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - stackp,
+	  READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - goban->stackp,
 			     move, upos, WIN, WIN);
 	}
 	else if (acode != 0
 		 && find_defense(goban, semeai_worms[sworm], NULL)) {
 	  critical_semeai_worms[sworm] = 1;
 	  owl_add_move(moves, upos, 95, "attack semeai worm", 1, NO_MOVE,
-	      	       0, NO_MOVE, MAX_SEMEAI_MOVES);
+		       0, NO_MOVE, MAX_SEMEAI_MOVES);
 	  TRACE(goban, "Added %1m %d (-1)\n", upos, 95);
 	}
       }
@@ -752,12 +781,12 @@ do_owl_analyze_semeai(int apos, int bpos,
       if (board[semeai_worms[sworm]] == color) {
 	if (important_semeai_worms[sworm])
 	  we_might_be_inessential = 0;
-	
+
 	if (attack(goban, semeai_worms[sworm], NULL)
 	    && find_defense(goban, semeai_worms[sworm], &upos)) {
 	  critical_semeai_worms[sworm] = 1;
 	  owl_add_move(moves, upos, 85, "defend semeai worm", 1, NO_MOVE,
-	      	       0, NO_MOVE, MAX_SEMEAI_MOVES);
+		       0, NO_MOVE, MAX_SEMEAI_MOVES);
 	  TRACE(goban, "Added %1m %d (0)\n", upos, 85);
 	}
       }
@@ -766,7 +795,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   /* We generate the candidate moves. During the early stages of
    * the semeai, there may be moves to expand or shrink the
    * eyespaces of the two dragons. During the later stages, the
-   * picture is simplified and reading the semeai is a matter 
+   * picture is simplified and reading the semeai is a matter
    * of filling liberties until one of the dragons may be removed,
    * or a seki results. The first stage we call the owl phase.
    */
@@ -777,7 +806,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   else {
     /* First the vital moves. These include moves to attack or
      * defend the eyespace (e.g. nakade, or hane to reduce the
-     * number of eyes) or moves to capture a lunch. 
+     * number of eyes) or moves to capture a lunch.
      */
     int eyemin_a;
     int eyemin_b;
@@ -785,24 +814,24 @@ do_owl_analyze_semeai(int apos, int bpos,
     int eyemax_b;
     const char *live_reasona;
     const char *live_reasonb;
-    
-    /* We do not wish for any string of the 'b' dragon to be 
-     * counted as a lunch of the 'a' dragon since owl_determine_life 
-     * can give a wrong result in the case of a semeai. So we eliminate 
+
+    /* We do not wish for any string of the 'b' dragon to be
+     * counted as a lunch of the 'a' dragon since owl_determine_life
+     * can give a wrong result in the case of a semeai. So we eliminate
      * such lunches.
      */
-    
-    owl_find_lunches(owla);
-    owl_find_lunches(owlb);
+
+    owl_find_lunches(goban, owla);
+    owl_find_lunches(goban, owlb);
     for (k = 0; k < MAX_LUNCHES; k++) {
-      if (owla->lunch[k] != NO_MOVE 
+      if (owla->lunch[k] != NO_MOVE
 	  && owlb->goal[owla->lunch[k]]) {
 	owla->lunch[k] = NO_MOVE;
       }
     }
 #if 1
     for (k = 0; k < MAX_LUNCHES; k++) {
-      if (owlb->lunch[k] != NO_MOVE 
+      if (owlb->lunch[k] != NO_MOVE
 	  && owla->goal[owlb->lunch[k]]) {
 	owlb->lunch[k] = NO_MOVE;
       }
@@ -810,24 +839,24 @@ do_owl_analyze_semeai(int apos, int bpos,
 #endif
 
 
-    if (owl_estimate_life(owla, owlb, vital_defensive_moves,
+    if (owl_estimate_life(goban, owla, owlb, vital_defensive_moves,
 			  &live_reasona, 0, &probable_eyes_a,
 			  &eyemin_a, &eyemax_a))
       I_look_alive = 1;
-    else if (stackp > 2 && owl_escape_route(owla) >= 5) {
+    else if (goban->stackp > 2 && owl_escape_route(goban, owla) >= 5) {
       live_reasona = "escaped";
       I_look_alive = 1;
     }
 
-    if (owl_estimate_life(owlb, owla, vital_offensive_moves,
+    if (owl_estimate_life(goban, owlb, owla, vital_offensive_moves,
 			  &live_reasonb, 1, &probable_eyes_b,
 			  &eyemin_b, &eyemax_b))
       you_look_alive = 1;
-    else if (stackp > 2 && owl_escape_route(owlb) >= 5) {
+    else if (goban->stackp > 2 && owl_escape_route(goban, owlb) >= 5) {
       live_reasonb = "escaped";
       you_look_alive = 1;
     }
-    
+
     if (verbose) {
       gprintf(goban, "probable_eyes_a: %s eyemin: %d eyemax: %d",
 	      eyevalue_to_string(&probable_eyes_a), eyemin_a, eyemax_a);
@@ -846,42 +875,41 @@ do_owl_analyze_semeai(int apos, int bpos,
       *resulta = WIN;
       *resultb = 0;
       *move = PASS_MOVE;
-      sgf_dumptree = save_sgf_dumptree;
-      count_variations = save_count_variations;
+      RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
       TRACE(goban, "Both live\n");
       SGFTRACE_SEMEAI(goban, PASS_MOVE, WIN, 0, "Both live");
-      READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - stackp,
+      READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - goban->stackp,
 			 move, PASS_MOVE, WIN, 0);
     }
-    
+
     /* Next the shape moves. */
     if (!I_look_alive) {
-      owl_shapes(&shape_defensive_patterns, shape_defensive_moves, color,
-		 owla, &owl_defendpat_db);
+      owl_shapes(goban, &shape_defensive_patterns, shape_defensive_moves,
+		 color, owla, &owl_defendpat_db);
       for (k = 0; k < MAX_MOVES-1; k++)
-	if (!get_next_move_from_list(&shape_defensive_patterns, color,
+	if (!get_next_move_from_list(goban, &shape_defensive_patterns, color,
 				     shape_defensive_moves, 1, owla))
 	  break;
     }
-    owl_shapes(&shape_offensive_patterns, shape_offensive_moves, color, owlb, 
-	       &owl_attackpat_db);
+    owl_shapes(goban, &shape_offensive_patterns, shape_offensive_moves,
+	       color, owlb, &owl_attackpat_db);
     for (k = 0; k < MAX_MOVES-1; k++)
-      if (!get_next_move_from_list(&shape_offensive_patterns, color,
-	                           shape_offensive_moves, 1, owla))
+      if (!get_next_move_from_list(goban, &shape_offensive_patterns, color,
+				   shape_offensive_moves, 1, owla))
 	break;
-    
+
     /* Now we review the moves already considered, while collecting
-     * them into a single list. 
+     * them into a single list.
      */
 
     if (!I_look_alive) {
-      semeai_review_owl_moves(vital_defensive_moves, owla, owlb, color,
+      semeai_review_owl_moves(goban, vital_defensive_moves, owla, owlb, color,
 			      &safe_outside_liberty_found,
 			      &safe_common_liberty_found,
 			      mw, moves, 0, 30,
 			      critical_semeai_worms);
-      
-      semeai_review_owl_moves(shape_defensive_moves, owla, owlb, color,
+
+      semeai_review_owl_moves(goban, shape_defensive_moves, owla, owlb, color,
 			      &safe_outside_liberty_found,
 			      &safe_common_liberty_found,
 			      mw, moves, 0, 0,
@@ -889,13 +917,13 @@ do_owl_analyze_semeai(int apos, int bpos,
     }
 
     if (!you_look_alive) {
-      semeai_review_owl_moves(vital_offensive_moves, owla, owlb, color,
+      semeai_review_owl_moves(goban, vital_offensive_moves, owla, owlb, color,
 			      &safe_outside_liberty_found,
 			      &safe_common_liberty_found,
 			      mw, moves, 1, 30,
 			      critical_semeai_worms);
-      
-      semeai_review_owl_moves(shape_offensive_moves, owla, owlb, color,
+
+      semeai_review_owl_moves(goban, shape_offensive_moves, owla, owlb, color,
 			      &safe_outside_liberty_found,
 			      &safe_common_liberty_found,
 			      mw, moves, 1, 0,
@@ -908,10 +936,10 @@ do_owl_analyze_semeai(int apos, int bpos,
      */
     if (moves[0].pos == NO_MOVE || we_might_be_inessential) {
       include_semeai_worms_in_eyespace = 1;
-      if (!owl_estimate_life(owlb, owla, vital_offensive_moves,
+      if (!owl_estimate_life(goban, owlb, owla, vital_offensive_moves,
 			     &live_reasonb, 1, &dummy_eyes,
 			     &eyemin_b, &eyemax_b))
-	semeai_review_owl_moves(vital_offensive_moves, owla, owlb, color,
+	semeai_review_owl_moves(goban, vital_offensive_moves, owla, owlb, color,
 				&safe_outside_liberty_found,
 				&safe_common_liberty_found,
 				mw, moves, 1, 30,
@@ -935,11 +963,11 @@ do_owl_analyze_semeai(int apos, int bpos,
   }
 
   if (1 && verbose) {
-    showboard(0);
-    goaldump(owla->goal);
-    goaldump(owlb->goal);
+    showboard(goban, 0);
+    goaldump(goban, owla->goal);
+    goaldump(goban, owlb->goal);
   }
-  
+
   /* Now we look for a move to fill a liberty. This is only
    * interesting if the opponent doesn't already have two eyes.
    */
@@ -949,19 +977,20 @@ do_owl_analyze_semeai(int apos, int bpos,
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (!ON_BOARD(goban, pos))
 	continue;
-      
+
       if (board[pos] == EMPTY && !mw[pos]) {
-	if (liberty_of_goal(pos, owlb)) {
-	  if (!liberty_of_goal(pos, owla)) {
+	if (liberty_of_goal(goban, pos, owlb)) {
+	  if (!liberty_of_goal(goban, pos, owla)) {
 	    /* outside liberty */
 	    if (safe_move(goban, pos, color) == WIN) {
 	      safe_outside_liberty_found = 1;
 	      outside_liberty.pos = pos;
 	      break;
 	    }
-	    else if (backfill_outside_liberty.pos == NO_MOVE)
-	      backfill_outside_liberty.pos = find_semeai_backfilling_move(bpos,
-									  pos);
+	    else if (backfill_outside_liberty.pos == NO_MOVE) {
+	      backfill_outside_liberty.pos
+		= find_semeai_backfilling_move(goban, bpos, pos);
+	    }
 	  }
 	  else {
 	    /* common liberty */
@@ -969,9 +998,10 @@ do_owl_analyze_semeai(int apos, int bpos,
 	      safe_common_liberty_found = 1;
 	      common_liberty.pos = pos;
 	    }
-	    else if (backfill_common_liberty.pos == NO_MOVE)
-	      backfill_common_liberty.pos = find_semeai_backfilling_move(bpos,
-									 pos);
+	    else if (backfill_common_liberty.pos == NO_MOVE) {
+	      backfill_common_liberty.pos
+		= find_semeai_backfilling_move(goban, bpos, pos);
+	    }
 	  }
 	}
       }
@@ -987,7 +1017,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   if (!you_look_alive) {
     if (safe_outside_liberty_found
 	&& outside_liberty.pos != NO_MOVE) {
-      move_value = semeai_move_value(outside_liberty.pos,
+      move_value = semeai_move_value(goban, outside_liberty.pos,
 				     owla, owlb, 50,
 				     critical_semeai_worms);
       owl_add_move(moves, outside_liberty.pos, move_value,
@@ -996,17 +1026,18 @@ do_owl_analyze_semeai(int apos, int bpos,
       TRACE(goban, "Added %1m %d (5)\n", outside_liberty.pos, move_value);
     }
     else if (backfill_outside_liberty.pos != NO_MOVE) {
-      move_value = semeai_move_value(backfill_outside_liberty.pos,
+      move_value = semeai_move_value(goban, backfill_outside_liberty.pos,
 				     owla, owlb, 50,
 				     critical_semeai_worms);
       owl_add_move(moves, backfill_outside_liberty.pos, move_value,
 		   "backfilling move", 0, NO_MOVE, 0,
 		   NO_MOVE, MAX_SEMEAI_MOVES);
-      TRACE(goban, "Added %1m %d (6)\n", backfill_outside_liberty.pos, move_value);
+      TRACE(goban, "Added %1m %d (6)\n",
+	    backfill_outside_liberty.pos, move_value);
     }
     else if (safe_common_liberty_found
 	     && common_liberty.pos != NO_MOVE) {
-      move_value = semeai_move_value(common_liberty.pos,
+      move_value = semeai_move_value(goban, common_liberty.pos,
 				     owla, owlb, 10,
 				     critical_semeai_worms);
       owl_add_move(moves, common_liberty.pos, move_value,
@@ -1015,13 +1046,14 @@ do_owl_analyze_semeai(int apos, int bpos,
       TRACE(goban, "Added %1m %d (7)\n", common_liberty.pos, move_value);
     }
     else if (backfill_common_liberty.pos != NO_MOVE) {
-      move_value = semeai_move_value(backfill_common_liberty.pos,
+      move_value = semeai_move_value(goban, backfill_common_liberty.pos,
 				     owla, owlb, 10,
 				     critical_semeai_worms);
       owl_add_move(moves, backfill_common_liberty.pos, move_value,
 		   "backfilling move", 0, NO_MOVE, 0,
 		   NO_MOVE, MAX_SEMEAI_MOVES);
-      TRACE(goban, "Added %1m %d (6)\n", backfill_common_liberty.pos, move_value);
+      TRACE(goban, "Added %1m %d (6)\n",
+	    backfill_common_liberty.pos, move_value);
     }
   }
 
@@ -1030,21 +1062,21 @@ do_owl_analyze_semeai(int apos, int bpos,
      * eye (i.e. put more stones in "bulky five" shape).
      */
     if (min_eyes(&probable_eyes_b) == 1) {
-      int move = semeai_propose_eyespace_filling_move(owla, owlb);
+      int move = semeai_propose_eyespace_filling_move(goban, owla, owlb);
 
       if (move) {
 	owl_add_move(moves, move, 70, "eyespace filling", 0, NO_MOVE,
-	    	     0, NO_MOVE, MAX_SEMEAI_MOVES);
+		     0, NO_MOVE, MAX_SEMEAI_MOVES);
       }
     }
 
     if (moves[0].pos == NO_MOVE)
       TRACE(goban, "No move found\n");
   }
-  
+
   /* Now we are ready to try moves. Turn on the sgf output ... */
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
+  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+
   tested_moves = 0;
   for (k = 0; k < MAX_SEMEAI_MOVES; k++) {
     int mpos = moves[k].pos;
@@ -1053,26 +1085,26 @@ do_owl_analyze_semeai(int apos, int bpos,
 
     /* Do not try too many moves. */
     if (tested_moves > 2
-	|| (stackp > semeai_branch_depth2 && tested_moves > 1)
-	|| (stackp > semeai_branch_depth && tested_moves > 0)) {
+	|| (goban->stackp > semeai_branch_depth2 && tested_moves > 1)
+	|| (goban->stackp > semeai_branch_depth && tested_moves > 0)) {
       /* If allpats, try and pop to get the move in the sgf record. */
       if (!allpats)
 	break;
       else if (trymove(goban, mpos, color, moves[k].name, apos)) {
-	semeai_add_sgf_comment(moves[k].value, owl_phase);
+	semeai_add_sgf_comment(goban, moves[k].value, owl_phase);
 	popgo(goban);
       }
       continue;
     }
-    
-    if (count_variations >= semeai_node_limit
-	|| stackp >= MAX_SEMEAI_DEPTH)
+
+    if (goban->variations_counter >= semeai_node_limit
+	|| goban->stackp >= MAX_SEMEAI_DEPTH)
       continue;
 
     /* Try playing the move at mpos and call ourselves recursively to
      * determine the result obtained by this move.
      */
-    if (semeai_trymove_and_recurse(apos, bpos, owla, owlb,
+    if (semeai_trymove_and_recurse(goban, apos, bpos, owla, owlb,
 				   owl_phase, mpos, color,
 				   best_resulta == 0 || best_resultb == 0,
 				   moves[k].value, moves[k].name,
@@ -1086,9 +1118,9 @@ do_owl_analyze_semeai(int apos, int bpos,
 	*move = mpos;
 	TRACE(goban, "After %1m I (%C) am alive, you are dead\n", mpos, color);
 	SGFTRACE_SEMEAI(goban, mpos, WIN, WIN, moves[k].name);
-	close_pattern_list(color, &shape_defensive_patterns);
-	close_pattern_list(color, &shape_offensive_patterns);
-	READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - stackp,
+	close_pattern_list(goban, color, &shape_defensive_patterns);
+	close_pattern_list(goban, color, &shape_offensive_patterns);
+	READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - goban->stackp,
 			   move, mpos, WIN, WIN);
       }
       /* When there is a choice between ko and seki, the prefer_ko
@@ -1112,8 +1144,8 @@ do_owl_analyze_semeai(int apos, int bpos,
     }
   }
 
-  close_pattern_list(color, &shape_defensive_patterns);
-  close_pattern_list(color, &shape_offensive_patterns);
+  close_pattern_list(goban, color, &shape_defensive_patterns);
+  close_pattern_list(goban, color, &shape_offensive_patterns);
 
   /* If we can't find a move and the opponent looks alive, we have
    * lost.
@@ -1123,7 +1155,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     *resultb = 0;
     *move = PASS_MOVE;
     SGFTRACE_SEMEAI(goban, PASS_MOVE, 0, 0, "You live, I die");
-    READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - stackp,
+    READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - goban->stackp,
 		       move, PASS_MOVE, 0, 0);
   }
 
@@ -1140,10 +1172,10 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  break;
       }
     }
-    
+
     if (sworm == s_worms) {
       include_semeai_worms_in_eyespace = 1;
-      if (!owl_estimate_life(owla, owlb, vital_defensive_moves,
+      if (!owl_estimate_life(goban, owla, owlb, vital_defensive_moves,
 			     &live_reasona, 0, &dummy_eyes,
 			     &eyemin_a, &eyemax_a)
 	  && eyemax_a < 2) {
@@ -1152,7 +1184,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	*resultb = 0;
 	*move = PASS_MOVE;
 	SGFTRACE_SEMEAI(goban, PASS_MOVE, 0, 0, "You live, I die - 2");
-	READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - stackp,
+	READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - goban->stackp,
 			   move, PASS_MOVE, 0, 0);
       }
       include_semeai_worms_in_eyespace = 0;
@@ -1169,7 +1201,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       *move = PASS_MOVE;
       TRACE(goban, "You have more eyes.\n");
       SGFTRACE_SEMEAI(goban, PASS_MOVE, 0, 0, "You have more eyes");
-      READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - stackp,
+      READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - goban->stackp,
 			 move, PASS_MOVE, 0, 0);
     }
     else if (max_eyes(&probable_eyes_b) < min_eyes(&probable_eyes_a)) {
@@ -1178,7 +1210,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       *move = PASS_MOVE;
       TRACE(goban, "I have more eyes\n");
       SGFTRACE_SEMEAI(goban, PASS_MOVE, WIN, WIN, "I have more eyes");
-      READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - stackp,
+      READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - goban->stackp,
 			 move, PASS_MOVE, WIN, WIN);
     }
     else {
@@ -1187,21 +1219,21 @@ do_owl_analyze_semeai(int apos, int bpos,
       *move = PASS_MOVE;
       TRACE(goban, "Seki\n");
       SGFTRACE_SEMEAI(goban, PASS_MOVE, WIN, 0, "Seki");
-      READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - stackp,
+      READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - goban->stackp,
 			 move, PASS_MOVE, WIN, 0);
     }
   }
-  
+
   /* If no move was found, then pass. */
   if (tested_moves == 0) {
-    do_owl_analyze_semeai(bpos, apos, owlb, owla,
+    do_owl_analyze_semeai(goban, bpos, apos, owlb, owla,
 			  resultb, resulta, NULL, 1, owl_phase);
     *resulta = REVERSE_RESULT(*resulta);
     *resultb = REVERSE_RESULT(*resultb);
     TRACE(goban, "No move found\n");
     SGFTRACE_SEMEAI(goban, PASS_MOVE, *resulta, *resultb, "No move found");
     *move = PASS_MOVE;
-    READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - stackp,
+    READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - goban->stackp,
 		       move, PASS_MOVE, *resulta, *resultb);
   }
 
@@ -1210,8 +1242,9 @@ do_owl_analyze_semeai(int apos, int bpos,
   if (best_resulta == 0)
     best_move = PASS_MOVE;
   *move = best_move;
-  SGFTRACE_SEMEAI(goban, best_move, best_resulta, best_resultb, best_move_name);
-  READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - stackp, 
+  SGFTRACE_SEMEAI(goban, best_move, best_resulta, best_resultb,
+		  best_move_name);
+  READ_RETURN_SEMEAI(goban, SEMEAI, apos, bpos, depth - goban->stackp,
 		     move, best_move, best_resulta, best_resultb);
 }
 
@@ -1220,70 +1253,74 @@ do_owl_analyze_semeai(int apos, int bpos,
  * move.
  */
 static int
-semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
-			   struct local_owl_data *owlb, int owl_phase,
-			   int move, int color, int ko_allowed,
+semeai_trymove_and_recurse(Goban *goban, int apos, int bpos,
+			   struct local_owl_data *owla,
+			   struct local_owl_data *owlb,
+			   int owl_phase, int move, int color, int ko_allowed,
 			   int move_value, const char *move_name,
 			   int same_dragon, int lunch, int *semeai_move,
 			   int *this_resulta, int *this_resultb)
 {
   int ko_move = 0;
-  
+
   gg_assert(goban, this_resulta != NULL && this_resultb != NULL);
   *this_resulta = 0;
   *this_resultb = 0;
-  if (!komaster_trymove(goban, move, color, move_name, apos, &ko_move, ko_allowed))
+  if (!komaster_trymove(goban, move, color, move_name, apos,
+			&ko_move, ko_allowed))
     return 0;
-  
-  semeai_add_sgf_comment(move_value, owl_phase);
+
+  semeai_add_sgf_comment(goban, move_value, owl_phase);
   TRACE(goban, "Trying %C %1m. Current stack: ", color, move);
   if (verbose) {
     dump_stack(goban);
-    goaldump(owla->goal);
+    goaldump(goban, owla->goal);
     gprintf(goban, "\n");
-    goaldump(owlb->goal);
+    goaldump(goban, owlb->goal);
     gprintf(goban, "\n");
   }
-  TRACE(goban, "%s, value %d, same_dragon %d\n", move_name, move_value, same_dragon);
-    
+  TRACE(goban, "%s, value %d, same_dragon %d\n",
+	move_name, move_value, same_dragon);
+
   push_owl(&owla);
   push_owl(&owlb);
 
   if (owla->color == color) {
-    owl_update_goal(move, same_dragon, lunch, owla, 1);
-    owl_update_boundary_marks(move, owlb);
+    owl_update_goal(goban, move, same_dragon, lunch, owla, 1);
+    owl_update_boundary_marks(goban, move, owlb);
   }
   else {
-    owl_update_goal(move, same_dragon, lunch, owlb, 1);
-    owl_update_boundary_marks(move, owla);
+    owl_update_goal(goban, move, same_dragon, lunch, owlb, 1);
+    owl_update_boundary_marks(goban, move, owla);
   }
   mark_goal_in_sgf(goban, owla->goal);
   mark_goal_in_sgf(goban, owlb->goal);
-    
+
   /* Do a recursive call to read the semeai after the move we just
    * tried. If dragon b was captured by the move, call
    * do_owl_attack() to see whether it sufficed for us to live.
    */
-  if (board[bpos] == EMPTY) {
+  if (goban->board[bpos] == EMPTY) {
     /* FIXME: Are all owl_data fields and relevant static
      * variables properly set up for a call to do_owl_attack()?
      */
-    *this_resulta = REVERSE_RESULT(do_owl_attack(apos, NULL, NULL, owla, 0));
+    *this_resulta = REVERSE_RESULT(do_owl_attack(goban, apos, NULL, NULL,
+						 owla, 0));
     *this_resultb = *this_resulta;
   }
   else {
-    do_owl_analyze_semeai(bpos, apos, owlb, owla,
+    do_owl_analyze_semeai(goban, bpos, apos, owlb, owla,
 			  this_resultb, this_resulta, semeai_move, 0,
 			  owl_phase);
     *this_resulta = REVERSE_RESULT(*this_resulta);
     *this_resultb = REVERSE_RESULT(*this_resultb);
   }
-    
+
   pop_owl(&owlb);
   pop_owl(&owla);
-    
+
   popgo(goban);
-    
+
   /* Does success require ko? */
   if (ko_move) {
     if (*this_resulta != 0)
@@ -1291,30 +1328,31 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
     if (*this_resultb != 0)
       *this_resultb = KO_B;
   }
-    
-  if (count_variations >= semeai_node_limit) {
+
+  if (goban->variations_counter >= semeai_node_limit) {
     TRACE(goban, "Out of nodes, claiming win.\n");
     result_certain = 0;
     *this_resulta = WIN;
     *this_resultb = WIN;
   }
+
   return 1;
 }
 
 /* Add details in sgf file about move value and whether owl_phase is active. */
 static void
-semeai_add_sgf_comment(int value, int owl_phase)
+semeai_add_sgf_comment(const Goban *goban, int value, int owl_phase)
 {
   char buf[100];
 
-  if (!sgf_dumptree)
+  if (!goban->sgf_dumptree)
     return;
-  
+
   if (owl_phase)
     gg_snprintf(buf, 100, "value %d, owl_phase", value);
   else
     gg_snprintf(buf, 100, "value %d", value);
-  sgftreeAddComment(sgf_dumptree, buf);
+  sgftreeAddComment(goban->sgf_dumptree, buf);
 }
 
 
@@ -1329,12 +1367,12 @@ semeai_add_sgf_comment(int value, int owl_phase)
  * not check whether there actually is an attack, though.
  */
 static int
-semeai_trust_tactical_attack(int str)
+semeai_trust_tactical_attack(const Goban *goban, int str)
 {
   int liberties;
   int libs[3];
-  int other = OTHER_COLOR(board[str]);
-  
+  int other = OTHER_COLOR(goban->board[str]);
+
   liberties = findlib(goban, str, 3, libs);
   if (liberties > 2)
     return 0;
@@ -1358,7 +1396,8 @@ semeai_trust_tactical_attack(int str)
  * in the semeai.
  */
 static void
-semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
+semeai_review_owl_moves(Goban *goban,
+			struct owl_move_data owl_moves[MAX_MOVES],
 			struct local_owl_data *owla,
 			struct local_owl_data *owlb, int color,
 			int *safe_outside_liberty_found,
@@ -1372,16 +1411,16 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
   int move_value;
   int same_dragon;
   int k;
-  
+
   for (k = 0; k < MAX_MOVES-1; k++) {
     move = owl_moves[k].pos;
     if (move == NO_MOVE)
       break;
 
     /* Does the move fill a liberty in the semeai? */
-    if (liberty_of_goal(move, owlb)
+    if (liberty_of_goal(goban, move, owlb)
 	&& safe_move(goban, move, color)) {
-      if (!liberty_of_goal(move, owla))
+      if (!liberty_of_goal(goban, move, owla))
 	*safe_outside_liberty_found = 1;
       else
 	*safe_common_liberty_found = 1;
@@ -1391,8 +1430,8 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
      * information recorded and need to guess.
      */
     if (guess_same_dragon) {
-      if (liberty_of_goal(move, owla)
-	  || second_liberty_of_goal(move, owla))
+      if (liberty_of_goal(goban, move, owla)
+	  || second_liberty_of_goal(goban, move, owla))
 	same_dragon = 1;
       else
 	same_dragon = 0;
@@ -1401,10 +1440,11 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
       same_dragon = owl_moves[k].same_dragon;
 
     mw[move] = 1;
-    move_value = (semeai_move_value(move, owla, owlb, owl_moves[k].value,
+    move_value = (semeai_move_value(goban, move, owla, owlb,
+				    owl_moves[k].value,
 				    critical_semeai_worms)
 		  + value_bonus);
-    owl_add_move(semeai_moves, move, move_value, owl_moves[k].name, 
+    owl_add_move(semeai_moves, move, move_value, owl_moves[k].name,
 		 same_dragon, NO_MOVE, owl_moves[k].escape,
 		 NO_MOVE, MAX_SEMEAI_MOVES);
     TRACE(goban, "Added %1m %d\n", move, move_value);
@@ -1425,7 +1465,8 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
  *	----
  */
 static int
-semeai_propose_eyespace_filling_move(struct local_owl_data *owla,
+semeai_propose_eyespace_filling_move(Goban *goban,
+				     struct local_owl_data *owla,
 				     struct local_owl_data *owlb)
 {
   int color = OTHER_COLOR(owlb->color);
@@ -1433,7 +1474,7 @@ semeai_propose_eyespace_filling_move(struct local_owl_data *owla,
   int mw[BOARDMAX];
   int mz[BOARDMAX];
 
-  owl_find_relevant_eyespaces(owlb, mw, mz);
+  owl_find_relevant_eyespaces(goban, owlb, mw, mz);
 
   /* Never try to fill opponent's eyes which contain our dragon.  This
    * is nothing else than suicide.
@@ -1444,7 +1485,7 @@ semeai_propose_eyespace_filling_move(struct local_owl_data *owla,
   }
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == EMPTY) {
+    if (goban->board[pos] == EMPTY) {
       int origin = owlb->my_eye[pos].origin;
 
       if (mw[origin] > 1
@@ -1456,7 +1497,8 @@ semeai_propose_eyespace_filling_move(struct local_owl_data *owla,
 	  int dummy_attack;
 	  int dummy_defense;
 
-	  compute_eyes(origin, &new_value, &dummy_attack, &dummy_defense,
+	  compute_eyes(goban, origin, &new_value,
+		       &dummy_attack, &dummy_defense,
 		       owlb->my_eye, owlb->half_eye, 0);
 	  if (max_eyes(&new_value) <= 1)
 	    good_move = 1;
@@ -1481,8 +1523,8 @@ semeai_propose_eyespace_filling_move(struct local_owl_data *owla,
  */
 
 static int
-semeai_move_value(int move, struct local_owl_data *owla,
-		  struct local_owl_data *owlb,
+semeai_move_value(Goban *goban, int move,
+		  struct local_owl_data *owla, struct local_owl_data *owlb,
 		  int raw_value, int *critical_semeai_worms)
 {
   int pos;
@@ -1492,16 +1534,16 @@ semeai_move_value(int move, struct local_owl_data *owla,
   int k;
   int bonus = 0;
 
-  ASSERT1(goban, board[move] == EMPTY, move);
+  ASSERT1(goban, goban->board[move] == EMPTY, move);
   verbose = 0;
   if (safe_move(goban, move, color)) {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (IS_STONE(board[pos])
+      if (IS_STONE(goban->board[pos])
 	  && pos == find_origin(goban, pos)) {
 	if (owla->goal[pos])
-	  net -= 75*countlib(goban, pos);
+	  net -= 75 * countlib(goban, pos);
 	if (owlb->goal[pos])
-	  net += 100*countlib(goban, pos);	  
+	  net += 100 * countlib(goban, pos);
       }
     }
     if (!trymove(goban, move, color, NULL, 0)) {
@@ -1509,13 +1551,13 @@ semeai_move_value(int move, struct local_owl_data *owla,
       return 0;
     }
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (IS_STONE(board[pos])
+      if (IS_STONE(goban->board[pos])
 	  && pos == find_origin(goban, pos)) {
 	if (owla->goal[pos]
-	    || (pos == move && liberty_of_goal(move, owla)))
-	  net += 75*countlib(goban, pos);
+	    || (pos == move && liberty_of_goal(goban, move, owla)))
+	  net += 75 * countlib(goban, pos);
 	if (owlb->goal[pos])
-	  net -= 100*countlib(goban, pos);
+	  net -= 100 * countlib(goban, pos);
       }
     }
 
@@ -1523,15 +1565,15 @@ semeai_move_value(int move, struct local_owl_data *owla,
     for (k = 0; k < s_worms; k++) {
       if (!critical_semeai_worms[k])
 	continue;
-      if (board[semeai_worms[k]] == color
+      if (goban->board[semeai_worms[k]] == color
 	  && !attack(goban, semeai_worms[k], NULL))
 	bonus += 50;
-      else if (board[semeai_worms[k]] == OTHER_COLOR(color)
+      else if (goban->board[semeai_worms[k]] == OTHER_COLOR(color)
 	       && !find_defense(goban, semeai_worms[k], NULL))
 	bonus += 50;
     }
     decrease_depth_values();
-    
+
     popgo(goban);
   }
 
@@ -1542,7 +1584,7 @@ semeai_move_value(int move, struct local_owl_data *owla,
 
   net /= 25;
   net *= 3;
-  
+
   return raw_value + net + bonus;
 }
 
@@ -1550,25 +1592,26 @@ semeai_move_value(int move, struct local_owl_data *owla,
 
 /* Is the vertex at pos adjacent to an element of the owl goal? */
 static int
-liberty_of_goal(int pos, struct local_owl_data *owl)
+liberty_of_goal(const Goban *goban, int pos, struct local_owl_data *owl)
 {
   int k;
   for (k = 0; k < 4; k++)
-    if (IS_STONE(board[pos + delta[k]]) && owl->goal[pos + delta[k]])
+    if (IS_STONE(goban->board[pos + delta[k]]) && owl->goal[pos + delta[k]])
       return 1;
-  
+
   return 0;
 }
 
 /* Is the vertex at pos a second liberty of the owl goal? */
 static int
-second_liberty_of_goal(int pos, struct local_owl_data *owl)
+second_liberty_of_goal(const Goban *goban, int pos, struct local_owl_data *owl)
 {
   int k;
   for (k = 0; k < 4; k++)
-    if (board[pos + delta[k]] == EMPTY && liberty_of_goal(pos + delta[k], owl))
+    if (goban->board[pos + delta[k]] == EMPTY
+	&& liberty_of_goal(goban, pos + delta[k], owl))
       return 1;
-  
+
   return 0;
 }
 
@@ -1592,9 +1635,9 @@ second_liberty_of_goal(int pos, struct local_owl_data *owl)
  */
 
 static int
-find_semeai_backfilling_move(int worm, int liberty)
+find_semeai_backfilling_move(Goban *goban, int worm, int liberty)
 {
-  int color = board[worm];
+  int color = goban->board[worm];
   int other = OTHER_COLOR(color);
   int result = NO_MOVE;
 
@@ -1606,8 +1649,8 @@ find_semeai_backfilling_move(int worm, int liberty)
 	&& trymove(goban, fill, other, "find_semeai_backfilling_move", worm)) {
       if (safe_move(goban, liberty, other))
 	result = fill;
-      else if (board[worm] != EMPTY)
-	result = find_semeai_backfilling_move(worm, liberty);
+      else if (goban->board[worm] != EMPTY)
+	result = find_semeai_backfilling_move(goban, worm, liberty);
       popgo(goban);
     }
   }
@@ -1620,12 +1663,13 @@ find_semeai_backfilling_move(int worm, int liberty)
 /* Some helper function for do_owl_attack/defend. */
 
 static int
-reading_limit_reached(const char **live_reason, int this_variation_number)
+reading_limit_reached(const Goban *goban, const char **live_reason,
+		      int this_variation_number)
 {
   /* If (stackp > owl_reading_depth), interpret deep reading
    * conservatively as escape.
    */
-  if (stackp > owl_reading_depth) {
+  if (goban->stackp > owl_reading_depth) {
     TRACE(goban, "%oVariation %d: ALIVE (maximum reading depth reached)\n",
 	  this_variation_number);
     *live_reason = "max reading depth reached";
@@ -1649,19 +1693,19 @@ clear_owl_move_data(struct owl_move_data moves[MAX_MOVES])
 {
   int k;
   for (k = 0; k < MAX_MOVES; k++) {
-    moves[k].pos = NO_MOVE;
-    moves[k].value = -1;
-    moves[k].name = NULL;
+    moves[k].pos	 = NO_MOVE;
+    moves[k].value	 = -1;
+    moves[k].name	 = NULL;
     moves[k].same_dragon = 2;
-    moves[k].escape = 0;
-    moves[k].lunch = NO_MOVE;
+    moves[k].escape	 = 0;
+    moves[k].lunch	 = NO_MOVE;
     clear_cut_list(moves[k].cuts);
   }
 }
 
 static void
 set_single_owl_move(struct owl_move_data moves[MAX_MOVES],
-    		    int pos, const char *name)
+		    int pos, const char *name)
 {
   moves[0].pos         = pos;
   moves[0].value       = 25;
@@ -1701,7 +1745,8 @@ set_single_owl_move(struct owl_move_data moves[MAX_MOVES],
  * */
 
 int
-owl_attack(int target, int *attack_point, int *certain, int *kworm)
+owl_attack(Goban *goban, int target, int *attack_point, int *certain,
+	   int *kworm)
 {
   int result;
   struct local_owl_data *owl;
@@ -1729,13 +1774,13 @@ owl_attack(int target, int *attack_point, int *certain, int *kworm)
 
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
-  
+
   TRACE(goban, "owl_attack %1m\n", target);
-  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1, NULL);
-  owl_make_domains(owl, NULL);
-  prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
+  init_owl(goban, &owl, target, NO_MOVE, NO_MOVE, 1, NULL);
+  owl_make_domains(goban, owl, NULL);
+  prepare_goal_list(goban, target, owl, owl_goal_worm, &goal_worms_computed,
 		    kworm, 1);
-  result = do_owl_attack(target, &move, &wid, owl, 0);
+  result = do_owl_attack(goban, target, &move, &wid, owl, 0);
   finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
@@ -1747,7 +1792,7 @@ owl_attack(int target, int *attack_point, int *certain, int *kworm)
   store_persistent_owl_cache(goban, OWL_ATTACK, target, 0, 0,
 			     result, move, wpos,
 			     result_certain, tactical_nodes,
-			     owl->goal, board[target]);
+			     owl->goal, goban->board[target]);
   if (attack_point)
     *attack_point = move;
   if (kworm)
@@ -1759,14 +1804,15 @@ owl_attack(int target, int *attack_point, int *certain, int *kworm)
 }
 
 
-/* Static function containing the main recursive code for 
+/* Static function containing the main recursive code for
  * owl_attack.
  */
 
 static int
-do_owl_attack(int str, int *move, int *wormid,
+do_owl_attack(Goban *goban, int str, int *move, int *wormid,
 	      struct local_owl_data *owl, int escape)
 {
+  const Intersection *const board = goban->board;
   int color = board[str];
   int other = OTHER_COLOR(color);
   struct owl_move_data vital_moves[MAX_MOVES];
@@ -1788,8 +1834,8 @@ do_owl_attack(int str, int *move, int *wormid,
   int xpos;
   int value1;
   int value2;
-  int this_variation_number = count_variations - 1;
-  
+  int this_variation_number = goban->variations_counter - 1;
+
   SETUP_TRACE_INFO("owl_attack", str);
 
   shape_patterns.initialized = 0;
@@ -1797,8 +1843,8 @@ do_owl_attack(int str, int *move, int *wormid,
   str = find_origin(goban, str);
 
   if ((hashflags & HASH_OWL_ATTACK)
-      && tt_get(goban, &ttable, OWL_ATTACK, str, NO_MOVE, depth - stackp, NULL, 
-		&value1, &value2, &xpos) == 2) {
+      && tt_get(goban, &ttable, OWL_ATTACK, str, NO_MOVE,
+		depth - goban->stackp, NULL, &value1, &value2, &xpos) == 2) {
 
     TRACE_CACHED_RESULT(value1, xpos);
     if (value1 != 0) {
@@ -1813,22 +1859,22 @@ do_owl_attack(int str, int *move, int *wormid,
 	  *wormid = MAX_GOAL_WORMS;
       }
     }
-    
+
     if (value1 == WIN)
       TRACE(goban, "%oVariation %d: DEAD (cached)\n", this_variation_number);
     else
       TRACE(goban, "%oVariation %d: ALIVE (cached)\n", this_variation_number);
-    
+
     SGFTRACE(goban, xpos, value1, "cached");
-    
+
     return value1;
   }
 
 
   /* If reading goes to deep or we run out of nodes, we assume life. */
-  if (reading_limit_reached(&live_reason, this_variation_number)) {
+  if (reading_limit_reached(goban, &live_reason, this_variation_number)) {
     SGFTRACE(goban, 0, 0, live_reason);
-    READ_RETURN(goban, OWL_ATTACK, str, depth - stackp, move, 0, 0);
+    READ_RETURN(goban, OWL_ATTACK, str, depth - goban->stackp, move, 0, 0);
   }
 
   memset(mw, 0, sizeof(mw));
@@ -1839,7 +1885,7 @@ do_owl_attack(int str, int *move, int *wormid,
   memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
 
   /* First see whether there is any chance to kill. */
-  if (owl_estimate_life(owl, NULL, vital_moves, &live_reason, 1,
+  if (owl_estimate_life(goban, owl, NULL, vital_moves, &live_reason, 1,
 			&probable_eyes, &eyemin, &eyemax)) {
     /*
      * We need to check here if there's a worm under atari. If yes,
@@ -1868,14 +1914,15 @@ do_owl_attack(int str, int *move, int *wormid,
       }
     }
     SGFTRACE(goban, 0, acode, live_reason);
-    TRACE(goban, "%oVariation %d: ALIVE (%s)\n", this_variation_number, live_reason);
+    TRACE(goban, "%oVariation %d: ALIVE (%s)\n",
+	  this_variation_number, live_reason);
     if (acode == 0) {
-      READ_RETURN(goban, OWL_ATTACK, str, depth - stackp, move, 0, 0);
+      READ_RETURN(goban, OWL_ATTACK, str, depth - goban->stackp, move, 0, 0);
     }
     else {
       if (wormid)
 	*wormid = saveworm;
-      READ_RETURN2(goban, OWL_ATTACK, str, depth - stackp,
+      READ_RETURN2(goban, OWL_ATTACK, str, depth - goban->stackp,
 		   move, mpos, acode, saveworm);
     }
   }
@@ -1892,31 +1939,32 @@ do_owl_attack(int str, int *move, int *wormid,
   for (pass = 0; pass < 6; pass++) {
     moves = NULL;
     move_cutoff = 1;
-    
+
     current_owl_data = owl;
     /* Get the shape moves if we are in the right pass. */
     switch (pass) {
     case 1:
-      if (stackp > owl_branch_depth && number_tried_moves > 0)
+      if (goban->stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
-      
-      owl_shapes(&shape_patterns, shape_moves, other, owl, &owl_attackpat_db);
+
+      owl_shapes(goban, &shape_patterns, shape_moves,
+		 other, owl, &owl_attackpat_db);
       moves = shape_moves;
       break;
 
     case 0:
     case 2:
-      if (stackp > owl_branch_depth && number_tried_moves > 0)
+      if (goban->stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
-      
+
       moves = vital_moves;
-      if (pass == 0 || stackp > owl_distrust_depth) {
-	if (stackp == 0)
+      if (pass == 0 || goban->stackp > owl_distrust_depth) {
+	if (goban->stackp == 0)
 	  move_cutoff = 70;
 	else
 	  move_cutoff = 45;
       }
-      if (eyemax < 2 && stackp > 2)
+      if (eyemax < 2 && goban->stackp > 2)
 	move_cutoff = 99; /* Effectively disable vital moves. */
       break;
 
@@ -1935,20 +1983,18 @@ do_owl_attack(int str, int *move, int *wormid,
 	 */
 	int apos;
 	int result;
-	SGFTree *save_sgf_dumptree = sgf_dumptree;
-	int save_count_variations = count_variations;
+	SGF_dump_data sgf_dump_save;
 
-	sgf_dumptree = NULL;
-	count_variations = 0;
+	SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 	result = attack(goban, str, &apos);
+	RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+
 	if (result == WIN
 	    || (result != 0 && (min_eyes(&probable_eyes) >= 2
 				|| pass == 5))) {
 	  set_single_owl_move(shape_moves, apos, "tactical attack");
 	  moves = shape_moves;
 	}
-	sgf_dumptree = save_sgf_dumptree;
-	count_variations = save_count_variations;
       }
       break;
 
@@ -1958,14 +2004,15 @@ do_owl_attack(int str, int *move, int *wormid,
     case 4:
       if (number_tried_moves == 0) {
 	int dpos;
-	int dcode = do_owl_defend(str, &dpos, NULL, owl, escape);
+	int dcode = do_owl_defend(goban, str, &dpos, NULL, owl, escape);
 	/* No defense, we won. */
 	if (dcode == 0) {
 	  TRACE(goban, "%oVariation %d: DEAD (no defense)\n",
 		this_variation_number);
 	  SGFTRACE(goban, 0, WIN, "no defense");
-	  close_pattern_list(other, &shape_patterns);
-	  READ_RETURN(goban, OWL_ATTACK, str, depth - stackp, move, 0, WIN);
+	  close_pattern_list(goban, other, &shape_patterns);
+	  READ_RETURN(goban, OWL_ATTACK, str, depth - goban->stackp,
+		      move, 0, WIN);
 	}
 	else if (dpos != NO_MOVE) {
 	  /* The dragon could be defended by one more move. Try to
@@ -1996,28 +2043,28 @@ do_owl_attack(int str, int *move, int *wormid,
       }
       break;
     } /* switch (pass) */
-      
+
 
     /* FIXME: This block probably should reappear somewhere in this
      * function.
      */
 #if 0
     /* First test whether the dragon has escaped. */
-    if (owl_escape_route(owl) >= 5) {
+    if (owl_escape_route(goban, owl) >= 5) {
       /* FIXME: We probably should make distinction in the returned
        * result whether the dragon lives by making two eyes or by
        * escaping.
        */
       TRACE(goban, "%oVariation %d: ALIVE (escaped)\n", this_variation_number);
       SGFTRACE(goban, 0, 0, "escaped");
-      close_pattern_list(other, &shape_patterns);
-      READ_RETURN0(goban, OWL_ATTACK, str, depth - stackp);
+      close_pattern_list(goban, other, &shape_patterns);
+      READ_RETURN0(goban, OWL_ATTACK, str, depth - goban->stackp);
     }
 #endif
 
     if (!moves)
       continue;
-    
+
     /* For the up to MAX_MOVES best moves with value equal to
      * move_cutoff or higher, try to attack the dragon and see if it
      * can then be defended.
@@ -2036,16 +2083,16 @@ do_owl_attack(int str, int *move, int *wormid,
        * FIXME: To behave as intended, k should be replaced by
        *        number_tried_moves.
        */
-      if (stackp > owl_branch_depth && k > 0)
+      if (goban->stackp > owl_branch_depth && k > 0)
 	break;
 
       current_owl_data = owl;
 
       /* Shape moves are selected on demand. */
       if (pass == 1) {
-        if (!get_next_move_from_list(&shape_patterns, other,
-	                             shape_moves, move_cutoff, owl))
-          break;
+	if (!get_next_move_from_list(goban, &shape_patterns, other,
+				     shape_moves, move_cutoff, owl))
+	  break;
       }
       else
 	if (moves[k].value < move_cutoff)
@@ -2053,19 +2100,21 @@ do_owl_attack(int str, int *move, int *wormid,
 
       mpos = moves[k].pos;
       ASSERT_ON_BOARD1(goban, mpos);
-    
+
       /* Have we already tested this move? */
       if (mw[mpos])
 	continue;
 
-      captured = (color == WHITE ? white_captured : black_captured);
+      captured = (color == WHITE
+		  ? goban->white_captured : goban->black_captured);
 
       /* Try to make the move. */
       if (!komaster_trymove(goban, mpos, other, moves[k].name, str,
 			    &ko_move, savecode == 0))
 	continue;
 
-      captured = (color == WHITE ? white_captured : black_captured) - captured;
+      captured = (color == WHITE
+		  ? goban->white_captured : goban->black_captured) - captured;
 
       TRACE(goban, "Trying %C %1m. Escape = %d. Current stack: ",
 	    other, mpos, escape);
@@ -2076,8 +2125,8 @@ do_owl_attack(int str, int *move, int *wormid,
       push_owl(&owl);
       mw[mpos] = 1;
       number_tried_moves++;
-      owl_update_boundary_marks(mpos, owl);
-      
+      owl_update_boundary_marks(goban, mpos, owl);
+
       /* If the origin of the dragon has been captured, we look
        * for another string which was part of the original dragon,
        * marked when stackp==0, which has not been captured. If no
@@ -2098,19 +2147,20 @@ do_owl_attack(int str, int *move, int *wormid,
 
       /* Test whether the move cut the goal dragon apart. */
       if (moves[k].cuts[0] != NO_MOVE)
-	owl_test_cuts(owl->goal, owl->color, moves[k].cuts);
+	owl_test_cuts(goban, owl->goal, owl->color, moves[k].cuts);
       mark_goal_in_sgf(goban, owl->goal);
 
       if (origin == NO_MOVE)
 	dcode = 0;
       else
-	dcode = do_owl_defend(origin, NULL, &wid, owl, escape);
+	dcode = do_owl_defend(goban, origin, NULL, &wid, owl, escape);
 
       if (!ko_move) {
 	if (dcode == 0) {
 	  pop_owl(&owl);
 	  popgo(goban);
-  	  if (sgf_dumptree) {
+
+	  if (goban->sgf_dumptree) {
 	    const char *wintxt;
 	    char winstr[192];
 	    if (origin == NO_MOVE)
@@ -2118,11 +2168,13 @@ do_owl_attack(int str, int *move, int *wormid,
 	    else
 	      wintxt = "attack effective";
 	    sprintf(winstr, "%s)\n  (%d variations", wintxt,
-	  		    count_variations - this_variation_number);
+			    goban->variations_counter - this_variation_number);
 	    SGFTRACE(goban, mpos, WIN, winstr);
 	  }
-          close_pattern_list(other, &shape_patterns);
-	  READ_RETURN(goban, OWL_ATTACK, str, depth - stackp, move, mpos, WIN);
+
+	  close_pattern_list(goban, other, &shape_patterns);
+	  READ_RETURN(goban, OWL_ATTACK, str, depth - goban->stackp, move,
+		      mpos, WIN);
 	}
 	else if (experimental_owl_ext && dcode == LOSS) {
 	  if (saveworm == MAX_GOAL_WORMS
@@ -2136,7 +2188,7 @@ do_owl_attack(int str, int *move, int *wormid,
 	 */
 	else if (experimental_owl_ext && goal_worms_computed
 #if 0
-		 && stackp > 1
+		 && goban->stackp > 1
 #endif
 		 && captured >= 3) {
 	  int w = MAX_GOAL_WORMS;
@@ -2154,7 +2206,7 @@ do_owl_attack(int str, int *move, int *wormid,
 	  }
 	  if (w != MAX_GOAL_WORMS) {
 	    if (GAIN > savecode) {
-  	      /* if new result better, just update */
+	      /* if new result better, just update */
 	      dcode = LOSS;
 	      saveworm = w;
 	    }
@@ -2162,7 +2214,7 @@ do_owl_attack(int str, int *move, int *wormid,
 	      /* bigger ? */
 	      int wpos = owl_goal_worm[saveworm];
 	      if (size > worm[wpos].size)
-  		saveworm = w;
+		saveworm = w;
 	    }
 	  }
 	}
@@ -2171,7 +2223,8 @@ do_owl_attack(int str, int *move, int *wormid,
       else { /* ko_move */
 	if (dcode != WIN) {
 	  if (mpos == 0) {
-	    SGFTRACE(goban, mpos, KO_B, "all original stones captured with ko");
+	    SGFTRACE(goban, mpos, KO_B,
+		     "all original stones captured with ko");
 	  }
 	  else {
 	    SGFTRACE(goban, mpos, KO_B, "attack effective - ko");
@@ -2181,43 +2234,44 @@ do_owl_attack(int str, int *move, int *wormid,
 	  savecode = KO_B;
 
 	  /* It's possible that the defender has no defense even if we
-           * give up the ko. In order to force a test of this,
-           * assuming this was our only move, we decrease the number
-           * of tried moves counter, disregarding this move.
+	   * give up the ko. In order to force a test of this,
+	   * assuming this was our only move, we decrease the number
+	   * of tried moves counter, disregarding this move.
 	   */
 	  number_tried_moves--;
 	}
       }
-    
+
       pop_owl(&owl);
       popgo(goban);
     }
   }
 
-  close_pattern_list(other, &shape_patterns);
-  
+  close_pattern_list(goban, other, &shape_patterns);
+
   if (savecode) {
     if (savecode == GAIN) {
       SGFTRACE(goban, savemove, savecode, "attack effective (gain) - E");
       if (wormid)
 	*wormid = saveworm;
-      READ_RETURN2(goban, OWL_ATTACK, str, depth - stackp,
+      READ_RETURN2(goban, OWL_ATTACK, str, depth - goban->stackp,
 		   move, savemove, savecode, saveworm);
     }
     else {
       SGFTRACE(goban, savemove, savecode, "attack effective (ko) - E");
-      READ_RETURN(goban, OWL_ATTACK, str, depth - stackp, move, savemove, savecode);
+      READ_RETURN(goban, OWL_ATTACK, str, depth - goban->stackp, move,
+		  savemove, savecode);
     }
   }
 
-  if (sgf_dumptree) {
+  if (goban->sgf_dumptree) {
     char winstr[128];
     sprintf(winstr, "attack failed)\n  (%d variations",
-	  	    count_variations - this_variation_number);
+	    goban->variations_counter - this_variation_number);
     SGFTRACE(goban, 0, 0, winstr);
   }
-  
-  READ_RETURN0(goban, OWL_ATTACK, str, depth - stackp);
+
+  READ_RETURN0(goban, OWL_ATTACK, str, depth - goban->stackp);
 }
 
 
@@ -2227,11 +2281,11 @@ do_owl_attack(int str, int *move, int *wormid,
  */
 
 int
-owl_threaten_attack(int target, int *attack1, int *attack2)
+owl_threaten_attack(Goban *goban, int target, int *attack1, int *attack2)
 {
   struct owl_move_data moves[MAX_MOVES];
   int k;
-  int other = OTHER_COLOR(board[target]);
+  int other = OTHER_COLOR(goban->board[target]);
   struct local_owl_data *owl;
   int result = 0;
   int reading_nodes_when_called = get_reading_node_counter();
@@ -2250,16 +2304,16 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
 
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
-  
-  gg_assert(goban, stackp == 0);
+
+  gg_assert(goban, goban->stackp == 0);
   TRACE(goban, "owl_threaten_attack %1m\n", target);
-  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1, NULL);
+  init_owl(goban, &owl, target, NO_MOVE, NO_MOVE, 1, NULL);
   memcpy(saved_boundary, owl->boundary, sizeof(saved_boundary));
-  owl_make_domains(owl, NULL);
-  owl_shapes(&shape_patterns, moves, other, owl, &owl_attackpat_db);
+  owl_make_domains(goban, owl, NULL);
+  owl_shapes(goban, &shape_patterns, moves, other, owl, &owl_attackpat_db);
   for (k = 0; k < MAX_MOVES; k++) {
     current_owl_data = owl;
-    if (!get_next_move_from_list(&shape_patterns, other, moves, 1, owl))
+    if (!get_next_move_from_list(goban, &shape_patterns, other, moves, 1, owl))
       break;
     else {
       int mpos = moves[k].pos;
@@ -2269,35 +2323,35 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
 	  int pos;
 	  int origin = NO_MOVE;
 	  owl->lunches_are_current = 0;
-	  owl_update_boundary_marks(mpos, owl);
-	  
+	  owl_update_boundary_marks(goban, mpos, owl);
+
 	  /* If the origin of the dragon has been captured, we look
 	   * for another string which was part of the original dragon,
 	   * marked when stackp==0, which has not been captured. If no
 	   * such string is found, owl_attack declares victory.
 	   */
-	  
-	  if (board[target] == EMPTY) {
+
+	  if (goban->board[target] == EMPTY) {
 	    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-	      if (IS_STONE(board[pos]) && owl->goal[pos] == 1) {
+	      if (IS_STONE(goban->board[pos]) && owl->goal[pos] == 1) {
 		origin = find_origin(goban, pos);
 		break;
 	      }
 	    }
-	    
+
 	    if (origin == NO_MOVE
-		|| do_owl_attack(origin, NULL, NULL, owl, 0)) {
+		|| do_owl_attack(goban, origin, NULL, NULL, owl, 0)) {
 	      /* probably this can't happen */
 	      popgo(goban);
-	      gg_assert(goban, stackp == 0);
+	      gg_assert(goban, goban->stackp == 0);
 	      result = 1;
 	      break;
 	    }
 	  }
-	  else if (do_owl_attack(target, &move2, NULL, owl, 0) == WIN) {
+	  else if (do_owl_attack(goban, target, &move2, NULL, owl, 0) == WIN) {
 	    move = moves[k].pos;
 	    popgo(goban);
-	    gg_assert(goban, stackp == 0);
+	    gg_assert(goban, goban->stackp == 0);
 	    result = 1;
 	    break;
 	  }
@@ -2307,7 +2361,7 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
     }
   }
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
 
   DEBUG(goban, DEBUG_OWL_PERFORMANCE,
     "owl_threaten_attack %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
@@ -2316,14 +2370,14 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
 
   store_persistent_owl_cache(goban, OWL_THREATEN_ATTACK, target, 0, 0,
 			     result, move, move2, 0,
-			     tactical_nodes, owl->goal, board[target]);
+			     tactical_nodes, owl->goal, goban->board[target]);
 
   if (attack1)
     *attack1 = move;
   if (attack2)
     *attack2 = move2;
 
-  close_pattern_list(other, &shape_patterns);
+  close_pattern_list(goban, other, &shape_patterns);
   return result;
 }
 
@@ -2352,14 +2406,18 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
  *   of the killed worm is returned through the *kworm field.
  *
  * The array goal marks the extent of the dragon. This must
- * be maintained during reading.  
+ * be maintained during reading.
  */
 
 int
-owl_defend(int target, int *defense_point, int *certain, int *kworm)
+owl_defend(Goban *goban, int target, int *defense_point, int *certain,
+	   int *kworm)
 {
   int result;
+
+  /* THREAD-FIXME */
   static struct local_owl_data *owl;
+
   int reading_nodes_when_called = get_reading_node_counter();
   double start = 0.0;
   int tactical_nodes;
@@ -2371,7 +2429,7 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
   if (worm[target].unconditional_status == DEAD)
     return 0;
 
-  if (search_persistent_owl_cache(goban, OWL_DEFEND, target, 0, 0, &result, 
+  if (search_persistent_owl_cache(goban, OWL_DEFEND, target, 0, 0, &result,
 				  defense_point, kworm, certain))
     return result;
 
@@ -2379,11 +2437,11 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
     start = gg_cputime();
 
   TRACE(goban, "owl_defend %1m\n", target);
-  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1, NULL);
-  owl_make_domains(owl, NULL);
-  prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
+  init_owl(goban, &owl, target, NO_MOVE, NO_MOVE, 1, NULL);
+  owl_make_domains(goban, owl, NULL);
+  prepare_goal_list(goban, target, owl, owl_goal_worm, &goal_worms_computed,
 		    kworm, 1);
-  result = do_owl_defend(target, &move, &wid, owl, 0);
+  result = do_owl_defend(goban, target, &move, &wid, owl, 0);
   finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
@@ -2392,9 +2450,9 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
 	    target, result, move, local_owl_node_counter,
 	    tactical_nodes, gg_cputime() - start);
 
-  store_persistent_owl_cache(goban, OWL_DEFEND, target, 0, 0, result, move, wpos,
-			     result_certain, tactical_nodes, owl->goal,
-			     board[target]);
+  store_persistent_owl_cache(goban, OWL_DEFEND, target, 0, 0, result,
+			     move, wpos, result_certain, tactical_nodes,
+			     owl->goal, goban->board[target]);
 
   if (defense_point)
     *defense_point = move;
@@ -2402,7 +2460,7 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
     *kworm = wpos;
   if (certain)
     *certain = result_certain;
-  
+
   return result;
 }
 
@@ -2411,10 +2469,10 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
  */
 
 static int
-do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
-	      int escape)
+do_owl_defend(Goban *goban, int str, int *move, int *wormid,
+	      struct local_owl_data *owl, int escape)
 {
-  int color = board[str];
+  int color = goban->board[str];
   struct owl_move_data shape_moves[MAX_MOVES];
   struct owl_move_data vital_moves[MAX_MOVES];
   struct owl_move_data *moves;
@@ -2435,18 +2493,18 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
   int xpos;
   int value1;
   int value2;
-  int this_variation_number = count_variations - 1;
+  int this_variation_number = goban->variations_counter - 1;
 
   SETUP_TRACE_INFO("owl_defend", str);
 
   shape_patterns.initialized = 0;
-  
+
   str = find_origin(goban, str);
 
   if ((hashflags & HASH_OWL_DEFEND)
-      && tt_get(goban, &ttable, OWL_DEFEND, str, NO_MOVE, depth - stackp, NULL, 
-		&value1, &value2, &xpos) == 2) {
-    
+      && tt_get(goban, &ttable, OWL_DEFEND, str, NO_MOVE,
+		depth - goban->stackp, NULL, &value1, &value2, &xpos) == 2) {
+
     TRACE_CACHED_RESULT(value1, xpos);
     if (value1 != 0) {
       if (move)
@@ -2478,21 +2536,21 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
    * FIXME: Should introduce a new owl depth value rather than having
    *        this hardwired value.
    */
-  escape_route = owl_escape_route(owl);
-  if (stackp > 2 && escape_route >= 5) {
+  escape_route = owl_escape_route(goban, owl);
+  if (goban->stackp > 2 && escape_route >= 5) {
     /* FIXME: We probably should make distinction in the returned
      * result whether the dragon lives by making two eyes or by
      * escaping.
      */
     TRACE(goban, "%oVariation %d: ALIVE (escaped)\n", this_variation_number);
     SGFTRACE(goban, 0, WIN, "escaped");
-    READ_RETURN(goban, OWL_DEFEND, str, depth - stackp, move, 0, WIN);
+    READ_RETURN(goban, OWL_DEFEND, str, depth - goban->stackp, move, 0, WIN);
   }
 
   /* If reading goes to deep or we run out of nodes, we assume life. */
-  if (reading_limit_reached(&live_reason, this_variation_number)) {
+  if (reading_limit_reached(goban, &live_reason, this_variation_number)) {
     SGFTRACE(goban, 0, WIN, live_reason);
-    READ_RETURN(goban, OWL_DEFEND, str, depth - stackp, move, 0, WIN);
+    READ_RETURN(goban, OWL_DEFEND, str, depth - goban->stackp, move, 0, WIN);
   }
 
   memset(mw, 0, sizeof(mw));
@@ -2504,12 +2562,12 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
 
   /* First see whether we might already be alife. */
   if (escape < MAX_ESCAPE) {
-    if (owl_estimate_life(owl, NULL, vital_moves, &live_reason, 0,
-	  		  &probable_eyes, &eyemin, &eyemax)) {
+    if (owl_estimate_life(goban, owl, NULL, vital_moves, &live_reason, 0,
+			  &probable_eyes, &eyemin, &eyemax)) {
       SGFTRACE(goban, 0, WIN, live_reason);
       TRACE(goban, "%oVariation %d: ALIVE (%s)\n",
 	    this_variation_number, live_reason);
-      READ_RETURN(goban, OWL_DEFEND, str, depth - stackp, move, 0, WIN);
+      READ_RETURN(goban, OWL_DEFEND, str, depth - goban->stackp, move, 0, WIN);
     }
   }
   else {
@@ -2536,27 +2594,28 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
   for (pass = 0; pass < 4; pass++) {
     moves = NULL;
     move_cutoff = 1;
-    
+
     current_owl_data = owl;
     switch (pass) {
     /* Get the shape moves if we are in the right pass. */
     case 1:
-      
-      if (stackp > owl_branch_depth && number_tried_moves > 0)
+
+      if (goban->stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
-      
-      owl_shapes(&shape_patterns, shape_moves, color, owl, &owl_defendpat_db);
+
+      owl_shapes(goban, &shape_patterns, shape_moves,
+		 color, owl, &owl_defendpat_db);
       moves = shape_moves;
       break;
 
     case 0:
     case 2:
-      if (stackp > owl_branch_depth && number_tried_moves > 0)
+      if (goban->stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
-      
+
       moves = vital_moves;
-      if (pass == 0 || stackp > owl_distrust_depth) {
-	if (stackp == 0)
+      if (pass == 0 || goban->stackp > owl_distrust_depth) {
+	if (goban->stackp == 0)
 	  move_cutoff = 70;
 	else if (eyemin + min_eyes(&probable_eyes) > 3)
 	  move_cutoff = 25;
@@ -2565,7 +2624,7 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
 	else
 	  move_cutoff = 45;
       }
-      if (eyemax < 2 && stackp > 2)
+      if (eyemax < 2 && goban->stackp > 2)
 	move_cutoff = 99; /* Effectively disable vital moves. */
       break;
 
@@ -2592,20 +2651,19 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
 	   * confusing the eye analysis.
 	   */
 	  int dpos;
-	  SGFTree *save_sgf_dumptree = sgf_dumptree;
-	  int save_count_variations = count_variations;
+	  SGF_dump_data sgf_dump_save;
 
-	  sgf_dumptree = NULL;
-	  count_variations = 0;
+	  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 	  if (attack_and_defend(goban, str, NULL, NULL, NULL, &dpos)
 	      && (approxlib(goban, dpos, color, 2, NULL) > 1
 		  || does_capture_something(goban, dpos, color))) {
-	    TRACE(goban, "Found tactical defense for %1m at %1m.\n", str, dpos);
+	    TRACE(goban, "Found tactical defense for %1m at %1m.\n",
+		  str, dpos);
 	    set_single_owl_move(shape_moves, dpos, "tactical_defense");
 	    moves = shape_moves;
 	  }
-	  sgf_dumptree = save_sgf_dumptree;
-	  count_variations = save_count_variations;
+
+	  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 	}
 	if (!moves)
 	  continue;
@@ -2621,34 +2679,34 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
       int ko_move = -1;
       int new_escape;
       int wid = MAX_GOAL_WORMS;
-      
+
       /* Consider only the highest scoring move if we're deeper than
        * owl_branch_depth.
        *
        * FIXME: To behave as intended, k should be replaced by
        *        number_tried_moves.
        */
-      if (stackp > owl_branch_depth && k > 0)
+      if (goban->stackp > owl_branch_depth && k > 0)
 	break;
-      
+
       current_owl_data = owl;
-      
+
       if (pass == 1) {
-        if (!get_next_move_from_list(&shape_patterns, color, shape_moves,
-	                             move_cutoff, owl))
+	if (!get_next_move_from_list(goban, &shape_patterns, color,
+				     shape_moves, move_cutoff, owl))
 	  break;
       }
       else
 	if (moves[k].value < move_cutoff)
 	  break;
-      
+
       mpos = moves[k].pos;
       ASSERT_ON_BOARD1(goban, mpos);
-      
+
       /* Have we already tested this move? */
       if (mw[mpos])
 	continue;
-      
+
       /* Try to make the move. */
       if (!komaster_trymove(goban, mpos, color, moves[k].name, str,
 			    &ko_move, savecode == 0))
@@ -2671,71 +2729,76 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
       /* Add the stone just played to the goal dragon, unless the
        * pattern explicitly asked for not doing this.
        */
-      owl_update_goal(mpos, moves[k].same_dragon, moves[k].lunch, owl, 0);
+      owl_update_goal(goban, mpos, moves[k].same_dragon, moves[k].lunch,
+		      owl, 0);
       mark_goal_in_sgf(goban, owl->goal);
 
       if (!ko_move) {
-	int acode = do_owl_attack(str, NULL, &wid, owl, new_escape);
+	int acode = do_owl_attack(goban, str, NULL, &wid, owl, new_escape);
 	if (!acode) {
 	  pop_owl(&owl);
 	  popgo(goban);
-	  if (sgf_dumptree) {
+
+	  if (goban->sgf_dumptree) {
 	    char winstr[192];
-	    sprintf(winstr, "defense effective)\n  (%d variations",   
-	  		    count_variations - this_variation_number);
+	    sprintf(winstr, "defense effective)\n  (%d variations",
+		    goban->variations_counter - this_variation_number);
 	    SGFTRACE(goban, mpos, WIN, winstr);
 	  }
-	  close_pattern_list(color, &shape_patterns);
-	  READ_RETURN(goban, OWL_DEFEND, str, depth - stackp, move, mpos, WIN);
+
+	  close_pattern_list(goban, color, &shape_patterns);
+	  READ_RETURN(goban, OWL_DEFEND, str, depth - goban->stackp,
+		      move, mpos, WIN);
 	}
 	if (acode == GAIN)
 	  saveworm = wid;
 	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, mpos);
       }
       else {
-	if (do_owl_attack(str, NULL, NULL, owl, new_escape) != WIN) {
+	if (do_owl_attack(goban, str, NULL, NULL, owl, new_escape) != WIN) {
 	  savemove = mpos;
 	  savecode = KO_B;
 	}
       }
-      
+
       /* Undo the tested move. */
       pop_owl(&owl);
       popgo(goban);
     }
   }
 
-  close_pattern_list(color, &shape_patterns);
-  
+  close_pattern_list(goban, color, &shape_patterns);
+
   if (savecode) {
     if (savecode == LOSS) {
       SGFTRACE(goban, savemove, savecode, "defense effective (loss) - B");
       if (wormid)
 	*wormid = saveworm;
-      READ_RETURN2(goban, OWL_DEFEND, str, depth - stackp,
+      READ_RETURN2(goban, OWL_DEFEND, str, depth - goban->stackp,
 		   move, savemove, savecode, saveworm);
     }
     else {
       SGFTRACE(goban, savemove, savecode, "defense effective (ko) - B");
-      READ_RETURN(goban, OWL_DEFEND, str, depth - stackp, move, savemove, savecode);
+      READ_RETURN(goban, OWL_DEFEND, str, depth - goban->stackp, move,
+		  savemove, savecode);
     }
   }
 
   if (number_tried_moves == 0 && min_eyes(&probable_eyes) >= 2) {
     SGFTRACE(goban, 0, WIN, "genus probably >= 2");
-    READ_RETURN(goban, OWL_DEFEND, str, depth - stackp, move, 0, WIN);
+    READ_RETURN(goban, OWL_DEFEND, str, depth - goban->stackp, move, 0, WIN);
   }
-  
 
-  if (sgf_dumptree) {
+
+  if (goban->sgf_dumptree) {
     char winstr[196];
     int print_genus = eyemin == 1 ? 1 : 0;
     sprintf(winstr, "defense failed - genus %d)\n  (%d variations",
-	  	    print_genus, count_variations - this_variation_number);
+	    print_genus, goban->variations_counter - this_variation_number);
     SGFTRACE(goban, 0, 0, winstr);
   }
 
-  READ_RETURN0(goban, OWL_DEFEND, str, depth - stackp);
+  READ_RETURN0(goban, OWL_DEFEND, str, depth - goban->stackp);
 }
 
 
@@ -2745,11 +2808,11 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
  */
 
 int
-owl_threaten_defense(int target, int *defend1, int *defend2)
+owl_threaten_defense(Goban *goban, int target, int *defend1, int *defend2)
 {
   struct owl_move_data moves[MAX_MOVES];
   int k;
-  int color = board[target];
+  int color = goban->board[target];
   int result = 0;
   struct local_owl_data *owl;
   int reading_nodes_when_called = get_reading_node_counter();
@@ -2774,25 +2837,25 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
     start = gg_cputime();
 
   TRACE(goban, "owl_threaten_defense %1m\n", target);
-  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1, NULL);
+  init_owl(goban, &owl, target, NO_MOVE, NO_MOVE, 1, NULL);
   memcpy(saved_goal, owl->goal, sizeof(saved_goal));
-  owl_make_domains(owl, NULL);
-  owl_shapes(&shape_patterns, moves, color, owl, &owl_defendpat_db);
+  owl_make_domains(goban, owl, NULL);
+  owl_shapes(goban, &shape_patterns, moves, color, owl, &owl_defendpat_db);
   for (k = 0; k < MAX_MOVES; k++) {
     current_owl_data = owl;
-    if (!get_next_move_from_list(&shape_patterns, color, moves, 1, owl))
+    if (!get_next_move_from_list(goban, &shape_patterns, color, moves, 1, owl))
       break;
     else {
       if (moves[k].pos != NO_MOVE && moves[k].value > 0)
 	if (trymove(goban, moves[k].pos, color, moves[k].name, target)) {
 	  owl->lunches_are_current = 0;
-	  owl_update_goal(moves[k].pos, moves[k].same_dragon,
-	      		  moves[k].lunch, owl, 0);
-	  if (do_owl_defend(target, &move2, NULL, owl, 0) == WIN) {
+	  owl_update_goal(goban, moves[k].pos, moves[k].same_dragon,
+			  moves[k].lunch, owl, 0);
+	  if (do_owl_defend(goban, target, &move2, NULL, owl, 0) == WIN) {
 	    move = moves[k].pos;
 	    popgo(goban);
 	    /* Don't return the second move if occupied before trymove */
-	    if (move2 != NO_MOVE && IS_STONE(board[move2]))
+	    if (move2 != NO_MOVE && IS_STONE(goban->board[move2]))
 	      move2 = NO_MOVE;
 	    result = WIN;
 	    break;
@@ -2804,23 +2867,23 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
     }
   }
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
 
-  DEBUG(goban, DEBUG_OWL_PERFORMANCE, 
+  DEBUG(goban, DEBUG_OWL_PERFORMANCE,
     "owl_threaten_defense %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
 	    target, move, move2, result, local_owl_node_counter,
 	    tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(goban, OWL_THREATEN_DEFENSE, target, 0, 0,
 			     result, move, move2, 0,
-			     tactical_nodes, owl->goal, board[target]);
+			     tactical_nodes, owl->goal, goban->board[target]);
 
   if (defend1)
     *defend1 = move;
   if (defend2)
     *defend2 = move2;
 
-  close_pattern_list(color, &shape_patterns);
+  close_pattern_list(goban, color, &shape_patterns);
   return result;
 }
 
@@ -2833,21 +2896,19 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
  * be considered alive.
  */
 static int
-owl_estimate_life(struct local_owl_data *owl,
+owl_estimate_life(Goban *goban, struct local_owl_data *owl,
 		  struct local_owl_data *second_owl,
-    		  struct owl_move_data vital_moves[MAX_MOVES],
+		  struct owl_move_data vital_moves[MAX_MOVES],
 		  const char **live_reason, int does_attack,
 		  struct eyevalue *probable_eyes, int *eyemin, int *eyemax)
 {
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
+  SGF_dump_data sgf_dump_save;
   struct owl_move_data dummy_moves[MAX_MOVES];
   int other = OTHER_COLOR(owl->color);
 
-  sgf_dumptree = NULL;
-  count_variations = 0;
+  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 
-  owl_determine_life(owl, second_owl, does_attack, vital_moves,
+  owl_determine_life(goban, owl, second_owl, does_attack, vital_moves,
 		     probable_eyes, eyemin, eyemax);
 
   matches_found = 0;
@@ -2857,34 +2918,34 @@ owl_estimate_life(struct local_owl_data *owl,
     memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
     if (!does_attack) {
       clear_owl_move_data(dummy_moves);
-      matchpat(owl_shapes_callback, other,
+      matchpat(goban, owl_shapes_callback, other,
 	       &owl_vital_apat_db, dummy_moves, owl->goal);
     }
     else if (max_eyes(probable_eyes) >= 2)
-      matchpat(owl_shapes_callback, other,
+      matchpat(goban, owl_shapes_callback, other,
 	       &owl_vital_apat_db, vital_moves, owl->goal);
   }
 
   if ((debug & DEBUG_EYES) && (debug & DEBUG_OWL))
-    gprintf(goban, "owl: eyemin=%d matches_found=%d\n", *eyemin, matches_found);
+    gprintf(goban, "owl: eyemin=%d matches_found=%d\n", *eyemin,
+	    matches_found);
   if (*eyemin >= matches_found)
     *eyemin -= matches_found;
   else
     *eyemin = 0;
 
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
+  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 
   if (*eyemin >= 2
       || (*eyemin == 1 && min_eyes(probable_eyes) >= 4)
-      || (stackp > owl_distrust_depth
+      || (goban->stackp > owl_distrust_depth
 	  && min_eyes(probable_eyes) >= 2
 	  && !matches_found)) {
     if (*eyemin >= 2)
       *live_reason = "2 or more secure eyes";
     else if (*eyemin == 1 && min_eyes(probable_eyes) >= 4)
       *live_reason = "1 secure eye, likely >= 4";
-    else if (stackp > owl_distrust_depth
+    else if (goban->stackp > owl_distrust_depth
 	     && min_eyes(probable_eyes) >= 2
 	     && !matches_found)
       *live_reason = "getting deep, looks lively";
@@ -2896,7 +2957,7 @@ owl_estimate_life(struct local_owl_data *owl,
   if (!does_attack
       && (*eyemin + matches_found >= 2
 	  || (*eyemin + matches_found == 1 && min_eyes(probable_eyes) >= 4)
-      || (stackp > owl_distrust_depth
+      || (goban->stackp > owl_distrust_depth
 	  && min_eyes(probable_eyes) >= 2))) {
     /* We are not yet alive only due to owl vital attack patterns matching.
      * Let's try to defend against it.
@@ -2910,7 +2971,7 @@ owl_estimate_life(struct local_owl_data *owl,
 }
 
 
-/* 
+/*
  * This function is invoked from do_owl_attack() and do_owl_defend()
  * for each node to determine whether the the dragon has sufficient
  * eye potential to live. It also generates vital moves to attack or
@@ -2947,7 +3008,7 @@ owl_estimate_life(struct local_owl_data *owl,
  */
 
 static void
-owl_determine_life(struct local_owl_data *owl,
+owl_determine_life(Goban *goban, struct local_owl_data *owl,
 		   struct local_owl_data *second_owl,
 		   int does_attack,
 		   struct owl_move_data *moves,
@@ -2981,16 +3042,16 @@ owl_determine_life(struct local_owl_data *owl,
 
   *eyemin = 0;
   *eyemax = 0;
-  
+
   /* Turn off eye debugging if we're not also debugging owl. */
   if (!(debug & DEBUG_OWL))
     debug &= ~DEBUG_EYES;
-  
+
   clear_owl_move_data(moves);
-  
+
   if (!owl->lunches_are_current)
-    owl_find_lunches(owl);
-  
+    owl_find_lunches(goban, owl);
+
   if (0) {
     for (k = 0; k < MAX_LUNCHES; k++)
       if (owl->lunch[k] != NO_MOVE)
@@ -3000,9 +3061,9 @@ owl_determine_life(struct local_owl_data *owl,
 		owl->lunch_defense_point[k]);
   }
 
-  owl_make_domains(owl, second_owl);
+  owl_make_domains(goban, owl, second_owl);
 
-  owl_find_relevant_eyespaces(owl, mw, mz);
+  owl_find_relevant_eyespaces(goban, owl, mw, mz);
 
   /* Reset halfeye data. Set topological eye value to something big. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -3011,24 +3072,24 @@ owl_determine_life(struct local_owl_data *owl,
       owl->half_eye[pos].value = 10.0;
     }
   }
-  
+
   /* Find topological half eyes and false eyes. */
-  find_half_and_false_eyes(color, eye, owl->half_eye, mw);
+  find_half_and_false_eyes(goban, color, eye, owl->half_eye, mw);
 
   /* The eyespaces may have been split or changed in other ways by the
    * topological analysis, so we need to regenerate them and once more
    * determine which ones are relevant.
    */
-  partition_eyespaces(owl->my_eye, owl->color);
-  owl_find_relevant_eyespaces(owl, mw, mz);
-  
+  partition_eyespaces(goban, owl->my_eye, owl->color);
+  owl_find_relevant_eyespaces(goban, owl, mw, mz);
+
   set_eyevalue(probable_eyes, 0, 0, 0, 0);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (ON_BOARD(goban, pos) && mw[pos] > 1) {
       int value = 0;
       const char *reason = "";
-      compute_eyes_pessimistic(pos, &eyevalue, &pessimistic_min,
+      compute_eyes_pessimistic(goban, pos, &eyevalue, &pessimistic_min,
 			       &attack_point, &defense_point,
 			       eye, owl->half_eye);
 
@@ -3106,12 +3167,13 @@ owl_determine_life(struct local_owl_data *owl,
 	      value = 98; /* Higher values may get special interpretation. */
 	  }
 
-	  TRACE(goban, "%s at %1m, score %d (eye at %1m, value %s, pessimistic_min %d)\n",
+	  TRACE(goban,
+		"%s at %1m, score %d (eye at %1m, value %s, pessimistic_min %d)\n",
 		reason, attack_point, value,
 		pos, eyevalue_to_string(&eyevalue), pessimistic_min);
 
 	  if (eye[attack_point].marginal
-	      && modify_stupid_eye_vital_point(owl, &attack_point, 1))
+	      && modify_stupid_eye_vital_point(goban, owl, &attack_point, 1))
 	    TRACE(goban, "vital point looked stupid, moved it to %1m\n",
 		  attack_point);
 
@@ -3135,7 +3197,7 @@ owl_determine_life(struct local_owl_data *owl,
 	 * +----
 	 *
 	 * but it's okay in this position
-	 * 
+	 *
 	 * |XXXXX
 	 * |....X
 	 * |OOOOX
@@ -3149,8 +3211,8 @@ owl_determine_life(struct local_owl_data *owl,
 	 */
 	else if (!does_attack
 		 && defense_point != NO_MOVE
-		 && board[defense_point] == EMPTY
-		 && (!liberty_of_goal(defense_point, owl)
+		 && goban->board[defense_point] == EMPTY
+		 && (!liberty_of_goal(goban, defense_point, owl)
 		     || !is_self_atari(goban, defense_point, color)
 		     || is_ko(goban, defense_point, color, NULL)
 		     || safe_move(goban, defense_point, color) != 0)) {
@@ -3160,13 +3222,14 @@ owl_determine_life(struct local_owl_data *owl,
 	      value = 98; /* Higher values may get special interpretation. */
 	  }
 
-	  TRACE(goban, "%s at %1m, score %d (eye at %1m, value %s, pessimistic_min %d)\n",
+	  TRACE(goban,
+		"%s at %1m, score %d (eye at %1m, value %s, pessimistic_min %d)\n",
 		reason, defense_point, value, pos,
 		eyevalue_to_string(&eyevalue), pessimistic_min);
 
 	  if ((eye[defense_point].marginal
 	       || eye[defense_point].origin != pos)
-	      && modify_stupid_eye_vital_point(owl, &defense_point, 0))
+	      && modify_stupid_eye_vital_point(goban, owl, &defense_point, 0))
 	    TRACE(goban, "vital point looked stupid, moved it to %1m\n",
 		  defense_point);
 
@@ -3195,7 +3258,7 @@ owl_determine_life(struct local_owl_data *owl,
 	int lunch_probable;
 	int lunch_max;
 	struct eyevalue e;
-	sniff_lunch(owl->lunch[lunch], 
+	sniff_lunch(goban, owl->lunch[lunch],
 		    &lunch_min, &lunch_probable, &lunch_max, owl);
 
 	set_eyevalue(&e, 0, 0, lunch_probable, lunch_probable);
@@ -3217,7 +3280,7 @@ owl_determine_life(struct local_owl_data *owl,
 	  value -= 10;
 
 	if (does_attack) {
-	  defense_point = improve_lunch_defense(owl->lunch[lunch],
+	  defense_point = improve_lunch_defense(goban, owl->lunch[lunch],
 						owl->lunch_defense_point[lunch]);
 
 	  if (vital_values[defense_point]) {
@@ -3236,7 +3299,7 @@ owl_determine_life(struct local_owl_data *owl,
 	    /* and adjust */
 	    eyevalue_list[ne].a = 0;
 	    eyevalue_list[ne].b = 0;
-	  } 
+	  }
 	  else {
 	    num_lunches++;
 	    eyevalue_list[num_eyes++] = e;
@@ -3246,10 +3309,10 @@ owl_determine_life(struct local_owl_data *owl,
 		owl->lunch[lunch], defense_point, value,
 		lunch_probable, lunch_max);
 	  owl_add_move(moves, defense_point, value,
-	      	       "save lunch", 1, NO_MOVE, 0, NO_MOVE, MAX_MOVES);
+		       "save lunch", 1, NO_MOVE, 0, NO_MOVE, MAX_MOVES);
 	}
 	else {
-	  attack_point = improve_lunch_attack(owl->lunch[lunch],
+	  attack_point = improve_lunch_attack(goban, owl->lunch[lunch],
 					      owl->lunch_attack_point[lunch]);
 	  TRACE(goban, "eat lunch at %1m with %1m, score %d, probable eye %d, max eye %d\n",
 		owl->lunch[lunch], attack_point, value,
@@ -3309,14 +3372,14 @@ owl_determine_life(struct local_owl_data *owl,
  */
 
 static void
-owl_find_relevant_eyespaces(struct local_owl_data *owl,
+owl_find_relevant_eyespaces(const Goban *goban, struct local_owl_data *owl,
 			    int mw[BOARDMAX], int mz[BOARDMAX])
 {
   int pos;
   int eye_color;
   int k;
   struct eye_data *eye = owl->my_eye;
-  
+
   if (owl->color == WHITE)
     eye_color = WHITE;
   else
@@ -3325,7 +3388,7 @@ owl_find_relevant_eyespaces(struct local_owl_data *owl,
   memset(mw, 0, BOARDMAX * sizeof(mw[0]));
   memset(mz, 0, BOARDMAX * sizeof(mz[0]));
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == owl->color) {
+    if (goban->board[pos] == owl->color) {
       for (k = 0; k < 8; k++) {
 	int pos2 = pos + delta[k];
 	if (ON_BOARD(goban, pos2)
@@ -3383,9 +3446,10 @@ owl_find_relevant_eyespaces(struct local_owl_data *owl,
  * This function changes the attack point to NO_MOVE (i.e. removes it).
  */
 static int
-modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
-			      int is_attack_point)
+modify_stupid_eye_vital_point(Goban *goban, struct local_owl_data *owl,
+			      int *vital_point, int is_attack_point)
 {
+  const Intersection *const board = goban->board;
   int up;
   int right;
   int k;
@@ -3416,7 +3480,8 @@ modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
 
   /* Case 2. */
   if (!is_attack_point) {
-    if (approxlib(goban, *vital_point, OTHER_COLOR(owl->color), 1, NULL) == 0) {
+    if (approxlib(goban, *vital_point, OTHER_COLOR(owl->color), 1, NULL)
+	== 0) {
       for (k = 4; k < 8; k++) {
 	int pos = *vital_point + delta[k];
 	if (board[pos] == OTHER_COLOR(owl->color)
@@ -3431,7 +3496,8 @@ modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
   /* Case 3. */
   if (is_attack_point
       && does_capture_something(goban, *vital_point, OTHER_COLOR(owl->color))
-      && accuratelib(goban, *vital_point, OTHER_COLOR(owl->color), 2, libs) == 1
+      && (accuratelib(goban, *vital_point, OTHER_COLOR(owl->color), 2, libs)
+	  == 1)
       && !attack(goban, libs[0], NULL)) {
     *vital_point = NO_MOVE;
     return 1;
@@ -3440,7 +3506,7 @@ modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
   return 0;
 }
 
-/* 
+/*
  * Generates up to max_moves moves, attempting to attack or defend the goal
  * dragon. The found moves are put in moves, an array of owl_move_data
  * structs, starting in the position 'initial'.  The entries in the array are
@@ -3455,17 +3521,16 @@ modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
  * Returns 1 if at least one move is found, or 0 if no move is found.  */
 
 static void
-owl_shapes(struct matched_patterns_list_data *pattern_list,
-           struct owl_move_data moves[MAX_MOVES],
+owl_shapes(Goban *goban, struct matched_patterns_list_data *pattern_list,
+	   struct owl_move_data moves[MAX_MOVES],
 	   int color, struct local_owl_data *owl, struct pattern_db *type)
 {
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
-  sgf_dumptree = NULL;
-  count_variations = 0;
+  SGF_dump_data sgf_dump_save;
+
+  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 
   current_owl_data = owl;
-  
+
   clear_owl_move_data(moves);
 
   /* We must reset the owl safe_move_cache before starting the
@@ -3473,16 +3538,17 @@ owl_shapes(struct matched_patterns_list_data *pattern_list,
    */
   memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
   init_pattern_list(pattern_list);
-  matchpat(collect_owl_shapes_callbacks, color, type, pattern_list, owl->goal);
+  matchpat(goban, collect_owl_shapes_callbacks, color, type, pattern_list,
+	   owl->goal);
 
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
+  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 }
 
 
 /* This function contains all the expensive checks for a matched pattern. */
 static int
-check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
+check_pattern_hard(Goban *goban, int move, int color,
+		   struct pattern *pattern, int ll)
 {
   int constraint_checked = 0;
   int safe_move_checked = 0;
@@ -3493,25 +3559,25 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
   if (!(pattern->class & CLASS_s))
     if (current_owl_data->safe_move_cache[move]) {
       if (current_owl_data->safe_move_cache[move] == 1)
-        return 0;
+	return 0;
       else
-        safe_move_checked = 1;
+	safe_move_checked = 1;
     }
 
   /* If the constraint is cheap to check, we do this first. */
   if ((pattern->autohelper_flag & HAVE_CONSTRAINT)
       && pattern->constraint_cost < 0.45) {
-    if (!pattern->autohelper(ll, move, color, 0))
+    if (!pattern->autohelper(goban, ll, move, color, 0))
       return 0;
     constraint_checked = 1;
   }
 
   /* For sacrifice patterns, the survival of the stone to be played is
-   * not checked. Otherwise we discard moves which can be captured. 
+   * not checked. Otherwise we discard moves which can be captured.
    * Illegal ko captures are accepted for ko analysis.
    */
   if (!(pattern->class & CLASS_s) && !safe_move_checked) {
-    if (!owl_safe_move(move, color)) {
+    if (!owl_safe_move(goban, move, color)) {
       if (0)
 	TRACE(goban, "  move at %1m wasn't safe, discarded\n", move);
       return 0;
@@ -3522,7 +3588,7 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
       return 0;
     }
   }
-  
+
   /* For class n patterns, the pattern is contingent on an opponent
    * move at * not being captured.
    *
@@ -3531,7 +3597,8 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
   if (pattern->class & CLASS_n) {
     if (safe_move(goban, move, OTHER_COLOR(color)) == 0) {
       if (0)
-	TRACE(goban, "  opponent can't play safely at %1m, move discarded\n", move);
+	TRACE(goban, "  opponent can't play safely at %1m, move discarded\n",
+	      move);
       return 0;
     }
   }
@@ -3540,8 +3607,9 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
    * if the pattern must be rejected.
    */
   if ((pattern->autohelper_flag & HAVE_CONSTRAINT) && !constraint_checked)
-    if (!pattern->autohelper(ll, move, color, 0))
+    if (!pattern->autohelper(goban, ll, move, color, 0))
       return 0;
+
   return 1;
 }
 
@@ -3557,18 +3625,20 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
 static void
 init_pattern_list(struct matched_patterns_list_data *list)
 {
-  gg_assert(goban, !list->initialized);
+  gg_assert(NULL, !list->initialized);
 
   list->counter = 0;
   list->used = 0;
 
   list->pattern_list = malloc(200 * sizeof(list->pattern_list[0]));
   list->list_size = 200;
-  gg_assert(goban, list->pattern_list != NULL);
+  gg_assert(NULL, list->pattern_list != NULL);
   list->pattern_heap = NULL;
 
-  if (0)
-    gprintf(goban, "List at %x has new array at %x\n", list, list->pattern_list);
+  if (0) {
+    gprintf(NULL, "List at %x has new array at %x\n",
+	    list, list->pattern_list);
+  }
 
   list->initialized = 1;
 }
@@ -3578,46 +3648,45 @@ init_pattern_list(struct matched_patterns_list_data *list)
  * in the calling function.
  */
 static void
-close_pattern_list(int color, struct matched_patterns_list_data *list)
+close_pattern_list(Goban *goban, int color,
+		   struct matched_patterns_list_data *list)
 {
   if (list->initialized) {
     if (0)
-      gprintf(goban, "%d patterns matched, %d patterns checked\n", list->counter,
-	      list->used);
+      gprintf(goban, "%d patterns matched, %d patterns checked\n",
+	      list->counter, list->used);
     if (0)
       gprintf(goban, "Pattern list at %x freed for list at %x\n",
 	      list->pattern_list, list);
     if (allpats && verbose) {
       int i;
       int found_one = 0;
-      SGFTree *save_sgf_dumptree = sgf_dumptree;
-      int save_count_variations = count_variations;
-      sgf_dumptree = NULL;
-      count_variations = 0;
+      SGF_dump_data sgf_dump_save;
+
+      SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 
       if (!current_owl_data->lunches_are_current)
-	owl_find_lunches(current_owl_data);
+	owl_find_lunches(goban, current_owl_data);
 
       if (!list->pattern_heap)
 	pattern_list_build_heap(list);
 
       for (i = 0; i < list->heap_num_patterns; i++)
-	if (check_pattern_hard(list->pattern_heap[i]->move, color,
-	     		       list->pattern_heap[i]->pattern,
+	if (check_pattern_hard(goban, list->pattern_heap[i]->move, color,
+			       list->pattern_heap[i]->pattern,
 			       list->pattern_heap[i]->ll)) {
 	  if (!found_one) {
 	    TRACE(goban, "Remaining valid (but unused) patterns at stack: ");
 	    dump_stack(goban);
 	    found_one = 1;
 	  }
-      	  TRACE(goban, "Pattern %s found at %1m with value %d\n",
-	        list->pattern_heap[i]->pattern->name,
-	        list->pattern_heap[i]->move,
-	        (int) list->pattern_heap[i]->pattern->value);
+	  TRACE(goban, "Pattern %s found at %1m with value %d\n",
+		list->pattern_heap[i]->pattern->name,
+		list->pattern_heap[i]->move,
+		(int) list->pattern_heap[i]->pattern->value);
 	}
-      
-      sgf_dumptree = save_sgf_dumptree;
-      count_variations = save_count_variations;
+
+      RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
     }
 
     free(list->pattern_list);
@@ -3628,10 +3697,10 @@ close_pattern_list(int color, struct matched_patterns_list_data *list)
 
 
 /* Can be called from gdb for debugging:
- * (gdb) set dump_pattern_list(&shape_patterns)
+ * (gdb) set dump_pattern_list(goban, &shape_patterns)
  */
 void
-dump_pattern_list(struct matched_patterns_list_data *list)
+dump_pattern_list(const Goban *goban, struct matched_patterns_list_data *list)
 {
   int i;
   struct matched_pattern_data *matched_pattern;
@@ -3653,20 +3722,21 @@ dump_pattern_list(struct matched_patterns_list_data *list)
  * forgetting the color.
  */
 static void
-collect_owl_shapes_callbacks(int anchor, int color, struct pattern *pattern,
-                             int ll, void *data)
+collect_owl_shapes_callbacks(Goban *goban, int anchor, int color,
+			     struct pattern *pattern, int ll, void *data)
 {
   struct matched_patterns_list_data *matched_patterns = data;
   struct matched_pattern_data *next_pattern;
 
+  UNUSED(goban);
   UNUSED(color); /* The calling function has to remember that. */
 
   if (matched_patterns->counter >= matched_patterns->list_size) {
     matched_patterns->list_size += 100;
     matched_patterns->pattern_list
-        = realloc(matched_patterns->pattern_list,
-	          matched_patterns->list_size
-	          * sizeof(matched_patterns->pattern_list[0]));
+	= realloc(matched_patterns->pattern_list,
+		  matched_patterns->list_size
+		  * sizeof matched_patterns->pattern_list[0]);
   }
 
   next_pattern = &matched_patterns->pattern_list[matched_patterns->counter];
@@ -3684,7 +3754,8 @@ collect_owl_shapes_callbacks(int anchor, int color, struct pattern *pattern,
 #define MAX_STORED_REASONS	4
 
 static int
-valuate_combinable_pattern_chain(struct matched_patterns_list_data *list,
+valuate_combinable_pattern_chain(const Goban *goban,
+				 struct matched_patterns_list_data *list,
 				 int pos)
 {
   /* FIXME: This is just a first attempt at pattern combination.
@@ -3725,7 +3796,7 @@ valuate_combinable_pattern_chain(struct matched_patterns_list_data *list,
 	switch (attribute->type) {
 	case THREATENS_TO_CAPTURE:
 	  if (num_capture_threats < MAX_STORED_REASONS) {
-	    ASSERT1(goban, IS_STONE(board[target]), target);
+	    ASSERT1(goban, IS_STONE(goban->board[target]), target);
 	    target = find_origin(goban, target);
 
 	    for (k = 0; k < num_capture_threats; k++) {
@@ -3760,7 +3831,7 @@ valuate_combinable_pattern_chain(struct matched_patterns_list_data *list,
 
 	case REVERSE_SENTE:
 	  if (num_reverse_sente < MAX_STORED_REASONS) {
-	    ASSERT1(goban, board[target] == EMPTY, target);
+	    ASSERT1(goban, goban->board[target] == EMPTY, target);
 
 	    for (k = 0; k < num_reverse_sente; k++) {
 	      if (reverse_sente_against[k] == target)
@@ -3805,14 +3876,14 @@ valuate_combinable_pattern_chain(struct matched_patterns_list_data *list,
  * center of the board.
  */
 static int
-bdist(int move)
+bdist(int board_size, int move)
 {
   /* i = 0:              idist = - (board_size - 1)
    * i = board_size -1 : idist =    board_size - 1
    */
-  int idist = 2*I(move) - board_size + 1;
-  int jdist = 2*J(move) - board_size + 1;
-  return idist*idist + jdist*jdist;
+  int idist = 2 * I(move) - board_size + 1;
+  int jdist = 2 * J(move) - board_size + 1;
+  return idist * idist + jdist * jdist;
 }
 
 
@@ -3843,7 +3914,8 @@ bdist(int move)
 
 
 static void
-pattern_list_prepare(struct matched_patterns_list_data *list)
+pattern_list_prepare(const Goban *goban,
+		     struct matched_patterns_list_data *list)
 {
   int k;
   int pos;
@@ -3870,7 +3942,7 @@ pattern_list_prepare(struct matched_patterns_list_data *list)
     int move = list->pattern_list[k].move;
 
 #if USE_BDIST
-    list->pattern_list[k].bdist = bdist(move);
+    list->pattern_list[k].bdist = bdist(goban->board_size, move);
 #endif
 
     /* Allocate heap elements for normal patterns.  Link combinable
@@ -3879,7 +3951,8 @@ pattern_list_prepare(struct matched_patterns_list_data *list)
     if (!(list->pattern_list[k].pattern->class & CLASS_c))
       list->pattern_heap[list->heap_num_patterns++] = &list->pattern_list[k];
     else {
-      list->pattern_list[k].next_pattern_index = list->first_pattern_index[move];
+      list->pattern_list[k].next_pattern_index
+	= list->first_pattern_index[move];
       list->first_pattern_index[move] = k;
     }
   }
@@ -3893,7 +3966,7 @@ pattern_list_prepare(struct matched_patterns_list_data *list)
       struct matched_pattern_data *pattern_data
 	= &list->pattern_list[list->first_pattern_index[pos]];
 
-      pattern_data->value = valuate_combinable_pattern_chain(list, pos);
+      pattern_data->value = valuate_combinable_pattern_chain(goban, list, pos);
       list->pattern_heap[list->heap_num_patterns++] = pattern_data;
     }
   }
@@ -3991,8 +4064,8 @@ pattern_list_sink_heap_top_element(struct matched_patterns_list_data *list)
  * is more than one.
  */
 static void
-generate_cut_list(struct pattern *pattern, int ll, int anchor,
-    		  int cuts[MAX_CUTS], struct local_owl_data *owl)
+generate_cut_list(const Goban *goban, struct pattern *pattern, int ll,
+		  int anchor, int cuts[MAX_CUTS], struct local_owl_data *owl)
 {
   int k;
   int num = 0;
@@ -4001,10 +4074,10 @@ generate_cut_list(struct pattern *pattern, int ll, int anchor,
   memset(mark, 0, BOARDMAX);
   for (k = 0; k < pattern->patlen; k++) {
     int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
-    if (!IS_STONE(board[pos]))
+    if (!IS_STONE(goban->board[pos]))
       continue;
     pos = find_origin(goban, pos);
-    if (!mark[pos] && board[pos] == owl->color && owl->goal[pos]) {
+    if (!mark[pos] && goban->board[pos] == owl->color && owl->goal[pos]) {
       cuts[num++] = pos;
       mark[pos] = 1;
       if (num == MAX_CUTS)
@@ -4038,20 +4111,18 @@ generate_cut_list(struct pattern *pattern, int ll, int anchor,
  */
 
 static int
-get_next_move_from_list(struct matched_patterns_list_data *list, int color,
-			struct owl_move_data *moves, int cutoff,
+get_next_move_from_list(Goban *goban, struct matched_patterns_list_data *list,
+			int color, struct owl_move_data *moves, int cutoff,
 			struct local_owl_data *owl)
 {
   int move_found = 0;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
+  SGF_dump_data sgf_dump_save;
 
-  sgf_dumptree = NULL;
-  count_variations = 0;
+  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 
   /* Prepare pattern list if needed. */
   if (!list->pattern_heap)
-    pattern_list_prepare(list);
+    pattern_list_prepare(goban, list);
 
   while (list->heap_num_patterns > 0) {
     int k;
@@ -4096,7 +4167,7 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
      * useful, i.e. if 2 of 3 patterns passed check_pattern_hard().
      */
     if (pattern == NULL
-	|| check_pattern_hard(move, color, pattern, ll)) {
+	|| check_pattern_hard(goban, move, color, pattern, ll)) {
       if (next_pattern_index == -1) {
 	/* Normal pattern or last one in a chain. */
 	pattern_list_pop_heap_once(list);
@@ -4128,8 +4199,8 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 	   * if there is more than one.
 	   */
 	  DEBUG(goban, DEBUG_SPLIT_OWL,
-	      	"Generating cut list for move at %1m.\n", move);
-	  generate_cut_list(pattern, ll, anchor, moves[k].cuts, owl);
+		"Generating cut list for move at %1m.\n", move);
+	  generate_cut_list(goban, pattern, ll, anchor, moves[k].cuts, owl);
 	}
 
 	if (pattern->class & CLASS_B)
@@ -4148,7 +4219,7 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 		&& pattern_data->move == move
 		&& ((pattern_data->pattern->class & CLASS_B)
 		    || !(pattern_data->pattern->class & CLASS_b))) {
-	      if (check_pattern_hard(move, color, pattern_data->pattern,
+	      if (check_pattern_hard(goban, move, color, pattern_data->pattern,
 				     pattern_data->ll)) {
 		TRACE(goban, "Additionally pattern %s found at %1m\n",
 		      pattern_data->pattern->name, move);
@@ -4206,15 +4277,15 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 	  list->pattern_heap[0] = list->pattern_list + next_pattern_index;
 
 	/* Reevaluate chain and adjust heap structure accordingly. */
-	list->pattern_heap[0]->value = valuate_combinable_pattern_chain(list,
+	list->pattern_heap[0]->value = valuate_combinable_pattern_chain(goban,
+									list,
 									move);
 	pattern_list_sink_heap_top_element(list);
       }
     }
   }
 
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
+  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 
   return move_found;
 }
@@ -4225,8 +4296,8 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
  * the goal dragon are considered.
  */
 static void
-owl_shapes_callback(int anchor, int color, struct pattern *pattern,
-		    int ll, void *data)
+owl_shapes_callback(Goban *goban, int anchor, int color,
+		    struct pattern *pattern, int ll, void *data)
 {
   int tval;  /* trial move and its value */
   int move;
@@ -4257,8 +4328,8 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
     if (k == MAX_MOVES && moves[MAX_MOVES - 1].value >= pattern->value)
       return;
   }
-  
-  if (!check_pattern_hard(move, color, pattern, ll))
+
+  if (!check_pattern_hard(goban, move, color, pattern, ll))
     return;
 
   /* and work out the value of this move */
@@ -4267,14 +4338,15 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
     gg_assert(goban, 0);
     DEBUG(goban, DEBUG_HELPER, "  asking helper to consider '%s'+%d at %1m\n",
 	  pattern->name, ll, move);
-    tval = pattern->helper(pattern, ll, move, color);
-    
+    tval = pattern->helper(goban, pattern, ll, move, color);
+
     if (tval > 0) {
       DEBUG(goban, DEBUG_HELPER, "helper likes pattern '%s' value %d at %1m\n",
 	    pattern->name, tval, move);
     }
     else {
-      DEBUG(goban, DEBUG_HELPER, "  helper does not like pattern '%s' at %1m\n",
+      DEBUG(goban, DEBUG_HELPER,
+	    "  helper does not like pattern '%s' at %1m\n",
 	    pattern->name, move);
       return;  /* pattern matcher does not like it */
     }
@@ -4285,7 +4357,8 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
 
   /* having made it here, we have made it through all the extra checks */
 
-  TRACE(goban, "Pattern %s found at %1m with value %d\n", pattern->name, move, tval);
+  TRACE(goban, "Pattern %s found at %1m with value %d\n",
+	pattern->name, move, tval);
 
   if (pattern->class & CLASS_B)
     same_dragon = 0;
@@ -4296,7 +4369,7 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
 
   if (pattern->class & CLASS_E)
     escape = 1;
-  else 
+  else
     escape = 0;
 
   /* Finally, check for position of defense move. */
@@ -4307,9 +4380,9 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
       if (pattern->patn[k].att == ATT_not)
 	defense_pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
   }
-  
+
   owl_add_move(moves, move, tval, pattern->name, same_dragon, NO_MOVE,
-      	       escape, defense_pos, MAX_MOVES);
+	       escape, defense_pos, MAX_MOVES);
 }
 
 
@@ -4326,7 +4399,7 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
     found_matches[move] = 1;
     matches_found++;
   }
-  
+
   /* Add the new move to the list of already found moves, if the value
    * is sufficently large. We keep the list sorted.
    *
@@ -4361,7 +4434,7 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
 	moves[k].value = value;
 	moves[k].name = reason;
 	/* If B or b class pattern, this move shouldn't be added to the
-         * dragon under consideration.
+	 * dragon under consideration.
 	 */
 	moves[k].same_dragon = same_dragon;
 	moves[k].lunch = lunch;
@@ -4380,29 +4453,29 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
     int l;
     for (k = 0; k < max_moves; k++)
       for (l = k+1; l < max_moves; l++)
-	gg_assert(goban, moves[k].pos == 0
-		  || moves[k].pos != moves[l].pos);
+	gg_assert(NULL, moves[k].pos == 0 || moves[k].pos != moves[l].pos);
   }
-}  
+}
 
 
 /* Marks the dragons at apos and bpos. If only one dragon
- * needs marking, bpos should be passed as NO_MOVE. 
+ * needs marking, bpos should be passed as NO_MOVE.
  */
 
 static void
-owl_mark_dragon(int apos, int bpos, struct local_owl_data *owl,
-		int new_dragons[BOARDMAX])
+owl_mark_dragon(const Goban *goban, int apos, int bpos,
+		struct local_owl_data *owl, int new_dragons[BOARDMAX])
 {
   int pos;
-  int color = board[apos];
-  
-  ASSERT1(goban, bpos == NO_MOVE || board[bpos] == color, bpos);
+  int color = goban->board[apos];
+
+  ASSERT1(goban, bpos == NO_MOVE || goban->board[bpos] == color, bpos);
 
   if (new_dragons == NULL) {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++)
       if (ON_BOARD(goban, pos)) {
-	if (is_same_dragon(pos, apos) || is_same_dragon(pos, bpos))
+	if (is_same_dragon(goban, pos, apos)
+	    || is_same_dragon(goban, pos, bpos))
 	  owl->goal[pos] = 1;
 	else
 	  owl->goal[pos] = 0;
@@ -4411,7 +4484,7 @@ owl_mark_dragon(int apos, int bpos, struct local_owl_data *owl,
   else {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++)
       if (ON_BOARD(goban, pos)) {
-	if (IS_STONE(board[pos])
+	if (IS_STONE(goban->board[pos])
 	    && (new_dragons[pos] == new_dragons[apos]
 		|| new_dragons[pos] == new_dragons[bpos]))
 	  owl->goal[pos] = 1;
@@ -4421,21 +4494,22 @@ owl_mark_dragon(int apos, int bpos, struct local_owl_data *owl,
   }
 
   owl->color = color;
-  owl_mark_boundary(owl);
+  owl_mark_boundary(goban, owl);
 }
 
 
 /* Marks the worms at apos and bpos. If only one worm
- * needs marking, bpos should be passed as NO_MOVE. 
+ * needs marking, bpos should be passed as NO_MOVE.
  */
 
 static void
-owl_mark_worm(int apos, int bpos, struct local_owl_data *owl)
+owl_mark_worm(const Goban *goban, int apos, int bpos,
+	      struct local_owl_data *owl)
 {
   int pos;
-  int color = board[apos];
-  
-  ASSERT1(goban, bpos == NO_MOVE || board[bpos] == color, bpos);
+  int color = goban->board[apos];
+
+  ASSERT1(goban, bpos == NO_MOVE || goban->board[bpos] == color, bpos);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(goban, pos)) {
@@ -4454,13 +4528,14 @@ owl_mark_worm(int apos, int bpos, struct local_owl_data *owl)
  */
 
 static void
-owl_mark_boundary(struct local_owl_data *owl)
+owl_mark_boundary(const Goban *goban, struct local_owl_data *owl)
 {
+  const Intersection *const board = goban->board;
   int k;
   int pos;
   int color = owl->color;
   int other = OTHER_COLOR(color);
-  
+
   memset(owl->boundary, 0, sizeof(owl->boundary));
   memset(owl->neighbors, 0, sizeof(owl->neighbors));
 
@@ -4509,14 +4584,15 @@ owl_mark_boundary(struct local_owl_data *owl)
 	if (board[pos2] == color
 	    && !owl->goal[pos2]
 	    && !owl->neighbors[pos2]
-	    && ((dragon[pos2].crude_status != DEAD && countstones(goban, pos2) > 2)
+	    && ((dragon[pos2].crude_status != DEAD
+		 && countstones(goban, pos2) > 2)
 		|| dragon[pos2].crude_status == ALIVE)) {
 	  mark_string(goban, pos, owl->boundary, 2);
 	  break;
 	}
       }
     }
-  
+
   /* During the owl reading, stones farther away may become parts of
    * the boundary. We mark those strings neighboring some other
    * friendly dragon with boundary value 2 right away, since we have
@@ -4535,15 +4611,15 @@ owl_mark_boundary(struct local_owl_data *owl)
       if (worm[pos].attack_codes[0] != 0
 	  && worm[pos].size != dragon[pos].size)
 	continue;
-      
+
       /* This can happen if called when stackp > 0 */
       if (dragon[pos].id == -1)
 	continue;
-      
+
       for (k = 0; k < DRAGON2(pos).neighbors; k++) {
 	int d = DRAGON2(pos).adjacent[k];
 	int apos = dragon2[d].origin;
-	
+
 	if (board[apos] == color && !owl->goal[apos]) {
 	  owl->boundary[pos] = 2;
 	  break;
@@ -4559,21 +4635,18 @@ owl_mark_boundary(struct local_owl_data *owl)
  * goal. If same_dragon is 0, we don't add any stones at all.
  */
 static void
-owl_update_goal(int pos, int same_dragon, int lunch,
-    		struct local_owl_data *owl, int semeai_call)
+owl_update_goal(Goban *goban, int pos, int same_dragon, int lunch,
+		struct local_owl_data *owl, int semeai_call)
 {
   int stones[MAX_BOARD * MAX_BOARD];
   int num_stones;
   int k;
   int do_add = 1;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
-  
+  SGF_dump_data sgf_dump_save;
 
-  /* Turn off sgf output during find_superstring(). */
-  sgf_dumptree = NULL;
-  count_variations = 0;
-  
+  /* Turn off SGF output during find_superstring(). */
+  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+
   if (same_dragon == 0)
     num_stones = findstones(goban, pos, MAX_BOARD*MAX_BOARD, stones);
   else if (semeai_call)
@@ -4581,10 +4654,9 @@ owl_update_goal(int pos, int same_dragon, int lunch,
   else
     find_superstring(goban, pos, &num_stones, stones);
 
-  /* Turn sgf output back on. */
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
-  
+  /* Turn SGF output back on. */
+  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+
   /* If same_dragon field is 1, only add if the played stone
    * clearly is in contact with the goal dragon.
    */
@@ -4596,7 +4668,7 @@ owl_update_goal(int pos, int same_dragon, int lunch,
 	break;
       }
   }
-  
+
   if (do_add)
     for (k = 0; k < num_stones; k++) {
       if (owl->goal[stones[k]] == 0) {
@@ -4609,7 +4681,7 @@ owl_update_goal(int pos, int same_dragon, int lunch,
   /* If this move captures a lunch, we add all it's direct neighbours to the
    * goal.
    */
-  if (!semeai_call && lunch != NO_MOVE && board[lunch] != EMPTY) {
+  if (!semeai_call && lunch != NO_MOVE && goban->board[lunch] != EMPTY) {
     int adj, adjs[MAXCHAIN];
     int k;
     adj = chainlinks(goban, lunch, adjs);
@@ -4619,7 +4691,7 @@ owl_update_goal(int pos, int same_dragon, int lunch,
   }
 
   if (1 && verbose)
-    goaldump(owl->goal);
+    goaldump(goban, owl->goal);
 }
 
 
@@ -4661,7 +4733,8 @@ connected_components(char graph[MAX_CUTS][MAX_CUTS], int graph_size,
     } while (found_one);
     num_components++;
   }
-  gg_assert(goban, num_components > 0);
+
+  gg_assert(NULL, num_components > 0);
   return num_components;
 }
 
@@ -4670,32 +4743,30 @@ connected_components(char graph[MAX_CUTS][MAX_CUTS], int graph_size,
  * to the biggest remaining component.
  */
 static void
-owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
+owl_test_cuts(Goban *goban, char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
 {
   int k, j;
   char connected[MAX_CUTS][MAX_CUTS];
   /* int connect_move[MAX_CUTS][MAX_CUTS]; */
   int num_cuts;
   int found_cut = 0;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
-    
-  sgf_dumptree = NULL;
-  count_variations = 0;
+  SGF_dump_data sgf_dump_save;
+
+  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 
   memset(connected, 1, MAX_CUTS*MAX_CUTS);
   if (debug & DEBUG_SPLIT_OWL) {
     gprintf(goban, "Called for this goal: ");
-    goaldump(goal);
+    goaldump(goban, goal);
     gprintf(goban, "At this position:\n");
-    showboard(0);
+    showboard(goban, 0);
   }
 
   /* Delete captured strings from list. */
   for (k = 0; k < MAX_CUTS; k++) {
     if (cuts[k] == NO_MOVE)
       break;
-    if (board[cuts[k]] == EMPTY) {
+    if (goban->board[cuts[k]] == EMPTY) {
       for (j = k + 1; j < MAX_CUTS; j++) {
 	if (cuts[j] == NO_MOVE)
 	  break;
@@ -4711,7 +4782,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
    * disconnected.
    */
   for (k = 0; k < num_cuts; k++) {
-    ASSERT1(goban, board[cuts[k]] == color, cuts[k]);
+    ASSERT1(goban, goban->board[cuts[k]] == color, cuts[k]);
     for (j = k + 1; j < num_cuts; j++)
       if (fast_disconnect(goban, cuts[k], cuts[j], NULL) == WIN) {
 	found_cut = 1;
@@ -4735,8 +4806,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
      */
     num_components = connected_components(connected, num_cuts, component);
     if (num_components <= 1) {
-      sgf_dumptree = save_sgf_dumptree;
-      count_variations = save_count_variations;
+      RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
       return;
     }
 
@@ -4759,7 +4829,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
 	  mark_string(goban, cuts[k], component2, c_id);
 	}
       init_connection_data(goban, color, this_goal, NO_MOVE, FP(3.01),
-	  		   conn_data + c_id, 1);
+			   conn_data + c_id, 1);
       spread_connection_distances(goban, color, conn_data + c_id);
     }
 
@@ -4769,7 +4839,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       int closest_dist = HUGE_CONNECTION_DISTANCE;
       int closest_component = -1;
-      if (board[pos] != color || !goal[pos])
+      if (goban->board[pos] != color || !goal[pos])
 	continue;
       if (pos != find_origin(goban, pos))
 	continue;
@@ -4804,13 +4874,13 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
     if (debug & DEBUG_SPLIT_OWL) {
       gprintf(goban, "Split dragon. Biggest component is %d (of %d).\n",
 	      biggest_component, num_components);
-      showboard(0);
-      componentdump(component2);
+      showboard(goban, 0);
+      componentdump(goban, component2);
     }
     free(conn_data);
   }
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
+
+  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 }
 
 /* We update the boundary marks. The boundary mark must be
@@ -4820,7 +4890,8 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
  * adjoins a live friendly dragon, the boundary mark is 2.
  */
 static void
-owl_update_boundary_marks(int pos, struct local_owl_data *owl)
+owl_update_boundary_marks(const Goban *goban, int pos,
+			  struct local_owl_data *owl)
 {
   char boundary_mark = 0;
   int k;
@@ -4831,7 +4902,7 @@ owl_update_boundary_marks(int pos, struct local_owl_data *owl)
     if (ON_BOARD(goban, pos2) && owl->boundary[pos2] > boundary_mark)
       boundary_mark = owl->boundary[pos2];
 
-    if (board[pos2] == owl->color
+    if (goban->board[pos2] == owl->color
 	&& dragon[pos2].color == owl->color
 	&& dragon[pos2].status == ALIVE
 	&& !owl->goal[pos2]
@@ -4843,11 +4914,11 @@ owl_update_boundary_marks(int pos, struct local_owl_data *owl)
 }
 
 /* Lists the goal array. For use in GDB:
- * (gdb) set goaldump(goal).
+ * (gdb) set goaldump(goban, goal).
  */
 
 void
-goaldump(const char goal[BOARDMAX])
+goaldump(const Goban *goban, const char goal[BOARDMAX])
 {
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
@@ -4857,7 +4928,7 @@ goaldump(const char goal[BOARDMAX])
 }
 
 void
-componentdump(const char goal[BOARDMAX])
+componentdump(const Goban *goban, const char goal[BOARDMAX])
 {
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
@@ -4873,17 +4944,17 @@ componentdump(const char goal[BOARDMAX])
  * move as a strategic attack.
  */
 static void
-test_owl_attack_move(int pos, int dr, int kworm, int acode)
+test_owl_attack_move(Goban *goban, int pos, int dr, int kworm, int acode)
 {
-  int color = OTHER_COLOR(board[dr]);
+  int color = OTHER_COLOR(goban->board[dr]);
   if (DRAGON2(dr).semeais == 0
       || DRAGON2(dr).semeai_defense_point == NO_MOVE
-      || (DRAGON2(dr).semeais == 1 && semeai_move_reason_known(pos, dr))
+      || (DRAGON2(dr).semeais == 1 && semeai_move_reason_known(goban, pos, dr))
       || acode == GAIN) {
-    add_owl_attack_move(pos, dr, kworm, acode);
+    add_owl_attack_move(goban, pos, dr, kworm, acode);
     DEBUG(goban, DEBUG_OWL, "owl: %1m attacks %1m (%s) at move %d\n",
 	  pos, dr, result_to_string(DRAGON2(dr).owl_attack_code),
-	  movenum+1);
+	  goban->move_number + 1);
   }
   else {
     int dr2 = DRAGON2(dr).semeai_defense_target;
@@ -4891,20 +4962,21 @@ test_owl_attack_move(int pos, int dr, int kworm, int acode)
     int save_verbose = verbose;
     if (verbose > 0)
       verbose--;
-    owl_analyze_semeai_after_move(pos, color, dr, dr2, &semeai_result,
+    owl_analyze_semeai_after_move(goban, pos, color, dr, dr2, &semeai_result,
 				  NULL, NULL, 1, &certain, 0);
     verbose = save_verbose;
     if (certain >= DRAGON2(dr).semeai_defense_certain
 	&& (semeai_result >= REVERSE_RESULT(acode))) {
       /* Demote the move reasons. */
-      DEBUG(goban, DEBUG_OWL, "owl: %1m ineffective owl attack on %1m (can live in semeai with %1m)\n", pos, dr, dr2);
-      add_strategical_attack_move(pos, dr);
+      DEBUG(goban, DEBUG_OWL, "owl: %1m ineffective owl attack on %1m (can live in semeai with %1m)\n",
+	    pos, dr, dr2);
+      add_strategical_attack_move(goban, pos, dr);
     }
     else {
-      add_owl_attack_move(pos, dr, kworm, acode);
+      add_owl_attack_move(goban, pos, dr, kworm, acode);
       DEBUG(goban, DEBUG_OWL, "owl: %1m attacks %1m (%s) at move %d\n",
 	    pos, dr, result_to_string(DRAGON2(dr).owl_attack_code),
-	    movenum+1);
+	    goban->move_number + 1);
     }
   }
 }
@@ -4914,30 +4986,32 @@ test_owl_attack_move(int pos, int dr, int kworm, int acode)
  */
 
 void
-owl_reasons(int color)
+owl_reasons(Goban *goban, int color)
 {
+  const Intersection *const board = goban->board;
   int pos;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!IS_STONE(board[pos])
-        || dragon[pos].origin != pos)
+	|| dragon[pos].origin != pos)
       continue;
-    
+
     if (dragon[pos].status == CRITICAL
 	&& DRAGON2(pos).owl_attack_point != NO_MOVE) {
       if (board[pos] == color) {
 	if (DRAGON2(pos).owl_defense_point != NO_MOVE) {
 	  if (DRAGON2(pos).owl_defense_code == LOSS) {
-	    add_loss_move(DRAGON2(pos).owl_defense_point, pos,
+	    add_loss_move(goban, DRAGON2(pos).owl_defense_point, pos,
 			  DRAGON2(pos).owl_defense_kworm);
-	    DEBUG(goban, DEBUG_OWL, "owl: %1m defends %1m with loss at move %d\n",
-		  DRAGON2(pos).owl_defense_point, pos, movenum+1);
+	    DEBUG(goban, DEBUG_OWL,
+		  "owl: %1m defends %1m with loss at move %d\n",
+		  DRAGON2(pos).owl_defense_point, pos, goban->move_number + 1);
 	  }
 	  else {
-	    add_owl_defense_move(DRAGON2(pos).owl_defense_point, pos,
+	    add_owl_defense_move(goban, DRAGON2(pos).owl_defense_point, pos,
 				 DRAGON2(pos).owl_defense_code);
 	    DEBUG(goban, DEBUG_OWL, "owl: %1m defends %1m at move %d\n",
-		  DRAGON2(pos).owl_defense_point, pos, movenum+1);
+		  DRAGON2(pos).owl_defense_point, pos, goban->move_number + 1);
 	  }
 	}
       }
@@ -4951,7 +5025,7 @@ owl_reasons(int color)
 	 *	  it's unfortunate to have the code duplication.
 	 */
 	int move = DRAGON2(pos).owl_attack_point;
-	
+
 	/* No worries if we catch something big. */
 	if (dragon[pos].effective_size < 8) {
 	  /* Look through the neighbors of the victim for dragons of
@@ -4977,20 +5051,20 @@ owl_reasons(int color)
 	      }
 	    }
 	  }
-	  
+
 	  /* It may occasionally happen that no neighbor of our
 	   * color was found. Assume safe in that case.
 	   */
 	  if (bpos == NO_MOVE)
 	    safe = 1;
-	  
+
 	  /* If not yet thought safe, ask the owl code whether the
 	   * owl attack defends the (largest) attacker.
 	   */
-	  if (!safe && owl_does_defend(move, bpos, &kworm) != WIN) {
+	  if (!safe && owl_does_defend(goban, move, bpos, &kworm) != WIN) {
 	    DEBUG(goban, DEBUG_OWL,
 		  "owl: %1m attacks %1m at move %d, but the attacker dies.\n",
-		  move, pos, movenum+1);
+		  move, pos, goban->move_number + 1);
 	    DRAGON2(pos).safety = INESSENTIAL;
 	    continue;
 	  }
@@ -4998,25 +5072,30 @@ owl_reasons(int color)
 
 	/* If we've reached this far, it only remains to check the move
 	 * against semeai complications. */
-	test_owl_attack_move(move, pos, DRAGON2(pos).owl_attack_kworm,
-	    		    DRAGON2(pos).owl_attack_code);
+	test_owl_attack_move(goban, move, pos, DRAGON2(pos).owl_attack_kworm,
+			    DRAGON2(pos).owl_attack_code);
       }
     }
     else if (DRAGON2(pos).owl_status == DEAD
 	     && DRAGON2(pos).owl_threat_status == CAN_THREATEN_DEFENSE) {
-      if (board[pos] == color 
+      if (board[pos] == color
 	  && DRAGON2(pos).owl_defense_point != NO_MOVE) {
-	add_owl_defense_threat_move(DRAGON2(pos).owl_defense_point, pos, WIN);
-	DEBUG(goban, DEBUG_OWL, "owl: %1m threatens to defend %1m at move %d\n", 
-	      DRAGON2(pos).owl_defense_point, pos, movenum+1);
+	add_owl_defense_threat_move(goban, DRAGON2(pos).owl_defense_point,
+				    pos, WIN);
+	DEBUG(goban, DEBUG_OWL,
+	      "owl: %1m threatens to defend %1m at move %d\n",
+	      DRAGON2(pos).owl_defense_point, pos, goban->move_number + 1);
       }
       if (board[pos] == color
 	    && DRAGON2(pos).owl_second_defense_point != NO_MOVE
 	  && is_legal(goban, DRAGON2(pos).owl_second_defense_point, color)) {
-	add_owl_defense_threat_move(DRAGON2(pos).owl_second_defense_point,
+	add_owl_defense_threat_move(goban,
+				    DRAGON2(pos).owl_second_defense_point,
 				    pos, WIN);
-	DEBUG(goban, DEBUG_OWL, "owl: %1m threatens to defend %1m at move %d\n", 
-	      DRAGON2(pos).owl_second_defense_point, pos, movenum+1);
+	DEBUG(goban, DEBUG_OWL,
+	      "owl: %1m threatens to defend %1m at move %d\n",
+	      DRAGON2(pos).owl_second_defense_point, pos,
+	      goban->move_number + 1);
       }
 
       /* If the opponent can threaten to live, an attacking
@@ -5025,52 +5104,57 @@ owl_reasons(int color)
       if (board[pos] == OTHER_COLOR(color)
 	  && DRAGON2(pos).owl_threat_status == CAN_THREATEN_DEFENSE
 	  && DRAGON2(pos).owl_attack_point != NO_MOVE) {
-	add_owl_prevent_threat_move(DRAGON2(pos).owl_attack_point, pos);
-	DEBUG(goban, DEBUG_OWL, "owl: %1m prevents a threat against %1m at move %d\n",
-	      DRAGON2(pos).owl_attack_point, pos, movenum+1);
+	add_owl_prevent_threat_move(goban, DRAGON2(pos).owl_attack_point, pos);
+	DEBUG(goban, DEBUG_OWL,
+	      "owl: %1m prevents a threat against %1m at move %d\n",
+	      DRAGON2(pos).owl_attack_point, pos, goban->move_number + 1);
       }
     }
     else if (DRAGON2(pos).owl_status == ALIVE) {
       if (board[pos] == OTHER_COLOR(color)
 	  && DRAGON2(pos).owl_threat_status == CAN_THREATEN_ATTACK) {
 	if (DRAGON2(pos).owl_attack_point != NO_MOVE) {
-	  add_owl_attack_threat_move(DRAGON2(pos).owl_attack_point, pos, WIN);
+	  add_owl_attack_threat_move(goban, DRAGON2(pos).owl_attack_point,
+				     pos, WIN);
 	  DEBUG(goban, DEBUG_OWL, "owl: %1m threatens %1m at move %d\n",
-		DRAGON2(pos).owl_attack_point, pos, movenum+1);
+		DRAGON2(pos).owl_attack_point, pos, goban->move_number + 1);
 	}
 	if (DRAGON2(pos).owl_second_attack_point != NO_MOVE
 	    && is_legal(goban, DRAGON2(pos).owl_second_attack_point, color)) {
-	  add_owl_attack_threat_move(DRAGON2(pos).owl_second_attack_point, pos,
-				     WIN);
+	  add_owl_attack_threat_move(goban,
+				     DRAGON2(pos).owl_second_attack_point,
+				     pos, WIN);
 	  DEBUG(goban, DEBUG_OWL, "owl: %1m threatens %1m at move %d\n",
-		DRAGON2(pos).owl_second_attack_point, pos, movenum+1);
+		DRAGON2(pos).owl_second_attack_point, pos,
+		goban->move_number + 1);
 	}
       }
       else if (board[pos] == OTHER_COLOR(color)
 	       && DRAGON2(pos).owl_attack_point != NO_MOVE
 	       && DRAGON2(pos).owl_attack_code == GAIN) {
-	add_owl_attack_move(DRAGON2(pos).owl_attack_point, pos,
-		            DRAGON2(pos).owl_attack_kworm, GAIN);
-	DEBUG(goban, DEBUG_OWL, "owl: %1m attacks %1m with gain at move %d\n", 
-	      DRAGON2(pos).owl_attack_point, pos, movenum+1);
+	add_owl_attack_move(goban, DRAGON2(pos).owl_attack_point, pos,
+			    DRAGON2(pos).owl_attack_kworm, GAIN);
+	DEBUG(goban, DEBUG_OWL, "owl: %1m attacks %1m with gain at move %d\n",
+	      DRAGON2(pos).owl_attack_point, pos, goban->move_number + 1);
       }
       else if (board[pos] == color
 	       && DRAGON2(pos).owl_defense_point != NO_MOVE
 	       && DRAGON2(pos).owl_defense_code == LOSS) {
-	add_loss_move(DRAGON2(pos).owl_defense_point, pos,
+	add_loss_move(goban, DRAGON2(pos).owl_defense_point, pos,
 		      DRAGON2(pos).owl_defense_kworm);
 	DEBUG(goban, DEBUG_OWL, "owl: %1m defends %1m with loss at move %d\n",
-	      DRAGON2(pos).owl_defense_point, pos, movenum+1);
+	      DRAGON2(pos).owl_defense_point, pos, goban->move_number + 1);
       }
       else if (board[pos] == color
 	       && DRAGON2(pos).owl_attack_point != NO_MOVE
 	       && DRAGON2(pos).owl_attack_code == GAIN
 	       && DRAGON2(pos).owl_defense_code == WIN
 	       && DRAGON2(pos).owl_defense_point != NO_MOVE) {
-	add_owl_defense_move(DRAGON2(pos).owl_defense_point, pos,
+	add_owl_defense_move(goban, DRAGON2(pos).owl_defense_point, pos,
 			     DRAGON2(pos).owl_defense_code);
-	DEBUG(goban, DEBUG_OWL, "owl: %1m defends %1m against possible loss at move %d\n",
-	      DRAGON2(pos).owl_defense_point, pos, movenum+1);
+	DEBUG(goban, DEBUG_OWL,
+	      "owl: %1m defends %1m against possible loss at move %d\n",
+	      DRAGON2(pos).owl_defense_point, pos, goban->move_number + 1);
 
       }
       /* The owl code found the friendly dragon alive, but was uncertain,
@@ -5081,10 +5165,11 @@ owl_reasons(int color)
 	       && !DRAGON2(pos).owl_attack_certain
 	       && DRAGON2(pos).owl_defense_certain
 	       && ON_BOARD(goban, DRAGON2(pos).owl_defense_point)) {
-	add_owl_uncertain_defense_move(DRAGON2(pos).owl_defense_point, pos);
-	DEBUG(goban, DEBUG_OWL, 
+	add_owl_uncertain_defense_move(goban, DRAGON2(pos).owl_defense_point,
+				       pos);
+	DEBUG(goban, DEBUG_OWL,
 	      "owl: %1m defends the uncertain dragon at %1m at move %d\n",
-	      DRAGON2(pos).owl_defense_point, pos, movenum+1);
+	      DRAGON2(pos).owl_defense_point, pos, goban->move_number + 1);
       }
     }
 
@@ -5096,10 +5181,11 @@ owl_reasons(int color)
 	     && board[pos] == OTHER_COLOR(color)
 	     && !DRAGON2(pos).owl_attack_certain
 	     && ON_BOARD(goban, DRAGON2(pos).owl_attack_point)) {
-      add_owl_uncertain_defense_move(DRAGON2(pos).owl_attack_point, pos);
+      add_owl_uncertain_defense_move(goban, DRAGON2(pos).owl_attack_point,
+				     pos);
       DEBUG(goban, DEBUG_OWL,
 	    "owl: %1m might defend the uncertain dragon at %1m at move %d\n",
-	    DRAGON2(pos).owl_attack_point, pos, movenum+1);
+	    DRAGON2(pos).owl_attack_point, pos, goban->move_number + 1);
     }
   }
 }
@@ -5107,15 +5193,15 @@ owl_reasons(int color)
 /* Use the owl code to determine whether the move at (move) makes
  * the dragon at (target) owl safe. This is used to test whether
  * tactical defenses are strategically viable and whether a vital eye
- * point does kill an owl critical dragon. 
+ * point does kill an owl critical dragon.
  *
  * Should be called only when stackp==0.
  */
 
 int
-owl_does_defend(int move, int target, int *kworm)
+owl_does_defend(Goban *goban, int move, int target, int *kworm)
 {
-  int color = board[target];
+  int color = goban->board[target];
   int result = 0;
   struct local_owl_data *owl;
   int reading_nodes_when_called = get_reading_node_counter();
@@ -5146,15 +5232,15 @@ owl_does_defend(int move, int target, int *kworm)
       popgo(goban);
       return REVERSE_RESULT(result);
     }
-    
+
     /*
      * FIXME: (move) will be added to the goal dragon although we
      * do not know whether it is really connected.
      */
-    init_owl(&owl, target, NO_MOVE, move, 1, NULL);
-    prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
+    init_owl(goban, &owl, target, NO_MOVE, move, 1, NULL);
+    prepare_goal_list(goban, target, owl, owl_goal_worm, &goal_worms_computed,
 		      kworm, 0);
-    acode = do_owl_attack(target, NULL, &wid, owl, 0);
+    acode = do_owl_attack(goban, target, NULL, &wid, owl, 0);
     finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
     result = REVERSE_RESULT(acode);
     popgo(goban);
@@ -5171,7 +5257,7 @@ owl_does_defend(int move, int target, int *kworm)
 
   store_persistent_owl_cache(goban, OWL_DOES_DEFEND, move, target, 0,
 			     result, wpos, 0, 0,
-			     tactical_nodes, owl->goal, board[target]);
+			     tactical_nodes, owl->goal, goban->board[target]);
 
   if (kworm)
     *kworm = wpos;
@@ -5188,9 +5274,10 @@ owl_does_defend(int move, int target, int *kworm)
  */
 
 int
-owl_confirm_safety(int move, int target, int *defense_point, int *kworm)
+owl_confirm_safety(Goban *goban, int move, int target, int *defense_point,
+		   int *kworm)
 {
-  int color = board[target];
+  int color = goban->board[target];
   int result = 0;
   struct local_owl_data *owl;
   int reading_nodes_when_called = get_reading_node_counter();
@@ -5227,11 +5314,11 @@ owl_confirm_safety(int move, int target, int *defense_point, int *kworm)
       else
 	return 0;
     }
-    
-    init_owl(&owl, target, NO_MOVE, move, 1, NULL);
-    prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
+
+    init_owl(goban, &owl, target, NO_MOVE, move, 1, NULL);
+    prepare_goal_list(goban, target, owl, owl_goal_worm, &goal_worms_computed,
 		      kworm, 0);
-    acode = do_owl_attack(target, &defense, &wid, owl, 0);
+    acode = do_owl_attack(goban, target, &defense, &wid, owl, 0);
     finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
     if (acode == 0)
       result = WIN;
@@ -5252,7 +5339,7 @@ owl_confirm_safety(int move, int target, int *defense_point, int *kworm)
 
   store_persistent_owl_cache(goban, OWL_CONFIRM_SAFETY, move, target, 0,
 			     result, defense, wpos, 0,
-			     tactical_nodes, owl->goal, board[target]);
+			     tactical_nodes, owl->goal, goban->board[target]);
 
   if (defense_point)
     *defense_point = defense;
@@ -5270,9 +5357,9 @@ owl_confirm_safety(int move, int target, int *defense_point, int *kworm)
  */
 
 int
-owl_does_attack(int move, int target, int *kworm)
+owl_does_attack(Goban *goban, int move, int target, int *kworm)
 {
-  int color = board[target];
+  int color = goban->board[target];
   int other = OTHER_COLOR(color);
   int result = 0;
   struct local_owl_data *owl;
@@ -5302,7 +5389,7 @@ owl_does_attack(int move, int target, int *kworm)
    * some stones of the goal dragon from the board.
    */
 #if 1
-  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1, NULL);
+  init_owl(goban, &owl, target, NO_MOVE, NO_MOVE, 1, NULL);
 #endif
 
   if (trymove(goban, move, other, "owl_does_attack", target)) {
@@ -5316,21 +5403,21 @@ owl_does_attack(int move, int target, int *kworm)
 #if 0
     local_owl_node_counter = 0;
     owl->lunches_are_current = 0;
-    owl_mark_dragon(target, NO_MOVE, owl);
+    owl_mark_dragon(goban, target, NO_MOVE, owl);
 #endif
-    owl_update_boundary_marks(move, owl);
+    owl_update_boundary_marks(goban, move, owl);
 #if 0
-    compute_owl_escape_values(owl);
+    compute_owl_escape_values(goban, owl);
 #endif
     /* FIXME: Should also check if part of the dragon was captured,
      *        like do_owl_attack() does.
      */
-    if (board[target] == EMPTY)
+    if (goban->board[target] == EMPTY)
       dcode = 0;
     else {
-      prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
-	                 kworm, 0);
-      dcode = do_owl_defend(target, NULL, &wid, owl, 0);
+      prepare_goal_list(goban, target, owl, owl_goal_worm, &goal_worms_computed,
+			kworm, 0);
+      dcode = do_owl_defend(goban, target, NULL, &wid, owl, 0);
       finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
     }
     result = REVERSE_RESULT(dcode);
@@ -5349,7 +5436,7 @@ owl_does_attack(int move, int target, int *kworm)
 
   store_persistent_owl_cache(goban, OWL_DOES_ATTACK, move, target, 0,
 			     result, wpos, 0, 0,
-			     tactical_nodes, owl->goal, board[target]);
+			     tactical_nodes, owl->goal, goban->board[target]);
 
   if (kworm)
     *kworm = wpos;
@@ -5363,9 +5450,9 @@ owl_does_attack(int move, int target, int *kworm)
  */
 
 int
-owl_connection_defends(int move, int target1, int target2)
+owl_connection_defends(Goban *goban, int move, int target1, int target2)
 {
-  int color = board[target1];
+  int color = goban->board[target1];
   int result = 0;
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
@@ -5375,7 +5462,7 @@ owl_connection_defends(int move, int target1, int target2)
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
 
-  ASSERT1(goban, board[target2] == color, target2);
+  ASSERT1(goban, goban->board[target2] == color, target2);
   TRACE(goban, "owl_connection_defends %1m %1m %1m\n", move, target1, target2);
 
   if (worm[target1].unconditional_status == DEAD)
@@ -5387,23 +5474,24 @@ owl_connection_defends(int move, int target1, int target2)
 				  target2, &result, NULL, NULL, NULL))
     return result;
 
-  init_owl(&owl, target1, target2, NO_MOVE, 1, NULL);
+  init_owl(goban, &owl, target1, target2, NO_MOVE, 1, NULL);
 
   if (trymove(goban, move, color, "owl_connection_defends", target1)) {
-    owl_update_goal(move, 1, NO_MOVE, owl, 0);
-    if (!do_owl_attack(move, NULL, NULL, owl, 0))
+    owl_update_goal(goban, move, 1, NO_MOVE, owl, 0);
+    if (!do_owl_attack(goban, move, NULL, NULL, owl, 0))
       result = WIN;
     owl->lunches_are_current = 0;
     popgo(goban);
   }
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
-  
+
   DEBUG(goban, DEBUG_OWL_PERFORMANCE,
 	"owl_conn_defends %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
 	move, target1, target2, result, local_owl_node_counter,
 	tactical_nodes, gg_cputime() - start);
 
-  store_persistent_owl_cache(goban, OWL_CONNECTION_DEFENDS, move, target1, target2,
+  store_persistent_owl_cache(goban, OWL_CONNECTION_DEFENDS,
+			     move, target1, target2,
 			     result, 0, 0, 0, tactical_nodes,
 			     owl->goal, color);
 
@@ -5492,8 +5580,9 @@ owl_connection_defends(int move, int target1, int target2)
  */
 
 static void
-owl_find_lunches(struct local_owl_data *owl)
+owl_find_lunches(Goban *goban, struct local_owl_data *owl)
 {
+  const Intersection *const board = goban->board;
   int k;
   int pos;
   int lunches = 0;
@@ -5506,16 +5595,14 @@ owl_find_lunches(struct local_owl_data *owl)
   int color = owl->color;
   int other = OTHER_COLOR(color);
   char already_checked[BOARDMAX];
+  SGF_dump_data sgf_dump_save;
 
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
-    
-  sgf_dumptree = NULL;
-  count_variations = 0;
+  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+
   for (prevlunch = 0; prevlunch < MAX_LUNCHES; prevlunch++)
     owl->lunch[prevlunch] = NO_MOVE;
   memset(owl->inessential, 0, sizeof(owl->inessential));
-  
+
   memset(already_checked, 0, sizeof(already_checked));
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] == color && owl->goal[pos]) {
@@ -5550,8 +5637,7 @@ owl_find_lunches(struct local_owl_data *owl)
 	    owl->lunch_defense_point[lunches] = NO_MOVE;
 	  lunches++;
 	  if (lunches == MAX_LUNCHES) {
-	    sgf_dumptree = save_sgf_dumptree;
-	    count_variations = save_count_variations;
+	    RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 	    owl->lunches_are_current = 1;
 	    return;
 	  }
@@ -5659,8 +5745,7 @@ owl_find_lunches(struct local_owl_data *owl)
   }
 
   owl->lunches_are_current = 1;
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
+  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 }
 
 
@@ -5679,9 +5764,9 @@ owl_find_lunches(struct local_owl_data *owl)
  * In all these position the attack point is moved from ',' to '*'.
  */
 static int
-improve_lunch_attack(int lunch, int attack_point)
+improve_lunch_attack(Goban *goban, int lunch, int attack_point)
 {
-  int color = OTHER_COLOR(board[lunch]);
+  int color = OTHER_COLOR(goban->board[lunch]);
   int defense_point;
   int k;
 
@@ -5700,7 +5785,7 @@ improve_lunch_attack(int lunch, int attack_point)
 	for (k = 0; k < 4; k++) {
 	  int apos = attack_point + delta[k];
 	  if (!ON_BOARD(goban, attack_point - delta[k])
-	      && board[apos] == EMPTY) {
+	      && goban->board[apos] == EMPTY) {
 	    if (does_attack(goban, apos, lunch)
 		&& safe_move(goban, apos, color))
 	      return apos;
@@ -5715,7 +5800,7 @@ improve_lunch_attack(int lunch, int attack_point)
 
   for (k = 0; k < 4; k++) {
     int pos = attack_point + delta[k];
-    if (board[pos] == color
+    if (goban->board[pos] == color
 	&& attack(goban, pos, NULL)
 	&& find_defense(goban, pos, &defense_point)
 	&& defense_point != NO_MOVE
@@ -5725,7 +5810,7 @@ improve_lunch_attack(int lunch, int attack_point)
       return defense_point;
     }
   }
-  
+
   return attack_point;
 }
 
@@ -5744,18 +5829,18 @@ improve_lunch_attack(int lunch, int attack_point)
  * ------+	------+
  */
 static int
-improve_lunch_defense(int lunch, int defense_point)
+improve_lunch_defense(Goban *goban, int lunch, int defense_point)
 {
-  int color = board[lunch];
+  int color = goban->board[lunch];
   int k;
-  
+
   for (k = 0; k < 4; k++) {
     int pos = defense_point + delta[k];
-    if (board[pos] == OTHER_COLOR(color)
+    if (goban->board[pos] == OTHER_COLOR(color)
 	&& countlib(goban, pos) == 2) {
       int libs[2];
       int pos2;
-      
+
       findlib(goban, pos, 2, libs);
       if (libs[0] == defense_point)
 	pos2 = libs[1];
@@ -5771,7 +5856,7 @@ improve_lunch_defense(int lunch, int defense_point)
       }
     }
   }
-  
+
   return defense_point;
 }
 
@@ -5784,48 +5869,50 @@ improve_lunch_defense(int lunch, int defense_point)
  */
 
 static void
-owl_make_domains(struct local_owl_data *owla, struct local_owl_data *owlb)
+owl_make_domains(Goban *goban,
+		 struct local_owl_data *owla, struct local_owl_data *owlb)
 {
   /* We need to set this so that owl_lively() can be used. */
   struct eye_data *black_eye = NULL;
   struct eye_data *white_eye = NULL;
-  
+
   current_owl_data = owla;
   other_owl_data = owlb;
 
   if (!owla->lunches_are_current)
-    owl_find_lunches(owla);
+    owl_find_lunches(goban, owla);
   if (owla->color == BLACK)
     black_eye = owla->my_eye;
   else
     white_eye = owla->my_eye;
-  
+
   if (owlb) {
     gg_assert(goban, owla->color == OTHER_COLOR(owlb->color));
     if (!owlb->lunches_are_current)
-      owl_find_lunches(owlb);
+      owl_find_lunches(goban, owlb);
     if (owlb->color == BLACK)
       black_eye = owlb->my_eye;
     else
       white_eye = owlb->my_eye;
   }
-  make_domains(black_eye, white_eye, 1);
+
+  make_domains(goban, black_eye, white_eye, 1);
 }
 
-/* True unless (pos) is EMPTY or occupied by a lunch for the goal dragon.  
+/* True unless (pos) is EMPTY or occupied by a lunch for the goal dragon.
  * Used during make_domains (see optics.c: lively macro). A ``lively''
- * worm is one that might be alive, hence cannot be ignored in 
+ * worm is one that might be alive, hence cannot be ignored in
  * determining eye spaces.
  */
 
-int 
-owl_lively(int pos)
+int
+owl_lively(const Goban *goban, int pos)
 {
   int origin;
   int lunch;
   ASSERT_ON_BOARD1(goban, pos);
 
-  if (board[pos] == EMPTY)
+  if (goban->board[pos] == EMPTY)
     return 0;
   origin = find_origin(goban, pos);
 
@@ -5841,8 +5928,8 @@ owl_lively(int pos)
 
     if (include_semeai_worms_in_eyespace && other_owl_data->goal[pos])
       return 0;
-    
-    if (other_owl_data->goal[pos] && !semeai_trust_tactical_attack(pos))
+
+    if (other_owl_data->goal[pos] && !semeai_trust_tactical_attack(goban, pos))
       return 1;
     /* FIXME: Shouldn't we check other_owl_data->inessential[origin] here? */
     for (lunch = 0; lunch < MAX_LUNCHES; lunch++)
@@ -5875,7 +5962,7 @@ owl_lively(int pos)
  */
 
 static int
-owl_safe_move(int move, int color)
+owl_safe_move(Goban *goban, int move, int color)
 {
   int acode, safe = 0;
 
@@ -5890,7 +5977,7 @@ owl_safe_move(int move, int color)
   current_owl_data->safe_move_cache[move] = safe+1;
   return safe;
 }
-  
+
 
 /* This function, called when stackp==0, returns true if capturing
  * the string at (str) results in a live group.
@@ -5899,7 +5986,7 @@ owl_safe_move(int move, int color)
 #define MAX_SUBSTANTIAL_LIBS 10
 
 int
-owl_substantial(int str)
+owl_substantial(Goban *goban, int str)
 {
   int k;
   int libs[MAX_SUBSTANTIAL_LIBS + 1];
@@ -5918,9 +6005,9 @@ owl_substantial(int str)
    */
   reduced_init_owl(&owl, 1);
 
-  owl->color = OTHER_COLOR(board[str]);
+  owl->color = OTHER_COLOR(goban->board[str]);
   local_owl_node_counter = 0;
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
 
   /* Big strings are always substantial since the biggest nakade is
    * six stones. (There are probably rare exceptions to this
@@ -5928,7 +6015,7 @@ owl_substantial(int str)
    */
   if (countstones(goban, str) > 6)
     return 1;
-  
+
   if (liberties > MAX_SUBSTANTIAL_LIBS)
     return 0;
 
@@ -5943,7 +6030,7 @@ owl_substantial(int str)
     for (k = 0; k < adj; k++) {
       if (dragon[adjs[k]].status == ALIVE)
 	return 1;
-      mark_dragon(adjs[k], owl->goal, 1);
+      mark_dragon(goban, adjs[k], owl->goal, 1);
     }
   }
 
@@ -5972,7 +6059,7 @@ owl_substantial(int str)
       }
       else {
 	/* Can't fill the liberties. Give up! */
-	while (stackp > 0) {
+	while (goban->stackp > 0) {
 	  if (level >= 8)
 	    decrease_depth_values();
 	  popgo(goban);
@@ -5984,15 +6071,15 @@ owl_substantial(int str)
   /* FIXME: We would want to use init_owl() here too, but it doesn't
    * fit very well with the construction of the goal array above.
    */
-  compute_owl_escape_values(owl);
-  owl_mark_boundary(owl);
+  compute_owl_escape_values(goban, owl);
+  owl_mark_boundary(goban, owl);
   owl->lunches_are_current = 0;
 
-  if (do_owl_attack(libs[0], NULL, NULL, owl, 0))
+  if (do_owl_attack(goban, libs[0], NULL, NULL, owl, 0))
     result = 0;
   else
     result = 1;
-  while (stackp > 0) {
+  while (goban->stackp > 0) {
     if (level >= 8)
       decrease_depth_values();
     popgo(goban);
@@ -6015,13 +6102,15 @@ owl_substantial(int str)
 
 /* Returns true if and only if (i, j) is a 1-2 vertex, i.e. next to a
  * corner.
+ *
+ * FIXME: Doesn't belong to `owl.c'.
  */
 static int
-one_two_point(int pos)
+one_two_point(int board_size, int pos)
 {
   int i = I(pos);
   int j = J(pos);
-  
+
   if ((i == 0 || i == board_size-1 || j == 0 || j == board_size-1)
       && (i == 1 || i == board_size-2 || j == 1 || j == board_size-2))
     return 1;
@@ -6038,15 +6127,15 @@ one_two_point(int pos)
  */
 
 static void
-sniff_lunch(int lunch, int *min, int *probable, int *max,
+sniff_lunch(Goban *goban, int lunch, int *min, int *probable, int *max,
 	    struct local_owl_data *owl)
 {
-  int other = OTHER_COLOR(board[lunch]);
+  int other = OTHER_COLOR(goban->board[lunch]);
   int libs[MAXLIBS];
   int liberties;
   int r;
 
-  ASSERT1(goban, IS_STONE(board[lunch]), lunch);
+  ASSERT1(goban, IS_STONE(goban->board[lunch]), lunch);
 
   if (owl->boundary[lunch] == 2) {
     *min = 2;
@@ -6062,7 +6151,8 @@ sniff_lunch(int lunch, int *min, int *probable, int *max,
 	&& !is_self_atari(goban, libs[r], other)) {
       int k;
       for (k = 0; k < 8; k++)
-	if (ON_BOARD(goban, libs[r] + delta[k]) && owl->goal[libs[r] + delta[k]])
+	if (ON_BOARD(goban, libs[r] + delta[k])
+	    && owl->goal[libs[r] + delta[k]])
 	  break;
       if (k == 8) {
 	*min = 2;
@@ -6073,17 +6163,17 @@ sniff_lunch(int lunch, int *min, int *probable, int *max,
     }
   }
 
-  estimate_lunch_eye_value(lunch, min, probable, max, 1);
+  estimate_lunch_eye_value(goban, lunch, min, probable, max, 1);
 
   if (*min < 2) {
-    int bonus = estimate_lunch_half_eye_bonus(lunch, owl->half_eye);
+    int bonus = estimate_lunch_half_eye_bonus(goban, lunch, owl->half_eye);
     *min += bonus/2;
     *probable += bonus;
     *max += (bonus + 1)/2;
   }
 
   if (*probable < 2)
-    eat_lunch_escape_bonus(lunch, min, probable, max, owl);
+    eat_lunch_escape_bonus(goban, lunch, min, probable, max, owl);
 }
 
 /* Capturing a lunch can give eyes by turning a false eye into a proper one,
@@ -6091,8 +6181,8 @@ sniff_lunch(int lunch, int *min, int *probable, int *max,
  * by capturing the string at (lunch).
  */
 static int
-estimate_lunch_half_eye_bonus(int lunch,
-    			      struct half_eye_data half_eye[BOARDMAX])
+estimate_lunch_half_eye_bonus(const Goban *goban, int lunch,
+			      struct half_eye_data half_eye[BOARDMAX])
 {
   int stones[10];
   int k;
@@ -6116,10 +6206,11 @@ estimate_lunch_half_eye_bonus(int lunch,
 
 
 void
-estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
+estimate_lunch_eye_value(Goban *goban, int lunch,
+			 int *min, int *probable, int *max,
 			 int appreciate_one_two_lunches)
 {
-  int other = OTHER_COLOR(board[lunch]);
+  int other = OTHER_COLOR(goban->board[lunch]);
   int size = countstones(goban, lunch);
 
   if (size > 6) {
@@ -6141,10 +6232,11 @@ estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
     int stones[2];
     findstones(goban, lunch, 2, stones);
     /* A lunch on a 1-2 point tends always to be worth contesting. */
-    if ((obvious_false_eye(stones[0], other)
-	|| obvious_false_eye(stones[1], other))
+    if ((obvious_false_eye(goban, stones[0], other)
+	 || obvious_false_eye(goban, stones[1], other))
 	&& (!appreciate_one_two_lunches
-	    || !(one_two_point(stones[0]) || one_two_point(stones[1])))) {
+	    || !(one_two_point(goban->board_size, stones[0])
+		 || one_two_point(goban->board_size, stones[1])))) {
       *min = 0;
       *probable = 0;
       *max = 0;
@@ -6156,7 +6248,7 @@ estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
     }
   }
   else if (size == 1) {
-    if (!obvious_false_eye(lunch, other)) {
+    if (!obvious_false_eye(goban, lunch, other)) {
       *min = 0;
       *probable = 1;
       *max = 1;
@@ -6174,12 +6266,13 @@ estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
  * the same time. This is indicated in some situations where the owl
  * code would stop the analysis because of various cutoffs. See
  * do_owl_defend()
- * 
+ *
  * The following implementation tries to get a precise idea of the
  * escape potential improvement by calling dragon_escape() twice.
  */
 static void
-eat_lunch_escape_bonus(int lunch, int *min, int *probable, int *max,
+eat_lunch_escape_bonus(Goban *goban, int lunch,
+		       int *min, int *probable, int *max,
 		       struct local_owl_data *owl)
 {
   int adjacent[MAXCHAIN];
@@ -6190,18 +6283,18 @@ eat_lunch_escape_bonus(int lunch, int *min, int *probable, int *max,
    * See owl_estimate_life() for details.
    */
   UNUSED(min);
-  
+
   /* Don't mess up with kos */
   if (is_ko_point(goban, lunch))
     return;
-  
+
   neighbors = chainlinks(goban, lunch, adjacent);
   for (n = 0; n < neighbors; n++)
     adjoins |= !owl->goal[adjacent[n]];
-  
+
   if (adjoins) {
     int before, after;
-    before = dragon_escape(owl->goal, owl->color, owl->escape_values);
+    before = dragon_escape(goban, owl->goal, owl->color, owl->escape_values);
     /* if the escape route is already large enough to be considered
      * a WIN by the owl code, then no need for more */
     if (before < 5) {
@@ -6210,8 +6303,8 @@ eat_lunch_escape_bonus(int lunch, int *min, int *probable, int *max,
       for (n = 0; n < neighbors; n++)
 	if (!owl->goal[adjacent[n]])
 	  mark_string(goban, adjacent[n], new_goal, 2);
-      after = dragon_escape(new_goal, owl->color, owl->escape_values);
-	
+      after = dragon_escape(goban, new_goal, owl->color, owl->escape_values);
+
       /* Following is completely ad hoc. Another set of tests might
        * very well get better results. */
       if (after - before >= 3) {
@@ -6226,7 +6319,7 @@ eat_lunch_escape_bonus(int lunch, int *min, int *probable, int *max,
   }
 }
 
- 
+
 /* Retrieve topological eye values stored in the half_eye[] array of
  * the current owl data.
  *
@@ -6255,31 +6348,31 @@ owl_topological_eye(int pos, int color)
  */
 
 int
-vital_chain(int pos)
+vital_chain(Goban *goban, int pos)
 {
   int min;
   int probable;
   int max;
-  sniff_lunch(pos, &min, &probable, &max, current_owl_data);
+  sniff_lunch(goban, pos, &min, &probable, &max, current_owl_data);
 
   return max;
 }
 
 
 static void
-compute_owl_escape_values(struct local_owl_data *owl)
+compute_owl_escape_values(Goban *goban, struct local_owl_data *owl)
 {
   int pos;
   int m, n;
   char safe_stones[BOARDMAX];
-  
-  get_lively_stones(OTHER_COLOR(owl->color), safe_stones);
-  compute_escape_influence(owl->color, safe_stones, NULL, NULL,
+
+  get_lively_stones(goban, OTHER_COLOR(owl->color), safe_stones);
+  compute_escape_influence(goban, owl->color, safe_stones, NULL, NULL,
 			   owl->escape_values);
 
   DEBUG(goban, DEBUG_ESCAPE, "Owl escape values:\n");
-  for (m = 0; m < board_size; m++) {
-    for (n = 0; n < board_size; n++) {
+  for (m = 0; m < goban->board_size; m++) {
+    for (n = 0; n < goban->board_size; n++) {
       pos = POS(m, n);
       if (dragon[pos].color == owl->color && !owl->goal[pos]) {
 	if (dragon[pos].crude_status == ALIVE)
@@ -6295,15 +6388,15 @@ compute_owl_escape_values(struct local_owl_data *owl)
 	      char escape_values[BOARDMAX];
 	      char dragon[BOARDMAX];
 
-	      compute_escape_influence(owl->color, safe_stones, owl->goal, NULL,
-				       escape_values);
+	      compute_escape_influence(goban, owl->color, safe_stones,
+				       owl->goal, NULL, escape_values);
 
 	      for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
 		if (ON_BOARD(goban, pos2))
-		  dragon[pos2] = is_same_dragon(pos2, pos);
+		  dragon[pos2] = is_same_dragon(goban, pos2, pos);
 	      }
 
-	      if (dragon_escape(dragon, owl->color, escape_values) > 5)
+	      if (dragon_escape(goban, dragon, owl->color, escape_values) > 5)
 		owl->escape_values[pos] = 4;
 	    }
 	  }
@@ -6318,9 +6411,9 @@ compute_owl_escape_values(struct local_owl_data *owl)
 
 /* Used by autohelpers. */
 int
-owl_escape_value(int pos)
+owl_escape_value(Goban *goban, int pos)
 {
-  /* FIXME: Should have a more robust mechanism to avoid 
+  /* FIXME: Should have a more robust mechanism to avoid
    * escaping inwards. Returning a negative value is just a kludge.
    */
   int k;
@@ -6328,11 +6421,12 @@ owl_escape_value(int pos)
   if (current_owl_data->goal[pos])
     return -10;
 
-  if (board[pos] == EMPTY)
+  if (goban->board[pos] == EMPTY)
     for (k = 0; k < 8; k++)
-      if (ON_BOARD(goban, pos + delta[k]) && current_owl_data->goal[pos + delta[k]])
+      if (ON_BOARD(goban, pos + delta[k])
+	  && current_owl_data->goal[pos + delta[k]])
 	return -10;
-  
+
   return current_owl_data->escape_values[pos];
 }
 
@@ -6349,11 +6443,11 @@ owl_goal_dragon(int pos)
  * under owl investigation.
  */
 int
-owl_eyespace(int pos)
+owl_eyespace(const Goban *goban, int pos)
 {
   int origin;
   ASSERT_ON_BOARD1(goban, pos);
-  
+
   origin = current_owl_data->my_eye[pos].origin;
   return (ON_BOARD(goban, origin)
 	  && (current_owl_data->my_eye[origin].color
@@ -6367,13 +6461,13 @@ owl_eyespace(int pos)
  * under owl investigation, which is possibly worth (at least) 2 eyes.
  */
 int
-owl_big_eyespace(int pos)
+owl_big_eyespace(const Goban *goban, int pos)
 {
   int origin;
   ASSERT_ON_BOARD1(goban, pos);
 
   origin = current_owl_data->my_eye[pos].origin;
-  return (ON_BOARD(goban, origin) 
+  return (ON_BOARD(goban, origin)
 	  && (current_owl_data->my_eye[origin].color
 	      == current_owl_data->color)
 	  && max_eyes(&current_owl_data->my_eye[origin].value) >= 2);
@@ -6385,17 +6479,17 @@ owl_big_eyespace(int pos)
  * under owl investigation.
  */
 int
-owl_mineye(int pos)
+owl_mineye(const Goban *goban, int pos)
 {
   int origin;
   ASSERT_ON_BOARD1(goban, pos);
-  
+
   origin = current_owl_data->my_eye[pos].origin;
   if (!ON_BOARD(goban, origin)
       || (current_owl_data->my_eye[origin].color
 	  != current_owl_data->color))
     return 0;
-      
+
   return min_eyes(&current_owl_data->my_eye[origin].value);
 }
 
@@ -6405,17 +6499,17 @@ owl_mineye(int pos)
  * under owl investigation.
  */
 int
-owl_maxeye(int pos)
+owl_maxeye(const Goban *goban, int pos)
 {
   int origin;
   ASSERT_ON_BOARD1(goban, pos);
-  
+
   origin = current_owl_data->my_eye[pos].origin;
   if (!ON_BOARD(goban, origin)
       || (current_owl_data->my_eye[origin].color
 	  != current_owl_data->color))
     return 0;
-      
+
   return max_eyes(&current_owl_data->my_eye[origin].value);
 }
 
@@ -6425,7 +6519,7 @@ owl_maxeye(int pos)
  * dragon currently under owl investigation.
  */
 int
-owl_proper_eye(int pos)
+owl_proper_eye(const Goban *goban, int pos)
 {
   ASSERT_ON_BOARD1(goban, pos);
 
@@ -6433,13 +6527,13 @@ owl_proper_eye(int pos)
 	   == current_owl_data->color)
 	  && !current_owl_data->my_eye[pos].marginal);
 }
-  
+
 
 /* Used by autohelpers.
  * Returns the effective size of the eyespace at pos.
  */
 int
-owl_eye_size(int pos)
+owl_eye_size(const Goban *goban, int pos)
 {
   int origin;
   ASSERT_ON_BOARD1(goban, pos);
@@ -6448,13 +6542,13 @@ owl_eye_size(int pos)
   return current_owl_data->my_eye[origin].esize
 	 - current_owl_data->my_eye[origin].msize;
 }
-  
+
 
 /* Used by autohelpers.
  * Returns whether str is a lunch.
  */
 int
-owl_lunch(int str)
+owl_lunch(const Goban *goban, int str)
 {
   int k;
   int origin;
@@ -6471,7 +6565,7 @@ owl_lunch(int str)
 
   return 0;
 }
-  
+
 
 /* Used by autohelpers.
 
@@ -6485,21 +6579,21 @@ owl_lunch(int str)
  * (pos) must not be part of the goal dragon.
  */
 int
-owl_strong_dragon(int pos)
+owl_strong_dragon(const Goban *goban, int pos)
 {
   ASSERT_ON_BOARD1(goban, pos);
-  ASSERT1(goban, IS_STONE(board[pos]), pos);
-  
+  ASSERT1(goban, IS_STONE(goban->board[pos]), pos);
+
   return (!current_owl_data->goal[pos]
-	  && dragon[pos].color == board[pos]
+	  && dragon[pos].color == goban->board[pos]
 	  && dragon[pos].crude_status == ALIVE);
 }
-  
+
 
 static int
-owl_escape_route(struct local_owl_data *owl)
+owl_escape_route(Goban *goban, struct local_owl_data *owl)
 {
-  return dragon_escape(owl->goal, owl->color, owl->escape_values);
+  return dragon_escape(goban, owl->goal, owl->color, owl->escape_values);
 }
 
 
@@ -6529,17 +6623,18 @@ reduced_init_owl(struct local_owl_data **owl, int at_bottom_of_stack)
  * need more than one set of owl data).
  */
 static void
-init_owl(struct local_owl_data **owl, int target1, int target2, int move,
-         int at_bottom_of_stack, int new_dragons[BOARDMAX])
+init_owl(Goban *goban, struct local_owl_data **owl,
+	 int target1, int target2, int move, int at_bottom_of_stack,
+	 int new_dragons[BOARDMAX])
 {
   reduced_init_owl(owl, at_bottom_of_stack);
 
   local_owl_node_counter = 0;
   (*owl)->lunches_are_current = 0;
-  owl_mark_dragon(target1, target2, *owl, new_dragons);
+  owl_mark_dragon(goban, target1, target2, *owl, new_dragons);
   if (move != NO_MOVE)
-    owl_update_goal(move, 1, NO_MOVE, *owl, 0);
-  compute_owl_escape_values(*owl);
+    owl_update_goal(goban, move, 1, NO_MOVE, *owl, 0);
+  compute_owl_escape_values(goban, *owl);
 }
 
 
@@ -6553,7 +6648,7 @@ check_owl_stack_size(void)
 {
   while (owl_stack_size <= owl_stack_pointer) {
     owl_stack[owl_stack_size] = malloc(sizeof(*owl_stack[0]));
-    gg_assert(goban, owl_stack[owl_stack_size] != NULL);
+    gg_assert(NULL, owl_stack[owl_stack_size] != NULL);
     owl_stack_size++;
   }
 }
@@ -6618,7 +6713,8 @@ pop_owl(struct local_owl_data **owl)
  * (GAIN/LOSS codes)
  */
 static int
-list_goal_worms(struct local_owl_data *owl, int goal_worm[MAX_GOAL_WORMS])
+list_goal_worms(const Goban *goban, struct local_owl_data *owl,
+		int goal_worm[MAX_GOAL_WORMS])
 {
   int pos, k;
   int w = 0;
@@ -6628,11 +6724,11 @@ list_goal_worms(struct local_owl_data *owl, int goal_worm[MAX_GOAL_WORMS])
 
   for (pos = BOARDMIN; pos < BOARDMAX && w < MAX_GOAL_WORMS; pos++) {
     if (ON_BOARD(goban, pos)
-	&& board[pos]
+	&& goban->board[pos]
 	&& owl->goal[pos] == 1) {
       int origin = find_origin(goban, pos);
       for (k = 0; k < w; k++)
-	if (goal_worm[k] == origin) 
+	if (goal_worm[k] == origin)
 	  break;
       if (k == w)
 	goal_worm[w++] = pos;
@@ -6651,7 +6747,7 @@ list_goal_worms(struct local_owl_data *owl, int goal_worm[MAX_GOAL_WORMS])
 	continue;
 
       for (ii = BOARDMIN; ii < BOARDMAX && w < MAX_GOAL_WORMS; ii++)
-	if (ON_BOARD(goban, ii) && board[ii] && worm[ii].origin == ii
+	if (ON_BOARD(goban, ii) && goban->board[ii] && worm[ii].origin == ii
 	    && worm[ii].size >= 3 && dragon[ii].id == d)
 	  goal_worm[w++] = ii;
     }
@@ -6661,7 +6757,7 @@ list_goal_worms(struct local_owl_data *owl, int goal_worm[MAX_GOAL_WORMS])
 }
 
 static void
-prepare_goal_list(int str, struct local_owl_data *owl,
+prepare_goal_list(const Goban *goban, int str, struct local_owl_data *owl,
 		  int list[MAX_GOAL_WORMS], int *flag,
 		  int *kworm, int do_list)
 {
@@ -6669,7 +6765,7 @@ prepare_goal_list(int str, struct local_owl_data *owl,
 
   if (kworm) {
     if (do_list)
-      list_goal_worms(owl, list);
+      list_goal_worms(goban, owl, list);
     /* N.B. We cannot use sizeof(list) below because a formal array
      * parameter implicitly is converted to a pointer and sizeof(list)
      * thus equals sizeof(int *), which is not what we want.
@@ -6685,8 +6781,8 @@ prepare_goal_list(int str, struct local_owl_data *owl,
 static void
 finish_goal_list(int *flag, int *wpos, int list[MAX_GOAL_WORMS], int index)
 {
-  gg_assert(goban, flag != NULL);
-  gg_assert(goban, wpos != NULL);
+  gg_assert(NULL, flag != NULL);
+  gg_assert(NULL, wpos != NULL);
 
   *flag = 0;
   if (index == MAX_GOAL_WORMS)
@@ -6711,7 +6807,7 @@ catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_GOAL_WORMS])
 
   for (pos = BOARDMIN; pos < BOARDMAX && worms < MAX_WORMS; pos++)
     if (ON_BOARD(goban, pos)
-	&& board[pos]
+	&& goban->board[pos]
 	&& (owl->goal)[pos]) {
       int origin = find_origin(goban, pos);
       if (pos == origin) {
@@ -6745,7 +6841,7 @@ get_owl_node_counter()
 
 /* Change the owl node limit and sets it to new_limit
  * Use *old_value to get the previous (old) limit
- */  
+ */
 void
 change_owl_node_limit(int new_limit, int *old_value)
 {

@@ -35,7 +35,6 @@
  */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,6 +49,7 @@
  */
 
 /* Element at origin of each worm stores allocated worm number. */
+/* THREAD-FIXME: Static variables are unacceptable. */
 static unsigned char dragon_num[BOARDMAX];
 
 static int next_white;		/* next worm number to allocate */
@@ -86,7 +86,7 @@ static const int domain_colors[4] = {5, 1, 2, 3}; /* gray, black, white, both */
  *   for (n = 0; n < board_size; n++) {
  *     int color = ...;
  *     int c = ...;
- *     draw_color_char(m, n, c, color);
+ *     draw_color_char(board_size, m, n, c, color);
  *   }
  * end_draw_board();
  *
@@ -98,10 +98,10 @@ static const int domain_colors[4] = {5, 1, 2, 3}; /* gray, black, white, both */
 
 /* Init color and print a line with coordinate letters above the board. */
 void
-start_draw_board()
+start_draw_board(int board_size)
 {
   gg_init_color();
-  draw_letter_coordinates(goban->board_size, stderr);
+  draw_letter_coordinates(board_size, stderr);
 }
 
 /* Draw a colored character. If c has the value EMPTY, either a "." or
@@ -110,7 +110,7 @@ start_draw_board()
  * is also drawn.
  */
 void
-draw_color_char(int m, int n, int c, int color)
+draw_color_char(int board_size, int m, int n, int c, int color)
 {
   /* Is this the first column? */
   if (n == 0)
@@ -118,7 +118,7 @@ draw_color_char(int m, int n, int c, int color)
 
   /* Do we see a hoshi point? */
   if (c == EMPTY) {
-    if (is_hoshi_point(goban->board_size, m, n))
+    if (is_hoshi_point(board_size, m, n))
       c = '+';
     else
       c = '.';
@@ -139,17 +139,17 @@ draw_color_char(int m, int n, int c, int color)
 
 /* Draw a black character as specified above. */
 void
-draw_char(int m, int n, int c)
+draw_char(int board_size, int m, int n, int c)
 {
-  draw_color_char(m, n, c, GG_COLOR_BLACK);
+  draw_color_char(board_size, m, n, c, GG_COLOR_BLACK);
 }
 
 /* Print a line with coordinate letters under the board. */
 void
-end_draw_board()
+end_draw_board(int board_size)
 {
   fprintf(stderr, "\n");
-  draw_letter_coordinates(goban->board_size, stderr);
+  draw_letter_coordinates(board_size, stderr);
   fprintf(stderr, "\n");
 }
 
@@ -166,7 +166,7 @@ end_draw_board()
  */
 
 static void 
-showchar(int i, int j, int empty, int xo)
+showchar(const Goban *goban, int i, int j, int empty, int xo)
 {
   struct dragon_data *d;  /* dragon data at (i, j) */
   struct dragon_data2 *d2;
@@ -263,8 +263,9 @@ showchar(int i, int j, int empty, int xo)
  */
 
 void
-showboard(int xo)
+showboard(const Goban *goban, int xo)
 {
+  const int board_size = goban->board_size;
   int i, j, ii;
   gg_init_color();
 
@@ -274,40 +275,44 @@ showboard(int xo)
   next_white = (259 - 26);
   next_black = 26;
   
-  start_draw_board();
+  start_draw_board(board_size);
   
   for (i = 0; i < board_size; i++) {
     ii = board_size - i;
     fprintf(stderr, "\n%2d", ii);
     
     for (j = 0; j < board_size; j++)
-      showchar(i, j, is_hoshi_point(goban->board_size, i, j) ? '+' : '.', xo);
-    
+      showchar(goban, i, j, is_hoshi_point(board_size, i, j) ? '+' : '.', xo);
+
     fprintf(stderr, " %d", ii);
     
-    if (xo == 0 && ((board_size < 10 && i == board_size-2)
-		    || (board_size >= 10 && i == 8)))
-      fprintf(stderr, "     WHITE (O) has captured %d stones", black_captured);
+    if (xo == 0 && ((board_size < 10 && i == board_size - 2)
+		    || (board_size >= 10 && i == 8))) {
+      fprintf(stderr, "     WHITE (O) has captured %d stones",
+	      goban->black_captured);
+    }
     
-    if (xo == 0 && ((board_size < 10 && i == board_size-1)
-		    || (board_size >= 10 && i == 9)))
-      fprintf(stderr, "     BLACK (X) has captured %d stones", white_captured);
+    if (xo == 0 && ((board_size < 10 && i == board_size - 1)
+		    || (board_size >= 10 && i == 9))) {
+      fprintf(stderr, "     BLACK (X) has captured %d stones",
+	      goban->white_captured);
+    }
     
     if (xo == 3) {
-      if (i == board_size-5)
+      if (i == board_size - 5)
 	write_color_string(GG_COLOR_GREEN, "    green=alive");
-      if (i == board_size-4)
+      if (i == board_size - 4)
 	write_color_string(GG_COLOR_CYAN, "    cyan=dead");
-      if (i == board_size-3)
+      if (i == board_size - 3)
 	write_color_string(GG_COLOR_RED, "    red=critical");
-      if (i == board_size-2)
+      if (i == board_size - 2)
 	write_color_string(GG_COLOR_YELLOW, "    yellow=unknown");
-      if (i == board_size-1)
+      if (i == board_size - 1)
 	write_color_string(GG_COLOR_MAGENTA, "    magenta=unchecked");
     }
   }
 
-  end_draw_board();
+  end_draw_board(board_size);
 }
 
 

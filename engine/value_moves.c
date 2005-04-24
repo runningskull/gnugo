@@ -21,7 +21,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,7 +41,7 @@
  * move. (This function is called for both colors.)
  */
 static int
-move_connects_strings(int pos, int color, int to_move)
+move_connects_strings(const Goban *goban, int pos, int color, int to_move)
 {
   int ss[4];
   int strings = 0;
@@ -54,7 +53,7 @@ move_connects_strings(int pos, int color, int to_move)
     int ii = pos + delta[k];
     int origin;
 
-    if (!ON_BOARD(goban, ii) || board[ii] == EMPTY)
+    if (!ON_BOARD(goban, ii) || goban->board[ii] == EMPTY)
       continue;
 
     origin = find_origin(goban, ii);
@@ -72,7 +71,7 @@ move_connects_strings(int pos, int color, int to_move)
   for (k = 0; k < strings; k++) {
     if (worm[ss[k]].invincible)
       continue;
-    if (board[ss[k]] == color) {
+    if (goban->board[ss[k]] == color) {
       int newlibs = approxlib(goban, pos, color, MAXLIBS, NULL);
       own_strings++;
       if (newlibs >= countlib(goban, ss[k])) {
@@ -104,24 +103,25 @@ move_connects_strings(int pos, int color, int to_move)
 
 /* Find saved dragons and worms, then call blunder_size(). */
 static float
-value_moves_get_blunder_size(int move, int color)
+value_moves_get_blunder_size(Goban *goban, int move, int color)
 {
   char saved_dragons[BOARDMAX];
   char saved_worms[BOARDMAX];
   char safe_stones[BOARDMAX];
 
-  get_saved_dragons(move, saved_dragons);
-  get_saved_worms(move, saved_worms);
+  get_saved_dragons(goban, move, saved_dragons);
+  get_saved_worms(goban, move, saved_worms);
 
-  mark_safe_stones(color, move, saved_dragons, saved_worms, safe_stones);
+  mark_safe_stones(goban, color, move,
+		   saved_dragons, saved_worms, safe_stones);
   
   return blunder_size(goban, move, color, NULL, safe_stones);
 }
 
 static int
-value_moves_confirm_safety(int move, int color)
+value_moves_confirm_safety(Goban *goban, int move, int color)
 {
-  return value_moves_get_blunder_size(move, color) == 0.0;
+  return value_moves_get_blunder_size(goban, move, color) == 0.0;
 }
 
 
@@ -133,7 +133,7 @@ value_moves_confirm_safety(int move, int color)
  */
 
 static void
-find_more_attack_and_defense_moves(int color)
+find_more_attack_and_defense_moves(Goban *goban, int color)
 {
   int unstable_worms[MAX_WORMS];
   int N = 0;  /* number of unstable worms */
@@ -146,7 +146,7 @@ find_more_attack_and_defense_moves(int color)
   
   /* Identify the unstable worms and store them in a list. */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-    if (IS_STONE(board[ii])
+    if (IS_STONE(goban->board[ii])
 	&& worm[ii].origin == ii
 	&& worm[ii].attack_codes[0] != 0
 	&& worm[ii].defense_codes[0] != 0) {
@@ -186,15 +186,16 @@ find_more_attack_and_defense_moves(int color)
     /* Try the move at (ii) and see what happens. */
     cursor_at_start_of_line = 0;
     TRACE(goban, "%1m ", ii);
-    if (trymove(goban, ii, color, "find_more_attack_and_defense_moves", NO_MOVE)) {
+    if (trymove(goban, ii, color, "find_more_attack_and_defense_moves",
+		NO_MOVE)) {
       for (k = 0; k < N; k++) {
 	int aa = unstable_worms[k];
 	
 	/* string of our color, see if there still is an attack,
 	 * unless we already know the move works as defense move.
 	 */
-	if (board[aa] == color
-	    && !defense_move_reason_known(ii, unstable_worms[k])) {
+	if (goban->board[aa] == color
+	    && !defense_move_reason_known(goban, ii, unstable_worms[k])) {
 	  int acode = attack(goban, aa, NULL);
 	  if (acode < worm[aa].attack_codes[0]) {
 	    /* Maybe attack() doesn't find the attack. Try to
@@ -204,7 +205,7 @@ find_more_attack_and_defense_moves(int color)
 	    
 	    if (trymove(goban, worm[aa].attack_points[0], other, 
 			"find_more_attack_and_defense_moves", 0)) {
-	      if (!board[aa])
+	      if (!goban->board[aa])
 		defense_works = 0;
 	      else {
 		int this_acode = REVERSE_RESULT(find_defense(goban, aa, NULL));
@@ -223,7 +224,7 @@ find_more_attack_and_defense_moves(int color)
 	      TRACE(goban, "%ofound extra point of defense of %1m at %1m code %d\n",
 		    aa, ii, REVERSE_RESULT(acode));
 	      cursor_at_start_of_line = 1;
-	      add_defense_move(ii, aa, REVERSE_RESULT(acode));
+	      add_defense_move(goban, ii, aa, REVERSE_RESULT(acode));
 	    }
 	  }
 	}
@@ -231,8 +232,8 @@ find_more_attack_and_defense_moves(int color)
 	/* string of opponent color, see if there still is a defense,
 	 * unless we already know the move works as attack move.
 	 */
-	if (board[aa] == other
-	    && !attack_move_reason_known(ii, unstable_worms[k])) {
+	if (goban->board[aa] == other
+	    && !attack_move_reason_known(goban, ii, unstable_worms[k])) {
 	  
 	  int dcode = find_defense(goban, aa, NULL);
 	  if (dcode < worm[aa].defense_codes[0]) {
@@ -266,7 +267,7 @@ find_more_attack_and_defense_moves(int color)
 	      TRACE(goban, "%ofound extra point of attack of %1m at %1m code %d\n",
 		    aa, ii, REVERSE_RESULT(dcode));
 	      cursor_at_start_of_line = 1;
-	      add_attack_move(ii, aa, REVERSE_RESULT(dcode));
+	      add_attack_move(goban, ii, aa, REVERSE_RESULT(dcode));
 	    }
 	  }
 	}
@@ -286,7 +287,7 @@ find_more_attack_and_defense_moves(int color)
  * one specific move reason only.
  */
 static void
-do_find_more_owl_attack_and_defense_moves(int color, int pos,
+do_find_more_owl_attack_and_defense_moves(Goban *goban, int color, int pos,
 					  int move_reason_type, int what)
 {
   int k;
@@ -345,13 +346,13 @@ do_find_more_owl_attack_and_defense_moves(int color, int pos,
 	 || move_reason_type == ATTACK_MOVE_GOOD_KO
 	 || move_reason_type == ATTACK_MOVE_BAD_KO
 	 || (move_reason_type == VITAL_EYE_MOVE
-	     && board[dd] == OTHER_COLOR(color)))
-	&& !owl_attack_move_reason_known(pos, dd)) {
+	     && goban->board[dd] == OTHER_COLOR(color)))
+	&& !owl_attack_move_reason_known(goban, pos, dd)) {
       int kworm = NO_MOVE;
-      int acode = owl_does_attack(pos, dd, &kworm);
+      int acode = owl_does_attack(goban, pos, dd, &kworm);
 
       if (acode >= DRAGON2(dd).owl_attack_code) {
-	add_owl_attack_move(pos, dd, kworm, acode);
+	add_owl_attack_move(goban, pos, dd, kworm, acode);
 	if (save_verbose)
 	  gprintf(goban, "Move at %1m upgraded to owl attack on %1m (%s).\n",
 		  pos, dd, result_to_string(acode));
@@ -364,17 +365,17 @@ do_find_more_owl_attack_and_defense_moves(int color, int pos,
 	 || move_reason_type == DEFEND_MOVE_GOOD_KO
 	 || move_reason_type == DEFEND_MOVE_BAD_KO
 	 || (move_reason_type == VITAL_EYE_MOVE
-	     && board[dd] == color))
-	&& !owl_defense_move_reason_known(pos, dd)) {
+	     && goban->board[dd] == color))
+	&& !owl_defense_move_reason_known(goban, pos, dd)) {
       int kworm = NO_MOVE;
       /* FIXME: Better use owl_connection_defend() for CONNECT_MOVE ? */
-      int dcode = owl_does_defend(pos, dd, &kworm);
+      int dcode = owl_does_defend(goban, pos, dd, &kworm);
 
       if (dcode >= DRAGON2(dd).owl_defense_code) {
 	if (dcode == LOSS)
-	  add_loss_move(pos, dd, kworm);
+	  add_loss_move(goban, pos, dd, kworm);
 	else
-	  add_owl_defense_move(pos, dd, dcode);
+	  add_owl_defense_move(goban, pos, dd, dcode);
 	if (save_verbose)
 	  gprintf(goban, "Move at %1m upgraded to owl defense for %1m (%s).\n",
 		  pos, dd, result_to_string(dcode));
@@ -394,7 +395,7 @@ do_find_more_owl_attack_and_defense_moves(int color, int pos,
  *    distance is currently 3.
  */
 static void
-find_large_scale_owl_attack_moves(int color)
+find_large_scale_owl_attack_moves(Goban *goban, int color)
 {
   int pos;
   int target;
@@ -416,9 +417,9 @@ find_large_scale_owl_attack_moves(int color)
     
   /* Identify the unstable dragons and store them in a list. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (IS_STONE(board[pos]) 
+    if (IS_STONE(goban->board[pos]) 
         && dragon[pos].origin == pos
-        && board[pos] == other) 
+        && goban->board[pos] == other) 
       if (dragon[pos].status == CRITICAL
 	  || DRAGON2(pos).owl_status == CRITICAL) {
     	
@@ -435,11 +436,11 @@ find_large_scale_owl_attack_moves(int color)
 	y = J(pos);
 	x_min_dragon[N] = x_max_dragon[N] = x;
 	y_min_dragon[N] = y_max_dragon[N] = y;
-	for (dx = 0; dx < board_size; dx++)
-	  for (dy = 0; dy < board_size; dy++) {
+	for (dx = 0; dx < goban->board_size; dx++)
+	  for (dy = 0; dy < goban->board_size; dy++) {
 	    
 	    if (ON_BOARD2(goban, dx, dy) 
-		&& is_same_dragon(pos, POS(dx, dy))) {
+		&& is_same_dragon(goban, pos, POS(dx, dy))) {
 	      if (dx < x_min_dragon[N]) 
 		x_min_dragon[N] = dx;
 	      if (dx > x_max_dragon[N]) 
@@ -465,7 +466,7 @@ find_large_scale_owl_attack_moves(int color)
           target = unstable_dragons[k];
           pos = POS(x, y);
           
-          if (ON_BOARD2(goban, x, y) && ON_BOARD1(goban, pos) && (board[pos] == EMPTY)) {
+          if (ON_BOARD2(goban, x, y) && goban->board[pos] == EMPTY) {
             int a, b;
             a = abs(x - x_min_dragon[k]);
             b = abs(x - x_max_dragon[k]);
@@ -492,7 +493,7 @@ find_large_scale_owl_attack_moves(int color)
               /* We try all large scale attacks on small dragons (and 
                * only moves with other move reason).
 	       */
-              if (board[target] == other)
+              if (goban->board[target] == other)
                 worth_trying = (dragon[target].size <= 6
                                 && has_move_reasons);
 	      
@@ -523,21 +524,21 @@ find_large_scale_owl_attack_moves(int color)
                 
                 /* Try large scale killing moves on opponent's stones. */
                 owl_nodes_before = get_owl_node_counter(); 
-                if (board[target] == other
-		    && !owl_attack_move_reason_known(pos, target)) {
+                if (goban->board[target] == other
+		    && !owl_attack_move_reason_known(goban, pos, target)) {
                   int kworm = NO_MOVE;
                   int acode;
 		  int save_verbose = verbose;
 		  if (verbose > 0)
 		    verbose--;
 
-		  acode = owl_does_attack(pos, target, &kworm);
+		  acode = owl_does_attack(goban, pos, target, &kworm);
                   
                   owl_nodes_used = get_owl_node_counter() - owl_nodes_before;
                   
                   if (acode >= DRAGON2(target).owl_attack_code
 		      && acode == WIN) {
-		    add_owl_attack_move(pos, target, kworm, acode);
+		    add_owl_attack_move(goban, pos, target, kworm, acode);
                     if (debug & DEBUG_LARGE_SCALE)
 		      gprintf(goban, "Move at %1m owl-attacks %1m on a large scale(%s).\n", 
 			      pos, target, result_to_string(acode));
@@ -571,7 +572,7 @@ find_large_scale_owl_attack_moves(int color)
  * 4. Moves connecting the dragon to something else.
  */
 static void
-find_more_owl_attack_and_defense_moves(int color)
+find_more_owl_attack_and_defense_moves(Goban *goban, int color)
 {
   int pos, pos2;
   int k;
@@ -595,7 +596,7 @@ find_more_owl_attack_and_defense_moves(int color)
       if (r < 0)
 	break;
 
-      do_find_more_owl_attack_and_defense_moves(color, pos,
+      do_find_more_owl_attack_and_defense_moves(goban, color, pos,
 						move_reasons[r].type,
 						move_reasons[r].what);
     }
@@ -622,24 +623,24 @@ find_more_owl_attack_and_defense_moves(int color)
     if (our_eyes[pos].origin == pos
 	&& our_vital_points[pos].defense_points[0] != NO_MOVE) {
       int k, dr;
-      find_eye_dragons(pos, our_eyes, color, &dr, 1);
+      find_eye_dragons(goban, pos, our_eyes, color, &dr, 1);
       for (k = 0; k < MAX_EYE_ATTACKS; k++) {
 	int move = our_vital_points[pos].defense_points[k];
 	if (move == NO_MOVE)
 	  break;
-	do_find_more_owl_attack_and_defense_moves(color, move,
+	do_find_more_owl_attack_and_defense_moves(goban, color, move,
 						  VITAL_EYE_MOVE, dr);
       }
     }
     if (your_eyes[pos].origin == pos
 	&& your_vital_points[pos].attack_points[0] != NO_MOVE) {
       int k, dr;
-      find_eye_dragons(pos, your_eyes, OTHER_COLOR(color), &dr, 1);
+      find_eye_dragons(goban, pos, your_eyes, OTHER_COLOR(color), &dr, 1);
       for (k = 0; k < MAX_EYE_ATTACKS; k++) {
 	int move = your_vital_points[pos].attack_points[k];
 	if (move == NO_MOVE)
 	  break;
-	do_find_more_owl_attack_and_defense_moves(color, move,
+	do_find_more_owl_attack_and_defense_moves(goban, color, move,
 						  VITAL_EYE_MOVE, dr);
       }
     }
@@ -653,11 +654,11 @@ find_more_owl_attack_and_defense_moves(int color)
    * attack or defend one also is effective on the other.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (IS_STONE(board[pos])
+    if (IS_STONE(goban->board[pos])
 	&& dragon[pos].origin == pos
 	&& DRAGON2(pos).owl_status == CRITICAL) {
       for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
-	if (board[pos2] != EMPTY)
+	if (goban->board[pos2] != EMPTY)
 	  continue;
 	worth_trying = 0;
 	for (k = 0; k < MAX_REASONS; k++) {
@@ -683,27 +684,27 @@ find_more_owl_attack_and_defense_moves(int color)
 	}
 
 	if (worth_trying) {
-	  if (board[pos] == color
-	      && !owl_defense_move_reason_known(pos2, pos)) {
+	  if (goban->board[pos] == color
+	      && !owl_defense_move_reason_known(goban, pos2, pos)) {
 	    int kworm = NO_MOVE;
-	    int dcode = owl_does_defend(pos2, pos, &kworm);
+	    int dcode = owl_does_defend(goban, pos2, pos, &kworm);
 	    if (dcode >= DRAGON2(pos).owl_defense_code) {
 	      if (dcode == LOSS)
-		add_loss_move(pos2, pos, kworm);
+		add_loss_move(goban, pos2, pos, kworm);
 	      else
-		add_owl_defense_move(pos2, pos, dcode);
+		add_owl_defense_move(goban, pos2, pos, dcode);
 	      if (save_verbose)
 	        gprintf(goban, "Move at %1m also owl defends %1m (%s).\n",
 		        pos2, pos, result_to_string(dcode));
 	    }
 
 	  }
-	  else if (board[pos] != color
-		   && !owl_attack_move_reason_known(pos2, pos)) {
+	  else if (goban->board[pos] != color
+		   && !owl_attack_move_reason_known(goban, pos2, pos)) {
 	    int kworm = NO_MOVE;
-	    int acode = owl_does_attack(pos2, pos, &kworm);
+	    int acode = owl_does_attack(goban, pos2, pos, &kworm);
 	    if (acode >= DRAGON2(pos).owl_attack_code) {
-	      add_owl_attack_move(pos2, pos, kworm, acode);
+	      add_owl_attack_move(goban, pos2, pos, kworm, acode);
 	      if (save_verbose)
 	        gprintf(goban, "Move at %1m also owl attacks %1m (%s).\n",
 		        pos2, pos, result_to_string(acode));
@@ -721,15 +722,16 @@ find_more_owl_attack_and_defense_moves(int color)
  * (*reason) works, and adds a semeai move if applicable.
  */
 static void
-try_potential_semeai_move(int pos, int color, struct move_reason *reason)
+try_potential_semeai_move(Goban *goban, int pos, int color,
+			  struct move_reason *reason)
 {
   int dr1 = semeai_target1[reason->what];
   int dr2 = semeai_target2[reason->what];
   int resulta, resultb, certain, old_certain;
-  ASSERT1(goban, IS_STONE(board[dr1]), pos);
+  ASSERT1(goban, IS_STONE(goban->board[dr1]), pos);
   switch (reason->type) {
     case POTENTIAL_SEMEAI_ATTACK:
-      owl_analyze_semeai_after_move(pos, color, dr1, dr2,
+      owl_analyze_semeai_after_move(goban, pos, color, dr1, dr2,
 				    &resulta, &resultb, NULL,
 				    1, &certain, 0);
       old_certain = DRAGON2(dr1).semeai_attack_certain;
@@ -737,7 +739,7 @@ try_potential_semeai_move(int pos, int color, struct move_reason *reason)
     case POTENTIAL_SEMEAI_DEFENSE:
       old_certain = DRAGON2(dr1).semeai_defense_certain;
       /* In this case other dragon gets to move first after forced move. */
-      owl_analyze_semeai_after_move(pos, color, dr2, dr1,
+      owl_analyze_semeai_after_move(goban, pos, color, dr2, dr1,
 				    &resulta, &resultb, NULL,
 				    1, &certain, 0);
       break;
@@ -746,7 +748,7 @@ try_potential_semeai_move(int pos, int color, struct move_reason *reason)
   }
   if (resulta == 0 && resultb == 0
       && (certain || !old_certain)) {
-    add_semeai_move(pos, dr1);
+    add_semeai_move(goban, pos, dr1);
     DEBUG(goban, DEBUG_SEMEAI,
 	  "Potential semeai move at %1m for dragon at %1m is real\n",
 	  pos, dr1);
@@ -761,7 +763,7 @@ try_potential_semeai_move(int pos, int color, struct move_reason *reason)
  * relevant position.
  */
 static void
-find_more_semeai_moves(int color)
+find_more_semeai_moves(Goban *goban, int color)
 {
   int pos;
   int save_verbose = verbose;
@@ -801,7 +803,7 @@ find_more_semeai_moves(int color)
 	break;
       if (move_reasons[r].type == POTENTIAL_SEMEAI_ATTACK
 	  || move_reasons[r].type == POTENTIAL_SEMEAI_DEFENSE)
-	try_potential_semeai_move(pos, color, &(move_reasons[r]));
+	try_potential_semeai_move(goban, pos, color, &(move_reasons[r]));
     }
   }
   verbose = save_verbose;
@@ -829,8 +831,9 @@ find_more_semeai_moves(int color)
  */
 
 static void
-induce_secondary_move_reasons(int color)
+induce_secondary_move_reasons(Goban *goban, int color)
 {
+  const Intersection *const board = goban->board;
   int pos;
   int k;
   int i, j;
@@ -913,9 +916,12 @@ induce_secondary_move_reasons(int color)
 		DEBUG(goban, DEBUG_MOVE_REASONS,
 		      "Connection move at %1m induced for %1m/%1m due to attack of %1m\n",
 		      pos, adj1, adj2, aa);
-		add_connection_move(pos, adj1, adj2);
-		do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
-							  find_connection(adj1, adj2));
+		add_connection_move(goban, pos, adj1, adj2);
+		do_find_more_owl_attack_and_defense_moves(goban, color, pos,
+							  CONNECT_MOVE,
+							  find_connection(goban,
+									  adj1,
+									  adj2));
 	      }
 
 	      if (!attack_move
@@ -924,7 +930,7 @@ induce_secondary_move_reasons(int color)
 		DEBUG(goban, DEBUG_MOVE_REASONS,
 		      "Cut move at %1m induced for %1m/%1m due to defense of %1m\n",
 		      pos, adj1, adj2, aa);
-		add_cut_move(pos, adj1, adj2);
+		add_cut_move(goban, pos, adj1, adj2);
 	      }
 
 	      if (!attack_move
@@ -933,9 +939,12 @@ induce_secondary_move_reasons(int color)
 		DEBUG(goban, DEBUG_MOVE_REASONS,
 		      "Connection move at %1m induced for %1m/%1m due to defense of %1m\n",
 		      pos, adj1, adj2, aa);
-		add_connection_move(pos, adj1, adj2);
-		do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
-							  find_connection(adj1, adj2));
+		add_connection_move(goban, pos, adj1, adj2);
+		do_find_more_owl_attack_and_defense_moves(goban, color, pos,
+							  CONNECT_MOVE,
+							  find_connection(goban,
+									  adj1,
+									  adj2));
 	      }
 
 	      popgo(goban);
@@ -982,12 +991,12 @@ induce_secondary_move_reasons(int color)
 	      if (board[origin] != color_to_move
 		  && neighbor_dragons[origin] != 2
 		  && dragon[origin].status != DEAD
-		  && dragon_weak(origin)) {
+		  && dragon_weak(goban, origin)) {
 		DEBUG(goban, DEBUG_MOVE_REASONS,
 		      "Strategical attack move at %1m induced for %1m due to defense of %1m\n",
 		      pos, origin, aa);
-		add_strategical_attack_move(pos, origin);
-		do_find_more_owl_attack_and_defense_moves(color, pos,
+		add_strategical_attack_move(goban, pos, origin);
+		do_find_more_owl_attack_and_defense_moves(goban, color, pos,
 							  STRATEGIC_ATTACK_MOVE,
 							  origin);
 
@@ -1003,8 +1012,8 @@ induce_secondary_move_reasons(int color)
 	  int bb = dragon2[DRAGON2(aa).adjacent[i]].origin;
 	  if (dragon[bb].color == color && worm[bb].attack_codes[0] == 0
 	      && !DRAGON2(bb).semeais) {
-	    add_strategical_defense_move(pos, bb);
-	    do_find_more_owl_attack_and_defense_moves(color, pos,
+	    add_strategical_defense_move(goban, pos, bb);
+	    do_find_more_owl_attack_and_defense_moves(goban, color, pos,
 						      STRATEGIC_DEFEND_MOVE,
 						      bb);
 	    DEBUG(goban, DEBUG_MOVE_REASONS, "Strategic defense at %1m induced for %1m due to owl attack on %1m\n",
@@ -1029,16 +1038,22 @@ induce_secondary_move_reasons(int color)
 		if (trymove(goban, pos, color, "induce_secondary_move_reasons-B",
 			    worm1)) {
 		  if (!disconnect(goban, pos3, worm1, NULL)) {
-		    add_connection_move(pos, pos3, worm1);
-		    do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
-							      find_connection(pos3, worm1));
+		    add_connection_move(goban, pos, pos3, worm1);
+		    do_find_more_owl_attack_and_defense_moves(goban, color, pos,
+							      CONNECT_MOVE,
+							      find_connection(goban,
+									      pos3,
+									      worm1));
 		    DEBUG(goban, DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m\n",
 			  pos, worm1, worm2, pos3, worm1);
 		  }
 		  if (!disconnect(goban, pos3, worm2, NULL)) {
-		    add_connection_move(pos, pos3, worm2);
-		    do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
-							      find_connection(pos3, worm2));
+		    add_connection_move(goban, pos, pos3, worm2);
+		    do_find_more_owl_attack_and_defense_moves(goban, color, pos,
+							      CONNECT_MOVE,
+							      find_connection(goban,
+									      pos3,
+									      worm2));
 		    DEBUG(goban, DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m\n",
 			  pos, worm1, worm2, pos3, worm2);
 		  }
@@ -1061,7 +1076,7 @@ induce_secondary_move_reasons(int color)
  * dragons. This sets the move.move_safety field.
  */
 static void
-examine_move_safety(int color)
+examine_move_safety(Goban *goban, int color)
 {
   int pos;
   int k;
@@ -1095,7 +1110,7 @@ examine_move_safety(int color)
 	{
 	  int ii;
 	  for (ii = first_worm_in_dragon(what); ii != NO_MOVE; 
-	       ii = next_worm_in_dragon(ii)) {
+	       ii = next_worm_in_dragon(goban, ii)) {
 	    if (!play_connect_n(goban, color, 0, 1, pos, ii, pos))
 	      break;
 	  }
@@ -1180,7 +1195,7 @@ examine_move_safety(int color)
 	    for (m = 0; m < num_adj; m++) {
 	      int adj = adjs[m];
 	      
-	      if (board[adj] == color) {
+	      if (goban->board[adj] == color) {
 		/* Check whether this string is part of the same
 		 * dragon as an earlier string. We only want to
 		 * count distinct neighbor dragons.
@@ -1232,7 +1247,7 @@ examine_move_safety(int color)
 	  
 	  for (m = 0; m < 4; m++) {
 	    int d = delta[m];
-	    if (board[pos+d] == color) {
+	    if (goban->board[pos+d] == color) {
 	      bb = pos + d;
 	      break;
 	    }
@@ -1259,7 +1274,7 @@ examine_move_safety(int color)
 	   *
 	   * FIXME: Might need to involve semeai code too here.
 	   */
-	  if (owl_does_defend(pos, bb, NULL)) {
+	  if (owl_does_defend(goban, pos, bb, NULL)) {
 	    tactical_safety = 1;
 	    safety = 1;
 	  }
@@ -1278,7 +1293,7 @@ examine_move_safety(int color)
 	    safety = 1;
 	  
 	  else if (!play_connect_n(goban, color, 0, 1, pos, aa, pos)
-		   && owl_does_defend(pos, aa, NULL))
+		   && owl_does_defend(goban, pos, aa, NULL))
 	    safety = 1;
 	  break;
 	}
@@ -1309,7 +1324,7 @@ examine_move_safety(int color)
 	    tactical_safety = 1;
 	    safety = 1;
 	  }
-	  else if (owl_connection_defends(pos, aa, bb)) {
+	  else if (owl_connection_defends(goban, pos, aa, bb)) {
 	    tactical_safety = 1;
 	    safety = 1;
 	  }
@@ -1406,7 +1421,8 @@ dragon_weakness(int dr, int ignore_dead_dragons)
  */
 
 static float
-connection_value(int dragona, int dragonb, int tt, float margin)
+connection_value(const Goban *goban, int dragona, int dragonb, int tt,
+		 float margin)
 {
   struct dragon_data2 *da = &DRAGON2(dragona);
   struct dragon_data2 *db = &DRAGON2(dragonb);
@@ -1415,7 +1431,8 @@ connection_value(int dragona, int dragonb, int tt, float margin)
   int safetya = da->safety;
   int safetyb = db->safety;
   float crude_weakness_a
-    = crude_dragon_weakness(da->safety, &da->genus, da->lunch != NO_MOVE, 
+    = crude_dragon_weakness(goban, da->safety, &da->genus,
+			    da->lunch != NO_MOVE, 
 			    da->moyo_territorial_value,
 			    (float) da->escape_route);
   float crude_weakness_sum;
@@ -1460,7 +1477,7 @@ connection_value(int dragona, int dragonb, int tt, float margin)
    * (owl) defends some stones.
    */
   crude_weakness_sum
-    = crude_dragon_weakness(safetyb, &genus_sum,
+    = crude_dragon_weakness(goban, safetyb, &genus_sum,
 			    (da->lunch != NO_MOVE || db->lunch != NO_MOVE), 
 			    da->moyo_territorial_value
 			    + db->moyo_territorial_value
@@ -1523,7 +1540,7 @@ connection_value(int dragona, int dragonb, int tt, float margin)
  */
 
 static float
-compute_shape_factor(int pos)
+compute_shape_factor(const Goban *goban, int pos)
 {
   float exponent = move[pos].maxpos_shape - move[pos].maxneg_shape;
 
@@ -1557,7 +1574,7 @@ compute_shape_factor(int pos)
  */
 
 static float
-adjusted_worm_attack_value(int pos, int ww)
+adjusted_worm_attack_value(Goban *goban, int pos, int ww)
 {
   int num_adj;
   int adjs[MAXCHAIN];
@@ -1608,7 +1625,7 @@ adjusted_worm_attack_value(int pos, int ww)
  * 1 in front of opponent's strength.
  */
 static float
-strategic_penalty(int pos, int color)
+strategic_penalty(const Goban *goban, int pos, int color)
 {
   int k;
   float ret_val;
@@ -1617,11 +1634,11 @@ strategic_penalty(int pos, int color)
    * whether all neighboring intersections belong to the opponent's moyo.
    */
   for (k = 0; k < 4; k++)
-    if (board[pos + delta[k]] == EMPTY
-        && whose_area(OPPOSITE_INFLUENCE(color), pos + delta[k])
+    if (goban->board[pos + delta[k]] == EMPTY
+        && whose_area(goban, OPPOSITE_INFLUENCE(color), pos + delta[k])
 	   != OTHER_COLOR(color))
       return 0.0;
-  if (whose_area(OPPOSITE_INFLUENCE(color), pos) != OTHER_COLOR(color))
+  if (whose_area(goban, OPPOSITE_INFLUENCE(color), pos) != OTHER_COLOR(color))
     return 0.0;
 
   for (k = 0; k < MAX_REASONS; k++) {
@@ -1675,7 +1692,7 @@ strategic_penalty(int pos, int color)
 	  return 0.0;
 	
 	for (i = 0; i < 4; i++)
-	  if (board[target + delta[i]] == OTHER_COLOR(color)) {
+	  if (goban->board[target + delta[i]] == OTHER_COLOR(color)) {
 	    if (dragon[target + delta[i]].size == 1) {
 	      has_weak_neighbor = 1;
 	      break;
@@ -1725,18 +1742,18 @@ strategic_penalty(int pos, int color)
  *        utils.c
  */
 int
-adjacent_to_nondead_stone(int pos, int color)
+adjacent_to_nondead_stone(Goban *goban, int pos, int color)
 {
   int k;
 
   int stack[MAXSTACK];
   int move_color[MAXSTACK];
-  int saved_stackp = stackp;
+  int saved_stackp = goban->stackp;
   int result = 0;
 
-  while (stackp > 0) {
-    get_move_from_stack(goban, stackp - 1, &stack[stackp - 1],
-			&move_color[stackp - 1]);
+  while (goban->stackp > 0) {
+    get_move_from_stack(goban, goban->stackp - 1, &stack[goban->stackp - 1],
+			&move_color[goban->stackp - 1]);
     popgo(goban);
   }
 
@@ -1761,20 +1778,20 @@ adjacent_to_nondead_stone(int pos, int color)
     popgo(goban);
   }
 
-  while (stackp < saved_stackp)
-    tryko(goban, stack[stackp], move_color[stackp], NULL);
+  while (goban->stackp < saved_stackp)
+    tryko(goban, stack[goban->stackp], move_color[goban->stackp], NULL);
   
   return result;
 }
 
 static int
-max_lunch_eye_value(int pos)
+max_lunch_eye_value(Goban *goban, int pos)
 {
   int min;
   int probable;
   int max;
   
-  estimate_lunch_eye_value(pos, &min, &probable, &max, 0);
+  estimate_lunch_eye_value(goban, pos, &min, &probable, &max, 0);
   return max;
 }
 
@@ -1782,9 +1799,10 @@ max_lunch_eye_value(int pos)
  * Estimate the direct territorial value of a move at (pos) by (color).
  */
 static void
-estimate_territorial_value(int pos, int color, float our_score,
+estimate_territorial_value(Goban *goban, int pos, int color, float our_score,
 			   int disable_delta_territory_cache)
 {
+  const Intersection *const board = goban->board;
   int other = OTHER_COLOR(color);
   int k;
   int aa = NO_MOVE;
@@ -1798,7 +1816,7 @@ estimate_territorial_value(int pos, int color, float our_score,
   char safe_stones[BOARDMAX];
   float strength[BOARDMAX];
 
-  set_strength_data(OTHER_COLOR(color), safe_stones, strength);
+  set_strength_data(goban, OTHER_COLOR(color), safe_stones, strength);
   
   for (k = 0; k < MAX_REASONS; k++) {
     int r = move[pos].reason[k];
@@ -1841,7 +1859,7 @@ estimate_territorial_value(int pos, int color, float our_score,
       }
 
       /* Mark the string as captured, for evaluation in the influence code. */
-      mark_changed_string(aa, safe_stones, strength, 0);
+      mark_changed_string(goban, aa, safe_stones, strength, 0);
       TRACE(goban, "  %1m: attack on worm %1m\n", pos, aa);
       
       /* FIXME: How much should we reduce the value for ko attacks? */
@@ -1888,9 +1906,9 @@ estimate_territorial_value(int pos, int color, float our_score,
       }
       
       if (DRAGON2(aa).owl_status == CRITICAL
-	  && (owl_defense_move_reason_known(pos, aa)
-	      < defense_move_reason_known(pos, aa))
-	  && !semeai_move_reason_known(pos, aa)) {
+	  && (owl_defense_move_reason_known(goban, pos, aa)
+	      < defense_move_reason_known(goban, pos, aa))
+	  && !semeai_move_reason_known(goban, pos, aa)) {
 	DEBUG(goban, DEBUG_MOVE_REASONS,
 	      "  %1m:   %f (secondary) - ineffective defense of %1m (critical)\n",
 	      pos, 0.2 * this_value, aa);
@@ -1899,7 +1917,8 @@ estimate_territorial_value(int pos, int color, float our_score,
       }
       
       /* Mark the string as saved, for evaluation in the influence code. */
-      mark_changed_string(aa, safe_stones, strength, INFLUENCE_SAVED_STONE);
+      mark_changed_string(goban, aa, safe_stones, strength,
+			  INFLUENCE_SAVED_STONE);
       TRACE(goban, "  %1m: defense of worm %1m\n", pos, aa);
       
       /* FIXME: How much should we reduce the value for ko defenses? */
@@ -1924,8 +1943,8 @@ estimate_territorial_value(int pos, int color, float our_score,
        * combination with bad ko it still has a positive net impact.
        */
       if (DRAGON2(aa).owl_status == CRITICAL
-	  && (owl_defense_move_reason_known(pos, aa)
-	      < defense_move_reason_known(pos, aa))) {
+	  && (owl_defense_move_reason_known(goban, pos, aa)
+	      < defense_move_reason_known(goban, pos, aa))) {
 	this_value = 0.45 * (2 * worm[aa].effective_size);
 	TRACE(goban, "  %1m: -%f - suspected ineffective defense of worm %1m\n",
 	      pos, this_value, aa);
@@ -2005,11 +2024,11 @@ estimate_territorial_value(int pos, int color, float our_score,
 	 * FIXME: This is somewhat halfhearted since only one defense
 	 * move is tested.
 	 */
-	if (!is_known_good_attack_threat(pos, aa)
+	if (!is_known_good_attack_threat(goban, pos, aa)
 	    && board[aa] != EMPTY
 	    && (move[pos].move_safety == 1
-		|| adjacent_to_nondead_stone(pos, color)
-		|| owl_defense_move_reason_known(pos, -1))
+		|| adjacent_to_nondead_stone(goban, pos, color)
+		|| owl_defense_move_reason_known(goban, pos, -1))
 	    && find_defense(goban, aa, &defense_move) == WIN
 	    && defense_move != NO_MOVE) {
 	  int bad_followup;
@@ -2144,7 +2163,7 @@ estimate_territorial_value(int pos, int color, float our_score,
 	  if (verbose > 0)
 	    verbose --;
 	  if (move[pos].move_safety == 0
-	      && !owl_substantial(aa)) {
+	      && !owl_substantial(goban, aa)) {
 	    verbose = save_verbose;
 	    break;
 	  }
@@ -2154,7 +2173,7 @@ estimate_territorial_value(int pos, int color, float our_score,
 	adjusted_value += adjustment_up;
 	adjusted_value -= adjustment_down;
 	if (adjusted_value > 0.0) {
-	  add_followup_value(pos, adjusted_value);
+	  add_followup_value(goban, pos, adjusted_value);
 	  TRACE(goban, "  %1m:   %f (followup) - threatens to capture %1m\n",
 		pos, adjusted_value, aa);
 	}
@@ -2199,7 +2218,7 @@ estimate_territorial_value(int pos, int color, float our_score,
 	popgo(goban);
       }
       
-      add_followup_value(pos, 2 * worm[aa].effective_size);
+      add_followup_value(goban, pos, 2 * worm[aa].effective_size);
 
       TRACE(goban, "  %1m:   %f (followup) - threatens to defend %1m\n",
 	    pos, 2 * worm[aa].effective_size, aa);
@@ -2232,7 +2251,7 @@ estimate_territorial_value(int pos, int color, float our_score,
       aa = move_reasons[r].what;
 
       /* threaten to win the semeai as a ko threat */
-      add_followup_value(pos, 2 * dragon[aa].effective_size);
+      add_followup_value(goban, pos, 2 * dragon[aa].effective_size);
       TRACE(goban, "  %1m: %f (followup) - threatens to win semeai for %1m\n",
 	    pos, 2 * dragon[aa].effective_size, aa);
       break;
@@ -2271,7 +2290,7 @@ estimate_territorial_value(int pos, int color, float our_score,
       }
 
       /* Mark the affected dragon for use in the territory analysis. */
-      mark_changed_dragon(pos, color, aa, bb, move_reasons[r].type,
+      mark_changed_dragon(goban, pos, color, aa, bb, move_reasons[r].type,
 	  		  safe_stones, strength, &this_value);
       this_value *= 2.0;
 
@@ -2317,7 +2336,7 @@ estimate_territorial_value(int pos, int color, float our_score,
 	   || move_reasons[r].type == OWL_ATTACK_MOVE_BAD_KO)
 	  && dragon[aa].size == worm[aa].size
 	  && worm[aa].attack_codes[0] == WIN
-	  && attack_move_reason_known(pos, aa) != WIN) {
+	  && attack_move_reason_known(goban, pos, aa) != WIN) {
 	if (large_scale)
 	  this_value = (2.0 + 0.05 * (2 * worm[aa].effective_size));
 	else
@@ -2360,12 +2379,12 @@ estimate_territorial_value(int pos, int color, float our_score,
 	  if (dragon[adj].color == color
 	      && dragon[adj].status == CRITICAL
 	      && dragon2[d].safety != INESSENTIAL
-	      && !owl_defense_move_reason_known(pos, adj))
+	      && !owl_defense_move_reason_known(goban, pos, adj))
 	    value = 0.0;
 	}
 	
 	if (value > 0.0) {
-	  add_followup_value(pos, value);
+	  add_followup_value(goban, pos, value);
 	  TRACE(goban, "  %1m: %f (followup) - threatens to owl attack %1m\n",
 		pos, value, aa);
 	}
@@ -2375,7 +2394,7 @@ estimate_territorial_value(int pos, int color, float our_score,
     case OWL_DEFEND_THREAT:
       aa = move_reasons[r].what;
 
-      add_followup_value(pos, 2 * dragon[aa].effective_size);
+      add_followup_value(goban, pos, 2 * dragon[aa].effective_size);
       TRACE(goban, "  %1m: %f (followup) - threatens to owl defend %1m\n",
 	    pos, 2 * dragon[aa].effective_size, aa);
       break;
@@ -2399,7 +2418,7 @@ estimate_territorial_value(int pos, int color, float our_score,
        * This does not apply if we are doing scoring.
        */
       if (!doing_scoring
-	  && is_same_dragon(get_last_opponent_move(goban, color), aa)) {
+	  && is_same_dragon(goban, get_last_opponent_move(goban, color), aa)) {
 	this_value = 1.5 * dragon[aa].effective_size;
 	TRACE(goban, "  %1m: %f - attack last move played, although it seems dead\n",
 	      pos, this_value);
@@ -2408,7 +2427,7 @@ estimate_territorial_value(int pos, int color, float our_score,
       else if (!doing_scoring && our_score > 0.0) {
 	/* tm - devalued this bonus (3.1.17) */
 	this_value = gg_min(0.9 * dragon[aa].effective_size,
-			    our_score/2.0 - board_size/2.0 - 1.0);
+			    our_score / 2.0 - goban->board_size / 2.0 - 1.0);
 	this_value = gg_max(this_value, 0);
 	TRACE(goban, "  %1m: %f - attack %1m, although it seems dead, as we are ahead\n",
 	      pos, this_value, aa);
@@ -2416,7 +2435,7 @@ estimate_territorial_value(int pos, int color, float our_score,
       }
       else {
 	
-	add_reverse_followup_value(pos, 2 * dragon[aa].effective_size);
+	add_reverse_followup_value(goban, pos, 2 * dragon[aa].effective_size);
 	if (board[aa] == color)
 	  TRACE(goban, "  %1m: %f (reverse followup) - prevent threat to attack %1m\n",
 		pos, 2 * dragon[aa].effective_size, aa);
@@ -2455,7 +2474,7 @@ estimate_territorial_value(int pos, int color, float our_score,
    */
   this_value = 0.0;
 
-  mark_inessential_stones(OTHER_COLOR(color), safe_stones);
+  mark_inessential_stones(goban, OTHER_COLOR(color), safe_stones);
 
   if (move[pos].move_safety == 1 && safe_move(goban, pos, color) == WIN) {
     safe_stones[pos] = INFLUENCE_SAVED_STONE;
@@ -2477,7 +2496,7 @@ estimate_territorial_value(int pos, int color, float our_score,
       && tryko(goban, pos, color, "estimate_territorial_value")) {
     Hash_data safety_hash = goal_to_hashvalue(goban->board_size, safe_stones);
     if (disable_delta_territory_cache
-	|| !retrieve_delta_territory_cache(pos, color, &this_value, 
+	|| !retrieve_delta_territory_cache(goban, pos, color, &this_value, 
 					   &move[pos].influence_followup_value,
 					   OPPOSITE_INFLUENCE(color),
 					   safety_hash)) {
@@ -2487,17 +2506,19 @@ estimate_territorial_value(int pos, int color, float our_score,
       /* Use the break-in code to break into moyos if there are
        * no big critical dragons around. This is disabled for now.
        */
-      if (0)
-	use_optimistic_territory = (size_of_biggest_critical_dragon() <= 5);  
+      if (0) {
+	use_optimistic_territory = (size_of_biggest_critical_dragon(goban)
+				    <= 5);  
+      }
 
-      compute_influence(OTHER_COLOR(color), safe_stones, strength, 
+      compute_influence(goban, OTHER_COLOR(color), safe_stones, strength, 
 	  		&move_influence, pos, "after move");
       increase_depth_values();
       break_territories(goban, OTHER_COLOR(color), &move_influence, 0, pos);
       decrease_depth_values();
-      this_value = influence_delta_territory(OPPOSITE_INFLUENCE(color),
+      this_value = influence_delta_territory(goban, OPPOSITE_INFLUENCE(color),
 	   				     &move_influence, color, pos);
-      compute_followup_influence(&move_influence, &followup_influence,
+      compute_followup_influence(goban, &move_influence, &followup_influence,
 	  			 pos, "followup");
                                  
       use_optimistic_territory = saved_optimistic_territory;                             
@@ -2506,9 +2527,9 @@ estimate_territorial_value(int pos, int color, float our_score,
       else
 	DEBUG(goban, DEBUG_MOVE_REASONS, "%1m: 0.00 - change in territory\n", pos);
       move[pos].influence_followup_value
-	= influence_delta_territory(&move_influence, &followup_influence,
+	= influence_delta_territory(goban, &move_influence, &followup_influence,
 	    			    color, pos);
-      store_delta_territory_cache(pos, color, this_value,
+      store_delta_territory_cache(goban, pos, color, this_value,
 	 			  move[pos].influence_followup_value,
 				  OPPOSITE_INFLUENCE(color), safety_hash);	
     }
@@ -2549,7 +2570,7 @@ estimate_territorial_value(int pos, int color, float our_score,
  * Estimate the strategical value of a move at (pos).
  */
 static void
-estimate_strategical_value(int pos, int color, float our_score,
+estimate_strategical_value(Goban *goban, int pos, int color, float our_score,
     			   int use_thrashing_dragon_heuristics)
 {
   int k;
@@ -2625,7 +2646,7 @@ estimate_strategical_value(int pos, int color, float our_score,
 	  break;
 
 	/* If the lunch has no potential to create eyes, no points. */
-	if (max_lunch_eye_value(aa) == 0)
+	if (max_lunch_eye_value(goban, aa) == 0)
 	  break;
 	
 	/* Can't use k in this loop too. */
@@ -2648,16 +2669,16 @@ estimate_strategical_value(int pos, int color, float our_score,
 	     */
 	    if (dragon[bb].status != DEAD
 		&& dragon[bb].size == worm[bb].size
-		&& (attack_move_reason_known(pos, bb)
-		    || defense_move_reason_known(pos, bb)))
+		&& (attack_move_reason_known(goban, pos, bb)
+		    || defense_move_reason_known(goban, pos, bb)))
 	      this_value = 0.0;
 
 	    /* If this dragon can be tactically attacked and the move
              * does not defend or attack, no points.
 	     */
 	    if (worm[bb].attack_codes[0] != 0
-		&& ((color == board[bb] && !does_defend(goban, pos, bb))
-		    || (color == OTHER_COLOR(board[bb])
+		&& ((color == goban->board[bb] && !does_defend(goban, pos, bb))
+		    || (color == OTHER_COLOR(goban->board[bb])
 			&& !does_attack(goban, pos, bb))))
 	      this_value = 0.0;
 
@@ -2703,11 +2724,11 @@ estimate_strategical_value(int pos, int color, float our_score,
 	 * FIXME: This is only applicable as long as the only moves
 	 *        handled by EITHER_MOVE are attacks.
 	 */
-	if (move_reason_known(pos, MY_ATARI_ATARI_MOVE, -1))
+	if (move_reason_known(goban, pos, MY_ATARI_ATARI_MOVE, -1))
 	  break;
 
-	aa_value = adjusted_worm_attack_value(pos, aa);
-	bb_value = adjusted_worm_attack_value(pos, bb);
+	aa_value = adjusted_worm_attack_value(goban, pos, aa);
+	bb_value = adjusted_worm_attack_value(goban, pos, bb);
 	this_value = gg_min(aa_value, bb_value);
 
 	TRACE(goban, "  %1m: %f - either attacks %1m (%f) or attacks %1m (%f)\n",
@@ -2729,7 +2750,7 @@ estimate_strategical_value(int pos, int color, float our_score,
 	/* Also if there is a combination attack, we assume it covers
 	 * the same thing.
 	 */
-	if (move_reason_known(pos, YOUR_ATARI_ATARI_MOVE, -1))
+	if (move_reason_known(goban, pos, YOUR_ATARI_ATARI_MOVE, -1))
 	  break;
 
 	aa_value = worm[aa].effective_size;
@@ -2769,9 +2790,9 @@ estimate_strategical_value(int pos, int color, float our_score,
 	    else if (DRAGON2(aa).safety == INESSENTIAL
 		     || DRAGON2(bb).safety == INESSENTIAL) {
 	      if ((DRAGON2(aa).safety == INESSENTIAL
-		   && max_lunch_eye_value(aa) == 0)
+		   && max_lunch_eye_value(goban, aa) == 0)
 		  || (DRAGON2(bb).safety == INESSENTIAL
-		      && max_lunch_eye_value(bb) == 0))
+		      && max_lunch_eye_value(goban, bb) == 0))
 		this_value = 0.0;
 	      else
 		this_value = 0.8 * dragon[cc].effective_size;
@@ -2803,9 +2824,9 @@ estimate_strategical_value(int pos, int color, float our_score,
 
 	/* If we are ahead by more than 20, value connections more strongly */
 	if (our_score > 20.0)
-	  this_value = connection_value(aa, bb, pos, our_score);
+	  this_value = connection_value(goban, aa, bb, pos, our_score);
 	else
-	  this_value = connection_value(aa, bb, pos, 0);
+	  this_value = connection_value(goban, aa, bb, pos, 0);
 	if (this_value > dragon_value[aa]) {
 	  dragon_value[aa] = this_value;
           DEBUG(goban, DEBUG_MOVE_REASONS,
@@ -2815,9 +2836,9 @@ estimate_strategical_value(int pos, int color, float our_score,
 
 	
 	if (our_score > 20.0)
-	  this_value = connection_value(bb, aa, pos, our_score);
+	  this_value = connection_value(goban, bb, aa, pos, our_score);
 	else
-	  this_value = connection_value(bb, aa, pos, 0);
+	  this_value = connection_value(goban, bb, aa, pos, 0);
 	if (this_value > dragon_value[bb]) {
 	  dragon_value[bb] = this_value;
           DEBUG(goban, DEBUG_MOVE_REASONS,
@@ -2884,7 +2905,7 @@ estimate_strategical_value(int pos, int color, float our_score,
 	    if (dragon[adj].color == color
 		&& dragon[adj].status == CRITICAL
 		&& dragon2[d].safety != INESSENTIAL
-		&& !owl_defense_move_reason_known(pos, adj))
+		&& !owl_defense_move_reason_known(goban, pos, adj))
 	      this_value = 0.0;
 	  }
 	}
@@ -2948,7 +2969,7 @@ estimate_strategical_value(int pos, int color, float our_score,
      * move, we ignore the strategic effect.
      */
     if (dragon[aa].status == CRITICAL
-	&& !owl_move_reason_known(pos, aa)) {
+	&& !owl_move_reason_known(goban, pos, aa)) {
       DEBUG(goban, DEBUG_MOVE_REASONS, "  %1m: 0.0 - disregarding strategic effect on %1m (critical dragon)\n",
 	    pos, aa);
       continue;
@@ -2961,8 +2982,8 @@ estimate_strategical_value(int pos, int color, float our_score,
      */
     if (dragon[aa].status != DEAD
 	&& dragon[aa].size == worm[aa].size
-	&& (attack_move_reason_known(pos, aa)
-	    || defense_move_reason_known(pos, aa))) {
+	&& (attack_move_reason_known(goban, pos, aa)
+	    || defense_move_reason_known(goban, pos, aa))) {
       TRACE(goban, "  %1m:   %f - %1m strategic value already counted - A.\n",
 	    pos, dragon_value[aa], aa);
       continue;
@@ -2971,12 +2992,12 @@ estimate_strategical_value(int pos, int color, float our_score,
      * in a semeai, we have likewise already counted the points as
      * territorial value.
      */
-    if (attack_move_reason_known(pos, aa)
-	|| defense_move_reason_known(pos, aa)
-	|| ((owl_attack_move_reason_known(pos, aa)
-	     || owl_defense_move_reason_known(pos, aa))
+    if (attack_move_reason_known(goban, pos, aa)
+	|| defense_move_reason_known(goban, pos, aa)
+	|| ((owl_attack_move_reason_known(goban, pos, aa)
+	     || owl_defense_move_reason_known(goban, pos, aa))
 	    && dragon[aa].status == CRITICAL)
-	|| move_reason_known(pos, SEMEAI_MOVE, aa)) {
+	|| move_reason_known(goban, pos, SEMEAI_MOVE, aa)) {
       /* But if the strategical value was larger than the territorial
        * value (e.g. because connecting to strong dragon) we award the
        * excess value as a bonus.
@@ -3001,7 +3022,7 @@ estimate_strategical_value(int pos, int color, float our_score,
   }
 
   /* Finally, subtract penalty for invasion type moves. */
-  this_value = strategic_penalty(pos, color);
+  this_value = strategic_penalty(goban, pos, color);
   /* Multiply by invasion_malus_weight to allow us to fit the weight */
   this_value = this_value * invasion_malus_weight;
   if (this_value > 0.0) {
@@ -3034,13 +3055,13 @@ compare_move_reasons(const void *p1, const void *p2)
  * still need a lot of improvement.
  */
 static float
-value_move_reasons(int pos, int color, float pure_threat_value,
+value_move_reasons(Goban *goban, int pos, int color, float pure_threat_value,
 		   float our_score, int use_thrashing_dragon_heuristics)
 {
   float tot_value;
   float shape_factor;
 
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
   
   /* Is it an antisuji? */
   if (is_antisuji_move(pos))
@@ -3067,14 +3088,14 @@ value_move_reasons(int pos, int color, float pure_threat_value,
 	    compare_move_reasons);
 
     /* Discard move reasons that only duplicate another. */
-    discard_redundant_move_reasons(pos);
+    discard_redundant_move_reasons(goban, pos);
 
     /* Estimate the value of various aspects of the move. The order
      * is significant. Territorial value must be computed before
      * strategical value. See connection_value().
      */
-    estimate_territorial_value(pos, color, our_score, 0);
-    estimate_strategical_value(pos, color, our_score,
+    estimate_territorial_value(goban, pos, color, our_score, 0);
+    estimate_strategical_value(goban, pos, color, our_score,
 			       use_thrashing_dragon_heuristics);
   }
 
@@ -3083,7 +3104,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
   tot_value = territorial_weight * move[pos].territorial_value + 
               strategical_weight * move[pos].strategical_value;
 
-  shape_factor = compute_shape_factor(pos);
+  shape_factor = compute_shape_factor(goban, pos);
 
   if (tot_value > 0.0) {
     int c;
@@ -3178,8 +3199,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     /* Add a special shape bonus for moves which connect own strings
      * or cut opponent strings.
      */
-    c = (move_connects_strings(pos, color, 1)
-	 + move_connects_strings(pos, OTHER_COLOR(color), 0));
+    c = (move_connects_strings(goban, pos, color, 1)
+	 + move_connects_strings(goban, pos, OTHER_COLOR(color), 0));
     if (c > 0) {
       float shape_factor2 = pow(1.02, (float) c) - 1;
       float base_value = gg_max(gg_min(tot_value, 5.0), 1.0);
@@ -3198,8 +3219,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
      * a point.
      */
     if (tot_value < 0.3
-	&& (move_reason_known(pos, CONNECT_MOVE, -1)
-	    || move_reason_known(pos, CUT_MOVE, -1))) {
+	&& (move_reason_known(goban, pos, CONNECT_MOVE, -1)
+	    || move_reason_known(goban, pos, CUT_MOVE, -1))) {
       float old_tot_value = tot_value;
       tot_value = gg_min(0.3, tot_value + 0.1);
       TRACE(goban, "  %1m: %f - cut/connect dame bonus\n", pos,
@@ -3223,10 +3244,10 @@ value_move_reasons(int pos, int color, float pure_threat_value,
   if (pure_threat_value > 0.0 
       && move[pos].worthwhile_threat
       && tot_value <= pure_threat_value
-      && board[pos] == EMPTY
+      && goban->board[pos] == EMPTY
       && move[pos].additional_ko_value > 0.0
       && is_legal(goban, pos, color)
-      && value_moves_confirm_safety(pos, color)) {
+      && value_moves_confirm_safety(goban, pos, color)) {
     float new_tot_value = gg_min(pure_threat_value,
 				 tot_value
 				 + 0.25 * move[pos].additional_ko_value);
@@ -3289,7 +3310,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
  * Loop over all possible moves and value the move reasons for each.
  */
 static void
-value_moves(int color, float pure_threat_value, float our_score,
+value_moves(Goban *goban, int color, float pure_threat_value, float our_score,
             int use_thrashing_dragon_heuristics)
 {
   int m, n;
@@ -3298,11 +3319,11 @@ value_moves(int color, float pure_threat_value, float our_score,
   TRACE(goban, "\nMove valuation:\n");
   
   /* Visit the moves in the standard lexicographical order */
-  for (n = 0; n < board_size; n++)
-    for (m = board_size-1; m >= 0; m--) {
+  for (n = 0; n < goban->board_size; n++)
+    for (m = goban->board_size - 1; m >= 0; m--) {
       pos = POS(m, n);
 
-      move[pos].value = value_move_reasons(pos, color, 
+      move[pos].value = value_move_reasons(goban, pos, color, 
 					   pure_threat_value, our_score,
 					   use_thrashing_dragon_heuristics);
       if (move[pos].value == 0.0)
@@ -3329,7 +3350,7 @@ value_moves(int color, float pure_threat_value, float our_score,
 /* Print the values of all moves with values bigger than zero. */
 
 void
-print_all_move_values(FILE *output)
+print_all_move_values(const Goban *goban, FILE *output)
 {
   int pos;
   
@@ -3346,7 +3367,7 @@ print_all_move_values(FILE *output)
  */
 
 static void
-print_top_moves(void)
+print_top_moves(const Goban *goban)
 {
   int k;
   int pos;
@@ -3413,7 +3434,7 @@ remove_top_move(int move)
  * ko capture.
  */
 static void
-reevaluate_ko_threats(int ko_move, int color, float ko_value)
+reevaluate_ko_threats(Goban *goban, int ko_move, int color, float ko_value)
 {
   int ko_stone = NO_MOVE;
   int opp_ko_move;
@@ -3482,8 +3503,7 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
       case SEMEAI_THREAT:
 	if (dragon[move_reasons[r].what].effective_size
 	    > threat_size) {
-	  threat_size = dragon[move_reasons[r].what]\
-	    .effective_size;
+	  threat_size = dragon[move_reasons[r].what].effective_size;
 	  type = move_reasons[r].type;
 	  what = move_reasons[r].what;
 	}
@@ -3509,7 +3529,7 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
 	  threat_does_work = 1;
 	else {
 	  int threat_wastes_point = 0;
-	  if (whose_area(OPPOSITE_INFLUENCE(color), pos) != EMPTY)
+	  if (whose_area(goban, OPPOSITE_INFLUENCE(color), pos) != EMPTY)
 	    threat_wastes_point = 1;
 
 	  if (trymove(goban, opp_ko_move, OTHER_COLOR(color),
@@ -3519,7 +3539,7 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
 	      threat_does_work = attack(goban, what, NULL);
 	      break;
 	    case DEFEND_THREAT:
-	      threat_does_work = (board[what] != EMPTY
+	      threat_does_work = (goban->board[what] != EMPTY
 				  && find_defense(goban, what, NULL));
 	      break;
 	    case OWL_ATTACK_THREAT:
@@ -3567,7 +3587,8 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
 	       */
 	      if (averting_pos != NO_MOVE) {
 		int averting_wastes_point = 0;
-		if (whose_territory(OPPOSITE_INFLUENCE(color), averting_pos)
+		if (whose_territory(goban, OPPOSITE_INFLUENCE(color),
+				    averting_pos)
 		    != EMPTY)
 		  averting_wastes_point = 1;
 		threat_quality = averting_wastes_point - threat_wastes_point;
@@ -3610,7 +3631,7 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
  * inferior move are transferred to the replacement.
  */
 static void
-redistribute_points(void)
+redistribute_points(const Goban *goban)
 {
   int source;
   int target;
@@ -3642,7 +3663,7 @@ redistribute_points(void)
  * for the best move.
  */
 static int
-find_best_move(int *the_move, float *value, int color,
+find_best_move(Goban *goban, int *the_move, float *value, int color,
 	       int allowed_moves[BOARDMAX])
 {
   int good_move_found = 0;
@@ -3684,13 +3705,13 @@ find_best_move(int *the_move, float *value, int color,
      */
     if (best_value > 0.0 && is_illegal_ko_capture(goban, best_move, color)) {
       TRACE(goban, "Move at %1m would be an illegal ko capture.\n", best_move);
-      reevaluate_ko_threats(best_move, color, best_value);
-      redistribute_points();
+      reevaluate_ko_threats(goban, best_move, color, best_value);
+      redistribute_points(goban);
       time_report(2, "  reevaluate_ko_threats", NO_MOVE, 1.0);
       remove_top_move(best_move);
       move[best_move].value = 0.0;
       move[best_move].final_value = 0.0;
-      print_top_moves();
+      print_top_moves(goban);
       good_move_found = 0;
     }
     /* Call blunder_size() to check that we're not about to make a
@@ -3699,7 +3720,8 @@ find_best_move(int *the_move, float *value, int color,
      */
     else if (best_value > 0.0) {
       if (!blunder_tested[best_move]) {
-	float blunder_size = value_moves_get_blunder_size(best_move, color);
+	float blunder_size = value_moves_get_blunder_size(goban, best_move,
+							  color);
 	if (blunder_size > 0.0) {
 	  TRACE(goban, "Move at %1m is a blunder, subtracting %f.\n", best_move,
 		blunder_size);
@@ -3745,7 +3767,7 @@ find_best_move(int *the_move, float *value, int color,
  * NULL any move is allowed.
  */
 int
-review_move_reasons(int *the_move, float *value, int color,
+review_move_reasons(Goban *goban, int *the_move, float *value, int color,
 		    float pure_threat_value, float our_score,
 		    int allowed_moves[BOARDMAX],
 		    int use_thrashing_dragon_heuristics)
@@ -3755,51 +3777,51 @@ review_move_reasons(int *the_move, float *value, int color,
   current_color = color;
   
   start_timer(2);
-  find_more_attack_and_defense_moves(color);
+  find_more_attack_and_defense_moves(goban, color);
   time_report(2, "  find_more_attack_and_defense_moves", NO_MOVE, 1.0);
 
   if (large_scale && level >= 6) {
-    find_large_scale_owl_attack_moves(color);
+    find_large_scale_owl_attack_moves(goban, color);
     time_report(2, "  find_large_scale_owl_attack_moves", NO_MOVE, 1.0);
   }
 
   if (level >= 6) {
-    find_more_owl_attack_and_defense_moves(color);
+    find_more_owl_attack_and_defense_moves(goban, color);
     time_report(2, "  find_more_owl_attack_and_defense_moves", NO_MOVE, 1.0);
   }
 
-  find_more_semeai_moves(color);
+  find_more_semeai_moves(goban, color);
   time_report(2, "  find_more_semeai_moves", NO_MOVE, 1.0);
 
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
-  examine_move_safety(color);
+  examine_move_safety(goban, color);
   time_report(2, "  examine_move_safety", NO_MOVE, 1.0);
   verbose = save_verbose;
 
   /* We can't do this until move_safety is known. */
-  induce_secondary_move_reasons(color);
+  induce_secondary_move_reasons(goban, color);
   time_report(2, "  induce_secondary_move_reasons", NO_MOVE, 1.0);
     
   if (printworms || verbose)
-    list_move_reasons(stderr, NO_MOVE);
+    list_move_reasons(goban, stderr, NO_MOVE);
 
   /* Evaluate all moves with move reasons. */
-  value_moves(color, pure_threat_value, our_score,
+  value_moves(goban, color, pure_threat_value, our_score,
       	      use_thrashing_dragon_heuristics);
   time_report(2, "  value_moves", NO_MOVE, 1.0);
 
   /* Perform point redistribution */
-  redistribute_points();
+  redistribute_points(goban);
 
   /* Search through all board positions for the 10 highest valued
    * moves and print them.
    */
-  print_top_moves();
+  print_top_moves(goban);
 
   /* Select the highest valued move and return it. */
-  return find_best_move(the_move, value, color, allowed_moves);
+  return find_best_move(goban, the_move, value, color, allowed_moves);
 }
 
 
@@ -3820,7 +3842,7 @@ choose_strategy(int color, float our_score, float game_status)
   invasion_malus_weight = 1.0;
   followup_weight       = 1.0;
 
-  TRACE(goban, "  Game status = %f (0.0 = start, 1.0 = game over)\n", game_status);
+  TRACE(NULL, "  Game status = %f (0.0 = start, 1.0 = game over)\n", game_status);
 
   
   if (cosmic_gnugo) {
@@ -3835,7 +3857,7 @@ choose_strategy(int color, float our_score, float game_status)
       attack_dragon_weight  = 1.1; 
       invasion_malus_weight = 1.3;
       followup_weight       = 1.1;
-      TRACE(goban, "  %s is leading, using conservative settings.\n",
+      TRACE(NULL, "  %s is leading, using conservative settings.\n",
 	    color == WHITE ? "White" : "Black");
     }
     else if (game_status > 0.16) {
@@ -3853,7 +3875,7 @@ choose_strategy(int color, float our_score, float game_status)
       if (game_status > 0.75 && our_score < -25.0)
         invasion_malus_weight = 0.2;
             
-      TRACE(goban, "  %s is not winning enough, using aggressive settings.\n", 
+      TRACE(NULL, "  %s is not winning enough, using aggressive settings.\n", 
 	    color == WHITE ? "White" : "Black");
     }
   }
@@ -3866,7 +3888,7 @@ choose_strategy(int color, float our_score, float game_status)
  * This function should only be used for debugging purposes.
  */
 void
-prepare_move_influence_debugging(int pos, int color)
+prepare_move_influence_debugging(Goban *goban, int pos, int color)
 {
   float our_score;
   
@@ -3875,7 +3897,7 @@ prepare_move_influence_debugging(int pos, int color)
   else
     our_score = -white_score;
 
-  estimate_territorial_value(pos, color, our_score, 1);
+  estimate_territorial_value(goban, pos, color, our_score, 1);
 }
 
 
@@ -3911,7 +3933,7 @@ prepare_move_influence_debugging(int pos, int color)
  *  P{V_i < t} = 1		  if t >= u_i.
  */
 void
-compute_move_probabilities(float probabilities[BOARDMAX])
+compute_move_probabilities(const Goban *goban, float probabilities[BOARDMAX])
 {
   int k;
   int pos;

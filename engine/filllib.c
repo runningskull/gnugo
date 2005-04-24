@@ -22,26 +22,28 @@
 
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "liberty.h"
 
-static int find_backfilling_move(int move, int color, int *backfill_move,
+static int find_backfilling_move(Goban *goban, int move, int color,
+				 int *backfill_move,
 				 int forbidden_moves[BOARDMAX]);
-static int filllib_confirm_safety(int move, int color, int *defense_point);
+static int filllib_confirm_safety(Goban *goban, int move, int color,
+				  int *defense_point);
 
-/* Determine whether a point is adjacent to at least one own string which
- * isn't dead.
+
+/* Determine whether a point is adjacent to at least one own string
+ * which isn't dead.
  */
 static int
-living_neighbor(int pos, int color)
+living_neighbor(const Goban *goban, int pos, int color)
 {
   int k;
   for (k = 0; k < 4; k++) {
-    if (board[pos + delta[k]] == color
+    if (goban->board[pos + delta[k]] == color
 	&& dragon[pos + delta[k]].status != DEAD)
       return 1;
   }
@@ -55,41 +57,43 @@ living_neighbor(int pos, int color)
  * around a killing nakade string.
  */
 static void
-analyze_neighbor(int pos, int *found_black, int *found_white)
+analyze_neighbor(Goban *goban, int pos, int *found_black, int *found_white)
 {
-  switch (board[pos]) {
-    case EMPTY:
-      if (!(*found_black)
-	  && living_neighbor(pos, BLACK)
-	  && safe_move(goban, pos, WHITE) != WIN)
+  switch (goban->board[pos]) {
+  case EMPTY:
+    if (!(*found_black)
+	&& living_neighbor(goban, pos, BLACK)
+	&& safe_move(goban, pos, WHITE) != WIN)
+      *found_black = 1;
+
+    if (!(*found_white)
+	&& living_neighbor(goban, pos, WHITE)
+	&& safe_move(goban, pos, BLACK) != WIN)
+      *found_white = 1;
+
+    break;
+
+  case BLACK:
+    if (!worm[pos].inessential && DRAGON2(pos).safety != INESSENTIAL) {
+      if (dragon[pos].status == ALIVE
+	  || dragon[pos].status == UNKNOWN)
 	*found_black = 1;
-      
-      if (!(*found_white)
-	  && living_neighbor(pos, WHITE)
-	  && safe_move(goban, pos, BLACK) != WIN)
+      else
 	*found_white = 1;
-      
-      break;
+    }
 
-    case BLACK:
-      if (!worm[pos].inessential && DRAGON2(pos).safety != INESSENTIAL) {
-	if (dragon[pos].status == ALIVE
-	    || dragon[pos].status == UNKNOWN)
-	  *found_black = 1;
-	else
-	  *found_white = 1;
-      }
-      break;
+    break;
 
-    case WHITE:
-      if (!worm[pos].inessential && DRAGON2(pos).safety != INESSENTIAL) {
-	if (dragon[pos].status == ALIVE
-	    || dragon[pos].status == UNKNOWN)
-	  *found_white = 1;
-	else
-	  *found_black = 1;
-      }
-      break;
+  case WHITE:
+    if (!worm[pos].inessential && DRAGON2(pos).safety != INESSENTIAL) {
+      if (dragon[pos].status == ALIVE
+	  || dragon[pos].status == UNKNOWN)
+	*found_white = 1;
+      else
+	*found_black = 1;
+    }
+
+    break;
   }
 }
 
@@ -103,9 +107,10 @@ analyze_neighbor(int pos, int *found_black, int *found_white)
  * The move is returned in (*move).
  */
 
-int 
-fill_liberty(int *move, int color)
+int
+fill_liberty(Goban *goban, int *move, int color)
 {
+  const Intersection *const board = goban->board;
   int k;
   int pos;
   int other = OTHER_COLOR(color);
@@ -125,7 +130,7 @@ fill_liberty(int *move, int color)
 
     if (worm[pos].inessential || DRAGON2(pos).safety == INESSENTIAL)
       continue;
-    
+
     if (dragon[pos].status != ALIVE) {
       for (k = 0; k < 4; k++) {
 	int pos2 = pos + delta[k];
@@ -133,11 +138,11 @@ fill_liberty(int *move, int color)
 	  potential_color[pos2] |= OTHER_COLOR(board[pos]);
       }
     }
-    
+
     if (dragon[pos].status != DEAD) {
       for (k = 0; k < 12; k++) {
 	int d = delta[k%8];
-	
+
 	if (k >= 8) {
 	  if (board[pos + d] != EMPTY)
 	    continue;
@@ -148,8 +153,8 @@ fill_liberty(int *move, int color)
       }
     }
   }
-  
-  
+
+
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     /* It seems we can't trust an empty liberty to be gray-colored
      * either as a cave or as a cavity. Instead we look for empty
@@ -159,25 +164,25 @@ fill_liberty(int *move, int color)
      */
     int found_white = 0;
     int found_black = 0;
-    
+
     if (board[pos] != EMPTY)
       continue;
 
     /* Quick rejection based on preliminary test above. */
     if (potential_color[pos] != GRAY)
       continue;
-    
+
     /* Loop over the neighbors. */
     for (k = 0; k < 4; k++) {
       int d = delta[k];
       if (ON_BOARD(goban, pos + d))
-	analyze_neighbor(pos + d, &found_black, &found_white);
+	analyze_neighbor(goban, pos + d, &found_black, &found_white);
     }
-    
+
     /* Do we have neighbors of both colors? */
     if (!(found_white && found_black))
       continue;
-    
+
     /* Ok, we wish to play here, but maybe we can't. The following
      * cases may occur:
      * 1. Move is legal and safe.
@@ -187,16 +192,16 @@ fill_liberty(int *move, int color)
      * 5. Move is illegal but can be played after back-captures.
      * 6. Move would violate confirm_safety.
      */
-    
+
     DEBUG(goban, DEBUG_FILLLIB, "Filllib: Considering move at %1m.\n", pos);
-    
+
     /* Legal and tactically safe, play it if it passes
      * confirm_safety test, i.e. that it isn't a blunder which
      * causes problems for other strings.
      */
     if (safe_move(goban, pos, color) == WIN) {
       DEBUG(goban, DEBUG_FILLLIB, "Filllib: Tactically safe.\n");
-      if (filllib_confirm_safety(pos, color, &defense_point)) {
+      if (filllib_confirm_safety(goban, pos, color, &defense_point)) {
 	/* Safety confirmed. */
 	DEBUG(goban, DEBUG_FILLLIB, "Filllib: Safety confirmed.\n");
 	*move = pos;
@@ -225,7 +230,7 @@ fill_liberty(int *move, int color)
 	continue;
       }
     }
-    
+
     /* Try to play the move. */
     if (trymove(goban, pos, color, "fill_liberty", NO_MOVE)) {
       int forbidden_moves[BOARDMAX];
@@ -235,10 +240,10 @@ fill_liberty(int *move, int color)
 	    "Filllib: Legal but not safe, looking for backfilling move.\n");
 
       memset(forbidden_moves, 0, sizeof(forbidden_moves));
-      while (find_backfilling_move(pos, color, move, forbidden_moves)) {
+      while (find_backfilling_move(goban, pos, color, move, forbidden_moves)) {
 	/* Mark as forbidden in case we need another turn in the loop. */
 	forbidden_moves[*move] = 1;
-	
+
 	DEBUG(goban, DEBUG_FILLLIB, "Filllib: Backfilling move at %1m.\n", *move);
 	/* In certain positions it may happen that an illegal move
 	 * is found. This probably only can happen if we try to play
@@ -250,17 +255,17 @@ fill_liberty(int *move, int color)
 	  *move = NO_MOVE;
 	  continue;
 	}
-	
+
 	/* If the move turns out to be strategically unsafe, or
 	 * setting up a double threat elsewhere, also discard it.
 	 */
-	if (!filllib_confirm_safety(*move, color, &defense_point)) {
+	if (!filllib_confirm_safety(goban, *move, color, &defense_point)) {
 	  DEBUG(goban, DEBUG_FILLLIB,
 		"Filllib: Safety not confirmed, discarded.\n");
 	  *move = NO_MOVE;
 	  continue;
 	}
-	
+
 	/* Seems to be ok. */
 	return 1;
       }
@@ -271,7 +276,7 @@ fill_liberty(int *move, int color)
       if (does_capture_something(goban, pos, color)) {
 	DEBUG(goban, DEBUG_FILLLIB,
 	      "Filllib: Not tactically safe, but captures stones.\n");
-	if (!filllib_confirm_safety(pos, color, &defense_point)) {
+	if (!filllib_confirm_safety(goban, pos, color, &defense_point)) {
 	  DEBUG(goban, DEBUG_FILLLIB,
 		"Filllib: Safety not confirmed, discarded.\n");
 	  continue;
@@ -294,7 +299,7 @@ fill_liberty(int *move, int color)
 	  return 1;
 	}
       }
-      
+
       DEBUG(goban, DEBUG_FILLLIB,
 	    "Filllib: Nothing found, looking for ko back-capture.\n");
       for (k = 0; k < 4; k++) {
@@ -324,7 +329,7 @@ fill_liberty(int *move, int color)
 	      *move = libs[1];
 	    else
 	      continue;
-	    
+
 	    DEBUG(goban, DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
 	    return 1;
 	  }
@@ -332,7 +337,7 @@ fill_liberty(int *move, int color)
       }
     }
   }
-  
+
   /* Nothing found. */
   DEBUG(goban, DEBUG_FILLLIB, "Filllib: No move found.\n");
   return 0;
@@ -367,7 +372,7 @@ static int adjs[MAXCHAIN];
 static int libs[MAXLIBS];
 
 static int
-find_backfilling_move(int move, int color, int *backfill_move,
+find_backfilling_move(Goban *goban, int move, int color, int *backfill_move,
 		      int forbidden_moves[BOARDMAX])
 {
   int k;
@@ -381,7 +386,7 @@ find_backfilling_move(int move, int color, int *backfill_move,
   int acode;
   int saved_move = NO_MOVE;
   int opponent_libs;
-  
+
   /* Play (move) and identify all liberties and adjacent strings. */
   if (!trymove(goban, move, color, "find_backfilling_move", move))
     return 0; /* This shouldn't happen, I believe. */
@@ -391,7 +396,7 @@ find_backfilling_move(int move, int color, int *backfill_move,
    */
   acode = attack(goban, move, &apos);
   gg_assert(goban, acode != 0 && apos != NO_MOVE);
-  
+
   /* Find liberties. */
   liberties = findlib(goban, move, MAXLIBS, libs);
 
@@ -400,7 +405,7 @@ find_backfilling_move(int move, int color, int *backfill_move,
 
   /* Remove (move) again. */
   popgo(goban);
-  
+
   /* It's most fun to capture stones. Start by trying to take some
    * neighbor off the board. If the attacking move does not directly
    * reduce the number of liberties of the attacked string we don't
@@ -441,7 +446,7 @@ find_backfilling_move(int move, int color, int *backfill_move,
       }
     }
   }
-  
+
   /* Otherwise look for a safe move at a liberty. */
   if (!found_one) {
     for (k = 0; k < liberties; k++) {
@@ -472,7 +477,7 @@ find_backfilling_move(int move, int color, int *backfill_move,
       }
     }
   }
-  
+
   /* If no luck so far, try with superstring liberties. */
   if (!found_one) {
     trymove(goban, move, color, "find_backfilling_move", move);
@@ -505,19 +510,19 @@ find_backfilling_move(int move, int color, int *backfill_move,
 
   if (found_one) {
     ASSERT1(goban, !forbidden_moves[*backfill_move], *backfill_move);
-  
+
     if (!trymove(goban, *backfill_move, color, "find_backfilling_move", move))
       return 0; /* This really shouldn't happen. */
-    
+
     /* Allow opponent to get a move in here. */
     if (trymove(goban, apos, OTHER_COLOR(color), "find_backfilling_move", move))
       extra_pop = 1;
-    
+
     /* If still not safe, recurse to find a new backfilling move. */
     if (safe_move(goban, move, color) == WIN)
       success = 1;
     else
-      success = find_backfilling_move(move, color, backfill_move,
+      success = find_backfilling_move(goban, move, color, backfill_move,
 				      forbidden_moves);
 
     /* Pop move(s) and return. */
@@ -541,13 +546,13 @@ find_backfilling_move(int move, int color, int *backfill_move,
  * owl code to verify the strategical viability of the move.
  */
 static int
-filllib_confirm_safety(int move, int color, int *defense_point)
+filllib_confirm_safety(Goban *goban, int move, int color, int *defense_point)
 {
   int k;
   int apos = NO_MOVE;
   int save_verbose;
 
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
   gg_assert(goban, defense_point != NULL);
   *defense_point = NO_MOVE;
 
@@ -555,7 +560,7 @@ filllib_confirm_safety(int move, int color, int *defense_point)
    * our color.
    */
   for (k = 0; k < 4; k++)
-    if (board[move + delta[k]] == color) {
+    if (goban->board[move + delta[k]] == color) {
       apos = move + delta[k];
       break;
     }
@@ -564,17 +569,17 @@ filllib_confirm_safety(int move, int color, int *defense_point)
   if (apos == NO_MOVE)
     for (k = 0; k < 4; k++) {
       int pos2 = move + delta[k];
-      if (board[pos2] == OTHER_COLOR(color)
+      if (goban->board[pos2] == OTHER_COLOR(color)
 	  && !play_attack_defend_n(goban, color, 0, 1, move, pos2)) {
 	int adj;
 	adj = chainlinks(goban, pos2, adjs);
 	/* It seems unlikely that we would ever get no adjacent strings
-         * here, but if it should happen we simply give up and say the
-         * move is unsafe.
+	 * here, but if it should happen we simply give up and say the
+	 * move is unsafe.
 	 */
 	if (adj == 0)
 	  return 0;
-	
+
 	apos = adjs[0];
 	break;
       }
@@ -583,7 +588,7 @@ filllib_confirm_safety(int move, int color, int *defense_point)
   /* Next attempt are diagonal neighbors. */
   if (apos == NO_MOVE) {
     for (k = 4; k < 8; k++)
-      if (board[move + delta[k]] == color) {
+      if (goban->board[move + delta[k]] == color) {
 	apos = move + delta[k];
 	break;
       }
@@ -592,12 +597,12 @@ filllib_confirm_safety(int move, int color, int *defense_point)
   /* And two steps away. */
   if (apos == NO_MOVE) {
     for (k = 0; k < 4; k++)
-      if (board[move + 2 * delta[k]] == color) {
+      if (goban->board[move + 2 * delta[k]] == color) {
 	apos = move + 2 * delta[k];
 	break;
       }
   }
-  
+
   /* We should have found something by now. If not something's
    * probably broken elsewhere. Declare the move unsafe if it happens.
    */
@@ -605,14 +610,14 @@ filllib_confirm_safety(int move, int color, int *defense_point)
     return 0;
 
   /* Ask the owl code whether this move is strategically viable. */
-  
+
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
-  if (!owl_does_defend(move, apos, NULL))
+  if (!owl_does_defend(goban, move, apos, NULL))
     return 0;
   verbose = save_verbose;
-  
+
   return confirm_safety(goban, move, color, defense_point, NULL);
 }
 

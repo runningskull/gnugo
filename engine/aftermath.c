@@ -22,7 +22,6 @@
 
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,17 +31,17 @@
 static SGFTree *aftermath_sgftree;
 
 
-static int do_aftermath_genmove(int color,
+static int do_aftermath_genmove(Goban *goban, int color,
 				int under_control[BOARDMAX],
 				int do_capture_dead_stones);
 
 
 static int
-all_own_neighbors_inessential(int pos, int color)
+all_own_neighbors_inessential(const Goban *goban, int pos, int color)
 {
   int k;
   for (k = 0; k < 4; k++)
-    if (board[pos + delta[k]] == color
+    if (goban->board[pos + delta[k]] == color
 	&& DRAGON2(pos + delta[k]).safety != INESSENTIAL
 	&& (DRAGON2(pos + delta[k]).safety != ALIVE
 	    || DRAGON2(pos + delta[k]).owl_status != DEAD))
@@ -61,10 +60,10 @@ all_own_neighbors_inessential(int pos, int color)
  */
 
 int
-aftermath_genmove(int color, int do_capture_dead_stones,
+aftermath_genmove(Goban *goban, int color, int do_capture_dead_stones,
 		  int allowed_moves[BOARDMAX])
 {
-  int move = do_aftermath_genmove(color, NULL, do_capture_dead_stones);
+  int move = do_aftermath_genmove(goban, color, NULL, do_capture_dead_stones);
   if (move != PASS_MOVE && allowed_moves && !allowed_moves[move])
     move = PASS_MOVE;
 
@@ -139,10 +138,11 @@ aftermath_genmove(int color, int do_capture_dead_stones,
  * genmove() call should return pass.
  */
 static int
-do_aftermath_genmove(int color,
+do_aftermath_genmove(Goban *goban, int color,
 		     int under_control[BOARDMAX],
 		     int do_capture_dead_stones)
 {
+  const Intersection *const board = goban->board;
   int k;
   int other = OTHER_COLOR(color);
   int distance[BOARDMAX];
@@ -224,8 +224,8 @@ do_aftermath_genmove(int color,
   
   if (debug & DEBUG_AFTERMATH) {
     int m, n;
-    for (m = 0; m < board_size; m++) {
-      for (n = 0; n < board_size; n++) {
+    for (m = 0; m < goban->board_size; m++) {
+      for (n = 0; n < goban->board_size; n++) {
 	pos = POS(m, n);
 	if (distance[pos] > 0)
 	  fprintf(stderr, "%2d", distance[pos]);
@@ -599,7 +599,7 @@ do_aftermath_genmove(int color,
 	|| !safe_move(goban, move, color)
 	|| (DRAGON2(bb).safety != INVINCIBLE
 	    && DRAGON2(bb).safety != STRONGLY_ALIVE
-	    && owl_does_defend(move, bb, NULL) != WIN)
+	    && owl_does_defend(goban, move, bb, NULL) != WIN)
 	|| (!confirm_safety(goban, move, color, NULL, NULL))) {
       score[move] = 0;
     }
@@ -635,7 +635,7 @@ do_aftermath_genmove(int color,
 	    popgo(goban);
 	    for (r = 0; r < neighbors && move_ok; r++) {
 	      if (dragon[adjs[r]].status == DEAD
-		  && !owl_does_attack(move, adjs[r], NULL)) {
+		  && !owl_does_attack(goban, move, adjs[r], NULL)) {
 		DEBUG(goban, DEBUG_AFTERMATH,
 		      "Blunder: %1m becomes more alive after %1m\n",
 		      adjs[r], move);
@@ -675,7 +675,7 @@ do_aftermath_genmove(int color,
 	  && (do_capture_dead_stones 
 	      || worm[pos2].unconditional_status != DEAD)
 	  && DRAGON2(pos2).safety != INESSENTIAL) {
-	if (k < 4 || all_own_neighbors_inessential(pos, color)) {
+	if (k < 4 || all_own_neighbors_inessential(goban, pos, color)) {
 	  target = pos2;
 	  break;
 	}
@@ -744,7 +744,7 @@ do_aftermath_genmove(int color,
 	move = NO_MOVE;
     }
 
-    while (stackp > 0)
+    while (goban->stackp > 0)
       popgo(goban);
     
     if (move == NO_MOVE)
@@ -761,13 +761,13 @@ do_aftermath_genmove(int color,
     /* Consult the owl code to determine whether the considered move
      * really is effective. Blunders should be detected here.
      */
-    if (owl_does_attack(move, target, NULL) == WIN) {
+    if (owl_does_attack(goban, move, target, NULL) == WIN) {
       /* If we have an adjacent own dragon, which is not inessential,
        * verify that it remains safe.
        */
-      if (cc != NO_MOVE && !owl_does_defend(move, cc, NULL)) {
+      if (cc != NO_MOVE && !owl_does_defend(goban, move, cc, NULL)) {
 	int resulta, resultb;
-	owl_analyze_semeai_after_move(move, color, target, cc,
+	owl_analyze_semeai_after_move(goban, move, color, target, cc,
 				      &resulta, &resultb, NULL, 1, NULL, 1);
 	if (resulta != 0)
 	  continue;
@@ -828,7 +828,7 @@ do_aftermath_genmove(int color,
  * important not to miss the move.
  */
 static int
-reduced_genmove(int color)
+reduced_genmove(Goban *goban, int color)
 {
   float value;
   int save_verbose;
@@ -840,10 +840,10 @@ reduced_genmove(int color)
   value = 0.0;
   
   /* Prepare pattern matcher and reading code. */
-  reset_engine();
+  reset_engine(goban);
 
   /* Find out information about the worms and dragons. */
-  examine_position(EXAMINE_ALL);
+  examine_position(goban, EXAMINE_ALL);
 
   /* The score will be used to determine when we are safely
    * ahead. So we want the most conservative score.
@@ -853,7 +853,7 @@ reduced_genmove(int color)
   else
     our_score = -white_score;
 
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
   
   /*
    * Ok, information gathering is complete. Now start to find some moves!
@@ -863,17 +863,18 @@ reduced_genmove(int color)
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
-  collect_move_reasons(color);
+  collect_move_reasons(goban, color);
   verbose = save_verbose;
   
   /* Look for combination attacks and defenses against them. */
-  combinations(color);
-  gg_assert(goban, stackp == 0);
+  combinations(goban, color);
+  gg_assert(goban, goban->stackp == 0);
 
   /* Review the move reasons and estimate move values. */
-  if (review_move_reasons(&move, &value, color, 0.0, our_score, NULL, 0))
+  if (review_move_reasons(goban, &move, &value, color,
+			  0.0, our_score, NULL, 0))
     TRACE(goban, "Move generation likes %1m with value %f\n", move, value);
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
 
   /* If no move is found then pass. */
   if (move == PASS_MOVE)
@@ -886,7 +887,7 @@ reduced_genmove(int color)
 
 /* Preliminary function for playing through the aftermath. */
 static void
-do_play_aftermath(int color, struct aftermath_data *a)
+do_play_aftermath(Goban *goban, int color, struct aftermath_data *a)
 {
   int move;
   int pass = 0;
@@ -899,15 +900,15 @@ do_play_aftermath(int color, struct aftermath_data *a)
   /* Disable matching of endgame patterns. */
   disable_endgame_patterns = 1;
 
-  while (pass < 2 && moves < board_size * board_size) {
+  while (pass < 2 && moves < goban->board_size * goban->board_size) {
     int reading_nodes = get_reading_node_counter();
     int owl_nodes = get_owl_node_counter();
-    move = reduced_genmove(color_to_play);
+    move = reduced_genmove(goban, color_to_play);
     if (move == PASS_MOVE) {
       int save_verbose = verbose;
       if (verbose > 0)
 	verbose--;
-      move = do_aftermath_genmove(color_to_play,
+      move = do_aftermath_genmove(goban, color_to_play,
 				  (color_to_play == WHITE ?
 				   a->white_control : a->black_control),
 				  0);
@@ -918,7 +919,8 @@ do_play_aftermath(int color, struct aftermath_data *a)
       sgftreeAddPlay(aftermath_sgftree, color_to_play, I(move), J(move));
     moves++;
     DEBUG(goban, DEBUG_AFTERMATH, "%d %C move %1m (nodes %d, %d  total %d, %d)\n",
-	  movenum, color_to_play, move, get_owl_node_counter() - owl_nodes,
+	  goban->move_number, color_to_play, move,
+	  get_owl_node_counter() - owl_nodes,
 	  get_reading_node_counter() - reading_nodes,
 	  get_owl_node_counter(), get_reading_node_counter());
     if (move != PASS_MOVE)
@@ -933,11 +935,14 @@ do_play_aftermath(int color, struct aftermath_data *a)
   disable_endgame_patterns   = 0;
 }
 
+
+/* THREAD-FIXME: Static variables are unacceptable. */
 static struct aftermath_data aftermath;
 
 static void
-play_aftermath(int color)
+play_aftermath(Goban *goban, int color)
 {
+  const Intersection *const board = goban->board;
   int pos;
   Board_state saved_board;
   struct aftermath_data *a = &aftermath;
@@ -964,17 +969,17 @@ play_aftermath(int color)
   if (cached_board)
     return;
 
-  a->white_captured = white_captured;
-  a->black_captured = black_captured;
+  a->white_captured  = goban->white_captured;
+  a->black_captured  = goban->black_captured;
   a->white_prisoners = 0;
   a->black_prisoners = 0;
   a->white_territory = 0;
   a->black_territory = 0;
-  a->white_area = 0;
-  a->black_area = 0;
+  a->white_area	     = 0;
+  a->black_area	     = 0;
   
   store_board(goban, &saved_board);
-  do_play_aftermath(color, a);
+  do_play_aftermath(goban, color, a);
   restore_board(goban, &saved_board);
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -1034,16 +1039,19 @@ play_aftermath(int color)
 }
 
 float
-aftermath_compute_score(int color, float komi, SGFTree *tree)
+aftermath_compute_score(Goban *goban, int color, float komi, SGFTree *tree)
 {
   struct aftermath_data *a = &aftermath;
+
   aftermath_sgftree = tree;
-  play_aftermath(color);
-  if (chinese_rules)
+  play_aftermath(goban, color);
+
+  if (goban->chinese_rules) {
     return (a->white_area
 	    - a->black_area
 	    + komi);
-  else
+  }
+  else {
     return (a->white_territory
 	    + a->black_captured
 	    + a->black_prisoners
@@ -1051,6 +1059,7 @@ aftermath_compute_score(int color, float komi, SGFTree *tree)
 	       + a->white_captured
 	       + a->white_prisoners)
 	    + komi);
+  }
 }
 
 /* Report the final status of a vertex on the board.
@@ -1058,11 +1067,11 @@ aftermath_compute_score(int color, float komi, SGFTree *tree)
  * BLACK_TERRITORY, and DAME.
  */
 enum dragon_status
-aftermath_final_status(int color, int pos)
+aftermath_final_status(Goban *goban, int color, int pos)
 {
   ASSERT_ON_BOARD1(goban, pos);
   aftermath_sgftree = NULL;
-  play_aftermath(color);
+  play_aftermath(goban, color);
   return aftermath.final_status[pos];
 }
 

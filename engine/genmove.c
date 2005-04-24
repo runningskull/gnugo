@@ -21,7 +21,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,10 +34,13 @@
  * After using this macro x will always have the value
  * position_number.
  */
-#define NEEDS_UPDATE(x) (x != position_number ? (x = position_number, 1) : 0)
+#define NEEDS_UPDATE(goban, x)						\
+  ((x) != (goban)->position_number					\
+   ? ((x) = (goban)->position_number, 1) : 0)
+
 
 static int get_level(int *level);
-static int do_genmove(int color, float pure_threat_value,
+static int do_genmove(Goban *goban, int color, float pure_threat_value,
 		      int allowed_moves[BOARDMAX], float *value, int *resign);
 
 /* Position numbers for which various examinations were last made. */
@@ -49,24 +51,25 @@ static int dragons_examined = -1;
 static int initial_influence2_examined = -1;
 static int dragons_refinedly_examined = -1;
 
-static int revise_semeai(int color);
-static int revise_thrashing_dragon(int color, float our_score,
-    			 	   float advantage);
+static int revise_semeai(const Goban *goban, int color);
+static int revise_thrashing_dragon(Goban *goban, int color, float our_score,
+				   float advantage);
 
-static void break_mirror_go(int color);
-static int find_mirror_move(int *move, int color);
-static int should_resign(int color, float optimistic_score, int move);
-static void compute_scores(void);
+static void break_mirror_go(Goban *goban, int color);
+static int find_mirror_move(Goban *goban, int *move, int color);
+static int should_resign(const Goban *goban, int color,
+			 float optimistic_score, int move);
+static void compute_scores(Goban *goban);
 
 
-/* Reset some things in the engine. 
+/* Reset some things in the engine.
  *
  * This prepares the hash table for the reading code for use.  It
- * should be called when we start examine a new position.  
+ * should be called when we start examine a new position.
  */
 
 void
-reset_engine()
+reset_engine(Goban *goban)
 {
   /* To improve the reproducability of games, we restart the random
    * number generator with the same seed for each move. Thus we don't
@@ -79,17 +82,18 @@ reset_engine()
   /* Initialize things for hashing of positions. */
   reading_cache_clear();
 
-  hashdata_recalc(&goban->board_hash, board, board_ko_pos);
+  /* FIXME: Is this needed at all?  /pp */
+  hashdata_recalc(&goban->board_hash, goban->board, goban->board_ko_pos);
 
-  worms_examined = -1;
-  initial_influence_examined = -1;
+  worms_examined	       = -1;
+  initial_influence_examined   = -1;
   dragons_examined_without_owl = -1;
-  dragons_examined = -1;
-  initial_influence2_examined = -1;
-  dragons_refinedly_examined = -1;
+  dragons_examined	       = -1;
+  initial_influence2_examined  = -1;
+  dragons_refinedly_examined   = -1;
 
   /* Prepare our table of move reasons. */
-  clear_move_reasons();
+  clear_move_reasons(goban);
   clear_break_in_list();
 
   /* Set up depth values (see comments there for details). */
@@ -102,26 +106,26 @@ reset_engine()
  * for debugging purposes (decidestring, etc).
  *
  * The parameter how_much tells us how much of the work we have to do.
- * For move generation we have to do it all.  For debugging we can 
+ * For move generation we have to do it all.  For debugging we can
  * sometimes stop a little earlier.
  */
 
 void
-examine_position(int how_much)
+examine_position(Goban *goban, int how_much)
 {
   int save_verbose = verbose;
 
   purge_persistent_caches(goban);
 
-  /* Don't print reading traces during make_worms and make_dragons unless 
-   * the user really wants it (verbose == 3). 
+  /* Don't print reading traces during make_worms and make_dragons unless
+   * the user really wants it (verbose == 3).
    */
   if (verbose == 1 || verbose == 2)
     --verbose;
 
-  if (NEEDS_UPDATE(worms_examined)) {
+  if (NEEDS_UPDATE(goban, worms_examined)) {
     start_timer(0);
-    make_worms();
+    make_worms(goban);
     time_report(0, "  make worms", NO_MOVE, 1.0);
   }
 
@@ -132,8 +136,8 @@ examine_position(int how_much)
   }
 
   if (stones_on_board(goban, BLACK | WHITE) != 0) {
-    if (NEEDS_UPDATE(initial_influence_examined))
-      compute_worm_influence();
+    if (NEEDS_UPDATE(goban, initial_influence_examined))
+      compute_worm_influence(goban);
     if (how_much == EXAMINE_INITIAL_INFLUENCE) {
       verbose = save_verbose;
       gg_assert(goban, test_gray_border(goban) < 0);
@@ -141,18 +145,18 @@ examine_position(int how_much)
     }
 
     if (how_much == EXAMINE_DRAGONS_WITHOUT_OWL) {
-      if (NEEDS_UPDATE(dragons_examined_without_owl))
-	make_dragons(1);
+      if (NEEDS_UPDATE(goban, dragons_examined_without_owl))
+	make_dragons(goban, 1);
       verbose = save_verbose;
       gg_assert(goban, test_gray_border(goban) < 0);
       return;
     }
-    
-    if (NEEDS_UPDATE(dragons_examined)) {
-      make_dragons(0);
-      compute_scores();
+
+    if (NEEDS_UPDATE(goban, dragons_examined)) {
+      make_dragons(goban, 0);
+      compute_scores(goban);
       /* We have automatically done a partial dragon analysis as well. */
-      dragons_examined_without_owl = position_number;
+      dragons_examined_without_owl = goban->position_number;
     }
     if (how_much == EXAMINE_DRAGONS) {
       verbose = save_verbose;
@@ -163,25 +167,25 @@ examine_position(int how_much)
   else if (how_much == EXAMINE_INITIAL_INFLUENCE
 	   || how_much == EXAMINE_DRAGONS
 	   || how_much == EXAMINE_ALL) {
-    initialize_dragon_data();
-    compute_scores();
+    initialize_dragon_data(goban);
+    compute_scores(goban);
     verbose = save_verbose;
     gg_assert(goban, test_gray_border(goban) < 0);
     return;
   }
-  
+
   verbose = save_verbose;
 
-  if (NEEDS_UPDATE(initial_influence2_examined)) {
-    compute_dragon_influence();
+  if (NEEDS_UPDATE(goban, initial_influence2_examined)) {
+    compute_dragon_influence(goban);
   }
   if (how_much == EXAMINE_INITIAL_INFLUENCE2) {
     gg_assert(goban, test_gray_border(goban) < 0);
     return;
   }
 
-  if (NEEDS_UPDATE(dragons_refinedly_examined)) {
-    compute_refined_dragon_weaknesses();
+  if (NEEDS_UPDATE(goban, dragons_refinedly_examined)) {
+    compute_refined_dragon_weaknesses(goban);
   }
   if (how_much == FULL_EXAMINE_DRAGONS) {
     gg_assert(goban, test_gray_border(goban) < 0);
@@ -189,7 +193,7 @@ examine_position(int how_much)
   }
 
   if (printworms)
-    show_dragons();
+    show_dragons(goban);
 }
 
 
@@ -197,38 +201,37 @@ examine_position(int how_much)
  * output, and sgf traces are turned off.
  */
 void
-silent_examine_position(int how_much)
+silent_examine_position(Goban *goban, int how_much)
 {
+  SGF_dump_data sgf_dump_save;
   int save_verbose = verbose;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
   int save_debug = debug;
   int save_printmoyo = printmoyo;
-  
+
+  SAVE_SGF_DUMP_DATA(goban, &sgf_dump_save);
+
   verbose = 0;
-  sgf_dumptree = NULL;
-  count_variations = 0;
   debug = 0;
   printmoyo = 0;
-  
-  examine_position(how_much);
+
+  examine_position(goban, how_much);
+
+  RESTORE_SGF_DUMP_DATA(goban, &sgf_dump_save);
 
   verbose = save_verbose;
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
   debug = save_debug;
   printmoyo = save_printmoyo;
 }
 
 
-/* 
+/*
  * Generate computer move for color.
  *
  * Return the generated move.
  */
 
 int
-genmove(int color, float *value, int *resign)
+genmove(Goban *goban, int color, float *value, int *resign)
 {
   int move = PASS_MOVE;
   if (resign)
@@ -237,50 +240,50 @@ genmove(int color, float *value, int *resign)
 #if ORACLE
   if (metamachine) {
     move = metamachine_genmove(color, value);
-    gg_assert(goban, stackp == 0);
+    gg_assert(goban, goban->stackp == 0);
     if (move != PASS_MOVE)
       return move;
   }
 #endif
 
-  move = do_genmove(color, 0.4, NULL, value, resign);
+  move = do_genmove(goban, color, 0.4, NULL, value, resign);
   gg_assert(goban, move == PASS_MOVE || ON_BOARD(goban, move));
 
   return move;
 }
 
 
-/* 
+/*
  * Same as above but doesn't generate pure threat moves. Useful when
  * trying to score a game.
  */
 
 int
-genmove_conservative(int color, float *value)
+genmove_conservative(Goban *goban, int color, float *value)
 {
-  return do_genmove(color, 0.0, NULL, value, NULL);
+  return do_genmove(goban, color, 0.0, NULL, value, NULL);
 }
 
 
 int
-genmove_restricted(int color, int allowed_moves[BOARDMAX])
+genmove_restricted(Goban *goban, int color, int allowed_moves[BOARDMAX])
 {
-  return do_genmove(color, 0.0, allowed_moves, NULL, NULL);
+  return do_genmove(goban, color, 0.0, allowed_moves, NULL, NULL);
 }
 
 /* This function collects move reasons can be generated immediately from
  * the data gathered in the examine_position() phase.
  */
 void
-collect_move_reasons(int color)
+collect_move_reasons(Goban *goban, int color)
 {
-  worm_reasons(color);
-  semeai_move_reasons(color);
-  owl_reasons(color);
+  worm_reasons(goban, color);
+  semeai_move_reasons(goban, color);
+  owl_reasons(goban, color);
   break_in_move_reasons(goban, color);
 }
 
-/* 
+/*
  * Perform the actual move generation.
  *
  * The array allowed_moves restricts which moves may be considered. If
@@ -291,9 +294,9 @@ collect_move_reasons(int color)
  * Resignation is indicated by a negatively valued move (which is not
  * a pass)
  */
-  
+
 static int
-do_genmove(int color, float pure_threat_value,
+do_genmove(Goban *goban, int color, float pure_threat_value,
 	   int allowed_moves[BOARDMAX], float *value, int *resign)
 {
   float average_score, pessimistic_score, optimistic_score;
@@ -312,21 +315,21 @@ do_genmove(int color, float pure_threat_value,
   /* Usually we would not recommend resignation. */
   if (resign)
     *resign = 0;
-  
+
   /* Prepare our table of moves considered. */
   memset(potential_moves, 0, sizeof(potential_moves));
-  
+
   /* no move is found yet. */
-  move = PASS_MOVE;  
-  *value = 0.0; 
+  move = PASS_MOVE;
+  *value = 0.0;
   if (get_level(&level))
     fprintf(stderr, "level = %d\n", level);
-  
+
   /* experimental level adapter */
-  clock_adapt_level(&level, color);
+  clock_adapt_level(goban->board_size, goban->move_number, &level, color);
 
   /* Prepare pattern matcher and reading code. */
-  reset_engine();
+  reset_engine(goban);
 
   /* Store the depth value so we can check that it hasn't changed when
    * we leave this function.
@@ -337,7 +340,7 @@ do_genmove(int color, float pure_threat_value,
   if (play_mirror_go
       && (mirror_stones_limit < 0
 	  || stones_on_board(goban, WHITE | BLACK) <= mirror_stones_limit)
-      && find_mirror_move(&move, color)) {
+      && find_mirror_move(goban, &move, color)) {
     TRACE(goban, "genmove() recommends mirror move at %1m\n", move);
     *value = 1.0;
     return move;
@@ -345,7 +348,7 @@ do_genmove(int color, float pure_threat_value,
 
   /* Find out information about the worms and dragons. */
   start_timer(1);
-  examine_position(EXAMINE_ALL);
+  examine_position(goban, EXAMINE_ALL);
   time_report(1, "examine position", NO_MOVE, 1.0);
 
 
@@ -368,44 +371,44 @@ do_genmove(int color, float pure_threat_value,
     average_score = (white_score + black_score)/2.0;
   else
     average_score = -(white_score + black_score)/2.0;
-  choose_strategy(color, average_score, game_status(color));
+  choose_strategy(color, average_score, game_status(goban, color));
 
   if (printboard) {
     if (printboard == 1)
       fprintf(stderr, "\n          dragon_status display:\n\n");
     if (printboard == 2)
       fprintf(stderr, "\n          eye display:\n\n");
-    showboard(printboard); 
+    showboard(goban, printboard);
     if (printboard == 1) {
-      fprintf(stderr, "\n           owl_status display:\n\n");      
-      showboard(3);
-      fprintf(stderr, "\n           matcher_status display:\n\n");      
-      showboard(4);
+      fprintf(stderr, "\n           owl_status display:\n\n");
+      showboard(goban, 3);
+      fprintf(stderr, "\n           matcher_status display:\n\n");
+      showboard(goban, 4);
     }
   }
-  
-  gg_assert(goban, stackp == 0);
-  
+
+  gg_assert(goban, goban->stackp == 0);
+
   /*
    * Ok, information gathering is complete. Now start to find some moves!
    */
 
-  
+
   /* Pick up moves that we know of already. */
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
-  collect_move_reasons(color);
+  collect_move_reasons(goban, color);
   verbose = save_verbose;
   time_report(1, "generate move reasons", NO_MOVE, 1.0);
-  
+
   /* Try to find empty corner moves. */
   if (!limit_search)
-    fuseki(color);
-  gg_assert(goban, stackp == 0);
+    fuseki(goban, color);
+  gg_assert(goban, goban->stackp == 0);
 
   /* Look for moves to break mirror play by the opponent. */
-  break_mirror_go(color);
+  break_mirror_go(goban, color);
 
   /* If we are ahead by 5 points or more, consider a thrashing
    * dragon dangerous and change its status from DEAD to
@@ -413,53 +416,53 @@ do_genmove(int color, float pure_threat_value,
    */
   if (!doing_scoring && !limit_search)
     use_thrashing_dragon_heuristics
-      = revise_thrashing_dragon(color, pessimistic_score, 5.0);
-  
+      = revise_thrashing_dragon(goban, color, pessimistic_score, 5.0);
+
   /* The general pattern database. */
-  shapes(color);
+  shapes(goban, color);
   time_report(1, "shapes", NO_MOVE, 1.0);
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
 
   /* Look for combination attacks and defenses against them. */
-  combinations(color);
+  combinations(goban, color);
   time_report(1, "combinations", NO_MOVE, 1.0);
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
 
   /* Review the move reasons and estimate move values. */
-  if (review_move_reasons(&move, value, color, 
+  if (review_move_reasons(goban, &move, value, color,
 			  pure_threat_value, pessimistic_score, allowed_moves,
 			  use_thrashing_dragon_heuristics))
     TRACE(goban, "Move generation likes %1m with value %f\n", move, *value);
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
   time_report(1, "review move reasons", NO_MOVE, 1.0);
 
 
   /* If the move value is 6 or lower, we look for endgame patterns too. */
   if (*value <= 6.0 && !disable_endgame_patterns && !limit_search) {
-    endgame_shapes(color);
-    endgame(color);
-    gg_assert(goban, stackp == 0);
-    if (review_move_reasons(&move, value, color, pure_threat_value,
-	  		    pessimistic_score, allowed_moves,
+    endgame_shapes(goban, color);
+    endgame(goban, color);
+    gg_assert(goban, goban->stackp == 0);
+    if (review_move_reasons(goban, &move, value, color, pure_threat_value,
+			    pessimistic_score, allowed_moves,
 			    use_thrashing_dragon_heuristics))
       TRACE(goban, "Move generation likes %1m with value %f\n", move, *value);
-    gg_assert(goban, stackp == 0);
+    gg_assert(goban, goban->stackp == 0);
     time_report(1, "endgame", NO_MOVE, 1.0);
   }
-  
+
   /* If no move found yet, revisit any semeai and change the
-   * status of the opponent group from DEAD to UNKNOWN, then 
+   * status of the opponent group from DEAD to UNKNOWN, then
    * run shapes and endgame_shapes again. This may turn up a move.
    */
   if (move == PASS_MOVE) {
-    if (revise_semeai(color)) {
-      shapes(color);
-      endgame_shapes(color);
-      if (review_move_reasons(&move, value, color, pure_threat_value,
+    if (revise_semeai(goban, color)) {
+      shapes(goban, color);
+      endgame_shapes(goban, color);
+      if (review_move_reasons(goban, &move, value, color, pure_threat_value,
 			      pessimistic_score, allowed_moves,
 			      use_thrashing_dragon_heuristics)) {
 	TRACE(goban, "Upon reconsideration move generation likes %1m with value %f\n",
-	      move, *value); 
+	      move, *value);
       }
     }
     time_report(1, "move reasons with revised semeai status",
@@ -470,7 +473,7 @@ do_genmove(int color, float pure_threat_value,
    * all missing dame points.
    */
   if (move == PASS_MOVE
-      && fill_liberty(&move, color)
+      && fill_liberty(goban, &move, color)
       && (!allowed_moves || allowed_moves[move])) {
     *value = 1.0;
     TRACE(goban, "Filling a liberty at %1m\n", move);
@@ -484,16 +487,16 @@ do_genmove(int color, float pure_threat_value,
    * our territory and we are clearly ahead, generate an aftermath move.
    */
   if (move == PASS_MOVE && !doing_scoring) {
-    if (play_out_aftermath 
-	|| capture_all_dead 
+    if (play_out_aftermath
+	|| capture_all_dead
 	|| (thrashing_dragon && pessimistic_score > 15.0))
-      move = aftermath_genmove(color, 0, allowed_moves);
-      
+      move = aftermath_genmove(goban, color, 0, allowed_moves);
+
     /* If we're instructed to capture all dead opponent stones, generate
      * a capturing move.
      */
-    if (move == PASS_MOVE && capture_all_dead) 
-      move = aftermath_genmove(color, 1, allowed_moves);
+    if (move == PASS_MOVE && capture_all_dead)
+      move = aftermath_genmove(goban, color, 1, allowed_moves);
 
     if (move != PASS_MOVE) {
       ASSERT1(goban, is_legal(goban, move, color), move);
@@ -512,15 +515,16 @@ do_genmove(int color, float pure_threat_value,
   else {
     TRACE(goban, "genmove() recommends %1m with value %f\n", move, *value);
   }
-  
+
   /* Maybe time to resign...
    */
   if (resign && resign_allowed
-      && *value < 10.0 && should_resign(color, optimistic_score, move)) {
+      && *value < 10.0
+      && should_resign(goban, color, optimistic_score, move)) {
     TRACE(goban, "... though, genmove() thinks the position is hopeless\n");
     *resign = 1;
   }
-  
+
   /* If statistics is turned on, this is the place to show it. */
   if (showstatistics)
     showstats();
@@ -529,16 +533,16 @@ do_genmove(int color, float pure_threat_value,
     double spent = time_report(0, "TIME to generate move at ", move, 1.0);
     total_time += spent;
     if (spent > slowest_time) {
-      slowest_time = spent;
-      slowest_move = move;
-      slowest_movenum = movenum + 1;
+      slowest_time    = spent;
+      slowest_move    = move;
+      slowest_movenum = goban->move_number + 1;
     }
   }
 
   /* Some consistency checks to verify that things are properly
    * restored and/or have not been corrupted.
    */
-  gg_assert(goban, stackp == 0);
+  gg_assert(goban, goban->stackp == 0);
   gg_assert(goban, test_gray_border(goban) < 0);
   gg_assert(goban, depth == save_depth);
 
@@ -552,7 +556,7 @@ do_genmove(int color, float pure_threat_value,
  * have considered.
  */
 
-void 
+void
 move_considered(int move, float value)
 {
   if (value > potential_moves[move])
@@ -584,7 +588,7 @@ get_level(int *level)
   else
     return 0;
 }
-  
+
 
 /* revise_semeai(color) changes the status of any DEAD dragon of
  * OPPOSITE_COLOR(color) which occurs in a semeai to UNKNOWN.
@@ -592,7 +596,7 @@ get_level(int *level)
  */
 
 static int
-revise_semeai(int color)
+revise_semeai(const Goban *goban, int color)
 {
   int pos;
   int found_one = 0;
@@ -603,7 +607,7 @@ revise_semeai(int color)
 
   if (doing_scoring)
     return 0;
-  
+
   gg_assert(goban, dragon2 != NULL);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -618,7 +622,7 @@ revise_semeai(int color)
 	      pos);
     }
   }
-  
+
   return found_one;
 }
 
@@ -630,7 +634,8 @@ revise_semeai(int color)
  */
 
 static int
-revise_thrashing_dragon(int color, float our_score, float advantage)
+revise_thrashing_dragon(Goban *goban, int color,
+			float our_score, float advantage)
 {
   int pos;
   char safe_stones[BOARDMAX];
@@ -641,10 +646,10 @@ revise_thrashing_dragon(int color, float our_score, float advantage)
     return 0;
 
   if (disable_threat_computation
-      || !thrashing_dragon 
+      || !thrashing_dragon
       || dragon[thrashing_dragon].status != DEAD)
     return 0;
-  
+
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(goban, pos) && thrashing_stone[pos]
 	&& worm[pos].unconditional_status != DEAD) {
@@ -652,12 +657,12 @@ revise_thrashing_dragon(int color, float our_score, float advantage)
       DRAGON2(pos).safety = ALIVE;
     }
 
-  set_strength_data(OTHER_COLOR(color), safe_stones, strength);
-  compute_influence(OTHER_COLOR(color), safe_stones, strength,
-      		    OPPOSITE_INFLUENCE(color),
+  set_strength_data(goban, OTHER_COLOR(color), safe_stones, strength);
+  compute_influence(goban, OTHER_COLOR(color), safe_stones, strength,
+		    OPPOSITE_INFLUENCE(color),
 		    NO_MOVE, "revised thrashing dragon");
-  compute_refined_dragon_weaknesses();
-  
+  compute_refined_dragon_weaknesses(goban);
+
   return 1;
 }
 
@@ -671,7 +676,7 @@ revise_thrashing_dragon(int color, float our_score, float advantage)
  */
 
 static int
-find_mirror_move(int *move, int color)
+find_mirror_move(Goban *goban, int *move, int color)
 {
   int last_move = get_last_move(goban);
   int mirror_move;
@@ -691,7 +696,7 @@ find_mirror_move(int *move, int color)
       }
     }
   }
-  
+
   return 0;
 }
 
@@ -700,19 +705,19 @@ find_mirror_move(int *move, int color)
  * black.
  */
 static void
-compute_scores()
+compute_scores(Goban *goban)
 {
   char safe_stones[BOARDMAX];
   float strength[BOARDMAX];
 
-  set_strength_data(WHITE, safe_stones, strength);
-  compute_influence(EMPTY, safe_stones, strength, &move_influence,
-      		    NO_MOVE, "White territory estimate");
-  white_score = influence_score(&move_influence);
-  set_strength_data(BLACK, safe_stones, strength);
-  compute_influence(EMPTY, safe_stones, strength, &move_influence,
-      		    NO_MOVE, "White territory estimate");
-  black_score = influence_score(&move_influence);
+  set_strength_data(goban, WHITE, safe_stones, strength);
+  compute_influence(goban, EMPTY, safe_stones, strength, &move_influence,
+		    NO_MOVE, "White territory estimate");
+  white_score = influence_score(goban, &move_influence);
+  set_strength_data(goban, BLACK, safe_stones, strength);
+  compute_influence(goban, EMPTY, safe_stones, strength, &move_influence,
+		    NO_MOVE, "White territory estimate");
+  black_score = influence_score(goban, &move_influence);
 
   if (verbose || showscore) {
     if (white_score == black_score)
@@ -734,14 +739,14 @@ compute_scores()
  * in patterns.db.
  */
 static void
-break_mirror_go(int color)
+break_mirror_go(Goban *goban, int color)
 {
-  int tengen = POS((board_size - 1) / 2, (board_size - 1) / 2);
-  if (board[tengen] == EMPTY
+  int tengen = POS((goban->board_size - 1) / 2, (goban->board_size - 1) / 2);
+  if (goban->board[tengen] == EMPTY
       && color == BLACK
       && stones_on_board(goban, BLACK | WHITE) > 10
       && test_symmetry_after_move(goban, tengen, color, 1)) {
-    set_minimum_move_value(tengen, 30.0);
+    set_minimum_move_value(goban, tengen, 30.0);
     TRACE(goban, "Play %1m to break mirror go, value 30.\n", tengen);
   }
 }
@@ -750,7 +755,7 @@ break_mirror_go(int color)
 /* Helper to decide whether GG should resign a game
  */
 static int
-should_resign(int color, float optimistic_score, int move)
+should_resign(const Goban *goban, int color, float optimistic_score, int move)
 {
   float status;
   int d;
@@ -762,11 +767,12 @@ should_resign(int color, float optimistic_score, int move)
    * it looks like all our dragons are dead and the generated move
    * is a pass.
    */
-  if (board_size > 2 && move == PASS_MOVE && !lively_dragon_exists(color))
+  if (goban->board_size > 2 && move == PASS_MOVE
+      && !lively_dragon_exists(color))
     return 1;
-  
+
   if (move == PASS_MOVE
-      || board_size < 19
+      || goban->board_size < 19
       || optimistic_score > -45.0)
     return 0;
   /* Check dragon statuses. If a friendly dragon is critical, we are
@@ -776,18 +782,18 @@ should_resign(int color, float optimistic_score, int move)
    */
   for (d = 0; d < number_of_dragons; d++) {
     /* any friendly critical dragon ? */
-    if (board[dragon2[d].origin] == color
+    if (goban->board[dragon2[d].origin] == color
 	&& DRAGON(d).status == CRITICAL)
       return 0;
     /* any weak opponent dragon ? */
-    if (board[dragon2[d].origin] == OTHER_COLOR(color)
+    if (goban->board[dragon2[d].origin] == OTHER_COLOR(color)
 	&& DRAGON(d).status != DEAD
 	&& DRAGON(d).effective_size >= 10
-	&& dragon_weak(dragon2[d].origin))
+	&& dragon_weak(goban, dragon2[d].origin))
       return 0;
   }
   /* Is it already too late to try something ? */
-  status = game_status(color);
+  status = game_status(goban, color);
   if (status < 0.8)
     /* Still "too early".
      * Note: the 0.8 constant is very conservative, we actually could give
@@ -816,22 +822,22 @@ static int search_mask[BOARDMAX];
  */
 
 void
-set_search_diamond(int pos)
+set_search_diamond(const Goban *goban, int pos)
 {
   int i = I(pos);
   int j = J(pos);
   int m, n;
-  
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
+
+  for (m = 0; m < goban->board_size; m++)
+    for (n = 0; n < goban->board_size; n++) {
       if (gg_abs(m - i) + gg_abs(n - j) <= 6)
 	search_mask[POS(m, n)] = 1;
       else
-	search_mask[POS(m, n)] = 0;      
+	search_mask[POS(m, n)] = 0;
     }
   limit_search = pos;
   if (0)
-    draw_search_area();
+    draw_search_area(goban);
 }
 
 /* unmarks the entire board */
@@ -853,31 +859,32 @@ set_search_limit(int pos, int value)
 /* displays the search area */
 
 void
-draw_search_area(void)
+draw_search_area(const Goban *goban)
 {
   int m, n;
 
-  start_draw_board();
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
+  start_draw_board(goban->board_size);
+  for (m = 0; m < goban->board_size; m++)
+    for (n = 0; n < goban->board_size; n++) {
       int col, c;
-	
+
       if (search_mask[POS(m, n)])
 	col = GG_COLOR_RED;
       else
 	col = GG_COLOR_BLACK;
-      
-      if (board[POS(m, n)] == BLACK)
+
+      if (BOARD(goban, m, n) == BLACK)
 	c = 'X';
-      else if (board[POS(m, n)] == WHITE)
+      else if (BOARD(goban, m, n) == WHITE)
 	c = 'O';
       else if (search_mask[POS(m, n)])
 	c = '*';
       else
 	c = '.';
-      draw_color_char(m, n, c, col);
+      draw_color_char(goban->board_size, m, n, c, col);
     }
-  end_draw_board();
+
+  end_draw_board(goban->board_size);
 }
 
 /* returns true if the position is within the search area */

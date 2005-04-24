@@ -1022,7 +1022,8 @@ blunder_size(Goban *goban, int move, int color, int *defense_point,
    * set up some combination attack that didn't exist before. We do
    * this last to avoid duplicate blunder reports.
    */
-  atari = atari_atari_blunder_size(color, move, defense_moves, safe_stones);
+  atari = atari_atari_blunder_size(goban, color, move, defense_moves,
+				   safe_stones);
   if (atari) {
     if (defense_point) {
       /* FIXME: Choose defense point more systematically. */
@@ -1095,7 +1096,7 @@ detect_owl_blunder(Goban *goban, int move, int color, int *defense_point,
 	&& DRAGON2(bpos).safety != INVINCIBLE
 	&& DRAGON2(bpos).safety != STRONGLY_ALIVE) {
       int kworm = NO_MOVE;
-      int acode = owl_confirm_safety(move, bpos, defense_point, &kworm);
+      int acode = owl_confirm_safety(goban, move, bpos, defense_point, &kworm);
 
       /* If owl couldn't confirm safety, maybe semeai can. */
       if (acode != WIN) {
@@ -1105,7 +1106,7 @@ detect_owl_blunder(Goban *goban, int move, int color, int *defense_point,
 	  int resultb;
 	  if (board[neighbor] == color)
 	    continue;
-	  owl_analyze_semeai_after_move(move, color, neighbor, bpos,
+	  owl_analyze_semeai_after_move(goban, move, color, neighbor, bpos,
 					NULL, &resultb, NULL, 1, NULL, 0);
 	  if (resultb == 0)
 	    acode = WIN;
@@ -1118,7 +1119,7 @@ detect_owl_blunder(Goban *goban, int move, int color, int *defense_point,
 	verbose = current_verbose;
 	*return_value += 2.0 * dragon[bpos].effective_size;
 	if (safe_stones)
-	  mark_dragon(bpos, safe_stones, 0);
+	  mark_dragon(goban, bpos, safe_stones, 0);
       }
       else if (acode == LOSS) {
 	verbose = save_verbose;
@@ -1212,7 +1213,7 @@ detect_tactical_blunder(Goban *goban, int move, int color, int *defense_point,
       
       popgo(goban);
       decrease_depth_values();
-      owl_attacks = owl_does_attack(move, pos, NULL);
+      owl_attacks = owl_does_attack(goban, move, pos, NULL);
       if (owl_attacks != WIN) {
 	*return_value += 2 * worm[pos].effective_size;
 	defense_effective = 1;
@@ -1236,7 +1237,7 @@ detect_tactical_blunder(Goban *goban, int move, int color, int *defense_point,
 	for (k = 0; k < num_adj; k++) {
 	  int neighbor = adj[k];
 	  int resulta;
-	  owl_analyze_semeai_after_move(move, color, pos, neighbor,
+	  owl_analyze_semeai_after_move(goban, move, color, pos, neighbor,
 					&resulta, NULL, NULL, 1, NULL, 1);
 	  if (resulta != 0) {
 	    *return_value += 2 * worm[pos].effective_size;
@@ -1448,11 +1449,11 @@ send_two_return_one(Goban *goban, int move, int color)
 /* Score the game and determine the winner */
 
 void
-who_wins(int color, FILE *outfile)
+who_wins(Goban *goban, int color, FILE *outfile)
 {
   float result;
 
-  silent_examine_position(EXAMINE_DRAGONS);
+  silent_examine_position(goban, EXAMINE_DRAGONS);
 
 #if 0
   float white_score;

@@ -241,7 +241,7 @@ break_in_goal_from_str(Goban *goban, int str, char goal[BOARDMAX],
     print_connection_distances(goban, &conn);
   DEBUG(goban, DEBUG_BREAKIN, "Trying to break in from %1m to:\n", str);
   if (debug & DEBUG_BREAKIN)
-    goaldump(smaller_goal);
+    goaldump(goban, smaller_goal);
 
   while ((color_to_move == goban->board[str]
           && break_in(goban, str, smaller_goal, &move))
@@ -311,7 +311,7 @@ break_in_goal_from_str(Goban *goban, int str, char goal[BOARDMAX],
 			 &conn, goal, smaller_goal);
     DEBUG(goban, DEBUG_BREAKIN, "Now trying to break to smaller goal:\n", str);
     if (debug & DEBUG_BREAKIN)
-      goaldump(smaller_goal);
+      goaldump(goban, smaller_goal);
 
     if (saved_move == NO_MOVE)
       saved_move = move;
@@ -340,7 +340,7 @@ break_in_goal(Goban *goban, int color_to_move, int owner, char goal[BOARDMAX],
   DEBUG(goban, DEBUG_BREAKIN,
         "Trying to break (%C to move) %C's territory ", color_to_move, owner);
   if (debug & DEBUG_BREAKIN)
-    goaldump(goal);
+    goaldump(goban, goal);
 
   /* Compute nearby fields of goal. */
   init_connection_data(goban, intruder, goal, NO_MOVE, FP(3.01), &conn, 1);
@@ -357,7 +357,7 @@ break_in_goal(Goban *goban, int color_to_move, int owner, char goal[BOARDMAX],
     if (conn.distances[pos] > min_distance + FP(1.001))
       break;
     if (goban->board[pos] == intruder
-	&& influence_considered_lively(q, pos)) {
+	&& influence_considered_lively(goban, q, pos)) {
       /* Discard this string in case the shortest path goes via a string
        * that we have in the candidate list already.
        */
@@ -397,9 +397,9 @@ break_in_goal(Goban *goban, int color_to_move, int owner, char goal[BOARDMAX],
   }
 
   for (k = 0; k < num_non_territory; k++)
-    influence_erase_territory(q, non_territory[k], owner);
+    influence_erase_territory(goban, q, non_territory[k], owner);
   if (0 && num_non_territory > 0 && (debug & DEBUG_BREAKIN))
-    showboard(0);
+    showboard(goban, 0);
 }
 
 
@@ -419,7 +419,7 @@ break_territories(Goban *goban, int color_to_move,
   if (!experimental_break_in || level < 10)
     return;
 
-  influence_get_territory_segmentation(q, &territories);
+  influence_get_territory_segmentation(goban, q, &territories);
   for (k = 1; k <= territories.number; k++) {
     char goal[BOARDMAX];
     int pos;
@@ -461,5 +461,5 @@ break_in_move_reasons(const Goban *goban, int color)
   int k;
   for (k = 0; k < num_break_ins; k++)
     if (goban->board[break_in_list[k].str] == color)
-      add_expand_territory_move(break_in_list[k].move);
+      add_expand_territory_move(goban, break_in_list[k].move);
 }

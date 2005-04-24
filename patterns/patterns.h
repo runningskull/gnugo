@@ -70,13 +70,13 @@ struct _unused_patterns_h {
 };
 
 
-#define ATTACK_MACRO(pos)						\
-  ((stackp == 0)							\
-   ? worm[pos].attack_codes[0] : attack(goban, (pos), NULL))
+#define ATTACK_MACRO(goban, pos)					\
+  (((goban)->stackp == 0)						\
+   ? worm[pos].attack_codes[0] : attack((goban), (pos), NULL))
 
-#define DEFEND_MACRO(pos)						\
-  ((stackp == 0)							\
-   ? worm[pos].defense_codes[0] : find_defense(goban, (pos), NULL))
+#define DEFEND_MACRO(goban, pos)					\
+  (((goban)->stackp == 0)						\
+   ? worm[pos].defense_codes[0] : find_defense((goban), (pos), NULL))
 
 struct pattern; /* forward reference to keep gcc happy */
 
@@ -89,11 +89,11 @@ struct pattern; /* forward reference to keep gcc happy */
  * return value : weight of move, or 0 if match failed            
  */
  
-typedef int (*pattern_helper_fn_ptr)(struct pattern *, int rotation,
-				     int move, int color);
+typedef int (*pattern_helper_fn_ptr) (Goban *goban, struct pattern *pattern,
+				      int rotation, int move, int color);
 
-typedef int (*autohelper_fn_ptr)(int rotation, int move,
-				 int color, int action);
+typedef int (*autohelper_fn_ptr) (Goban *goban, int rotation, int move,
+				  int color, int action);
 
 
 /* each pattern is compiled into a sequence of these elements.
@@ -308,35 +308,41 @@ struct fullboard_pattern {
 
 /* helper functions */
 
-#define DECLARE(x) int x(struct pattern *pattern, int transformation, int move, int color)
+#define DECLARE_HELPER(helper_name)					\
+  int helper_name(Goban *goban, struct pattern *pattern,		\
+		  int transformation, int move, int color)
 
-DECLARE(jump_out_helper);
-DECLARE(jump_out_far_helper);
-DECLARE(high_handicap_helper);
-DECLARE(reinforce_helper);
-DECLARE(throw_in_atari_helper);
-DECLARE(cutstone2_helper);
-DECLARE(thrash_around_helper);
+DECLARE_HELPER(jump_out_helper);
+DECLARE_HELPER(jump_out_far_helper);
+DECLARE_HELPER(high_handicap_helper);
+DECLARE_HELPER(reinforce_helper);
+DECLARE_HELPER(throw_in_atari_helper);
+DECLARE_HELPER(cutstone2_helper);
+DECLARE_HELPER(thrash_around_helper);
 
 /* autohelper fns */
-int seki_helper(int str);
-void threaten_to_save_helper(int move, int str);
-void threaten_to_capture_helper(int move, int str);
-void prevent_attack_threat_helper(int move, int str);
-void defend_against_atari_helper(int move, int str);
-void amalgamate_most_valuable_helper(int apos, int bpos, int cpos);
-int finish_ko_helper(int apos);
-int squeeze_ko_helper(int apos);
-int backfill_helper(int apos, int bpos, int cpos);
+int seki_helper(const Goban *goban, int str);
+void threaten_to_save_helper(const Goban *goban, int move, int str);
+void threaten_to_capture_helper(Goban *goban, int move, int str);
+void prevent_attack_threat_helper(const Goban *goban, int move, int str);
+void defend_against_atari_helper(Goban *goban, int move, int str);
+void amalgamate_most_valuable_helper(const Goban *goban,
+				     int apos, int bpos, int cpos);
+int finish_ko_helper(const Goban *goban, int apos);
+int squeeze_ko_helper(const Goban *goban, int apos);
+int backfill_helper(Goban *goban, int apos, int bpos, int cpos);
 int owl_threatens_attack(int apos, int bpos);
-int connect_and_cut_helper(int Apos, int bpos, int cpos);
-int connect_and_cut_helper2(int Apos, int bpos, int cpos, int color);
-int edge_double_sente_helper(int move, int apos, int bpos, int cpos);
-void test_attack_either_move(int move, int color, int worma, int wormb);
-int adjacent_to_stone_in_atari(int str);
-int adjacent_to_defendable_stone_in_atari(int str);
-void backfill_replace(int move, int str);
-int break_mirror_helper(int str, int color);
+int connect_and_cut_helper(Goban *goban, int Apos, int bpos, int cpos);
+int connect_and_cut_helper2(Goban *goban, int Apos, int bpos, int cpos,
+			    int color);
+int edge_double_sente_helper(Goban *goban, int move,
+			     int apos, int bpos, int cpos);
+void test_attack_either_move(Goban *goban, int move, int color,
+			     int worma, int wormb);
+int adjacent_to_stone_in_atari(Goban *goban, int str);
+int adjacent_to_defendable_stone_in_atari(Goban *goban, int str);
+void backfill_replace(Goban *goban, int move, int str);
+int break_mirror_helper(Goban *goban, int str, int color);
 
 
 void init_tree_conn(void);

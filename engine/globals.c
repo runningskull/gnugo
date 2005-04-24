@@ -30,6 +30,8 @@
 
 /* 
  * Define all global variables used within the engine.
+ *
+ * THREAD-FIXME: Attach them (most at least) to gobans, don't use globals.
  */
 
 int thrashing_dragon = NO_MOVE; /* Dead opponent's dragon trying to live. */

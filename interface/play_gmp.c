@@ -188,7 +188,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
     }
     else {
       /* Generate my next move. */
-      float move_value = gnugo_genmove(&i, &j, mycolor, NULL);
+      float move_value = gnugo_genmove(goban, &i, &j, mycolor, NULL);
       gnugo_play_move(goban, i, j, mycolor);
       sgffile_add_debuginfo(goban, sgftree.lastnode, move_value);
       
@@ -217,7 +217,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
   
   if (!quiet)
     fprintf(stderr, "Game over - waiting for client to shut us down\n");
-  who_wins(mycolor, stderr);
+  gnugo_who_wins(goban, mycolor, stderr);
 
   if (showtime) {
     gprintf(goban, "\nSLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
@@ -233,7 +233,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
    * writing code is here.
    */
   { 
-    float score = gnugo_estimate_score(NULL, NULL);
+    float score = gnugo_estimate_score(goban, NULL, NULL);
     sgfWriteResult(sgftree.root, score, 1);
   }
   sgffile_output(&sgftree);

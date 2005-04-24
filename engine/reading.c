@@ -2273,7 +2273,7 @@ hane_rescue_moves(const Goban *goban, int str, int libs[4],
 	if (0 && !in_list(cpos, moves->num, moves->pos)) {
 	  gprintf(goban, "hane_rescue_move added for %1m at %1m\n", str, cpos);
 	  dump_stack(goban);
-	  showboard(0);
+	  showboard(goban, 0);
 	}
 	ADD_CANDIDATE_MOVE(cpos, 0, *moves, "hane_rescue");
       }
@@ -5916,7 +5916,7 @@ draw_reading_shadow(const Goban *goban)
   int i, j, ii;
   int c = ' ';
 
-  start_draw_board();
+  start_draw_board(goban->board_size);
 
   for (i = 0; i < goban->board_size; i++) {
     ii = goban->board_size - i;
@@ -5943,7 +5943,7 @@ draw_reading_shadow(const Goban *goban)
     fprintf(stderr, " %d", ii);
   }
 
-  end_draw_board();
+  end_draw_board(goban->board_size);
 }
 
 

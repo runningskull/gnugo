@@ -23,12 +23,11 @@
 #include <stdio.h>
 #include "liberty.h"
 #include "patterns.h"
-#include "old-board.h"
 
 
 #define TRYMOVE(goban, pos, color) trymove(goban, pos, color, "helper", NO_MOVE)
 #define OFFSET_BY(x, y) AFFINE_TRANSFORM(OFFSET(x, y), trans, move)
-#define ARGS struct pattern *pattern, int trans, int move, int color
+#define ARGS Goban *goban, struct pattern *pattern, int trans, int move, int color
 
 
 /* This file contains helper functions which assist the pattern matcher.
@@ -57,7 +56,8 @@ jump_out_helper(ARGS)
 
   own_eyespace = (white_eye[move].color == color);
   
-  if (whose_area(OPPOSITE_INFLUENCE(color), move) != color && !own_eyespace)
+  if (whose_area(goban, OPPOSITE_INFLUENCE(color), move) != color
+      && !own_eyespace)
     return 1;
   else
     return 0;
@@ -72,8 +72,8 @@ jump_out_helper(ARGS)
 int 
 jump_out_far_helper(ARGS)
 {
-  if (whose_area(OPPOSITE_INFLUENCE(color), move) != OTHER_COLOR(color))
-    return jump_out_helper(pattern, trans, move, color);
+  if (whose_area(goban, OPPOSITE_INFLUENCE(color), move) != OTHER_COLOR(color))
+    return jump_out_helper(goban, pattern, trans, move, color);
   else
     return 0;
 }
@@ -172,7 +172,7 @@ throw_in_atari_helper(ARGS)
   /* The followup is to capture the "a" string. Estimate the value to
    * twice the size.
    */
-  add_followup_value(move, 2 * worm[apos].effective_size);
+  add_followup_value(goban, move, 2 * worm[apos].effective_size);
   TRACE(goban, "...followup value %f\n", 2 * worm[apos].effective_size);
 
   return success;
@@ -187,7 +187,7 @@ throw_in_atari_helper(ARGS)
  */
 
 int 
-seki_helper(int str)
+seki_helper(const Goban *goban, int str)
 {
   int r;
   int adj;
@@ -221,7 +221,7 @@ cutstone2_helper(ARGS)
   UNUSED(pattern);
   UNUSED(color);
 
-  if (stackp > 0)
+  if (goban->stackp > 0)
     return 0;
   
   apos = OFFSET_BY(-1, -1);
@@ -233,13 +233,13 @@ cutstone2_helper(ARGS)
   
   dpos = worm[apos].defense_points[0];
 
-  if (TRYMOVE(goban, dpos, board[apos])) {
-    if (!board[bpos] || attack(goban, bpos, NULL)
-	|| !board[cpos] || attack(goban, cpos, NULL)
-	|| safe_move(goban, move, board[apos]) != 0) {
+  if (TRYMOVE(goban, dpos, goban->board[apos])) {
+    if (!goban->board[bpos] || attack(goban, bpos, NULL)
+	|| !goban->board[cpos] || attack(goban, cpos, NULL)
+	|| safe_move(goban, move, goban->board[apos]) != 0) {
       popgo(goban);
       worm[worm[apos].origin].cutstone2++;
-      propagate_worm(worm[apos].origin);
+      propagate_worm(goban, worm[apos].origin);
       return 0;
     }
     popgo(goban);
@@ -259,15 +259,15 @@ cutstone2_helper(ARGS)
  */
 
 int 
-edge_double_sente_helper(int move, int apos, int bpos, int cpos)
+edge_double_sente_helper(Goban *goban, int move, int apos, int bpos, int cpos)
 {
-  int color = board[cpos];
+  int color = goban->board[cpos];
   int success = 0;
   ASSERT1(goban, (color == BLACK || color == WHITE), move);
   
   if (TRYMOVE(goban, move, color)) {
     ASSERT1(goban, countlib(goban, move) == 2, move);
-    success = connect_and_cut_helper(move, apos, bpos);
+    success = connect_and_cut_helper(goban, move, apos, bpos);
     popgo(goban);
   }
 
@@ -282,9 +282,9 @@ edge_double_sente_helper(int move, int apos, int bpos, int cpos)
  */
 
 void
-threaten_to_save_helper(int move, int str)
+threaten_to_save_helper(const Goban *goban, int move, int str)
 {
-  add_followup_value(move, 2.0 + 2.0 * worm[str].effective_size);
+  add_followup_value(goban, move, 2.0 + 2.0 * worm[str].effective_size);
   TRACE(goban, "...followup value %f\n", 2.0 + 2.0 * worm[str].effective_size);
 }
 
@@ -295,9 +295,9 @@ threaten_to_save_helper(int move, int str)
  * to capture (str).
  */
 void
-prevent_attack_threat_helper(int move, int str)
+prevent_attack_threat_helper(const Goban *goban, int move, int str)
 {
-  add_reverse_followup_value(move, 2.0 * worm[str].effective_size);
+  add_reverse_followup_value(goban, move, 2.0 * worm[str].effective_size);
   TRACE(goban, "...reverse followup value %f\n", 2.0 * worm[str].effective_size);
 }
 
@@ -331,7 +331,7 @@ prevent_attack_threat_helper(int move, int str)
  */
 
 void
-threaten_to_capture_helper(int move, int str)
+threaten_to_capture_helper(Goban *goban, int move, int str)
 {
   int adj, adjs[MAXCHAIN];
   int defense_move;
@@ -343,12 +343,12 @@ threaten_to_capture_helper(int move, int str)
 	&& !does_defend(goban, move, adjs[k]))
       return;
 
-  if (!TRYMOVE(goban, move, OTHER_COLOR(board[str])))
+  if (!TRYMOVE(goban, move, OTHER_COLOR(goban->board[str])))
     return;
   if (find_defense(goban, str, &defense_move) != 0
       && defense_move != NO_MOVE
-      && TRYMOVE(goban, defense_move, board[str])) {
-    if (board[move] == EMPTY || attack(goban, move, NULL) != 0) {
+      && TRYMOVE(goban, defense_move, goban->board[str])) {
+    if (goban->board[move] == EMPTY || attack(goban, move, NULL) != 0) {
       popgo(goban);
       popgo(goban);
       return;
@@ -363,9 +363,9 @@ threaten_to_capture_helper(int move, int str)
   for (k = 0; k < adj; k++) {
     int lib;
     findlib(goban, adjs[k], 1, &lib);
-    if (TRYMOVE(goban, lib, board[str])) {
+    if (TRYMOVE(goban, lib, goban->board[str])) {
       if (!attack(goban, str, NULL)
-	  && (board[move] == EMPTY || attack(goban, move, NULL) != 0)) {
+	  && (goban->board[move] == EMPTY || attack(goban, move, NULL) != 0)) {
 	popgo(goban);
 	popgo(goban);
 	return;
@@ -376,7 +376,7 @@ threaten_to_capture_helper(int move, int str)
 
   popgo(goban);
   
-  add_followup_value(move, 2.0 * worm[str].effective_size);
+  add_followup_value(goban, move, 2.0 * worm[str].effective_size);
   TRACE(goban, "...followup value %f\n", 2.0 * worm[str].effective_size);
 }
 
@@ -391,7 +391,7 @@ threaten_to_capture_helper(int move, int str)
  */
 
 void
-defend_against_atari_helper(int move, int str)
+defend_against_atari_helper(Goban *goban, int move, int str)
 {
   int adj, adjs[MAXCHAIN];
   int libs[2];
@@ -408,12 +408,12 @@ defend_against_atari_helper(int move, int str)
 
   /* No value if opponent has no safe atari. */
   findlib(goban, str, 2, libs);
-  if (!safe_move(goban, libs[0], OTHER_COLOR(board[str]))
-      && !safe_move(goban, libs[1], OTHER_COLOR(board[str])))
+  if (!safe_move(goban, libs[0], OTHER_COLOR(goban->board[str]))
+      && !safe_move(goban, libs[1], OTHER_COLOR(goban->board[str])))
     return;
   
   TRACE(goban, "...reverse followup value %f\n", 2.0 * worm[str].effective_size);
-  add_reverse_followup_value(move, 2.0 * worm[str].effective_size);
+  add_reverse_followup_value(goban, move, 2.0 * worm[str].effective_size);
 }
 
 
@@ -428,13 +428,15 @@ defend_against_atari_helper(int move, int str)
  */
 
 void
-amalgamate_most_valuable_helper(int apos, int bpos, int cpos)
+amalgamate_most_valuable_helper(const Goban *goban,
+				int apos, int bpos, int cpos)
 {
-  if (!is_same_dragon(apos, bpos) && !is_same_dragon(bpos, cpos)) {
+  if (!is_same_dragon(goban, apos, bpos)
+      && !is_same_dragon(goban, bpos, cpos)) {
     if (dragon[apos].effective_size >= dragon[cpos].effective_size)
-      join_dragons(apos, bpos);
+      join_dragons(goban, apos, bpos);
     else
-      join_dragons(bpos, cpos);
+      join_dragons(goban, bpos, cpos);
   }
 }
 
@@ -446,7 +448,7 @@ amalgamate_most_valuable_helper(int apos, int bpos, int cpos)
  */
 
 int
-finish_ko_helper(int pos)
+finish_ko_helper(const Goban *goban, int pos)
 {
   int adj, adjs[MAXCHAIN];
   int k;
@@ -458,10 +460,11 @@ finish_ko_helper(int pos)
 
     if (countstones(goban, aa) == 1) {
       findlib(goban, aa, 1, &xx);
-      if (is_ko(goban, xx, board[pos], NULL))
+      if (is_ko(goban, xx, goban->board[pos], NULL))
 	return 1;
     }
   }
+
   return 0;
 }
 
@@ -473,7 +476,7 @@ finish_ko_helper(int pos)
  */
 
 int
-squeeze_ko_helper(int pos)
+squeeze_ko_helper(const Goban *goban, int pos)
 {
   int libs[2];
   int liberties;
@@ -484,7 +487,7 @@ squeeze_ko_helper(int pos)
 
   for (k = 0; k < liberties; k++) {
     int aa = libs[k];
-    if (is_ko(goban, aa, OTHER_COLOR(board[pos]), NULL))
+    if (is_ko(goban, aa, OTHER_COLOR(goban->board[pos]), NULL))
       return 1;
   }
 
@@ -500,16 +503,16 @@ squeeze_ko_helper(int pos)
  */
 
 int
-backfill_helper(int apos, int bpos, int cpos)
+backfill_helper(Goban *goban, int apos, int bpos, int cpos)
 {
-  int color = board[cpos];
+  int color = goban->board[cpos];
   int other = OTHER_COLOR(color);
   int dpos  = NO_MOVE;
 
   if (TRYMOVE(goban, apos, color)) {
     if (TRYMOVE(goban, bpos, other)) {
       if (attack(goban, cpos, NULL) && find_defense(goban, cpos, &dpos)) {
-	set_minimum_move_value(dpos, 0.1);
+	set_minimum_move_value(goban, dpos, 0.1);
 	TRACE(goban, "%o...setting min move value of %1m to 0.1\n", dpos);
       }
       popgo(goban);
@@ -550,11 +553,11 @@ owl_threatens_attack(int apos, int bpos)
  */
    
 int
-connect_and_cut_helper(int Apos, int bpos, int cpos)
+connect_and_cut_helper(Goban *goban, int Apos, int bpos, int cpos)
 {
   int dpos;
   int epos = NO_MOVE;
-  int other = board[Apos];
+  int other = goban->board[Apos];
   int color = OTHER_COLOR(other);
   int libs[2];
   int liberties = findlib(goban, Apos, 2, libs);
@@ -570,7 +573,7 @@ connect_and_cut_helper(int Apos, int bpos, int cpos)
     dpos = libs[0];
 
   for (k = 0; k < 4; k++)
-    if (board[cpos + delta[k]] == color
+    if (goban->board[cpos + delta[k]] == color
 	&& neighbor_of_string(goban, cpos + delta[k], Apos)) {
       epos = cpos + delta[k];
       break;
@@ -581,8 +584,8 @@ connect_and_cut_helper(int Apos, int bpos, int cpos)
   if (TRYMOVE(goban, bpos, color)) {
     if (TRYMOVE(goban, dpos, other)) {
       if (TRYMOVE(goban, cpos, other)) {
-	if (board[bpos] == EMPTY
-	    || board[epos] == EMPTY
+	if (goban->board[bpos] == EMPTY
+	    || goban->board[epos] == EMPTY
 	    || !defend_both(goban, bpos, epos))
 	  result = 1;
 	popgo(goban);
@@ -609,7 +612,7 @@ connect_and_cut_helper(int Apos, int bpos, int cpos)
  */
    
 int
-connect_and_cut_helper2(int Apos, int bpos, int cpos, int color)
+connect_and_cut_helper2(Goban *goban, int Apos, int bpos, int cpos, int color)
 {
   int dpos;
   int epos = NO_MOVE;
@@ -622,7 +625,7 @@ connect_and_cut_helper2(int Apos, int bpos, int cpos, int color)
 
   if (TRYMOVE(goban, Apos, color)) {
     for (k = 0; k < 4; k++)
-      if (board[cpos + delta[k]] == other
+      if (goban->board[cpos + delta[k]] == other
 	  && neighbor_of_string(goban, cpos + delta[k], Apos)) {
 	epos = cpos + delta[k];
 	break;
@@ -639,8 +642,8 @@ connect_and_cut_helper2(int Apos, int bpos, int cpos, int color)
       
       if (TRYMOVE(goban, dpos, color)) {
 	if (TRYMOVE(goban, cpos, color)) {
-	  if (board[bpos] == EMPTY
-	      || board[epos] == EMPTY
+	  if (goban->board[bpos] == EMPTY
+	      || goban->board[epos] == EMPTY
 	      || !defend_both(goban, bpos, epos))
 	    result = 1;
 	  popgo(goban);
@@ -658,12 +661,13 @@ connect_and_cut_helper2(int Apos, int bpos, int cpos, int color)
 
 
 void
-test_attack_either_move(int move, int color, int worma, int wormb)
+test_attack_either_move(Goban *goban, int move, int color,
+			int worma, int wormb)
 {
   ASSERT_ON_BOARD1(goban, move);
-  ASSERT1(goban, board[move] == EMPTY, move);
-  ASSERT1(goban, board[worma] == OTHER_COLOR(color)
-          && board[wormb] == OTHER_COLOR(color), move);
+  ASSERT1(goban, goban->board[move] == EMPTY, move);
+  ASSERT1(goban, goban->board[worma] == OTHER_COLOR(color)
+          && goban->board[wormb] == OTHER_COLOR(color), move);
 
   if (!defend_both(goban, worma, wormb)) {
     if (0)
@@ -671,9 +675,10 @@ test_attack_either_move(int move, int color, int worma, int wormb)
 	      move, worma, wormb);
     return;
   }
+
   if (trymove(goban, move, color, "test_attack_either_move", worma)) {
-    if (board[worma] == OTHER_COLOR(color)
-	&& board[wormb] == OTHER_COLOR(color)) {
+    if (goban->board[worma] == OTHER_COLOR(color)
+	&& goban->board[wormb] == OTHER_COLOR(color)) {
       if (!find_defense(goban, worma, NULL)
 	  || !find_defense(goban, wormb, NULL)) {
 	if (0)
@@ -681,7 +686,7 @@ test_attack_either_move(int move, int color, int worma, int wormb)
 		  move, worma, wormb);
       }
       else if (!defend_both(goban, worma, wormb))
-        add_either_move(move, ATTACK_STRING, worma, ATTACK_STRING, wormb);
+        add_either_move(goban, move, ATTACK_STRING, worma, ATTACK_STRING, wormb);
       else {
 	if (0)
 	  gprintf(goban, "%1m: Rej. attack_either_move for %1m & %1m (doesn't work)\n",
@@ -700,7 +705,7 @@ test_attack_either_move(int move, int color, int worma, int wormb)
  * attackable (to exclude pointless captures of snapback stones).
  */
 int
-adjacent_to_stone_in_atari(int str)
+adjacent_to_stone_in_atari(Goban *goban, int str)
 {
   int adj;
   int adjs[MAXCHAIN];
@@ -719,7 +724,7 @@ adjacent_to_stone_in_atari(int str)
  * defendable.
  */
 int
-adjacent_to_defendable_stone_in_atari(int str)
+adjacent_to_defendable_stone_in_atari(Goban *goban, int str)
 {
   int adj;
   int adjs[MAXCHAIN];
@@ -734,15 +739,15 @@ adjacent_to_defendable_stone_in_atari(int str)
 }
 
 void
-backfill_replace(int move, int str)
+backfill_replace(Goban *goban, int move, int str)
 {
   int defense_move = NO_MOVE;
 
-  if (TRYMOVE(goban, move, OTHER_COLOR(board[str]))) {
+  if (TRYMOVE(goban, move, OTHER_COLOR(goban->board[str]))) {
     if (attack_and_defend(goban, str, NULL, NULL, NULL, &defense_move)) {
       /* Must undo the trymove before adding the replacement move. */
       popgo(goban);
-      add_replacement_move(move, defense_move);
+      add_replacement_move(goban, move, defense_move);
     }
     else
       popgo(goban);
@@ -773,8 +778,10 @@ thrash_around_helper(ARGS)
    */
   if (doing_scoring
       || disable_fuseki
-      || (stones_on_board(goban, BLACK | WHITE) > board_size * board_size * 2 / 5
-	  && stones_on_board(goban, WHITE) > board_size * board_size / 5)
+      || ((stones_on_board(goban, BLACK | WHITE)
+	   > goban->board_size * goban->board_size * 2 / 5)
+	  && (stones_on_board(goban, WHITE)
+	      > goban->board_size * goban->board_size / 5))
       || color == BLACK
       || lively_dragon_exists(WHITE))
     return 0;
@@ -797,13 +804,13 @@ thrash_around_helper(ARGS)
  * if komi is non-positive, otherwise the mirroring is to our advantage.
  */
 int
-break_mirror_helper(int str, int color)
+break_mirror_helper(Goban *goban, int str, int color)
 {
-  if (board_size % 2 == 1
+  if (goban->board_size % 2 == 1
       && color == WHITE
-      && komi <= 0.0
-      && I(str) == (board_size - 1) / 2
-      && J(str) == (board_size - 1) / 2
+      && goban->komi <= 0.0
+      && I(str) == (goban->board_size - 1) / 2
+      && J(str) == (goban->board_size - 1) / 2
       && stones_on_board(goban, BLACK | WHITE) > 10
       && test_symmetry_after_move(goban, PASS_MOVE, EMPTY, 1))
     return 1;

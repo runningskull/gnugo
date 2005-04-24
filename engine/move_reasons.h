@@ -188,26 +188,28 @@ extern int current_color;
 int find_worm(int str);
 int find_dragon(int str);
    
-int move_reason_known(int pos, int type, int what);
-int attack_move_reason_known(int pos, int what);
-int defense_move_reason_known(int pos, int what);
-int owl_attack_move_reason_known(int pos, int what);
-int owl_defense_move_reason_known(int pos, int what);
-int owl_move_reason_known(int pos, int what);
-int semeai_move_reason_known(int pos, int what);
+int move_reason_known(const Goban *goban, int pos, int type, int what);
+int attack_move_reason_known(const Goban *goban, int pos, int what);
+int defense_move_reason_known(const Goban *goban, int pos, int what);
+int owl_attack_move_reason_known(const Goban *goban, int pos, int what);
+int owl_defense_move_reason_known(const Goban *goban, int pos, int what);
+int owl_move_reason_known(const Goban *goban, int pos, int what);
+int semeai_move_reason_known(const Goban *goban, int pos, int what);
 int get_biggest_owl_target(int pos);
 int is_antisuji_move(int pos);
 
-void discard_redundant_move_reasons(int pos);
+void discard_redundant_move_reasons(Goban *goban, int pos);
 
-void mark_changed_dragon(int pos, int color, int affected, int affected2,
+void mark_changed_dragon(Goban *goban, int pos, int color,
+			 int affected, int affected2,
 			 int move_reason_type, char safe_stones[BOARDMAX],
 			 float strength[BOARDMAX], float *effective_size);
-void mark_changed_string(int affected, char changed_stones[BOARDMAX],
+void mark_changed_string(const Goban *goban, int affected,
+			 char changed_stones[BOARDMAX],
 			 float strength[BOARDMAX], char new_status);
-int adjacent_to_nondead_stone(int pos, int color);
+int adjacent_to_nondead_stone(Goban *goban, int pos, int color);
 
-int find_connection(int worm1, int worm2);
+int find_connection(const Goban *goban, int worm1, int worm2);
 
 /*
  * Local Variables:

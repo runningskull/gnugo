@@ -21,7 +21,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -144,12 +143,14 @@ report_pattern_profiling()
 
 /* Forward declarations. */
 
-static void fixup_patterns_for_board_size(struct pattern *pattern);
-static void prepare_for_match(int color);
-static void do_matchpat(int anchor, matchpat_callback_fn_ptr callback,
+static void fixup_patterns_for_board_size(struct pattern *pattern,
+					  int board_size);
+static void prepare_for_match(const Goban *goban, int color);
+static void do_matchpat(Goban *goban, int anchor,
+			matchpat_callback_fn_ptr callback,
 			int color, struct pattern *database,
 			void *callback_data, char goal[BOARDMAX]);
-static void matchpat_loop(matchpat_callback_fn_ptr callback, 
+static void matchpat_loop(Goban *goban, matchpat_callback_fn_ptr callback, 
 			  int color, int anchor,
 			  struct pattern_db *pdb, void *callback_data,
 			  char goal[BOARDMAX], int anchor_in_goal);
@@ -205,7 +206,8 @@ static const int val_mask[2][8] = {
  * initially set to 0, and we overwrite the ones
  * we care about each time.
  */
-  
+
+/* THREAD-FIXME: Static variables are unacceptable. */
 static unsigned int class_mask[NUM_DRAGON_STATUS][3];
 
 
@@ -223,7 +225,7 @@ static unsigned int class_mask[NUM_DRAGON_STATUS][3];
  */
 
 static void
-fixup_patterns_for_board_size(struct pattern *pattern)
+fixup_patterns_for_board_size(struct pattern *pattern, int board_size)
 {
   for (; pattern->patn; ++pattern)
     if (pattern->edge_constraints != 0) {
@@ -275,7 +277,7 @@ fixup_patterns_for_board_size(struct pattern *pattern)
  * prepare a pattern matching for color point of view
  */
 static void
-prepare_for_match(int color)
+prepare_for_match(const Goban *goban, int color)
 {
   int other = OTHER_COLOR(color);
 
@@ -318,11 +320,11 @@ transform2(int i, int j, int *ti, int *tj, int trans)
  */
 
 static void
-do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
-	    struct pattern *pattern, void *callback_data,
+do_matchpat(Goban *goban, int anchor, matchpat_callback_fn_ptr callback,
+	    int color, struct pattern *pattern, void *callback_data,
 	    char goal[BOARDMAX]) 
 {
-  const int anchor_test = board[anchor] ^ color;  /* see below */
+  const int anchor_test = goban->board[anchor] ^ color;  /* see below */
   int m = I(anchor);
   int n = J(anchor);
   int merged_val;
@@ -479,17 +481,18 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	  ASSERT_ON_BOARD1(goban, pos);
 
 	  /* ...and check that board[pos] matches (see above). */
-	  if ((board[pos] & and_mask[color-1][att]) != val_mask[color-1][att])
+	  if ((goban->board[pos] & and_mask[color-1][att])
+	      != val_mask[color-1][att])
 	    goto match_failed;
 
-	  if (goal != NULL && board[pos] != EMPTY && goal[pos])
+	  if (goal != NULL && goban->board[pos] != EMPTY && goal[pos])
 	    found_goal = 1;
 	  
 	  /* Check out the class_X, class_O, class_x, class_o
 	   * attributes - see patterns.db and above.
 	   */
 	  if ((pattern->class
-	       & class_mask[dragon[pos].status][board[pos]]) != 0)
+	       & class_mask[dragon[pos].status][goban->board[pos]]) != 0)
 	    goto match_failed; 
 	  
 	} /* loop over elements */
@@ -521,7 +524,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 #endif
 	
 	/* A match!  - Call back to the invoker to let it know. */
-	callback(anchor, color, pattern, ll, callback_data);
+	callback(goban, anchor, color, pattern, ll, callback_data);
 
 #if PROFILE_PATTERNS
 	pattern->reading_nodes += stats.nodes - nodes_before;
@@ -553,15 +556,16 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
  * the board must be prepared by dfa_prepare_for_match(color) !
  */
 static void
-matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
-	      struct pattern_db *pdb, void *callback_data,
-	      char goal[BOARDMAX], int anchor_in_goal) 
+matchpat_loop(Goban *goban, matchpat_callback_fn_ptr callback,
+	      int color, int anchor, struct pattern_db *pdb,
+	      void *callback_data, char goal[BOARDMAX], int anchor_in_goal) 
 {
   int pos;
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == anchor && (!anchor_in_goal || goal[pos] != 0))
-      do_matchpat(pos, callback, color, pdb->patterns,
+    if (goban->board[pos] == anchor
+	&& (!anchor_in_goal || goal[pos] != 0))
+      do_matchpat(goban, pos, callback, color, pdb->patterns,
 		  callback_data, goal);
   }
 }
@@ -764,6 +768,7 @@ tree_initialize_pointers(struct tree_node_list *tnl,
 /* #define DFA_TRACE 1 */
 
 /* Data. */
+/* THREAD-FIXME: Static variables are unacceptable. */
 static int dfa_board_size = -1;
 static int dfa_p[DFA_BASE * DFA_BASE];
 
@@ -777,21 +782,21 @@ static const int convert[3][4] = {
 		(convert[player_c][position_c])
 
 /* Forward declarations. */
-static void dfa_prepare_for_match(int color);
+static void dfa_prepare_for_match(const Goban *goban, int color);
 static int scan_for_patterns(dfa_rt_t *pdfa, int l, int *dfa_pos,
 			     int *pat_list);
-static void do_dfa_matchpat(dfa_rt_t *pdfa,
+static void do_dfa_matchpat(Goban *goban, dfa_rt_t *pdfa,
 			    int anchor, matchpat_callback_fn_ptr callback,
 			    int color, struct pattern *database,
 			    void *callback_data, char goal[BOARDMAX],
                             int anchor_in_goal);
-static void check_pattern_light(int anchor, 
+static void check_pattern_light(Goban *goban, int anchor, 
 				matchpat_callback_fn_ptr callback,
 				int color, struct pattern *pattern, int ll,
 				void *callback_data,
 				char goal[BOARDMAX],
                                 int anchor_in_goal);
-static void dfa_matchpat_loop(matchpat_callback_fn_ptr callback,
+static void dfa_matchpat_loop(Goban *goban, matchpat_callback_fn_ptr callback,
 			      int color, int anchor,
 			      struct pattern_db *pdb, void *callback_data,
 			      char goal[BOARDMAX], int anchor_in_goal);
@@ -808,27 +813,27 @@ dfa_match_init(void)
   build_spiral_order();
 
   if (owl_vital_apat_db.pdfa != NULL)
-    DEBUG(goban, DEBUG_MATCHER, "owl_vital_apat --> using dfa\n");
+    DEBUG(NULL, DEBUG_MATCHER, "owl_vital_apat --> using dfa\n");
   if (owl_attackpat_db.pdfa != NULL)
-    DEBUG(goban, DEBUG_MATCHER, "owl_attackpat --> using dfa\n");
+    DEBUG(NULL, DEBUG_MATCHER, "owl_attackpat --> using dfa\n");
   if (owl_defendpat_db.pdfa != NULL)
-    DEBUG(goban, DEBUG_MATCHER, "owl_defendpat --> using dfa\n");
+    DEBUG(NULL, DEBUG_MATCHER, "owl_defendpat --> using dfa\n");
   if (pat_db.pdfa != NULL)
-    DEBUG(goban, DEBUG_MATCHER, "pat --> using dfa\n");
+    DEBUG(NULL, DEBUG_MATCHER, "pat --> using dfa\n");
   if (attpat_db.pdfa != NULL)
-    DEBUG(goban, DEBUG_MATCHER, "attpat --> using dfa\n");
+    DEBUG(NULL, DEBUG_MATCHER, "attpat --> using dfa\n");
   if (defpat_db.pdfa != NULL)
-    DEBUG(goban, DEBUG_MATCHER, "defpat --> using dfa\n");
+    DEBUG(NULL, DEBUG_MATCHER, "defpat --> using dfa\n");
   if (endpat_db.pdfa != NULL)
-    DEBUG(goban, DEBUG_MATCHER, "endpat --> using dfa\n");
+    DEBUG(NULL, DEBUG_MATCHER, "endpat --> using dfa\n");
   if (conn_db.pdfa != NULL)
-    DEBUG(goban, DEBUG_MATCHER, "conn --> using dfa\n");
+    DEBUG(NULL, DEBUG_MATCHER, "conn --> using dfa\n");
   if (influencepat_db.pdfa != NULL)
-    DEBUG(goban, DEBUG_MATCHER, "influencepat --> using dfa\n");
+    DEBUG(NULL, DEBUG_MATCHER, "influencepat --> using dfa\n");
   if (barrierspat_db.pdfa != NULL)
-    DEBUG(goban, DEBUG_MATCHER, "barrierspat --> using dfa\n");
+    DEBUG(NULL, DEBUG_MATCHER, "barrierspat --> using dfa\n");
   if (fusekipat_db.pdfa != NULL)
-    DEBUG(goban, DEBUG_MATCHER, "barrierspat --> using dfa\n");
+    DEBUG(NULL, DEBUG_MATCHER, "barrierspat --> using dfa\n");
 
   /* force out_board initialization */
   dfa_board_size = -1;
@@ -839,13 +844,13 @@ dfa_match_init(void)
  * and adapted size 
  */
 static void
-dfa_prepare_for_match(int color)
+dfa_prepare_for_match(const Goban *goban, int color)
 {
   int i, j;
   int pos;
     
-  if (dfa_board_size != board_size) {
-    dfa_board_size = board_size;
+  if (dfa_board_size != goban->board_size) {
+    dfa_board_size = goban->board_size;
     /* clean up the board */
     for (pos = 0; pos < DFA_BASE * DFA_BASE; pos++)
       dfa_p[pos] = OUT_BOARD;
@@ -856,7 +861,7 @@ dfa_prepare_for_match(int color)
     for (j = 0; j < dfa_board_size; j++)
       dfa_p[DFA_POS(i, j)] = EXPECTED_COLOR(color, BOARD(goban, i, j));
 
-  prepare_for_match(color);
+  prepare_for_match(goban, color);
 }
 
 #if 0
@@ -914,7 +919,7 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int *dfa_pos, int *pat_list)
 
 /* Perform pattern matching with DFA filtering. */
 static void
-do_dfa_matchpat(dfa_rt_t *pdfa,
+do_dfa_matchpat(Goban *goban, dfa_rt_t *pdfa,
 		int anchor, matchpat_callback_fn_ptr callback,
 		int color, struct pattern *database,
 		void *callback_data, char goal[BOARDMAX],
@@ -953,7 +958,7 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
     database[matched].dfa_hits++;
 #endif
 
-    check_pattern_light(anchor, callback, color, database + matched,
+    check_pattern_light(goban, anchor, callback, color, database + matched,
 			ll, callback_data, goal, anchor_in_goal);
   }
 }
@@ -966,7 +971,8 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
  */
 
 static void
-check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
+check_pattern_light(Goban *goban, int anchor,
+		    matchpat_callback_fn_ptr callback, int color,
 		    struct pattern *pattern, int ll, void *callback_data,
 		    char goal[BOARDMAX], int anchor_in_goal)
 {
@@ -1008,13 +1014,14 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
 
     if (!anchor_in_goal) { 
       /* goal check */
-      if (goal != NULL && board[pos] != EMPTY && goal[pos])
+      if (goal != NULL && goban->board[pos] != EMPTY && goal[pos])
 	found_goal = 1;
     }
 
     /* class check */
     ASSERT1(goban, dragon[pos].status < 4, anchor);
-    if ((pattern->class & class_mask[dragon[pos].status][board[pos]]) != 0)
+    if ((pattern->class & class_mask[dragon[pos].status][goban->board[pos]])
+	!= 0)
       goto match_failed;
     
   } /* loop over elements */
@@ -1035,7 +1042,7 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
 #endif
   
   /* A match!  - Call back to the invoker to let it know. */
-  callback(anchor, color, pattern, ll, callback_data);
+  callback(goban, anchor, color, pattern, ll, callback_data);
   
 #if PROFILE_PATTERNS
   pattern->reading_nodes += stats.nodes - nodes_before;
@@ -1055,15 +1062,16 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
  * the board must be prepared by dfa_prepare_for_match(color) !
  */
 static void
-dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
-		  struct pattern_db *pdb, void *callback_data,
+dfa_matchpat_loop(Goban *goban, matchpat_callback_fn_ptr callback, int color,
+		  int anchor, struct pattern_db *pdb, void *callback_data,
 		  char goal[BOARDMAX], int anchor_in_goal) 
 {
   int pos;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == anchor && (!anchor_in_goal || goal[pos] != 0))
-      do_dfa_matchpat(pdb->pdfa, pos, callback, color, pdb->patterns,
+    if (goban->board[pos] == anchor
+	&& (!anchor_in_goal || goal[pos] != 0))
+      do_dfa_matchpat(goban, pdb->pdfa, pos, callback, color, pdb->patterns,
 		      callback_data, goal, anchor_in_goal);
   }
 }
@@ -1075,12 +1083,13 @@ dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 /**************************************************************************/
 
 
-typedef void (*loop_fn_ptr_t)(matchpat_callback_fn_ptr callback, 
-			      int color, int anchor,
-			      struct pattern_db *pdb, void *callback_data,
-			      char goal[BOARDMAX], int anchor_in_goal);
+typedef void (*loop_fn_ptr_t) (Goban *goban,
+			       matchpat_callback_fn_ptr callback, 
+			       int color, int anchor,
+			       struct pattern_db *pdb, void *callback_data,
+			       char goal[BOARDMAX], int anchor_in_goal);
 
-typedef void (*prepare_fn_ptr_t)(int color);
+typedef void (*prepare_fn_ptr_t) (const Goban *goban, int color);
 
 /* same as the old matchpat but for all the board with
  * preparation.
@@ -1093,26 +1102,26 @@ typedef void (*prepare_fn_ptr_t)(int color);
  */
 
 void
-matchpat(matchpat_callback_fn_ptr callback, int color,
+matchpat(Goban *goban, matchpat_callback_fn_ptr callback, int color,
 	 struct pattern_db *pdb, void *callback_data,
 	 char goal[BOARDMAX]) 
 {
-  matchpat_goal_anchor(callback, color, pdb, callback_data, goal, 
+  matchpat_goal_anchor(goban, callback, color, pdb, callback_data, goal, 
                        pdb->fixed_anchor);
 }
 
 void 
-matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
-		     struct pattern_db *pdb, void *callback_data,
+matchpat_goal_anchor(Goban *goban, matchpat_callback_fn_ptr callback,
+		     int color, struct pattern_db *pdb, void *callback_data,
 		     char goal[BOARDMAX], int anchor_in_goal) 
 {
   loop_fn_ptr_t loop = matchpat_loop;
   prepare_fn_ptr_t prepare = prepare_for_match;
 
   /* check board size */
-  if (pdb->fixed_for_size != board_size) {
-    fixup_patterns_for_board_size(pdb->patterns);
-    pdb->fixed_for_size = board_size;
+  if (pdb->fixed_for_size != goban->board_size) {
+    fixup_patterns_for_board_size(pdb->patterns, goban->board_size);
+    pdb->fixed_for_size = goban->board_size;
   }
 
   /* select pattern matching strategy */
@@ -1128,30 +1137,39 @@ matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
   }
 #endif
 
-  /* select strategy */
+  /* Select strategy. */
   switch (color) {
-    case ANCHOR_COLOR:
-      { /* match pattern for the color of their anchor */
-	prepare(WHITE);
-	loop(callback, WHITE, WHITE, pdb, callback_data, goal, anchor_in_goal);
-	prepare(BLACK);
-	loop(callback, BLACK, BLACK, pdb, callback_data, goal, anchor_in_goal);
-      }
-      break;
-    case ANCHOR_OTHER:
-      { /* match pattern for the opposite color of their anchor */
-	prepare(WHITE);
-	loop(callback, WHITE, BLACK, pdb, callback_data, goal, anchor_in_goal);
-	prepare(BLACK);
-	loop(callback, BLACK, WHITE, pdb, callback_data, goal, anchor_in_goal);
-      }
-      break;
-    default:
-      { /* match all patterns for color */
-	prepare(color);
-	loop(callback, color, WHITE, pdb, callback_data, goal, anchor_in_goal);
-	loop(callback, color, BLACK, pdb, callback_data, goal, anchor_in_goal);
-      }
+  case ANCHOR_COLOR:
+    /* Match pattern for the color of their anchor. */
+    prepare(goban, WHITE);
+    loop(goban, callback, WHITE, WHITE, pdb, callback_data,
+	 goal, anchor_in_goal);
+
+    prepare(goban, BLACK);
+    loop(goban, callback, BLACK, BLACK, pdb, callback_data,
+	 goal, anchor_in_goal);
+
+    break;
+
+  case ANCHOR_OTHER:
+    /* Match pattern for the opposite color of their anchor. */
+    prepare(goban, WHITE);
+    loop(goban, callback, WHITE, BLACK, pdb, callback_data,
+	 goal, anchor_in_goal);
+
+    prepare(goban, BLACK);
+    loop(goban, callback, BLACK, WHITE, pdb, callback_data,
+	 goal, anchor_in_goal);
+
+    break;
+
+  default:
+    /* Match all patterns for color. */
+    prepare(goban, color);
+    loop(goban, callback, color, WHITE, pdb, callback_data,
+	 goal, anchor_in_goal);
+    loop(goban, callback, color, BLACK, pdb, callback_data,
+	 goal, anchor_in_goal);
   }
 }
 
@@ -1160,19 +1178,19 @@ matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
  * odd-sized boards, optimized for fuseki patterns.
  */
 void
-fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
-		   struct fullboard_pattern *pattern)
+fullboard_matchpat(Goban *goban, fullboard_matchpat_callback_fn_ptr callback,
+		   int color, struct fullboard_pattern *pattern)
 {
   int other = OTHER_COLOR(color);
   int ll;   /* Iterate over transformations (rotations or reflections)  */
   int k;    /* Iterate over elements of pattern */
   /* We transform around the center point. */
-  int mid = POS((board_size-1)/2, (board_size-1)/2);
+  int mid = POS((goban->board_size - 1) / 2, (goban->board_size - 1) / 2);
   int number_of_stones_on_board = stones_on_board(goban, BLACK | WHITE);
   
   /* Basic sanity check. */
   gg_assert(goban, color != EMPTY);
-  gg_assert(goban, board_size % 2 == 1);
+  gg_assert(goban, goban->board_size % 2 == 1);
 
   /* Try each pattern - NULL pattern marks end of list. */
   for (; pattern->patn; pattern++) { 
@@ -1195,16 +1213,16 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
 
         ASSERT_ON_BOARD1(goban, pos);
 
-	if ((att == ATT_O && board[pos] != color)
-	    || (att == ATT_X && board[pos] != other))
+	if ((att == ATT_O && goban->board[pos] != color)
+	    || (att == ATT_X && goban->board[pos] != other))
 	  break;
 	
       } /* loop over elements */
-	
+
       if (k == pattern->patlen) {
 	/* A match!  - Call back to the invoker to let it know. */
 	int pos = AFFINE_TRANSFORM(pattern->move_offset, ll, mid);
-	callback(pos, pattern, ll);
+	callback(goban, pos, pattern, ll);
       }
     }
   }
@@ -1236,6 +1254,7 @@ static const int corner_y[8] = {0, 1, 1, 0, 1, 0, 0, 1};
  * However, it may be anchored at any corner of the board, so if the board is
  * small, we may calculate NUM_STONES() at negative coordinates.
  */
+/* THREAD-FIXME: Static variables are unacceptable. */
 static int num_stones[2*BOARDMAX];
 #define NUM_STONES(pos) num_stones[(pos) + BOARDMAX]
 
@@ -1252,7 +1271,8 @@ static int pattern_stones[BOARDMAX];
  * callback function.
  */
 static void
-do_corner_matchpat(int num_variations, struct corner_variation *variation,
+do_corner_matchpat(Goban *goban,
+		   int num_variations, struct corner_variation *variation,
 		   int match_color, corner_matchpat_callback_fn_ptr callback,
 		   int callback_color, int trans, int anchor, int stones)
 {
@@ -1268,19 +1288,21 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
       if (NUM_STONES(second_corner) == stones
 	  && (!pattern->symmetric || trans < 4)) {
 	/* We have found a matching pattern. */
-	ASSERT1(goban, board[move] == EMPTY, move);
+	ASSERT1(goban, goban->board[move] == EMPTY, move);
 
-	callback(move, callback_color, pattern, trans, pattern_stones, stones);
+	callback(goban, move, callback_color, pattern, trans,
+		 pattern_stones, stones);
 	continue;
       }
     }
 
     if (variation->num_variations
 	&& NUM_STONES(move) == variation->num_stones
-	&& board[move] == color_check) {
+	&& goban->board[move] == color_check) {
       /* A matching variation. */
       pattern_stones[stones] = move;
-      do_corner_matchpat(variation->num_variations, variation->variations,
+      do_corner_matchpat(goban,
+			 variation->num_variations, variation->variations,
 			 match_color, callback, callback_color,
 			 trans, anchor, stones + 1);
     }
@@ -1293,14 +1315,14 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
  * matching pattern is found.
  */
 void
-corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
-		struct corner_db *database)
+corner_matchpat(Goban *goban, corner_matchpat_callback_fn_ptr callback,
+		int color, struct corner_db *database)
 {
   int k;
 
   for (k = 0; k < 8; k++) {
-    int anchor = POS(corner_x[k] * (board_size - 1),
-		     corner_y[k] * (board_size - 1));
+    int anchor = POS(corner_x[k] * (goban->board_size - 1),
+		     corner_y[k] * (goban->board_size - 1));
     int i;
     int j;
     int dx = TRANSFORM(OFFSET(1, 0), k);
@@ -1311,7 +1333,7 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
     /* Fill in the NUM_STONES() array. We use `max_width' and `max_height'
      * fields of database structure to stop working as early as possible.
      */
-    NUM_STONES(anchor) = IS_STONE(board[anchor]);
+    NUM_STONES(anchor) = IS_STONE(goban->board[anchor]);
 
     pos = anchor;
     for (i = 1; i < database->max_height; i++) {
@@ -1325,7 +1347,7 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
 	break;
       }
 
-      NUM_STONES(pos) = NUM_STONES(pos - dx) + IS_STONE(board[pos]);
+      NUM_STONES(pos) = NUM_STONES(pos - dx) + IS_STONE(goban->board[pos]);
     }
 
     pos = anchor;
@@ -1340,16 +1362,16 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
 	break;
       }
       
-      NUM_STONES(pos) = NUM_STONES(pos - dy) + IS_STONE(board[pos]);
+      NUM_STONES(pos) = NUM_STONES(pos - dy) + IS_STONE(goban->board[pos]);
     }
     
     for (i = 1; i < database->max_height; i++) {
       pos = anchor + i * dy;
       for (j = 1; j < database->max_width; j++) {
 	pos += dx;
-	NUM_STONES(pos) = NUM_STONES(pos - dx) + NUM_STONES(pos - dy)
-			- NUM_STONES(pos - dx - dy);
-	if (ON_BOARD1(goban, pos) && IS_STONE(board[pos]))
+	NUM_STONES(pos) = (NUM_STONES(pos - dx) + NUM_STONES(pos - dy)
+			   - NUM_STONES(pos - dx - dy));
+	if (ON_BOARD1(goban, pos) && IS_STONE(goban->board[pos]))
 	  NUM_STONES(pos)++;
       }
     }
@@ -1360,10 +1382,11 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
     for (i = 0; i < database->num_top_variations; i++) {
       int move = AFFINE_TRANSFORM(variation->move_offset, k, anchor);
 
-      if (NUM_STONES(move) == 1 && IS_STONE(board[move])) {
+      if (NUM_STONES(move) == 1 && IS_STONE(goban->board[move])) {
 	pattern_stones[0] = move;
-	do_corner_matchpat(variation->num_variations, variation->variations,
-			   board[move], callback, color, k, anchor, 1);
+	do_corner_matchpat(goban,
+			   variation->num_variations, variation->variations,
+			   goban->board[move], callback, color, k, anchor, 1);
       }
 
       variation++;

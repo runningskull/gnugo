@@ -208,81 +208,81 @@ static struct gtp_command commands[] = {
   {"aa_confirm_safety",       gtp_aa_confirm_safety},
   {"accurate_approxlib",      gtp_accurate_approxlib},
   {"accuratelib",             gtp_accuratelib},
-  {"all_legal",        	      gtp_all_legal},
+  {"all_legal",	      gtp_all_legal},
   {"all_move_values",         gtp_all_move_values},
-  {"analyze_eyegraph", 	      gtp_analyze_eyegraph},
+  {"analyze_eyegraph",	      gtp_analyze_eyegraph},
   {"analyze_semeai",          gtp_analyze_semeai},
   {"analyze_semeai_after_move", gtp_analyze_semeai_after_move},
-  {"attack",           	      gtp_attack},
+  {"attack",	      gtp_attack},
   {"attack_either",           gtp_attack_either},
-  {"black",            	      gtp_playblack},
+  {"black",	      gtp_playblack},
   {"block_off",		      gtp_block_off},
-  {"boardsize",        	      gtp_set_boardsize},
+  {"boardsize",	      gtp_set_boardsize},
   {"break_in",		      gtp_break_in},
-  {"captures",        	      gtp_captures},
-  {"clear_board",      	      gtp_clear_board},
+  {"captures",	      gtp_captures},
+  {"clear_board",	      gtp_clear_board},
   {"clear_cache",	      gtp_clear_cache},
-  {"color",            	      gtp_what_color},
+  {"color",	      gtp_what_color},
   {"combination_attack",      gtp_combination_attack},
   {"combination_defend",      gtp_combination_defend},
-  {"connect",         	      gtp_connect},
-  {"countlib",         	      gtp_countlib},
+  {"connect",	      gtp_connect},
+  {"countlib",	      gtp_countlib},
   {"cputime",		      gtp_cputime},
-  {"decrease_depths",  	      gtp_decrease_depths},
-  {"defend",           	      gtp_defend},
+  {"decrease_depths",	      gtp_decrease_depths},
+  {"defend",	      gtp_defend},
   {"defend_both",	      gtp_defend_both},
-  {"disconnect",       	      gtp_disconnect},
+  {"disconnect",	      gtp_disconnect},
   {"does_attack",             gtp_does_attack},
   {"does_defend",             gtp_does_defend},
   {"does_surround",           gtp_does_surround},
   {"dragon_data",             gtp_dragon_data},
-  {"dragon_status",    	      gtp_dragon_status},
+  {"dragon_status",	      gtp_dragon_status},
   {"dragon_stones",           gtp_dragon_stones},
   {"draw_search_area",        gtp_draw_search_area},
-  {"dump_stack",       	      gtp_dump_stack},
+  {"dump_stack",	      gtp_dump_stack},
   {"echo" ,                   gtp_echo},
   {"echo_err" ,               gtp_echo_err},
   {"estimate_score",          gtp_estimate_score},
-  {"eval_eye",         	      gtp_eval_eye},
+  {"eval_eye",	      gtp_eval_eye},
   {"experimental_score",      gtp_experimental_score},
   {"eye_data",                gtp_eye_data},
   {"final_score",             gtp_final_score},
   {"final_status",            gtp_final_status},
   {"final_status_list",       gtp_final_status_list},
-  {"findlib",          	      gtp_findlib},
-  {"finish_sgftrace",  	      gtp_finish_sgftrace},
-  {"fixed_handicap",   	      gtp_fixed_handicap},
+  {"findlib",	      gtp_findlib},
+  {"finish_sgftrace",	      gtp_finish_sgftrace},
+  {"fixed_handicap",	      gtp_fixed_handicap},
   {"followup_influence",      gtp_followup_influence},
   {"genmove",                 gtp_genmove},
   {"genmove_black",           gtp_genmove_black},
   {"genmove_white",           gtp_genmove_white},
   {"get_connection_node_counter", gtp_get_connection_node_counter},
-  {"get_handicap",   	      gtp_get_handicap},
-  {"get_komi",        	      gtp_get_komi},
+  {"get_handicap",	      gtp_get_handicap},
+  {"get_komi",	      gtp_get_komi},
   {"get_life_node_counter",   gtp_get_life_node_counter},
   {"get_owl_node_counter",    gtp_get_owl_node_counter},
-  {"get_random_seed",  	      gtp_get_random_seed},
+  {"get_random_seed",	      gtp_get_random_seed},
   {"get_reading_node_counter", gtp_get_reading_node_counter},
   {"get_trymove_counter",     gtp_get_trymove_counter},
   {"gg-undo",                 gtp_gg_undo},
   {"gg_genmove",              gtp_gg_genmove},
   {"half_eye_data",           gtp_half_eye_data},
   {"help",                    gtp_list_commands},
-  {"increase_depths",  	      gtp_increase_depths},
+  {"increase_depths",	      gtp_increase_depths},
   {"initial_influence",       gtp_initial_influence},
-  {"is_legal",         	      gtp_is_legal},
+  {"is_legal",	      gtp_is_legal},
   {"is_surrounded",           gtp_is_surrounded},
   {"kgs-genmove_cleanup",     gtp_kgs_genmove_cleanup},
-  {"known_command",    	      gtp_known_command},
-  {"komi",        	      gtp_set_komi},
-  {"ladder_attack",    	      gtp_ladder_attack},
-  {"last_move",    	      gtp_last_move},
-  {"level",        	      gtp_set_level},
-  {"limit_search",     	      gtp_limit_search},
+  {"known_command",	      gtp_known_command},
+  {"komi",	      gtp_set_komi},
+  {"ladder_attack",	      gtp_ladder_attack},
+  {"last_move",	      gtp_last_move},
+  {"level",	      gtp_set_level},
+  {"limit_search",	      gtp_limit_search},
   {"limit_search",            gtp_limit_search},
-  {"list_commands",    	      gtp_list_commands},
-  {"list_stones",    	      gtp_list_stones},
-  {"loadsgf",          	      gtp_loadsgf},
+  {"list_commands",	      gtp_list_commands},
+  {"list_stones",	      gtp_list_stones},
+  {"loadsgf",	      gtp_loadsgf},
   {"move_influence",          gtp_move_influence},
   {"move_probabilities",      gtp_move_probabilities},
   {"move_reasons",            gtp_move_reasons},
@@ -290,23 +290,23 @@ static struct gtp_command commands[] = {
   {"move_history",	      gtp_move_history},
   {"name",                    gtp_name},
   {"new_score",               gtp_estimate_score},
-  {"orientation",     	      gtp_set_orientation},
-  {"owl_attack",     	      gtp_owl_attack},
+  {"orientation",	      gtp_set_orientation},
+  {"owl_attack",	      gtp_owl_attack},
   {"owl_connection_defends",  gtp_owl_connection_defends},
-  {"owl_defend",     	      gtp_owl_defend},
-  {"owl_does_attack", 	      gtp_owl_does_attack},
-  {"owl_does_defend", 	      gtp_owl_does_defend},
-  {"owl_substantial", 	      gtp_owl_substantial},
+  {"owl_defend",	      gtp_owl_defend},
+  {"owl_does_attack",	      gtp_owl_does_attack},
+  {"owl_does_defend",	      gtp_owl_does_defend},
+  {"owl_substantial",	      gtp_owl_substantial},
   {"owl_threaten_attack",     gtp_owl_threaten_attack},
   {"owl_threaten_defense",    gtp_owl_threaten_defense},
   {"place_free_handicap",     gtp_place_free_handicap},
-  {"play",            	      gtp_play},
-  {"popgo",            	      gtp_popgo},
-  {"printsgf",         	      gtp_printsgf},
+  {"play",	      gtp_play},
+  {"popgo",	      gtp_popgo},
+  {"printsgf",	      gtp_printsgf},
   {"protocol_version",        gtp_protocol_version},
   {"query_boardsize",         gtp_query_boardsize},
   {"query_orientation",       gtp_query_orientation},
-  {"quit",             	      gtp_quit},
+  {"quit",	      gtp_quit},
   {"reg_genmove",             gtp_reg_genmove},
   {"report_uncertainty",      gtp_report_uncertainty},
   {"reset_connection_node_counter", gtp_reset_connection_node_counter},
@@ -316,13 +316,13 @@ static struct gtp_command commands[] = {
   {"reset_search_mask",       gtp_reset_search_mask},
   {"reset_trymove_counter",   gtp_reset_trymove_counter},
   {"restricted_genmove",      gtp_restricted_genmove},
-  {"same_dragon",    	      gtp_same_dragon},
+  {"same_dragon",	      gtp_same_dragon},
   {"set_free_handicap",       gtp_set_free_handicap},
-  {"set_random_seed",  	      gtp_set_random_seed},
+  {"set_random_seed",	      gtp_set_random_seed},
   {"set_search_diamond",      gtp_set_search_diamond},
   {"set_search_limit",        gtp_set_search_limit},
-  {"showboard",        	      gtp_showboard},
-  {"start_sgftrace",  	      gtp_start_sgftrace},
+  {"showboard",	      gtp_showboard},
+  {"start_sgftrace",	      gtp_start_sgftrace},
   {"surround_map",            gtp_surround_map},
   {"tactical_analyze_semeai", gtp_tactical_analyze_semeai},
   {"test_eyeshape",           gtp_test_eyeshape},
@@ -331,13 +331,13 @@ static struct gtp_command commands[] = {
   {"top_moves",               gtp_top_moves},
   {"top_moves_black",         gtp_top_moves_black},
   {"top_moves_white",         gtp_top_moves_white},
-  {"tryko",          	      gtp_tryko},
-  {"trymove",          	      gtp_trymove},
+  {"tryko",	      gtp_tryko},
+  {"trymove",	      gtp_trymove},
   {"tune_move_ordering",      gtp_tune_move_ordering},
   {"unconditional_status",    gtp_unconditional_status},
   {"undo",                    gtp_undo},
   {"version",                 gtp_program_version},
-  {"white",            	      gtp_playwhite},
+  {"white",	      gtp_playwhite},
   {"worm_cutstone",           gtp_worm_cutstone},
   {"worm_data",               gtp_worm_data},
   {"worm_stones",             gtp_worm_stones},
@@ -368,9 +368,9 @@ play_gtp(Goban *_goban,
 
   /* Initialize time handling. */
   gtp_init_time_handling();
-  
+
   /* Prepare pattern matcher and reading code. */
-  reset_engine();
+  reset_engine(goban);
   clearstats();
   gtp_main_loop(commands, gtp_input, gtp_output, gtp_dump_commands);
   if (showstatistics)
@@ -467,7 +467,7 @@ gtp_set_boardsize(char *s)
 
   if (sscanf(s, "%d", &board_size) < 1)
     return gtp_failure("boardsize not an integer");
-  
+
   if (board_size < MIN_BOARD || board_size > MAX_BOARD) {
     if (gtp_version == 1)
       return gtp_failure("unacceptable boardsize");
@@ -484,7 +484,7 @@ gtp_set_boardsize(char *s)
   goban->board_size = board_size;
   clear_board(goban);
   gtp_internal_set_boardsize(board_size);
-  reset_engine();
+  reset_engine(goban);
   return gtp_success("");
 }
 
@@ -525,7 +525,7 @@ gtp_clear_board(char *s)
 
   clear_board(goban);
   gtp_init_time_handling();
-  
+
   return gtp_success("");
 }
 
@@ -544,7 +544,7 @@ gtp_set_orientation(char *s)
   int orientation;
   if (sscanf(s, "%d", &orientation) < 1)
     return gtp_failure("orientation not an integer");
-  
+
   if (orientation < 0 || orientation > 7)
     return gtp_failure("unacceptable orientation");
 
@@ -583,7 +583,7 @@ gtp_set_komi(char *s)
 {
   if (sscanf(s, "%f", &goban->komi) < 1)
     return gtp_failure("komi not a float");
-  
+
   return gtp_success("");
 }
 
@@ -595,7 +595,7 @@ gtp_set_komi(char *s)
 /* Function:  Get the komi
  * Arguments: none
  * Fails:     never
- * Returns:   Komi 
+ * Returns:   Komi
  */
 static int
 gtp_get_komi(char *s)
@@ -662,7 +662,7 @@ gtp_playwhite(char *s)
   }
   else if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
-  
+
   if (!is_legal(goban, POS(i, j), WHITE))
     return gtp_failure("illegal move");
 
@@ -716,7 +716,7 @@ gtp_fixed_handicap(char *s)
 
   if (sscanf(s, "%d", &this_handicap) < 1)
     return gtp_failure("handicap not an integer");
-  
+
   if (this_handicap < 2 && (gtp_version > 1 || this_handicap != 0))
     return gtp_failure("invalid handicap");
 
@@ -738,7 +738,7 @@ gtp_fixed_handicap(char *s)
 	  first = 0;
 	gtp_mprintf("%m", m, n);
       }
-  
+
   return gtp_finish_response();
 }
 
@@ -758,7 +758,7 @@ gtp_place_free_handicap(char *s)
   int this_handicap;
   if (sscanf(s, "%d", &this_handicap) < 1)
     return gtp_failure("handicap not an integer");
-  
+
   if (stones_on_board(goban, BLACK | WHITE) > 0)
     return gtp_failure("board not empty");
 
@@ -778,7 +778,7 @@ gtp_place_free_handicap(char *s)
 	  first = 0;
 	gtp_mprintf("%m", m, n);
       }
-  
+
   return gtp_finish_response();
 }
 
@@ -796,7 +796,7 @@ gtp_set_free_handicap(char *s)
   int n;
   int i, j;
   int k;
-  
+
   if (stones_on_board(goban, BLACK | WHITE) > 0)
     return gtp_failure("board not empty");
 
@@ -822,7 +822,7 @@ gtp_set_free_handicap(char *s)
   }
 
   handicap = k;
-  
+
   return gtp_success("");
 }
 
@@ -841,7 +841,7 @@ gtp_get_handicap(char *s)
 
 
 /* Function:  Load an sgf file, possibly up to a move number or the first
- *            occurence of a move.           
+ *            occurence of a move.
  * Arguments: filename + move number, vertex, or nothing
  * Fails:     missing filename or failure to open or parse file
  * Returns:   color to play
@@ -857,7 +857,7 @@ gtp_loadsgf(char *s)
   Gameinfo gameinfo;
   int nread;
   int color_to_move;
-  
+
   nread = sscanf(s, "%s %s", filename, untilstring);
   if (nread < 1)
     return gtp_failure("missing filename");
@@ -875,11 +875,11 @@ gtp_loadsgf(char *s)
   else
     color_to_move = gameinfo_play_sgftree_rot(&gameinfo, goban, &sgftree,
 					      untilstring,
-                                              gtp_orientation);
+					      gtp_orientation);
 
   handicap = gameinfo.handicap;
   gtp_internal_set_boardsize(goban->board_size);
-  reset_engine();
+  reset_engine(goban);
   gtp_init_time_handling();
 
   sgfFreeNode(sgftree.root);
@@ -905,7 +905,7 @@ gtp_what_color(char *s)
   int i, j;
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
-  
+
   return gtp_success(color_to_string(BOARD(goban, i, j)));
 }
 
@@ -923,7 +923,7 @@ gtp_list_stones(char *s)
   int vertexi[MAX_BOARD * MAX_BOARD];
   int vertexj[MAX_BOARD * MAX_BOARD];
   int vertices = 0;
-  
+
   if (!gtp_decode_color(s, &color))
     return gtp_failure("invalid color");
 
@@ -970,7 +970,7 @@ gtp_findlib(char *s)
   int i, j;
   int libs[MAXLIBS];
   int liberties;
-  
+
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
 
@@ -1053,7 +1053,7 @@ gtp_is_legal(char *s)
 {
   int i, j;
   int color;
-  
+
   if (!gtp_decode_move(s, &color, &i, &j))
     return gtp_failure("invalid color or coordinate");
 
@@ -1074,7 +1074,7 @@ gtp_all_legal(char *s)
   int movei[MAX_BOARD * MAX_BOARD];
   int movej[MAX_BOARD * MAX_BOARD];
   int moves = 0;
-  
+
   if (!gtp_decode_color(s, &color))
     return gtp_failure("invalid color");
 
@@ -1100,7 +1100,7 @@ static int
 gtp_captures(char *s)
 {
   int color;
-  
+
   if (!gtp_decode_color(s, &color))
     return gtp_failure("invalid color");
 
@@ -1125,7 +1125,7 @@ gtp_last_move(char *s)
 
   if (color == EMPTY)
     return gtp_failure("no previous move known");
-  
+
   gtp_start_response(GTP_SUCCESS);
   gtp_mprintf("%C %m", color, I(pos), J(pos));
   return gtp_finish_response();
@@ -1134,14 +1134,14 @@ gtp_last_move(char *s)
 /* Function:  Print the move history in reverse order
  * Arguments: none
  * Fails:     never
- * Returns:   List of moves played in reverse order in format: 
+ * Returns:   List of moves played in reverse order in format:
  *            color move (one move per line)
  */
 static int
 gtp_move_history(char *s)
 {
   UNUSED(s);
-  
+
   gtp_start_response(GTP_SUCCESS);
   if (get_last_player(goban) != EMPTY) {
     int k;
@@ -1188,7 +1188,7 @@ gtp_trymove(char *s)
   return gtp_success("");
 }
 
-/* Function:  Play a stone of the given color at the given vertex, 
+/* Function:  Play a stone of the given color at the given vertex,
  *            allowing illegal ko capture.
  * Arguments: move (color + vertex)
  * Fails:     invalid color, invalid vertex, illegal move
@@ -1260,7 +1260,7 @@ gtp_attack(char *s)
   int i, j;
   int apos;
   int attack_code;
-  
+
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
 
@@ -1275,7 +1275,7 @@ gtp_attack(char *s)
     gtp_print_vertex(I(apos), J(apos));
   }
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Try to attack either of two strings
@@ -1326,7 +1326,7 @@ gtp_defend(char *s)
   int i, j;
   int dpos;
   int defend_code;
-  
+
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
 
@@ -1341,7 +1341,7 @@ gtp_defend(char *s)
     gtp_print_vertex(I(dpos), J(dpos));
   }
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Examine whether a specific move attacks a string tactically.
@@ -1374,12 +1374,12 @@ gtp_does_attack(char *s)
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
-  
+
   attack_code = does_attack(goban, POS(ti, tj), POS(i, j));
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(attack_code);
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Examine whether a specific move defends a string tactically.
@@ -1412,12 +1412,12 @@ gtp_does_defend(char *s)
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
-  
+
   defense_code = does_defend(goban, POS(ti, tj), POS(i, j));
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(defense_code);
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Try to attack a string strictly in a ladder.
@@ -1431,7 +1431,7 @@ gtp_ladder_attack(char *s)
   int i, j;
   int apos;
   int attack_code;
-  
+
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
 
@@ -1449,7 +1449,7 @@ gtp_ladder_attack(char *s)
     gtp_print_vertex(I(apos), J(apos));
   }
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Increase depth values by one.
@@ -1463,7 +1463,7 @@ gtp_increase_depths(char *s)
   UNUSED(s);
   increase_depth_values();
   return gtp_success("");
-}  
+}
 
 
 /* Function:  Decrease depth values by one.
@@ -1477,7 +1477,7 @@ gtp_decrease_depths(char *s)
   UNUSED(s);
   decrease_depth_values();
   return gtp_success("");
-}  
+}
 
 
 /******************
@@ -1504,13 +1504,14 @@ gtp_owl_attack(char *s)
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
+
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
-  
-  attack_code = owl_attack(POS(i, j), &attack_point, &result_certain, &kworm);
+
+  attack_code = owl_attack(goban, POS(i, j), &attack_point,
+			   &result_certain, &kworm);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(attack_code);
   if (attack_code > 0) {
@@ -1520,7 +1521,7 @@ gtp_owl_attack(char *s)
   if (!result_certain && report_uncertainty)
     gtp_printf(" uncertain");
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Try to defend a dragon.
@@ -1536,20 +1537,21 @@ gtp_owl_defend(char *s)
   int defend_code;
   int result_certain;
   int kworm;
-  
+
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
 
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
+
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
 
-  defend_code = owl_defend(POS(i, j), &defense_point, &result_certain, &kworm);
+  defend_code = owl_defend(goban, POS(i, j), &defense_point,
+			   &result_certain, &kworm);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(defend_code);
   if (defend_code > 0) {
@@ -1559,7 +1561,7 @@ gtp_owl_defend(char *s)
   if (!result_certain && report_uncertainty)
     gtp_printf(" uncertain");
   return gtp_finish_response();
-}  
+}
 
 /* Function:  Try to attack a dragon in 2 moves.
  * Arguments: vertex
@@ -1581,13 +1583,14 @@ gtp_owl_threaten_attack(char *s)
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
+
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
-  
-  attack_code = owl_threaten_attack(POS(i, j), &attack_point1, &attack_point2);
+
+  attack_code = owl_threaten_attack(goban, POS(i, j),
+				    &attack_point1, &attack_point2);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(attack_code);
   if (attack_code > 0) {
@@ -1597,7 +1600,7 @@ gtp_owl_threaten_attack(char *s)
     gtp_print_vertex(I(attack_point2), J(attack_point2));
   }
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Try to defend a dragon with 2 moves.
@@ -1613,21 +1616,21 @@ gtp_owl_threaten_defense(char *s)
   int defense_point1;
   int defense_point2;
   int defend_code;
-  
+
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
 
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
+
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
 
-  defend_code = owl_threaten_defense(POS(i, j), &defense_point1,
-				     &defense_point2);
+  defend_code = owl_threaten_defense(goban, POS(i, j),
+				     &defense_point1, &defense_point2);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(defend_code);
   if (defend_code > 0) {
@@ -1637,7 +1640,7 @@ gtp_owl_threaten_defense(char *s)
     gtp_print_vertex(I(defense_point2), J(defense_point2));
   }
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Examine whether a specific move attacks a dragon.
@@ -1668,17 +1671,17 @@ gtp_owl_does_attack(char *s)
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("dragon vertex must not be empty");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
+
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
-  
-  attack_code = owl_does_attack(POS(ti, tj), POS(i, j), &kworm);
+
+  attack_code = owl_does_attack(goban, POS(ti, tj), POS(i, j), &kworm);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(attack_code);
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Examine whether a specific move defends a dragon.
@@ -1709,17 +1712,17 @@ gtp_owl_does_defend(char *s)
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("dragon vertex must not be empty");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
+
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
-  
-  defense_code = owl_does_defend(POS(ti, tj), POS(i, j), &kworm);
+
+  defense_code = owl_does_defend(goban, POS(ti, tj), POS(i, j), &kworm);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(defense_code);
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Examine whether a connection defends involved dragons.
@@ -1759,13 +1762,14 @@ gtp_owl_connection_defends(char *s)
   if (BOARD(goban, ai, aj) != BOARD(goban, bi, bj))
     return gtp_failure("dragon vertices must have the same color");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
+
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
-  
-  defense_code = owl_connection_defends(POS(ti, tj), POS(ai, aj), POS(bi, bj));
+
+  defense_code = owl_connection_defends(goban, POS(ti, tj), POS(ai, aj),
+					POS(bi, bj));
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(defense_code);
   return gtp_finish_response();
@@ -1820,22 +1824,22 @@ gtp_owl_substantial(char *s)
 {
   int i, j;
   int result;
-  
+
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
 
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
+
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
 
-  result = owl_substantial(POS(i, j));
+  result = owl_substantial(goban, POS(i, j));
   return gtp_success("%d", result);
-}  
+}
 
 
 /* Function:  Analyze a semeai
@@ -1850,7 +1854,7 @@ gtp_analyze_semeai(char *s)
   int k;
   int dragona, dragonb;
   int resulta, resultb, move, result_certain;
-  
+
   k = gtp_decode_coord(s, &i, &j);
 
   if (k == 0)
@@ -1865,13 +1869,13 @@ gtp_analyze_semeai(char *s)
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
 
-  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 1,
-  		     &result_certain);
+  owl_analyze_semeai(goban, dragona, dragonb, &resulta, &resultb, &move, 1,
+		     &result_certain);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(resulta);
   gtp_printf(" ");
@@ -1881,7 +1885,7 @@ gtp_analyze_semeai(char *s)
     gtp_printf(" uncertain");
 
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Analyze a semeai after a move have been made.
@@ -1907,7 +1911,7 @@ gtp_analyze_semeai_after_move(char *s)
   if (board[move] != EMPTY)
     return gtp_failure("move vertex is not empty");
   s += k;
-  
+
   k = gtp_decode_coord(s, &i, &j);
   if (k == 0)
     return gtp_failure("invalid coordinate");
@@ -1922,12 +1926,12 @@ gtp_analyze_semeai_after_move(char *s)
   if (board[dragonb] == EMPTY)
     return gtp_failure("dragon vertex must not be empty");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
 
-  owl_analyze_semeai_after_move(move, color, dragona, dragonb,
+  owl_analyze_semeai_after_move(goban, move, color, dragona, dragonb,
 				&resulta, &resultb, &semeai_move, 1,
 				&result_certain, 0);
   gtp_start_response(GTP_SUCCESS);
@@ -1939,7 +1943,7 @@ gtp_analyze_semeai_after_move(char *s)
     gtp_printf(" uncertain");
 
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Analyze a semeai, not using owl
@@ -1954,7 +1958,7 @@ gtp_tactical_analyze_semeai(char *s)
   int k;
   int dragona, dragonb;
   int resulta, resultb, move, result_certain;
-  
+
   k = gtp_decode_coord(s, &i, &j);
 
   if (k == 0)
@@ -1969,15 +1973,15 @@ gtp_tactical_analyze_semeai(char *s)
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
   /* to get the variations into the sgf file, clear the reading cache */
   if (goban->sgf_dumptree)
     reading_cache_clear();
 
-  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 0,
-                     &result_certain);
+  owl_analyze_semeai(goban, dragona, dragonb, &resulta, &resultb, &move, 0,
+		     &result_certain);
   gtp_start_response(GTP_SUCCESS);
-  gtp_mprintf("%s %s %m", 
+  gtp_mprintf("%s %s %m",
 	      status_to_string(resulta),
 	      status_to_string(resultb),
 	      I(move), J(move));
@@ -1985,7 +1989,7 @@ gtp_tactical_analyze_semeai(char *s)
     gtp_printf(" uncertain");
 
   return gtp_finish_response();
-}  
+}
 
 
 /***********************
@@ -2005,7 +2009,7 @@ gtp_connect(char *s)
   int connect_move = PASS_MOVE;
   int result;
   int n;
-  
+
   n = gtp_decode_coord(s, &ai, &aj);
   if (n == 0)
     return gtp_failure("invalid coordinate");
@@ -2026,7 +2030,7 @@ gtp_connect(char *s)
     gtp_mprintf(" %m", I(connect_move), J(connect_move));
 
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Try to disconnect two strings.
@@ -2042,7 +2046,7 @@ gtp_disconnect(char *s)
   int disconnect_move = PASS_MOVE;
   int result;
   int n;
-  
+
   n = gtp_decode_coord(s, &ai, &aj);
   if (n == 0)
     return gtp_failure("invalid coordinate");
@@ -2063,7 +2067,7 @@ gtp_disconnect(char *s)
     gtp_mprintf(" %m", I(disconnect_move), J(disconnect_move));
 
   return gtp_finish_response();
-}  
+}
 
 
 /* Function:  Try to break from string into area.
@@ -2081,7 +2085,7 @@ gtp_break_in(char *s)
   int result;
   int n;
   int k;
-  
+
   n = gtp_decode_coord(s, &ai, &aj);
   if (n == 0)
     return gtp_failure("invalid coordinate");
@@ -2128,7 +2132,7 @@ gtp_block_off(char *s)
   int result;
   int n;
   int k;
-  
+
   n = gtp_decode_coord(s, &ai, &aj);
   if (n == 0)
     return gtp_failure("invalid coordinate");
@@ -2187,16 +2191,16 @@ gtp_eval_eye(char *s)
   if (!gtp_decode_coord(s, &m, &n))
     return gtp_failure("invalid coordinate");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
+
   if (black_eye[POS(m, n)].color == BLACK) {
     pos = black_eye[POS(m, n)].origin;
-    compute_eyes(pos, &value, &attack_point, &defense_point,
+    compute_eyes(goban, pos, &value, &attack_point, &defense_point,
 		 black_eye, half_eye, 0);
   }
   else if (white_eye[POS(m, n)].color == WHITE) {
     pos = white_eye[POS(m, n)].origin;
-    compute_eyes(pos, &value, &attack_point, &defense_point,
+    compute_eyes(goban, pos, &value, &attack_point, &defense_point,
 		 white_eye, half_eye, 0);
   }
   else
@@ -2247,8 +2251,8 @@ gtp_dragon_status(char *s)
   else if (sscanf(s, "%*s") != EOF)
     return gtp_failure("invalid coordinate");
 
-  silent_examine_position(EXAMINE_DRAGONS);
-  
+  silent_examine_position(goban, EXAMINE_DRAGONS);
+
   gtp_start_response(GTP_SUCCESS);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -2259,7 +2263,7 @@ gtp_dragon_status(char *s)
 		&& dragon[pos].origin == pos))) {
       if (str == NO_MOVE)
 	gtp_mprintf("%m: ", I(pos), J(pos));
-      
+
       if (dragon[pos].status == ALIVE)
 	gtp_printf("alive\n");
       else if (dragon[pos].status == DEAD)
@@ -2268,9 +2272,9 @@ gtp_dragon_status(char *s)
 	gtp_printf("unknown\n");
       else {
 	/* Only remaining possibility. */
-	assert(dragon[pos].status == CRITICAL); 
+	assert(dragon[pos].status == CRITICAL);
 	/* Status critical, need to return attack and defense point as well. */
-	gtp_mprintf("critical %m %m\n", 
+	gtp_mprintf("critical %m %m\n",
 		    I(DRAGON2(pos).owl_attack_point),
 		    J(DRAGON2(pos).owl_attack_point),
 		    I(DRAGON2(pos).owl_defense_point),
@@ -2307,8 +2311,8 @@ gtp_same_dragon(char *s)
   if (BOARD(goban, ai, aj) == EMPTY || BOARD(goban, bi, bj) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
+  silent_examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
+
   return gtp_success("%d", dragon[POS(ai, aj)].id == dragon[POS(bi, bj)].id);
 }
 
@@ -2335,8 +2339,8 @@ gtp_unconditional_status(char *s)
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
 
-  silent_examine_position(EXAMINE_WORMS);
-  
+  silent_examine_position(goban, EXAMINE_WORMS);
+
   status = worm[POS(i, j)].unconditional_status;
   if (status == UNKNOWN)
     return gtp_success("undecided");
@@ -2366,11 +2370,11 @@ gtp_combination_attack(char *s)
   if (!n)
     return gtp_failure("invalid color");
 
-  silent_examine_position(EXAMINE_ALL);
+  silent_examine_position(goban, EXAMINE_ALL);
 
-  if (!atari_atari(color, &attack_point, NULL, verbose))
+  if (!atari_atari(goban, color, &attack_point, NULL, verbose))
     attack_point = NO_MOVE;
-  
+
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(attack_point), J(attack_point));
   return gtp_finish_response();
@@ -2397,12 +2401,12 @@ gtp_combination_defend(char *s)
   if (!n)
     return gtp_failure("invalid color");
 
-  silent_examine_position(EXAMINE_ALL);
+  silent_examine_position(goban, EXAMINE_ALL);
 
   memset(defense_points, 0, sizeof(defense_points));
-  if (!atari_atari(color, NULL, defense_points, verbose))
+  if (!atari_atari(goban, color, NULL, defense_points, verbose))
     return gtp_success("PASS");
-  
+
   gtp_start_response(GTP_SUCCESS);
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(goban, pos) && defense_points[pos]) {
@@ -2412,7 +2416,7 @@ gtp_combination_defend(char *s)
 	first = 0;
       gtp_print_vertex(I(pos), J(pos));
     }
-  
+
   return gtp_finish_response();
 }
 
@@ -2440,19 +2444,19 @@ gtp_aa_confirm_safety(char *s)
 
   sscanf(s + n, "%d", &minsize);
 
-  genmove(color, NULL, NULL);
-  get_saved_dragons(POS(i, j), saved_dragons);
-  get_saved_worms(POS(i, j), saved_worms);
-  
-  result = atari_atari_confirm_safety(color, POS(i, j),
+  genmove(goban, color, NULL, NULL);
+  get_saved_dragons(goban, POS(i, j), saved_dragons);
+  get_saved_worms(goban, POS(i, j), saved_worms);
+
+  result = atari_atari_confirm_safety(goban, color, POS(i, j),
 				      &defense_point, minsize,
 				      saved_dragons, saved_worms);
-  
+
   gtp_start_response(GTP_SUCCESS);
   gtp_mprintf("%d", result);
   if (result == 0)
     gtp_mprintf(" %m", I(defense_point), J(defense_point));
-  
+
   return gtp_finish_response();
 }
 
@@ -2477,7 +2481,7 @@ gtp_genmove_black(char *s)
   if (goban->stackp > 0)
     return gtp_failure("genmove cannot be called when stackp > 0");
 
-  move = genmove(BLACK, NULL, NULL);
+  move = genmove(goban, BLACK, NULL, NULL);
 
   play_move(goban, move, BLACK);
 
@@ -2502,7 +2506,7 @@ gtp_genmove_white(char *s)
   if (goban->stackp > 0)
     return gtp_failure("genmove cannot be called when stackp > 0");
 
-  move = genmove(WHITE, NULL, NULL);
+  move = genmove(goban, WHITE, NULL, NULL);
 
   play_move(goban, move, WHITE);
 
@@ -2535,7 +2539,7 @@ gtp_genmove(char *s)
 
   adjust_level_offset(color);
   level += level_offset;
-  move = genmove(color, NULL, &resign);
+  move = genmove(goban, color, NULL, &resign);
   level -= level_offset;
 
   if (resign)
@@ -2577,8 +2581,8 @@ gtp_reg_genmove(char *s)
    * 0.
    */
   set_random_seed(0);
-  
-  move = genmove_conservative(color, NULL);
+
+  move = genmove_conservative(goban, color, NULL);
 
   set_random_seed(saved_random_seed);
   gtp_start_response(GTP_SUCCESS);
@@ -2618,8 +2622,8 @@ gtp_gg_genmove(char *s)
   seed = 0;
   sscanf(s+n, "%u", &seed);
   set_random_seed(seed);
-  
-  move = genmove_conservative(color, NULL);
+
+  move = genmove_conservative(goban, color, NULL);
   set_random_seed(saved_random_seed);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(move), J(move));
@@ -2675,8 +2679,8 @@ gtp_restricted_genmove(char *s)
    * 0.
    */
   set_random_seed(0);
-  
-  move = genmove_restricted(color, allowed_moves);
+
+  move = genmove_restricted(goban, color, allowed_moves);
   set_random_seed(saved_random_seed);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(move), J(move));
@@ -2714,14 +2718,14 @@ gtp_kgs_genmove_cleanup(char *s)
    * opponent stones.
    */
   capture_all_dead = 1;
-  
+
   adjust_level_offset(color);
   level += level_offset;
-  move = genmove(color, NULL, NULL);
+  move = genmove(goban, color, NULL, NULL);
   level -= level_offset;
 
   capture_all_dead = save_capture_all_dead;
-  
+
   play_move(goban, move, color);
 
   gtp_start_response(GTP_SUCCESS);
@@ -2747,7 +2751,7 @@ gtp_move_reasons(char *s)
     return gtp_failure("vertex must not be occupied");
 
   gtp_start_response(GTP_SUCCESS);
-  if (list_move_reasons(gtp_output_file, POS(i, j)) == 0)
+  if (list_move_reasons(goban, gtp_output_file, POS(i, j)) == 0)
     gtp_printf("\n");
   gtp_printf("\n");
   return GTP_OK;
@@ -2767,7 +2771,7 @@ gtp_all_move_values(char *s)
 {
   UNUSED(s);
   gtp_start_response(GTP_SUCCESS);
-  print_all_move_values(gtp_output_file);
+  print_all_move_values(goban, gtp_output_file);
   gtp_printf("\n");
   return GTP_OK;
 }
@@ -2808,7 +2812,7 @@ gtp_top_moves_white(char *s)
 {
   int k;
   UNUSED(s);
-  genmove(WHITE, NULL, NULL);
+  genmove(goban, WHITE, NULL, NULL);
   gtp_start_response(GTP_SUCCESS);
   for (k = 0; k < 10; k++)
     if (best_move_values[k] > 0.0) {
@@ -2829,7 +2833,7 @@ gtp_top_moves_black(char *s)
 {
   int k;
   UNUSED(s);
-  genmove(BLACK, NULL, NULL);
+  genmove(goban, BLACK, NULL, NULL);
   gtp_start_response(GTP_SUCCESS);
   for (k = 0; k < 10; k++)
     if (best_move_values[k] > 0.0) {
@@ -2852,7 +2856,7 @@ gtp_set_level(char *s)
   int new_level;
   if (sscanf(s, "%d", &new_level) < 1)
     return gtp_failure("level not an integer");
-  
+
   level = new_level;
   level_offset = 0;
   return gtp_success("");
@@ -2874,8 +2878,8 @@ gtp_undo(char *s)
   if (goban->stackp > 0 || !undo_moves(goban, 1))
     return gtp_failure("cannot undo");
 
-  reset_engine();
-  
+  reset_engine(goban);
+
   return gtp_success("");
 }
 
@@ -2899,8 +2903,8 @@ gtp_gg_undo(char *s)
   if (goban->stackp > 0 || !undo_moves(goban, number_moves))
     return gtp_failure("cannot undo");
 
-  reset_engine();
-  
+  reset_engine(goban);
+
   return gtp_success("");
 }
 
@@ -2938,7 +2942,7 @@ analyze_time_data(int time_left_data[2], int stones_left_data[2],
   /* Do we have any time limits. */
   if (byo_yomi_stones == 0 && byo_yomi_time > 0)
     return;
-  
+
   /* If we don't have time information for the two last moves, just return. */
   if (time_left_data[1] < 0)
     return;
@@ -3047,7 +3051,7 @@ static int
 gtp_time_settings(char *s)
 {
   int a, b, c;
-  
+
   if (sscanf(s, "%d %d %d", &a, &b, &c) < 3)
     return gtp_failure("not three integers");
 
@@ -3078,7 +3082,7 @@ gtp_time_left(char *s)
   n = gtp_decode_color(s, &color);
   if (!n)
     return gtp_failure("invalid color");
-  
+
   if (sscanf(s+n, "%d %d", &time, &stones) < 2)
     return gtp_failure("time and stones not two integers");
 
@@ -3094,7 +3098,7 @@ gtp_time_left(char *s)
     white_time_left[0] = time;
     white_stones_left[0] = stones;
   }
-  
+
   return gtp_success("");
 }
 
@@ -3157,7 +3161,7 @@ finish_and_score_game(int seed)
     next = OTHER_COLOR(get_last_player(goban));
 
   do {
-    move = genmove_conservative(next, NULL);
+    move = genmove_conservative(goban, next, NULL);
     play_move(goban, move, next);
     if (move != PASS_MOVE) {
       pass = 0;
@@ -3169,10 +3173,10 @@ finish_and_score_game(int seed)
     next = OTHER_COLOR(next);
   } while (pass < 2 && moves < goban->board_size * goban->board_size);
 
-  final_score = aftermath_compute_score(next, goban->komi, NULL);
+  final_score = aftermath_compute_score(goban, next, goban->komi, NULL);
   for (i = 0; i < goban->board_size; i++)
     for (j = 0; j < goban->board_size; j++) {
-      final_status[i][j] = aftermath_final_status(next, POS(i, j));
+      final_status[i][j] = aftermath_final_status(goban, next, POS(i, j));
       saved_board[i][j] = BOARD(goban, i, j);
     }
 
@@ -3330,7 +3334,7 @@ gtp_final_status_list(char *s)
 
   if (sscanf(s, "%s %n", status_string, &n) != 1)
     return gtp_failure("missing status");
-  
+
   for (k = 0; k < 6; k++) {
     if (strcmp(status_string, status_names[k]) == 0)
       status = status_numbers[k];
@@ -3398,17 +3402,17 @@ gtp_estimate_score(char *s)
   float upper_bound, lower_bound;
   UNUSED(s);
 
-  score = gnugo_estimate_score(&upper_bound, &lower_bound);
+  score = gnugo_estimate_score(goban, &upper_bound, &lower_bound);
   gtp_start_response(GTP_SUCCESS);
   /* Traditionally W wins jigo */
-  if (score >= 0.0) 
-    gtp_printf("W+%3.1f (upper bound: %3.1f, lower: %3.1f)", 
+  if (score >= 0.0)
+    gtp_printf("W+%3.1f (upper bound: %3.1f, lower: %3.1f)",
 	       score, upper_bound, lower_bound);
   else if (score < 0.0)
-    gtp_printf("B+%3.1f (upper bound: %3.1f, lower: %3.1f)", 
+    gtp_printf("B+%3.1f (upper bound: %3.1f, lower: %3.1f)",
 	       -score, upper_bound, lower_bound);
   return gtp_finish_response();
-}  
+}
 
 /* Function:  Estimate the score, taking into account which player moves next
  * Arguments: Color to play
@@ -3432,8 +3436,8 @@ gtp_experimental_score(char *s)
       || (color != BLACK && color != WHITE))
     return gtp_failure("invalid color");
 
-  genmove_conservative(color, NULL);
-  gnugo_estimate_score(&upper_bound, &lower_bound);
+  genmove_conservative(goban, color, NULL);
+  gnugo_estimate_score(goban, &upper_bound, &lower_bound);
 
   if (debug & DEBUG_SCORING)
     fprintf(stderr, "upper = %3.1f, lower = %3.1f, best = %3.1f\n",
@@ -3444,7 +3448,7 @@ gtp_experimental_score(char *s)
     score = upper_bound - best_move_values[0];
 
   return gtp_success("%3.1f", score);
-}  
+}
 
 
 /**************
@@ -3621,11 +3625,11 @@ gtp_test_eyeshape(char *s)
     s += n;
     n = gtp_decode_coord(s, &i, &j);
   }
-  
+
   if (eyesize == 0)
     return gtp_failure("invalid coordinate");
 
-  test_eyeshape(eyesize, eye_vertices);
+  test_eyeshape(goban->board_size, eyesize, eye_vertices);
 
   return gtp_success("");
 }
@@ -3676,7 +3680,7 @@ static int
 gtp_showboard(char *s)
 {
   UNUSED(s);
-  
+
   gtp_start_response(GTP_SUCCESS);
   gtp_printf("\n");
   simple_showboard(goban, gtp_output_file);
@@ -3711,7 +3715,7 @@ print_influence_data(struct influence_data *q, char *what_data)
   float black_influence[BOARDMAX];
   float white_strength[BOARDMAX];
   float black_strength[BOARDMAX];
-  float white_attenuation[BOARDMAX]; 
+  float white_attenuation[BOARDMAX];
   float black_attenuation[BOARDMAX];
   float white_permeability[BOARDMAX];
   float black_permeability[BOARDMAX];
@@ -3719,14 +3723,14 @@ print_influence_data(struct influence_data *q, char *what_data)
   int influence_regions[BOARDMAX];
   int non_territory[BOARDMAX];
   int m, n;
-  
+
   float *float_pointer = NULL;
   int *int_pointer = NULL;
-  
+
   while (*what_data == ' ')
     what_data++;
 
-  get_influence(q, white_influence, black_influence,
+  get_influence(goban, q, white_influence, black_influence,
 		white_strength, black_strength,
 		white_attenuation, black_attenuation,
 		white_permeability, black_permeability,
@@ -3756,7 +3760,7 @@ print_influence_data(struct influence_data *q, char *what_data)
     int_pointer = non_territory;
   else
     return gtp_failure("unknown influence data");
-  
+
   gtp_start_response(GTP_SUCCESS);
   for (m = 0; m < goban->board_size; m++) {
     for (n = 0; n < goban->board_size; n++) {
@@ -3767,7 +3771,7 @@ print_influence_data(struct influence_data *q, char *what_data)
     }
     gtp_printf("\n");
   }
-  
+
   /* We already have one newline and thus can't use gtp_finish_response(). */
   gtp_printf("\n");
   return GTP_OK;
@@ -3778,15 +3782,15 @@ print_influence_data(struct influence_data *q, char *what_data)
  * Fails:     never
  * Returns:   Influence data formatted like:
  *
- *   0.51   1.34   3.20   6.60   9.09   8.06   1.96   0.00   0.00 
- *   0.45   1.65   4.92  12.19  17.47  15.92   4.03   0.00   0.00 
+ *   0.51   1.34   3.20   6.60   9.09   8.06   1.96   0.00   0.00
+ *   0.45   1.65   4.92  12.19  17.47  15.92   4.03   0.00   0.00
  *                   .
  *                   .
  *                   .
  *   0.00   0.00   0.00   0.00   0.00 100.00  75.53  41.47  23.41
  *
  * The available choices of information are:
- * 
+ *
  * white_influence (float)
  * black_influence (float)
  * white_strength (float)
@@ -3822,8 +3826,8 @@ gtp_initial_influence(char *s)
     return gtp_failure("invalid color");
 
   q = INITIAL_INFLUENCE(color);
-  
-  silent_examine_position(EXAMINE_ALL);
+
+  silent_examine_position(goban, EXAMINE_ALL);
 
   return print_influence_data(q, s + n);
 }
@@ -3845,8 +3849,8 @@ gtp_move_influence(char *s)
   if (n == 0)
     return gtp_failure("invalid move");
 
-  prepare_move_influence_debugging(POS(i, j), color);
-  
+  prepare_move_influence_debugging(goban, POS(i, j), color);
+
   return print_influence_data(&move_influence, s + n);
 }
 
@@ -3867,7 +3871,7 @@ gtp_move_probabilities(char *s)
 
   UNUSED(s);
 
-  compute_move_probabilities(probabilities);
+  compute_move_probabilities(goban, probabilities);
 
   gtp_start_response(GTP_SUCCESS);
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -3902,7 +3906,7 @@ gtp_move_uncertainty(char *s)
 
   UNUSED(s);
 
-  compute_move_probabilities(probabilities);
+  compute_move_probabilities(goban, probabilities);
 
   gtp_start_response(GTP_SUCCESS);
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -3936,8 +3940,8 @@ gtp_followup_influence(char *s)
   if (n == 0)
     return gtp_failure("invalid move");
 
-  prepare_move_influence_debugging(POS(i, j), color);
-  
+  prepare_move_influence_debugging(goban, POS(i, j), color);
+
   return print_influence_data(&followup_influence, s + n);
 }
 
@@ -3986,10 +3990,10 @@ gtp_worm_data(char *s)
   if (sscanf(s, "%*c") >= 0 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid color or coordinate");
 
-  examine_position(EXAMINE_WORMS);
+  examine_position(goban, EXAMINE_WORMS);
 
   gtp_start_response(GTP_SUCCESS);
-  
+
   for (m = 0; m < goban->board_size; m++)
     for (n = 0; n < goban->board_size; n++)
       if (i == -1 || (m == i && n == j)) {
@@ -4005,12 +4009,12 @@ gtp_worm_data(char *s)
 	gtp_printf("liberties3           %d\n",   w->liberties3);
 	gtp_printf("liberties4           %d\n",   w->liberties4);
 	gtp_printf("attack_code          %d\n",   w->attack_codes[0]);
-	gtp_mprintf("attack_point         %m\n",  
+	gtp_mprintf("attack_point         %m\n",
 		    I(w->attack_points[0]), J(w->attack_points[0]));
 	gtp_printf("defense_code         %d\n",   w->defense_codes[0]);
-	gtp_mprintf("defense_point        %m\n",  
+	gtp_mprintf("defense_point        %m\n",
 		    I(w->defense_points[0]), J(w->defense_points[0]));
-	gtp_mprintf("lunch                %m\n",  
+	gtp_mprintf("lunch                %m\n",
 		    I(w->lunch), J(w->lunch));
 	gtp_printf("cutstone             %d\n",   w->cutstone);
 	gtp_printf("cutstone2            %d\n",   w->cutstone2);
@@ -4020,7 +4024,7 @@ gtp_worm_data(char *s)
 	gtp_printf("unconditional_status %s\n",
 		   status_to_string(w->unconditional_status));
       }
-  
+
   gtp_printf("\n");
   return GTP_OK;
 }
@@ -4045,12 +4049,12 @@ gtp_worm_stones(char *s)
 	&& !gtp_decode_color(s, &color))
       return gtp_failure("invalid coordinate");
   }
-    
+
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("worm_stones called on an empty vertex");
 
   gtp_start_response(GTP_SUCCESS);
-  
+
   for (u = 0; u < goban->board_size; u++)
     for (v = 0; v < goban->board_size; v++) {
       if (BOARD(goban, u, v) == EMPTY
@@ -4059,7 +4063,7 @@ gtp_worm_stones(char *s)
       board_empty = 0;
       if (find_origin(goban, POS(u, v)) != POS(u, v))
 	continue;
-      if (ON_BOARD2(goban, i, j) 
+      if (ON_BOARD2(goban, i, j)
 	  && !same_string(goban, POS(u, v), POS(i, j)))
 	continue;
       for (m = 0; m < goban->board_size; m++)
@@ -4069,8 +4073,8 @@ gtp_worm_stones(char *s)
 	    gtp_mprintf("%m ", m, n);
       gtp_printf("\n");
     }
-  
-  if (board_empty) 
+
+  if (board_empty)
     gtp_printf("\n"); /* in case no stones have been printed */
   gtp_printf("\n");
   return GTP_OK;
@@ -4094,7 +4098,7 @@ gtp_worm_cutstone(char *s)
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  examine_position(EXAMINE_WORMS);
+  examine_position(goban, EXAMINE_WORMS);
 
   return gtp_success(" %d", worm[POS(i, j)].cutstone);
 }
@@ -4117,7 +4121,7 @@ gtp_dragon_data(char *s)
   if (goban->stackp > 0)
     return gtp_failure("dragon data unavailable when stackp > 0");
 
-  examine_position(FULL_EXAMINE_DRAGONS);
+  examine_position(goban, FULL_EXAMINE_DRAGONS);
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -4132,7 +4136,7 @@ gtp_dragon_data(char *s)
 		&& dragon[POS(m, n)].origin == POS(m, n))) {
 	  gtp_print_vertex(m, n);
 	  gtp_printf(":\n");
-	  report_dragon(gtp_output_file, POS(m, n));
+	  report_dragon(goban, gtp_output_file, POS(m, n));
 	}
   }
   gtp_printf("\n");
@@ -4162,11 +4166,11 @@ gtp_dragon_stones(char *s)
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("dragon_stones called on an empty vertex");
 
-  examine_position(EXAMINE_DRAGONS);
+  examine_position(goban, EXAMINE_DRAGONS);
 
   gtp_start_response(GTP_SUCCESS);
 
-  
+
   for (u = 0; u < goban->board_size; u++)
     for (v = 0; v < goban->board_size; v++) {
       if (BOARD(goban, u, v) == EMPTY
@@ -4182,7 +4186,7 @@ gtp_dragon_stones(char *s)
 	    gtp_mprintf("%m ", m, n);
       gtp_printf("\n");
     }
-  
+
   gtp_printf("\n");
   return GTP_OK;
 }
@@ -4206,7 +4210,7 @@ gtp_eye_data(char *s)
   if (goban->stackp > 0)
     return gtp_failure("eye data unavailable when stackp > 0");
 
-  examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -4214,7 +4218,7 @@ gtp_eye_data(char *s)
     e = &black_eye[POS(i, j)];
   else
     e = &white_eye[POS(i, j)];
-  
+
   gtp_mprintf("origin               %m\n", I(e->origin), J(e->origin));
   gtp_mprintf("color                %C\n", e->color);
   gtp_printf("esize                %d\n", e->esize);
@@ -4223,7 +4227,7 @@ gtp_eye_data(char *s)
   gtp_printf("marginal             %d\n", e->marginal);
   gtp_printf("neighbors            %d\n", e->neighbors);
   gtp_printf("marginal_neighbors   %d\n", e->marginal_neighbors);
-  
+
   gtp_printf("\n");
   return GTP_OK;
 }
@@ -4248,12 +4252,12 @@ gtp_half_eye_data(char *s)
   if (goban->stackp > 0)
     return gtp_failure("half eye data unavailable when stackp > 0");
 
-  examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  examine_position(goban, EXAMINE_DRAGONS_WITHOUT_OWL);
 
   gtp_start_response(GTP_SUCCESS);
 
   h = &half_eye[POS(i, j)];
-  
+
   gtp_printf("value                %.2f\n", h->value);
   if (h->type == HALF_EYE)
     gtp_printf("type                 HALF_EYE\n");
@@ -4269,7 +4273,7 @@ gtp_half_eye_data(char *s)
   for (k = 0; k < h->num_defenses; k++)
     gtp_mprintf("defense_point[%d]     %m\n", k, I(h->defense_point[k]),
 		J(h->defense_point[k]));
-  
+
   gtp_printf("\n");
   return GTP_OK;
 }
@@ -4278,7 +4282,7 @@ gtp_half_eye_data(char *s)
 static SGFTree gtp_sgftree;
 
 /* Function:  Start storing moves executed during reading in an sgf
- *            tree in memory. 
+ *            tree in memory.
  * Arguments: none
  * Fails:     never
  * Returns:   nothing
@@ -4296,7 +4300,7 @@ gtp_start_sgftrace(char *s)
 }
 
 
-/* Function:  Finish storing moves in an sgf tree and write it to file. 
+/* Function:  Finish storing moves in an sgf tree and write it to file.
  * Arguments: filename
  * Fails:     never
  * Returns:   nothing
@@ -4309,7 +4313,7 @@ gtp_finish_sgftrace(char *s)
 {
   char filename[GTP_BUFSIZE];
   int nread;
-  
+
   nread = sscanf(s, "%s", filename);
   if (nread < 1)
     return gtp_failure("missing filename");
@@ -4321,7 +4325,7 @@ gtp_finish_sgftrace(char *s)
 
 
 /* Function:  Dump the current position as a static sgf file to filename,
- *            or as output if filename is missing or "-" 
+ *            or as output if filename is missing or "-"
  * Arguments: optional filename
  * Fails:     never
  * Returns:   nothing if filename, otherwise the sgf
@@ -4332,7 +4336,7 @@ gtp_printsgf(char *s)
   char filename[GTP_BUFSIZE];
   int nread;
   int next;
-  
+
   if (get_last_player(goban) == EMPTY)
     next = BLACK;
   else
@@ -4473,12 +4477,12 @@ gtp_report_uncertainty(char *s)
   }
   return gtp_failure("invalid argument");
 }
-    
+
 
 static void
 gtp_print_code(int c)
 {
-  static int conversion[6] = { 
+  static int conversion[6] = {
     0, /* LOSE */
     3, /* KO_B */
     5, /* LOSS */
@@ -4500,7 +4504,7 @@ gtp_print_vertices2(int n, int *moves)
     movei[k] = I(moves[k]);
     movej[k] = J(moves[k]);
   }
-  
+
   gtp_print_vertices(n, movei, movej);
 }
 
@@ -4548,7 +4552,7 @@ gtp_set_random_seed(char *s)
   int seed;
   if (sscanf(s, "%d", &seed) < 1)
     return gtp_failure("invalid seed");
-  
+
   set_random_seed(seed);
   return gtp_success("");
 }
@@ -4576,7 +4580,7 @@ gtp_is_surrounded(char *s)
   if (BOARD(goban, i, j) == EMPTY)
     return gtp_failure("dragon vertex must be nonempty");
 
-  silent_examine_position(EXAMINE_DRAGONS);
+  silent_examine_position(goban, EXAMINE_DRAGONS);
   return gtp_success("%d", DRAGON2(POS(i, j)).surround_status);
 }
 
@@ -4605,8 +4609,8 @@ gtp_does_surround(char *s)
   if (BOARD(goban, di, dj) == EMPTY)
     return gtp_failure("dragon vertex must be nonempty");
 
-  silent_examine_position(EXAMINE_DRAGONS);
-  return gtp_success("%d", does_surround(POS(si, sj), POS(di, dj)));
+  silent_examine_position(goban, EXAMINE_DRAGONS);
+  return gtp_success("%d", does_surround(goban, POS(si, sj), POS(di, dj)));
 }
 
 /* Function:  Report the surround map for dragon at a vertex
@@ -4633,7 +4637,7 @@ gtp_surround_map(char *s)
   if (n == 0)
     return gtp_failure("invalid coordinate");
 
-  silent_examine_position(EXAMINE_DRAGONS);
+  silent_examine_position(goban, EXAMINE_DRAGONS);
   return gtp_success("%d", surround_map(POS(di, dj), POS(mi, mj)));
 }
 
@@ -4653,9 +4657,9 @@ gtp_set_search_diamond(char *s)
 
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
-  
+
   limit_search = 1;
-  set_search_diamond(POS(i, j));
+  set_search_diamond(goban, POS(i, j));
   return gtp_success("");
 }
 
@@ -4672,7 +4676,7 @@ gtp_reset_search_mask(char *s)
   reset_search_mask();
   return gtp_success("");
 }
-  
+
 /* Function:  sets the global variable limit_search
  * Arguments: value
  * Fails:     invalid arguments
@@ -4703,7 +4707,7 @@ gtp_set_search_limit(char *s)
   set_search_limit(POS(i, j), 1);
   return gtp_success("");
 }
-  
+
 /* Function:  Draw search area. Writes to stderr.
  * Arguments: none
  * Fails:     never
@@ -4716,7 +4720,7 @@ gtp_draw_search_area(char *s)
 
   gtp_start_response(GTP_SUCCESS);
   gtp_printf("\n");
-  draw_search_area();
+  draw_search_area(goban);
   return gtp_finish_response();
 }
 

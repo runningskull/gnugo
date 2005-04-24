@@ -286,10 +286,10 @@ gnugo_sethand(Goban *goban, int handicap, SGFNode *node)
 
 /* Interface to genmove() */
 float
-gnugo_genmove(int *i, int *j, int color, int *resign)
+gnugo_genmove(Goban *goban, int *i, int *j, int color, int *resign)
 {
   float value;
-  int move = genmove(color, &value, resign);
+  int move = genmove(goban, color, &value, resign);
   if (i && j) {
     *i = I(move);
     *j = J(move);
@@ -336,9 +336,9 @@ gnugo_find_defense(Goban *goban, int m, int n, int *i, int *j)
 
 /* Interface to who_wins */
 void
-gnugo_who_wins(int color, FILE *outfile)
+gnugo_who_wins(Goban *goban, int color, FILE *outfile)
 {
-  who_wins(color, outfile);
+  who_wins(goban, color, outfile);
 }
 
 
@@ -349,14 +349,15 @@ gnugo_who_wins(int color, FILE *outfile)
  */
 
 float
-gnugo_estimate_score(float *upper, float *lower)
+gnugo_estimate_score(Goban *goban, float *upper, float *lower)
 {
-  silent_examine_position(EXAMINE_DRAGONS);
+  silent_examine_position(goban, EXAMINE_DRAGONS);
   if (upper != NULL)
     *upper = white_score;
   if (lower != NULL)
     *lower = black_score;
-  return ((white_score + black_score)/2.0);
+
+  return (white_score + black_score) /2.0;
 }
 
 

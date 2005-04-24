@@ -21,21 +21,20 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
-#include "old-board.h"
 
 #include <string.h>
 #include "liberty.h"
 #include "gg_utils.h"
 
 
-static int dilate_erode(int dilations, int erosions, 
+static int dilate_erode(const Goban *goban, int dilations, int erosions, 
 			int gb[BOARDMAX], int color);
-static void print_new_moyo(int dilations, int erosions);
-static void close_bubbles(int gb[BOARDMAX]);
-static int captured_territory(int pos, int color);
+static void print_new_moyo(const Goban *goban, int dilations, int erosions);
+static void close_bubbles(const Goban *goban, int gb[BOARDMAX]);
+static int captured_territory(const Goban *goban, int pos, int color);
 
-void print_moyo(void);
-float old_estimate_score(float *upper, float *lower);
+void print_moyo(const Goban *goban);
+float old_estimate_score(const Goban *goban, float *upper, float *lower);
 
 #define ARRAYSIZE MAX_BOARD*MAX_BOARD
 
@@ -60,7 +59,8 @@ float old_estimate_score(float *upper, float *lower);
  */
 
 static int
-dilate_erode(int dilations, int erosions, int gb[BOARDMAX], int color)
+dilate_erode(const Goban *goban, int dilations, int erosions,
+	     int gb[BOARDMAX], int color)
 {
   int ii;
   int work[BOARDMAX];
@@ -71,14 +71,16 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX], int color)
     if (!ON_BOARD(goban, ii))
       continue;
 
-    if (board[ii] && dragon[ii].status == CRITICAL
+    if (goban->board[ii] && dragon[ii].status == CRITICAL
 	&& DRAGON2(ii).safety != INESSENTIAL) {
       critical_found = 1;
       DEBUG(goban, DEBUG_SCORING, "critical dragon found at %1m\n", ii);
     }
-    if (board[ii] == WHITE && !captured_territory(ii, color))
+    if (goban->board[ii] == WHITE
+	&& !captured_territory(goban, ii, color))
       gb[ii] = 128;
-    else if (board[ii] == BLACK && !captured_territory(ii, color))      
+    else if (goban->board[ii] == BLACK
+	     && !captured_territory(goban, ii, color))
       gb[ii] = -128;
     else
       gb[ii] = 0;
@@ -174,7 +176,7 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX], int color)
  */
 
 static void
-close_bubbles(int gb[BOARDMAX])
+close_bubbles(const Goban *goban, int gb[BOARDMAX])
 {
   int bubbles[BOARDMAX];
   int ii;
@@ -261,48 +263,50 @@ close_bubbles(int gb[BOARDMAX])
  */
 
 static void
-print_regions(int gb[BOARDMAX])
+print_regions(const Goban *goban, int gb[BOARDMAX])
 {
+  const int board_size = goban->board_size;
   int i, j, k;
   int ii;
 
-  start_draw_board();
+  start_draw_board(board_size);
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
       ii = POS(i, j);
 
-      if (board[ii] && dragon[ii].status != DEAD)
-	k = board[ii];
+      if (goban->board[ii] && dragon[ii].status != DEAD)
+	k = goban->board[ii];
       else
 	k = EMPTY;
 
       switch (k) {
       case EMPTY:
 	if (gb[ii] > 0)
-	  draw_color_char(i, j, 'w', GG_COLOR_GREEN);
+	  draw_color_char(board_size, i, j, 'w', GG_COLOR_GREEN);
 	else if (gb[ii] < 0)
-	  draw_color_char(i, j, 'b', GG_COLOR_MAGENTA);
+	  draw_color_char(board_size, i, j, 'b', GG_COLOR_MAGENTA);
 	else
-	  draw_color_char(i, j, '.', GG_COLOR_BLACK);
+	  draw_color_char(board_size, i, j, '.', GG_COLOR_BLACK);
 	break;
 
       case BLACK:
 	if (dragon[ii].status == CRITICAL)
-	  draw_color_char(i, j, 'X', GG_COLOR_RED);
+	  draw_color_char(board_size, i, j, 'X', GG_COLOR_RED);
 	else
-	  draw_color_char(i, j, 'X', GG_COLOR_BLACK);
+	  draw_color_char(board_size, i, j, 'X', GG_COLOR_BLACK);
 	break;
 
       case WHITE:
 	if (dragon[ii].status == CRITICAL)
-	  draw_color_char(i, j, 'O', GG_COLOR_RED);
+	  draw_color_char(board_size, i, j, 'O', GG_COLOR_RED);
 	else
-	  draw_color_char(i, j, 'O', GG_COLOR_BLACK);
+	  draw_color_char(board_size, i, j, 'O', GG_COLOR_BLACK);
 	break;
       }
     }
   }
-  end_draw_board();
+
+  end_draw_board(board_size);
 }
 
 
@@ -314,28 +318,28 @@ print_regions(int gb[BOARDMAX])
  */
 
 void
-print_moyo(void)
+print_moyo(const Goban *goban)
 {
   if (printmoyo & PRINTMOYO_TERRITORY)
-    print_new_moyo(5, 21);
+    print_new_moyo(goban, 5, 21);
   
   if (printmoyo & PRINTMOYO_MOYO)
-    print_new_moyo(5, 10);
+    print_new_moyo(goban, 5, 10);
   
   if (printmoyo & PRINTMOYO_AREA) {
-    print_new_moyo(4, 0);
+    print_new_moyo(goban, 4, 0);
   }
 }
 
 
 static void
-print_new_moyo(int dilations, int erosions)
+print_new_moyo(const Goban *goban, int dilations, int erosions)
 {
   int gb[BOARDMAX];
 
-  dilate_erode(dilations, erosions, gb, WHITE);
-  close_bubbles(gb);
-  print_regions(gb);
+  dilate_erode(goban, dilations, erosions, gb, WHITE);
+  close_bubbles(goban, gb);
+  print_regions(goban, gb);
 }
 
 
@@ -346,8 +350,9 @@ print_new_moyo(int dilations, int erosions)
  */
 
 float
-old_estimate_score(float *upper, float *lower)
+old_estimate_score(const Goban *goban, float *upper, float *lower)
 {
+  const int board_size = goban->board_size;
   int gb[BOARDMAX];
 
   float white_territory = 0.0;
@@ -359,21 +364,22 @@ old_estimate_score(float *upper, float *lower)
   float u, l;
   int critical;
 
-  critical = dilate_erode(5, 21, gb, WHITE);
-  close_bubbles(gb);
+  critical = dilate_erode(goban, 5, 21, gb, WHITE);
+  close_bubbles(goban, gb);
   if (debug & DEBUG_SCORING)
-    print_regions(gb);
+    print_regions(goban, gb);
 
   for (i = 0; i < board_size; i++) {
     int black_territory_in_row = 0;
     int white_territory_in_row = 0;
     int white_area_in_row = 0;
     int black_area_in_row = 0;
+
     for (j = 0; j < board_size; j++) {
       ii = POS(i, j);
       
-      if (board[ii] == BLACK) {
-	if (captured_territory(ii, WHITE)) {
+      if (goban->board[ii] == BLACK) {
+	if (captured_territory(goban, ii, WHITE)) {
 	  white_territory += 2;
 	  white_area++;
 	  white_territory_in_row += 2;
@@ -384,8 +390,8 @@ old_estimate_score(float *upper, float *lower)
 	  black_area_in_row++;
 	}
       }
-      else if (board[ii] == WHITE) {
-	if (captured_territory(ii, WHITE)) {
+      else if (goban->board[ii] == WHITE) {
+	if (captured_territory(goban, ii, WHITE)) {
 	  black_territory += 2;
 	  black_area++;
 	  black_territory_in_row += 2;
@@ -422,22 +428,24 @@ old_estimate_score(float *upper, float *lower)
   }
 
   if (chinese_rules)
-    u = white_area - black_area + komi;
+    u = white_area - black_area + goban->komi;
   else {
     DEBUG(goban, DEBUG_SCORING,
 	  "black captured: %d\nwhite captured: %d\nkomi: %f\n",
-	  black_captured, white_captured, komi);
-    u = white_territory 
-      + black_captured - black_territory - white_captured + komi;
+	  goban->black_captured, goban->white_captured, goban->komi);
+    u = ((white_territory + goban->black_captured)
+	 - (black_territory + goban->white_captured)
+	 + goban->komi);
   }
+
   if (critical) {
     white_territory = 0.0;
     black_territory = 0.0;
     white_area = 0.0;
     black_area = 0.0;
     
-    dilate_erode(5, 21, gb, BLACK);
-    close_bubbles(gb);
+    dilate_erode(goban, 5, 21, gb, BLACK);
+    close_bubbles(goban, gb);
     for (i = 0; i < board_size; i++) {
       int black_territory_in_row = 0;
       int white_territory_in_row = 0;
@@ -446,8 +454,8 @@ old_estimate_score(float *upper, float *lower)
       for (j = 0; j < board_size; j++) {
 	ii = POS(i, j);
 
-	if (board[ii] == BLACK) {
-	  if (captured_territory(ii, BLACK)) {
+	if (goban->board[ii] == BLACK) {
+	  if (captured_territory(goban, ii, BLACK)) {
 	    white_territory += 2;
 	    white_territory_in_row += 2;
 	    white_area++;
@@ -458,8 +466,8 @@ old_estimate_score(float *upper, float *lower)
 	    black_area_in_row++;
 	  }
 	}
-	else if (board[ii] == WHITE) {
-	  if (captured_territory(ii, BLACK)) {
+	else if (goban->board[ii] == WHITE) {
+	  if (captured_territory(goban, ii, BLACK)) {
 	    black_territory += 2;
 	    black_area++;
 	    black_territory_in_row += 2;
@@ -496,13 +504,14 @@ old_estimate_score(float *upper, float *lower)
     }
 
     if (chinese_rules)
-      l = white_area - black_area + komi;
+      l = white_area - black_area + goban->komi;
     else {
       DEBUG(goban, DEBUG_SCORING,
 	    "black captured: %d\nwhite captured: %d\nkomi: %f\n",
-	    black_captured, white_captured, komi);
-      l = white_territory 
-	+ black_captured - black_territory - white_captured + komi;
+	    goban->black_captured, goban->white_captured, goban->komi);
+      l = ((white_territory + goban->black_captured)
+	   - (black_territory + goban->white_captured)
+	   + goban->komi);
     }
   }
   else
@@ -538,14 +547,14 @@ old_estimate_score(float *upper, float *lower)
  */
 
 static int
-captured_territory(int pos, int color)
+captured_territory(const Goban *goban, int pos, int color)
 {
   int d;
 
-  if (board[pos] == EMPTY 
+  if (goban->board[pos] == EMPTY 
       || dragon[pos].status == ALIVE
       || dragon[pos].status == UNKNOWN
-      || (board[pos] == color && dragon[pos].status == CRITICAL))
+      || (goban->board[pos] == color && dragon[pos].status == CRITICAL))
     return 0;
 
   if (DRAGON2(pos).neighbors == 0
@@ -553,11 +562,12 @@ captured_territory(int pos, int color)
     return 1;
 
   for (d = 0; d < DRAGON2(pos).neighbors; d++)
-    if (DRAGON(DRAGON2(pos).adjacent[d]).color == OTHER_COLOR(board[pos])
+    if ((DRAGON(DRAGON2(pos).adjacent[d]).color
+	 == OTHER_COLOR(goban->board[pos]))
 	&& (DRAGON(DRAGON2(pos).adjacent[d]).status == ALIVE
 	    || (DRAGON(DRAGON2(pos).adjacent[d]).status == UNKNOWN
 		&& dragon2[DRAGON2(pos).adjacent[d]].weakness < .1)
-	    || (board[pos] != color
+	    || (goban->board[pos] != color
 		&& DRAGON(DRAGON2(pos).adjacent[d]).status == CRITICAL)))
       return 1;
   return 0;

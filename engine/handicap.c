@@ -140,7 +140,7 @@ static const int places[][2] = {
 int
 place_fixed_handicap(Goban *goban, int handicap)
 {
-  int board_size = goban->board_size;
+  const int board_size = goban->board_size;
   int x;
   int maxhand;
   int three = board_size > 11 ? 3 : 2;
@@ -212,14 +212,14 @@ static int remaining_handicap_stones = -1;
 static int total_handicap_stones = -1;
 
 static int find_free_handicap_pattern(Goban *goban);
-static void free_handicap_callback(int anchor, int color,
+static void free_handicap_callback(Goban *goban, int anchor, int color,
 				   struct pattern *pattern,
 				   int ll, void *data);
 
 int
 place_free_handicap(Goban *goban, int handicap)
 {
-  int board_size = goban->board_size;
+  const int board_size = goban->board_size;
 
   gg_assert(goban, handicap == 0 || handicap >= 2);
 
@@ -257,8 +257,8 @@ place_free_handicap(Goban *goban, int handicap)
     /* Call genmove_conservative() in order to prepare the engine for
      * an aftermath_genmove() call. We discard the genmove result.
      */
-    genmove_conservative(BLACK, NULL);
-    move = aftermath_genmove(BLACK, 0, NULL);
+    genmove_conservative(goban, BLACK, NULL);
+    move = aftermath_genmove(goban, BLACK, 0, NULL);
     if (move != PASS_MOVE) {
       add_stone(goban, move, BLACK);
       remaining_handicap_stones--;
@@ -304,7 +304,7 @@ find_free_handicap_pattern(Goban *goban)
   int move;
 
   number_of_matches = 0;
-  matchpat(free_handicap_callback, BLACK, &handipat_db, NULL, NULL);
+  matchpat(goban, free_handicap_callback, BLACK, &handipat_db, NULL, NULL);
 
   if (number_of_matches == 0)
     return 0;
@@ -362,8 +362,8 @@ find_free_handicap_pattern(Goban *goban)
 }
 
 static void
-free_handicap_callback(int anchor, int color, struct pattern *pattern,
-		       int ll, void *data)
+free_handicap_callback(Goban *goban, int anchor, int color,
+		       struct pattern *pattern, int ll, void *data)
 {
   int r = -1;
   int k;
@@ -372,6 +372,7 @@ free_handicap_callback(int anchor, int color, struct pattern *pattern,
   /* Pick up the location of the move */
   int move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
 
+  UNUSED(goban);
   UNUSED(data);
 
   /* Check how many stones are placed by the pattern. This must not be
@@ -388,7 +389,7 @@ free_handicap_callback(int anchor, int color, struct pattern *pattern,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(ll, move, color, 0))
+    if (!pattern->autohelper(goban, ll, move, color, 0))
       return;
   }
   

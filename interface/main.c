@@ -856,7 +856,11 @@ main(int argc, char *argv[])
 	    return EXIT_FAILURE;
 	  }
 	  rotate(m, n, &m, &n, board_size, orientation);
+
+	  /* FIXME: Revive. */
+#if 0
 	  set_search_diamond(POS(m, n));
+#endif
 	}
 	break;
 

@@ -398,9 +398,73 @@ gg_sort(void *base, size_t nel, size_t width,
 }
 
 
+/* This is a straight copy of the above function except that cmp() is
+ * passed one additional `void *' argument named `user_data'.
+ */
+void
+gg_sort_with_data(void *base, size_t nel, size_t width, void *user_data,
+		  int (*cmp)(void *user_data, const void *, const void *))
+{
+  int gap = nel;
+  int swap_made;
+  char *end = (char *) base + width * (nel - 1);
+  do {
+    char *a, *b;
+    swap_made = 0;
+    gap = (10 * gap + 3) / 13;
+    for (a = base, b = a + gap * width; b <= end; a += width, b += width) {
+      if (cmp(user_data, (void *) a, (void *) b) > 0) {
+	char *c = a;
+	char *d = b;
+	size_t size = width;
+	while (size-- > 0) {
+	  char tmp = *c;
+	  *c++ = *d;
+	  *d++ = tmp;
+	}
+	swap_made = 1;
+      }
+    }
+  } while (gap > 1 || swap_made);
+}
+
+
+/* Yet another version with const `user_data'.  I wish we had C++
+ * templates for this (and many other things)...
+ */
+void
+gg_sort_with_const_data(void *base, size_t nel, size_t width,
+			const void *user_data,
+			int (*cmp)(const void *user_data,
+				   const void *, const void *))
+{
+  int gap = nel;
+  int swap_made;
+  char *end = (char *) base + width * (nel - 1);
+  do {
+    char *a, *b;
+    swap_made = 0;
+    gap = (10 * gap + 3) / 13;
+    for (a = base, b = a + gap * width; b <= end; a += width, b += width) {
+      if (cmp(user_data, (void *) a, (void *) b) > 0) {
+	char *c = a;
+	char *d = b;
+	size_t size = width;
+	while (size-- > 0) {
+	  char tmp = *c;
+	  *c++ = *d;
+	  *d++ = tmp;
+	}
+	swap_made = 1;
+      }
+    }
+  } while (gap > 1 || swap_made);
+}
+
+
 /* Linearly interpolate f(x) from the data given in interpolation_data. */
 float
-gg_interpolate(struct interpolation_data *f, float x)
+gg_interpolate(const struct interpolation_data *f, float x)
 {
   int i;
   float ratio;
