@@ -1612,6 +1612,17 @@ O*O
 :8,OX,maxterri(0.1)
 
 
+Pattern CE34
+# gf New pattern. (3.7.4)
+# See gunnar:77.
+
+X.*
+?O.
+??X
+
+:/,OXe
+
+
 ######################################################################
 #
 # Center followup patterns

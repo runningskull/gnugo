@@ -4826,6 +4826,40 @@ oabc
 ;&& oplay_attack(*,b,?,a,a) && !oplay_attack(*,b,c)
 
 
+Pattern A1140a
+# gf New pattern. (3.7.4)
+# See gunnar:73.
+
+?XOY
+XO*o
+----
+
+:8,-,value(40)
+
+?AOB
+XO*o
+----
+
+;owl_escape_value(A) > 0 && xplay_disconnect(*,A,B) != WIN
+
+
+Pattern A1140b
+# gf New pattern. (3.7.4)
+# See gunnar:76.
+
+?YOX
+XO*o
+----
+
+:8,-,value(40)
+
+?AOB
+XO*o
+----
+
+;owl_escape_value(B) > 0 && xplay_disconnect(*,A,B) != WIN
+
+
 #########################################################
 #                                                       #
 #       Kill or threaten a worm of the dragon           #
@@ -4947,7 +4981,7 @@ Pattern A1210
 ?O?     not always found as lunch defense
 Y*X
 
-:|,-,value(65)
+:8,-,value(65)
 
 ?a?
 B*C

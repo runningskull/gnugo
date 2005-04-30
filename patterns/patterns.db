@@ -8267,6 +8267,27 @@ Pattern CB243
 :8,OXead
 
 
+Pattern CB243b
+# gf New pattern. (3.7.4)
+# See gunnar:79.
+
+?oo?		block in center
+...?
+..*O
+?OX?
+?Ox?
+
+:8,OXead
+
+?oo?
+...?
+.a*O
+?OX?
+?Ox?
+
+;oplay_attack(*,a,a)
+
+
 Pattern CB246
 
 .O.O.?      block opponent
@@ -8388,6 +8409,25 @@ Pattern CB263
 ?X??
 
 :8,OXed
+
+
+Pattern CB263b
+# gf New pattern. (3.7.4)
+# See gunnar:74.
+
+?x.?       jump and attach
+...O
+.*.O
+OX??
+
+:8,OXed
+
+?x.?
+...O
+a*.O
+OX??
+
+;oplay_attack(*,a,a)
 
 
 Pattern CB264
