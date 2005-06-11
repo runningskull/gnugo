@@ -900,7 +900,7 @@ as @code{(X)}, not @code{(X!)}.
 The public function @code{make_domains()} calls the function
 @code{make_primary_domains()} which is static in @file{optics.c}. It's purpose
 is to compute the domains of influence of each color, used in determining eye
-shapes. @strong{Note:} the term influence as used here is distinct from the
+shapes. @strong{Note}: the term influence as used here is distinct from the
 influence in influence.c.
 
 For this algorithm the strings which are not lively are invisible. Ignoring
