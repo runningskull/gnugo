@@ -162,3 +162,9 @@ loadsgf games/filllib14.sgf
 loadsgf games/filllib15.sgf
 47 reg_genmove black
 #? [L2|K2|J1]
+
+# F1 is an unsafe backfilling move for J1 and must be preceded by e.g. E2.
+loadsgf games/filllib16.sgf
+48 reg_genmove white
+#? [B4|E2|B2]
+

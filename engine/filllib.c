@@ -381,6 +381,10 @@ find_backfilling_move(int move, int color, int *backfill_move,
   int saved_move = NO_MOVE;
   int opponent_libs;
   
+  DEBUG(DEBUG_FILLLIB, "find_backfilling_move for %C %1m\n", color, move);
+  if (debug & DEBUG_FILLLIB)
+    dump_stack();
+  
   /* Play (move) and identify all liberties and adjacent strings. */
   if (!trymove(move, color, "find_backfilling_move", move))
     return 0; /* This shouldn't happen, I believe. */
@@ -529,6 +533,9 @@ find_backfilling_move(int move, int color, int *backfill_move,
     success = 1;
   }
 
+  if (!success)
+    *backfill_move = NO_MOVE;
+  
   return success;
 }
 
