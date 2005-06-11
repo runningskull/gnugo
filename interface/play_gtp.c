@@ -2224,6 +2224,7 @@ gtp_dragon_status(char *s)
   int i, j;
   int str = NO_MOVE;
   int pos;
+  int empty_response = 1;
 
   if (gtp_decode_coord(s, &i, &j)) {
     str = POS(i, j);
@@ -2262,8 +2263,12 @@ gtp_dragon_status(char *s)
 		    I(DRAGON2(pos).owl_defense_point),
 		    J(DRAGON2(pos).owl_defense_point));
       }
+      empty_response = 0;
     }
   }
+
+  if (empty_response)
+    gtp_printf("\n");
 
   gtp_printf("\n");
   return GTP_OK;
