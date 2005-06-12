@@ -2,7 +2,7 @@
  * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *
  * http://www.gnu.org/software/gnugo/ for more information.          *
  *                                                                   *
- * Copyright 2003 and 2004 by the Free Software Foundation.          *
+ * Copyright 2003, 2004 and 2005 by the Free Software Foundation.    *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *
  * modify it under the terms of the GNU General Public License as    *
@@ -15,7 +15,7 @@
  *                                                                   *
  * You should have received a copy of the GNU General Public         *
  * License along with this program; if not, write to the Free        *
- * Software Foundation, Inc., 59 Temple Place - Suite 330,           *
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,       *
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

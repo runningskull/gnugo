@@ -1,4 +1,4 @@
-;;; ID: $Id: gnugo.el,v 1.3 2003-07-21 16:33:19 bump Exp $
+;;; ID: $Id: gnugo.el,v 1.4 2005-06-12 09:34:14 gf Exp $
 ;;;
 ;;; This is GNU Go, a Go program. Contact gnugo@gnu.org, or see
 ;;; http://www.gnu.org/software/gnugo/ for more information.   
@@ -17,7 +17,7 @@
 ;;;                                                            
 ;;; You should have received a copy of the GNU General Public  
 ;;; License along with this program; if not, write to the Free 
-;;; Software Foundation, Inc., 59 Temple Place - Suite 330,    
+;;; Software Foundation, Inc., 51 Franklin Street, Fifth Floor,    
 ;;; Boston, MA 02111, USA.
 
 ;;; Description: Run GNU Go in a buffer.
@@ -659,4 +659,4 @@ See also variable `gnugo-option-history'."
 
 (provide 'gnugo)
 
-;;; $RCSfile: gnugo.el,v $$Revision: 1.3 $ ends here
+;;; $RCSfile: gnugo.el,v $$Revision: 1.4 $ ends here

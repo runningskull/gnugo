@@ -2,7 +2,7 @@
  * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *
  * http://www.gnu.org/software/gnugo/ for more information.          *
  *                                                                   *
- * Copyright 1999, 2000, 2001, 2002, 2003 and 2004                   *
+ * Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005             *
  * by the Free Software Foundation.                                  *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *
@@ -16,7 +16,7 @@
  *                                                                   *
  * You should have received a copy of the GNU General Public         *
  * License along with this program; if not, write to the Free        *
- * Software Foundation, Inc., 59 Temple Place - Suite 330,           *
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,       *
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -457,7 +457,7 @@ dummyhelper(int transformation, int move, int color, int action)
  * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *\n\
  * http://www.gnu.org/software/gnugo/ for more information.          *\n\
  *                                                                   *\n\
- * Copyright 1999, 2000, 2001, 2002, 2003 and 2004                   *\n\
+ * Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005             *\n\
  * by the Free Software Foundation.                                  *\n\
  *                                                                   *\n\
  * This program is free software; you can redistribute it and/or     *\n\
@@ -471,7 +471,7 @@ dummyhelper(int transformation, int move, int color, int action)
  *                                                                   *\n\
  * You should have received a copy of the GNU General Public         *\n\
  * License along with this program; if not, write to the Free        *\n\
- * Software Foundation, Inc., 59 Temple Place - Suite 330,           *\n\
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,       *\n\
  * Boston, MA 02111, USA.                                            *\n\
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */\n\n\
 #include <stdio.h> /* for NULL */\n\

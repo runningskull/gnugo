@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- copyright notices updated for 2005 and new FSF address
 - bugfix in find_backfilling_move in filllib.c
 - make fast_defense() aware of under-the-stones tesuji
 - make superstring_break_chain_moves() attack 3-liberty chains

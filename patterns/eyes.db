@@ -1,40 +1,41 @@
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       #
-# http://www.gnu.org/software/gnugo/ for more information.          #
-#                                                                   #
-# Copyright 1999, 2000, 2001, 2002, 2003 and 2004                   #
-# by the Free Software Foundation.                                  #
-#                                                                   #
-# This program is free software; you can redistribute it and/or     #
-# modify it under the terms of the GNU General Public License       #
-# as published by the Free Software Foundation - version 2.         #
-#                                                                   #
-# This program is distributed in the hope that it will be useful,   #
-# but WITHOUT ANY WARRANTY; without even the implied warranty of    #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU #
-# General Public License in file COPYING for more details.          #
-#                                                                   #
-# You should have received a copy of the GNU General Public License #
-# along with this program; if not, write to the Free Software       #
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111,  #
-# USA.                                                              #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#                                                                   #
-#                  Eye Shape Database                               #
-#                                                                   #
-#     . - ordinary eye space                                        #
-#     * - ordinary eye space and key point, attack/defense          #
-#     < - ordinary eye space and attack key point (shrinks)         #
-#     > - ordinary eye space and defense key point (expands)        #
-#     ! - marginal eye space                                        #
-#     @ - marginal eye space and key point, attack/defense          #
-#     $ - marginal eye space containing an opponent stone           #
-#     ( - marginal eye space and attack key point                   #
-#     ) - marginal eye space and defense key point                  #
-#     X - dead opponent stone                                       #
-#     x - . or X                                                    #
-#                                                                   #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU Go, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005         #
+# by the Free Software Foundation.                              #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 51 Franklin Street, Fifth Floor,   #
+# Boston, MA 02111, USA                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                                                               #
+#                  Eye Shape Database                           #
+#                                                               #
+#     . - ordinary eye space                                    #
+#     * - ordinary eye space and key point, attack/defense      #
+#     < - ordinary eye space and attack key point (shrinks)     #
+#     > - ordinary eye space and defense key point (expands)    #
+#     ! - marginal eye space                                    #
+#     @ - marginal eye space and key point, attack/defense      #
+#     $ - marginal eye space containing an opponent stone       #
+#     ( - marginal eye space and attack key point               #
+#     ) - marginal eye space and defense key point              #
+#     X - dead opponent stone                                   #
+#     x - . or X                                                #
+#                                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 #
 # The patterns are sorted as follows within each size, with the primary

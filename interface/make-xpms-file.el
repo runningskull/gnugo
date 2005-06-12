@@ -18,7 +18,7 @@
 ;;;                                                            
 ;;; You should have received a copy of the GNU General Public  
 ;;; License along with this program; if not, write to the Free 
-;;; Software Foundation, Inc., 59 Temple Place - Suite 330,    
+;;; Software Foundation, Inc., 51 Franklin Street, Fifth Floor,    
 ;;; Boston, MA 02111, USA.
 ;;; 
 ;;; This Emacs mode for GNU Go may work with Emacs 20.x but
@@ -108,7 +108,7 @@ one is kept."
 ;;;                        
 ;;; You should have received a copy of the GNU General Public
 ;;; License along with this program; if not, write to the Free
-;;; Software Foundation, Inc., 59 Temple Place - Suite 330,
+;;; Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;;; Boston, MA 02111, USA.\n\n")
       (mapc 'pp `((defconst gnugo-xpms
                     (mapcar (lambda (pair)

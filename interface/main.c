@@ -2,7 +2,7 @@
  * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *
  * http://www.gnu.org/software/gnugo/ for more information.          *
  *                                                                   *
- * Copyright 1999, 2000, 2001, 2002, 2003 and 2004                   *
+ * Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005             *
  * by the Free Software Foundation.                                  *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *
@@ -16,7 +16,7 @@
  *                                                                   *
  * You should have received a copy of the GNU General Public         *
  * License along with this program; if not, write to the Free        *
- * Software Foundation, Inc., 59 Temple Place - Suite 330,           *
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,       *
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -1550,7 +1550,7 @@ Informative Output:\n\
 
 
 #define COPYRIGHT \
-"Copyright 1999, 2000, 2001, 2002, 2003 and 2004 by the Free Software\n\
+"Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005 by the Free Software\n\
 Foundation, Inc. See http://www.gnu.org/software/gnugo/ or contact\n\
 gnugo@gnu.org for information about GNU Go. GNU Go comes with NO WARRANTY to\n\
 the extent permitted by law. This program is free software; you can\n\
