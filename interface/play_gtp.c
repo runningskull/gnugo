@@ -1144,7 +1144,8 @@ gtp_move_history(char *s)
       pos = move_history_pos[k];
       gtp_mprintf("%C %m\n", color, I(pos), J(pos));
     }
-  else gtp_printf("\n");
+  else
+    gtp_printf("\n");
   gtp_printf("\n");
   return GTP_OK;
 }

@@ -55,7 +55,7 @@ static int recursive_block(int str, const char goal[BOARDMAX], int *move,
 			   Hash_data *goal_hash);
 
 static int add_array(int *array, int elt);
-static int element_array(int *array,int elt);
+static int element_array(int *array, int elt);
 static void intersection_array(int *array1, int *array2);
 static int snapback(int str);
 static int connection_one_move(int str1, int str2);
@@ -199,7 +199,7 @@ add_array(int *array, int elt)
 /* test if an element is part of an array */
 
 static int
-element_array(int *array,int elt)
+element_array(int *array, int elt)
 {
   int r;
   for (r = 1; r < array[0] + 1; r++)
@@ -217,8 +217,8 @@ intersection_array(int *array1, int *array2)
   
   for (r = 1; r < array1[0] + 1; r++)
     if (!element_array(array2, array1[r])) {
-      for (s = r; s< array1[0]; s++)
-	array1[s]=array1[s+1];
+      for (s = r; s < array1[0]; s++)
+	array1[s] = array1[s+1];
       array1[0]--;
       r--;
     }
@@ -295,7 +295,7 @@ ponnuki_connect(int *moves, int str1, int str2, zone *zn)
 	int pos = libs[r] + delta[k];
 	if (board[pos] == board[str1]
 	    && !same_string(pos, str1)
-	    && !same_string(pos, str2) ) {
+	    && !same_string(pos, str2)) {
 	  /* try to connect pos to str2 in one move */
 	  /* play a common liberty */
 	  neighb = findlib(pos, MAXLIBS, neighbs);
@@ -3756,7 +3756,7 @@ spread_connection_distances(int color, struct connection_data *conn)
 	    && ((board[apos] == color && board[fpos] == color
 		 && board[bpos] == EMPTY)
 		|| (board[hpos] == color && board[jpos] == color
-		    && board[ipos] == EMPTY))){
+		    && board[ipos] == EMPTY))) {
 	  ENQUEUE(conn, pos, epos, distance + FP(1.1), FP(1.0), gpos, NO_MOVE);
 	}
 

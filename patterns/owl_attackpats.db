@@ -5815,6 +5815,7 @@ Pattern A1351
 
 :8,s,value(75)
 
+
 Pattern A1352a
 # gf New pattern. (3.7.3)
 
@@ -5853,7 +5854,6 @@ Pattern A1352b
 +----
 
 ;proper_eye(a) && oplay_defend(*,b,c,*)
-
 
 
 #########################################################

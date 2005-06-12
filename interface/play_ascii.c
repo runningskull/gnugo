@@ -653,8 +653,8 @@ do_play_ascii(Gameinfo *gameinfo)
       if (!fgets(line, 80, stdin))
 	return;
 #else
-      snprintf(line,79,"%s(%d): ",
-	       color_to_string(gameinfo->to_move), movenum+1);
+      snprintf(line, 79, "%s(%d): ",
+	       color_to_string(gameinfo->to_move), movenum + 1);
       if (!(line_ptr = readline(line)))
 	return;
 

@@ -784,7 +784,8 @@ dfa_end(void)
  */
 
 int 
-dfa_minmax_delta(dfa_t *pdfa, int next_index, int isMin) {
+dfa_minmax_delta(dfa_t *pdfa, int next_index, int isMin)
+{
 
   int ret, i, j;
   assert(next_index <= 3);
