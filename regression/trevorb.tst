@@ -559,7 +559,7 @@ loadsgf games/trevor/auto/b83.sgf 20
 
 loadsgf games/trevor/auto/b83.sgf 50
 900 reg_genmove white
-#? [F11]*
+#? [F11]
 
 
 loadsgf games/trevor/auto/b83.sgf 64

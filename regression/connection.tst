@@ -423,26 +423,26 @@ loadsgf games/golife.sgf 30
 # See also trevor:15.
 loadsgf games/trevor/trevor_15.sgf 
 117 disconnect D7 F7
-#? [3 E7]
+#? [3 E7]*
 
 # See also reading:219.
 loadsgf games/kgs/llk-GNU.sgf 150
 118 same_dragon H12 N13
 #? [0]
 119 disconnect H12 N13
-#? [1 N10]
+#? [1 N10]*
 
 # See also gunnar:75.
 loadsgf games/kgs/GNU-higher.sgf 193
 120 same_dragon L10 N11
 #? [0]
 121 disconnect L10 N11
-#? [1 M11]
+#? [1 M11]*
 
 # This test is extremely important.
 loadsgf games/kgs/perler-GNU.sgf 202
 122 disconnect B18 E15
-#? [3 E16]
+#? [3 E16]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

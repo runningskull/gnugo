@@ -773,7 +773,7 @@ loadsgf games/reading41.sgf 130
 186 defend C19
 #? [1 E11]
 187 defend A19
-#? [1 E11]*
+#? [1 E11]
 
 loadsgf games/reading40.sgf
 188 defend B4
@@ -837,7 +837,7 @@ popgo
 
 loadsgf games/reading45.sgf
 199 defend D2
-#? [0]*
+#? [0]
 
 # Ladder reading problem. See also kgs:290 and kgs:300
 # This is more or less a duplicate of reading:156.
@@ -867,11 +867,11 @@ loadsgf games/reading46.sgf
 
 loadsgf games/reading47.sgf
 205 attack G2
-#? [0]*
+#? [0]
 
 loadsgf games/reading47.sgf
 206 attack B3
-#? [0]*
+#? [0]
 
 # See also 9x9:250.
 loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312161910.sgf 52
@@ -903,7 +903,7 @@ loadsgf games/kgs/maproom-gnugo3pt6.sgf 37
 trymove W D3
 218 defend C4
 popgo
-#? [1 B5]
+#? [1 B5]*
 
 # See also connection:119.
 loadsgf games/kgs/llk-GNU.sgf 150
@@ -914,7 +914,7 @@ trymove B L10
 trymove W M11
 trymove B L14
 219 defend K12
-#? [1 M14]
+#? [1 M14]*
 popgo
 popgo
 popgo

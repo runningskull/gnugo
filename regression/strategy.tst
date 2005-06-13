@@ -253,7 +253,7 @@ loadsgf games/nicklas/nicklas8.sgf 98
 #
 loadsgf games/nicklas/nicklas8.sgf 106
 41 reg_genmove black
-#? [N16]*
+#? [N16]
 
 loadsgf games/strategy9.sgf 232
 42 reg_genmove black

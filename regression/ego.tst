@@ -52,7 +52,7 @@ loadsgf games/ego.sgf 96
 #SEVERITY=5
 loadsgf games/ego.sgf 112
 8 reg_genmove white
-#? [F12]*
+#? [F12]
 
 loadsgf games/ego.sgf 180
 9 reg_genmove white

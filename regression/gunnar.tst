@@ -402,7 +402,7 @@ loadsgf games/kgs/dogo-TheGNUGo.sgf 198
 # sente.
 loadsgf games/kgs/llk-GNU.sgf 228
 72 restricted_genmove black P11 F18
-#? [F18]
+#? [F18]*
 
 # The ko threat was answered. Now take the ko again instead of a small
 # move like M4.
@@ -419,12 +419,12 @@ loadsgf games/kgs/GNU-ivanho.sgf 210
 # See also connection:120,121.
 loadsgf games/kgs/GNU-higher.sgf 193
 75 reg_genmove white
-#? [C14]
+#? [C14]*
 
 # R2 can't live. Necessary to find a ko threat.
 loadsgf games/kgs/GNU-HISOKA10.sgf 226
 76 restricted_genmove white P1 R2 G17
-#? [G17]
+#? [G17]*
 
 # G8 is biggest by far.
 loadsgf games/kgs/GNU-marfan.sgf 183
@@ -434,7 +434,7 @@ loadsgf games/kgs/GNU-marfan.sgf 183
 # N3 is a solid defense. The game move at M5 fails.
 loadsgf games/kgs/GNU-marfan.sgf 221
 78 reg_genmove white
-#? [N3]
+#? [N3]*
 
 # K12 is clearly more solid than K11.
 loadsgf games/kgs/perler-GNU.sgf 198
@@ -444,7 +444,7 @@ loadsgf games/kgs/perler-GNU.sgf 198
 # K15 is clearly more solid than K14.
 loadsgf games/kgs/perler-GNU.sgf 202
 80 restricted_genmove black K14 K15
-#? [K15]
+#? [K15]*
 
 # C5 is both bigger and leaves less aji than C4.
 loadsgf games/kgs/JMBE-GNU.sgf 198
@@ -454,7 +454,7 @@ loadsgf games/kgs/JMBE-GNU.sgf 198
 # One point bigger to capture at T6 than to connect at T11.
 loadsgf games/kgs/sade-GNU.sgf 253
 82 restricted_genmove black T11 T6
-#? [T6]
+#? [T6]*
 
 # M10 is clearly better than N10.
 loadsgf games/kgs/sade-GNU.sgf 265
@@ -464,7 +464,7 @@ loadsgf games/kgs/sade-GNU.sgf 265
 # P13 is clearly better than O13.
 loadsgf games/kgs/GNU-bassanio.sgf 164
 84 restricted_genmove black P13 O13
-#? [P13]
+#? [P13]*
 
 ############ End of Tests #################
 

@@ -72,7 +72,7 @@ loadsgf games/handtalk/handtalk23.sgf 80
 
 loadsgf games/handtalk/handtalk23.sgf 82
 15 reg_genmove white
-#? [J3]*
+#? [J3]
 
 #CATEGORY=CONNECTION
 loadsgf games/handtalk/handtalk23.sgf 96

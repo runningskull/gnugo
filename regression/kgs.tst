@@ -60,7 +60,7 @@ loadsgf games/kgs/20040517-siRNA-GnuGoCVS.sgf 192
 # White missed, P18 can still be saved.
 loadsgf games/kgs/20040517-siRNA-GnuGoCVS.sgf 198
 130 reg_genmove black
-#? [S18]*
+#? [S18]
 
 # Awful tenuki.
 loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 56
@@ -230,12 +230,12 @@ loadsgf games/kgs/evand-TheGNUGo.sgf 190
 
 loadsgf games/kgs/evand-TheGNUGo.sgf 242
 490 reg_genmove black
-#? [H13]*
+#? [H13]
 
 loadsgf games/kgs/evand-TheGNUGo.sgf 270
 # Removed P13, too short on liberties to play that.  /pp
 500 reg_genmove black
-#? [O15]*
+#? [O15]
 
 # P8 seems the most reasonable move here.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 16

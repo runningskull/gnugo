@@ -203,13 +203,13 @@ loadsgf games/boardspace/GNUGo-GoFigure0.1-200503171816.sgf 35
 
 loadsgf games/boardspace/GNUGo-GoFigure0.1-200503181316.sgf 11
 410 reg_genmove black
-#? [B5]
+#? [B5]*
 
 loadsgf games/boardspace/GNUGo-GoFigure0.1-200503181614.sgf 41
 420 reg_genmove black
-#? [D5]
+#? [D5]*
 
 #solve the endgame problem with one move, not 3 like in the game
 loadsgf games/boardspace/GNUGo-GoFigure0.1-200503302359.sgf 41
 430 reg_genmove black
-#? [G7|H7]
+#? [G7|H7]*

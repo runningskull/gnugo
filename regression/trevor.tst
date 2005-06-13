@@ -578,7 +578,7 @@ loadsgf games/trevor/trevor_67.sgf
 
 loadsgf games/trevor/trevor_67.sgf
 671 defend G1
-#? [1 (D1|C3|C1)]*
+#? [1 (D1|C3|C1)]
 
 loadsgf games/trevor/trevor_68.sgf
 680 owl_attack H3
