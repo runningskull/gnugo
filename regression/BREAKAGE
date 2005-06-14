@@ -1,3 +1,73 @@
+./regress.sh . reading.tst 
+187 unexpected PASS!
+199 unexpected PASS!
+205 unexpected PASS!
+206 unexpected PASS!
+218 unexpected FAIL: Correct '', got '1 B5'
+219 unexpected FAIL: Correct '1 M14', got '0'
+./regress.sh . filllib.tst 
+48 unexpected FAIL: Correct 'B4|E2|B2', got 'PASS'
+./regress.sh . connection.tst 
+117 unexpected FAIL: Correct '3 E7', got '0'
+119 unexpected FAIL: Correct '1 N10', got '0'
+121 unexpected FAIL: Correct '1 M11', got '0'
+122 unexpected FAIL: Correct '3 E16', got '0'
+./regress.sh . strategy.tst 
+41 unexpected PASS!
+./regress.sh . endgame.tst 
+930 unexpected FAIL: Correct 'O14', got 'R16'
+931 unexpected FAIL: Correct 'R16', got 'E4'
+933 unexpected FAIL: Correct 'P4', got 'C11'
+941 unexpected FAIL: Correct 'R16', got 'K11'
+942 unexpected FAIL: Correct 'P4', got 'R1'
+951 unexpected FAIL: Correct 'H8', got 'C1'
+960 unexpected FAIL: Correct 'J10', got 'H8'
+./regress.sh . ego.tst 
+8 unexpected PASS!
+./regress.sh . trevorb.tst 
+900 unexpected PASS!
+./regress.sh . trevor.tst 
+671 unexpected PASS!
+./regress.sh . nngs.tst 
+510 unexpected FAIL: Correct 'G14', got 'P13'
+900 unexpected PASS!
+./regress.sh . strategy3.tst 
+101 unexpected FAIL: Correct 'M16', got 'M17'
+./regress.sh . global.tst 
+44 unexpected FAIL: Correct 'D5', got 'J7'
+./regress.sh . trevord.tst 
+680 unexpected PASS!
+./regress.sh . owl1.tst 
+366 unexpected FAIL: Correct '0', got '1 P2'
+367 unexpected FAIL: Correct '1 O4', got '1 N5'
+368 unexpected FAIL: Correct '1 (O4|N3)', got '0'
+370 unexpected FAIL: Correct '1 O4', got '0'
+371 unexpected FAIL: Correct '1 M13', got '0'
+372 unexpected FAIL: Correct '1 D18', got '0'
+374 unexpected FAIL: Correct '1 K19', got '0'
+./regress.sh . handtalk.tst 
+15 unexpected PASS!
+./regress.sh . auto04.tst 
+2 unexpected FAIL: Correct '!0', got '0'
+./regress.sh . ninestones.tst 
+150 unexpected PASS!
+./regress.sh . gunnar.tst 
+72 unexpected FAIL: Correct 'F18', got 'P11'
+75 unexpected FAIL: Correct 'C14', got 'P2'
+76 unexpected FAIL: Correct 'G17', got 'N19'
+78 unexpected FAIL: Correct 'N3', got 'M5'
+80 unexpected FAIL: Correct 'K15', got 'K14'
+82 unexpected FAIL: Correct 'T6', got 'T11'
+84 unexpected FAIL: Correct 'P13', got 'O13'
+./regress.sh . 9x9.tst 
+410 unexpected FAIL: Correct 'B5', got 'C8'
+420 unexpected FAIL: Correct 'D5', got 'E4'
+430 unexpected FAIL: Correct 'G7|H7', got 'G8'
+./regress.sh . kgs.tst 
+130 unexpected PASS!
+490 unexpected PASS!
+500 unexpected PASS!
+
 ========================== 3.7.3  ==================================
 
 ./regress.sh . reading.tst 
