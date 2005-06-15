@@ -884,15 +884,15 @@ loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312161910.sgf 52
 210 defend D4
 #? [1 (A2|C2|C1)]
 211 defend A3
-#? [3 (C4|C5|C1)]*
+#? [3 (B4|C4|C1)]*
 212 attack A3
 #? [1 (A2|C2|C1)]
 213 defend B2
-#? [3 (C4|C5)]*
+#? [3 (B4|C4)]*
 214 attack B2
 #? [1 (A2|C2|C1)]
 215 defend A1
-#? [3 (C4|C5)]*
+#? [3 (B4|C4)]*
 216 attack A1
 #? [1 (A2|C2|C1)]
 
@@ -902,8 +902,8 @@ loadsgf games/kgs/maproom-gnugo3pt6.sgf 37
 #? [2 D4]*
 trymove W D3
 218 defend C4
-popgo
 #? [1 B5]*
+popgo
 
 # See also connection:119.
 loadsgf games/kgs/llk-GNU.sgf 150

@@ -265,7 +265,7 @@ loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 114
 #? [F15]*
 
 # Saving M13 is small compared to stopping a black incursion.
-loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 114
+loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 122
 48 restricted_genmove white M12 P11
 #? [P11]
 
@@ -419,7 +419,7 @@ loadsgf games/kgs/GNU-ivanho.sgf 210
 # See also connection:120,121.
 loadsgf games/kgs/GNU-higher.sgf 193
 75 reg_genmove white
-#? [C14]*
+#? [M11]*
 
 # R2 can't live. Necessary to find a ko threat.
 loadsgf games/kgs/GNU-HISOKA10.sgf 226

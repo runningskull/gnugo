@@ -440,7 +440,7 @@ loadsgf games/kgs/GNU-higher.sgf 193
 #? [1 M11]*
 
 # This test is extremely important.
-loadsgf games/kgs/perler-GNU.sgf 202
+loadsgf games/kgs/perler-GNU.sgf 246
 122 disconnect B18 E15
 #? [3 E16]*
 
