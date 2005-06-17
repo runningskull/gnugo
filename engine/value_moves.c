@@ -3595,6 +3595,18 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
 
   for (k = 0; k < num_good_threats; k++) {
     pos = good_threats[k];
+
+    /* If the move previously had no value, we need to add in the
+     * randomness contribution now.
+     *
+     * FIXME: This is very ugly. Restructure the code so that the
+     * randomness need only be considered in one place.
+     */
+    if (move[pos].value == 0.0) {
+      move[pos].value += 
+	0.01 * move[pos].random_number * move[pos].randomness_scaling;
+    }
+
     TRACE("%1m: %f + %f = %f\n", pos, move[pos].value,
 	  move[pos].additional_ko_value,
 	  move[pos].value + move[pos].additional_ko_value);
