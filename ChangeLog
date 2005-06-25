@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- do not trust connection moves to be safe in
+  estimate_territorial_value() 
 - add random move value contributions also for pure ko threats
 - new and revised tests
 

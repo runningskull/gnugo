@@ -2208,7 +2208,6 @@ estimate_territorial_value(int pos, int color, float our_score,
       /* This move reason is valued as a strategical value. */
       break;
       
-    case CONNECT_MOVE:
     case CUT_MOVE:
     case EXPAND_MOYO_MOVE:
     case EXPAND_TERRITORY_MOVE:
@@ -2216,6 +2215,15 @@ estimate_territorial_value(int pos, int color, float our_score,
       does_block = 1;
       break;
 
+    case CONNECT_MOVE:
+      /* This used to always set does_block=1, but there is no
+       * guarantee that a connection move is strategically safe. See
+       * for example gunnar:72.
+       */
+      if (move[pos].move_safety)
+	does_block = 1;
+      break;
+      
     case STRATEGIC_ATTACK_MOVE:
     case STRATEGIC_DEFEND_MOVE:
       /* Do not trust these when we are scoring. Maybe we shouldn't
