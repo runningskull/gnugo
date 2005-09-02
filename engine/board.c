@@ -1248,13 +1248,7 @@ komaster_trymove(int pos, int color, const char *message, int str,
   *is_conditional_ko = 0;
   ko_move = is_ko(pos, color, &kpos);
 
-  if (!ko_move) {
-    if (komaster == WEAK_KO) {
-      set_new_komaster(EMPTY);
-      set_new_kom_pos(NO_MOVE);
-    }
-  }
-  else {
+  if (ko_move) {
     /* If opponent is komaster we may not capture his ko. */
     if (komaster == other && pos == kom_pos)
       return 0;
@@ -1293,8 +1287,13 @@ komaster_trymove(int pos, int color, const char *message, int str,
     }
   }
 
-  if (!ko_move)
+  if (!ko_move) {
+    if (komaster == WEAK_KO) {
+      set_new_komaster(EMPTY);
+      set_new_kom_pos(NO_MOVE);
+    }
     return 1;
+  }
 
   if (komaster == other) {
     if (color == WHITE)
