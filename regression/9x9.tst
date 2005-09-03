@@ -213,3 +213,36 @@ loadsgf games/boardspace/GNUGo-GoFigure0.1-200503181614.sgf 41
 loadsgf games/boardspace/GNUGo-GoFigure0.1-200503302359.sgf 41
 430 reg_genmove black
 #? [G7|H7]*
+
+loadsgf games/bitti-gnug36.sgf 24
+440 restricted_genmove black D6 C6 B7
+#? [!D6]
+
+# Not A8 as in the game
+loadsgf games/bitti-gnug36.sgf 30
+450 reg_genmove black
+#? [B5|B4]
+
+# This is not very obvious, but B9 still wins the whole board.
+loadsgf games/bitti-gnug36.sgf 44
+460 reg_genmove black
+#? [B9]
+
+# Need to protect lower right corner
+loadsgf nodan-guno.sgf 8
+470 reg_genmove black
+#? [H3|H4|G4|D3]
+
+loadsgf nodan-guno.sgf 24
+480 restricted_genmove black E2 F2
+#? [E2]
+
+# E1 is non-sense.
+loadsgf nodan-guno.sgf 38
+490 reg_genmove black
+#? [D1|A6|H1]
+
+loadsgf nodan-guno.sgf 54
+500 reg_genmove black
+#? [H6]
+
