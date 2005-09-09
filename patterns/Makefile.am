@@ -72,7 +72,7 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c\
 		 read_attack.c read_defend.c handipat.c oraclepat.c
 
-DBBUILT = gogo.sgf hoshi_keima.db hoshi_other.db komoku.db sansan.db \
+DBBUILT = gogo.db hoshi_keima.db hoshi_other.db komoku.db sansan.db \
 	  mokuhazushi.db takamoku.db
 
 DBBUILT_INPUT = -i gogo.sgf -i hoshi_keima.db -i hoshi_other.db -i komoku.db \
