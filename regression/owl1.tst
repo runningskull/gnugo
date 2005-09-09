@@ -455,6 +455,10 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
 374 owl_defend F18
 #? [1 K19]*
 
+loadsgf games/kgs/Erro-TheGNUGo.sgf
+375 owl_attack R10
+#? [1 (S16|S17|S18)]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
