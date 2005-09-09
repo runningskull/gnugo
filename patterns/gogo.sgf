@@ -1,0 +1,105 @@
+This is GNU Go, a Go program. Contact gnugo@gnu.org, or see
+http://www.gnu.org/software/gnugo/ for more information.
+
+Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005
+by the Free Software Foundation.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+publishedby the Free Software Foundation - version 2.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License in file COPYING for more details.
+
+You should have received a copy of the GNU General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA 02111, USA.
+
+(;GM[1]FF[3]
+SZ[19];B[oe]
+(;W[qc]N[San-san invasion]
+(;B[oc]MA[kg]
+(;W[qe]MA[mg];B[pg]MA[ki];W[qg];B[ph]MA[li])
+
+(;W[qf]MA[mi];B[qb]
+C[S
+# According to KJD, Q13 is an option too.  But I think Q13 is generally
+ too cosmic for GNU Go.  /pp]
+MA[mg];W[rb]C[U]MA[ng];B[qd]MA[ng];W[pc]C[U]MA[ng];B[pd]C[U]MA[nf];
+W[rd]C[U]MA[nf];B[pb]MA[nf];W[rc]MA[ng];B[pg]MA[lh])
+)
+
+(;B[pc]C[# Looks risky for GNU Go.  /pp];W[pb]MA[mf];B[qd]
+C[U
+# Is it urgent enough?  /pp]MA[mf];W[oc]C[U]MA[mf];B[pd]C[U]MA[mf]
+;W[rb]C[U]MA[nf];B[rc]MA[mg];W[qb]C[U]MA[nf];B[nc]MA[lf])
+)
+
+(;W[pd]N[Hoshi invasion];B[pe]MA[nh]
+(;W[qd]MA[lg];B[qe]MA[mg]
+(;W[od]MA[mf];B[nd]MA[kf];W[nc]MA[mf];B[mc]MA[kf];W[nb]MA[lf];B[mb]
+MA[lf];W[pb]MA[lf];B[md]MA[lf])
+
+(;W[nc]MA[lf];B[oc]MA[lf];W[od]MA[mf];B[nd]MA[lf]
+(;W[ob]MA[mf];B[mc]MA[lf];W[nb]C[U]MA[lf];B[md]MA[lf])
+
+(;W[md]C[# This empasizes the top, hence larger area.  /pp]MA[jf];
+B[ne]MA[lg];W[mc]MA[kf];B[rd]MA[lg];W[pb]MA[me];B[qb]C[# Tesuji.]
+MA[me];W[pc]MA[me];B[qc]MA[me];W[ob]MA[me])
+)
+)
+
+(;W[qe]C[# Looks risky for GNU Go.  /pp];B[qf]MA[nh];W[qd]MA[ng];B[od]
+MA[ng];W[rf]MA[nh];B[qg]MA[ni];W[rg]MA[ni];B[qh]MA[mj];W[ob]
+C[j
+# I think so.  /pp]MA[mh];B[oc]MA[lh];W[pb]MA[me];B[mc]C[j]MA[kh])
+
+(;W[oc]MA[kf]
+(;B[qe]MA[mh];W[mc]MA[kf];B[qc]MA[lf];W[jc]MA[ie])
+
+(;B[qd]MA[mh];W[qc]MA[mf];B[qe]C[U]MA[nf];W[rc]MA[nf];B[nc]MA[mf];
+W[nb]MA[me];B[od]MA[me];W[pc]C[U]MA[me];B[mc]MA[lf];W[mb]MA[ke];B[lc]
+MA[kg])
+)
+)
+
+(;W[qd]N[Komoku invasion]
+(;B[qe]
+C[# According to KJD, this emphasizes top despite the way it 
+looks.  /pp]
+MA[lg];W[re]MA[mg]
+(;B[pe]C[U
+# I think so.  /pp]MA[nf]
+(;W[rf]C[U]MA[ng];B[oc]MA[lf];W[pc]MA[nf];B[ob]MA[nf])
+
+(;W[qf]C[0
+# Bad.]MA[oh]
+(;B[rf]MA[oh];W[rg];B[rd];W[sf];B[qc])
+
+(;B[rd]C[0
+# Bad too.]MA[oh];W[rc]MA[ng];B[rf];W[sd];B[qg];W[oc])
+)
+)
+
+(;B[rf]C[0
+# Mistake.];W[pe];B[qf];W[pd];B[pf];W[od])
+)
+
+(;B[pc]MA[lf];W[qc]MA[nf];B[pf]MA[mg]
+(;W[pd]MA[mg];B[od]C[U]MA[ng]
+(;W[oc]MA[mf];B[nc]C[U]MA[mf];W[pb]MA[mf];B[ob]MA[mf];W[rf]MA[mg])
+
+(;W[ob]
+C[:-,shape(1)
+# A trick to avoid ko.  I think it's better for GNU Go.  /pp]
+MA[mf];B[oc]MA[mf];W[pb]MA[nf];B[nb]MA[mf];W[rf]MA[mg];B[mc];W[qg])
+)
+
+(;W[rf]MA[nh];B[pb]MA[lg];W[qg]MA[ni];B[kc]MA[jh])
+)
+)
+
+)

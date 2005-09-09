@@ -9,6 +9,7 @@ EXTRA_DIST = $(DSP)\
         $(DTR)\
 	dfa.c\
 	gnugo-db.el\
+	gogo.sgf\
 	hoshi_keima.sgf\
 	hoshi_other.sgf\
 	komoku.sgf\
@@ -71,10 +72,10 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c\
 		 read_attack.c read_defend.c handipat.c oraclepat.c
 
-DBBUILT = hoshi_keima.db hoshi_other.db komoku.db sansan.db \
+DBBUILT = gogo.sgf hoshi_keima.db hoshi_other.db komoku.db sansan.db \
 	  mokuhazushi.db takamoku.db
 
-DBBUILT_INPUT = -i hoshi_keima.db -i hoshi_other.db -i komoku.db \
+DBBUILT_INPUT = -i gogo.sgf -i hoshi_keima.db -i hoshi_other.db -i komoku.db \
                -i sansan.db -i mokuhazushi.db -i takamoku.db
 
 DB_TO_TAG = aa_attackpats.db attack.db barriers.db conn.db defense.db\
@@ -99,6 +100,9 @@ AM_CPPFLAGS = \
 noinst_LIBRARIES = libpatterns.a
 
 libpatterns_a_SOURCES = connections.c helpers.c transform.c $(GGBUILTSOURCES)
+
+gogo.db : $(srcdir)/gogo.sgf joseki$(EXEEXT)
+	./joseki JG $(srcdir)/gogo.sgf >gogo.db
 
 hoshi_keima.db : $(srcdir)/hoshi_keima.sgf joseki$(EXEEXT)
 	./joseki JHK $(srcdir)/hoshi_keima.sgf >hoshi_keima.db
