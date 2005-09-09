@@ -439,8 +439,8 @@ play white H2
 
 # A14 is strictly correct since C19 allows W an unfavorable ko.
 loadsgf games/semeai/semeai19.sgf
-120 analyze_semeai C18 C19
-#? [1 1 (A14|C19)]*
+120 analyze_semeai C18 C17
+#? [0 0 PASS]
 
 # There is a complication that B18 and C17 are not amalgamated.
 # If B plays first C19 gives a favorable ko; A15 allows seki.
