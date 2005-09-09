@@ -481,6 +481,74 @@ Pattern F18
 :8,FeEaj,shape(2.98)
 
 
+
+Pattern F19
+|..xxX	    go-go invasion at san-san
+|....x
+|..*.x
+|.....
+|.....
++-----
+
+:/,FeEaj, shape(1)
+
+|..abX
+|....c
+|..*.d
+|.....
+|.....
++-----
+
+; x_alive_somewhere(a) + x_alive_somewhere(b)
+; + x_alive_somewhere(c) + x_alive_somewhere(d) <= 1
+
+
+Pattern F20
+
+|...????    go-go invasion at hoshi
+|.....??
+|....X.?
+|...*..?
+|.......
+|.......
+|.......
++-------
+# I think this is suboptimal, thus the worse shape. /ab
+
+:/,FeEaj, shape(0.94)
+
+
+Pattern F21
+
+|..?xx??    go-go invasion at komoku
+|.....??
+|....X.?
+|..*...?
+|......?
+|.......
+|.......
++-------
+
+:8,FeEaj, shape(1)
+
+
+Pattern F22
+
+|..o???
+|..oo??
+|......    5-3 approach move to go-go
+|......
+|..*.X.
+|......
+|......
+|......
+|......
++------
+
+:8,FEaj,shape(1)
+
+
+
 ###################
 # Corner enclosures
 ###################

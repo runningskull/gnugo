@@ -75,7 +75,7 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
 DBBUILT = gogo.db hoshi_keima.db hoshi_other.db komoku.db sansan.db \
 	  mokuhazushi.db takamoku.db
 
-DBBUILT_INPUT = -i gogo.sgf -i hoshi_keima.db -i hoshi_other.db -i komoku.db \
+DBBUILT_INPUT = -i gogo.db -i hoshi_keima.db -i hoshi_other.db -i komoku.db \
                -i sansan.db -i mokuhazushi.db -i takamoku.db
 
 DB_TO_TAG = aa_attackpats.db attack.db barriers.db conn.db defense.db\
