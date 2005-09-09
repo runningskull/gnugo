@@ -302,6 +302,7 @@ static void break_chain4_moves(int str, struct reading_moves *moves,
 			       int be_aggressive);
 static void superstring_moves(int str, struct reading_moves *moves, 
     		  	      int liberty_cap, int does_attack);
+static void squeeze_moves(int str, struct reading_moves *moves);
 static void superstring_break_chain_moves(int str, int liberty_cap,
 					 struct reading_moves *moves);
 static void double_atari_chain2_moves(int str,
@@ -1621,8 +1622,10 @@ defend2(int str, int *move)
   /* If nothing else works, we try playing a liberty of the
    * super_string.
    */
-  if (stackp <= superstring_depth)
+  if (stackp <= superstring_depth) {
     superstring_moves(str, &moves, 3, 0);
+    squeeze_moves(str, &moves);
+  }
 
   break_chain2_defense_moves(str, &moves, be_aggressive);
 
@@ -1793,8 +1796,10 @@ defend3(int str, int *move)
   /* If nothing else works, we try playing a liberty of the
    * super_string.
    */
-  if (level >= 8 && stackp <= backfill2_depth)
+  if (level >= 8 && stackp <= backfill2_depth) {
     superstring_moves(str, &moves, 3, 0);
+    squeeze_moves(str, &moves);
+  }
 
   if (stackp <= break_chain_depth)
     break_chain3_moves(str, &moves, 0);
@@ -1864,6 +1869,7 @@ defend4(int str, int *move)
 #endif
   if (stackp <= superstring_depth)
     superstring_moves(str, &moves, 4, 0);
+    squeeze_moves(str, &moves);
   }
 
   order_moves(str, &moves, color, read_function_name, *move);
@@ -2499,6 +2505,82 @@ superstring_moves(int str, struct reading_moves *moves,
       if (!does_attack)
 	special_rescue_moves(str, apos, moves);
     }
+  }
+}
+
+
+/* This function is somewhat related to superstring_moves() but tries
+ * to find moves to squeeze out liberties from the superstring, aiming
+ * to capture the main string in a shortage of liberties.
+ *
+ * For a typical example, see the move E9 in reading:203,204. It is
+ * assumed that the same move is effective both for attack and
+ * defense.
+ */
+static void
+squeeze_moves(int str, struct reading_moves *moves)
+{
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int libs[4];
+  int num_libs;
+  int libs2[4];
+  int num_libs2;
+  int k;
+  int r;
+  int potential_move = NO_MOVE;
+  int previous_liberty;
+
+  num_libs = findlib(str, 4, libs);
+  gg_assert(num_libs <= 4);
+
+  for (k = 0; k < num_libs; k++) {
+    if (!is_suicide(libs[k], other))
+      continue;
+
+    num_libs2 = approxlib(libs[k], color, 4, libs2);
+    if (num_libs2 != num_libs)
+      continue;
+
+    for (r = 0; r < num_libs2; r++)
+      if (!liberty_of_string(libs2[r], str)) {
+	potential_move = libs2[r];
+	break;
+      }
+
+    previous_liberty = libs[k];
+
+    while (is_suicide(potential_move, other)) {
+      num_libs2 = approxlib(potential_move, color, 3, libs2);
+      if (num_libs2 != 2) {
+	potential_move = NO_MOVE;
+	break;
+      }
+      if (libs2[0] == previous_liberty) {
+	previous_liberty = potential_move;
+	potential_move = libs2[1];
+      }
+      else {
+	previous_liberty = potential_move;
+	potential_move = libs2[0];
+      }
+      if (liberty_of_string(potential_move, str)) {
+	potential_move = NO_MOVE;
+	break;
+      }
+    }
+    
+    if (potential_move == NO_MOVE
+	|| !is_self_atari(potential_move, other))
+      continue;
+
+    approxlib(potential_move, other, 1, libs2);
+
+    num_libs2 = approxlib(libs2[0], color, MAXLIBS, NULL);
+    
+    if (num_libs2 < 3
+	&& num_libs2 < approxlib(potential_move, color, MAXLIBS, NULL))
+      ADD_CANDIDATE_MOVE(potential_move, 0, *moves, "squeeze move");
   }
 }
 
@@ -3582,6 +3664,7 @@ attack2(int str, int *move)
 	if (stackp <= backfill2_depth)
 	  liberty_cap = 3;
 	superstring_moves(str, &moves, liberty_cap, 1);
+	squeeze_moves(str, &moves);
       }
       break;
 
@@ -3722,8 +3805,10 @@ attack3(int str, int *move)
       /* If nothing else works, we try filling a liberty of the
        * super_string.
        */
-      if (level >= 8 && stackp <= backfill2_depth)
+      if (level >= 8 && stackp <= backfill2_depth) {
 	superstring_moves(str, &moves, 3, 1);
+	squeeze_moves(str, &moves);
+      }
       break;
 
     default:
