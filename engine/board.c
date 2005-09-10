@@ -1226,25 +1226,6 @@ komaster_trymove(int pos, int color, const char *message, int str,
   int kpos;
   int previous_board_ko_pos = board_ko_pos;
 
-  /* First we check whether the ko claimed by komaster has been
-   * resolved. If that is the case, we revert komaster to EMPTY.
-   *
-   * The ko has been resolved in favor of the komaster if it has
-   * been filled, or if it is no longer a ko and an opponent move
-   * there is suicide.
-   */
-  if (((komaster == WHITE || komaster == GRAY_WHITE)
-       && (IS_STONE(board[kom_pos])
-	   || (!is_ko(kom_pos, BLACK, NULL)
-	       && is_suicide(kom_pos, BLACK))))
-      || ((komaster == BLACK || komaster == GRAY_BLACK)
-	  && (IS_STONE(board[kom_pos])
-	      || (!is_ko(kom_pos, WHITE, NULL)
-		  && is_suicide(kom_pos, WHITE))))) {
-    set_new_komaster(EMPTY);
-    set_new_kom_pos(NO_MOVE);
-  }
-
   *is_conditional_ko = 0;
   ko_move = is_ko(pos, color, &kpos);
 
@@ -1288,10 +1269,28 @@ komaster_trymove(int pos, int color, const char *message, int str,
   }
 
   if (!ko_move) {
+    /* If we are komaster, check whether the ko was resolved by the
+     * current move. If that is the case, revert komaster to EMPTY.
+     *
+     * The ko has been resolved in favor of the komaster if it has
+     * been filled, or if it is no longer a ko and an opponent move
+     * there is suicide.
+     */
+    if (((komaster == color
+	  || (komaster == GRAY_WHITE && color == WHITE)
+	  || (komaster == GRAY_BLACK && color == BLACK))
+	 && (IS_STONE(board[kom_pos])
+	     || (!is_ko(kom_pos, other, NULL)
+		 && is_suicide(kom_pos, other))))) {
+      set_new_komaster(EMPTY);
+      set_new_kom_pos(NO_MOVE);
+    }
+
     if (komaster == WEAK_KO) {
       set_new_komaster(EMPTY);
       set_new_kom_pos(NO_MOVE);
     }
+    
     return 1;
   }
 
