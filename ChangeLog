@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- handle CRLF newlines correctly in view.pike	
 - new static function squeeze_moves() in reading.c
 - fix komaster problem
 - do not trust connection moves to be safe in
