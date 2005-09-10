@@ -213,6 +213,7 @@ loadsgf games/trevor/auto/a019.sgf 6
 # games/trevor/auto/a021.sgf problems:
 
 #Break through important
+# See also break_in:100.
 loadsgf games/trevor/auto/a021.sgf 16
 370 reg_genmove white
 #? [F6]

@@ -188,7 +188,7 @@ loadsgf games/endgame10.sgf
 870 restricted_genmove black H1 N7
 #? [H1]
 
-# K5 is best, althought in absence of other worthy moves it doesn't matter.
+# K5 is best, although in absence of other worthy moves it doesn't matter.
 loadsgf games/endgame11.sgf
 880 reg_genmove white
 #? [K5]
@@ -252,6 +252,12 @@ loadsgf games/kgs/GNU-merlenoir.sgf 209
 loadsgf games/kgs/GNU-merlenoir.sgf 233
 960 restricted_genmove white J10 H8
 #? [J10]*
+
+# No point to gain at the top, fill ko. After white C6, black E6,
+# white has to defend and loses the ko.
+loadsgf games/endgame12.sgf
+970 reg_genmove white
+#? [G2]
 
 ############ End of Tests #################
 

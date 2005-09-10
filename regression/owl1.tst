@@ -459,6 +459,22 @@ loadsgf games/kgs/Erro-TheGNUGo.sgf
 375 owl_attack R10
 #? [1 (S16|S17|S18)]
 
+# See also gunnar:73.
+loadsgf games/kgs/GNU-ivanho.sgf 182
+376 owl_defend K18
+#? [2 M19]
+377 owl_defend H17
+#? [3 M19]
+
+loadsgf games/kgs/GNU-tadf.sgf 98
+378 owl_attack C5
+#? [1 A2]
+
+# See also nngs4:730.
+loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 194
+379 owl_does_attack D18 E15
+#? [0]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

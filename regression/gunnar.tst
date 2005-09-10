@@ -406,6 +406,7 @@ loadsgf games/kgs/llk-GNU.sgf 228
 
 # The ko threat was answered. Now take the ko again instead of a small
 # move like M4.
+# See also owl1:376,377.
 loadsgf games/kgs/GNU-ivanho.sgf 182
 73 reg_genmove white
 #? [M19]
@@ -465,6 +466,32 @@ loadsgf games/kgs/sade-GNU.sgf 265
 loadsgf games/kgs/GNU-bassanio.sgf 164
 84 restricted_genmove black P13 O13
 #? [P13]*
+
+# T6 can't be defended. R8 is globally too small but locally
+# guaranteed to be better.
+loadsgf games/kgs/ben9992000-GNU.sgf 141
+85 restricted_genmove black T6 R8
+#? [R8]
+
+# B6 unreasonable.
+loadsgf games/kgs/haiku-GNU.sgf 93
+86 restricted_genmove black C8 B6
+#? [R8]
+
+# O5 solves the problem. P4 backfires.
+loadsgf games/kgs/melonhead1-GNU.sgf 127
+87 restricted_genmove black O5 P4 M4 P3 M3 N3 N2 M5 N6
+#? [O5]
+
+# A15 does not solve the atari-atari problem.
+loadsgf games/kgs/melonhead1-GNU.sgf 183
+88 reg_genmove black
+#? [B17]
+
+# E6 three points reverse sente.
+loadsgf games/kgs/Kuksa-GNU.sgf 178
+89 reg_genmove black
+#? [E6]
 
 ############ End of Tests #################
 

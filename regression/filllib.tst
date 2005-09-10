@@ -168,3 +168,8 @@ loadsgf games/filllib16.sgf
 48 reg_genmove white
 #? [B4|E2|B2]*
 
+# The liberty filling move at B16 is a blunder but can be played after
+# either of C18 and E18.
+loadsgf games/filllib17.sgf
+49 reg_genmove white
+#? [C18|E18]*

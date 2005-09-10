@@ -307,6 +307,7 @@ loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 190
 720 reg_genmove black
 #? [B15|B16|B17]*
 
+# See also owl1:379.
 loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 194
 730 reg_genmove black
 #? [C17]*
