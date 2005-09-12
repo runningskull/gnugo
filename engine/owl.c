@@ -69,6 +69,8 @@
 struct local_owl_data {
   char goal[BOARDMAX];
   char boundary[BOARDMAX];
+  /* Same as goal, except never anything is removed from it. */
+  char cumulative_goal[BOARDMAX];
 
   /* FIXME: neighbors[] and escape_values[] are never recomputed.
    *	    Consider moving these arrays from stack to a static or
@@ -4417,6 +4419,7 @@ owl_mark_dragon(int apos, int bpos, struct local_owl_data *owl,
       }
   }
 
+  memcpy(owl->cumulative_goal, owl->goal, sizeof(owl->goal));
   owl->color = color;
   owl_mark_boundary(owl);
 }
@@ -4600,6 +4603,7 @@ owl_update_goal(int pos, int same_dragon, int lunch,
 	if (0)
 	  TRACE("Added %1m to goal.\n", stones[k]);
 	owl->goal[stones[k]] = 2;
+	owl->cumulative_goal[stones[k]] = 1;
       }
     }
 
@@ -4611,8 +4615,10 @@ owl_update_goal(int pos, int same_dragon, int lunch,
     int k;
     adj = chainlinks(lunch, adjs);
     for (k = 0; k < adj; k++)
-      if (!owl->goal[adjs[k]])
+      if (!owl->goal[adjs[k]]) {
 	mark_string(adjs[k], owl->goal, 2);
+	mark_string(adjs[k], owl->cumulative_goal, 2);
+      }
   }
 
   if (1 && verbose)
@@ -5978,6 +5984,7 @@ owl_substantial(int str)
   /* FIXME: We would want to use init_owl() here too, but it doesn't
    * fit very well with the construction of the goal array above.
    */
+  memcpy(owl->cumulative_goal, owl->goal, BOARDMAX);
   compute_owl_escape_values(owl);
   owl_mark_boundary(owl);
   owl->lunches_are_current = 0;
@@ -6492,7 +6499,13 @@ owl_strong_dragon(int pos)
 static int
 owl_escape_route(struct local_owl_data *owl)
 {
-  return dragon_escape(owl->goal, owl->color, owl->escape_values);
+  char modified_escape[BOARDMAX];
+  int pos;
+  memcpy(modified_escape, owl->escape_values, sizeof(modified_escape));
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos) && owl->cumulative_goal[pos])
+      modified_escape[pos] = 0;
+  return dragon_escape(owl->goal, owl->color, modified_escape);
 }
 
 
@@ -6563,6 +6576,8 @@ do_push_owl(struct local_owl_data **owl)
   VALGRIND_MAKE_WRITABLE(new_owl, sizeof(struct local_owl_data));
   /* Copy the owl data. */
   memcpy(new_owl->goal, (*owl)->goal, sizeof(new_owl->goal));
+  memcpy(new_owl->cumulative_goal, (*owl)->cumulative_goal,
+         sizeof(new_owl->cumulative_goal));
   memcpy(new_owl->boundary, (*owl)->boundary, sizeof(new_owl->boundary));
   memcpy(new_owl->neighbors, (*owl)->neighbors, sizeof(new_owl->neighbors));
   memcpy(new_owl->escape_values, (*owl)->escape_values,

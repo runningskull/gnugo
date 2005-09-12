@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new array comulative_goal in local_owl_data
+- don't count former owl goal dragon stones towards escape measure
 - removed PROFILE_MATCHER
 - handle CRLF newlines correctly in view.pike	
 - new static function squeeze_moves() in reading.c
