@@ -36,14 +36,6 @@
 /* Pattern profiling functions:                                           */
 /**************************************************************************/
 
-/* define this to see how each phase of pattern rejection is performing */
-/* #define PROFILE_MATCHER */
-
-
-#ifdef PROFILE_MATCHER
-static int totals[6];
-#endif
-
 
 #if PROFILE_PATTERNS
 /* Initialize pattern profiling fields in one pattern struct array. */
@@ -382,13 +374,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
        */
 
       if (anchor_test != pattern->anchored_at_X)
-      {
-#ifdef PROFILE_MATCHER
-	/* oops - need to work out something we deferred */
-        totals[0] += (pattern->trfno == 5 ? 4 : pattern->trfno);
-#endif
 	continue;  /* does not match the anchor */
-      }
 
       ll = 0;  /* first transformation number */
       end_transformation = pattern->trfno;
@@ -399,10 +385,6 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	end_transformation = 6;
       }
       
-#ifdef PROFILE_MATCHER
-      totals[0] += end_transformation - ll;
-#endif
-
       /* try each orientation transformation. Assume at least 1 */
 
       do {
@@ -411,10 +393,6 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	int nodes_before;
 #endif
 	
-#ifdef PROFILE_MATCHER
-	++totals[1];
-#endif
-
 #if GRID_OPT == 1
 
 	/* We first perform the grid check : this checks up to 16
@@ -432,9 +410,6 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 
 #endif /* GRID_OPT == 1 */
 
-#ifdef PROFILE_MATCHER
-	++totals[2];
-#endif
 	/* Next, we do the range check. This applies the edge
 	 * constraints implicitly.
 	 */
@@ -459,10 +434,6 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	  if (!ON_BOARD2(m + mi, n + mj) || !ON_BOARD2(m + xi, n + xj))
 	    continue;  /* out of range */
 	}
-
-#ifdef PROFILE_MATCHER	 
-	++totals[3];
-#endif
 
 	/* Now iterate over the elements of the pattern. */
 	found_goal = 0;
@@ -502,17 +473,9 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 #endif /* we don't trust the grid optimisation */
 
 
-#ifdef PROFILE_MATCHER
-	++totals[4];
-#endif
-
 	/* Make it here ==> We have matched all the elements to the board. */
 	if ((goal != NULL) && !found_goal)
 	  goto match_failed;
-
-#ifdef PROFILE_MATCHER
-	++totals[5];
-#endif
 
 #if PROFILE_PATTERNS
 	pattern->hits++;
@@ -535,14 +498,6 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
       } while (++ll < end_transformation); /* ll loop over symmetries */
     } /* if not rejected by maxwt */
   } while ((++pattern)->patn);  /* loop over patterns */
-
-
-#ifdef PROFILE_MATCHER
-  fprintf(stderr, 
-	  "total %d, anchor=%d, grid=%d, edge=%d, matched=%d, accepted=%d\n",
-	  totals[0], totals[1], totals[2], totals[3], totals[4], totals[5]);
-#endif
-
 }
 
 
@@ -976,10 +931,6 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
   int nodes_before;
 #endif
   
-#ifdef PROFILE_MATCHER
-  ++totals[1];
-#endif
-
   if (0)
     gprintf("check_pattern_light @ %1m rot:%d pattern: %s\n", 
 	    anchor, ll, pattern->name);
@@ -1023,10 +974,6 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
     if (goal != NULL && !found_goal)
       goto match_failed;
   }
-
-#ifdef PROFILE_MATCHER
-  ++totals[4];
-#endif
 
 #if PROFILE_PATTERNS
   pattern->hits++;
