@@ -21,6 +21,11 @@
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+// Defaults:
+// linux
+    string sgf_viewer_command = "quarry %s";                                 
+// windows (for example)
+//  string sgf_viewer_command = "c:\\programs\\winmgt\\winmgt %s";     
 
 class GtpResponse
 {
@@ -1466,7 +1471,7 @@ class Controller
 	sgf_filename_entry->set_editable(1);
 
 	sgf_viewer_button = GTK.CheckButton("start sgf viewer as");
-        sgf_viewer_entry = GTK.Entry()->set_text("quarry %s")
+        sgf_viewer_entry = GTK.Entry()->set_text(sgf_viewer_command)
                            ->set_editable(1);
         sgf_viewer_button->signal_connect("toggled", sgf_viewer_button_toggled);
         sgf_traces_button->signal_connect("toggled", sgf_traces_button_toggled);
