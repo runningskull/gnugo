@@ -108,10 +108,8 @@ void
 hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
 {
   int pos;
-  int i;
 
-  for (i = 0; i < NUM_HASHVALUES; i++)
-    target->hashval[i] = 0;
+  hashdata_clear(target);
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (p[pos] == WHITE)
@@ -124,6 +122,14 @@ hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
     hashdata_xor(*target, ko_hash[ko_pos]);
 }
 
+/* Clear hashdata. */
+void
+hashdata_clear(Hash_data *hd)
+{
+  int i;
+  for (i = 0; i < NUM_HASHVALUES; i++)
+    hd->hashval[i] = 0;
+}
 
 /* Set or remove ko in the hash value and hash position.  */
 void
@@ -162,16 +168,14 @@ hashdata_invert_kom_pos(Hash_data *hd, int kom_pos)
 Hash_data
 goal_to_hashvalue(const char *goal)
 {
-  int i, pos;
+  int pos;
   Hash_data return_value;
   
-  for (i = 0; i < NUM_HASHVALUES; i++)
-    return_value.hashval[i] = 0;
+  hashdata_clear(&return_value);
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos) && goal[pos])
-      for (i = 0; i < NUM_HASHVALUES; i++) 
-	return_value.hashval[i] ^= goal_hash[pos].hashval[i];
+      hashdata_xor(return_value, goal_hash[pos]);
   
   return return_value;
 }

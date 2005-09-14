@@ -267,7 +267,7 @@ static void
 fuseki_callback(int move, struct fullboard_pattern *pattern, int ll)
 {
   TRACE("Fuseki database move at %1m with relative weight %d, pattern %s+%d\n",
-	move, (int) pattern->value, pattern->name, ll);
+	move, pattern->value, pattern->name, ll);
 
   /* Store coordinates and relative weight for the found move. */
   fuseki_moves[num_fuseki_moves] = move;

@@ -291,11 +291,11 @@ struct pattern_db {
 
 
 struct fullboard_pattern {
-  struct patval *patn;  /* array of elements */
-  int patlen;           /* number of elements */
-  const char *name;     /* short description of pattern (optional) */
-  int move_offset;      /* offset of the suggested move (to intersection (0,0)) */
-  float value;          /* value for pattern, if matched */
+  Hash_data fullboard_hash;	/* Hash of the full board position. */	
+  int number_of_stones;		/* Number of stones on board. */
+  const char *name;		/* Pattern identifier. */
+  int move_offset;      	/* position of the move relative to tengen */
+  int value;			/* value for pattern, if matched */
 };
 
 

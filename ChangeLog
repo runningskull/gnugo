@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- use a fullboard hash for fuseki database patterns
 - new array comulative_goal in local_owl_data
 - don't count former owl goal dragon stones towards escape measure
 - removed PROFILE_MATCHER

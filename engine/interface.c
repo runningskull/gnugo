@@ -43,7 +43,7 @@ init_gnugo(float memory, unsigned int seed)
    * reproducable results.
    * FIXME: Test the quality of the seed.
    */
-  set_random_seed(12345);
+  set_random_seed(HASH_RANDOM_SEED);
   reading_cache_init(memory * 1024 * 1024);
   set_random_seed(seed);
   persistent_cache_init();

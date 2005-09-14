@@ -64,6 +64,7 @@
 #define MAXSTACK  MAX_BOARD * MAX_BOARD
 #define MAXCHAIN  160
 
+#define HASH_RANDOM_SEED 12345
 
 /* ================================================================ *
  *                         One-dimensional board                    *

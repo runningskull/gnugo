@@ -87,6 +87,7 @@ void hash_init(void);
 #define INIT_ZOBRIST_ARRAY(a) \
   hash_init_zobrist_array(a, (int) (sizeof(a) / sizeof(a[0])))
 
+void hashdata_clear(Hash_data *hd);
 void hashdata_recalc(Hash_data *hd, Intersection *board, int ko_pos);
 void hashdata_invert_ko(Hash_data *hd, int pos);
 void hashdata_invert_stone(Hash_data *hd, int pos, int color);

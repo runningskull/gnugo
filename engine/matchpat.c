@@ -1102,6 +1102,17 @@ matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
 }
 
 
+static int
+fullboard_transform(int pos, int trans)
+{
+  int dx = I(pos) - (board_size-1)/2;
+  int dy = J(pos) - (board_size-1)/2;
+  int x, y;
+  gg_assert(POS((board_size-1)/2, (board_size-1)/2) + DELTA(dx, dy) == pos);
+  TRANSFORM2(dx, dy, &x, &y, trans);
+  return POS(x + (board_size-1)/2, y + (board_size-1)/2);
+}
+
 /* A dedicated matcher which can only do fullboard matching on
  * odd-sized boards, optimized for fuseki patterns.
  */
@@ -1109,50 +1120,56 @@ void
 fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
 		   struct fullboard_pattern *pattern)
 {
-  int other = OTHER_COLOR(color);
   int ll;   /* Iterate over transformations (rotations or reflections)  */
-  int k;    /* Iterate over elements of pattern */
   /* We transform around the center point. */
-  int mid = POS((board_size-1)/2, (board_size-1)/2);
   int number_of_stones_on_board = stones_on_board(BLACK | WHITE);
+  static int color_map[gg_max(WHITE, BLACK) + 1];
+  /* One hash value for each rotation/reflection: */
+  Hash_data current_board_hash[8];
   
   /* Basic sanity check. */
   gg_assert(color != EMPTY);
   gg_assert(board_size % 2 == 1);
 
-  /* Try each pattern - NULL pattern marks end of list. */
-  for (; pattern->patn; pattern++) { 
-    /* The number of stones on the board must be right. This is not
-     * only an optimization because we never even look at the
-     * intersections which are empty in the pattern.
-     */
-    if (pattern->patlen != number_of_stones_on_board)
+  color_map[EMPTY] = EMPTY;
+  if (color == WHITE) {
+    color_map[WHITE] = WHITE;
+    color_map[BLACK] = BLACK;
+  }
+  else {
+    color_map[WHITE] = BLACK;
+    color_map[BLACK] = WHITE;
+  }
+
+  /* Get hash data of all rotations/reflections of current board position. */
+  for (ll = 0; ll < 8; ll++) {
+    Intersection p[BOARDSIZE];
+    int pos;
+    for (pos = 0; pos < BOARDSIZE; pos++)
+      if (ON_BOARD(pos))
+	p[pos] = color_map[board[fullboard_transform(pos, ll)]];
+      else
+	p[pos] = GRAY;
+
+    if (ON_BOARD(board_ko_pos))
+      hashdata_recalc(&current_board_hash[ll], p,
+		      fullboard_transform(board_ko_pos, ll));
+    else 
+      hashdata_recalc(&current_board_hash[ll], p, NO_MOVE);
+  }
+
+  /* Try each pattern - NULL pattern name marks end of list. */
+  for (; pattern->name; pattern++) { 
+    if (pattern->number_of_stones != number_of_stones_on_board)
       continue;
-    
-    /* try each orientation transformation */
-    for (ll = 0; ll < 8; ll++) {
-      /* Now iterate over the elements of the pattern. */
-      for (k = 0; k < pattern->patlen; k++) { /* match each point */
-	int pos; /* board co-ords of transformed pattern element */
-	int att = pattern->patn[k].att;  /* what we are looking for */
-
-	/* Work out the position on the board of this pattern element. */
-	pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, mid);
-
-        ASSERT_ON_BOARD1(pos);
-
-	if ((att == ATT_O && board[pos] != color)
-	    || (att == ATT_X && board[pos] != other))
-	  break;
-	
-      } /* loop over elements */
-	
-      if (k == pattern->patlen) {
+    /* Try each orientation transformation. */
+    for (ll = 0; ll < 8; ll++)
+      if (hashdata_is_equal(current_board_hash[ll], pattern->fullboard_hash)) {
 	/* A match!  - Call back to the invoker to let it know. */
-	int pos = AFFINE_TRANSFORM(pattern->move_offset, ll, mid);
+	int pos = AFFINE_TRANSFORM(pattern->move_offset, ll,
+			           POS((board_size-1)/2, (board_size-1)/2));
 	callback(pos, pattern, ll);
       }
-    }
   }
 }
 
