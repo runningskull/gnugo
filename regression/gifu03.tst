@@ -183,10 +183,12 @@ loadsgf games/cgf2003/GnuGo-Haruka.sgf 168
 507 reg_genmove white
 #? [G13]
 
-# Q14 is not common in the Chinese fuseki. (But is it worth regressing over?)
-loadsgf games/cgf2003/GnuGo-KCC.sgf 7
-601 restricted_genmove black R12 O16 Q14
-#? [R12|O16|Q11|P14]
+## Q14 is not common in the Chinese fuseki. (But is it worth regressing over?)
+# dr deleted 2004-12-13 when reinserting pattern Fuseki488 / pre 0x220d654c
+# / post 0x235d1a72
+# loadsgf games/cgf2003/GnuGo-KCC.sgf 7
+# 601 restricted_genmove black R12 O16 Q14
+# #? [R12|O16|Q11|P14]
 
 # Making moyo here is much better than the game move F14. The
 # important thing is that O5 has some strategic effect on white while

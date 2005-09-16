@@ -1,5 +1,5 @@
-noinst_PROGRAMS = mkpat joseki mkeyes
-EXTRA_PROGRAMS = extract_fuseki transpat
+noinst_PROGRAMS = mkpat joseki mkeyes uncompress_fuseki
+EXTRA_PROGRAMS = extract_fuseki transpat compress_fuseki
 
 DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
 DTR = aa_attackpats.dtr owl_attackpats.dtr owl_defendpats.dtr \
@@ -30,9 +30,9 @@ EXTRA_DIST = $(DSP)\
 	influence.db\
 	barriers.db\
 	fuseki.db\
-	fuseki9.db\
-	fuseki13.db\
-	fuseki19.db\
+	fuseki9.dbz\
+	fuseki13.dbz\
+	fuseki19.dbz\
 	handicap.db\
 	read_attack.db\
 	read_defend.db\
@@ -62,6 +62,9 @@ extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a\
                        ../sgf/libsgf.a ../utils/libutils.a
 extract_fuseki_AM_CPPFLAGS = $(GNU_GO_WARNINGS) -I$(top_srcdir)/sgf
 
+uncompress_fuseki_SOURCES = uncompress_fuseki.c
+uncompress_fuseki_LDADD = ../utils/libutils.a ../engine/libboard.a ../sgf/libsgf.a
+compress_fuseki_SOURCES = compress_fuseki.c
 
 noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h dfa-mkpat.h
 
@@ -79,7 +82,7 @@ DBBUILT_INPUT = -i gogo.db -i hoshi_keima.db -i hoshi_other.db -i komoku.db \
                -i sansan.db -i mokuhazushi.db -i takamoku.db
 
 DB_TO_TAG = aa_attackpats.db attack.db barriers.db conn.db defense.db\
-	    endgame.db eyes.db fuseki.db fuseki9.db fuseki13.db fuseki19.db\
+	    endgame.db eyes.db fuseki.db fuseki9.dbz fuseki13.dbz fuseki19.dbz\
 	    handicap.db influence.db oracle.db owl_attackpats.db\
 	    owl_defendpats.db owl_vital_apats.db patterns.db patterns2.db\
 	    read_attack.db read_defend.db $(DBBUILT)
@@ -172,14 +175,14 @@ owl_defendpat.c : $(srcdir)/owl_defendpats.db $(srcdir)/owl_defendpats.dtr mkpat
 fusekipat.c : $(srcdir)/fuseki.db mkpat$(EXEEXT)
 	./mkpat -b fusekipat -i $(srcdir)/fuseki.db -o fusekipat.c
 
-fuseki9.c : $(srcdir)/fuseki9.db mkpat$(EXEEXT)
-	./mkpat -b -f fuseki9 -i $(srcdir)/fuseki9.db -o fuseki9.c
+fuseki9.c : $(srcdir)/fuseki9.dbz mkpat$(EXEEXT) uncompress_fuseki$(EXEEXT)
+	./uncompress_fuseki 9 fuseki9.dbz c >fuseki9.c
 
-fuseki13.c : $(srcdir)/fuseki13.db mkpat$(EXEEXT)
-	./mkpat -b -f fuseki13 -i $(srcdir)/fuseki13.db -o fuseki13.c
+fuseki13.c : $(srcdir)/fuseki13.dbz mkpat$(EXEEXT) uncompress_fuseki$(EXEEXT)
+	./uncompress_fuseki 13 fuseki13.dbz c >fuseki13.c
 
-fuseki19.c : $(srcdir)/fuseki19.db mkpat$(EXEEXT)
-	./mkpat -b -f fuseki19 -i $(srcdir)/fuseki19.db -o fuseki19.c
+fuseki19.c : $(srcdir)/fuseki19.dbz mkpat$(EXEEXT) uncompress_fuseki$(EXEEXT)
+	./uncompress_fuseki 19 fuseki19.dbz c >fuseki19.c
 
 handipat.c : $(srcdir)/handicap.db mkpat$(EXEEXT)
 	./mkpat -b handipat -i $(srcdir)/handicap.db -o handipat.c

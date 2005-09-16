@@ -170,8 +170,8 @@ typedef int (*autohelper_fn_ptr)(int rotation, int move,
 
 
 typedef struct patval {
-  int offset;
-  int att;
+  short offset;
+  char att;
 } Patval;
 
 /* Build-time version of patval structure. */

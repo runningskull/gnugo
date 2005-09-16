@@ -346,10 +346,12 @@ loadsgf games/nngs/gnugo-3.5.2gf1-vincentkuo-200312162312.sgf 194
 800 reg_genmove white
 #? [E4]
 
-#O5 is bad
-loadsgf games/nngs/gnugo-3.5.2gf1-thi-200312210524.sgf 8
-810 reg_genmove white
-#? [D10|K4|K3|R6|Q6|Q2]
+# dr test removed 2004-12-13 same time as pattern Fuseki1000 
+#         aka pre 0x0ed9073c / post 0x319ca3dd was reinserted
+# #O5 is bad
+# loadsgf games/nngs/gnugo-3.5.2gf1-thi-200312210524.sgf 8
+# 810 reg_genmove white
+# #? [D10|K4|K3|R6|Q6|Q2]
 
 #some kind of base for the invasion is urgent
 loadsgf games/nngs/gnugo-3.5.2gf1-thi-200312210524.sgf 20
