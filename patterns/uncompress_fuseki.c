@@ -24,15 +24,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include "board.h"
+#include "liberty.h"
+#include "hash.h"
+#include "gg_utils.h"
 
 #define MAX_BOARDSIZE 19
 #define BUFSIZE 160
 
 #define USAGE "\
-Usage : uncompress_fuseki boardsize filename\n\
+Usage :\
+uncompress_fuseki boardsize filename c\n\
+uncompress_fuseki boardsize filename db\n\
 "
 
-#define PREAMBLE "\
+#define DB_PREAMBLE "\
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #\n\
 # This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       #\n\
 # http://www.gnu.org/software/gnugo/ for more information.          #\n\
@@ -60,43 +66,155 @@ Usage : uncompress_fuseki boardsize filename\n\
 \n\n\
 "
 
+#define DB_HEADER "# Fuseki patternsboardsize %d\nattribute_map value_only\n\n"
+#define DB_FOOTER ""
+
+#define C_PREAMBLE "\
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n\
+ * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *\n\
+ * http://www.gnu.org/software/gnugo/ for more information.          *\n\
+ *                                                                   *\n\
+ * Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005             *\n\
+ * by the Free Software Foundation.                                  *\n\
+ *                                                                   *\n\
+ * This program is free software; you can redistribute it and/or     *\n\
+ * modify it under the terms of the GNU General Public License as    *\n\
+ * published by the Free Software Foundation - version 2             *\n\
+ *                                                                   *\n\
+ * This program is distributed in the hope that it will be useful,   *\n\
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of    *\n\
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the     *\n\
+ * GNU General Public License in file COPYING for more details.      *\n\
+ *                                                                   *\n\
+ * You should have received a copy of the GNU General Public         *\n\
+ * License along with this program; if not, write to the Free        *\n\
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,       *\n\
+ * Boston, MA 02111, USA.                                            *\n\
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */\n\
+\n#include <stdio.h> /* for NULL */\n\
+#include \"liberty.h\"\n\
+#include \"patterns.h\"\n\n\
+"
+
+#define C_HEADER "struct fullboard_pattern fuseki%d[] = {\n"
+#define C_FOOTER "  {{{0,0}}, -1,NULL,0,0}\n};\n"
+  
+const char *const db_output_strings[3] =
+  {DB_PREAMBLE, DB_HEADER, DB_FOOTER};
+const char *const c_output_strings[3] =
+  {C_PREAMBLE, C_HEADER, C_FOOTER};
+
+#define PREAMBLE 	0
+#define HEADER 		1
+#define FOOTER 	 	2
+
+
 /* Place a stone (or move mark) on the internal board. The board point
  * is sgf encoded.
  */
-static void
-set_board(char board[MAX_BOARDSIZE + 2][MAX_BOARDSIZE + 2],
-	  char *stones, char color, int boardsize)
+static int
+set_boards(char board[MAX_BOARDSIZE + 2][MAX_BOARDSIZE + 2],
+	   char board1d[BOARDSIZE],
+	   char *stones, char color, int boardsize)
 {
   int i = stones[1] - 'a' + 1;
   int j = stones[0] - 'a' + 1;
   if (stones[0] != 't') {
     assert(i > 0 && i < boardsize + 2);
     board[i][j] = color;
+    if (color == 'O')
+      board1d[POS(i - 1, j - 1)] = WHITE;
+    else if (color == 'X')
+      board1d[POS(i - 1, j - 1)] = BLACK;
+    return POS(i - 1, j - 1);
   }
+  else 
+    return NO_MOVE;
 }
+
+static void
+write_pattern(char *name, char board[MAX_BOARDSIZE + 2][MAX_BOARDSIZE + 2],
+	      int value, int boardsize)
+{
+  int i, j;
+  /* Output the uncompressed pattern. */
+  printf("Pattern %s\n\n", name);
+  for (i = 0; i <= boardsize + 1; i++) {
+    for (j = 0; j <= boardsize + 1; j++)
+      printf("%c", board[i][j]);
+    printf("\n");
+  }
+  printf("\n:8,-,value(%d)\n\n\n", value);
+}
+
+
+static void
+write_pattern_c_code(char *name, Intersection board1d[BOARDSIZE],
+		     int move_pos, int value, int boardsize, int patlen)
+{
+  int k;
+  Hash_data pattern_hash;
+
+  /* Compute hash. */
+  hashdata_recalc(&pattern_hash, board1d, NO_MOVE);
+  printf("  {{{");
+  for (k = 0; k < NUM_HASHVALUES; k++) {
+    printf("0x%lx", pattern_hash.hashval[k]);
+    if (k < NUM_HASHVALUES - 1)
+      printf(",");
+  }
+  printf("}},%d,\"%s\",%d,%d},\n", patlen, name,
+	OFFSET(I(move_pos) - (boardsize-1)/2, J(move_pos) - (boardsize-1)/2),
+	value);
+}
+
+
+
+#define DB_OUTPUT 	1
+#define C_OUTPUT 	2
+
 
 int
 main(int argc, char *argv[])
 {
   const char *filename;
   FILE *input_FILE;
+  const char *const *output_strings;
+  int mode;
+  int move_pos;
   char line[BUFSIZE];
   char name[BUFSIZE];
   char stones[BUFSIZE];
   int value;
   char board[MAX_BOARDSIZE + 2][MAX_BOARDSIZE + 2];
+  Intersection board1d[BOARDSIZE];
   int boardsize;
   int i, j, k;
+  int pos;
   char color;
 
   /* Check number of arguments. */
-  if (argc != 3) {
+  if (argc != 4) {
     fprintf(stderr, USAGE);
     return EXIT_FAILURE;
   }
 
   boardsize = atoi(argv[1]);
   filename = argv[2];
+  if (strncmp(argv[3], "c", 2) == 0) {
+    mode = C_OUTPUT;
+    output_strings = c_output_strings;
+    set_random_seed(HASH_RANDOM_SEED);
+    hash_init();
+  }
+  else if (strncmp(argv[3], "db", 3) == 0) {
+    mode = DB_OUTPUT;
+    output_strings = db_output_strings;
+  }
+  else {
+    fprintf(stderr, USAGE);
+    return EXIT_FAILURE;
+  }
 
   assert(boardsize > 0 && boardsize <= MAX_BOARDSIZE);
   
@@ -120,17 +238,26 @@ main(int argc, char *argv[])
     board[k][boardsize + 1] = '|';
   }
 
-  printf(PREAMBLE);
-  printf("attribute_map value_only\n\n");
+  printf(output_strings[PREAMBLE]);
+  printf(output_strings[HEADER], boardsize);
 
   /* Loop over the lines of the compressed database.
    * Each line is one pattern.
    */
   while (fgets(line, BUFSIZE, input_FILE)) {
+    int num_stones = 0;
     /* Clear the internal board. */
     for (i = 1; i <= boardsize; i++)
       for (j = 1; j <= boardsize; j++)
 	board[i][j] = '.';
+
+    /* Initialize private 1D-board. */
+    for (pos = 0; pos < BOARDSIZE; pos++)
+      if (I(pos) >= 0 && I(pos) < boardsize
+          && J(pos) >= 0 && J(pos) < boardsize)
+	board1d[pos] = EMPTY;
+      else
+	board1d[pos] = GRAY;
 
     /* Assume a line from copyright notice if misformed and
      * silently ignore it.
@@ -139,27 +266,29 @@ main(int argc, char *argv[])
       continue;
 
     /* The first point in the stones list is the move to be played. */
-    set_board(board, stones, '*', boardsize);
+    move_pos = set_boards(board, board1d, stones, '*', boardsize);
 
     /* Then follows alternating X and O stones. */
     color = 'X';
     for (k = 2; k < (int) strlen(stones); k += 2) {
-      set_board(board, stones + k, color, boardsize);
+      pos = set_boards(board, board1d, stones + k, color, boardsize);
+      if (I(pos) >= 0 && I(pos) < boardsize
+          && J(pos) >= 0 && J(pos) < boardsize)
+	num_stones++;
       if (color == 'X')
 	color = 'O';
       else
 	color = 'X';
     }
 
-    /* Output the uncompressed pattern. */
-    printf("Pattern %s\n\n", name);
-    for (i = 0; i <= boardsize + 1; i++) {
-      for (j = 0; j <= boardsize + 1; j++)
-	printf("%c", board[i][j]);
-      printf("\n");
-    }
-    printf("\n:8,-,value(%d)\n\n\n", value);
+    if (mode == DB_OUTPUT)
+      write_pattern(name, board, value, boardsize);
+    else
+      write_pattern_c_code(name, board1d, move_pos, value, boardsize,
+		           num_stones);
+
   }
+  printf(output_strings[FOOTER]);
 
   return EXIT_SUCCESS;
 }
