@@ -3124,7 +3124,7 @@ main(int argc, char *argv[])
   }
 
   if (gg_optind >= argc) {
-    fputs(USAGE, stdout);
+    fputs(USAGE, stderr);
     exit(EXIT_FAILURE);
   }
 

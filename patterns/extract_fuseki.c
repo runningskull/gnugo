@@ -1577,7 +1577,7 @@ main(int argc, char *argv[])
   
   /* Check number of arguments. */
   if (argc < 10) {
-    printf(USAGE);
+    fprintf(stderr, USAGE);
     exit(EXIT_FAILURE);
   }
   

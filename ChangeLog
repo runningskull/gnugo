@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- send usage messages caused by bad input to stderr	
 - new, larger fuseki database added as compressed files
 - new files patterns/compress_fuseki.c and patterns/uncompress_fuseki.c
 - use a fullboard hash for fuseki database patterns

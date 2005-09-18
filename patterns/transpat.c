@@ -133,7 +133,8 @@ main(int argc, char *argv[])
   int command = 0;
 
   if (argc < 2 || argc > 4) {
-    printf("usage: %s command patnames [patfilename]\n\
+    fprintf(stderr,
+	    "usage: %s command patnames [patfilename]\n\
 where\n\
     command     is one of 'flipleft' or 'normalize'\n\
     patnames    is a standard glob pattern (like EE*)\n\
