@@ -597,14 +597,14 @@ owl_defendpat.c : $(srcdir)/owl_defendpats.db $(srcdir)/owl_defendpats.dtr mkpat
 fusekipat.c : $(srcdir)/fuseki.db mkpat$(EXEEXT)
 	./mkpat -b fusekipat -i $(srcdir)/fuseki.db -o fusekipat.c
 
-fuseki9.c : $(srcdir)/fuseki9.dbz mkpat$(EXEEXT) uncompress_fuseki$(EXEEXT)
-	./uncompress_fuseki 9 fuseki9.dbz c >fuseki9.c
+fuseki9.c : $(srcdir)/fuseki9.dbz uncompress_fuseki$(EXEEXT)
+	./uncompress_fuseki 9 $(srcdir)/fuseki9.dbz c >fuseki9.c
 
-fuseki13.c : $(srcdir)/fuseki13.dbz mkpat$(EXEEXT) uncompress_fuseki$(EXEEXT)
-	./uncompress_fuseki 13 fuseki13.dbz c >fuseki13.c
+fuseki13.c : $(srcdir)/fuseki13.dbz uncompress_fuseki$(EXEEXT)
+	./uncompress_fuseki 13 $(srcdir)/fuseki13.dbz c >fuseki13.c
 
-fuseki19.c : $(srcdir)/fuseki19.dbz mkpat$(EXEEXT) uncompress_fuseki$(EXEEXT)
-	./uncompress_fuseki 19 fuseki19.dbz c >fuseki19.c
+fuseki19.c : $(srcdir)/fuseki19.dbz uncompress_fuseki$(EXEEXT)
+	./uncompress_fuseki 19 $(srcdir)/fuseki19.dbz c >fuseki19.c
 
 handipat.c : $(srcdir)/handicap.db mkpat$(EXEEXT)
 	./mkpat -b handipat -i $(srcdir)/handicap.db -o handipat.c
