@@ -403,11 +403,11 @@ loadsgf games/life_and_death/mixed3.sgf
 324 owl_attack L4
 #? [1 N2]
 325 owl_defend B3
-#? [1 E1]
+#? [1 E1]*
 
 loadsgf games/life_and_death/mixed4.sgf
 326 owl_attack B11
-#? [1 B13]
+#? [1 B13]*
 
 # tough under the stones problem from Sensei's Library
 loadsgf games/owl47.sgf 5

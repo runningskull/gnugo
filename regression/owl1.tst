@@ -457,23 +457,23 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
 
 loadsgf games/kgs/Erro-TheGNUGo.sgf
 375 owl_attack R10
-#? [1 (S16|S17|S18)]
+#? [1 (S16|S17|S18)]*
 
 # See also gunnar:73.
 loadsgf games/kgs/GNU-ivanho.sgf 182
 376 owl_defend K18
-#? [2 M19]
+#? [2 M19]*
 377 owl_defend H17
-#? [3 M19]
+#? [3 M19]*
 
 loadsgf games/kgs/GNU-tadf.sgf 98
 378 owl_attack C5
-#? [1 A2]
+#? [1 A2]*
 
 # See also nngs4:730.
 loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 194
 379 owl_does_attack D18 E15
-#? [0]
+#? [0]*
 
 ########### end of tests #####################
 

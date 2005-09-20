@@ -255,7 +255,7 @@ loadsgf games/trevor/auto/a024.sgf 12
 #Last chance to invade.
 loadsgf games/trevor/auto/a025.sgf 12
 410 reg_genmove white
-#? [!(J7|D1)]*
+#? [!(J7|D1)]
 
 
 

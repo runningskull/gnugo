@@ -296,7 +296,7 @@ loadsgf games/trevor/trevor_28.sgf 36
 # Yikes, short of liberties!
 loadsgf games/trevor/trevor_29.sgf 54
 290 reg_genmove white
-#? [!A9]*
+#? [!A9]
 
 
 # Black A7 is a serious threat.  Also, white should at least 

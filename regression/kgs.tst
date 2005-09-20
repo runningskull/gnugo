@@ -272,19 +272,19 @@ loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 126
 #E6 is bad
 loadsgf games/kgs/20050407-tfujii-GNU.sgf 21
 570 reg_genmove black
-#? [K17|N16|P9|R15|C4|C15|D16]
+#? [K17|N16|P9|R15|C4|C15|D16]*
 
 loadsgf games/kgs/20050407-tfujii-GNU.sgf 27
 580 reg_genmove black
-#? [P16]
+#? [P16]*
 
 loadsgf games/kgs/20050407-tfujii-GNU.sgf 37
 590 reg_genmove black
-#? [P16]
+#? [P16]*
 
 loadsgf games/kgs/20050407-tfujii-GNU.sgf 51
 600 reg_genmove black
-#? [E15]
+#? [E15]*
 
 loadsgf games/kgs/20050407-tfujii-GNU.sgf 71
 610 reg_genmove black
@@ -292,11 +292,11 @@ loadsgf games/kgs/20050407-tfujii-GNU.sgf 71
 
 loadsgf games/kgs/20050407-tfujii-GNU.sgf 73
 620 reg_genmove black
-#? [N16]
+#? [N16]*
 
 loadsgf games/kgs/20050407-tfujii-GNU.sgf 133
 630 reg_genmove black
-#? [F10|G9]
+#? [F10|G9]*
 
 #I think B2 is at best ko, and GNU Go fails to continue next move
 #GNU Go 3.7.3 doesn't seem to play this -- a result of Gunnar's
@@ -308,56 +308,56 @@ loadsgf games/kgs/20050407-tfujii-GNU.sgf 153
 #G6 is bad.  B4 or D9 is probably best, C3 is at least an improvement
 loadsgf games/kgs/20050408-wrf6041-GNU.sgf 11
 650 reg_genmove black
-#? [B4|D9|C3]
+#? [B4|D9|C3]*
 
 #something local; N15 is bad
 loadsgf games/kgs/20050408-wrf6041-GNU.sgf 27
 660 reg_genmove black
-#? [H16|J15|C13|E16]
+#? [H16|J15|C13|E16]*
 
 #M16 is bad
 loadsgf games/kgs/20050408-wrf6041-GNU.sgf 33
 670 reg_genmove black
-#? [J15|C13|B4|C3|H4|S6|S5|G13]
+#? [J15|C13|B4|C3|H4|S6|S5|G13]*
 
 # D13 clearly best but C12 acceptable. /ab
 loadsgf games/kgs/20050408-GNU-mamassang.sgf 30
 680 reg_genmove white
-#? [D13|C12]
+#? [D13|C12]*
 
 loadsgf games/kgs/20050408-GNU-mamassang.sgf 34
 690 restricted_genmove white K9 R11
-#? [R11]
+#? [R11]*
 
 loadsgf games/kgs/20050408-GNU-mamassang.sgf 46
 700 reg_genmove white
-#? [C10|D10|M3|M4|K3|R3]
+#? [C10|D10|M3|M4|K3|R3]*
 
 loadsgf games/kgs/20050408-GNU-mamassang.sgf 80
 710 reg_genmove white
-#? [B7]
+#? [B7]*
 
 loadsgf games/kgs/20050408-GNU-mamassang.sgf 160
 720 reg_genmove white
-#? [A15]
+#? [A15]*
 
 # This requires knowledge that we have no ko threats. Tough to solve, but
 # important. /ab
 loadsgf games/kgs/20050408-janine-GNU.sgf 16
 730 reg_genmove black
-#? [R16]
+#? [R16]*
 
 loadsgf games/kgs/20050408-janine-GNU.sgf 28
 740 restricted_genmove black F3 F4
-#? [F4]
+#? [F4]*
 
 #H6 should at least get the J6-5 stones out
 loadsgf games/kgs/20050408-janine-GNU.sgf 90
 750 reg_genmove black
-#? [H6|K7]
+#? [H6|K7]*
 
 #W S10 is big
 loadsgf games/kgs/20050408-janine-GNU.sgf 230
 760 reg_genmove black
-#? [S10|R10]
+#? [S10|R10]*
 

@@ -257,7 +257,7 @@ loadsgf games/kgs/GNU-merlenoir.sgf 233
 # white has to defend and loses the ko.
 loadsgf games/endgame12.sgf
 970 reg_genmove white
-#? [G2]
+#? [G2]*
 
 ############ End of Tests #################
 

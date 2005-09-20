@@ -20,7 +20,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 22
 #new failure (GNU Go 3.7.3 plays L2)
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 24
 112 reg_genmove black
-#? [H5|J5]
+#? [H5|J5]*
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 30
@@ -31,7 +31,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 30
 #new failure GNU Go 3.7.3
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 32
 122 restricted_genmove black K16 R8 K5
-#? [K16|K5]
+#? [K16|K5]*
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 56
@@ -62,7 +62,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 86
 #new failure GNU Go 3.7.3
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 122
 175 reg_genmove black
-#? [L4|P2]
+#? [L4|P2]*
 
 
 #GNU Go 3.7.3 plays K9.  Is this acceptable? --evand
@@ -118,7 +118,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 60
 #GNU Go 3.7.3 likes M7
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 92
 270 reg_genmove black
-#? [F8|H8|G6|H9]
+#? [F8|H8|G6|H9]*
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 98
@@ -139,25 +139,25 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 112
 #New failure GNU Go 3.7.3
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 114
 302 restricted_genmove black C12 F15 M7 B14
-#? [!C12]
+#? [!C12]*
 
 
 #New failure GNU Go 3.7.3
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 116
 304 restricted_genmove black B14 E13 M7
-#? [B14|M7]
+#? [B14|M7]*
 
 
 #New failure GNU Go 3.7.3
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 158
 306 reg_genmove black
-#? [E14|E13|F13]
+#? [E14|E13|F13]*
 
 
 #New failure GNU Go 3.7.3
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 240
 308 reg_genmove black
-#? [L3|M19]
+#? [L3|M19]*
 
 
 
@@ -182,7 +182,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 14
 #New failure GNU Go 3.7.3
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 52
 335 restricted_genmove black S6 R5 R2
-#? [S6|R5]
+#? [S6|R5]*
 
 
 #Other moves possible.

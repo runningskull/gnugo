@@ -107,7 +107,7 @@ loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312130817.sgf 26
 #G6 is very hard for gnugo, even if playable
 loadsgf games/nngs/gnugo-3.5.2gf1-kisome-200312131322.sgf 4
 220 reg_genmove white
-#? [C7|C6|D7|D6|G7|F7]*
+#? [C7|C6|D7|D6|G7|F7]
 
 #I think D2 lives because of a threat to connect under
 #the important thing is to find a way to live, either
@@ -182,7 +182,7 @@ loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312241905.sgf 32
 
 loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312292348.sgf 8
 360 reg_genmove black
-#? [F4|E6|D5]
+#? [F4|E6|D5]*
 
 #E7 appears to be a losing move
 loadsgf games/nngs/gnugo-3.5.2gf1-Kiskol-200401021557.sgf 10
@@ -216,22 +216,22 @@ loadsgf games/boardspace/GNUGo-GoFigure0.1-200503302359.sgf 41
 
 loadsgf games/bitti-gnug36.sgf 24
 440 restricted_genmove black D6 C6 B7
-#? [!D6]
+#? [!D6]*
 
 # Not A8 as in the game
 loadsgf games/bitti-gnug36.sgf 30
 450 reg_genmove black
-#? [B5|B4]
+#? [B5|B4]*
 
 # This is not very obvious, but B9 still wins the whole board.
 loadsgf games/bitti-gnug36.sgf 44
 460 reg_genmove black
-#? [B9]
+#? [B9]*
 
 # Need to protect lower right corner
 loadsgf nodan-guno.sgf 8
 470 reg_genmove black
-#? [H3|H4|G4|D3]
+#? [H3|H4|G4|D3]*
 
 loadsgf nodan-guno.sgf 24
 480 restricted_genmove black E2 F2
@@ -240,9 +240,9 @@ loadsgf nodan-guno.sgf 24
 # E1 is non-sense.
 loadsgf nodan-guno.sgf 38
 490 reg_genmove black
-#? [D1|A6|H1]
+#? [D1|A6|H1]*
 
 loadsgf nodan-guno.sgf 54
 500 reg_genmove black
-#? [H6]
+#? [H6]*
 

@@ -267,7 +267,7 @@ loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 114
 # Saving M13 is small compared to stopping a black incursion.
 loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 122
 48 restricted_genmove white M12 P11
-#? [P11]
+#? [P11]*
 
 # In 3.5.2 the breakin code hallucinates that white A10 would suddenly
 # let black break into the territory around F6.
@@ -402,7 +402,7 @@ loadsgf games/kgs/dogo-TheGNUGo.sgf 198
 # sente.
 loadsgf games/kgs/llk-GNU.sgf 228
 72 restricted_genmove black P11 F18
-#? [F18]*
+#? [F18]
 
 # The ko threat was answered. Now take the ko again instead of a small
 # move like M4.
@@ -471,27 +471,27 @@ loadsgf games/kgs/GNU-bassanio.sgf 164
 # guaranteed to be better.
 loadsgf games/kgs/ben9992000-GNU.sgf 141
 85 restricted_genmove black T6 R8
-#? [R8]
+#? [R8]*
 
 # B6 unreasonable.
 loadsgf games/kgs/haiku-GNU.sgf 93
 86 restricted_genmove black C8 B6
-#? [R8]
+#? [R8]*
 
 # O5 solves the problem. P4 backfires.
 loadsgf games/kgs/melonhead1-GNU.sgf 127
 87 restricted_genmove black O5 P4 M4 P3 M3 N3 N2 M5 N6
-#? [O5]
+#? [O5]*
 
 # A15 does not solve the atari-atari problem.
 loadsgf games/kgs/melonhead1-GNU.sgf 183
 88 reg_genmove black
-#? [B17]
+#? [B17]*
 
 # E6 three points reverse sente.
 loadsgf games/kgs/Kuksa-GNU.sgf 178
 89 reg_genmove black
-#? [E6]
+#? [E6]*
 
 ############ End of Tests #################
 

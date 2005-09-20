@@ -446,11 +446,11 @@ loadsgf games/kgs/perler-GNU.sgf 246
 
 loadsgf games/kgs/ben9992000-GNU.sgf 189
 123 disconnect E10 F12
-#? [3 E11]
+#? [3 E11]*
 124 connect E10 G10
-#? [1 E11]
+#? [1 E11]*
 125 disconnect E10 G10
-#? [3 E11]
+#? [3 E11]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

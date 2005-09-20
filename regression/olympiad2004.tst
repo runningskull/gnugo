@@ -2,7 +2,7 @@
 # would be preferrable if GNU Go played some more normal fuseki move.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 5
 1 reg_genmove black
-#? [!Q12]*
+#? [!Q12]
 
 # G14 looks more natural than the played move at G12.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 65

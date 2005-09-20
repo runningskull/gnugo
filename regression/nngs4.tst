@@ -192,7 +192,7 @@ loadsgf games/nngs/looknglass-ggl-200302271041.sgf 99
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 6
 480 gg_genmove black 2
-#? [R16]*
+#? [R16]
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 12
 485 gg_genmove black 3
@@ -310,7 +310,7 @@ loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 190
 # See also owl1:379.
 loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 194
 730 reg_genmove black
-#? [C17]*
+#? [C17]
 
 loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 220
 740 reg_genmove black

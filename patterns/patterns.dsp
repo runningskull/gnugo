@@ -232,6 +232,10 @@ SOURCE=.\patterns.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\gogo.db
+# End Source File
+# Begin Source File
+
 SOURCE=.\hoshi_other.db
 # End Source File
 # Begin Source File
@@ -633,25 +637,25 @@ SOURCE=.\hoshi_keima.db
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
-USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"hoshi_other.db"	"komoku.db "	"sansan.db "	"mokuhazushi.db "	"takamoku.db "	
+USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"gogo.db"    "hoshi_other.db"	"komoku.db "	"sansan.db "	"mokuhazushi.db "	"takamoku.db "	
 # Begin Custom Build
 IntDir=.\Release
 InputPath=.\hoshi_keima.db
 
 "josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -C joseki -i hoshi_keima.db -i hoshi_other.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
+	$(IntDir)\mkpat -C joseki -i hoshi_keima.db -i gogo.db -i hoshi_other.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
 
-USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"hoshi_other.db"	"komoku.db "	"sansan.db "	"mokuhazushi.db "	"takamoku.db "	
+USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"gogo.db"   "hoshi_other.db"	"komoku.db "	"sansan.db "	"mokuhazushi.db "	"takamoku.db "	
 # Begin Custom Build
 IntDir=.\Debug
 InputPath=.\hoshi_keima.db
 
 "josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -C joseki -i hoshi_keima.db -i hoshi_other.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
+	$(IntDir)\mkpat -C joseki -i hoshi_keima.db -i gogo.db -i hoshi_other.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
 
 # End Custom Build
 
@@ -939,6 +943,39 @@ InputPath=.\hoshi_other.sgf
 
 "hoshi_other.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\joseki JHO hoshi_other.sgf >hoshi_other.db
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\gogo.sgf
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+USERDEP__GOGO="$(IntDir)\joseki.exe"	
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\gogo.sgf
+
+"gogo.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\joseki JHO gogo.sgf >gogo.db
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+USERDEP__GOGOO="$(IntDir)\joseki.exe"	
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\gogo.sgf
+
+"gogo.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\joseki JHO gogo.sgf >gogo.db
 
 # End Custom Build
 

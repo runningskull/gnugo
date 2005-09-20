@@ -303,7 +303,7 @@ loadsgf games/nicklas/nicklas18.sgf 15
 
 loadsgf games/nicklas/nicklas19.sgf 34
 1901 reg_genmove black
-#? [B7]
+#? [B7]*
 
 loadsgf games/nicklas/nicklas19.sgf 46
 1902 reg_genmove black

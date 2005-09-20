@@ -861,7 +861,7 @@ popgo
 
 loadsgf games/reading46.sgf
 203 attack H9
-#? [1 E9]*
+#? [1 E9]
 204 defend H9
 #? [1 (C6|E9|G9)]
 
@@ -902,7 +902,7 @@ loadsgf games/kgs/maproom-gnugo3pt6.sgf 37
 #? [2 D4]*
 trymove W D3
 218 defend C4
-#? [1 B5]*
+#? [1 B5]
 popgo
 
 # See also connection:119.

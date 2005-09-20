@@ -135,7 +135,7 @@ play white B1
 undo
 play white C1
 206 reg_genmove black
-#? [A1]*
+#? [A1]
 
 undo
 undo
@@ -357,7 +357,7 @@ loadsgf games/seki12.sgf
 # favor unless white accepts gote.
 play white B2
 803 reg_genmove black
-#? [C2]
+#? [C2]*
 
 # B1 also makes seki but white definitely ends in gote.
 play black C2
@@ -401,7 +401,7 @@ play black B1
 # A1 secures seki, removing white's ko aji.
 play white A3
 811 reg_genmove black
-#? [A1]*
+#? [A1]
 
 
 loadsgf games/seki13.sgf
