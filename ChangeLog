@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.7.4 released June 20, 2005
+
+- revision to patterns.dsp (but more revision needed before VC will compile)
 - send usage messages caused by bad input to stderr	
 - new, larger fuseki database added as compressed files
 - new files patterns/compress_fuseki.c and patterns/uncompress_fuseki.c
