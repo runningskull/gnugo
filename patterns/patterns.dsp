@@ -232,10 +232,6 @@ SOURCE=.\patterns.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\gogo.db
-# End Source File
-# Begin Source File
-
 SOURCE=.\hoshi_other.db
 # End Source File
 # Begin Source File
@@ -257,6 +253,10 @@ SOURCE=.\sansan.db
 # Begin Source File
 
 SOURCE=.\takamoku.db
+# End Source File
+# Begin Source File
+
+SOURCE=.\gogo.db
 # End Source File
 # End Group
 # Begin Source File
@@ -509,29 +509,29 @@ InputPath=.\fuseki.db
 # End Source File
 # Begin Source File
 
-SOURCE=.\fuseki13.db
+SOURCE=.\fuseki13.dbz
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
-USERDEP__FUSEKI="$(IntDir)\mkpat.exe"	
+USERDEP__FUSEKI="$(IntDir)\uncompress_fuseki.exe"	
 # Begin Custom Build
 IntDir=.\Release
-InputPath=.\fuseki13.db
+InputPath=.\fuseki13.dbz
 
 "fuseki13.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki13 -i ..\patterns\fuseki13.db -o fuseki13.c
+	$(IntDir)\uncompress_fuseki 13 ..\patterns\fuseki13.dbz c >fuseki13.c
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
 
-USERDEP__FUSEKI="$(IntDir)\mkpat.exe"	
+USERDEP__FUSEKI="$(IntDir)\uncompress_fuseki.exe"	
 # Begin Custom Build
 IntDir=.\Debug
-InputPath=.\fuseki13.db
+InputPath=.\fuseki13.dbz
 
 "fuseki13.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki13 -i ..\patterns\fuseki13.db -o fuseki13.c
+	$(IntDir)\uncompress_fuseki 13 ..\patterns\fuseki13.dbz c >fuseki13.c
 
 # End Custom Build
 
@@ -540,29 +540,29 @@ InputPath=.\fuseki13.db
 # End Source File
 # Begin Source File
 
-SOURCE=.\fuseki19.db
+SOURCE=.\fuseki19.dbz
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
-USERDEP__FUSEKI1="$(IntDir)\mkpat.exe"	
+USERDEP__FUSEKI1="$(IntDir)\uncompress_fuseki.exe"	
 # Begin Custom Build
 IntDir=.\Release
-InputPath=.\fuseki19.db
+InputPath=.\fuseki19.dbz
 
 "fuseki19.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki19 -i ..\patterns\fuseki19.db -o fuseki19.c
+	$(IntDir)\uncompress_fuseki 19 ..\patterns\fuseki19.dbz c >fuseki19.c
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
 
-USERDEP__FUSEKI1="$(IntDir)\mkpat.exe"	
+USERDEP__FUSEKI1="$(IntDir)\uncompress_fuseki.exe"	
 # Begin Custom Build
 IntDir=.\Debug
-InputPath=.\fuseki19.db
+InputPath=.\fuseki19.dbz
 
 "fuseki19.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki19 -i ..\patterns\fuseki19.db -o fuseki19.c
+	$(IntDir)\uncompress_fuseki 19 ..\patterns\fuseki19.dbz c >fuseki19.c
 
 # End Custom Build
 
@@ -571,29 +571,29 @@ InputPath=.\fuseki19.db
 # End Source File
 # Begin Source File
 
-SOURCE=.\fuseki9.db
+SOURCE=.\fuseki9.dbz
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
-USERDEP__FUSEKI9="$(IntDir)\mkpat.exe"	
+USERDEP__FUSEKI9="$(IntDir)\uncompress_fuseki.exe"	
 # Begin Custom Build
 IntDir=.\Release
-InputPath=.\fuseki9.db
+InputPath=.\fuseki9.dbz
 
 "fuseki9.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki9 -i ..\patterns\fuseki9.db -o fuseki9.c
+	$(IntDir)\uncompress_fuseki 9 ..\patterns\fuseki9.dbz c >fuseki9.c
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
 
-USERDEP__FUSEKI9="$(IntDir)\mkpat.exe"	
+USERDEP__FUSEKI9="$(IntDir)\uncompress_fuseki.exe"	
 # Begin Custom Build
 IntDir=.\Debug
-InputPath=.\fuseki9.db
+InputPath=.\fuseki9.dbz
 
 "fuseki9.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki9 -i ..\patterns\fuseki9.db -o fuseki9.c
+	$(IntDir)\uncompress_fuseki 9 ..\patterns\fuseki9.dbz c >fuseki9.c
 
 # End Custom Build
 
@@ -637,25 +637,25 @@ SOURCE=.\hoshi_keima.db
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
-USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"gogo.db"    "hoshi_other.db"	"komoku.db "	"sansan.db "	"mokuhazushi.db "	"takamoku.db "	
+USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"hoshi_other.db"	"komoku.db"	"sansan.db"	"mokuhazushi.db"	"takamoku.db"	"gogo.db"	
 # Begin Custom Build
 IntDir=.\Release
 InputPath=.\hoshi_keima.db
 
 "josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -C joseki -i hoshi_keima.db -i gogo.db -i hoshi_other.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
+	$(IntDir)\mkpat -C joseki -i hoshi_keima.db -i hoshi_other.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -i gogo.db -o josekidb.c
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
 
-USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"gogo.db"   "hoshi_other.db"	"komoku.db "	"sansan.db "	"mokuhazushi.db "	"takamoku.db "	
+USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"hoshi_other.db"	"komoku.db"	"sansan.db"	"mokuhazushi.db"	"takamoku.db"	"gogo.db"	
 # Begin Custom Build
 IntDir=.\Debug
 InputPath=.\hoshi_keima.db
 
 "josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -C joseki -i hoshi_keima.db -i gogo.db -i hoshi_other.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
+	$(IntDir)\mkpat -C joseki -i hoshi_keima.db -i hoshi_other.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -i gogo.db -o josekidb.c
 
 # End Custom Build
 
@@ -951,39 +951,6 @@ InputPath=.\hoshi_other.sgf
 # End Source File
 # Begin Source File
 
-SOURCE=.\gogo.sgf
-
-!IF  "$(CFG)" == "patterns - Win32 Release"
-
-# PROP Ignore_Default_Tool 1
-USERDEP__GOGO="$(IntDir)\joseki.exe"	
-# Begin Custom Build
-IntDir=.\Release
-InputPath=.\gogo.sgf
-
-"gogo.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\joseki JHO gogo.sgf >gogo.db
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-USERDEP__GOGOO="$(IntDir)\joseki.exe"	
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=.\gogo.sgf
-
-"gogo.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\joseki JHO gogo.sgf >gogo.db
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=.\komoku.sgf
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
@@ -1100,6 +1067,37 @@ InputPath=.\takamoku.sgf
 
 "takamoku.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\joseki  JT takamoku.sgf > takamoku.db
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\gogo.sgf
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+USERDEP__KOMOK="$(IntDir)\joseki.exe"	
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\gogo.sgf
+
+"gogo.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\joseki JG gogo.sgf >gogo.db
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+USERDEP__KOMOK="$(IntDir)\joseki.exe"	
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\gogo.sgf
+
+"gogo.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\joseki JG gogo.sgf >gogo.db
 
 # End Custom Build
 
