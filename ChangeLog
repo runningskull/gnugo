@@ -2,12 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.7.6 released June 21, 2005
+3.7.6 released September 21, 2005
 
 - a few missing game records restored
 - revised patterns.dsp and new uncompress_fuseki.dsp
 
-3.7.6 released June 20, 2005
+3.7.5 released September 20, 2005
 
 - revision to patterns.dsp (but more revision needed before VC will compile)
 - send usage messages caused by bad input to stderr	
