@@ -922,6 +922,17 @@ popgo
 popgo
 popgo
 
+# See also nando:33
+loadsgf games/nando/auto023.sgf 170
+trymove W H11
+trymove B K13
+trymove W K12
+220 attack K12
+#? [0]
+popgo
+popgo
+popgo
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

@@ -174,6 +174,12 @@ loadsgf games/nando/auto022.sgf 206
 32 reg_genmove white
 #? [N13|O13]
 
+# After W:H11 B:K13, White can save the day with K12, but GNU Go 3.7.5
+# thinks that the move is unsafe (see reading:220)
+loadsgf games/nando/auto023.sgf 170
+33 reg_genmove white
+#? [H11]
+
 
 #--------------------------------------------------------------
 # Cascade of chain breakings

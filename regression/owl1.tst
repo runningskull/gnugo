@@ -475,6 +475,18 @@ loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 194
 379 owl_does_attack D18 E15
 #? [0]*
 
+loadsgf games/nando/auto024.sgf 77
+play black N3
+play white M2
+play black O2
+play white M4
+play white N10
+play white M10
+play white L5
+play white M6
+380 owl_defend O7
+#? [1 P4]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
