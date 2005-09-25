@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- fullboard support (-f option) remove from mkpat
 - atari_atari tuning
 - endgame tuning
 	

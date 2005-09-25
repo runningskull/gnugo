@@ -54,7 +54,6 @@ Usage : mkpat [options] <prefix>\n\
   Database type:\n\
 	-p = compile general pattern database (the default)\n\
 	-c = compile connections database\n\
-	-f = compile a fullboard pattern database\n\
 	-C = compile a corner pattern database\n\
 	-D = compile a DFA database (allows fast matching)\n\
 	-T = compile a tree based pattern database (even faster)\n\
@@ -88,12 +87,10 @@ If output file is not specified, writes to stdout.\n\
 #include "gg_utils.h"
 
 #include "dfa-mkpat.h"
-#include "hash.h"
 
 
 #define DB_GENERAL	((int) 'p')
 #define DB_CONNECTIONS	((int) 'c')
-#define DB_FULLBOARD	((int) 'f')
 #define DB_CORNER	((int) 'C')
 #define DB_DFA		((int) 'D')
 #define DB_TREE 	((int) 'T')
@@ -174,7 +171,6 @@ static char constraint_diagram[MAX_BOARD+2][MAX_BOARD+3];
 static char *prefix;
 static struct pattern pattern[MAXPATNO]; /* accumulate the patterns into here */
 static char pattern_names[MAXPATNO][MAXNAME]; /* with optional names here, */
-static Hash_data pattern_hash[MAXPATNO];
 static int num_attributes;
 static struct pattern_attribute attributes[MAXPATNO * NUM_ATTRIBUTES];
 static char helper_fn_names[MAXPATNO][MAXNAME]; /* helper fn names here */
@@ -917,11 +913,6 @@ read_pattern_line(char *p)
       cj = j;
       pattern[patno].anchored_at_X = (off == ATT_X) ? 3 : 0;
     }
-
-    /* Special limitations for fullboard patterns. */
-    if (database_type == DB_FULLBOARD)
-      if (off == ATT_dot)
-	continue;
     
     /* Range checking. */
     assert(el < (int) (sizeof(elements) / sizeof(elements[0])));
@@ -1101,12 +1092,7 @@ finish_pattern(char *line)
     fatal_errors = 1;
   }
 
-  if (database_type == DB_FULLBOARD) {
-    /* For fullboard patterns, the "anchor" is always at the mid point. */
-    ci = (maxi-1)/2;
-    cj = (maxj-1)/2;
-  }
-  else if (database_type == DB_CORNER) {
+  if (database_type == DB_CORNER) {
     ci = 0;
     cj = 0;
   }
@@ -1880,7 +1866,7 @@ write_elements(FILE *outfile)
     fprintf(outfile, "{%d,%d}", OFFSET(dx, dy), att);
   }
 
-  /* This may happen for fullboard patterns or if we have discarded all
+  /* This may happen if we have discarded all
    * the elements as unneeded by the matcher.
    */
   if (!used_nodes)
@@ -2711,88 +2697,6 @@ corner_write_variations(struct corner_variation_b *variation, FILE *outfile)
 }
 
 
-/* ================================================================ */
-/*		    Fullboard database specific functions 	    */
-/* ================================================================ */
-
-static void
-fullboard_init(void)
-{
-  set_random_seed(HASH_RANDOM_SEED);
-  hash_init();
-}
-
-/* Compute a hash of the current fullboard pattern, where we assume
- * black stones at X and white stones at O elements.
- */
-static void
-compute_fullboard_hash(void)
-{
-  int node;
-  int used_nodes = 0;
-  int pos;
-  Intersection pattern_board[BOARDSIZE];
-  unsigned int bs = maxi + 1;
-
-  assert(ci == maxi/2 && cj == maxj/2);
-  assert(maxi == maxj && mini == minj && mini == 0);
-
-  /* Clear private board. */
-  for (pos = 0; pos < BOARDSIZE; pos++)
-    if ((unsigned) I(pos) < bs && (unsigned) J(pos) < bs) {
-      pattern_board[pos] = EMPTY;
-    }
-    else
-      pattern_board[pos] = GRAY;
-
-  /* Populate private board. */
-  for (node = 0; node < el; node++) {
-    int x = elements[node].x;
-    int y = elements[node].y;
-    int att = elements[node].att;
-    int pos = POS(x, y);
-    assert((unsigned) I(pos) < bs && (unsigned) J(pos) < bs);
-
-    if (att == ATT_O)
-      pattern_board[pos] = WHITE;
-    else
-      pattern_board[pos] = BLACK;
-
-    used_nodes++;
-  }
-
-  /* Compute hash. */
-  hashdata_recalc(&pattern_hash[patno], pattern_board, NO_MOVE);
-
-  pattern[patno].patlen = used_nodes;
-}
-
-
-static void
-write_fullboard_patterns(FILE *outfile)
-{
-  int j, k;
-
-  fprintf(outfile, "struct fullboard_pattern %s[] = {\n", prefix);
-
-  for (j = 0; j < patno; ++j) {
-    struct pattern *p = pattern + j;
-    fprintf(outfile, "  {{{");
-    for (k = 0; k < NUM_HASHVALUES; k++) {
-      fprintf(outfile, "0x%lx", pattern_hash[j].hashval[k]);
-      if (k < NUM_HASHVALUES - 1)
-	fprintf(outfile, ",");
-    }
-    fprintf(outfile, "}},%d,\"%s\",%d,%d},\n",
-	    p->patlen, pattern_names[j], p->move_offset, (int) p->value);
-  }
-
-  fprintf(outfile, "  {{{");
-  for (k = 0; k < NUM_HASHVALUES - 1; k++)
-    fprintf(outfile, "0,");
-  fprintf(outfile, "0}}, -1,NULL,0,0}\n};\n");
-}
-
 
 static void
 write_attributes(FILE *outfile)
@@ -3136,8 +3040,6 @@ main(int argc, char *argv[])
   }
   else if (database_type == DB_CORNER)
     corner_init();
-  else if (database_type == DB_FULLBOARD)
-    fullboard_init();
 
   if (database_type == OPTIMIZE_DFA) {
     if (transformations_file_name == NULL) {
@@ -3384,8 +3286,8 @@ main(int argc, char *argv[])
 	  }
 
 	  if (attributes_needed
-	      && (database_type == DB_FULLBOARD || database_type == DB_TREE)) {
-	    fprintf(stderr, "%s(%d) : Error : attributes other than `value' are not allowed in fullboard and tree databases\n",
+	      && database_type == DB_TREE) {
+	    fprintf(stderr, "%s(%d) : Error : attributes other than `value' are not allowed in tree databases\n",
 		    current_file, current_line_number);
 	    fatal_errors++;
 	  }
@@ -3438,8 +3340,6 @@ main(int argc, char *argv[])
 	      write_to_dfa(patno);
 	    if (database_type == DB_CORNER)
 	      corner_add_pattern();
-	    else if (database_type == DB_FULLBOARD)
-	      compute_fullboard_hash();
 	    else if (database_type != OPTIMIZE_DFA)
 	      write_elements(output_FILE);
 	  }
@@ -3533,9 +3433,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "%d / %d patterns have edge-constraints\n",
 	    pats_with_constraints, patno);
 
-  if (database_type == DB_FULLBOARD)
-    write_fullboard_patterns(output_FILE);
-  else if (database_type != OPTIMIZE_DFA) {
+  if (database_type != OPTIMIZE_DFA) {
     /* Forward declaration, which autohelpers might need. */
     if (database_type != DB_CORNER)
       fprintf(output_FILE, "static struct pattern %s[%d];\n\n", prefix, patno + 1);
