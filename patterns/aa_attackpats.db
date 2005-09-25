@@ -143,6 +143,32 @@ OXO
 :|,s
 
 
+Pattern A7b
+# gf New pattern. (3.5.10)
+
+|.X      reduce eyespace
+|*X
+|XO
+|.X
+
+:8,s
+
+
+Pattern A7c
+
+X.X      reduce eyespace
+X*X
+OX.
+
+:8,s
+
+A.X
+A*X
+OXb
+
+;lib(A)==2 && olib(b)>1
+
+
 Pattern A8
 
 O..

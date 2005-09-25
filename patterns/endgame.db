@@ -1455,13 +1455,14 @@ OaO
 
 
 Pattern CE22
+# gf Territory not guaranteed by pattern. Removed terri(1). (3.7.2)
 
 ?X?
 .*.      one point gote
 O.O
 ooo
 
-:8,OXe,terri(1)
+:8,OXe
 
 
 Pattern CE23
