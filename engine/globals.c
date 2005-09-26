@@ -61,20 +61,21 @@ int connect_depth;	/* Used by Tristan Cazenave's connection reader. */
 int connect_depth2;     /* Used by alternater connection reader. */
 int connection_node_limit; 
 int breakin_node_limit; /* Reading limits for break_in/block_off reading */
-int breakin_depth;
-int mandated_depth;             /* deep reading cut off, mandated value */
-int mandated_backfill_depth;    /* deep reading cut off, mandated value */
-int mandated_backfill2_depth;   /* deep reading cut off, mandated value */
-int mandated_break_chain_depth; /* deep reading cut off, mandated value */
-int mandated_superstring_depth; /* deep reading cut off, mandated value */
-int mandated_fourlib_depth;     /* deep reading cut off, mandated value */
-int mandated_ko_depth;          /* deep reading cut off, mandated value */
-int mandated_branch_depth;      /* deep reading cut off, mandated value */
-int mandated_aa_depth;
-int mandated_owl_distrust_depth;  
-int mandated_owl_branch_depth;  
-int mandated_owl_reading_depth; 
-int mandated_owl_node_limit;    
+int breakin_depth;    
+/* Mandated values for deep reading cutoffs. */
+int mandated_depth = -1;   
+int mandated_backfill_depth = -1;
+int mandated_backfill2_depth = -1;
+int mandated_break_chain_depth = -1;
+int mandated_superstring_depth = -1;
+int mandated_fourlib_depth = -1;   
+int mandated_ko_depth = -1;       
+int mandated_branch_depth = -1;  
+int mandated_aa_depth = -1;
+int mandated_owl_distrust_depth = -1;  
+int mandated_owl_branch_depth = -1;  
+int mandated_owl_reading_depth = -1; 
+int mandated_owl_node_limit = -1;    
 
 
 /* Miscellaneous. */
@@ -105,7 +106,7 @@ int disable_threat_computation = 0;
 int disable_endgame_patterns   = 0;
 int doing_scoring              = 0;
 
-int chinese_rules       = 0;    /* ruleset choice for GMP connection */
+int chinese_rules = CHINESE_RULES; /* ruleset choice for GMP connection */
 /* use experimental connection module */
 int experimental_connections = EXPERIMENTAL_CONNECTIONS;
 /* use alternate connection reading algorithm */
@@ -118,11 +119,12 @@ int experimental_owl_ext = EXPERIMENTAL_OWL_EXT;
 int experimental_break_in = USE_BREAK_IN;
 /* use central oriented influence */
 int cosmic_gnugo = COSMIC_GNUGO;
+/* search for large scale owl moves */
+int large_scale = LARGE_SCALE;
 
 int capture_all_dead    = 0;    /* capture all dead opponent stones */
 int play_out_aftermath  = 0;    /* make everything unconditionally settled */
-int resign_allowed      = 0;    /* resign hopeless games */
-int large_scale         = 0;    /* search for large scale owl moves */
+int resign_allowed = RESIGNATION_ALLOWED; /* resign hopeless games */
 
 int play_mirror_go      = 0;    /* try to play mirror go if possible */
 int mirror_stones_limit = -1;   /* but stop at this number of stones */

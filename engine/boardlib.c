@@ -41,7 +41,7 @@ int          move_history_color[MAX_MOVE_HISTORY];
 int          move_history_pos[MAX_MOVE_HISTORY];
 int          move_history_pointer;
 
-float komi;
+float komi = 0.0;
 int movenum;
 int allow_suicide = 0;  /* allow opponent to make suicide moves */
 

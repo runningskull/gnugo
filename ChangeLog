@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- consistently initialize global variables in globals.c (not main.c)
 - large scale code reorganized
 - fullboard support (-f option) remove from mkpat
 - atari_atari tuning

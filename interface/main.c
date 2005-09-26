@@ -343,49 +343,6 @@ main(int argc, char *argv[])
   int seed = 0;
   int seed_specified = 0;
 
-  komi = 0.0;
-  
-  level = DEFAULT_LEVEL;
-  min_level = 0;
-  max_level = 10;
-  
-  mandated_depth               = -1;
-  mandated_backfill_depth      = -1;
-  mandated_backfill2_depth     = -1;
-  mandated_break_chain_depth   = -1;
-  mandated_superstring_depth   = -1;
-  mandated_fourlib_depth       = -1;
-  mandated_ko_depth            = -1;
-  mandated_branch_depth        = -1;
-  mandated_owl_distrust_depth  = -1;
-  mandated_owl_branch_depth    = -1;
-  mandated_owl_reading_depth   = -1;
-  mandated_owl_node_limit      = -1;
-  mandated_aa_depth            = -1;
-
-  debug = 0;
-  fusekidb = 1;
-  disable_fuseki = 0;
-  josekidb = 1;
-  if (CHINESE_RULES)
-    chinese_rules = 1;
-  else 
-    chinese_rules = 0;
-  if (OWL_THREATS)
-    owl_threats = 1;
-  else
-    owl_threats = 0;
-  experimental_owl_ext = EXPERIMENTAL_OWL_EXT;
-  experimental_connections = EXPERIMENTAL_CONNECTIONS;
-  cosmic_gnugo = COSMIC_GNUGO;
-  large_scale = LARGE_SCALE;
-  resign_allowed = RESIGNATION_ALLOWED;
-
-  allow_suicide = 0;
-  capture_all_dead = 0;
-  play_out_aftermath = 0;
-  limit_search = 0;
-
   /* Default parameters for clock and auto level systems. */
   clock_init(3600, 0, 0);      /* One hour sudden death. */
 
