@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- endgame1.tst removed from distribution but not from CVS
+- cutstone.tst, semeai2.tst, and *_rot.tst removed
 - debugboard removed	
 - support for pattern based reading (EXPERIMENTAL_READING) removed
 - support for tree based pattern matching removed

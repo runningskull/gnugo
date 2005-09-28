@@ -2,21 +2,21 @@ TST = 13x13b.tst 13x13.tst arb.tst arend2.tst arend.tst \
       arion.tst atari_atari.tst auto01.tst auto02.tst \
       auto03.tst auto04.tst auto_handtalk.tst blunder.tst \
       break_in.tst buzco.tst capture.tst century2002.tst \
-      connection_rot.tst connection.tst connect_rot.tst connect.tst \
-      cutstone.tst dniwog.tst ego.tst endgame1.tst \
-      endgame_rot.tst endgame.tst filllib.tst global.tst \
+      connection.tst connect.tst \
+      dniwog.tst ego.tst \
+      endgame.tst filllib.tst global.tst \
       golife.tst gunnar.tst handtalk.tst heikki.tst \
-      joseki.tst lazarus.tst ld_owl_rot.tst ld_owl.tst \
+      joseki.tst lazarus.tst ld_owl.tst \
       manyfaces1.tst manyfaces.tst nando.tst neurogo.tst \
       newscore.tst nicklas1.tst nicklas2.tst nicklas3.tst \
       nicklas4.tst nicklas5.tst niki.tst ninestones.tst \
       nngs1.tst nngs2.tst nngs3.tst nngs4.tst \
-      nngs.tst optics_rot.tst optics.tst owl1.tst \
-      owl_rot.tst owl.tst reading_rot.tst reading.tst \
-      rosebud.tst safety.tst score2.tst score_rot.tst \
-      score.tst semeai2.tst semeai_rot.tst semeai.tst \
+      nngs.tst optics.tst owl1.tst \
+      owl.tst reading.tst \
+      rosebud.tst safety.tst score2.tst \
+      score.tst semeai.tst \
       strategy2.tst strategy3.tst strategy4.tst strategy5.tst \
-      strategy_rot.tst strategy.tst tactics1.tst tactics.tst \
+      strategy.tst tactics1.tst tactics.tst \
       thrash.tst trevora.tst trevorb.tst trevorc.tst \
       trevord.tst trevor.tst vie.tst viking.tst gifu03.tst seki.tst \
       9x9.tst unconditional.tst cgf2004.tst kgs.tst olympiad2004.tst \
@@ -85,16 +85,7 @@ century2002: century2002.tst
 connect: connect.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
-connect_rot: connect_rot.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
 connection: connection.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
-connection_rot: connection_rot.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
-cutstone: cutstone.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
 dniwog: dniwog.tst
@@ -104,12 +95,6 @@ ego: ego.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
 endgame: endgame.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
-endgame1: endgame1.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
-endgame_rot: endgame_rot.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
 filllib: filllib.tst
@@ -137,9 +122,6 @@ lazarus: lazarus.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
 ld_owl: ld_owl.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
-ld_owl_rot: ld_owl_rot.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
 manyfaces: manyfaces.tst
@@ -201,16 +183,10 @@ olympiad2004: olympiad2004.tst
 optics: optics.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
-optics_rot: optics_rot.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
 owl: owl.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
 owl1: owl1.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
-owl_rot: owl_rot.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
 owl_rotall: owl.tst
@@ -226,9 +202,6 @@ owl_rotall: owl.tst
 reading: reading.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
-reading_rot: reading_rot.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
 rosebud: rosebud.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
@@ -241,22 +214,10 @@ score: score.tst
 score2: score2.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
-score_rot: score_rot.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
 semeai: semeai.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
-semeai_rot: semeai_rot.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
-semeai2: semeai2.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
 strategy: strategy.tst
-	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
-
-strategy_rot: strategy_rot.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
 strategy2: strategy2.tst
@@ -310,7 +271,6 @@ all_batches: first_batch second_batch third_batch fourth_batch fifth_batch
 first_batch: 
 	$(srcdir)/regress.sh $(srcdir) reading.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) owl.tst $(GG_OPTIONS)
-	$(srcdir)/regress.sh $(srcdir) owl_rot.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) ld_owl.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) optics.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) filllib.tst $(GG_OPTIONS)
