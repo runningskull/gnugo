@@ -56,7 +56,6 @@ Usage : mkpat [options] <prefix>\n\
 	-c = compile connections database\n\
 	-C = compile a corner pattern database\n\
 	-D = compile a DFA database (allows fast matching)\n\
-	-T = compile a tree based pattern database (even faster)\n\
 	-d <iterations> = don't generate database, but optimize a DFA\n\
 			  transformation file instead\n\
   Pattern generation options:\n\
@@ -93,7 +92,6 @@ If output file is not specified, writes to stdout.\n\
 #define DB_CONNECTIONS	((int) 'c')
 #define DB_CORNER	((int) 'C')
 #define DB_DFA		((int) 'D')
-#define DB_TREE 	((int) 'T')
 #define OPTIMIZE_DFA	((int) 'd')
 
 /* code assumes that ATT_O and ATT_X are 1 and 2 (in either order)
@@ -1755,35 +1753,6 @@ compare_elements(const void *a, const void *b)
     - order[((const struct patval_b *)b)->att];
 }
 
-#if EXPERIMENTAL_READING
-
-/* For the tree-based algorithm, it works best to sort the elements
- * by distance from the anchor, making the search tree smaller.
- * Similarly, it's best to match the most common elements first.
- * Note: This will therefore not work for the connections database
- */
-
-static int
-compare_elements_closest(const void *a, const void *b)
-{
-  const struct patval_b *pa = (const struct patval_b *)a;
-  const struct patval_b *pb = (const struct patval_b *)b;
-
-  int ax = pa->x - ci;
-  int bx = pb->x - ci;
-  int ay = pa->y - cj;
-  int by = pb->y - cj;
-  int metric = (ax*ax + ay*ay) - (bx*bx + by*by);
-  if (metric == 0)
-    return -compare_elements(a, b);
-  else
-    return metric;
-}
-
-static void tree_push_pattern(void);
-
-#endif
-
 struct element_node {
   struct patval_b e;
   struct element_node *next;
@@ -1850,8 +1819,6 @@ write_elements(FILE *outfile)
       /* DFA pattern matcher doesn't itself need these elements at all. But
        * they might be needed for goal checking or by callback function, so
        * we check it before discarding an element.
-       *
-       * FIXME: What about tree matcher?
        */
       if (database_type == DB_DFA)
 	continue;
@@ -1875,465 +1842,7 @@ write_elements(FILE *outfile)
     fprintf(outfile, "\n};\n\n");
 
   pattern[patno].patlen = used_nodes;
-
-#if EXPERIMENTAL_READING
-  if (database_type == DB_TREE)
-    tree_push_pattern();
-#endif
 }
-
-#if EXPERIMENTAL_READING
-
-struct tree_node graph[2];
-int tree_next = 0;
-
-/* The elements of a "simplified" pattern, which has already been
- * copied in the following ways:
- *  1) All rotations
- *  2) All ATT_x & ATT_o elements reduced to ATT_dot, ATT_X, and ATT_O
- * 
- * This simplification allows for very simple searching of the
- * pre-digested patterns.  
- *
- * For example, a pattern with 8 symmetry and one ATT_x element will
- * have 16 copies located in various places throughout the tree.
- * This function adds only one of the 16 copies.
- */
-static void
-tree_push_elements(struct element_node *elist,
-		   struct tree_node *tree_start, int ll)
-{
-  struct tree_node_list *grptr;
-  struct element_node *elist_next;
-  struct element_node *elist_prev;
-
-   if (!tree_start->next_list) {
-     tree_start->next_list = malloc(sizeof(*(tree_start->next_list)));
-     tree_start->next_list->next = 0;
-   }
-
-    elist_prev = elist_next = elist;
-    while (elist_next->next) {
-      elist_prev = elist_next;
-      elist_next = elist_next->next;
-      for (grptr = tree_start->next_list; grptr != 0; grptr = grptr->next) {
-        if (elist_next->e.x == grptr->node.x
-	    && elist_next->e.y == grptr->node.y
-	    && elist_next->e.att == grptr->node.att)
-        {
-          if (verbose) 
-            fprintf(stderr, "  element matched.\n");
-          elist_prev->next = elist_next->next;
-          tree_push_elements(elist, &(grptr->node), ll);
-          return;
-        }
-      }
-    }
-
-    if (elist->next) {
-      /* Still elements to add to tree */
-      for (grptr = tree_start->next_list;
-	   grptr->next != NULL;
-	   grptr = grptr->next)
-	;
-      
-      grptr->next = malloc(sizeof(*(grptr->next)));
-      grptr = grptr->next;
-      grptr->node.matches = 0;
-      grptr->node.att = elist->next->e.att;
-      if (!(grptr->node.att == ATT_dot
-	    || grptr->node.att == ATT_X
-	    || grptr->node.att == ATT_O)) {
-        fprintf(stderr,
-		"%s(%d) : error : Internal error; unexpected att = %d\n",
-                current_file, current_line_number, grptr->node.att);
-        fatal_errors++;
-      }
-      grptr->node.x = elist->next->e.x;
-      grptr->node.y = elist->next->e.y;
-      grptr->node.next_list = 0;
-      grptr->next = 0;
-      elist->next = elist->next->next;
-      if (verbose) {
-        fprintf(stderr, "  Added node %c, x=%2d, y=%2d\n", 
-		*(VALID_PATTERN_CHARS + grptr->node.att),
-		grptr->node.x, grptr->node.y);
-      }
-      tree_push_elements(elist, &grptr->node, ll);
-    }
-    else {
-      /* patten matches here! */
-      struct match_node *matches;
-      if (verbose)
-        fprintf(stderr, "  pattern complete.\n");
-      matches = tree_start->matches;
-      
-      if (!matches) {
-        matches = malloc(sizeof(*matches));
-        matches->next = 0;
-        tree_start->matches = matches;
-      }
-      
-      while (matches->next != NULL)
-        matches = matches->next;
-
-      matches->next = malloc(sizeof(*(matches->next)));
-      matches = matches->next;
-      matches->patnum = patno;
-      matches->next = 0;
-      matches->orientation = ll;
-    }
-}
-
-
-/* By this point, the pattern is rotated.  Now, recursively
- * copy the entries as necessary, expanding o & x to ., O, & X
- */
-static void
-tree_push_pattern_DOX(struct element_node *elist, int ll)
-{
-  struct element_node *elist_next = 0;
-  struct element_node *elist_prev = 0;
-  int need_copy = 0;
-
-  elist_next = elist->next;
-  while (elist_next) {
-    if (elist_next->e.att == ATT_o 
-        || elist_next->e.att == ATT_x) {
-      need_copy = 1;
-      break;
-    }
-    elist_next = elist_next->next;
-  }
-    
-  if (need_copy) {
-    struct element_node *elist_copy1 = malloc(sizeof(*elist_copy1));
-    struct element_node *elist_copy2 = malloc(sizeof(*elist_copy2));
-    struct element_node *elist1_next = elist_copy1;
-    struct element_node *elist2_next = elist_copy2;
-    int found_copy_element = 0;
-    
-    elist_next = elist->next;
-    while (elist_next) {
-      elist1_next->next = malloc(sizeof(*(elist1_next->next)));
-      elist1_next = elist1_next->next;
-      elist1_next->e = elist_next->e;
-      elist2_next->next = malloc(sizeof(*(elist2_next->next)));
-      elist2_next = elist2_next->next;
-      elist2_next->e = elist_next->e;
-      if (!found_copy_element) {
-        if (elist_next->e.att == ATT_o
-            || elist_next->e.att == ATT_x) {
-          found_copy_element = 1;
-          elist1_next->e.att = ATT_dot;
-          elist2_next->e.att = (elist_next->e.att == ATT_o ? ATT_O : ATT_X);
-        }
-      }
-      elist1_next->next = 0;
-      elist2_next->next = 0;
-      elist_next = elist_next->next;
-    }
-    assert(found_copy_element);
-    tree_push_pattern_DOX(elist_copy1, ll);
-    tree_push_pattern_DOX(elist_copy2, ll);
-    return;
-  }
-
-  {
-    if (verbose)
-      fprintf(stderr, "P[%s %d]:\n", pattern_names[patno], ll);
-    elist_prev = elist_next = elist;
-    while (elist_next->next) {
-      int i;
-      elist_prev = elist_next;
-      elist_next = elist_next->next;
-      for (i = 0; i <= 1; i++) {
-        if (elist_next->e.x == graph[i].x
-            && elist_next->e.y == graph[i].y
-            && elist_next->e.att == graph[i].att)
-        {
-          elist_prev->next = elist_next->next;
-          tree_push_elements(elist, &graph[i], ll);
-          assert(!elist->next);  /* Element list should get exhausted */
-          return;
-        }
-      }
-    }
-  }
-  assert(0 && "Anchor not matched.");
-}
-
-/* Rotate the pattern and push it onto the tree once for each
- * appropriate rotation.
- */
-static void 
-tree_push_pattern_rot(int ll)
-{
-  struct element_node *elist = 0;
-  struct element_node *elist_next = 0;
-  int i;
-  
-  elist = malloc(sizeof(*elist));
-  elist_next = elist;
-  for (i = 0; i < el; i++) {
-    elist_next->next = malloc(sizeof(*(elist_next->next))); /*or die*/
-    elist_next = elist_next->next;
-    elist_next->e.att = elements[i].att;
-    /* or continue if we don't need this transformation */
-    TRANSFORM2(elements[i].x - ci, elements[i].y - cj, 
-               &(elist_next->e.x), &(elist_next->e.y), ll);
-    elist_next->next = 0;
-  }
-  tree_push_pattern_DOX(elist, ll);
-}
-
-/* For each pattern, this is the entry point to add the pattern
- * to the tree-based pattern matching data structure.
- *
- * The pattern will be rotated and copied possibly many times,
- * as explained in tree_push_elements().
- * 
- * Conceptually, each node of the tree corresponds to either
- * ATT_dot, ATT_X, or ATT_O, with an x and y coordinate relative
- * to the anchor.  When the pattern matcher is run, if 
- * board[POS(node.x, node.y)] == node.att, then proceed to the
- * next node.  If you find a node with a match_node pointer,
- * then a pattern has matched (with a given orientation).
- */
-static void
-tree_push_pattern(void)
-{
-  static int init = 0;
-  int ll;
-  int start_transformation = 0;
-  int end_transformation;
-
-  if (!init) {
-    memset(graph, 0, sizeof(struct tree_node));
-    graph[0].att = ATT_X;
-    graph[1].att = ATT_O;
-    graph[0].next_list = 0;
-    graph[1].next_list = 0;
-    tree_next = 2;
-    init = 1;
-  }
-
-  if (pattern->trfno == 5) {
-    start_transformation = 2;
-    end_transformation = 6;
-  }
-
-  end_transformation = pattern[patno].trfno;
-
-  /* sort the elements so that MOST likely elements are tested first. */
-  gg_sort(elements, el, sizeof(struct patval_b), compare_elements_closest);
-
-  if (0) {
-  int i;
-    for (i = 0; i < el; i++) {
-      fprintf(stderr, "E[%d, %d, %c]\n",
-	      elements[i].x - ci, elements[i].y - cj, 
-	      *(VALID_PATTERN_CHARS + elements[i].att));
-    }
-    fprintf(stderr, "\n");
-  }
-
-  for (ll = start_transformation; ll < end_transformation; ++ll)
-    tree_push_pattern_rot(ll);
-}
-
-
-/* ================================================================ */
-/*         stuff to write out the stored pattern structures         */
-/* ================================================================ */
-
-static int mn_count;
-static int tnl_count;
-
-struct tree_node_list *tnl_dump;
-struct match_node *matches_dump;
-
-#define PASS_COUNT 1
-#define PASS_FILL 2
-
-
-/* Note: Currently the tree_node_list & match_node lists contain
- * dummy headers in their lists, which isn't at all necessary when
- * being used by GNU Go, but are very handy when building them up 
- * in mkpat.  Probably can strip these out when writing out the
- * final data structure.
- *
- * Does the hard work to outputs the tree data structure data as C code 
- * for GNU Go.
- */
-static void
-dump_tree_node(FILE *outfile, struct tree_node *gn, int depth, int pass)
-{
-  static int as_text = 0;
-  struct tree_node_list *gl;
-  tnl_count++;
-
-  if (as_text) {
-    if (depth > 0)
-      fprintf(stderr, "%.*s", depth*2, "                                             ");
-    fprintf(stderr, "GN[att=%c, x=%d, y=%d",
-	    *(VALID_PATTERN_CHARS + gn->att), gn->x, gn->y);
-  }
-  
-  if (pass == PASS_FILL) {
-    tnl_dump[tnl_count].node.att = gn->att;
-    tnl_dump[tnl_count].node.x = gn->x;
-    tnl_dump[tnl_count].node.y = gn->y;
-  }
-
-  if (gn->matches) {
-    struct match_node *m = gn->matches->next;
-    if (pass == PASS_FILL) {
-      tnl_dump[tnl_count].node.matches = (void *) mn_count;
-      matches_dump[mn_count].patnum = -1; /*Unused*/
-      matches_dump[mn_count].orientation = 0; /*Unused*/
-      matches_dump[mn_count].next = (void *) (mn_count + 1);
-    }
-    
-    if (as_text)
-      fprintf(stderr, ", matches[%d]: ", mn_count);
-
-    mn_count++;
-    while (m) {
-      if (pass == PASS_FILL) {
-        matches_dump[mn_count].patnum = m->patnum;
-        matches_dump[mn_count].orientation = m->orientation;
-        if (m->next)
-          matches_dump[mn_count].next = (void *) (mn_count + 1);
-	else
-          matches_dump[mn_count].next = 0;
-      }
-      
-      if (as_text)
-        fprintf(stderr, "P[%s, %d]", pattern_names[m->patnum],
-		m->orientation);
-
-      mn_count++;
-      m = m->next;
-    }
-  }
-  else {
-    if (pass == PASS_FILL)
-      tnl_dump[tnl_count].node.matches = 0;
-  }
-
-  if (as_text)
-    fprintf(stderr, "]\n");
-
-  gl = gn->next_list;
-  if (gl) {
-    int prev_tnl_count = tnl_count;
-    if (pass == PASS_FILL) {
-      tnl_dump[tnl_count].node.next_list = (void *) (tnl_count + 1);
-      /*tnl_dump[tnl_count+1].node data is unused.*/
-      tnl_dump[tnl_count+1].node.matches = 0;   /*Unused*/
-      tnl_dump[tnl_count+1].node.att = -1;      /*Unused*/
-      tnl_dump[tnl_count+1].node.x = -99;       /*Unused*/
-      tnl_dump[tnl_count+1].node.y = -99;       /*Unused*/
-      tnl_dump[tnl_count+1].node.next_list = 0; /*Unused*/
-
-    }
-    prev_tnl_count = tnl_count;
-    tnl_count++;
-    while (gl->next) {
-      if (pass == PASS_FILL)
-        tnl_dump[prev_tnl_count+1].next = (void *) (tnl_count + 1);
-
-      prev_tnl_count = tnl_count;
-      dump_tree_node(outfile, &gl->next->node, depth + 1, pass);
-      gl = gl->next;
-    }
-    if (pass == PASS_FILL)
-      tnl_dump[prev_tnl_count + 1].next = 0;
-  }
-  else {
-    if (pass == PASS_FILL) {
-      assert(0 && "Strange bug here");
-      /* This may be where we crash if we're missing an anchor color
-       * in the database */
-      if (0)
-	fprintf(outfile, "  tnl[%d].node.next_list = 0;\n", tnl_count);
-    }
-  }
-
-
-}
-  
-/*
- * Outputs the tree data structure data as C code for GNU Go.
- */
-static void
-tree_write_patterns(FILE *outfile)
-{
-  int oanchor_index = 0;
-  int i;
-  fprintf(outfile, "#include \"patterns.h\"\n\n");
-
-  mn_count = 1;
-  tnl_count = 0;
-  dump_tree_node(outfile, &graph[0], 0, PASS_COUNT);
-
-  oanchor_index = tnl_count+1;
-  dump_tree_node(outfile, &graph[1], 0, PASS_COUNT);
-
-  tnl_dump = malloc(sizeof(*tnl_dump) * tnl_count);
-  matches_dump = malloc(sizeof(*matches_dump) * mn_count);
-
-  tnl_dump[0].next = (void *) 1;  /* X anchor node */
-  tnl_dump[0].node.att = -1;    /* Not used */
-  tnl_dump[0].node.matches = 0; /* Not used */
-  tnl_dump[0].node.x = -99;     /* Not used */
-  tnl_dump[0].node.y = -99;     /* Not used */
-  tnl_dump[0].node.next_list = 0; /* Not used */
-  tnl_dump[1].next = (void *) oanchor_index;
-  tnl_dump[oanchor_index].next = 0;
-  
-  mn_count = 1;
-  tnl_count = 0;
-  dump_tree_node(outfile, &graph[0], 0, PASS_FILL);
-  dump_tree_node(outfile, &graph[1], 0, PASS_FILL);
-
-  fprintf(outfile, "struct tree_node_list tnl_%s[] =\n{\n", prefix);
-  for (i = 0; i < tnl_count+1; i++) {
-    fprintf(outfile,
-	    "  { {(void *)%d, %d, %d, %d, (void *)%d}, (void *)%d}, /*#%d*/\n",
-	    (int)tnl_dump[i].node.matches,
-	    tnl_dump[i].node.att,
-	    tnl_dump[i].node.x,
-	    tnl_dump[i].node.y,
-	    (int)tnl_dump[i].node.next_list,
-	    (int)tnl_dump[i].next,
-	    i);
-  }
-  fprintf(outfile, "};\n\n");
-
-  fprintf(outfile, "struct match_node matches_%s[] = \n{\n", prefix);
-  for (i = 0; i < mn_count; i++) {
-    fprintf(outfile, "  {%d, %d, (void *)%d}, /*#%d*/\n",
-	    matches_dump[i].patnum,
-	    matches_dump[i].orientation,
-	    (int) matches_dump[i].next,
-	    i);
-  }
-  fprintf(outfile, "};\n\n");
-
-  fprintf(outfile, "void\ninit_tree_%s(void)\n{\n", prefix);
-  fprintf(outfile, "  gg_assert(sizeof(tnl_%s) / sizeof(struct tree_node_list) == %d);\n", 
-	  prefix, tnl_count+1);
-  fprintf(outfile, "  gg_assert(sizeof(matches_%s) / sizeof(struct match_node) == %d);\n",
-	  prefix, mn_count);
-  fprintf(outfile,
-	  "  tree_initialize_pointers(tnl_%s, matches_%s, %d, %d);\n",
-	  prefix, prefix, tnl_count+1, mn_count+1);
-  fprintf(outfile, "}\n\n");
-}
-
-#endif
 
 
 /* ================================================================ */
@@ -2740,15 +2249,6 @@ write_patterns(FILE *outfile)
 {
   int j;
 
-#if EXPERIMENTAL_READING
-  if (database_type == DB_TREE)
-    tree_write_patterns(outfile);
-  else
-    fprintf(outfile, "\nvoid\ninit_tree_%s(void)\n{\n"
-	    "  /* nothing to do - tree option not compiled */\n"
-	    "}\n\n", prefix);
-#endif
-
   /* Write out the patterns. */
   if (database_type == DB_CORNER)
     fprintf(outfile, "static struct corner_pattern %s[] = {\n", prefix);
@@ -2883,12 +2383,6 @@ write_pattern_db(FILE *outfile)
     fprintf(outfile, " ,& dfa_%s\n", prefix); /* pointer to the wired dfa */
   else
     fprintf(outfile, " , NULL\n"); /* pointer to a possible dfa */
-#if EXPERIMENTAL_READING
-  if (database_type == DB_TREE)
-    fprintf(outfile, " , tnl_%s", prefix);
-  else
-    fprintf(outfile, " , NULL\n");
-#endif
 
   fprintf(outfile, "};\n");
 }
@@ -2917,13 +2411,13 @@ main(int argc, char *argv[])
     int multiple_anchor_options = 0;
 
     /* Parse command-line options */
-    while ((i = gg_getopt(argc, argv, "i:o:t:vV:pcfCDTd:A:OXbma")) != EOF) {
+    while ((i = gg_getopt(argc, argv, "i:o:t:vV:pcfCDd:A:OXbma")) != EOF) {
       switch (i) {
       case 'i': 
 	if (input_files == MAX_INPUT_FILE_NAMES) {
 	  fprintf(stderr, "Error : Too many input files (maximum %d supported)\n",
 	    MAX_INPUT_FILE_NAMES);
-	  return 1;
+	  return EXIT_FAILURE;
         }
 	input_file_names[input_files++] = gg_optarg;
 	break;
@@ -2938,7 +2432,6 @@ main(int argc, char *argv[])
       case 'f':
       case 'C':
       case 'D':
-      case 'T':
       case 'd':
 	if (database_type) {
 	  fprintf(stderr, "Error : More than one database type specified (-%c and -%c)\n",
@@ -2953,14 +2446,6 @@ main(int argc, char *argv[])
 	    return 1;
 	  }
 	}
-
-#if EXPERIMENTAL_READING == 0
-	if (i == 'T') {
-	  fprintf(stderr, "Error : Tree based matcher is unsupported in this configuration\n");
-	  fprintf(stderr, "        Try `configure --enable-experimental-reading'\n");
-	  return 1;
-	}
-#endif
 	break;
 
       case 'O':
@@ -3281,13 +2766,6 @@ main(int argc, char *argv[])
 
 	  if (patno != -1 && attribute_map != old_map) {
 	    fprintf(stderr, "%s(%d) : Error : attribute map can only be set before the first pattern\n",
-		    current_file, current_line_number);
-	    fatal_errors++;
-	  }
-
-	  if (attributes_needed
-	      && database_type == DB_TREE) {
-	    fprintf(stderr, "%s(%d) : Error : attributes other than `value' are not allowed in tree databases\n",
 		    current_file, current_line_number);
 	    fatal_errors++;
 	  }

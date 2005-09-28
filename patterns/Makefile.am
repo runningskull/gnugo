@@ -34,8 +34,6 @@ EXTRA_DIST = $(DSP)\
 	fuseki13.dbz\
 	fuseki19.dbz\
 	handicap.db\
-	read_attack.db\
-	read_defend.db\
 	oracle.db
 
 mkpat_SOURCES  = mkpat.c transform.c dfa.c
@@ -73,7 +71,7 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  owl_attackpat.c\
 		 owl_vital_apat.c owl_defendpat.c fusekipat.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c\
-		 read_attack.c read_defend.c handipat.c oraclepat.c
+		 handipat.c oraclepat.c
 
 DBBUILT = gogo.db hoshi_keima.db hoshi_other.db komoku.db sansan.db \
 	  mokuhazushi.db takamoku.db
@@ -85,7 +83,7 @@ DB_TO_TAG = aa_attackpats.db attack.db barriers.db conn.db defense.db\
 	    endgame.db eyes.db fuseki.db fuseki9.dbz fuseki13.dbz fuseki19.dbz\
 	    handicap.db influence.db oracle.db owl_attackpats.db\
 	    owl_defendpats.db owl_vital_apats.db patterns.db patterns2.db\
-	    read_attack.db read_defend.db $(DBBUILT)
+	    $(DBBUILT)
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = $(GGBUILTSOURCES) $(DBBUILT) *~
@@ -186,12 +184,6 @@ fuseki19.c : $(srcdir)/fuseki19.dbz uncompress_fuseki$(EXEEXT)
 
 handipat.c : $(srcdir)/handicap.db mkpat$(EXEEXT)
 	./mkpat -b handipat -i $(srcdir)/handicap.db -o handipat.c
-
-read_attack.c : $(srcdir)/read_attack.db mkpat$(EXEEXT)
-	./mkpat -b read_attack -i $(srcdir)/read_attack.db -o read_attack.c
-
-read_defend.c : $(srcdir)/read_defend.db mkpat$(EXEEXT)
-	./mkpat -b read_defend -i $(srcdir)/read_defend.db -o read_defend.c
 
 
 ETAGS_ARGS = --language none --regex '/^Pattern[ \t]+[a-zA-Z0-9]+/' $(DB_TO_TAG)\

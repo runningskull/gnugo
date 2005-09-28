@@ -275,18 +275,11 @@ struct pattern {
 };
 
 
-#if EXPERIMENTAL_READING
-struct tree_node_list;
-#endif
-
 struct pattern_db {
   int fixed_for_size;
   const int fixed_anchor;
   struct pattern *patterns;
   struct dfa_rt *pdfa;
-#if EXPERIMENTAL_READING
-  struct tree_node_list *tnl; /* For tree-based pattern matching */
-#endif
 };
 
 
@@ -334,23 +327,6 @@ void backfill_replace(int move, int str);
 int break_mirror_helper(int str, int color);
 
 
-void init_tree_conn(void);
-void init_tree_pat(void);
-void init_tree_attpat(void);
-void init_tree_defpat(void);
-void init_tree_influencepat(void);
-void init_tree_barrierspat(void);
-void init_tree_endpat(void);
-void init_tree_aa_attackpat(void);
-void init_tree_owl_attackpat(void);
-void init_tree_owl_vital_apat(void);
-void init_tree_owl_defendpat(void);
-void init_tree_fusekipat(void);
-void init_tree_joseki(void);
-void init_tree_read_attack(void);
-void init_tree_read_defend(void);
-void init_tree_oracle(void);
-
 /* pattern arrays themselves */
 extern struct pattern_db pat_db;
 extern struct pattern_db aa_attackpat_db;
@@ -372,40 +348,6 @@ extern struct corner_db joseki_db;
 extern struct fullboard_pattern fuseki19[];
 extern struct fullboard_pattern fuseki13[];
 extern struct fullboard_pattern fuseki9[];
-
-#if EXPERIMENTAL_READING
-
-/* Experimental reading */
-extern struct pattern_db read_attack_db;
-extern struct pattern_db read_defend_db;
-
-#endif
-
-/* Tree-based pattern matching structures*/
-
-struct match_node;
-struct tree_node_list;
-
-struct match_node {
-  int patnum;
-  int orientation;
-  struct match_node *next;
-};
-
-
-struct tree_node {
-  struct match_node *matches;
-  int att;
-  int x;
-  int y;
-  struct tree_node_list *next_list;
-};
-
-struct tree_node_list {
-  struct tree_node node;
-  struct tree_node_list *next;
-};
-
 
 struct corner_db;
 struct corner_variation;

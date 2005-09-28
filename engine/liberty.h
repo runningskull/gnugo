@@ -175,8 +175,6 @@ struct corner_pattern;
 struct corner_db;
 struct half_eye_data;
 struct movelist;
-struct tree_node_list;
-struct match_node;
 
 /*
  * Try to match a pattern in the database to the board. Callbacks for
@@ -203,11 +201,6 @@ void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 void corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
 		     struct corner_db *database);
 void dfa_match_init(void);
-void tree_match_init(void);
-void tree_initialize_pointers(struct tree_node_list *tnl,
-                              struct match_node *matches,
-                              int tnl_size,
-                              int matches_size);
 
 void reading_cache_init(int bytes);
 void reading_cache_clear(void);

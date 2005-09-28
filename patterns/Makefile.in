@@ -112,8 +112,6 @@ EXTRA_DIST = $(DSP)\
 	fuseki13.dbz\
 	fuseki19.dbz\
 	handicap.db\
-	read_attack.db\
-	read_defend.db\
 	oracle.db
 
 
@@ -150,7 +148,7 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  owl_attackpat.c\
 		 owl_vital_apat.c owl_defendpat.c fusekipat.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c\
-		 read_attack.c read_defend.c handipat.c oraclepat.c
+		 handipat.c oraclepat.c
 
 
 DBBUILT = gogo.db hoshi_keima.db hoshi_other.db komoku.db sansan.db \
@@ -165,7 +163,7 @@ DB_TO_TAG = aa_attackpats.db attack.db barriers.db conn.db defense.db\
 	    endgame.db eyes.db fuseki.db fuseki9.dbz fuseki13.dbz fuseki19.dbz\
 	    handicap.db influence.db oracle.db owl_attackpats.db\
 	    owl_defendpats.db owl_vital_apats.db patterns.db patterns2.db\
-	    read_attack.db read_defend.db $(DBBUILT)
+	    $(DBBUILT)
 
 
 # Remove these files here... they are created locally
@@ -202,8 +200,8 @@ am_libpatterns_a_OBJECTS = connections.$(OBJEXT) helpers.$(OBJEXT) \
 	aa_attackpat.$(OBJEXT) owl_attackpat.$(OBJEXT) \
 	owl_vital_apat.$(OBJEXT) owl_defendpat.$(OBJEXT) \
 	fusekipat.$(OBJEXT) fuseki9.$(OBJEXT) fuseki13.$(OBJEXT) \
-	fuseki19.$(OBJEXT) josekidb.$(OBJEXT) read_attack.$(OBJEXT) \
-	read_defend.$(OBJEXT) handipat.$(OBJEXT) oraclepat.$(OBJEXT)
+	fuseki19.$(OBJEXT) josekidb.$(OBJEXT) \
+	handipat.$(OBJEXT) oraclepat.$(OBJEXT)
 libpatterns_a_OBJECTS = $(am_libpatterns_a_OBJECTS)
 EXTRA_PROGRAMS = extract_fuseki$(EXEEXT) transpat$(EXEEXT) \
 	compress_fuseki$(EXEEXT)
@@ -266,8 +264,8 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/oraclepat.Po $(DEPDIR)/owl_attackpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/owl_defendpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/owl_vital_apat.Po $(DEPDIR)/patlib.Po \
-@AMDEP_TRUE@	$(DEPDIR)/patterns.Po $(DEPDIR)/read_attack.Po \
-@AMDEP_TRUE@	$(DEPDIR)/read_defend.Po $(DEPDIR)/transform.Po \
+@AMDEP_TRUE@	$(DEPDIR)/patterns.Po \
+@AMDEP_TRUE@	$(DEPDIR)/transform.Po \
 @AMDEP_TRUE@	$(DEPDIR)/transpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/uncompress_fuseki.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -363,8 +361,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl_vital_apat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/patlib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/patterns.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/read_attack.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/read_defend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/transform.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/transpat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/uncompress_fuseki.Po@am__quote@
@@ -607,12 +603,6 @@ fuseki19.c : $(srcdir)/fuseki19.dbz uncompress_fuseki$(EXEEXT)
 
 handipat.c : $(srcdir)/handicap.db mkpat$(EXEEXT)
 	./mkpat -b handipat -i $(srcdir)/handicap.db -o handipat.c
-
-read_attack.c : $(srcdir)/read_attack.db mkpat$(EXEEXT)
-	./mkpat -b read_attack -i $(srcdir)/read_attack.db -o read_attack.c
-
-read_defend.c : $(srcdir)/read_defend.db mkpat$(EXEEXT)
-	./mkpat -b read_defend -i $(srcdir)/read_defend.db -o read_defend.c
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
