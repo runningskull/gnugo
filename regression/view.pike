@@ -433,7 +433,7 @@ string font_filename = "";
 
 int main(int argc, array(string) argv)
 {
-    if (argc != 2) {
+    if (argc < 2) {
 	werror("Usage: %s TEST-FILE:TEST-NUMBER\n", basename(argv[0]));
 	return 1;
     }
@@ -449,12 +449,13 @@ int main(int argc, array(string) argv)
     }
 
     GTK.setup_gtk(argv);
-    Controller controller = Controller(engine, argv[1]);
+    Controller controller = Controller(engine, argv[1..]);
 
     GTK.main();
 
     return 0;
 }
+
 
 array(string) recursive_find_files(string dir, string suffix)
 {
@@ -1274,12 +1275,16 @@ class Controller
     GTK.Entry sgf_filename_entry, sgf_viewer_entry;
     GTK.Table sgf_stuff;
     GTK.Button new_testcase_button, new_engine_button;
+    GTK.Button next_testcase_button, prev_testcase_button;
     GTK.Entry new_testcase_entry, engine_path_entry, engine_name_entry;
     
     string delta_territory_move = "PASS";
     string move_influence_move = "PASS";
     string first_vertex = "";
 
+    int testcase_index = 0;
+
+    array(string) testcases;
     string testcase_name;
     string testcase_command;
     string result;
@@ -1294,14 +1299,15 @@ class Controller
 
     static mixed nasty_signal_id;
 
-    static void create(SimpleGtp engine_, string testcase)
+    static void create(SimpleGtp engine_, array(string) testcases_)
     {
-	if (!excerpt_testcase(testcase, engine_))
+	testcases = testcases_;
+	if (!excerpt_testcase(testcases[0], engine_))
 	{
 	    werror("Failed to load testcase.\n");
 	    exit(1);
 	}
-	testcase_name = testcase;
+	testcase_name = testcases[0];
 
 	testcase_label = (GTK.Label(full_testcase * "\n")
 		          ->set_justify(GTK.JUSTIFY_LEFT));
@@ -1343,7 +1349,7 @@ class Controller
 			     ->add(controller_notebook));
 	}
 
-	main_window->set_title(testcase);
+	main_window->set_title(testcases[0]);
 	main_window->signal_connect_new("destroy", quit);
 
 	if (has_prefix(testcase_command, "reg_genmove")
@@ -1482,10 +1488,18 @@ class Controller
                     ->attach_defaults(sgf_viewer_entry, 1, 2, 1, 2);
 
 	new_testcase_entry = GTK.Entry();
-        new_testcase_entry->set_text(testcase);
+        new_testcase_entry->set_text(testcases[0]);
         new_testcase_entry->set_editable(1);
         new_testcase_button = GTK.Button("Load new testcase");
         new_testcase_button->signal_connect_new("clicked", new_testcase);
+	new_testcase_entry->signal_connect_new("activate", new_testcase);
+	if (sizeof(testcases)) {
+	    prev_testcase_button = GTK.Button("Previous testcase");
+	    prev_testcase_button->signal_connect_new("clicked", prev_testcase);
+	    prev_testcase_button->set_sensitive(0);
+	    next_testcase_button = GTK.Button("Next testcase");
+	    next_testcase_button->signal_connect_new("clicked", next_testcase);
+	}
 	engine_path_entry = GTK.Entry();
 	engine_path_entry->set_text("../interface/gnugo");
 	engine_path_entry->set_editable(1);
@@ -1496,6 +1510,7 @@ class Controller
 	    engine_name_entry->set_editable(1);
 	}
 
+	engine_path_entry->signal_connect_new("activate", select_new_engine);
 	new_engine_button = GTK.Button("Start new engine");
 	new_engine_button->signal_connect_new("clicked", select_new_engine);
 
@@ -1573,6 +1588,12 @@ class Controller
 				 ->add(new_engine_button), 0, 0, 0)
 		     ->pack_start(new_testcase_entry, 0, 0, 0)
 		     ->pack_start(new_testcase_button, 0, 0, 0);
+	if  (sizeof(testcases) > 1) {
+	    GTK.Widget next_prev
+	    	= (GTK.Hbox(0, 12)->pack_start(prev_testcase_button, 0, 0, 0)
+				  ->pack_start(next_testcase_button, 0, 0, 0));
+	    engines_page->pack_start(next_prev, 0, 0, 0);
+	}
 	controller_notebook->append_page(engines_page->set_border_width(12),
 					 GTK.Label("engines"));
 
@@ -1847,10 +1868,8 @@ class Controller
 	}
     }
 
-
-    static void new_testcase()
+    static void this_new_testcase(string new_testcase)
     {
-        string new_testcase = new_testcase_entry->get_text();
         werror("Trying to load new testcase %s.", new_testcase);
         if (!excerpt_testcase(new_testcase, viewers[0]->engine))
         {
@@ -1868,6 +1887,35 @@ class Controller
 	    controller_notebook->show_all();
 	    controller_notebook->set_page(1);
 	}
+    }
+
+    static void new_testcase()
+    {
+        this_new_testcase(new_testcase_entry->get_text());
+    }
+
+    static void next_testcase()
+    {
+    	if (testcase_index >= sizeof(testcases) - 1)
+	    return;
+    	testcase_index += 1;
+	prev_testcase_button->set_sensitive(1);
+	if (testcase_index == sizeof(testcases) - 1)
+	    next_testcase_button->set_sensitive(0);
+	this_new_testcase(testcases[testcase_index]);
+    }
+
+    static void prev_testcase()
+    {
+    	if (testcase_index == 0)
+	    return;
+    	testcase_index -= 1;
+	if (!testcases)
+	    werror("Error handling list of test cases!\n");
+	next_testcase_button->set_sensitive(1);
+	if (testcase_index == 0)
+	    prev_testcase_button->set_sensitive(0);
+	this_new_testcase(testcases[testcase_index]);
     }
 
 

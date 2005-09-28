@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- view.pike: support multiple tests as argument
 - test revisions
 - consistently initialize global variables in globals.c (not main.c)
 - large scale code reorganized
