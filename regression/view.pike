@@ -73,7 +73,7 @@ class SimpleGtp
 	GtpResponse response = GtpResponse();
 	while (1)
 	{
-	    string s = engine_out->gets() - "\r";
+	    string s = engine_out->gets();
 	    if (!s)
 	    {
 		// FIXME: This is probably not adequate.
@@ -83,6 +83,8 @@ class SimpleGtp
 		engine_out->close();
 		break;
 	    }
+
+	    s -= "\r";
 	    
 	    if (first_line)
 	    {
@@ -113,9 +115,10 @@ class SimpleGtp
     {
 	while (1)
 	{
-	    string s = engine_err->gets() - "\r";
+	    string s = engine_err->gets();
 	    if (!s)
 		break;
+	    s -= "\r";
 	    if (trace_callback)
 		trace_callback(s);
 	}
