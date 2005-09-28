@@ -114,7 +114,7 @@ const char *const c_output_strings[3] =
  */
 static int
 set_boards(char board[MAX_BOARDSIZE + 2][MAX_BOARDSIZE + 2],
-	   char board1d[BOARDSIZE],
+	   Intersection board1d[BOARDSIZE],
 	   char *stones, char color, int boardsize)
 {
   int i = stones[1] - 'a' + 1;
