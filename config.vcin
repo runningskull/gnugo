@@ -30,9 +30,6 @@
 /* GAIN/LOSS codes. Disabled by default. */
 #define EXPERIMENTAL_OWL_EXT 0
 
-/* Experimental pattern based reading. Disabled by default. */
-#define EXPERIMENTAL_READING 0
-
 /* Define as 1 to use the grid optimisation, or 2 to run it in self-test mode
    */
 #define GRID_OPT 1
@@ -48,6 +45,9 @@
 
 /* Owl Threats. 0 standard. */
 #define OWL_THREATS 0
+
+/* Enable GNU Readline support */
+#define READLINE 0
 
 /* Allow resignation. Default enabled */
 #define RESIGNATION_ALLOWED 1

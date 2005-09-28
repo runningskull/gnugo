@@ -247,8 +247,6 @@ if test "$gnugo_cv_transparent_unions" = "yes"; then
 	AC_DEFINE(HAVE_TRANSPARENT_UNIONS)
 fi
 
-dnl check for a working curses library for use in debugboard
-
 AH_TEMPLATE([CURSES],
 [Define to use curses for color debugging])
 
@@ -617,4 +615,4 @@ dnl autoconf 2.50 recommends AC_CONFIG_FILES and AC_OUPUT
 dnl This however requires automake 1.4p2 or better
 
 AC_OUTPUT([Makefile interface/Makefile patterns/Makefile sgf/Makefile
-utils/Makefile engine/Makefile doc/Makefile regression/Makefile interface/debugboard/Makefile config.vc:config.vcin])
+utils/Makefile engine/Makefile doc/Makefile regression/Makefile config.vc:config.vcin])

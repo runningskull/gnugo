@@ -200,8 +200,8 @@ am_libpatterns_a_OBJECTS = connections.$(OBJEXT) helpers.$(OBJEXT) \
 	aa_attackpat.$(OBJEXT) owl_attackpat.$(OBJEXT) \
 	owl_vital_apat.$(OBJEXT) owl_defendpat.$(OBJEXT) \
 	fusekipat.$(OBJEXT) fuseki9.$(OBJEXT) fuseki13.$(OBJEXT) \
-	fuseki19.$(OBJEXT) josekidb.$(OBJEXT) \
-	handipat.$(OBJEXT) oraclepat.$(OBJEXT)
+	fuseki19.$(OBJEXT) josekidb.$(OBJEXT) handipat.$(OBJEXT) \
+	oraclepat.$(OBJEXT)
 libpatterns_a_OBJECTS = $(am_libpatterns_a_OBJECTS)
 EXTRA_PROGRAMS = extract_fuseki$(EXEEXT) transpat$(EXEEXT) \
 	compress_fuseki$(EXEEXT)
@@ -264,8 +264,7 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/oraclepat.Po $(DEPDIR)/owl_attackpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/owl_defendpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/owl_vital_apat.Po $(DEPDIR)/patlib.Po \
-@AMDEP_TRUE@	$(DEPDIR)/patterns.Po \
-@AMDEP_TRUE@	$(DEPDIR)/transform.Po \
+@AMDEP_TRUE@	$(DEPDIR)/patterns.Po $(DEPDIR)/transform.Po \
 @AMDEP_TRUE@	$(DEPDIR)/transpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/uncompress_fuseki.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \

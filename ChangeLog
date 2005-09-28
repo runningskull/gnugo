@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- makevcdist.pl updated and re-run
+- all Makefile.in regenerated
+- debugboard traces from Makefile and configure removed
 - endgame1.tst removed from distribution but not from CVS
 - cutstone.tst, semeai2.tst, and *_rot.tst removed
 - debugboard removed	
