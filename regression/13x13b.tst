@@ -79,7 +79,7 @@ loadsgf games/mertin13x13/GNDA3.sgf 61
 
 loadsgf games/mertin13x13/GAGN1.sgf 12
 2 reg_genmove white
-#? [!B12]
+#? [C12|G10|G12]
 
 # N5 is locally worse than M5.
 loadsgf games/mertin13x13/GAGN1.sgf 28
@@ -113,13 +113,13 @@ loadsgf games/mertin13x13/GNGA3.sgf 81
 
 # Most other moves are better than the game move at C6.
 loadsgf games/mertin13x13/GHGN1.sgf 26
-9 reg_genmove white
-#? [!C6]
+9 owl_attack D7
+#? [0]
 
 # Most other moves are better than the game move at M6.
 loadsgf games/mertin13x13/GHGN2.sgf 48
-10 reg_genmove white
-#? [!M6]
+10 restricted_genmove white M4 L6 M6
+#? [M4|L6]
 
 # L6 urgent.
 loadsgf games/mertin13x13/GHGN2.sgf 52
@@ -128,13 +128,13 @@ loadsgf games/mertin13x13/GHGN2.sgf 52
 
 # J5 not joseki.
 loadsgf games/mertin13x13/GHGN3.sgf 8
-12 reg_genmove white
-#? [!J5]
+12 restricted_genmove white J5 J6
+#? [J6]
 
 # M13 is a very odd move.
 loadsgf games/mertin13x13/GHGN3.sgf 38
-13 reg_genmove white
-#? [!M13]
+13 restricted_genmove white M11 M12 M13 K12
+#? [K12]
 
 # J9 is huge.
 loadsgf games/mertin13x13/GNGH2.sgf 23
@@ -173,8 +173,8 @@ loadsgf games/mertin13x13/GIGN3.sgf 92
 
 # J13 fails right out.
 loadsgf games/mertin13x13/GIGN3.sgf 94
-21 reg_genmove white
-#? [!J13]
+21 restricted_genmove white K11 J13
+#? [K11]
 
 # A6 bad shape.
 loadsgf games/mertin13x13/GIGN3.sgf 100
@@ -206,10 +206,11 @@ loadsgf games/mertin13x13/GMGN2.sgf 92
 27 reg_genmove white
 #? [C4]
 
-# H9 can be cut off.
-loadsgf games/mertin13x13/GMGN3.sgf 30
-28 reg_genmove white
-#? [!H9]
+# Taken out -- H9 seems reasonable nevertheless. /ab
+## H9 can be cut off.
+#loadsgf games/mertin13x13/GMGN3.sgf 30
+#28 reg_genmove white
+##? [!H9]
 
 # Must connect at F3.
 loadsgf games/mertin13x13/GNGM3.sgf 11
@@ -237,12 +238,13 @@ loadsgf games/mertin13x13/GNGP5.sgf 73
 # E5 is just cut off and captured.
 loadsgf games/mertin13x13/GXGN2.sgf 48
 34 reg_genmove white
-#? [!E5]
+#? [E8|F9|F8|D7]
 
+# Breakin problem.
 # D10 captures on too small scale.
 loadsgf games/mertin13x13/GXGN2.sgf 52
 35 reg_genmove white
-#? [!D10]
+#? [D7|E8|F9]
 
 # Low enclosure better.
 loadsgf games/mertin13x13/GXGN3.sgf 12
