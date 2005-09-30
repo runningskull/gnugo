@@ -1,5 +1,5 @@
 noinst_PROGRAMS = mkpat joseki mkeyes uncompress_fuseki
-EXTRA_PROGRAMS = extract_fuseki transpat compress_fuseki
+EXTRA_PROGRAMS = extract_fuseki compress_fuseki
 
 DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
 DTR = aa_attackpats.dtr owl_attackpats.dtr owl_defendpats.dtr \
@@ -46,8 +46,6 @@ else
 DFAFLAGS =
 endif
 
-transpat_SOURCES = transpat.c patlib.c transform.c
-transpat_LDADD = 
 joseki_SOURCES = joseki.c 
 joseki_LDADD = ../engine/libboard.a ../sgf/libsgf.a ../utils/libutils.a 
 joseki_AM_CPPFLAGS = $(GNU_GO_WARNINGS) -I$(top_srcdir)/sgf
@@ -64,7 +62,7 @@ uncompress_fuseki_SOURCES = uncompress_fuseki.c
 uncompress_fuseki_LDADD = ../utils/libutils.a ../engine/libboard.a ../sgf/libsgf.a
 compress_fuseki_SOURCES = compress_fuseki.c
 
-noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h dfa-mkpat.h
+noinst_HEADERS = patterns.h eyes.h dfa.h dfa-mkpat.h
 
 GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  influence.c barriers.c endgame.c aa_attackpat.c\

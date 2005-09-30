@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- patterns/transpat.c, patterns/patlib.c, and patterns/patlib.h removed
 - unused game records in regression/golois removed
 - makevcdist.pl updated and re-run
 - all Makefile.in regenerated
