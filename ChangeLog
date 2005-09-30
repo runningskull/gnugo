@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- unused game records in regression/golois removed
 - makevcdist.pl updated and re-run
 - all Makefile.in regenerated
 - debugboard traces from Makefile and configure removed
