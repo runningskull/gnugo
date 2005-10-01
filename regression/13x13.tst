@@ -208,9 +208,12 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
 40 reg_genmove white
 #? [K13]*
 
-#loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
-#41 reg_genmove white
-##? [!C8]
+# C8 can be cut off. Stones added to make the testcase more clear cut.
+loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
+play white H10
+play black D5
+41 restricted_genmove white C8 D7
+#? [D7]
 
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
