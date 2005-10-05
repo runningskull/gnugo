@@ -1221,8 +1221,6 @@ class RegressionViewer
 
 class Controller
 {
-    static int single_window_mode = 1;
-
     array(RegressionViewer) viewers = ({});
     array(GTK.Widget) viewer_title_widgets = ({});
 
@@ -1234,7 +1232,8 @@ class Controller
     GTK.Notebook data_notebook;
     GTK.Notebook selector_notebook;
 
-    GTK.Widget testcase_label;
+    GTK.ScrolledWindow scrolled_testcase_text;
+    GTK.Label testcase_text;
 
     GTK.RadioButton worm_data_button;
     GTK.RadioButton dragon_data1_button;
@@ -1312,45 +1311,44 @@ class Controller
 	}
 	testcase_name = testcases[0];
 
-	testcase_label = (GTK.Label(full_testcase * "\n")
-		          ->set_justify(GTK.JUSTIFY_LEFT));
+	scrolled_testcase_text
+	     = GTK.ScrolledWindow(GTK.Adjustment(), GTK.Adjustment())
+		->set_policy(GTK.POLICY_AUTOMATIC, GTK.POLICY_AUTOMATIC)
+                ->set_usize(450, 100);
+        testcase_text = GTK.Label(full_testcase * "\n")
+                	->set_justify(GTK.JUSTIFY_LEFT)
+			->set_alignment(0.0, 0.0);
+ 	scrolled_testcase_text->add(testcase_text);
 
 	main_window = GTK.Window(GTK.WindowToplevel);
 	controller_notebook = GTK.Notebook();
 	controller_notebook->set_tab_pos(GTK.POS_LEFT);
 
-	if (single_window_mode) {
-	    gobans_notebook   = (GTK.Notebook()
-				 ->set_show_tabs(0));
-	    data_notebook     = (GTK.Notebook()
-				 ->set_show_tabs(0)
-				 ->set_show_border(0));
-	    selector_notebook = (GTK.Notebook()
-				 ->set_tab_pos(GTK.POS_TOP));
-	    selector_notebook->signal_connect_new("switch_page", change_engine);
+	gobans_notebook   = (GTK.Notebook()
+			     ->set_show_tabs(0));
+	data_notebook     = (GTK.Notebook()
+			     ->set_show_tabs(0)
+			     ->set_show_border(0));
+	selector_notebook = (GTK.Notebook()
+			     ->set_tab_pos(GTK.POS_TOP));
+	selector_notebook->signal_connect_new("switch_page", change_engine);
 
-	    GTK.Widget main_window_contents
-		= (GTK.Vbox(0, 0)
-		   ->pack_start(GTK.Hbox(0, 24)
-				->pack_start(testcase_label, 0, 0, 24)
-				->pack_start(GTK.Alignment(0.0, 0.5, 0.0, 0.0)
-					     ->add(selector_notebook),
-					     0, 0, 0),
-				0, 0, 0)
-		   ->add(GTK.Hbox(0, 2)
-			 ->add(GTK.Vbox(0, 6)
-			       ->pack_start(controller_notebook, 0, 0, 0)
-			       ->add(data_notebook))
-			 ->pack_start(GTK.Alignment(0.0, 0.0, 0.0, 0.0)
-				      ->add(gobans_notebook),
-				      0, 0, 0)));
-	    main_window->add(main_window_contents);
-	}
-	else {
-	    main_window->add(GTK.Vbox(0, 0)
-			     ->add(testcase_label)
-			     ->add(controller_notebook));
-	}
+	GTK.Widget main_window_contents
+	    = (GTK.Vbox(0, 0)
+	       ->pack_start(GTK.Hbox(0, 24)
+			    ->pack_start(scrolled_testcase_text, 0, 0, 24)
+			    ->pack_start(GTK.Alignment(0.0, 0.5, 0.0, 0.0)
+					 ->add(selector_notebook),
+					 0, 0, 0),
+			    0, 0, 0)
+	       ->add(GTK.Hbox(0, 2)
+		     ->add(GTK.Vbox(0, 6)
+			   ->pack_start(controller_notebook, 0, 0, 0)
+			   ->add(data_notebook))
+		     ->pack_start(GTK.Alignment(0.0, 0.0, 0.0, 0.0)
+				  ->add(gobans_notebook),
+				  0, 0, 0)));
+	main_window->add(main_window_contents);
 
 	main_window->set_title(testcases[0]);
 	main_window->signal_connect_new("destroy", quit);
@@ -1507,11 +1505,9 @@ class Controller
 	engine_path_entry->set_text("../interface/gnugo");
 	engine_path_entry->set_editable(1);
 
-	if (single_window_mode) {
-	    engine_name_entry = GTK.Entry();
-	    engine_name_entry->set_text("Engine 2");
-	    engine_name_entry->set_editable(1);
-	}
+	engine_name_entry = GTK.Entry();
+	engine_name_entry->set_text("Engine 2");
+	engine_name_entry->set_editable(1);
 
 	engine_path_entry->signal_connect_new("activate", select_new_engine);
 	new_engine_button = GTK.Button("Start new engine");
@@ -1585,8 +1581,7 @@ class Controller
 	GTK.Widget engines_page
 	    = (GTK.Vbox(0, 12)
 	       ->pack_start(engine_path_entry, 0, 0, 0));
-	if (single_window_mode)
-	    engines_page->pack_start(engine_name_entry, 0, 0, 0);
+	engines_page->pack_start(engine_name_entry, 0, 0, 0);
 	engines_page->pack_start(GTK.Alignment(1.0, 0.0, 0.0, 0.0)
 				 ->add(new_engine_button), 0, 0, 0)
 		     ->pack_start(new_testcase_entry, 0, 0, 0)
@@ -1636,68 +1631,42 @@ class Controller
 	    add_regression_viewer(
 		RegressionViewer(new_engine, complete_testcase,
 				 testcase_command, button_pressed_on_a_board,
-				 (single_window_mode ?
-				  engine_name_entry->get_text() : ""),
+				 engine_name_entry->get_text(),
 				 this_object()));
 	}
 
-	if (single_window_mode) {
-	    engine_name_entry->set_text(sprintf("Engine %d",
-						sizeof(viewers) + 1));
-	}
+	engine_name_entry->set_text(sprintf("Engine %d", sizeof(viewers) + 1));
     }
 
     static void add_regression_viewer(RegressionViewer viewer)
     {
 	viewers += ({ viewer });
-	if (single_window_mode) {
-	    viewer->goban_widget->show_all();
-	    gobans_notebook->append_page(viewer->goban_widget, 0);
+	viewer->goban_widget->show_all();
+	gobans_notebook->append_page(viewer->goban_widget, 0);
 
-	    GTK.Widget title_label = GTK.Label("");
-	    viewer_title_widgets += ({ title_label });
+	GTK.Widget title_label = GTK.Label("");
+	viewer_title_widgets += ({ title_label });
 
-	    GTK.Widget data_page = (GTK.Vbox(0, 2)
-				    ->pack_start(title_label, 0, 0, 0)
-				    ->add(viewer->scrolled_data_window)
-				    ->show_all());
-	    data_notebook->append_page(data_page, 0);
+	GTK.Widget data_page = (GTK.Vbox(0, 2)
+				->pack_start(title_label, 0, 0, 0)
+				->add(viewer->scrolled_data_window)
+				->show_all());
+	data_notebook->append_page(data_page, 0);
 
-	    selector_notebook
-		->append_page((GTK.Alignment(0.0, 0.5, 0.0, 0.0)
-			       ->set_border_width(4)
-			       ->add(GTK.Label(viewer->engine->command_line))),
-			      GTK.Label(viewer->name));
-	    selector_notebook->show_all();
-	    selector_notebook->set_page(sizeof(viewers) - 1);
-	}
-	else {
-	    GTK.Widget board_window = GTK.Window(GTK.WindowToplevel);
-	    board_window->signal_connect_new("destroy", quit);
-
-	    board_window->add(viewer->goban_widget);
-	    board_window->set_title(testcase_name);
-	    board_window->show_all();
-
-	    GTK.Widget data_window = GTK.Window(GTK.WindowToplevel);
-	    viewer->scrolled_data_window->set_usize(300,400);
-	    data_window->add(viewer->scrolled_data_window);
-	    data_window->set_title(testcase_name);
-	    data_window->show_all();
-
-	    viewer_title_widgets += ({ data_window });
-	}
+	selector_notebook
+	    ->append_page((GTK.Alignment(0.0, 0.5, 0.0, 0.0)
+			   ->set_border_width(4)
+			   ->add(GTK.Label(viewer->engine->command_line))),
+			  GTK.Label(viewer->name));
+	selector_notebook->show_all();
+	selector_notebook->set_page(sizeof(viewers) - 1);
     }
 
     void set_title(RegressionViewer viewer, string title)
     {
 	for (int k = 0; k < sizeof(viewers); k++) {
-	    if (viewers[k] == viewer) {
-		if (single_window_mode)
-		    viewer_title_widgets[k]->set_text(title);
-		else
-		    viewer_title_widgets[k]->set_title(title);
-	    }
+	    if (viewers[k] == viewer)
+		viewer_title_widgets[k]->set_text(title);
 	}
     }
 
@@ -1881,7 +1850,7 @@ class Controller
         }
         testcase_name = new_testcase;
 	main_window->set_title(testcase_name);
-	testcase_label->set_text(full_testcase * "\n");
+	testcase_text->set_text(full_testcase * "\n");
         viewers->new_testcase(complete_testcase, testcase_command);
         viewers->handle_testcase();
 
