@@ -444,7 +444,7 @@ init_sgf(Gameinfo *ginfo)
       		   level, chinese_rules);
   sgfOverwritePropertyInt(sgftree.root, "HA", ginfo->handicap);
   if (ginfo->handicap > 0)
-    gnugo_recordboard(sgftree.root);
+    sgffile_recordboard(sgftree.root);
 }
 
 
@@ -513,7 +513,7 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
     return 0;
   }
   
-  if (!gnugo_is_legal(i, j, gameinfo->to_move)) {
+  if (!is_legal(POS(i, j), gameinfo->to_move)) {
     printf("\nIllegal move: %s", command);
     return 0;
   }
@@ -592,7 +592,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
     if (gameinfo->handicap == 0)
       gameinfo->to_move = BLACK;
     else {
-      gameinfo->handicap = gnugo_placehand(gameinfo->handicap);
+      gameinfo->handicap = place_fixed_handicap(gameinfo->handicap);
       gameinfo->to_move = WHITE;
     }
     sgf_initialized = 0;
@@ -709,7 +709,7 @@ do_play_ascii(Gameinfo *gameinfo)
 	  /* Init board. */
 	  gnugo_clear_board(sz);
 	  /* In case max handicap changes on smaller board. */
-	  gameinfo->handicap = gnugo_placehand(gameinfo->handicap);
+	  gameinfo->handicap = place_fixed_handicap(gameinfo->handicap);
 	  sgfOverwritePropertyInt(sgftree.root, "SZ", sz);
 	  sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 	  break;
@@ -732,7 +732,7 @@ do_play_ascii(Gameinfo *gameinfo)
 	  gnugo_clear_board(board_size);
 	  /* Place stones on board but don't record sgf 
 	   * in case we change more info. */
-	  gameinfo->handicap = gnugo_placehand(num);
+	  gameinfo->handicap = place_fixed_handicap(num);
 	  printf("\nSet handicap to %d\n", gameinfo->handicap);
           gameinfo->to_move = (gameinfo->handicap ? WHITE : BLACK);
 	  break;
@@ -866,7 +866,7 @@ do_play_ascii(Gameinfo *gameinfo)
 
 	case UNDO:
 	case CMD_BACK:
-	  if (gnugo_undo_move(1)) {
+	  if (undo_move(1)) {
             sgftreeAddComment(&sgftree, "undone");
 	    sgftreeBack(&sgftree);
 	    gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
@@ -1031,7 +1031,7 @@ ascii_endgame(Gameinfo *gameinfo, int reason)
   int state = 0;
 
   if (reason == 0) {		/* Two passes, game is over. */
-    gnugo_who_wins(gameinfo->computer_player, stdout);
+    who_wins(gameinfo->computer_player, stdout);
     printf("\nIf you disagree, we may count the game together.\n");
 
     sgftreeWriteResult(&sgftree, (white_score + black_score)/2.0, 1);
@@ -1166,7 +1166,7 @@ ascii_count(Gameinfo *gameinfo)
       }
     }
   }
-  gnugo_who_wins(gameinfo->computer_player, stdout);
+  who_wins(gameinfo->computer_player, stdout);
 }
 
 

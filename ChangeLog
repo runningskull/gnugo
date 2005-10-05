@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- remove trivial wrapper functions from engine/interface.c
 - patterns/transpat.c, patterns/patlib.c, and patterns/patlib.h removed
 - unused game records in regression/golois removed
 - makevcdist.pl updated and re-run

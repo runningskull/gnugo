@@ -85,33 +85,18 @@ const char *result_to_string(int result);
 
 
 void gnugo_clear_board(int boardsize);
-void gnugo_set_komi(float new_komi);
-void gnugo_add_stone(int i, int j, int color);
-void gnugo_remove_stone(int i, int j);
-int  gnugo_is_pass(int i, int j);
 void gnugo_play_move(int i, int j, int color);
-int  gnugo_undo_move(int n);
 int  gnugo_play_sgfnode(SGFNode *node, int to_move);
 int  gnugo_play_sgftree(SGFNode *root, int *until, SGFNode **curnode);
-int  gnugo_is_legal(int i, int j, int color);
-int  gnugo_is_suicide(int i, int j, int color);
 
-int  gnugo_placehand(int handicap);
 int  gnugo_sethand(int handicap, SGFNode *root);
-void gnugo_recordboard(SGFNode *node);
 
 float gnugo_genmove(int *i, int *j, int color, int *resign);
 
 int  gnugo_attack(int m, int n, int *i, int *j);
 int  gnugo_find_defense(int m, int n, int *i, int *j);
 
-void  gnugo_who_wins(int color, FILE *outfile);
 float gnugo_estimate_score(float *upper, float *lower);
-
-float gnugo_get_komi(void);
-void  gnugo_get_board(int b[MAX_BOARD][MAX_BOARD]);
-int   gnugo_get_boardsize(void);
-int   gnugo_get_move_number(void);
 
 /* ================================================================ */
 /*                           Game handling                          */

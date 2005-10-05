@@ -43,7 +43,6 @@ play_solo(Gameinfo *gameinfo, int moves)
   float move_value;
   double t1, t2;
   int save_moves = moves;
-  int boardsize = gnugo_get_boardsize();
 
   struct stats_data totalstats;
   int total_owl_count = 0;
@@ -57,20 +56,20 @@ play_solo(Gameinfo *gameinfo, int moves)
   int n = 6 + 2*gg_rand()%5;
   int i, j;
 
-  gnugo_set_komi(5.5);
+  komi = 5.5;
 
   sgftree_clear(&sgftree);
-  sgftreeCreateHeaderNode(&sgftree, gnugo_get_boardsize(), gnugo_get_komi());
+  sgftreeCreateHeaderNode(&sgftree, board_size, komi);
   sgf_write_header(sgftree.root, 1, get_random_seed(), 5.5,
                    level, chinese_rules);
  
   /* Generate some random moves. */
-  if (boardsize > 6) {
+  if (board_size > 6) {
     do {
       do {
-	i = (gg_rand() % 4) + (gg_rand() % (boardsize - 4));
-	j = (gg_rand() % 4) + (gg_rand() % (boardsize - 4));
-      } while (!gnugo_is_legal(i, j, gameinfo->to_move));
+	i = (gg_rand() % 4) + (gg_rand() % (board_size - 4));
+	j = (gg_rand() % 4) + (gg_rand() % (board_size - 4));
+      } while (!is_legal(POS(i, j), gameinfo->to_move));
 
       gnugo_play_move(i, j, gameinfo->to_move);
       sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
@@ -111,7 +110,7 @@ play_solo(Gameinfo *gameinfo, int moves)
   t2 = gg_cputime();
   
   /* Two passes and it's over. (EMPTY == BOTH) */
-  gnugo_who_wins(EMPTY, stdout);
+  who_wins(EMPTY, stdout);
 
   {
     float score = gnugo_estimate_score(NULL, NULL);
