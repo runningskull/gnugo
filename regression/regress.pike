@@ -1,9 +1,7 @@
 #!/usr/bin/env pike
 
-static Thread.Queue write_queue;
-static Thread.Condition cond;
-static Thread.Mutex condmutex;
-static Thread.MutexKey condmutexkey;
+static Thread.Queue writing_finished;
+static Thread.Queue reading_finished;
 static int debug = 0;
 static object machine;
 static mapping(int:string) correct_results = ([]);
@@ -94,17 +92,16 @@ Testsuite current_testsuite;
 Highscorelist slow_moves;
 int report_slow = 0;
 
-void send(string|void s)
+void send(Thread.Queue out, string|void s)
 {
   if (!s) {
     if (debug)
       werror("Finishing sending.\n");
-    write_queue->write("");
   }
   else {
     if (debug)
       werror("Sent: " + s + "\n");
-    write_queue->write(s + "\n");
+    out->write(s + "\n");
   }
 }
 
@@ -114,7 +111,6 @@ static void finish()
 	current_testsuite->cputime,
 	current_testsuite->reading_nodes, current_testsuite->owl_nodes,
 	current_testsuite->connection_nodes);
-  cond->signal();
 }
 
 static void program_reader(object f)
@@ -126,6 +122,11 @@ static void program_reader(object f)
   array(int) unexpected_failures = ({});
   array(int) unexpected_passes = ({});
   int test_number;
+  if (debug)
+    werror("Waiting for writing to be finished.\n");
+  writing_finished->read();
+  if (debug)
+    werror("Finished Waiting for writing to be finished.\n");
   while (1) {
     string s = f->gets();
     float current_time = time(timebase);
@@ -187,20 +188,20 @@ static void program_reader(object f)
     else if (sscanf(s, "?%s", answer)) {
       number = -1;
       sscanf(answer, "%d", number);
-      if (verbose || (number != -1 && number < 10000))
-	write("%-15s ?%s\n", current_testsuite->name + ":", answer);
+      write("%-15s ?%s\n", current_testsuite->name + ":", answer);
     }
   }
-  f->close();
   if (debug)
-    werror("Reader closed down.\n");
+    werror("Reader closing down.\n");
   finish();
+  f->close();
+  reading_finished->write("\n");
 }
 
-static void program_writer(object f)
+static void program_writer(Thread.Queue in, object f)
 {
   while (1) {
-    string s = write_queue->read();
+    string s = in->read();
     if (s == "")
       break;
     f->write(s);
@@ -254,7 +255,9 @@ void run_testsuite(string suite_name, string engine,
   if (options["check-unoccupied-answers"])
     testsuite = modify_testsuite(testsuite);
 
-  write_queue = Thread.Queue();
+  writing_finished = Thread.Queue();
+  reading_finished = Thread.Queue();
+  Thread.Queue write_queue = Thread.Queue();
   object f1 = Stdio.File();
   object pipe1 = f1->pipe();
   object f2 = Stdio.FILE();
@@ -262,7 +265,7 @@ void run_testsuite(string suite_name, string engine,
   machine = Process.create_process(program_start_array,
 				   (["stdin":pipe1, "stdout":pipe2]));
   thread_create(program_reader, f2);
-  thread_create(program_writer, f1);
+  thread_create(program_writer, write_queue, f1);
 
   int number;
   string answer;
@@ -287,16 +290,16 @@ void run_testsuite(string suite_name, string engine,
 	continue;
       if (correct_results[(int) number])
 	write("Repeated test number " + number + ".\n");
-      send("reset_reading_node_counter");
-      send("reset_owl_node_counter");
-      send("reset_connection_node_counter");
-      send(s);
+      send(write_queue, "reset_reading_node_counter");
+      send(write_queue, "reset_owl_node_counter");
+      send(write_queue, "reset_connection_node_counter");
+      send(write_queue, s);
       if (sscanf(s, "%*sreg_genmove%*s") == 2)
-	send("10005 move_uncertainty");
-      send("10000 get_reading_node_counter");
-      send("10001 get_owl_node_counter");
-      send("10002 get_connection_node_counter");
-      send("10003 cputime");
+	send(write_queue, "10005 move_uncertainty");
+      send(write_queue, "10000 get_reading_node_counter");
+      send(write_queue, "10001 get_owl_node_counter");
+      send(write_queue, "10002 get_connection_node_counter");
+      send(write_queue, "10003 cputime");
     }
     else if (sscanf(s, "#? [%[^]]]%s", answer, expected)) {
       correct_results[(int)number] = answer;
@@ -304,12 +307,16 @@ void run_testsuite(string suite_name, string engine,
 	expected_failures[(int)number] = 1;
     }
     else
-      send(s);
+      send(write_queue, s);
   }
   
-  send("10004 quit");
-  send();
-  cond->wait(condmutexkey);
+  if (debug)
+    werror("Signalling finish of writing\n");
+  writing_finished->write("\n");
+  send(write_queue, "10004 cputime");
+  reading_finished->read();
+  send(write_queue, "10004 quit");
+  send(write_queue, );
 }
 
 void final_report()
@@ -385,9 +392,6 @@ string parse_tests(mapping(string:array(int)) partial_testsuites,
 
 int main(int argc, array(string) argv)
 {
-  cond = Thread.Condition();
-  condmutex = Thread.Mutex();
-  condmutexkey = condmutex->lock();
   array(string) testsuites = ({});
   mapping(string:array(int)) partial_testsuites = ([]);
 
