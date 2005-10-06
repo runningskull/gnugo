@@ -803,7 +803,6 @@ main(int argc, char *argv[])
 	    fprintf(stderr, "gnugo: use --limit-search <pos>\n");
 	    return EXIT_FAILURE;
 	  }
-	  rotate(m, n, &m, &n, board_size, orientation);
 	  set_search_diamond(POS(m, n));
 	}
 	break;
@@ -1093,7 +1092,6 @@ main(int argc, char *argv[])
 	return EXIT_FAILURE;
       }
 
-      rotate(m, n, &m, &n, board_size, orientation);
       decide_string(POS(m, n));
     }
     break;
@@ -1119,8 +1117,6 @@ main(int argc, char *argv[])
 	return EXIT_FAILURE;
       }
 
-      rotate(ai, aj, &ai, &aj, board_size, orientation);
-      rotate(bi, bj, &bi, &bj, board_size, orientation);
       decide_connection(POS(ai, aj), POS(bi, bj));
     }
     break;
@@ -1139,7 +1135,6 @@ main(int argc, char *argv[])
 	return EXIT_FAILURE;
       }
 
-      rotate(m, n, &m, &n, board_size, orientation);
       decide_owl(POS(m, n));
     }
     break;
@@ -1158,7 +1153,6 @@ main(int argc, char *argv[])
 	return EXIT_FAILURE;
       }
 
-      rotate(m, n, &m, &n, board_size, orientation);
       decide_dragon_data(POS(m, n));
     }
     break;
@@ -1184,8 +1178,6 @@ main(int argc, char *argv[])
 	return EXIT_FAILURE;
       }
 
-      rotate(ai, aj, &ai, &aj, board_size, orientation);
-      rotate(bi, bj, &bi, &bj, board_size, orientation);
       decide_semeai(POS(ai, aj), POS(bi, bj));
     }
     break;
@@ -1212,8 +1204,6 @@ main(int argc, char *argv[])
 	return EXIT_FAILURE;
       }
 
-      rotate(ai, aj, &ai, &aj, board_size, orientation);
-      rotate(bi, bj, &bi, &bj, board_size, orientation);
       decide_tactical_semeai(POS(ai, aj), POS(bi, bj));
     }
     break;
@@ -1243,7 +1233,6 @@ main(int argc, char *argv[])
 	return EXIT_FAILURE;
       }
       
-      rotate(m, n, &m, &n, board_size, orientation);
       decide_eye(POS(m, n));
     }
     break;
@@ -1272,7 +1261,6 @@ main(int argc, char *argv[])
 	return EXIT_FAILURE;
       }
 
-      rotate(m, n, &m, &n, board_size, orientation);
       decide_surrounded(POS(m, n));
       break;
     }
