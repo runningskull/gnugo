@@ -218,7 +218,7 @@ static void owl_mark_boundary(struct local_owl_data *owl);
 static void owl_update_goal(int pos, int same_dragon, int lunch,
 			    struct local_owl_data *owl, int semeai_call);
 static void owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS]);
-static void componentdump(const char goal[BOARDMAX]);
+static void componentdump(const signed char component[BOARDMAX]);
 static void owl_update_boundary_marks(int pos, struct local_owl_data *owl);
 static void owl_find_lunches(struct local_owl_data *owl);
 static int improve_lunch_attack(int lunch, int attack_point);
@@ -4636,7 +4636,7 @@ owl_update_goal(int pos, int same_dragon, int lunch,
  */
 static int
 connected_components(char graph[MAX_CUTS][MAX_CUTS], int graph_size,
-		     char component[MAX_CUTS])
+		     signed char component[MAX_CUTS])
 {
   int num_components = 0;
   int k, j;
@@ -4724,8 +4724,8 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
   }
 
   if (found_cut) {
-    char component[MAX_CUTS];
-    char component2[BOARDMAX];
+    signed char component[MAX_CUTS];
+    signed char component2[BOARDMAX];
     int component_size[MAX_CUTS];
     int num_components;
     int biggest_component = -1;
@@ -4759,7 +4759,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
       for (k = 0; k < num_cuts; k++)
 	if (component[k] == c_id) {
 	  mark_string(cuts[k], this_goal, 1);
-	  mark_string(cuts[k], component2, c_id);
+	  signed_mark_string(cuts[k], component2, c_id);
 	}
       init_connection_data(color, this_goal, NO_MOVE, FP(3.01),
 	  		   conn_data + c_id, 1);
@@ -4784,7 +4784,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
       }
       /* FIXME: What to do if no close component found? */
       if (closest_component != -1) {
-	mark_string(pos, component2, closest_component);
+	signed_mark_string(pos, component2, closest_component);
 	component_size[closest_component] += countstones(pos);
       }
     }
@@ -4860,12 +4860,12 @@ goaldump(const char goal[BOARDMAX])
 }
 
 void
-componentdump(const char goal[BOARDMAX])
+componentdump(const signed char component[BOARDMAX])
 {
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos) && goal[pos] != -1)
-      gprintf("%o%1m (%d)  ", pos, (int) goal[pos]);
+    if (ON_BOARD(pos) && component[pos] != -1)
+      gprintf("%o%1m (%d)  ", pos, (int) component[pos]);
   gprintf("\n");
 }
 
