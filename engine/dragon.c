@@ -2406,11 +2406,9 @@ size_of_biggest_critical_dragon(void)
 void
 ascii_report_dragon(char *string)
 {
-  int m, n, pos;
+  int pos = string_to_location(board_size, string);
 
-  string_to_location(board_size, string, &m, &n);
-  pos = POS(m, n);
-  if (!ON_BOARD1(pos))
+  if (!ON_BOARD(pos))
     fprintf(stderr, "unknown position %s\n", string);
   else
     report_dragon(stderr, pos);

@@ -270,7 +270,7 @@ double gg_gettimeofday(void);
 
 
 /* influence.c */
-void debug_influence_move(int i, int j);
+void debug_influence_move(int move);
 
 
 #define TRACE  (!(verbose)) ? (void)0 : (void)gprintf

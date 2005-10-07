@@ -505,24 +505,24 @@ computer_move(Gameinfo *gameinfo, int *passes)
 static int
 do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
 {
-  int i, j;
+  int move = string_to_location(board_size, command);
 
-  if (!string_to_location(board_size, command, &i, &j)) {
+  if (move == NO_MOVE) {
     printf("\nInvalid move: %s\n", command);
     return 0;
   }
   
-  if (!is_legal(POS(i, j), gameinfo->to_move)) {
+  if (!is_legal(move, gameinfo->to_move)) {
     printf("\nIllegal move: %s", command);
     return 0;
   }
 
   *passes = 0;
-  TRACE("\nyour move: %m\n\n", i, j);
+  TRACE("\nyour move: %1m\n\n", move);
   init_sgf(gameinfo);
-  gnugo_play_move(i, j, gameinfo->to_move);
+  gnugo_play_move(I(move), J(move), gameinfo->to_move);
   sgffile_add_debuginfo(sgftree.lastnode, 0.0);
-  sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
+  sgftreeAddPlay(&sgftree, gameinfo->to_move, I(move), J(move));
   sgffile_output(&sgftree);
   
   if (opt_showboard) {
@@ -1095,7 +1095,7 @@ ascii_count(Gameinfo *gameinfo)
 {
   char line[12];
   int done = 0;
-  int i, j;
+  int i;
   int xyzzy = 1;
   
   printf("\nGame over. Let's count!.\n");  
@@ -1140,13 +1140,13 @@ ascii_count(Gameinfo *gameinfo)
       ascii_showboard();
     }
     else {
-      if (!string_to_location(board_size, line, &i, &j)
-	  || BOARD(i, j) == EMPTY)
+      int pos = string_to_location(board_size, line);
+      if (pos == NO_MOVE || board[pos] == EMPTY)
 	printf("\ninvalid!\n");
       else {
-	int status = dragon_status(POS(i, j));
+	int status = dragon_status(pos);
 	status = (status == DEAD) ? ALIVE : DEAD;
-	change_dragon_status(POS(i, j), status);
+	change_dragon_status(pos, status);
 	ascii_showboard();
       }
     }
@@ -1158,44 +1158,44 @@ ascii_count(Gameinfo *gameinfo)
 static void
 showcapture(char *line)
 {
-  int i, j;
+  int str;
   int move;
 
   gg_assert(line);
-  if (!string_to_location(board_size, line, &i, &j)
-      || BOARD(i, j) == EMPTY) {
+  str = string_to_location(board_size, line);
+  if (str == NO_MOVE || board[str] == EMPTY) {
     printf("\ninvalid point!\n");
     return;
   }
   
-  if (attack(POS(i, j), &move))
-    mprintf("\nSuccessful attack of %m at %1m\n", i, j, move);
+  if (attack(str, &move))
+    mprintf("\nSuccessful attack of %1m at %1m\n", str, move);
   else
-    mprintf("\n%m cannot be attacked\n", i, j);
+    mprintf("\n%1m cannot be attacked\n", str);
 }
 
 
 static void
 showdefense(char *line)
 {
-  int i, j;
+  int str;
   int move;
   
   gg_assert(line);
-  if (!string_to_location(board_size, line, &i, &j)
-      || BOARD(i, j) == EMPTY) {
+  str = string_to_location(board_size, line);
+  if (str == NO_MOVE || board[str] == EMPTY) {
     printf("\ninvalid point!\n");
     return;
   }
 
-  if (attack(POS(i, j), NULL)) {
-      if (find_defense(POS(i, j), &move))
-        mprintf("\nSuccessful defense of %m at %1m\n", i, j, move);
+  if (attack(str, NULL)) {
+      if (find_defense(str, &move))
+        mprintf("\nSuccessful defense of %1m at %1m\n", str, move);
       else
-        mprintf("\n%m cannot be defended\n", i, j);
+        mprintf("\n%1m cannot be defended\n", str);
     }
     else
-      mprintf("\nThere is no need to defend %m\n", i, j);
+      mprintf("\nThere is no need to defend %1m\n", str);
 }
 
 
@@ -1224,7 +1224,6 @@ ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
   int i;
   char line[80];
   int stones[MAX_BOARD*MAX_BOARD];
-  int x, y, pos;
 
   if (sscanf(handicap, "%d", &handi) == 1) {
     /* Gnu Go is to place handicap */
@@ -1274,17 +1273,19 @@ ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
 	else
 	  break;
       }
-      else if (string_to_location(board_size, line, &x, &y)) {
-	pos = POS(x, y);
-	if (board[pos] != EMPTY)
-	  printf("\nThere's already a stone there.\n");
-	else {
-	  add_stone(pos, BLACK);
-	  stones[handi++] = pos;
+      else {
+	int pos = string_to_location(board_size, line);
+	if (pos != NO_MOVE) {
+	  if (board[pos] != EMPTY)
+	    printf("\nThere's already a stone there.\n");
+	  else {
+	    add_stone(pos, BLACK);
+	    stones[handi++] = pos;
+	  }
 	}
+	else
+	  printf("\nInvalid command: %s", line);
       }
-      else
-	printf("\nInvalid command: %s", line);
     }
   }
   gameinfo->handicap = handi;

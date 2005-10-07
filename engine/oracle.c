@@ -397,8 +397,7 @@ do_metamachine_genmove(int color, int width, float *value)
     token = strtok(NULL, delimiters);
     if (!token)
       break;
-    string_to_location(board_size, token, &i, &j);
-    moves[k] = POS(i, j);
+    moves[k] = string_to_location(board_size, token);
     token = strtok(NULL, delimiters);
     if (!token)
       break;

@@ -1748,16 +1748,14 @@ compute_worm_influence()
 void
 ascii_report_worm(char *string)
 {
-  int m, n;
-  string_to_location(board_size, string, &m, &n);
-  report_worm(m, n);
+  int pos = string_to_location(board_size, string);
+  report_worm(pos);
 }
 
 
 void
-report_worm(int m, int n)
+report_worm(int pos)
 {
-  int pos = POS(m, n);
   int i;
 
   if (board[pos] == EMPTY) {

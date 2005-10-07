@@ -797,13 +797,12 @@ main(int argc, char *argv[])
 
       case OPT_LIMIT_SEARCH:
 	{
-	  int m, n;
-
-	  if (!string_to_location(board_size, gg_optarg, &m, &n)) {
+	  int pos = string_to_location(board_size, gg_optarg);
+	  if (pos == NO_MOVE) {
 	    fprintf(stderr, "gnugo: use --limit-search <pos>\n");
 	    return EXIT_FAILURE;
 	  }
-	  set_search_diamond(POS(m, n));
+	  set_search_diamond(pos);
 	}
 	break;
 
@@ -972,9 +971,8 @@ main(int argc, char *argv[])
   /* Notice that we need to know the board size before we can do this.
    */
   if (debuginfluence_move[0]) {
-    int m, n;
-    string_to_location(board_size, debuginfluence_move, &m, &n);
-    debug_influence_move(m, n);
+    int pos = string_to_location(board_size, debuginfluence_move);
+    debug_influence_move(pos);
   }
   
   /* Figure out a default mode if there was no explicit one. */
@@ -1080,131 +1078,140 @@ main(int argc, char *argv[])
     
   case MODE_DECIDE_STRING:
     {
-      int m, n;
+      int str;
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-string must be used with -l\n");
 	return EXIT_FAILURE;
       }
-      
-      if (!string_to_location(board_size, decide_this, &m, &n)) {
+
+      str = string_to_location(board_size, decide_this); 
+      if (str == NO_MOVE) {
 	fprintf(stderr, "gnugo: --decide-string: strange coordinate \n");
 	return EXIT_FAILURE;
       }
 
-      decide_string(POS(m, n));
+      decide_string(str);
     }
     break;
   
   case MODE_DECIDE_CONNECTION:
     {
-      int ai, aj, bi, bj;
+      int str1, str2;
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-connection must be used with -l\n");
 	return EXIT_FAILURE;
       }
-      
-      if (!string_to_location(board_size, decide_this, &ai, &aj)) {
-	fprintf(stderr,
-		"usage: --decide-connection [first string]/[second string]\n");
-	return EXIT_FAILURE;
-      }
-      
-      if (!string_to_location(board_size, decide_that, &bi, &bj)) {
+
+      str1 = string_to_location(board_size, decide_this);
+      if (str1 == NO_MOVE) {
 	fprintf(stderr,
 		"usage: --decide-connection [first string]/[second string]\n");
 	return EXIT_FAILURE;
       }
 
-      decide_connection(POS(ai, aj), POS(bi, bj));
+      str2 = string_to_location(board_size, decide_that);
+      if (str2 == NO_MOVE) {
+	fprintf(stderr,
+		"usage: --decide-connection [first string]/[second string]\n");
+	return EXIT_FAILURE;
+      }
+
+      decide_connection(str1, str2);
     }
     break;
   
   case MODE_DECIDE_OWL:
     {
-      int m, n;
+      int pos;
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-dragon must be used with -l\n");
 	return EXIT_FAILURE;
       }
-      
-      if (!string_to_location(board_size, decide_this, &m, &n)) {
+
+      pos = string_to_location(board_size, decide_this);
+      if (pos == NO_MOVE) {
 	fprintf(stderr, "gnugo: --decide-dragon: strange coordinate \n");
 	return EXIT_FAILURE;
       }
 
-      decide_owl(POS(m, n));
+      decide_owl(pos);
     }
     break;
   
   case MODE_DECIDE_DRAGON_DATA:
     {
-      int m, n;
+      int pos;
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-dragon-data must be used with -l\n");
 	return EXIT_FAILURE;
       }
-      
-      if (!string_to_location(board_size, decide_this, &m, &n)) {
+
+      pos = string_to_location(board_size, decide_this);
+      if (pos == NO_MOVE) {
 	fprintf(stderr, "gnugo: --decide-dragon-data: strange coordinate \n");
 	return EXIT_FAILURE;
       }
 
-      decide_dragon_data(POS(m, n));
+      decide_dragon_data(pos);
     }
     break;
   
   case MODE_DECIDE_SEMEAI:
     {
-      int ai, aj, bi, bj;
+      int pos1, pos2;
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-semeai must be used with -l\n");
 	return EXIT_FAILURE;
       }
-      
-      if (!string_to_location(board_size, decide_this, &ai, &aj)) {
-	fprintf(stderr, 
-		"usage: --decide-semeai [first dragon]/[second dragon]\n");
-	return EXIT_FAILURE;
-      }
-      
-      if (!string_to_location(board_size, decide_that, &bi, &bj)) {
+
+      pos1 = string_to_location(board_size, decide_this);
+      if (pos1 == NO_MOVE) {
 	fprintf(stderr, 
 		"usage: --decide-semeai [first dragon]/[second dragon]\n");
 	return EXIT_FAILURE;
       }
 
-      decide_semeai(POS(ai, aj), POS(bi, bj));
+      pos2 = string_to_location(board_size, decide_that);
+      if (pos2 == NO_MOVE) {
+	fprintf(stderr, 
+		"usage: --decide-semeai [first dragon]/[second dragon]\n");
+	return EXIT_FAILURE;
+      }
+
+      decide_semeai(pos1, pos2);
     }
     break;
     
 
   case MODE_DECIDE_TACTICAL_SEMEAI:
     {
-      int ai, aj, bi, bj;
+      int pos1, pos2;
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-tactical-semeai must be used with -l\n");
 	return EXIT_FAILURE;
       }
-      
-      if (!string_to_location(board_size, decide_this, &ai, &aj)) {
-	fprintf(stderr, 
-		"usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
-	return EXIT_FAILURE;
-      }
-      
-      if (!string_to_location(board_size, decide_that, &bi, &bj)) {
+
+      pos1 = string_to_location(board_size, decide_this);
+      if (pos1 == NO_MOVE) {
 	fprintf(stderr, 
 		"usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
 	return EXIT_FAILURE;
       }
 
-      decide_tactical_semeai(POS(ai, aj), POS(bi, bj));
+      pos2 = string_to_location(board_size, decide_that);
+      if (pos2 == NO_MOVE) {
+	fprintf(stderr, 
+		"usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
+	return EXIT_FAILURE;
+      }
+
+      decide_tactical_semeai(pos1, pos2);
     }
     break;
     
@@ -1221,19 +1228,20 @@ main(int argc, char *argv[])
     
   case MODE_DECIDE_EYE:
     {
-      int m, n;
+      int pos;
       
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-eye must be used with -l\n");
 	return EXIT_FAILURE;
       }
-      
-      if (!string_to_location(board_size, decide_this, &m, &n)) {
+
+      pos = string_to_location(board_size, decide_this);
+      if (pos == NO_MOVE) {
 	fprintf(stderr, "gnugo: --decide-eye: strange coordinate \n");
 	return EXIT_FAILURE;
       }
       
-      decide_eye(POS(m, n));
+      decide_eye(pos);
     }
     break;
   
@@ -1253,15 +1261,15 @@ main(int argc, char *argv[])
     
   case MODE_DECIDE_SURROUNDED:
     {
-      int m, n;
+      int pos = string_to_location(board_size, decide_this);
 
-      if (!string_to_location(board_size, decide_this, &m, &n)) {
+      if (pos == NO_MOVE) {
 	fprintf(stderr, 
 		"usage: --decide-surrounded [pos]\n");
 	return EXIT_FAILURE;
       }
 
-      decide_surrounded(POS(m, n));
+      decide_surrounded(pos);
       break;
     }
 

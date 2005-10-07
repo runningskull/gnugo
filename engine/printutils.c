@@ -353,35 +353,35 @@ location_to_buffer(int pos, char *buf)
 
 
 /*
- * Get the (m, n) coordinates in the standard GNU Go coordinate system
- * from the string STR.  This means that m is the nth row from the top
- * and n is the column. Both coordinates are between 0 and boardsize-1,
- * inclusive.
- *
- * Return 1 if ok, otherwise return 0;
+ * Convert the string str to a 1D coordinate. Return NO_MOVE if invalid
+ * string.
  */
 
 int
-string_to_location(int boardsize, const char *str, int *m, int *n)
+string_to_location(int boardsize, const char *str)
 {
+  int m, n;
+  
   if (*str == '\0')
-    return 0;
+    return NO_MOVE;
 
   if (!isalpha((int) *str))
-    return 0;
-  *n = tolower((int) *str) - 'a';
+    return NO_MOVE;
+  
+  n = tolower((int) *str) - 'a';
   if (tolower((int) *str) >= 'i')
-    --*n;
-  if (*n < 0 || *n > boardsize - 1)
-    return 0;
+    --n;
+  if (n < 0 || n > boardsize - 1)
+    return NO_MOVE;
 
-  if (!isdigit((int) *(str+1)))
-    return 0;
-  *m = boardsize - atoi(str + 1);
-  if (*m < 0 || *m > boardsize - 1)
-    return 0;
+  if (!isdigit((int) *(str + 1)))
+    return NO_MOVE;
+  
+  m = boardsize - atoi(str + 1);
+  if (m < 0 || m > boardsize - 1)
+    return NO_MOVE;
 
-  return 1;
+  return POS(m, n);
 }
 
 

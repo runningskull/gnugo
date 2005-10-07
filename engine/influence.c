@@ -2216,9 +2216,9 @@ game_status(int color)
  * move at (i, j).
  */
 void
-debug_influence_move(int i, int j)
+debug_influence_move(int move)
 {
-  debug_influence = POS(i, j);
+  debug_influence = move;
 }
 
 

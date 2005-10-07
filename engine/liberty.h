@@ -50,7 +50,7 @@ void clearstats(void);
 
 void transformation_init(void);
 
-void report_worm(int m, int n);
+void report_worm(int pos);
 void ascii_report_worm(char *string);
 void report_dragon(FILE *outfile, int pos);
 void ascii_report_dragon(char *string);
