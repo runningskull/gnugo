@@ -65,7 +65,6 @@ init_gnugo(float memory, unsigned int seed)
 void
 gnugo_clear_board(int boardsize)
 {
-  gg_assert(MIN_BOARD <= boardsize && boardsize <= MAX_BOARD);
   board_size = boardsize;
   clear_board();
 #if 0
@@ -220,41 +219,6 @@ gnugo_genmove(int *i, int *j, int color, int *resign)
   }
    
   return value;
-}
-
-/* Interface to attack() */
-int
-gnugo_attack(int m, int n, int *i, int *j)
-{
-  int retval;
-  int move;
-
-  retval = attack(POS(m, n), &move);
-
-  if (i)
-    *i = I(move);
-  if (j)
-    *j = J(move);
-  
-  return retval;
-}
-
-
-/* Interface to find_defense() */
-int
-gnugo_find_defense(int m, int n, int *i, int *j)
-{
-  int retval;
-  int move;
-
-  retval = find_defense(POS(m, n), &move);
-
-  if (i)
-    *i = I(move);
-  if (j)
-    *j = J(move);
-
-  return retval;
 }
 
 

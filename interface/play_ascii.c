@@ -351,7 +351,7 @@ enum commands {INVALID = -1, END, EXIT, QUIT, RESIGN,
                CMD_CAPTURE, CMD_DEFEND,
                CMD_HELPDEBUG, CMD_SHOWAREA, CMD_SHOWMOYO, CMD_SHOWTERRI,
                CMD_GOTO, CMD_SAVE, CMD_LOAD, CMD_SHOWDRAGONS, CMD_LISTDRAGONS,
-	       SETHURRY, SETLEVEL, NEW, COUNT, CONTINUE
+	       SETLEVEL, NEW, COUNT, CONTINUE
 };
 
 
@@ -400,7 +400,6 @@ get_command(char *command)
   if (!strncmp(command, "play", 4)) return PLAY;
   if (!strncmp(command, "info", 4)) return INFO;
   if (!strncmp(command, "force", 4)) return FORCE;
-  if (!strncmp(command, "hurry", 5)) return SETHURRY;
   if (!strncmp(command, "level", 5)) return SETLEVEL;
   if (!strncmp(command, "pass", 4)) return PASS;
   if (!strncmp(command, "save", 3)) return CMD_SAVE;
@@ -610,7 +609,6 @@ void
 do_play_ascii(Gameinfo *gameinfo)
 {
   int m, num;
-  int sz;
   float fnum;
   int passes = 0;  /* two passes and its over */
   int tmp;
@@ -705,12 +703,12 @@ do_play_ascii(Gameinfo *gameinfo)
 	    printf("\nInvalid board size: %d\n", num);
 	    break;
 	  }
-	  sz = num;
 	  /* Init board. */
-	  gnugo_clear_board(sz);
+	  board_size = num;
+	  clear_board();
 	  /* In case max handicap changes on smaller board. */
 	  gameinfo->handicap = place_fixed_handicap(gameinfo->handicap);
-	  sgfOverwritePropertyInt(sgftree.root, "SZ", sz);
+	  sgfOverwritePropertyInt(sgftree.root, "SZ", board_size);
 	  sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 	  break;
 
@@ -729,7 +727,7 @@ do_play_ascii(Gameinfo *gameinfo)
 	    break;
 	  }
 	  /* Init board. */
-	  gnugo_clear_board(board_size);
+	  clear_board();
 	  /* Place stones on board but don't record sgf 
 	   * in case we change more info. */
 	  gameinfo->handicap = place_fixed_handicap(num);
@@ -779,19 +777,6 @@ do_play_ascii(Gameinfo *gameinfo)
 	  }
 	  level = num;
 	  printf("\nSet level to %d\n", level);
-	  break;
-
-	  /* Level replaces hurry as of 2.7.204. This option is retained
-	   * for compatibility with gnugoclient. 
-	   */
-	case SETHURRY:
-	  command += 6;
-	  if (sscanf(command, "%d", &num) != 1) {
-	    printf("\nInvalid command syntax!\n");
-	    break;
-	  }
-	  level = 10 - num;
-	  printf("\nSet hurry to %d\n", 10 - level);
 	  break;
 
 	case DISPLAY:
@@ -1173,16 +1158,18 @@ ascii_count(Gameinfo *gameinfo)
 static void
 showcapture(char *line)
 {
-  int i, j, x, y;
-  if (line)
-    if (!string_to_location(board_size, line, &i, &j)
-	|| BOARD(i, j) == EMPTY) {
-      printf("\ninvalid point!\n");
-      return;
-    }
+  int i, j;
+  int move;
+
+  gg_assert(line);
+  if (!string_to_location(board_size, line, &i, &j)
+      || BOARD(i, j) == EMPTY) {
+    printf("\ninvalid point!\n");
+    return;
+  }
   
-  if (gnugo_attack(i, j, &x, &y))
-    mprintf("\nSuccessfull attack of %m at %m\n", i, j, x, y);
+  if (attack(POS(i, j), &move))
+    mprintf("\nSuccessful attack of %m at %1m\n", i, j, move);
   else
     mprintf("\n%m cannot be attacked\n", i, j);
 }
@@ -1191,17 +1178,19 @@ showcapture(char *line)
 static void
 showdefense(char *line)
 {
-  int i, j, x, y;
-  if (line)
-    if (!string_to_location(board_size, line, &i, &j)
-	|| BOARD(i, j) == EMPTY) {
-      printf("\ninvalid point!\n");
-      return;
-    }
+  int i, j;
+  int move;
+  
+  gg_assert(line);
+  if (!string_to_location(board_size, line, &i, &j)
+      || BOARD(i, j) == EMPTY) {
+    printf("\ninvalid point!\n");
+    return;
+  }
 
-    if (gnugo_attack(i, j, &x, &y)) {
-      if (gnugo_find_defense(i, j, &x, &y))
-        mprintf("\nSuccessfull defense of %m at %m\n", i, j, x, y);
+  if (attack(POS(i, j), NULL)) {
+      if (find_defense(POS(i, j), &move))
+        mprintf("\nSuccessful defense of %m at %1m\n", i, j, move);
       else
         mprintf("\n%m cannot be defended\n", i, j);
     }
@@ -1244,12 +1233,12 @@ ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
       return;
     }
 
-    gnugo_clear_board(board_size);
+    clear_board();
     handi = place_free_handicap(handi);
     printf("\nPlaced %d stones of free handicap.\n", handi);
   }
   else { /* User is to place handicap */
-    gnugo_clear_board(board_size);
+    clear_board();
     handi = 0;
 
     while (1) {
@@ -1275,7 +1264,7 @@ ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
 	}
       }
       else if (!strncmp(line, "clear", 5)) {
-        gnugo_clear_board(board_size);
+        clear_board();
         handi = 0;
       }
       else if (!strncmp(line, "done", 4)) {

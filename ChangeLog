@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- remove long deprecated command hurry from play_ascii
+- use signed char in connected_components() in owl.c
+- rotation support for --decide_* options removed
 - remove trivial wrapper functions from engine/interface.c
 - patterns/transpat.c, patterns/patlib.c, and patterns/patlib.h removed
 - unused game records in regression/golois removed
