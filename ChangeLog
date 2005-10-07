@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- documentation update
 - remove long deprecated command hurry from play_ascii
 - use signed char in connected_components() in owl.c
 - rotation support for --decide_* options removed

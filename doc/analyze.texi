@@ -17,7 +17,7 @@ certain move.
 * Decide string::		Checking the reading code
 * Decide dragon::		Checking the owl code
 * GTP and GDB techniques::      GTP and GDB techniques
-* Debugboard::                  Debugboard
+* view.pike::                   Debugging on a Graphic Board
 * Scoring::                     Finding out the winner of the game
 * Colored Display::             Colored Display
 @end menu
@@ -46,12 +46,11 @@ instead of introducing a new one.
 
 If you use the @option{-w} option, GNU Go will report the statuses of
 worms and dragons around the board. This type of information is
-available by different methods, however (@pxref{Debugboard},
+available by different methods, however (@pxref{view.pike},
 @pxref{Colored Display}).
 
 @node Output File
 @section The Output File
-@cindex output file
 @cindex output file
 
 If GNU Go is invoked with the option @option{-o filename} it will
@@ -152,7 +151,7 @@ try setting @code{sgf_dumptree=1} and setting a breakpoint in
 @code{sgf_trace}.
 
 @node Decide dragon
-@section Checking the Owl code
+@section Checking the Owl Code
 @cindex decide-dragon
 
 You can similarly debug the Owl code using the option
@@ -185,17 +184,22 @@ list the dragon data with the command:
 
 Similarly you can get the worm data with @command{worm P12}.
 
-@node Debugboard
-@section Debugboard
-@cindex debugboard
+@node view.pike
+@section Debugging on a Graphical Board
+@cindex debugging on a graphical board
 
-A useful utility called @command{debugboard} is made in
-the @file{interface/debugboard/} directory. This can be run
-in an Xterm. Use a smaller font since it requires 50 rows
-and 80 columns. This runs @code{examine_position()}, then
-makes a graphical display of the board. Using the cursor
-movement keys, you can move around the board and find
-out the contents of the worm, dragon and eye arrays.
+The quickest way to analyze most positions is to use the tool
+@file{view.pike} in the @file{regression} directory. It can be started
+with a testcase specified, e.g. @command{pike view.pike strategy:40} or
+at a move in an sgf file, e.g. @command{pike view.pike mistake.sgf:125}.
+When started it shows the position on a grapical board on which it also
+marks information like move values, dragon status, and so on. By
+clicking on the board further information about the valuation of moves,
+contents of various data structures, and other data can be made
+available.
+
+Specific information on how to use @file{view.pike} for influence tuning
+can be found in @xref{Influence Tuning}.
 
 @node Scoring
 @section Scoring the game

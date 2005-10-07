@@ -79,7 +79,6 @@ particularly if you are dissatisfied with GNU Go's performance.
 @menu
 * Ram Cache::                 Ram Cache
 * Default Level::             Default Level
-* DFA Option::                DFA Option
 * Other Options::             Other Options
 @end menu
 
@@ -148,23 +147,13 @@ using level 10 unless you find it too slow. If you decide
 you want to change the default you may rerun configure
 and recompile the program.
 
-@node DFA Option
-@subsection DFA Configure Option
-
-There are two distinct implementations of the pattern matcher in GNU
-Go. The DFA (Discrete Finite-state Automata) option was considered
-experimental in GNU Go 3.0 but is now standard. You can disable it by
-with the configure option @command{./configure --disable-dfa}.  The
-option is harder to debug than the old matcher but significantly
-faster (@pxref{DFA}).
-
 @node Other Options
 @subsection Other Options
 
-Anything new in the engine is generally tested as an experimental
-option which can be turned on or off at compile time or run time.
-Some ``experimental'' options such as the break-in code and the
-semeai code are no longer experimental but are enabled by default.
+Anything new in the engine is generally tested as an experimental option
+which can be turned on or off at compile time or run time. Some
+``experimental'' options such as the break-in code are no longer
+experimental but are enabled by default.
 
 This section can be skipped unless you are interested in the
 experimental options.
