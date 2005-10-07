@@ -36,7 +36,6 @@
  */
 #define NEEDS_UPDATE(x) (x != position_number ? (x = position_number, 1) : 0)
 
-static int get_level(int *level);
 static int do_genmove(int color, float pure_threat_value,
 		      int allowed_moves[BOARDMAX], float *value, int *resign);
 
@@ -318,8 +317,6 @@ do_genmove(int color, float pure_threat_value,
   /* no move is found yet. */
   move = PASS_MOVE;  
   *value = 0.0; 
-  if (get_level(&level))
-    fprintf(stderr, "level = %d\n", level);
   
   /* experimental level adapter */
   clock_adapt_level(&level, color);
@@ -558,32 +555,6 @@ move_considered(int move, float value)
     potential_moves[move] = value;
 }
 
-
-/* If there is a file with the name "level", reads it
- * each move and corrects the value of level.
- */
-
-static int
-get_level(int *level)
-{
-  char buffer[128];
-  FILE *fp;
-
-  const char filename[] = "level";
-
-  if ((fp = fopen(filename, "r")) == NULL)
-    return 0;
-
-  if (fgets(buffer, 128, fp)) {
-    if (sscanf(buffer, "%d", level))
-      return 1;
-    else
-      return 0;
-  }
-  else
-    return 0;
-}
-  
 
 /* revise_semeai(color) changes the status of any DEAD dragon of
  * OPPOSITE_COLOR(color) which occurs in a semeai to UNKNOWN.

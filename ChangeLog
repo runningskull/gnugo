@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- get_level() removed from genmove.c
 - documentation update
 - remove long deprecated command hurry from play_ascii
 - use signed char in connected_components() in owl.c
