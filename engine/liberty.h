@@ -243,7 +243,7 @@ void store_persistent_connection_cache(enum routine_id routine,
 				       int str1, int str2,
 				       int result, int move,
 				       int tactical_nodes,
-				       char connection_shadow[BOARDMAX]);
+				       signed char connection_shadow[BOARDMAX]);
 int search_persistent_breakin_cache(enum routine_id routine,
 				    int str, Hash_data *goal_hash,
 				    int breakin_node_limit,

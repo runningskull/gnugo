@@ -89,7 +89,7 @@ static int white_domain[BOARDMAX];
 
 /* Used internally by mapping functions. */
 static int map_size;
-static char used_index[MAXEYE];
+static signed char used_index[MAXEYE];
 
 
 /*
@@ -307,7 +307,7 @@ compute_primary_domains(int color, int domain[BOARDMAX],
   int i, j, k;
   int pos, pos2;
   int own, enemy;
-  char threshold[BOARDMAX];
+  signed char threshold[BOARDMAX];
   signed char influence[BOARDMAX];
   int list[BOARDMAX];
   int size = 0, lastchange = 0;
@@ -798,7 +798,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   int margins_adjacent_to_margin = 0;
   int effective_eyesize;
   int bulk_score = 0;
-  char chainlinks[BOARDMAX];
+  signed char chainlinks[BOARDMAX];
 
   /* Stones inside eyespace which do not coincide with a false eye or
    * a halfeye.
@@ -1229,7 +1229,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
   int eye_size = 0;
   int num_marginals = 0;
   int vpos[MAXEYE];
-  char marginal[MAXEYE], edge[MAXEYE], neighbors[MAXEYE];
+  signed char marginal[MAXEYE], edge[MAXEYE], neighbors[MAXEYE];
   int graph;
   int map[MAXEYE];
   int best_score;

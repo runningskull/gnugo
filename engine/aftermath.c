@@ -342,8 +342,8 @@ do_aftermath_genmove(int color,
 
     /* if we're about to play at distance 1, try to optimize the move. */
     if (distance[move] == 2) {
-      char mx[BOARDMAX];
-      char mark = 0;
+      signed char mx[BOARDMAX];
+      signed char mark = 0;
       memset(mx, 0, sizeof(mx));
       best_score = 0;
       best_scoring_move = move;

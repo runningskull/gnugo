@@ -1522,9 +1522,9 @@ superstring_add_string(int str,
 		       int *num_stones, int *stones,
 		       int *num_libs, int *libs, int maxlibs,
 		       int *num_adj, int *adjs, int liberty_cap,
-		       char mx[BOARDMAX],
-		       char ml[BOARDMAX],
-		       char ma[BOARDMAX],
+		       signed char mx[BOARDMAX],
+		       signed char ml[BOARDMAX],
+		       signed char ma[BOARDMAX],
 		       int do_add);
 
 void
@@ -1658,9 +1658,9 @@ do_find_superstring(int str, int *num_stones, int *stones,
   int num_my_stones;
   int my_stones[MAX_BOARD * MAX_BOARD];
   
-  char mx[BOARDMAX]; /* stones */
-  char ml[BOARDMAX]; /* liberties */
-  char ma[BOARDMAX]; /* adjacent strings */
+  signed char mx[BOARDMAX]; /* stones */
+  signed char ml[BOARDMAX]; /* liberties */
+  signed char ma[BOARDMAX]; /* adjacent strings */
 
   int k, l, r;
   int color = board[str];
@@ -1837,9 +1837,9 @@ superstring_add_string(int str,
 		       int *num_stones, int *stones,
 		       int *num_libs, int *libs, int maxlibs,
 		       int *num_adj, int *adjs, int liberty_cap,
-		       char mx[BOARDMAX],
-		       char ml[BOARDMAX],
-		       char ma[BOARDMAX],
+		       signed char mx[BOARDMAX],
+		       signed char ml[BOARDMAX],
+		       signed char ma[BOARDMAX],
 		       int do_add)
 {
   int num_my_libs;

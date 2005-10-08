@@ -87,7 +87,7 @@
 struct persistent_cache_entry {
   int boardsize;
   int movenum;
-  char board[BOARDMAX];
+  Intersection board[BOARDMAX];
   int stack[MAX_CACHE_DEPTH];
   int move_color[MAX_CACHE_DEPTH];
   enum routine_id routine;
@@ -111,7 +111,7 @@ struct persistent_cache_entry {
  * This function has to be provided by each cache.
  */
 typedef void (*compute_active_area_fn)(struct persistent_cache_entry *entry,
-				       const char goal[BOARDMAX],
+				       const signed char goal[BOARDMAX],
 				       int goal_color);
 
 struct persistent_cache {
@@ -126,20 +126,22 @@ struct persistent_cache {
 };
 
 static void compute_active_owl_area(struct persistent_cache_entry *entry,
-				    const char goal[BOARDMAX],
+				    const signed char goal[BOARDMAX],
 				    int goal_color);
 static void compute_active_semeai_area(struct persistent_cache_entry *entry,
-				       const char goal[BOARDMAX],
+				       const signed char goal[BOARDMAX],
 				       int dummy);
 static void compute_active_reading_area(struct persistent_cache_entry *entry,
-					const char reading_shadow[BOARDMAX],
+					const signed char
+					    reading_shadow[BOARDMAX],
 					int dummy);
 static void compute_active_connection_area(struct persistent_cache_entry *entry,
-					   const char
+					   const signed char
 					   	connection_shadow[BOARDMAX],
 					   int goal_color);
 static void compute_active_breakin_area(struct persistent_cache_entry *entry,
-				        const char breakin_shadow[BOARDMAX],
+				        const signed char
+					    breakin_shadow[BOARDMAX],
 				        int dummy);
 
 static struct persistent_cache reading_cache =
@@ -172,7 +174,7 @@ static struct persistent_cache semeai_cache =
 
 
 static void
-draw_active_area(char board[BOARDMAX], int apos)
+draw_active_area(Intersection board[BOARDMAX], int apos)
 {
   int i, j, ii;
   int c = ' ';
@@ -219,7 +221,7 @@ draw_active_area(char board[BOARDMAX], int apos)
  * 0 otherwise.
  */
 static int
-verify_stored_board(char p[BOARDMAX])
+verify_stored_board(Intersection p[BOARDMAX])
 {
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -467,7 +469,8 @@ store_persistent_cache(struct persistent_cache *cache,
 		       Hash_data *goal_hash,
 		       int result, int result2, int move, int move2,
 		       int certain, int node_limit,
-		       int cost, const char goal[BOARDMAX], int goal_color)
+		       int cost, const signed char goal[BOARDMAX],
+		       int goal_color)
 {
   int r;
   struct persistent_cache_entry *entry;
@@ -621,7 +624,7 @@ store_persistent_reading_cache(enum routine_id routine, int str,
 
 static void
 compute_active_reading_area(struct persistent_cache_entry *entry,
-			    const char goal[BOARDMAX], int dummy)
+			    const signed char goal[BOARDMAX], int dummy)
 {
   signed char active[BOARDMAX];
   int pos, r;
@@ -822,7 +825,7 @@ void
 store_persistent_connection_cache(enum routine_id routine,
     				  int str1, int str2,
 				  int result, int move, int tactical_nodes,
-				  char connection_shadow[BOARDMAX])
+				  signed char connection_shadow[BOARDMAX])
 {
   store_persistent_cache(&connection_cache, routine,
       			 str1, str2, NO_MOVE, EMPTY, NULL,
@@ -836,7 +839,7 @@ store_persistent_connection_cache(enum routine_id routine,
  */
 static void
 compute_active_connection_area(struct persistent_cache_entry *entry,
-			       const char connection_shadow[BOARDMAX],
+			       const signed char connection_shadow[BOARDMAX],
 			       int dummy)
 {
   int pos;
@@ -985,7 +988,8 @@ store_persistent_breakin_cache(enum routine_id routine,
  */
 static void
 compute_active_breakin_area(struct persistent_cache_entry *entry,
-			    const char breakin_shadow[BOARDMAX], int dummy)
+			    const signed char breakin_shadow[BOARDMAX],
+			    int dummy)
 {
   int pos;
   int k, r;
@@ -1127,7 +1131,7 @@ store_persistent_owl_cache(enum routine_id routine,
  * some intersection to be active.
  */
 static void
-compute_active_owl_type_area(const char goal[BOARDMAX], int goal_color,
+compute_active_owl_type_area(const signed char goal[BOARDMAX], int goal_color,
 			     signed char active[BOARDMAX])
 {
   int k, r;
@@ -1213,7 +1217,7 @@ compute_active_owl_type_area(const char goal[BOARDMAX], int goal_color,
 
 static void
 compute_active_owl_area(struct persistent_cache_entry *entry,
-			const char goal[BOARDMAX], int goal_color)
+			const signed char goal[BOARDMAX], int goal_color)
 {
   int pos;
   signed char active[BOARDMAX];
@@ -1272,7 +1276,7 @@ store_persistent_semeai_cache(enum routine_id routine,
 			      signed char goala[BOARDMAX],
 			      signed char goalb[BOARDMAX])
 {
-  char goal[BOARDMAX];
+  signed char goal[BOARDMAX];
   int pos;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
@@ -1287,7 +1291,7 @@ store_persistent_semeai_cache(enum routine_id routine,
 
 static void
 compute_active_semeai_area(struct persistent_cache_entry *entry,
-			   const char goal[BOARDMAX], int dummy)
+			   const signed char goal[BOARDMAX], int dummy)
 {
   int pos;
   signed char active_b[BOARDMAX];
@@ -1328,7 +1332,8 @@ compute_active_semeai_area(struct persistent_cache_entry *entry,
 /* Helper for the owl_hotspots() function below. */
 static void
 mark_dragon_hotspot_values(float values[BOARDMAX], int dr,
-			   float contribution, char active_board[BOARDMAX])
+			   float contribution,
+			   Intersection active_board[BOARDMAX])
 {
   int pos;
   int k;

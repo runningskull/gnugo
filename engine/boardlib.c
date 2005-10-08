@@ -46,7 +46,7 @@ int movenum;
 int allow_suicide = 0;  /* allow opponent to make suicide moves */
 
 
-char shadow[BOARDMAX];
+signed char shadow[BOARDMAX];
 
 /* Hashing of positions. */
 Hash_data board_hash;

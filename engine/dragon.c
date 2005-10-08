@@ -65,7 +65,8 @@ static int connected_to_eye(int pos, int str, int color, int eye_color,
 			    struct eye_data *eye);
 static void connected_to_eye_recurse(int pos, int str, int color,
 				     int eye_color, struct eye_data *eye,
-				     char *mx, char *me, int *halfeyes);
+				     signed char *mx, signed char *me,
+				     int *halfeyes);
 static int compute_crude_status(int pos);
 static int compute_escape(int pos, int dragon_status_known);
 static void compute_surrounding_moyo_sizes(const struct influence_data *q);
@@ -1413,8 +1414,8 @@ static int
 connected_to_eye(int pos, int str, int color, int eye_color,
 		 struct eye_data *eye)
 {
-  char mx[BOARDMAX];
-  char me[BOARDMAX];
+  signed char mx[BOARDMAX];
+  signed char me[BOARDMAX];
   int k;
   int halfeyes;
 
@@ -1443,7 +1444,7 @@ connected_to_eye(int pos, int str, int color, int eye_color,
  */
 static void
 connected_to_eye_recurse(int pos, int str, int color, int eye_color,
-			 struct eye_data *eye, char *mx, char *me,
+			 struct eye_data *eye, signed char *mx, signed char *me,
 			 int *halfeyes)
 {
   int liberties;

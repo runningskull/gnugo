@@ -183,7 +183,7 @@ extern int          move_history_pointer;
 extern float        komi;
 extern int          movenum;      /* movenumber - used for debug output */
 		    
-extern char         shadow[BOARDMAX];      /* reading tree shadow */
+extern signed char  shadow[BOARDMAX];      /* reading tree shadow */
 
 extern int chinese_rules;
 extern int allow_suicide;

@@ -30,9 +30,10 @@
 #include "gg_utils.h"
 
 /* Forward declarations */
-static int goal_dist(int pos, char goal[BOARDMAX]);
+static int goal_dist(int pos, signed char goal[BOARDMAX]);
 static int compare_angles(const void *a, const void *b);
-static void show_surround_map(char mf[BOARDMAX], char mn[BOARDMAX]);
+static void show_surround_map(signed char mf[BOARDMAX],
+			      signed char mn[BOARDMAX]);
 
 /* Globals */
 static int gg;      /* stores the gravity center of the goal */
@@ -103,8 +104,8 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   int stones = 0;
   int found_some;
   
-  char mf[BOARDMAX]; /* friendly dragon  */
-  char mn[BOARDMAX]; /* neighbor dragons */
+  signed char mf[BOARDMAX]; /* friendly dragon  */
+  signed char mn[BOARDMAX]; /* neighbor dragons */
   int  sd[BOARDMAX]; /* distances to the goal */
   
   if (DRAGON2(pos).hostile_neighbors == 0)
@@ -520,7 +521,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
  */
 
 static int
-goal_dist(int pos, char goal[BOARDMAX])
+goal_dist(int pos, signed char goal[BOARDMAX])
 {
   int dist = 10000;
   int ii;
@@ -597,7 +598,7 @@ compare_angles(const void *a, const void *b)
 
 
 static void
-show_surround_map(char mf[BOARDMAX], char mn[BOARDMAX])
+show_surround_map(signed char mf[BOARDMAX], signed char mn[BOARDMAX])
 {
   int m, n;
 
