@@ -534,8 +534,8 @@ find_large_scale_owl_attack_moves(int color)
     int target = dragon2[d].origin;
     if (dragon[target].color == OTHER_COLOR(color)
 	&& dragon[target].size <= 6
-        && (dragon[target].status == CRITICAL
-	    || dragon2[d].owl_status == CRITICAL)) {
+        && dragon[target].status == CRITICAL
+	&& dragon2[d].owl_status == CRITICAL) {
       DEBUG(DEBUG_LARGE_SCALE, "Small critical dragon found at %1m\n", target);
       find_large_scale_owl_attacks_on_dragon(color, target);
     }
