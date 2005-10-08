@@ -638,7 +638,7 @@ compute_active_reading_area(struct persistent_cache_entry *entry,
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     active[pos] = goal[pos];
 
-  signed_mark_string(entry->apos, active, 1);
+  mark_string(entry->apos, active, 1);
 
   /* To be safe, also add the successful move. */
   if (entry->result != 0 && entry->move != 0)
@@ -655,7 +655,7 @@ compute_active_reading_area(struct persistent_cache_entry *entry,
 	|| (ON_BOARD(NORTH(pos)) && active[NORTH(pos)] == 1)
 	|| (ON_BOARD(EAST(pos)) && active[EAST(pos)] == 1)) {
       if (IS_STONE(board[pos]))
-	signed_mark_string(pos, active, 2);
+	mark_string(pos, active, 2);
       else
 	active[pos] = 2;
     }
@@ -861,8 +861,8 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     active[pos] = connection_shadow[pos];
 
-  signed_mark_string(entry->apos, active, 1);
-  signed_mark_string(entry->bpos, active, 1);
+  mark_string(entry->apos, active, 1);
+  mark_string(entry->bpos, active, 1);
 
   /* To be safe, also add the successful move. */
   if (entry->result != 0 && entry->move != 0)
@@ -880,7 +880,7 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
 	if (board[pos] == EMPTY)
 	  active[pos] = k + 1;
 	else
-	  signed_mark_string(pos, active, (signed char) (k + 1));
+	  mark_string(pos, active, (signed char) (k + 1));
       }
     }
   }
@@ -892,7 +892,7 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
     for (r = 0; r < 4; r++) {
       int pos2 = pos + delta[r];
       if (ON_BOARD(pos2) && board[pos2] != other && active[pos2] != 0) {
-	signed_mark_string(pos, active, 1);
+	mark_string(pos, active, 1);
 	break;
       }
     }
@@ -916,7 +916,7 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
        */
       adj = chainlinks(pos, adjs);
       for (r = 0; r < adj; r++) {
-	signed_mark_string(adjs[r], active, -1);
+	mark_string(adjs[r], active, -1);
 	if (countlib(adjs[r]) <= 3) {
 	  int s;
 	  int adjs2[MAXCHAIN];
@@ -926,7 +926,7 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
 	    active[libs[s]] = 1;
 	  adj2 = chainlinks(pos, adjs2);
 	  for (s = 0; s < adj2; s++)
-	    signed_mark_string(adjs2[s], active, -1);
+	    mark_string(adjs2[s], active, -1);
 	}
       }
     }
@@ -1010,7 +1010,7 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     active[pos] = breakin_shadow[pos];
 
-  signed_mark_string(entry->apos, active, 1);
+  mark_string(entry->apos, active, 1);
 
   /* To be safe, also add the successful move. */
   if (entry->result != 0 && entry->move != 0)
@@ -1028,7 +1028,7 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
 	if (board[pos] == EMPTY)
 	  active[pos] = k + 1;
 	else
-	  signed_mark_string(pos, active, (signed char) (k + 1));
+	  mark_string(pos, active, (signed char) (k + 1));
       }
     }
   }
@@ -1042,7 +1042,7 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
       if (ON_BOARD(pos2)
 	  && board[pos2] != other
 	  && active[pos2] && active[pos2] <= 2) {
-	signed_mark_string(pos, active, 1);
+	mark_string(pos, active, 1);
 	break;
       }
     }
@@ -1066,7 +1066,7 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
        */
       adj = chainlinks(pos, adjs);
       for (r = 0; r < adj; r++) {
-	signed_mark_string(adjs[r], active, -1);
+	mark_string(adjs[r], active, -1);
 	if (countlib(adjs[r]) <= 3) {
 	  int s;
 	  int adjs2[MAXCHAIN];
@@ -1076,7 +1076,7 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
 	    active[libs[s]] = 1;
 	  adj2 = chainlinks(pos, adjs2);
 	  for (s = 0; s < adj2; s++)
-	    signed_mark_string(adjs2[s], active, -1);
+	    mark_string(adjs2[s], active, -1);
 	}
       }
     }
@@ -1162,7 +1162,7 @@ compute_active_owl_type_area(const signed char goal[BOARDMAX], int goal_color,
 	if (board[pos] == EMPTY)
 	  active[pos] = k + 1;
 	else
-	  signed_mark_string(pos, active, (signed char) (k + 1));
+	  mark_string(pos, active, (signed char) (k + 1));
       }
     }
   }
@@ -1174,7 +1174,7 @@ compute_active_owl_type_area(const signed char goal[BOARDMAX], int goal_color,
     for (r = 0; r < 4; r++) {
       int pos2 = pos + delta[r];
       if (ON_BOARD(pos2) && board[pos2] != other && active[pos2] != 0) {
-	signed_mark_string(pos, active, 1);
+	mark_string(pos, active, 1);
 	break;
       }
     }
@@ -1198,7 +1198,7 @@ compute_active_owl_type_area(const signed char goal[BOARDMAX], int goal_color,
        */
       adj = chainlinks(pos, adjs);
       for (r = 0; r < adj; r++) {
-	signed_mark_string(adjs[r], active, -1);
+	mark_string(adjs[r], active, -1);
 	if (countlib(adjs[r]) <= 3) {
 	  int s;
 	  int adjs2[MAXCHAIN];
@@ -1208,7 +1208,7 @@ compute_active_owl_type_area(const signed char goal[BOARDMAX], int goal_color,
 	    active[libs[s]] = 1;
 	  adj2 = chainlinks(pos, adjs2);
 	  for (s = 0; s < adj2; s++)
-	    signed_mark_string(adjs2[s], active, -1);
+	    mark_string(adjs2[s], active, -1);
 	}
       }
     }

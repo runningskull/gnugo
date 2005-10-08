@@ -2756,7 +2756,7 @@ find_break_moves(int str, const signed char goal[BOARDMAX], int color_to_move,
 	if (goal[stones[i]]) {
 	  str2 = find_origin(stones[i]);
 	  TRACE("%oUsing %1m as secondary target.\n", str2);
-	  signed_mark_string(str2, breakin_shadow, 1);
+	  mark_string(str2, breakin_shadow, 1);
 	  break;
 	}
       }

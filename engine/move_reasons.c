@@ -1420,7 +1420,7 @@ get_saved_worms(int pos, signed char saved[BOARDMAX])
      * move is unsafe.
      */
     if (move_reasons[r].type == DEFEND_MOVE)
-      signed_mark_string(worm[what].origin, saved, 1);
+      mark_string(worm[what].origin, saved, 1);
     else if (move_reasons[r].type == OWL_DEFEND_MOVE_LOSS) {
       int origin = dragon[what].origin;
       int kworm = worm[what].origin;
@@ -1428,7 +1428,7 @@ get_saved_worms(int pos, signed char saved[BOARDMAX])
       for (ii = BOARDMIN; ii < BOARDMAX; ii++)
 	if (IS_STONE(board[ii]) && dragon[ii].origin == origin
 	    && worm[ii].origin != kworm)
-	  signed_mark_string(worm[ii].origin, saved, 1);
+	  mark_string(worm[ii].origin, saved, 1);
     }
   }    
 }

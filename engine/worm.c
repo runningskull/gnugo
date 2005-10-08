@@ -1712,7 +1712,7 @@ get_lively_stones(int color, signed char safe_stones[BOARDMAX])
       if (worm[ii].attack_codes[0] == 0
 	  || (board[ii] == color
 	      && worm[ii].defense_codes[0] != 0))
-	signed_mark_string(ii, safe_stones, 1);
+	mark_string(ii, safe_stones, 1);
     }
 }
 

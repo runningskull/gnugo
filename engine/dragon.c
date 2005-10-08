@@ -2291,7 +2291,7 @@ mark_dragon(int pos, signed char mx[BOARDMAX], signed char mark)
   int w;
   for (w = first_worm_in_dragon(dragon[pos].origin); w != NO_MOVE;
        w = next_worm_in_dragon(w))
-    signed_mark_string(w, mx, mark);
+    mark_string(w, mx, mark);
 }
 
 

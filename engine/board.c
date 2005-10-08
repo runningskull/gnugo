@@ -2974,23 +2974,6 @@ mark_string(int str, signed char mx[BOARDMAX], signed char mark)
 }
 
 
-/* Signed char variant of the function above.
- * FIXME: Do we want to convert all mark_string() to signed char?
- */
-void
-signed_mark_string(int str, signed char mx[BOARDMAX], signed char mark)
-{
-  int pos = str;
-
-  ASSERT1(IS_STONE(board[str]), str);
-
-  do {
-    mx[pos] = mark;
-    pos = NEXT_STONE(pos);
-  } while (pos != str);
-}
-
-
 /* Returns true if at least one move has been played at pos
  * at deeper than level 'cutoff' in the reading tree.
  */

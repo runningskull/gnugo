@@ -291,7 +291,6 @@ int has_neighbor(int pos, int color);
 int same_string(int str1, int str2);
 int adjacent_strings(int str1, int str2);
 void mark_string(int str, signed char mx[BOARDMAX], signed char mark);
-void signed_mark_string(int str, signed char mx[BOARDMAX], signed char mark);
 int are_neighbors(int pos1, int pos2);
 
 /* Count and/or find liberties at (pos). */
