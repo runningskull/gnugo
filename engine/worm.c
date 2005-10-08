@@ -1700,7 +1700,7 @@ defense_callback(int anchor, int color, struct pattern *pattern, int ll,
 }
 
 void
-get_lively_stones(int color, char safe_stones[BOARDMAX])
+get_lively_stones(int color, signed char safe_stones[BOARDMAX])
 {
   int ii;
   memset(safe_stones, 0, BOARDMAX * sizeof(*safe_stones));
@@ -1712,7 +1712,7 @@ get_lively_stones(int color, char safe_stones[BOARDMAX])
       if (worm[ii].attack_codes[0] == 0
 	  || (board[ii] == color
 	      && worm[ii].defense_codes[0] != 0))
-	mark_string(ii, safe_stones, 1);
+	signed_mark_string(ii, safe_stones, 1);
     }
 }
 
@@ -1720,7 +1720,7 @@ get_lively_stones(int color, char safe_stones[BOARDMAX])
 void
 compute_worm_influence()
 {
-  char safe_stones[BOARDMAX];
+  signed char safe_stones[BOARDMAX];
 
   get_lively_stones(BLACK, safe_stones);
   compute_influence(BLACK, safe_stones, NULL, &initial_black_influence,

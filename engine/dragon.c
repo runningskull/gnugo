@@ -1090,7 +1090,7 @@ dragon_looks_inessential(int origin)
  * owl code thinks so.
  */
 static void
-get_alive_stones(int color, char safe_stones[BOARDMAX])
+get_alive_stones(int color, signed char safe_stones[BOARDMAX])
 {
   int d;
   get_lively_stones(color, safe_stones);
@@ -1154,7 +1154,8 @@ identify_thrashing_dragons()
 	  DEBUG(DEBUG_DRAGONS,
 		"neighbor at distance %d of thrashing dragon found at %1m\n",
 		dist + 1, DRAGON(d).origin);
-	  mark_dragon(DRAGON(d).origin, thrashing_stone, (char)(dist + 1));
+	  mark_dragon(DRAGON(d).origin, thrashing_stone,
+		      (signed char)(dist + 1));
 	}
       }
     }
@@ -1163,7 +1164,7 @@ identify_thrashing_dragons()
 
 
 static void
-set_dragon_strengths(const char safe_stones[BOARDMAX],
+set_dragon_strengths(const signed char safe_stones[BOARDMAX],
     		     float strength[BOARDMAX])
 {
   int ii;
@@ -1183,7 +1184,7 @@ set_dragon_strengths(const char safe_stones[BOARDMAX],
  * everything else unchanged.
  */
 void
-mark_inessential_stones(int color, char safe_stones[BOARDMAX])
+mark_inessential_stones(int color, signed char safe_stones[BOARDMAX])
 {
   int ii;
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
@@ -1202,7 +1203,7 @@ mark_inessential_stones(int color, char safe_stones[BOARDMAX])
 }
 
 void
-set_strength_data(int color, char safe_stones[BOARDMAX],
+set_strength_data(int color, signed char safe_stones[BOARDMAX],
     		  float strength[BOARDMAX])
 {
   gg_assert(IS_STONE(color) || color == EMPTY);
@@ -1216,7 +1217,7 @@ set_strength_data(int color, char safe_stones[BOARDMAX],
 void
 compute_dragon_influence()
 {
-  char safe_stones[BOARDMAX];
+  signed char safe_stones[BOARDMAX];
   float strength[BOARDMAX];
 
   set_strength_data(BLACK, safe_stones, strength);
@@ -1849,7 +1850,7 @@ compute_crude_status(int pos)
  */
 int
 dragon_escape(char goal[BOARDMAX], int color,
-	      char escape_value[BOARDMAX])
+	      signed char escape_value[BOARDMAX])
 {
   int ii;
   int k;
@@ -2004,8 +2005,8 @@ compute_escape(int pos, int dragon_status_known)
 {
   int ii;
   char goal[BOARDMAX];
-  char escape_value[BOARDMAX];
-  char safe_stones[BOARDMAX];
+  signed char escape_value[BOARDMAX];
+  signed char safe_stones[BOARDMAX];
 
   ASSERT1(IS_STONE(board[pos]), pos);
 
@@ -2284,12 +2285,12 @@ are_neighbor_dragons(int d1, int d2)
 
 /* Mark the stones of a dragon. */
 void
-mark_dragon(int pos, char mx[BOARDMAX], char mark)
+mark_dragon(int pos, signed char mx[BOARDMAX], signed char mark)
 {
   int w;
   for (w = first_worm_in_dragon(dragon[pos].origin); w != NO_MOVE;
        w = next_worm_in_dragon(w))
-    mark_string(w, mx, mark);
+    signed_mark_string(w, mx, mark);
 }
 
 

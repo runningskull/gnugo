@@ -79,7 +79,7 @@ struct local_owl_data {
    */
   char neighbors[BOARDMAX];
 
-  char escape_values[BOARDMAX];
+  signed char escape_values[BOARDMAX];
   int color;
 
   struct eye_data my_eye[BOARDMAX];
@@ -6271,7 +6271,7 @@ compute_owl_escape_values(struct local_owl_data *owl)
 {
   int pos;
   int m, n;
-  char safe_stones[BOARDMAX];
+  signed char safe_stones[BOARDMAX];
   
   get_lively_stones(OTHER_COLOR(owl->color), safe_stones);
   compute_escape_influence(owl->color, safe_stones, NULL, NULL,
@@ -6292,7 +6292,7 @@ compute_owl_escape_values(struct local_owl_data *owl)
 	      owl->escape_values[pos] = owl->escape_values[DRAGON2(pos).origin];
 	    else {
 	      int pos2;
-	      char escape_values[BOARDMAX];
+	      signed char escape_values[BOARDMAX];
 	      char dragon[BOARDMAX];
 
 	      compute_escape_influence(owl->color, safe_stones, owl->goal, NULL,
@@ -6499,7 +6499,7 @@ owl_strong_dragon(int pos)
 static int
 owl_escape_route(struct local_owl_data *owl)
 {
-  char modified_escape[BOARDMAX];
+  signed char modified_escape[BOARDMAX];
   int pos;
   memcpy(modified_escape, owl->escape_values, sizeof(modified_escape));
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)

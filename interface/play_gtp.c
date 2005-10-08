@@ -2380,7 +2380,7 @@ static int
 gtp_combination_defend(char *s)
 {
   int color;
-  char defense_points[BOARDMAX];
+  signed char defense_points[BOARDMAX];
   int pos;
   int first = 1;
   int n;
@@ -2423,8 +2423,8 @@ gtp_aa_confirm_safety(char *s)
   int minsize = 0;
   int result;
   int defense_point = NO_MOVE;
-  char saved_dragons[BOARDMAX];
-  char saved_worms[BOARDMAX];
+  signed char saved_dragons[BOARDMAX];
+  signed char saved_worms[BOARDMAX];
 
   n = gtp_decode_move(s, &color, &i, &j);
   if (n == 0 || POS(i, j) == NO_MOVE)

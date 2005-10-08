@@ -33,7 +33,7 @@
  */
 
 int thrashing_dragon = NO_MOVE; /* Dead opponent's dragon trying to live. */
-char thrashing_stone[BOARDMAX]; /* All thrashing stones. */
+signed char thrashing_stone[BOARDMAX]; /* All thrashing stones. */
 
 int hashflags = HASH_DEFAULT;
 

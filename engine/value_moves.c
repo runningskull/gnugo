@@ -105,9 +105,9 @@ move_connects_strings(int pos, int color, int to_move)
 static float
 value_moves_get_blunder_size(int move, int color)
 {
-  char saved_dragons[BOARDMAX];
-  char saved_worms[BOARDMAX];
-  char safe_stones[BOARDMAX];
+  signed char saved_dragons[BOARDMAX];
+  signed char saved_worms[BOARDMAX];
+  signed char safe_stones[BOARDMAX];
 
   get_saved_dragons(move, saved_dragons);
   get_saved_worms(move, saved_worms);
@@ -930,7 +930,7 @@ induce_secondary_move_reasons(int color)
 	 */
 	if (!attack_move) {
 	  int strategically_valuable = (worm[aa].size > 3);
-	  char neighbor_dragons[BOARDMAX];
+	  signed char neighbor_dragons[BOARDMAX];
 
 	  memset(neighbor_dragons, 0, sizeof(neighbor_dragons));
 
@@ -1773,7 +1773,7 @@ estimate_territorial_value(int pos, int color, float our_score,
   float secondary_value = 0.0;
 
   int does_block = 0;
-  char safe_stones[BOARDMAX];
+  signed char safe_stones[BOARDMAX];
   float strength[BOARDMAX];
 
   set_strength_data(OTHER_COLOR(color), safe_stones, strength);
@@ -3644,7 +3644,7 @@ find_best_move(int *the_move, float *value, int color,
 	       int allowed_moves[BOARDMAX])
 {
   int good_move_found = 0;
-  char blunder_tested[BOARDMAX];
+  signed char blunder_tested[BOARDMAX];
   float best_value = 0.0;
   int best_move = NO_MOVE;
   int pos;

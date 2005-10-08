@@ -578,7 +578,7 @@ void
 decide_combination(int color)
 {
   int attack_move;
-  char defense_moves[BOARDMAX];
+  signed char defense_moves[BOARDMAX];
   SGFTree tree;
   int first = 1;
   int pos;

@@ -603,7 +603,7 @@ static int
 revise_thrashing_dragon(int color, float our_score, float advantage)
 {
   int pos;
-  char safe_stones[BOARDMAX];
+  signed char safe_stones[BOARDMAX];
   float strength[BOARDMAX];
 
   /* Trust the owl code's opinion if we are behind. */
@@ -672,7 +672,7 @@ find_mirror_move(int *move, int color)
 static void
 compute_scores()
 {
-  char safe_stones[BOARDMAX];
+  signed char safe_stones[BOARDMAX];
   float strength[BOARDMAX];
 
   set_strength_data(WHITE, safe_stones, strength);

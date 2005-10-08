@@ -47,7 +47,7 @@ combinations(int color)
 {
   int save_verbose;
   int attack_point;
-  char defense_points[BOARDMAX];
+  signed char defense_points[BOARDMAX];
   int other = OTHER_COLOR(color);
   int aa_val;
 
@@ -211,29 +211,31 @@ struct aa_move {
 static int aa_status[BOARDMAX]; /* ALIVE, DEAD or CRITICAL */
 static int forbidden[BOARDMAX];
 static int aa_values[BOARDMAX];
-static void compute_aa_status(int color, const char safe_stones[BOARDMAX]);
+static void compute_aa_status(int color,
+			      const signed char safe_stones[BOARDMAX]);
 static void compute_aa_values(int color);
 static int get_aa_status(int pos);
 static int do_atari_atari(int color, int *attack_point, int *defense_point,
-			  char all_potential_defenses[BOARDMAX],
+			  signed char all_potential_defenses[BOARDMAX],
 			  int last_friendly, int save_verbose, int minsize,
-			  char goal[BOARDMAX]);
+			  signed char goal[BOARDMAX]);
 static int atari_atari_succeeded(int color, int *attack_point,
                                 int *defense_point, int last_friendly,
                                 int save_verbose, int minsize);
 static void atari_atari_find_attack_moves(int color, int minsize,
 					  struct aa_move attacks[AA_MAX_MOVES],
-					  char goal[BOARDMAX]);
+					  signed char goal[BOARDMAX]);
 static void atari_atari_attack_patterns(int color, int minsize,
 					struct aa_move attacks[AA_MAX_MOVES],
-					char goal[BOARDMAX]);
+					signed char goal[BOARDMAX]);
 static void atari_atari_attack_callback(int anchor, int color,
 					struct pattern *pattern,
 					int ll, void *data);
 static int atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
 					  int moves[AA_MAX_MOVES]);
 static int get_aa_value(int str);
-static int update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX],
+static int update_aa_goal(signed char goal[BOARDMAX],
+			  signed char new_goal[BOARDMAX],
 			  int apos, int color);
 static void aa_init_moves(struct aa_move attacks[AA_MAX_MOVES]);
 static void aa_add_move(struct aa_move attacks[AA_MAX_MOVES],
@@ -245,14 +247,14 @@ static void aa_sort_moves(struct aa_move attacks[AA_MAX_MOVES]);
 /* Set to 1 if you want verbose traces from this function. */
 
 int
-atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
+atari_atari(int color, int *attack_move, signed char defense_moves[BOARDMAX],
 	    int save_verbose)
 {
   int other = OTHER_COLOR(color);
   int apos;
   int dpos;
   int aa_val;
-  char saved_defense_moves[BOARDMAX];
+  signed char saved_defense_moves[BOARDMAX];
 
   /* Collect worm statuses of opponent's worms. We need to
    * know this because we only want to report unexpected
@@ -355,11 +357,11 @@ atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
  */
 int
 atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
-			   const char saved_dragons[BOARDMAX],
-			   const char saved_worms[BOARDMAX])
+			   const signed char saved_dragons[BOARDMAX],
+			   const signed char saved_worms[BOARDMAX])
 {
-  char safe_stones[BOARDMAX];
-  char defense_moves[BOARDMAX];
+  signed char safe_stones[BOARDMAX];
+  signed char defense_moves[BOARDMAX];
   int pos;
   int blunder_size;
 
@@ -386,14 +388,15 @@ atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
  * safe_stones marks which of our stones are supposedly safe after this move.
  */
 int
-atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
-			 const char safe_stones[BOARDMAX])
+atari_atari_blunder_size(int color, int move,
+			 signed char defense_moves[BOARDMAX],
+			 const signed char safe_stones[BOARDMAX])
 {
   int apos;
   int defense_point = NO_MOVE;
   int aa_val, after_aa_val;
   int other = OTHER_COLOR(color);
-  char defense_points[BOARDMAX];
+  signed char defense_points[BOARDMAX];
   int last_forbidden = NO_MOVE;
 
   /* If aa_depth is too small, we can't see any combination attacks,
@@ -518,7 +521,7 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
  */
 
 static void
-compute_aa_status(int color, const char safe_stones[BOARDMAX])
+compute_aa_status(int color, const signed char safe_stones[BOARDMAX])
 {
   int other = OTHER_COLOR(color);
   int pos;
@@ -668,8 +671,8 @@ get_aa_status(int pos)
 
 static int
 do_atari_atari(int color, int *attack_point, int *defense_point,
-	       char all_potential_defenses[BOARDMAX], int last_friendly,
-	       int save_verbose, int minsize, char goal[BOARDMAX])
+	       signed char all_potential_defenses[BOARDMAX], int last_friendly,
+	       int save_verbose, int minsize, signed char goal[BOARDMAX])
 {
   int other = OTHER_COLOR(color);
   int k;
@@ -789,7 +792,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 
       if (trymove(bpos, other, "do_atari_atari-B", str)) {
 	int new_aa_val;
-	char new_goal[BOARDMAX];
+	signed char new_goal[BOARDMAX];
 	/* These moves may have been irrelevant for later
 	 * reading, so in order to avoid horizon problems, we
 	 * need to temporarily increase the depth values.
@@ -928,7 +931,7 @@ atari_atari_succeeded(int color, int *attack_point, int *defense_point,
 static void
 atari_atari_find_attack_moves(int color, int minsize,
 			      struct aa_move attacks[AA_MAX_MOVES],
-			      char goal[BOARDMAX])
+			      signed char goal[BOARDMAX])
 {
   int k;
   int r;
@@ -965,9 +968,9 @@ static int conditional_attack_point[BOARDMAX];
 static void
 atari_atari_attack_patterns(int color, int minsize,
 			    struct aa_move attacks[AA_MAX_MOVES],
-			    char goal[BOARDMAX])
+			    signed char goal[BOARDMAX])
 {
-  char revised_goal[BOARDMAX];
+  signed char revised_goal[BOARDMAX];
   current_minsize = minsize;
   current_attacks = attacks;
   memset(conditional_attack_point, 0, sizeof(conditional_attack_point));
@@ -1294,8 +1297,8 @@ get_aa_value(int str)
     } while (0);
 
 static int
-update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX], int apos,
-	       int color)
+update_aa_goal(signed char goal[BOARDMAX], signed char new_goal[BOARDMAX],
+	       int apos, int color)
 {
   int other = OTHER_COLOR(color);
   int dists[BOARDMAX];

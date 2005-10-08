@@ -201,10 +201,11 @@ int is_antisuji_move(int pos);
 void discard_redundant_move_reasons(int pos);
 
 void mark_changed_dragon(int pos, int color, int affected, int affected2,
-			 int move_reason_type, char safe_stones[BOARDMAX],
+			 int move_reason_type,
+			 signed char safe_stones[BOARDMAX],
 			 float strength[BOARDMAX], float *effective_size);
-void mark_changed_string(int affected, char changed_stones[BOARDMAX],
-			 float strength[BOARDMAX], char new_status);
+void mark_changed_string(int affected, signed char changed_stones[BOARDMAX],
+			 float strength[BOARDMAX], signed char new_status);
 int adjacent_to_nondead_stone(int pos, int color);
 
 int find_connection(int worm1, int worm2);

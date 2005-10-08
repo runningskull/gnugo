@@ -292,12 +292,12 @@ void estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
 int owl_topological_eye(int pos, int color);
 int vital_chain(int pos);
 int confirm_safety(int move, int color, int *defense_point,
-		   char safe_stones[BOARDMAX]);
+		   signed char safe_stones[BOARDMAX]);
 int dragon_weak(int pos);
 float dragon_weakness(int pos, int ignore_dead_dragons);
 int size_of_biggest_critical_dragon(void);
 float blunder_size(int move, int color, int *defense_point,
-		   char safe_stones[BOARDMAX]);
+		   signed char safe_stones[BOARDMAX]);
 void set_depth_values(int level, int report_levels);
 void modify_depth_values(int n);
 void increase_depth_values(void);
@@ -311,7 +311,8 @@ int does_secure(int color, int move, int pos);
 
 void compute_new_dragons(int dragon_origins[BOARDMAX]);
 void join_dragons(int d1, int d2);
-int dragon_escape(char goal[BOARDMAX], int color, char escape_value[BOARDMAX]);
+int dragon_escape(char goal[BOARDMAX], int color,
+		  signed char escape_value[BOARDMAX]);
 void compute_refined_dragon_weaknesses(void);
 
 struct eyevalue;
@@ -321,16 +322,16 @@ float crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
 
 int is_same_dragon(int d1, int d2);
 int are_neighbor_dragons(int d1, int d2);
-void mark_dragon(int pos, char mx[BOARDMAX], char mark);
+void mark_dragon(int pos, signed char mx[BOARDMAX], signed char mark);
 int first_worm_in_dragon(int d);
 int next_worm_in_dragon(int w);
 int lively_dragon_exists(int color);
 void compute_dragon_influence(void);
-void set_strength_data(int color, char safe_stones[BOARDMAX],
+void set_strength_data(int color, signed char safe_stones[BOARDMAX],
 		       float strength[BOARDMAX]);
-void mark_inessential_stones(int color, char safe_stones[BOARDMAX]);
+void mark_inessential_stones(int color, signed char safe_stones[BOARDMAX]);
 
-void get_lively_stones(int color, char safe_stones[BOARDMAX]);
+void get_lively_stones(int color, signed char safe_stones[BOARDMAX]);
 int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
 void propagate_worm(int pos);
@@ -417,12 +418,12 @@ int is_known_good_attack_threat(int move, int target);
 
 int get_attack_threats(int pos, int max_strings, int strings[]);
 int get_defense_threats(int pos, int max_strings, int strings[]);
-void get_saved_worms(int pos, char saved[BOARDMAX]);
-void get_saved_dragons(int pos, char saved[BOARDMAX]);
+void get_saved_worms(int pos, signed char saved[BOARDMAX]);
+void get_saved_dragons(int pos, signed char saved[BOARDMAX]);
 void mark_safe_stones(int color, int move_pos,
-		      const char saved_dragons[BOARDMAX],
-		      const char saved_worms[BOARDMAX],
-		      char safe_stones[BOARDMAX]);
+		      const signed char saved_dragons[BOARDMAX],
+		      const signed char saved_worms[BOARDMAX],
+		      signed char safe_stones[BOARDMAX]);
 
 
 int owl_lively(int pos);
@@ -468,14 +469,16 @@ void endgame(int color);
 void endgame_shapes(int color);
 
 void combinations(int color);
-int atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
+int atari_atari(int color, int *attack_move,
+		signed char defense_moves[BOARDMAX],
 		int save_verbose);
 int atari_atari_confirm_safety(int color, int tpos, int *move, int minsize,
-			       const char saved_dragons[BOARDMAX],
-			       const char saved_worms[BOARDMAX]);
+			       const signed char saved_dragons[BOARDMAX],
+			       const signed char saved_worms[BOARDMAX]);
 
-int atari_atari_blunder_size(int color, int tpos, char defense_moves[BOARDMAX],
-			     const char safe_stones[BOARDMAX]);
+int atari_atari_blunder_size(int color, int tpos,
+			     signed char defense_moves[BOARDMAX],
+			     const signed char safe_stones[BOARDMAX]);
 
 int review_move_reasons(int *move, float *value, int color,
 			float pure_threat_value, float our_score,
@@ -534,7 +537,7 @@ int semeai_move_reason_known(int move, int dr);
 int does_attack(int move, int str);
 int does_defend(int move, int str);
 int double_atari(int move, int color, float *value,
-		 char safe_stones[BOARDMAX]);
+		 signed char safe_stones[BOARDMAX]);
 int send_two_return_one(int move, int color);
 int play_attack_defend_n(int color, int do_attack, int num_moves, ...);
 int play_attack_defend2_n(int color, int do_attack, int num_moves, ...);
@@ -602,17 +605,18 @@ extern struct influence_data followup_influence;
 #define DEFAULT_STRENGTH 100.0
 
 /* Influence functions. */
-void compute_influence(int color, const char safe_stones[BOARDMAX],
+void compute_influence(int color, const signed char safe_stones[BOARDMAX],
 		       const float strength[BOARDMAX],
 		       struct influence_data *q,
 		       int move, const char *trace_message);
 void compute_followup_influence(const struct influence_data *base,
 			        struct influence_data *q, 
 		                int move, const char *trace_message);
-void compute_escape_influence(int color, const char safe_stones[BOARDMAX],
-			      const char goal[BOARDMAX],
+void compute_escape_influence(int color,
+			      const signed char safe_stones[BOARDMAX],
+			      const signed char goal[BOARDMAX],
 			      const float strength[BOARDMAX],
-                              char escape_value[BOARDMAX]);
+                              signed char escape_value[BOARDMAX]);
 
 float influence_delta_territory(const struct influence_data *base,
 	                        const struct influence_data *q, int color,
@@ -743,7 +747,7 @@ extern int cosmic_gnugo;             /* use center oriented influence */
 extern int large_scale;              /* seek large scale captures */
 
 extern int thrashing_dragon;        /* Dead opponent's dragon trying to live */
-extern char thrashing_stone[BOARDMAX];        /* All thrashing stones. */
+extern signed char thrashing_stone[BOARDMAX];       /* All thrashing stones. */
 
 /* Experimental reading */
 extern char *rgoal;

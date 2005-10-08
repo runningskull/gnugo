@@ -1402,7 +1402,7 @@ add_replacement_move(int from, int to)
 
 /* Find worms rescued by a move at (pos). */
 void
-get_saved_worms(int pos, char saved[BOARDMAX])
+get_saved_worms(int pos, signed char saved[BOARDMAX])
 {
   int k;
   memset(saved, 0, sizeof(saved[0]) * BOARDMAX);
@@ -1420,7 +1420,7 @@ get_saved_worms(int pos, char saved[BOARDMAX])
      * move is unsafe.
      */
     if (move_reasons[r].type == DEFEND_MOVE)
-      mark_string(worm[what].origin, saved, 1);
+      signed_mark_string(worm[what].origin, saved, 1);
     else if (move_reasons[r].type == OWL_DEFEND_MOVE_LOSS) {
       int origin = dragon[what].origin;
       int kworm = worm[what].origin;
@@ -1428,7 +1428,7 @@ get_saved_worms(int pos, char saved[BOARDMAX])
       for (ii = BOARDMIN; ii < BOARDMAX; ii++)
 	if (IS_STONE(board[ii]) && dragon[ii].origin == origin
 	    && worm[ii].origin != kworm)
-	  mark_string(worm[ii].origin, saved, 1);
+	  signed_mark_string(worm[ii].origin, saved, 1);
     }
   }    
 }
@@ -1446,11 +1446,11 @@ get_saved_worms(int pos, char saved[BOARDMAX])
  */
 void
 mark_changed_dragon(int pos, int color, int affected, int affected2,
-    		    int move_reason_type, char safe_stones[BOARDMAX],
+    		    int move_reason_type, signed char safe_stones[BOARDMAX],
 		    float strength[BOARDMAX], float *effective_size)
 {
   int ii;
-  char new_status = INFLUENCE_SAVED_STONE;
+  signed char new_status = INFLUENCE_SAVED_STONE;
   int result_to_beat = 0;
 
   ASSERT1(board[pos] == EMPTY, pos);
@@ -1550,8 +1550,8 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
  * with the new strength.
  */
 void
-mark_changed_string(int affected, char safe_stones[BOARDMAX],
-    		    float strength[BOARDMAX], char new_status)
+mark_changed_string(int affected, signed char safe_stones[BOARDMAX],
+    		    float strength[BOARDMAX], signed char new_status)
 {
   float new_strength;
   int ii;
@@ -1575,7 +1575,7 @@ mark_changed_string(int affected, char safe_stones[BOARDMAX],
 
 /* Find dragons rescued by a move at (pos). */
 void
-get_saved_dragons(int pos, char saved[BOARDMAX])
+get_saved_dragons(int pos, signed char saved[BOARDMAX])
 {
   int k;
   memset(saved, 0, sizeof(saved[0]) * BOARDMAX);
@@ -1606,8 +1606,10 @@ get_saved_dragons(int pos, char saved[BOARDMAX])
  * move[pos].move_safety.
  */
 void
-mark_safe_stones(int color, int move_pos, const char saved_dragons[BOARDMAX],
-    		 const char saved_worms[BOARDMAX], char safe_stones[BOARDMAX])
+mark_safe_stones(int color, int move_pos,
+		 const signed char saved_dragons[BOARDMAX],
+    		 const signed char saved_worms[BOARDMAX],
+		 signed char safe_stones[BOARDMAX])
 {
   int pos; 
 

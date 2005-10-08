@@ -376,7 +376,7 @@ accumulate_influence(struct influence_data *q, int pos, int color)
 
 static void
 init_influence(struct influence_data *q, int color,
-	       const char safe_stones[BOARDMAX], 
+	       const signed char safe_stones[BOARDMAX], 
 	       const float strength[BOARDMAX])
 {
   int ii;
@@ -1148,7 +1148,7 @@ check_double_block(int color, int pos, const struct influence_data *q)
  */
 static void
 remove_double_blocks(struct influence_data *q,
-    		     const char inhibited_sources[BOARDMAX])
+    		     const signed char inhibited_sources[BOARDMAX])
 {
   int ii;
   float *strength = ((q->color_to_move == WHITE) ? q->white_strength :
@@ -1184,8 +1184,8 @@ remove_double_blocks(struct influence_data *q,
  * compute_influence and compute_escape_influence.
  */
 static void
-do_compute_influence(int color, const char safe_stones[BOARDMAX],
-		     const char inhibited_sources[BOARDMAX],
+do_compute_influence(int color, const signed char safe_stones[BOARDMAX],
+		     const signed char inhibited_sources[BOARDMAX],
     		     const float strength[BOARDMAX], struct influence_data *q,
 		     int move, const char *trace_message)
 {
@@ -1240,7 +1240,7 @@ do_compute_influence(int color, const char safe_stones[BOARDMAX],
  */
 
 void
-compute_influence(int color, const char safe_stones[BOARDMAX],
+compute_influence(int color, const signed char safe_stones[BOARDMAX],
     	          const float strength[BOARDMAX], struct influence_data *q,
 		  int move, const char *trace_message)
 {
@@ -1584,7 +1584,7 @@ segment_region(struct influence_data *q, owner_function_ptr region_owner,
 	       int type, int segmentation[BOARDMAX])
 {
   int ii;
-  static char marked[BOARDMAX];
+  static signed char marked[BOARDMAX];
 
   /* Reset the markings. */
   memset(marked, 0, sizeof(marked));
@@ -1820,7 +1820,7 @@ compute_followup_influence(const struct influence_data *base,
 			   int move, const char *trace_message) 
 {
   int ii;
-  char goal[BOARDMAX];
+  signed char goal[BOARDMAX];
   /* This is the color that will get a followup value. */
   int color = OTHER_COLOR(base->color_to_move);
   int save_debug = debug;
@@ -1881,10 +1881,10 @@ compute_followup_influence(const struct influence_data *base,
  */
 
 void
-compute_escape_influence(int color, const char safe_stones[BOARDMAX],
-			 const char goal[BOARDMAX],
+compute_escape_influence(int color, const signed char safe_stones[BOARDMAX],
+			 const signed char goal[BOARDMAX],
     			 const float strength[BOARDMAX],
-    			 char escape_value[BOARDMAX])
+    			 signed char escape_value[BOARDMAX])
 {
   int k;
   int ii;
@@ -1895,7 +1895,7 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
    * states. Better check for these, too.
    */
   static int cached_board[BOARDMAX];
-  static char escape_values[BOARDMAX][2];
+  static signed char escape_values[BOARDMAX][2];
   static int active_caches[2] = {0, 0};
 
   int cache_number = (color == WHITE);

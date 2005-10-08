@@ -935,11 +935,11 @@ restore_depth_values()
  *******************/
 
 static int detect_owl_blunder(int move, int color, int *defense_point,
-			      char safe_stones[BOARDMAX], int liberties,
+			      signed char safe_stones[BOARDMAX], int liberties,
 			      float *return_value, int save_verbose);
 
 static void detect_tactical_blunder(int move, int color, int *defense_point,
-				    char safe_stones[BOARDMAX],
+				    signed char safe_stones[BOARDMAX],
 				    int liberties, int *libs,
 				    float *return_value, int save_verbose);
 
@@ -948,7 +948,7 @@ static void detect_tactical_blunder(int move, int color, int *defense_point,
  */
 int
 confirm_safety(int move, int color, int *defense_point,
-	       char safe_stones[BOARDMAX])
+	       signed char safe_stones[BOARDMAX])
 {
   return (blunder_size(move, color, defense_point, safe_stones) == 0.0);
 }
@@ -973,7 +973,7 @@ confirm_safety(int move, int color, int *defense_point,
 
 float
 blunder_size(int move, int color, int *defense_point,
-	     char safe_stones[BOARDMAX])
+	     signed char safe_stones[BOARDMAX])
 {
   int libs[5];
   int liberties = accuratelib(move, color, 5, libs);
@@ -981,7 +981,7 @@ blunder_size(int move, int color, int *defense_point,
   int save_verbose = verbose;
   float return_value = 0.0;
   int atari;
-  char defense_moves[BOARDMAX];
+  signed char defense_moves[BOARDMAX];
   
   if (defense_point)
     *defense_point = NO_MOVE;
@@ -1045,7 +1045,7 @@ blunder_size(int move, int color, int *defense_point,
 
 static int
 detect_owl_blunder(int move, int color, int *defense_point,
-		   char safe_stones[BOARDMAX], int liberties,
+		   signed char safe_stones[BOARDMAX], int liberties,
 		   float *return_value, int save_verbose)
 {
   int k;
@@ -1151,7 +1151,7 @@ detect_owl_blunder(int move, int color, int *defense_point,
  */
 static void
 detect_tactical_blunder(int move, int color, int *defense_point,
-			char safe_stones[BOARDMAX],
+			signed char safe_stones[BOARDMAX],
 			int liberties, int *libs,
 			float *return_value, int save_verbose)
 {
@@ -1325,7 +1325,8 @@ detect_tactical_blunder(int move, int color, int *defense_point,
  */
 
 int
-double_atari(int move, int color, float *value, char safe_stones[BOARDMAX])
+double_atari(int move, int color, float *value,
+	     signed char safe_stones[BOARDMAX])
 {
   int other = OTHER_COLOR(color);
   int k;

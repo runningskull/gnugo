@@ -93,7 +93,7 @@ struct intrusion_data
 
 struct influence_data
 {
-  char safe[BOARDMAX];
+  signed char safe[BOARDMAX];
 
   float white_influence[BOARDMAX]; 	/* Accumulated influence. */
   float black_influence[BOARDMAX]; 	/* Accumulated influence. */
