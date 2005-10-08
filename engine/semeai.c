@@ -52,7 +52,7 @@ semeai()
   int semeai_results_first[MAX_DRAGONS][MAX_DRAGONS];
   int semeai_results_second[MAX_DRAGONS][MAX_DRAGONS];
   int semeai_move[MAX_DRAGONS][MAX_DRAGONS];
-  char semeai_certain[MAX_DRAGONS][MAX_DRAGONS];
+  signed char semeai_certain[MAX_DRAGONS][MAX_DRAGONS];
   int d1, d2;
   int k;
   int num_dragons = number_of_dragons;

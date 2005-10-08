@@ -4444,7 +4444,7 @@ do_find_break_chain3_moves(int *chain_links, int num_chain_links,
 {
   int other = board[chain_links[0]];
   int color = OTHER_COLOR(other);
-  char move_added[BOARDMAX];
+  signed char move_added[BOARDMAX];
   int possible_moves[MAX_MOVES];
   int num_possible_moves = 0;
   int r;

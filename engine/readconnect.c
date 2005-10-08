@@ -88,7 +88,7 @@ static void order_connection_moves(int *moves, int str1, int str2,
 static int nodes_connect = 0;
 
 /* Used by alternate connections. */
-static char connection_shadow[BOARDMAX];
+static signed char connection_shadow[BOARDMAX];
 
 static signed char breakin_shadow[BOARDMAX]; 
 
@@ -2697,7 +2697,7 @@ init_connection_data(int color, const signed char goal[BOARDMAX],
 		     struct connection_data *conn, int speculative)
 {
   int pos;
-  char mark[BOARDMAX];
+  signed char mark[BOARDMAX];
 
   memset(mark, 0, BOARDMAX);
   VALGRIND_MAKE_WRITABLE(conn, sizeof(conn));

@@ -1025,7 +1025,7 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
 {
   for (; --num_variations >= 0; variation++) {
     int move = AFFINE_TRANSFORM(variation->move_offset, trans, anchor);
-    char color_check = match_color ^ variation->xor_att;
+    int color_check = match_color ^ variation->xor_att;
     struct corner_pattern *pattern = variation->pattern;
 
     if (pattern && color_check == callback_color) {

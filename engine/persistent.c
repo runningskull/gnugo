@@ -1083,7 +1083,7 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
   }
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    char value = board[pos];
+    Intersection value = board[pos];
     if (!ON_BOARD(pos))
       continue;
     if (!active[pos])
