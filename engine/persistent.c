@@ -1112,7 +1112,7 @@ store_persistent_owl_cache(enum routine_id routine,
     			   int apos, int bpos, int cpos,
 			   int result, int move, int move2, int certain,
 			   int tactical_nodes,
-			   char goal[BOARDMAX], int goal_color)
+			   signed char goal[BOARDMAX], int goal_color)
 {
   store_persistent_cache(&owl_cache, routine, apos, bpos, cpos, EMPTY, NULL,
       			 result, NO_MOVE, move, move2, certain, owl_node_limit,
@@ -1269,7 +1269,8 @@ store_persistent_semeai_cache(enum routine_id routine,
 			      Hash_data *goal_hash,
     			      int resulta, int resultb, int move, int certain,
 			      int tactical_nodes,
-			      char goala[BOARDMAX], char goalb[BOARDMAX])
+			      signed char goala[BOARDMAX],
+			      signed char goalb[BOARDMAX])
 {
   char goal[BOARDMAX];
   int pos;

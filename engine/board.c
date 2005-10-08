@@ -2961,7 +2961,7 @@ does_capture_something(int pos, int color)
 
 /* For each stone in the string at pos, set mx to value mark. */
 void
-mark_string(int str, char mx[BOARDMAX], char mark)
+mark_string(int str, signed char mx[BOARDMAX], signed char mark)
 {
   int pos = str;
 

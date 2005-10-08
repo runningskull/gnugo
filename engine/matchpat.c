@@ -139,11 +139,11 @@ static void fixup_patterns_for_board_size(struct pattern *pattern);
 static void prepare_for_match(int color);
 static void do_matchpat(int anchor, matchpat_callback_fn_ptr callback,
 			int color, struct pattern *database,
-			void *callback_data, char goal[BOARDMAX]);
+			void *callback_data, signed char goal[BOARDMAX]);
 static void matchpat_loop(matchpat_callback_fn_ptr callback, 
 			  int color, int anchor,
 			  struct pattern_db *pdb, void *callback_data,
-			  char goal[BOARDMAX], int anchor_in_goal);
+			  signed char goal[BOARDMAX], int anchor_in_goal);
 
 /* Precomputed tables to allow rapid checks on the piece at
  * the board. This table relies on the fact that color is
@@ -311,7 +311,7 @@ transform2(int i, int j, int *ti, int *tj, int trans)
 static void
 do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	    struct pattern *pattern, void *callback_data,
-	    char goal[BOARDMAX]) 
+	    signed char goal[BOARDMAX]) 
 {
   const int anchor_test = board[anchor] ^ color;  /* see below */
   int m = I(anchor);
@@ -509,7 +509,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 static void
 matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 	      struct pattern_db *pdb, void *callback_data,
-	      char goal[BOARDMAX], int anchor_in_goal) 
+	      signed char goal[BOARDMAX], int anchor_in_goal) 
 {
   int pos;
   
@@ -548,18 +548,18 @@ static int scan_for_patterns(dfa_rt_t *pdfa, int l, int *dfa_pos,
 static void do_dfa_matchpat(dfa_rt_t *pdfa,
 			    int anchor, matchpat_callback_fn_ptr callback,
 			    int color, struct pattern *database,
-			    void *callback_data, char goal[BOARDMAX],
+			    void *callback_data, signed char goal[BOARDMAX],
                             int anchor_in_goal);
 static void check_pattern_light(int anchor, 
 				matchpat_callback_fn_ptr callback,
 				int color, struct pattern *pattern, int ll,
 				void *callback_data,
-				char goal[BOARDMAX],
+				signed char goal[BOARDMAX],
                                 int anchor_in_goal);
 static void dfa_matchpat_loop(matchpat_callback_fn_ptr callback,
 			      int color, int anchor,
 			      struct pattern_db *pdb, void *callback_data,
-			      char goal[BOARDMAX], int anchor_in_goal);
+			      signed char goal[BOARDMAX], int anchor_in_goal);
 
 
 /***********************************************************************/
@@ -682,7 +682,7 @@ static void
 do_dfa_matchpat(dfa_rt_t *pdfa,
 		int anchor, matchpat_callback_fn_ptr callback,
 		int color, struct pattern *database,
-		void *callback_data, char goal[BOARDMAX],
+		void *callback_data, signed char goal[BOARDMAX],
 		int anchor_in_goal)
 {
   int k;
@@ -733,7 +733,7 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
 static void
 check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
 		    struct pattern *pattern, int ll, void *callback_data,
-		    char goal[BOARDMAX], int anchor_in_goal)
+		    signed char goal[BOARDMAX], int anchor_in_goal)
 {
   int k;			/* Iterate over elements of pattern */
   int found_goal = 0;
@@ -814,7 +814,7 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
 static void
 dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 		  struct pattern_db *pdb, void *callback_data,
-		  char goal[BOARDMAX], int anchor_in_goal) 
+		  signed char goal[BOARDMAX], int anchor_in_goal) 
 {
   int pos;
 
@@ -835,7 +835,7 @@ dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 typedef void (*loop_fn_ptr_t)(matchpat_callback_fn_ptr callback, 
 			      int color, int anchor,
 			      struct pattern_db *pdb, void *callback_data,
-			      char goal[BOARDMAX], int anchor_in_goal);
+			      signed char goal[BOARDMAX], int anchor_in_goal);
 
 typedef void (*prepare_fn_ptr_t)(int color);
 
@@ -852,7 +852,7 @@ typedef void (*prepare_fn_ptr_t)(int color);
 void
 matchpat(matchpat_callback_fn_ptr callback, int color,
 	 struct pattern_db *pdb, void *callback_data,
-	 char goal[BOARDMAX]) 
+	 signed char goal[BOARDMAX]) 
 {
   matchpat_goal_anchor(callback, color, pdb, callback_data, goal, 
                        pdb->fixed_anchor);
@@ -861,7 +861,7 @@ matchpat(matchpat_callback_fn_ptr callback, int color,
 void 
 matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
 		     struct pattern_db *pdb, void *callback_data,
-		     char goal[BOARDMAX], int anchor_in_goal) 
+		     signed char goal[BOARDMAX], int anchor_in_goal) 
 {
   loop_fn_ptr_t loop = matchpat_loop;
   prepare_fn_ptr_t prepare = prepare_for_match;

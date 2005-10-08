@@ -67,17 +67,17 @@
                       /*    not called                                       */
 
 struct local_owl_data {
-  char goal[BOARDMAX];
-  char boundary[BOARDMAX];
+  signed char goal[BOARDMAX];
+  signed char boundary[BOARDMAX];
   /* Same as goal, except never anything is removed from it. */
-  char cumulative_goal[BOARDMAX];
+  signed char cumulative_goal[BOARDMAX];
 
   /* FIXME: neighbors[] and escape_values[] are never recomputed.
    *	    Consider moving these arrays from stack to a static or
    *	    dynamic variable so it is not copied around in
    *	    do_push_owl().  Be aware of semeai code though.
    */
-  char neighbors[BOARDMAX];
+  signed char neighbors[BOARDMAX];
 
   signed char escape_values[BOARDMAX];
   int color;
@@ -91,11 +91,11 @@ struct local_owl_data {
   int lunch_attack_point[MAX_LUNCHES];
   int lunch_defend_code[MAX_LUNCHES];
   int lunch_defense_point[MAX_LUNCHES];
-  char inessential[BOARDMAX];
+  signed char inessential[BOARDMAX];
   
   int lunches_are_current; /* If true, owl lunch data is current */  
 
-  char safe_move_cache[BOARDMAX];
+  signed char safe_move_cache[BOARDMAX];
 
   /* This is used to organize the owl stack. */
   struct local_owl_data *restore_from;
@@ -217,7 +217,8 @@ static void owl_mark_worm(int apos, int bpos,
 static void owl_mark_boundary(struct local_owl_data *owl);
 static void owl_update_goal(int pos, int same_dragon, int lunch,
 			    struct local_owl_data *owl, int semeai_call);
-static void owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS]);
+static void owl_test_cuts(signed char goal[BOARDMAX], int color,
+		          int cuts[MAX_CUTS]);
 static void componentdump(const signed char component[BOARDMAX]);
 static void owl_update_boundary_marks(int pos, struct local_owl_data *owl);
 static void owl_find_lunches(struct local_owl_data *owl);
@@ -256,7 +257,7 @@ static void semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
 				    struct local_owl_data *owlb, int color,
 				    int *safe_outside_liberty_found,
 				    int *safe_common_liberty_found,
-				    char mw[BOARDMAX],
+				    signed char mw[BOARDMAX],
 				    struct owl_move_data semeai_moves[MAX_SEMEAI_MOVES],
 				    int guess_same_dragon, int value_bonus,
 				    int *critical_semeai_worms);
@@ -267,7 +268,7 @@ static int find_semeai_backfilling_move(int worm, int liberty);
 static int liberty_of_goal(int pos, struct local_owl_data *owl);
 static int second_liberty_of_goal(int pos, struct local_owl_data *owl);
 static int matches_found;
-static char found_matches[BOARDMAX];
+static signed char found_matches[BOARDMAX];
 
 static void reduced_init_owl(struct local_owl_data **owl,
     			     int at_bottom_of_stack);
@@ -368,7 +369,7 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
 			      int owl, int *semeai_result_certain,
 			      int recompute_dragons)
 {
-  char ms[BOARDMAX];
+  signed char ms[BOARDMAX];
   int w1, w2;
   int str;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
@@ -621,7 +622,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   struct owl_move_data backfill_common_liberty;
   int safe_outside_liberty_found = 0;
   int safe_common_liberty_found = 0;
-  char mw[BOARDMAX];  
+  signed char mw[BOARDMAX];  
   int k;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
@@ -1362,7 +1363,7 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
 			struct local_owl_data *owlb, int color,
 			int *safe_outside_liberty_found,
 			int *safe_common_liberty_found,
-			char mw[BOARDMAX],
+			signed char mw[BOARDMAX],
 			struct owl_move_data semeai_moves[MAX_SEMEAI_MOVES],
 			int guess_same_dragon, int value_bonus,
 			int *critical_semeai_worms)
@@ -1772,7 +1773,7 @@ do_owl_attack(int str, int *move, int *wormid,
   struct owl_move_data shape_moves[MAX_MOVES];
   struct owl_move_data *moves;
   struct matched_patterns_list_data shape_patterns;
-  char mw[BOARDMAX];
+  signed char mw[BOARDMAX];
   int number_tried_moves = 0;
   int pass;
   int k;
@@ -2234,7 +2235,7 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
   struct local_owl_data *owl;
   int result = 0;
   int reading_nodes_when_called = get_reading_node_counter();
-  char saved_boundary[BOARDMAX];
+  signed char saved_boundary[BOARDMAX];
   double start = 0.0;
   int tactical_nodes;
   int move = 0;
@@ -2418,7 +2419,7 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
   struct owl_move_data vital_moves[MAX_MOVES];
   struct owl_move_data *moves;
   struct matched_patterns_list_data shape_patterns;
-  char mw[BOARDMAX];
+  signed char mw[BOARDMAX];
   int number_tried_moves = 0;
   int pass;
   int k;
@@ -2752,7 +2753,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
   int result = 0;
   struct local_owl_data *owl;
   int reading_nodes_when_called = get_reading_node_counter();
-  char saved_goal[BOARDMAX];
+  signed char saved_goal[BOARDMAX];
   double start = 0.0;
   int tactical_nodes;
   int move = 0;
@@ -3995,7 +3996,7 @@ generate_cut_list(struct pattern *pattern, int ll, int anchor,
 {
   int k;
   int num = 0;
-  char mark[BOARDMAX];
+  signed char mark[BOARDMAX];
 
   memset(mark, 0, BOARDMAX);
   for (k = 0; k < pattern->patlen; k++) {
@@ -4635,7 +4636,7 @@ owl_update_goal(int pos, int same_dragon, int lunch,
  * so we leave it here for now.
  */
 static int
-connected_components(char graph[MAX_CUTS][MAX_CUTS], int graph_size,
+connected_components(signed char graph[MAX_CUTS][MAX_CUTS], int graph_size,
 		     signed char component[MAX_CUTS])
 {
   int num_components = 0;
@@ -4673,10 +4674,10 @@ connected_components(char graph[MAX_CUTS][MAX_CUTS], int graph_size,
  * to the biggest remaining component.
  */
 static void
-owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
+owl_test_cuts(signed char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
 {
   int k, j;
-  char connected[MAX_CUTS][MAX_CUTS];
+  signed char connected[MAX_CUTS][MAX_CUTS];
   /* int connect_move[MAX_CUTS][MAX_CUTS]; */
   int num_cuts;
   int found_cut = 0;
@@ -4825,7 +4826,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
 static void
 owl_update_boundary_marks(int pos, struct local_owl_data *owl)
 {
-  char boundary_mark = 0;
+  signed char boundary_mark = 0;
   int k;
 
   for (k = 0; k < 4; k++) {
@@ -4850,7 +4851,7 @@ owl_update_boundary_marks(int pos, struct local_owl_data *owl)
  */
 
 void
-goaldump(const char goal[BOARDMAX])
+goaldump(const signed char goal[BOARDMAX])
 {
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
@@ -5508,7 +5509,7 @@ owl_find_lunches(struct local_owl_data *owl)
   int dpos;
   int color = owl->color;
   int other = OTHER_COLOR(color);
-  char already_checked[BOARDMAX];
+  signed char already_checked[BOARDMAX];
 
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
@@ -6205,7 +6206,7 @@ eat_lunch_escape_bonus(int lunch, int *min, int *probable, int *max,
     /* if the escape route is already large enough to be considered
      * a WIN by the owl code, then no need for more */
     if (before < 5) {
-      char new_goal[BOARDMAX];
+      signed char new_goal[BOARDMAX];
       memcpy(new_goal, owl->goal, sizeof(new_goal));
       for (n = 0; n < neighbors; n++)
 	if (!owl->goal[adjacent[n]])
@@ -6293,7 +6294,7 @@ compute_owl_escape_values(struct local_owl_data *owl)
 	    else {
 	      int pos2;
 	      signed char escape_values[BOARDMAX];
-	      char dragon[BOARDMAX];
+	      signed char dragon[BOARDMAX];
 
 	      compute_escape_influence(owl->color, safe_stones, owl->goal, NULL,
 				       escape_values);

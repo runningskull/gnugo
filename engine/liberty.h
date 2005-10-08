@@ -192,10 +192,10 @@ typedef void (*corner_matchpat_callback_fn_ptr)(int move, int color,
 						int *stones, int num_stones);
 void matchpat(matchpat_callback_fn_ptr callback, int color,
 	      struct pattern_db *pdb, void *callback_data,
-	      char goal[BOARDMAX]);
+	      signed char goal[BOARDMAX]);
 void matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
 	      struct pattern_db *pdb, void *callback_data,
-	      char goal[BOARDMAX], int anchor_in_goal);
+	      signed char goal[BOARDMAX], int anchor_in_goal);
 void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 			int color, struct fullboard_pattern *pattern);
 void corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
@@ -261,7 +261,7 @@ int search_persistent_owl_cache(enum routine_id routine,
 void store_persistent_owl_cache(enum routine_id routine,
 				int apos, int bpos, int cpos,
 				int result, int move, int move2, int certain,
-				int tactical_nodes, char goal[BOARDMAX],
+				int tactical_nodes, signed char goal[BOARDMAX],
 				int goal_color);
 void owl_hotspots(float values[BOARDMAX]);
 int search_persistent_semeai_cache(enum routine_id routine,
@@ -274,7 +274,8 @@ void store_persistent_semeai_cache(enum routine_id routine,
 				   Hash_data *goal_hash,
 				   int resulta, int resultb,
 				   int move, int certain, int tactical_nodes,
-				   char goala[BOARDMAX], char goalb[BOARDMAX]);
+				   signed char goala[BOARDMAX],
+				   signed char goalb[BOARDMAX]);
 
 
 /* readconnect.c */
@@ -311,7 +312,7 @@ int does_secure(int color, int move, int pos);
 
 void compute_new_dragons(int dragon_origins[BOARDMAX]);
 void join_dragons(int d1, int d2);
-int dragon_escape(char goal[BOARDMAX], int color,
+int dragon_escape(signed char goal[BOARDMAX], int color,
 		  signed char escape_value[BOARDMAX]);
 void compute_refined_dragon_weaknesses(void);
 
@@ -679,7 +680,7 @@ int analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
 
 
 /* debugging support */
-void goaldump(const char goal[BOARDMAX]);
+void goaldump(const signed char goal[BOARDMAX]);
 void move_considered(int move, float value);
 
 

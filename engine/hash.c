@@ -166,7 +166,7 @@ hashdata_invert_kom_pos(Hash_data *hd, int kom_pos)
 
 /* Compute hash value to identify the goal area. */
 Hash_data
-goal_to_hashvalue(const char *goal)
+goal_to_hashvalue(const signed char *goal)
 {
   int pos;
   Hash_data return_value;

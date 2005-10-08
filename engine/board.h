@@ -290,7 +290,7 @@ int neighbor_of_string(int pos, int str);
 int has_neighbor(int pos, int color);
 int same_string(int str1, int str2);
 int adjacent_strings(int str1, int str2);
-void mark_string(int str, char mx[BOARDMAX], char mark);
+void mark_string(int str, signed char mx[BOARDMAX], signed char mark);
 void signed_mark_string(int str, signed char mx[BOARDMAX], signed char mark);
 int are_neighbors(int pos1, int pos2);
 
@@ -392,7 +392,7 @@ int is_hoshi_point(int m, int n);
 void draw_letter_coordinates(FILE *outfile);
 void simple_showboard(FILE *outfile);
 
-void mark_goal_in_sgf(char goal[BOARDMAX]);
+void mark_goal_in_sgf(signed char goal[BOARDMAX]);
 
 /* ================================================================ */
 /*                         assertions                               */

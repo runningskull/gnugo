@@ -1849,7 +1849,7 @@ compute_crude_status(int pos)
  * in the goal array.
  */
 int
-dragon_escape(char goal[BOARDMAX], int color,
+dragon_escape(signed char goal[BOARDMAX], int color,
 	      signed char escape_value[BOARDMAX])
 {
   int ii;
@@ -2004,7 +2004,7 @@ static int
 compute_escape(int pos, int dragon_status_known)
 {
   int ii;
-  char goal[BOARDMAX];
+  signed char goal[BOARDMAX];
   signed char escape_value[BOARDMAX];
   signed char safe_stones[BOARDMAX];
 

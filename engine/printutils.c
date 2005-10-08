@@ -514,7 +514,7 @@ simple_showboard(FILE *outfile)
  * This function cannot be in sgf/ as it has to understand the 1-D board.
  */
 void
-mark_goal_in_sgf(char goal[BOARDMAX])
+mark_goal_in_sgf(signed char goal[BOARDMAX])
 {
   int pos;
   SGFNode *node;

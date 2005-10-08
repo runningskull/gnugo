@@ -80,7 +80,7 @@ typedef struct {
 
 extern Hash_data board_hash;
 
-Hash_data goal_to_hashvalue(const char *goal);
+Hash_data goal_to_hashvalue(const signed char *goal);
 
 void hash_init_zobrist_array(Hash_data *array, int size);
 void hash_init(void);
