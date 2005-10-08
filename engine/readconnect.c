@@ -47,12 +47,10 @@ static int recursive_connect2(int str1, int str2, int *move,
 			        int has_passed);
 static int recursive_disconnect2(int str1, int str2, int *move,
 				   int has_passed);
-static int recursive_break(int str, const char goal[BOARDMAX], int *move,
-    			     int has_passed,
-			   Hash_data *goal_hash);
-static int recursive_block(int str, const char goal[BOARDMAX], int *move,
-    			     int has_passed,
-			   Hash_data *goal_hash);
+static int recursive_break(int str, const signed char goal[BOARDMAX], int *move,
+			   int has_passed, Hash_data *goal_hash);
+static int recursive_block(int str, const signed char goal[BOARDMAX], int *move,
+			   int has_passed, Hash_data *goal_hash);
 
 static int add_array(int *array, int elt);
 static int element_array(int *array, int elt);
@@ -92,8 +90,7 @@ static int nodes_connect = 0;
 /* Used by alternate connections. */
 static char connection_shadow[BOARDMAX];
 
-static char breakin_shadow[BOARDMAX];
-
+static signed char breakin_shadow[BOARDMAX]; 
 
 /* Statistics. */
 static int global_connection_node_counter = 0;
@@ -2695,7 +2692,7 @@ add_to_start_queue(int pos, int dist, struct connection_data *conn)
 
 
 void
-init_connection_data(int color, const char goal[BOARDMAX],
+init_connection_data(int color, const signed char goal[BOARDMAX],
     		     int target, int cutoff,
 		     struct connection_data *conn, int speculative)
 {
@@ -2727,7 +2724,7 @@ init_connection_data(int color, const char goal[BOARDMAX],
 }
 
 static int
-find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
+find_break_moves(int str, const signed char goal[BOARDMAX], int color_to_move,
 		 int moves[MAX_MOVES], int *total_distance)
 {
   struct connection_data conn1;
@@ -2759,7 +2756,7 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
 	if (goal[stones[i]]) {
 	  str2 = find_origin(stones[i]);
 	  TRACE("%oUsing %1m as secondary target.\n", str2);
-	  mark_string(str2, breakin_shadow, 1);
+	  signed_mark_string(str2, breakin_shadow, 1);
 	  break;
 	}
       }
@@ -2826,7 +2823,7 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
 
 /* Can (str) connect to goal[] if the other color moves first? */
 static int
-recursive_break(int str, const char goal[BOARDMAX], int *move,
+recursive_break(int str, const signed char goal[BOARDMAX], int *move,
     		  int has_passed,
 		Hash_data *goal_hash)
 {
@@ -2941,7 +2938,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
 
 /* Can (str) connect to goal[] if the other color moves first? */
 static int
-recursive_block(int str, const char goal[BOARDMAX], int *move,
+recursive_block(int str, const signed char goal[BOARDMAX], int *move,
 		int has_passed,	Hash_data *goal_hash)
 {
   int color = board[str];
@@ -3064,7 +3061,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
  * not contain stones), if he gets the first move.
  */
 int
-break_in(int str, const char goal[BOARDMAX], int *move)
+break_in(int str, const signed char goal[BOARDMAX], int *move)
 {
   int dummy_move;
   int save_verbose;
@@ -3127,7 +3124,7 @@ break_in(int str, const char goal[BOARDMAX], int *move)
  * not contain stones), if the other color moves first.
  */
 int
-block_off(int str, const char goal[BOARDMAX], int *move)
+block_off(int str, const signed char goal[BOARDMAX], int *move)
 {
   int dummy_move;
   int result;

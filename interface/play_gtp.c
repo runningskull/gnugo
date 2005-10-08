@@ -2063,7 +2063,7 @@ gtp_break_in(char *s)
 {
   int ai, aj;
   int i, j;
-  char goal[BOARDMAX];
+  signed char goal[BOARDMAX];
   int break_move = PASS_MOVE;
   int result;
   int n;
@@ -2110,7 +2110,7 @@ gtp_block_off(char *s)
 {
   int ai, aj;
   int i, j;
-  char goal[BOARDMAX];
+  signed char goal[BOARDMAX];
   int block_move = PASS_MOVE;
   int result;
   int n;

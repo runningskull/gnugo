@@ -64,7 +64,7 @@ static int num_break_ins;
 
 /* Adds all empty intersections that have two goal neighbors to the goal. */
 static void
-enlarge_goal(char goal[BOARDMAX])
+enlarge_goal(signed char goal[BOARDMAX])
 {
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -89,7 +89,8 @@ enlarge_goal(char goal[BOARDMAX])
 static void
 compute_smaller_goal(int owner, int color_to_move,
     		     const struct connection_data *conn,
-    		     const char goal[BOARDMAX], char smaller_goal[BOARDMAX])
+    		     const signed char goal[BOARDMAX],
+		     signed char smaller_goal[BOARDMAX])
 {
   int k, j;
   int own_stones_visited[BOARDMAX];
@@ -160,9 +161,9 @@ compute_smaller_goal(int owner, int color_to_move,
    * component.
    */
   if (owner == color_to_move) {
-    char marked[BOARDMAX];
+    signed char marked[BOARDMAX];
     int sizes[BOARDMAX / 2];
-    char mark = 0;
+    signed char mark = 0;
     int biggest_region = 1;
     memset(marked, 0, BOARDMAX);
     for (k = 0; k < conn->queue_end; k++) {
@@ -216,13 +217,13 @@ compute_smaller_goal(int owner, int color_to_move,
  * try again.
  */
 static int
-break_in_goal_from_str(int str, char goal[BOARDMAX],
+break_in_goal_from_str(int str, signed char goal[BOARDMAX],
     		      int *num_non_territory, int non_territory[BOARDMAX],
     		      int color_to_move, int info_pos)
 {
   int move = NO_MOVE;
   int saved_move = NO_MOVE;
-  char smaller_goal[BOARDMAX];
+  signed char smaller_goal[BOARDMAX];
   struct connection_data conn;
 
   /* When blocking off, we use a somewhat smaller goal area. */
@@ -319,13 +320,13 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
 #define MAX_TRIES 10
 
 static void
-break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
+break_in_goal(int color_to_move, int owner, signed char goal[BOARDMAX],
     	      struct influence_data *q, int store, int info_pos)
 {
   struct connection_data conn;
   int k;
   int intruder = OTHER_COLOR(owner);
-  char used[BOARDMAX];
+  signed char used[BOARDMAX];
   int non_territory[BOARDMAX];
   int num_non_territory = 0;
   int candidate_strings[MAX_TRIES];
@@ -415,7 +416,7 @@ break_territories(int color_to_move, struct influence_data *q, int store,
 
   influence_get_territory_segmentation(q, &territories);
   for (k = 1; k <= territories.number; k++) {
-    char goal[BOARDMAX];
+    signed char goal[BOARDMAX];
     int pos;
     int size = 0;
 

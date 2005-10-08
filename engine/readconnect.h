@@ -73,7 +73,7 @@ struct connection_data {
 void compute_connection_distances(int str, int target, int cutoff,
 				  struct connection_data *conn,
 				  int speculative);
-void init_connection_data(int color, const char goal[BOARDMAX],
+void init_connection_data(int color, const signed char goal[BOARDMAX],
 			  int target, int cutoff,
 			  struct connection_data *conn, int speculative);
 void spread_connection_distances(int color, struct connection_data *conn);

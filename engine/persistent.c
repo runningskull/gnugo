@@ -971,7 +971,7 @@ store_persistent_breakin_cache(enum routine_id routine,
     			       int str, Hash_data *goal_hash,
 			       int result, int move, int tactical_nodes,
 			       int breakin_node_limit,
-			       char breakin_shadow[BOARDMAX])
+			       signed char breakin_shadow[BOARDMAX])
 {
   store_persistent_cache(&breakin_cache, routine,
       			 str, NO_MOVE, NO_MOVE, EMPTY, goal_hash,

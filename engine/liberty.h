@@ -253,7 +253,7 @@ void store_persistent_breakin_cache(enum routine_id routine,
 				    int result, int move,
 				    int tactical_nodes,
 				    int breakin_node_limit,
-				    char breakin_shadow[BOARDMAX]);
+				    signed char breakin_shadow[BOARDMAX]);
 int search_persistent_owl_cache(enum routine_id routine,
 				int apos, int bpos, int cpos,
 				int *result, int *move, int *move2,
@@ -283,8 +283,8 @@ int disconnect(int str1, int str2, int *move);
 int fast_disconnect(int str1, int str2, int *move);
 int non_transitivity(int str1, int str2, int str3, int *move);
 
-int break_in(int str, const char goal[BOARDMAX], int *move);
-int block_off(int str1, const char goal[BOARDMAX], int *move);
+int break_in(int str, const signed char goal[BOARDMAX], int *move);
+int block_off(int str1, const signed char goal[BOARDMAX], int *move);
 
 int obvious_false_eye(int pos, int color);
 void estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,

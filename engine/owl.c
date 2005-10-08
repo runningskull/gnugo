@@ -4753,12 +4753,12 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
     memset(component_size, 0, sizeof(int) * num_components);
     conn_data = malloc(sizeof(struct connection_data) * num_components);
     for (c_id = 0; c_id < num_components; c_id++) {
-      char this_goal[BOARDMAX];
+      signed char this_goal[BOARDMAX];
       memset(this_goal, 0, BOARDMAX);
 
       for (k = 0; k < num_cuts; k++)
 	if (component[k] == c_id) {
-	  mark_string(cuts[k], this_goal, 1);
+	  signed_mark_string(cuts[k], this_goal, 1);
 	  signed_mark_string(cuts[k], component2, c_id);
 	}
       init_connection_data(color, this_goal, NO_MOVE, FP(3.01),
