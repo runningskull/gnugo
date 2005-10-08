@@ -2303,6 +2303,7 @@ estimate_territorial_value(int pos, int color, float our_score,
 	   || move_reasons[r].type == OWL_ATTACK_MOVE_BAD_KO)
 	  && dragon[aa].size == worm[aa].size
 	  && worm[aa].attack_codes[0] == WIN
+	  && worm[aa].defense_codes[0] != 0
 	  && attack_move_reason_known(pos, aa) != WIN) {
 	if (large_scale)
 	  this_value = (2.0 + 0.05 * (2 * worm[aa].effective_size));
