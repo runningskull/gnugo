@@ -171,7 +171,7 @@ typedef int (*autohelper_fn_ptr)(int rotation, int move,
 
 typedef struct patval {
   short offset;
-  char att;
+  unsigned char att;
 } Patval;
 
 /* Build-time version of patval structure. */
@@ -357,18 +357,18 @@ struct corner_db {
   int max_width;	/* Largest possible width and... */
   int max_height;	/* ... largest possible height of database patterns. */
 
-  char num_top_variations; /* Number of top level variations. */
+  unsigned char num_top_variations; /* Number of top level variations. */
   struct corner_variation *top_variations;
 };
 
 struct corner_variation {
-  int move_offset;	/* Offset of the move in this variation. */
-  char xor_att; 	/* 0 - the same color as the first matched stone,
-			 * 3 - the opposite color.
-			 */
-  char num_stones;      /* Number of stones in the `move_offset' rectangle. */
+  int move_offset;	    /* Offset of the move in this variation. */
+  signed char xor_att;      /* 0 - the same color as the first matched stone,
+			     * 3 - the opposite color.
+			     */
+  unsigned char num_stones; /* Number of stones in the `move_offset' rectangle. */
 
-  char num_variations;  /* Number of subvariations. */
+  unsigned char num_variations; /* Number of subvariations. */
   struct corner_variation *variations; /* Pointer to subvariation array. */
 
   struct corner_pattern *pattern; /* Address of matched pattern (if any). */
@@ -391,10 +391,10 @@ struct corner_pattern {
 /* Build time version of corner_variation structure. */
 struct corner_variation_b {
   int move_offset;
-  char xor_att;
-  char num_stones;
+  signed char xor_att;
+  unsigned char num_stones;
 
-  char num_variations;
+  unsigned char num_variations;
   struct corner_variation_b *next;
   struct corner_variation_b *child;
   int child_num;

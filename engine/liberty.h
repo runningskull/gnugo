@@ -787,21 +787,16 @@ extern double total_time;
 
 
 struct eyevalue {
-#if 0
-  char maxeye;       /* number of eyes if defender plays first               */
-  char mineye;       /* number of eyes if attacker plays first               */
-#else
   unsigned char a; /* number of eyes if attacker plays first twice */
   unsigned char b; /* number of eyes if attacker plays first */
   unsigned char c; /* number of eyes if defender plays first */
   unsigned char d; /* number of eyes if defender plays first twice */
-#endif
 };
 
 
 struct half_eye_data {
   float value;          /* Topological eye value. */
-  char type;            /* HALF_EYE or FALSE_EYE; */
+  unsigned char type;   /* HALF_EYE or FALSE_EYE; */
   int num_attacks;      /* number of attacking points */
   int attack_point[4];  /* the moves to attack a topological halfeye */
   int num_defenses;     /* number of defending points */
@@ -861,8 +856,8 @@ extern struct worm_data worm[BOARDMAX];
 #define MAX_SURROUND 10
 
 struct surround_data {
-  int dragon_number;           /* number of the (surrounded) beast */
-  char surround_map[BOARDMAX]; /* surround map                     */
+  int dragon_number;                  /* number of the (surrounded) beast */
+  signed char surround_map[BOARDMAX]; /* surround map                     */
 };
 
 extern struct surround_data surroundings[MAX_SURROUND];
@@ -988,9 +983,9 @@ struct eye_data {
   /* ---------------------------------------------------------------- */
   /* The below fields are not.                                        */
 
-  char marginal;             /* This vertex is marginal               */
-  char neighbors;            /* number of neighbors in eyespace       */
-  char marginal_neighbors;   /* number of marginal neighbors          */
+  unsigned char marginal;             /* This vertex is marginal               */
+  unsigned char neighbors;            /* number of neighbors in eyespace       */
+  unsigned char marginal_neighbors;   /* number of marginal neighbors          */
 };
 
 struct vital_eye_points {

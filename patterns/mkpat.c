@@ -1747,7 +1747,7 @@ static int
 compare_elements(const void *a, const void *b)
 {
   /* score for each attribute */
-  static char order[] = {7, 2, 3, 5, 6, 0, 4, 1};
+  static int order[] = {7, 2, 3, 5, 6, 0, 4, 1};
   
   return  order[((const struct patval_b *)a)->att]
     - order[((const struct patval_b *)b)->att];

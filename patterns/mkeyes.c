@@ -47,9 +47,9 @@ main(void)
   int patno = 0;
   int p;
   char vertex[MAXDIMEN][MAXDIMEN];
-  char marginal[MAXDIMEN][MAXDIMEN];
-  char edge[MAXDIMEN][MAXDIMEN];
-  char flags[MAXDIMEN][MAXDIMEN];
+  signed char marginal[MAXDIMEN][MAXDIMEN];
+  signed char edge[MAXDIMEN][MAXDIMEN];
+  unsigned char flags[MAXDIMEN][MAXDIMEN];
   int neighbors[MAXSIZE];
   int k, l, h;
   int m = 0, n = 0;
