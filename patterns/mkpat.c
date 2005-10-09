@@ -1967,7 +1967,7 @@ corner_best_element(struct corner_element *el, int n,
 
 /* Dynamically allocates a new variation structure. */
 static struct corner_variation_b *
-corner_variation_new(int move_offset, char xor_att, char num_stones)
+corner_variation_new(int move_offset, signed char xor_att, unsigned char num_stones)
 {
   struct corner_variation_b *variation;
    
@@ -1993,9 +1993,9 @@ corner_variation_new(int move_offset, char xor_att, char num_stones)
  */
 static struct corner_variation_b *
 corner_follow_variation(struct corner_variation_b *variation,
-			int offset, int color, char num_stones)
+			int offset, int color, unsigned char num_stones)
 {
-  char xor_att = color ? ATT_O ^ ATT_O : ATT_O ^ ATT_X;
+  signed char xor_att = color ? ATT_O ^ ATT_O : ATT_O ^ ATT_X;
   struct corner_variation_b *subvariation = variation->child;
   struct corner_variation_b **link = &(variation->child);
 
@@ -2031,7 +2031,7 @@ corner_add_pattern(void)
   int move_pos;
   int move_x;
   int move_y;
-  char num_stones;
+  unsigned char num_stones;
   struct corner_variation_b *variation = &corner_root;
 
   /* Check if we have a corner pattern and select appropriate transformation. */
