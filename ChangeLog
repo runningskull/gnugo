@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.7.7 released October 9, 2005
+
+- FSF address corrected in COPYING
 - large scale improvements
 - use signed char instead of char most of the time in the engine
 - string_to_location(), debug_influence_move(), and report_worm()

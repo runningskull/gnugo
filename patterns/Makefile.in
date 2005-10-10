@@ -201,8 +201,7 @@ am_libpatterns_a_OBJECTS = connections.$(OBJEXT) helpers.$(OBJEXT) \
 	fuseki19.$(OBJEXT) josekidb.$(OBJEXT) handipat.$(OBJEXT) \
 	oraclepat.$(OBJEXT)
 libpatterns_a_OBJECTS = $(am_libpatterns_a_OBJECTS)
-EXTRA_PROGRAMS = extract_fuseki$(EXEEXT) \
-	compress_fuseki$(EXEEXT)
+EXTRA_PROGRAMS = extract_fuseki$(EXEEXT) compress_fuseki$(EXEEXT)
 noinst_PROGRAMS = mkpat$(EXEEXT) joseki$(EXEEXT) mkeyes$(EXEEXT) \
 	uncompress_fuseki$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
@@ -256,8 +255,8 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/mkeyes.Po $(DEPDIR)/mkpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/oraclepat.Po $(DEPDIR)/owl_attackpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/owl_defendpat.Po \
-@AMDEP_TRUE@	$(DEPDIR)/owl_vital_apat.Po \
-@AMDEP_TRUE@	$(DEPDIR)/patterns.Po $(DEPDIR)/transform.Po \
+@AMDEP_TRUE@	$(DEPDIR)/owl_vital_apat.Po $(DEPDIR)/patterns.Po \
+@AMDEP_TRUE@	$(DEPDIR)/transform.Po \
 @AMDEP_TRUE@	$(DEPDIR)/uncompress_fuseki.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -266,8 +265,7 @@ LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 CFLAGS = @CFLAGS@
 DIST_SOURCES = $(libpatterns_a_SOURCES) $(compress_fuseki_SOURCES) \
 	$(extract_fuseki_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) \
-	$(mkpat_SOURCES) \
-	$(uncompress_fuseki_SOURCES)
+	$(mkpat_SOURCES) $(uncompress_fuseki_SOURCES)
 HEADERS = $(noinst_HEADERS)
 
 DIST_COMMON = README $(noinst_HEADERS) Makefile.am Makefile.in

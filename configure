@@ -1249,7 +1249,7 @@ fi
 
 # Define the identity of the package.
 PACKAGE=gnugo
-VERSION=3.7.6
+VERSION=3.7.7
 
 cat >>confdefs.h <<EOF
 #define PACKAGE "$PACKAGE"
