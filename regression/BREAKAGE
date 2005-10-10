@@ -1,3 +1,35 @@
+========================== 3.7.7  ==================================
+
+./regress.sh . reading.tst 
+220 unexpected FAIL: Correct '0', got '1 M12'
+./regress.sh . atari_atari.tst 
+29 unexpected PASS!
+./regress.sh . endgame.tst 
+970 unexpected PASS!
+./regress.sh . 13x13.tst 
+8 unexpected FAIL: Correct 'J8', got 'H8'
+14 unexpected FAIL: Correct 'A10|E8|E6|H6', got 'E9'
+41 unexpected FAIL: Correct 'D7', got 'C8'
+./regress.sh . owl1.tst 
+380 unexpected FAIL: Correct '1 P4', got '0'
+./regress.sh . nando.tst 
+33 unexpected FAIL: Correct 'H11', got 'L12'
+./regress.sh . 13x13b.tst 
+12 unexpected FAIL: Correct 'J6', got 'J5'
+13 unexpected FAIL: Correct 'K12', got 'M11'
+35 unexpected FAIL: Correct 'D7|E8|F9', got 'G10'
+./regress.sh . 9x9.tst 
+470 unexpected PASS!
+480 unexpected FAIL: Correct 'E2', got 'F2'
+500 unexpected PASS!
+
+
+========================== 3.7.6  ==================================
+
+None
+
+========================== 3.7.5  ==================================
+
 ./regress.sh . reading.tst 
 187 unexpected PASS!
 199 unexpected PASS!

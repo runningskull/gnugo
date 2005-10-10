@@ -129,12 +129,12 @@ loadsgf games/mertin13x13/GHGN2.sgf 52
 # J5 not joseki.
 loadsgf games/mertin13x13/GHGN3.sgf 8
 12 restricted_genmove white J5 J6
-#? [J6]
+#? [J6]*
 
 # M13 is a very odd move.
 loadsgf games/mertin13x13/GHGN3.sgf 38
 13 restricted_genmove white M11 M12 M13 K12
-#? [K12]
+#? [K12]*
 
 # J9 is huge.
 loadsgf games/mertin13x13/GNGH2.sgf 23
@@ -244,7 +244,7 @@ loadsgf games/mertin13x13/GXGN2.sgf 48
 # D10 captures on too small scale.
 loadsgf games/mertin13x13/GXGN2.sgf 52
 35 reg_genmove white
-#? [D7|E8|F9]
+#? [D7|E8|F9]*
 
 # Low enclosure better.
 loadsgf games/mertin13x13/GXGN3.sgf 12

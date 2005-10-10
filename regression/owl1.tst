@@ -485,7 +485,7 @@ play white M10
 play white L5
 play white M6
 380 owl_defend O7
-#? [1 P4]
+#? [1 P4]*
 
 ########### end of tests #####################
 

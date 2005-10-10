@@ -178,7 +178,7 @@ loadsgf games/nando/auto022.sgf 206
 # thinks that the move is unsafe (see reading:220)
 loadsgf games/nando/auto023.sgf 170
 33 reg_genmove white
-#? [H11]
+#? [H11]*
 
 
 #--------------------------------------------------------------

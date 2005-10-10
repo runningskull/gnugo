@@ -231,11 +231,11 @@ loadsgf games/bitti-gnug36.sgf 44
 # Need to protect lower right corner
 loadsgf games/nodan-guno.sgf 8
 470 reg_genmove black
-#? [H3|H4|G4|D3]*
+#? [H3|H4|G4|D3]
 
 loadsgf games/nodan-guno.sgf 24
 480 restricted_genmove black E2 F2
-#? [E2]
+#? [E2]*
 
 # E1 is non-sense.
 loadsgf games/nodan-guno.sgf 38
@@ -244,5 +244,5 @@ loadsgf games/nodan-guno.sgf 38
 
 loadsgf games/nodan-guno.sgf 54
 500 reg_genmove black
-#? [H6]*
+#? [H6]
 

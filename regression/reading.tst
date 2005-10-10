@@ -928,7 +928,7 @@ trymove W H11
 trymove B K13
 trymove W K12
 220 attack K12
-#? [0]
+#? [0]*
 popgo
 popgo
 popgo

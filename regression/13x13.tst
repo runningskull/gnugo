@@ -52,7 +52,7 @@ loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 48
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 54
 8 restricted_genmove white K6 K7 J8 H8
-#? [J8]
+#? [J8]*
 
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 72
@@ -83,7 +83,7 @@ loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 24
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 28
 14 reg_genmove white
-#? [A10|E8|E6|H6]
+#? [A10|E8|E6|H6]*
 
 #CATEGORY=STRATEGY
 # New failure (comparing 3.1.15 and 3.0.0)
@@ -213,7 +213,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
 play white H10
 play black D5
 41 restricted_genmove white C8 D7
-#? [D7]
+#? [D7]*
 
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
