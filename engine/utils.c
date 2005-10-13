@@ -804,6 +804,8 @@ set_depth_values(int level, int report_levels)
     owl_reading_depth = mandated_owl_reading_depth;
   if (mandated_owl_node_limit != -1)
     owl_node_limit = mandated_owl_node_limit;
+  if (mandated_semeai_node_limit != -1)
+    semeai_node_limit = mandated_semeai_node_limit;
 
   depth_offset = 0;
   

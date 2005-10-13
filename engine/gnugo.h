@@ -273,6 +273,7 @@ extern int mandated_owl_distrust_depth;
 extern int mandated_owl_branch_depth;
 extern int mandated_owl_reading_depth;
 extern int mandated_owl_node_limit; 
+extern int mandated_semeai_node_limit; 
 
 extern float potential_moves[BOARDMAX];
 

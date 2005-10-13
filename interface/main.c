@@ -545,7 +545,7 @@ main(int argc, char *argv[])
 	break;
 
       case OPT_SEMEAI_NODE_LIMIT:
-	semeai_node_limit = atoi(gg_optarg);
+	mandated_semeai_node_limit = atoi(gg_optarg);
 	break;
 
       case OPT_EXPERIMENTAL_CONNECTIONS:

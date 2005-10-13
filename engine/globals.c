@@ -76,6 +76,7 @@ int mandated_owl_distrust_depth = -1;
 int mandated_owl_branch_depth = -1;  
 int mandated_owl_reading_depth = -1; 
 int mandated_owl_node_limit = -1;    
+int mandated_semeai_node_limit = -1;    
 
 
 /* Miscellaneous. */
