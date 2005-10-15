@@ -97,7 +97,7 @@ uncompress_fuseki boardsize filename db\n\
 "
 
 #define C_HEADER "struct fullboard_pattern fuseki%d[] = {\n"
-#define C_FOOTER "  {{{0,0}}, -1,NULL,0,0}\n};\n"
+#define C_FOOTER "};\n"
   
 const char *const db_output_strings[3] =
   {DB_PREAMBLE, DB_HEADER, DB_FOOTER};
@@ -163,9 +163,13 @@ write_pattern_c_code(char *name, Intersection board1d[BOARDSIZE],
     if (k < NUM_HASHVALUES - 1)
       printf(",");
   }
-  printf("}},%d,\"%s\",%d,%d},\n", patlen, name,
-	OFFSET(I(move_pos) - (boardsize-1)/2, J(move_pos) - (boardsize-1)/2),
-	value);
+  if (name)
+    printf("}},%d,\"%s\",%d,%d},\n", patlen, name,
+	   OFFSET(I(move_pos) - (boardsize-1)/2,
+		  J(move_pos) - (boardsize-1)/2),
+	   value);
+  else
+    printf("}},-1,NULL,0,0},\n");
 }
 
 
@@ -286,8 +290,14 @@ main(int argc, char *argv[])
     else
       write_pattern_c_code(name, board1d, move_pos, value, boardsize,
 		           num_stones);
-
   }
+
+  /* Add a dummy pattern to mark the end of the array. This can't be
+   * done statically in the footer since NUM_HASHVALUES may vary.
+   */
+  if (mode == C_OUTPUT)
+    write_pattern_c_code(NULL, board1d, NO_MOVE, 0, boardsize, -1);
+  
   printf(output_strings[FOOTER]);
 
   return EXIT_SUCCESS;
