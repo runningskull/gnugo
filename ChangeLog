@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- play_replay() and replay_node() partially rewritten
+
 3.7.7 released October 9, 2005
 
 - FSF address corrected in COPYING

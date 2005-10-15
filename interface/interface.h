@@ -37,7 +37,7 @@ void play_gtp(FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands,
 	      int gtp_initial_orientation);
 void play_gmp(Gameinfo *gameinfo, int simplified);
 void play_solo(Gameinfo *gameinfo, int benchmark);
-void play_replay(Gameinfo *gameinfo, int color_to_test);
+void play_replay(SGFTree *tree, int color_to_test);
 
 void load_and_analyze_sgf_file(Gameinfo *gameinfo);
 void load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,

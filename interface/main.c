@@ -1024,7 +1024,7 @@ main(int argc, char *argv[])
       fprintf(stderr, "You must use -l infile with replay mode.\n");
       exit(EXIT_FAILURE);
     }
-    play_replay(&gameinfo, replay_color);
+    play_replay(&sgftree, replay_color);
     break;
     
   case MODE_LOAD_AND_ANALYZE:
