@@ -299,30 +299,16 @@ make_dragons(int stop_before_owl)
   time_report(2, "  owl reading", NO_MOVE, 1.0);
   
   /* Compute the status to be used by the matcher. We most trust the
-   * owl status, if it is available.
+   * owl status, if it is available. If it's not we assume that we are
+   * already confident that the dragon is alive, regardless of
+   * crude_status.
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
-      if (IS_STONE(board[str])) {
-	if (DRAGON2(str).owl_status != UNCHECKED)
-	  dragon[str].status = DRAGON2(str).owl_status;
-	else if (dragon[str].crude_status == DEAD 
-		 || dragon[str].crude_status == CRITICAL) {
-	  /* If a dragon has sufficient escape potential or
-	   * surrounding moyo to stop the owl code from being run, the
-	   * status should be no worse than UNKNOWN,
-	   * regardless what the static life and death analysis
-	   * guesses.
-	   */
-	  dragon[str].status = UNKNOWN;
-	}
-	else {
-	  /* And if the static life and death analysis said UNKNOWN,
-           * we are most likely ALIVE.
-	   */
-	  dragon[str].status = ALIVE;
-	}
-      }
+    if (IS_STONE(board[str])) {
+      if (DRAGON2(str).owl_status != UNCHECKED)
+	dragon[str].status = DRAGON2(str).owl_status;
+      else
+	dragon[str].status = ALIVE;
     }
 
   /* The dragon data is now correct at the origin of each dragon but

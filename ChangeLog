@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- always set dragon status to ALIVE if owl_status is UNCHECKED
 - correct C-code footer in uncompress_fuseki.c for all values of
   NUM_HASHVALUES 
 - play_replay() and replay_node() partially rewritten
