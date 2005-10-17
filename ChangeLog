@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfixes in do_aftermath_genmove()
 - adjust readconnect node limit when starting search at higher stackp
 - new function get_depth_modification()
 - removed functions set_temporary_depth_values()/restore_depth_values()

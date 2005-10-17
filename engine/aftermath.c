@@ -671,6 +671,7 @@ do_aftermath_genmove(int color,
 	continue;
       if (board[pos2] == other 
 	  && dragon[pos2].status != ALIVE
+	  && dragon[pos2].status != UNKNOWN
 	  && (do_capture_dead_stones 
 	      || worm[pos2].unconditional_status != DEAD)
 	  && DRAGON2(pos2).safety != INESSENTIAL) {
@@ -752,9 +753,10 @@ do_aftermath_genmove(int color,
     /* Make sure that the potential move really isn't a self
      * atari. In the case of a move found after backfilling this
      * could happen (because the backfilling moves happened to
-     * capture some stones).
+     * capture some stones). The position of the move may even be
+     * occupied.
      */
-    if (!self_atari_ok && is_self_atari(move, color))
+    if (!self_atari_ok && (board[move] != EMPTY || is_self_atari(move, color)))
       continue;
     
     /* Consult the owl code to determine whether the considered move
