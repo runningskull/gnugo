@@ -303,9 +303,7 @@ void set_depth_values(int level, int report_levels);
 void modify_depth_values(int n);
 void increase_depth_values(void);
 void decrease_depth_values(void);
-void set_temporary_depth_values(int d, int b, int b2, int bc,
-				int ss, int br, int f, int k);
-void restore_depth_values(void);
+int get_depth_modification(void);
 
 int safe_move(int move, int color);
 int does_secure(int color, int move, int pos);

@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <math.h>
 
 #include "liberty.h"
 #include "cache.h"
@@ -1099,6 +1100,7 @@ string_connect(int str1, int str2, int *move)
     int reading_nodes_when_called = get_reading_node_counter();
     double start = 0;
     int tactical_nodes;
+    int save_connection_node_limit = connection_node_limit;
 #if USE_PERSISTENT_CONNECTION_CACHE == 1
     int result2 = -1;
     int move2;
@@ -1113,6 +1115,7 @@ string_connect(int str1, int str2, int *move)
       str2 = tmp;
     }
 
+
 #if USE_PERSISTENT_CONNECTION_CACHE == 1
     if (!search_persistent_connection_cache(CONNECT, str1, str2,
 					    &result2, &move2))
@@ -1126,6 +1129,7 @@ string_connect(int str1, int str2, int *move)
       return result;
 #endif
 
+    connection_node_limit *= pow(1.45, -stackp + get_depth_modification());
     save_verbose = verbose;
     if (verbose > 0)
       verbose--;
@@ -1134,6 +1138,7 @@ string_connect(int str1, int str2, int *move)
     result = recursive_connect2(str1, str2, move, 0);
     verbose = save_verbose;
     tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
+    connection_node_limit = save_connection_node_limit;
 
 #if USE_PERSISTENT_CONNECTION_CACHE == 1
     if (result2 != -1
@@ -1278,6 +1283,7 @@ disconnect(int str1, int str2, int *move)
   
   if (alternate_connections) {
     int reading_nodes_when_called = get_reading_node_counter();
+    int save_connection_node_limit = connection_node_limit;
     double start = 0;
     int tactical_nodes;
 #if USE_PERSISTENT_CONNECTION_CACHE == 1
@@ -1308,6 +1314,7 @@ disconnect(int str1, int str2, int *move)
       return result;
 #endif
 
+    connection_node_limit *= pow(1.5, -stackp + get_depth_modification());
     save_verbose = verbose;
     if (verbose > 0)
       verbose--;
@@ -1316,6 +1323,7 @@ disconnect(int str1, int str2, int *move)
     result = recursive_disconnect2(str1, str2, move, 0);
     verbose = save_verbose;
     tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
+    connection_node_limit = save_connection_node_limit;
 
 #if USE_PERSISTENT_CONNECTION_CACHE == 1
     if (result2 != -1

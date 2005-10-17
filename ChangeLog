@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- adjust readconnect node limit when starting search at higher stackp
+- new function get_depth_modification()
+- removed functions set_temporary_depth_values()/restore_depth_values()
 - always set dragon status to ALIVE if owl_status is UNCHECKED
 - correct C-code footer in uncompress_fuseki.c for all values of
   NUM_HASHVALUES 

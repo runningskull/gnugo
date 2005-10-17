@@ -774,7 +774,7 @@ set_depth_values(int level, int report_levels)
 
   connect_depth         = gg_max(2, CONNECT_DEPTH  + 2 * depth_level);
   connect_depth2        = gg_max(2, CONNECT_DEPTH2 + 2 * depth_level);
-  connection_node_limit = CONNECT_NODE_LIMIT * pow(1.5, depth_level);
+  connection_node_limit = CONNECT_NODE_LIMIT * pow(1.45, depth_level);
   breakin_depth 	= gg_max(2, BREAKIN_DEPTH + 2 * depth_level);
   breakin_node_limit 	= BREAKIN_NODE_LIMIT * pow(1.5, depth_level);
 
@@ -843,6 +843,8 @@ breakin_node_limit: %d\n\n",
 }
 
 
+static int depth_modification = 0;
+
 /*
  * Modify the various tactical reading depth parameters. This is
  * typically used to avoid horizon effects. By temporarily increasing
@@ -865,6 +867,7 @@ modify_depth_values(int n)
   ko_depth           += n;
   breakin_depth	     += n;
   depth_offset       += n;
+  depth_modification += n;
 }
 
 void
@@ -879,58 +882,12 @@ decrease_depth_values(void)
   modify_depth_values(-1);
 }
 
-/* These functions allow more drastic temporary modifications of the
- * depth values. Typical use is to turn certain depth values way down
- * for reading where speed is more important than accuracy, e.g. for
- * the influence function.
- */
-
-static int save_depth;
-static int save_backfill_depth;
-static int save_backfill2_depth;
-static int save_break_chain_depth;
-static int save_superstring_depth;
-static int save_branch_depth;
-static int save_fourlib_depth;
-static int save_ko_depth;
-
-/* Currently this function is never called. */
-
-void
-set_temporary_depth_values(int d, int b, int b2, int bc,
-			   int ss, int br, int f, int k)
+int
+get_depth_modification(void)
 {
-  save_depth             = depth;
-  save_backfill_depth    = backfill_depth;
-  save_backfill2_depth   = backfill2_depth;
-  save_break_chain_depth = break_chain_depth;
-  save_superstring_depth = superstring_depth;
-  save_branch_depth      = branch_depth;
-  save_fourlib_depth     = fourlib_depth;
-  save_ko_depth          = ko_depth;
-
-  depth             = d;
-  backfill_depth    = b;
-  backfill2_depth   = b2;
-  break_chain_depth = bc;
-  superstring_depth = ss;
-  branch_depth      = br;
-  fourlib_depth     = f;
-  ko_depth          = k;
+  return depth_modification;
 }
 
-void
-restore_depth_values()
-{
-  depth             = save_depth;
-  backfill_depth    = save_backfill_depth;
-  backfill2_depth   = save_backfill2_depth;
-  break_chain_depth = save_break_chain_depth;
-  superstring_depth = save_superstring_depth;
-  branch_depth      = save_branch_depth;
-  fourlib_depth     = save_fourlib_depth;
-  ko_depth          = save_ko_depth;
-}
 
 /*******************
  * Detect blunders *
