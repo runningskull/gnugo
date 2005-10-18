@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- use more tactical moves in do_owl_analyze_semeai()
 - unused function transform2() removed
 - report_worm() made static in worm.c
 - hashdata_to_string() revised for consistency between 32 and 64 bit platforms 

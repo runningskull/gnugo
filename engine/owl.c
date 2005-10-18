@@ -737,9 +737,15 @@ do_owl_analyze_semeai(int apos, int bpos,
 	else if (acode != 0
 		 && find_defense(semeai_worms[sworm], NULL)) {
 	  critical_semeai_worms[sworm] = 1;
-	  owl_add_move(moves, upos, 95, "attack semeai worm", 1, NO_MOVE,
-	      	       0, NO_MOVE, MAX_SEMEAI_MOVES);
-	  TRACE("Added %1m %d (-1)\n", upos, 95);
+	  owl_add_move(moves, upos, 105, "attack semeai worm", 1,
+		       NO_MOVE, 0, NO_MOVE, MAX_SEMEAI_MOVES);
+	  TRACE("Added %1m %d (-1)\n", upos, 105);
+	}
+	else if (acode == WIN
+		 && important_semeai_worms[sworm]) {
+	  owl_add_move(moves, upos, 100, "attack semeai worm", 1,
+		       NO_MOVE, 0, NO_MOVE, MAX_SEMEAI_MOVES);
+	  TRACE("Added %1m %d (-1)\n", upos, 100);
 	}
       }
     }
@@ -944,7 +950,7 @@ do_owl_analyze_semeai(int apos, int bpos,
    * interesting if the opponent doesn't already have two eyes.
    */
   if (!you_look_alive
-      && !safe_outside_liberty_found && moves[0].value < 100) {
+      && !safe_outside_liberty_found && moves[0].value < 110) {
     int pos;
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (!ON_BOARD(pos))
