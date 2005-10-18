@@ -1208,7 +1208,7 @@ gtp_popgo(char *s)
   UNUSED(s);
 
   if (stackp == 0)
-    return gtp_failure("Stack empty.\n");
+    return gtp_failure("Stack empty.");
 
   popgo();
   return gtp_success("");

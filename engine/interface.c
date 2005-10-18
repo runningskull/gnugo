@@ -408,29 +408,20 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 	    prop->name & 0xff, (prop->name >> 8), prop->value);
       switch (prop->name) {
       case SGFAB:
-	get_moveXY(prop, &i, &j, board_size);
+      case SGFAW:
 	/* Generally the last move is unknown when the AB or AW
 	 * properties are encountered. These are used to set up
 	 * a board position (diagram) or to place handicap stones
 	 * without reference to the order in which the stones are
 	 * placed on the board.
 	 */
-	rotate(i, j, &i, &j, board_size, orientation);
-	if (BOARD(i, j) != EMPTY)
-	  gprintf("Illegal SGF! attempt to add a stone at occupied point %m\n",
-		  i, j);
-	else
-	  add_stone(POS(i, j), BLACK);
-	break;
-	      
-      case SGFAW:
 	get_moveXY(prop, &i, &j, board_size);
 	rotate(i, j, &i, &j, board_size, orientation);
 	if (BOARD(i, j) != EMPTY)
 	  gprintf("Illegal SGF! attempt to add a stone at occupied point %m\n",
 		  i, j);
 	else
-	  add_stone(POS(i, j), WHITE);
+	  add_stone(POS(i, j), prop->name == SGFAB ? BLACK : WHITE);
 	break;
 	      
       case SGFPL:

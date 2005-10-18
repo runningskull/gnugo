@@ -50,18 +50,10 @@ void clearstats(void);
 
 void transformation_init(void);
 
-void report_worm(int pos);
 void ascii_report_worm(char *string);
 void report_dragon(FILE *outfile, int pos);
 void ascii_report_dragon(char *string);
 struct dragon_data2 *dragon2_func(int pos);
-
-/* prototypes for reorientation functions */
-
-void rotate2(int i, int j, int *ri, int *rj, int rot);
-void inv_rotate2(int i, int j, int *ri, int *rj, int rot);
-int rotate1(int pos, int rot);
-int inv_rotate1(int pos, int rot);
 
 /* Routine names used by persistent and non-persistent caching schemes. */
 enum routine_id {
@@ -334,7 +326,6 @@ void get_lively_stones(int color, signed char safe_stones[BOARDMAX]);
 int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
 void propagate_worm(int pos);
-void transform2(int i, int j, int *ti, int *tj, int trans);
 void find_cuts(void);
 void find_connections(void);
 
@@ -747,10 +738,6 @@ extern int large_scale;              /* seek large scale captures */
 
 extern int thrashing_dragon;        /* Dead opponent's dragon trying to live */
 extern signed char thrashing_stone[BOARDMAX];       /* All thrashing stones. */
-
-/* Experimental reading */
-extern char *rgoal;
-extern int goallib;
 
 extern int transformation[MAX_OFFSET][8];
 extern const int transformation2[8][2][2];

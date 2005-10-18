@@ -447,16 +447,14 @@ int
 finish_ko_helper(int pos)
 {
   int adj, adjs[MAXCHAIN];
+  int lib;
   int k;
 
   adj = chainlinks2(pos, adjs, 1);
   for (k = 0; k < adj; k++) {
-    int aa = adjs[k];
-    int xx;
-
-    if (countstones(aa) == 1) {
-      findlib(aa, 1, &xx);
-      if (is_ko(xx, board[pos], NULL))
+    if (countstones(adjs[k]) == 1) {
+      findlib(adjs[k], 1, &lib);
+      if (is_ko(lib, board[pos], NULL))
 	return 1;
     }
   }

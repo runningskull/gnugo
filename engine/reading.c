@@ -5491,33 +5491,34 @@ get_reading_node_counter()
 void
 draw_reading_shadow()
 {
-  int i, j, ii;
+  int i, j;
   int c = ' ';
+  int pos;
 
   start_draw_board();
   
   for (i = 0; i < board_size; i++) {
-    ii = board_size - i;
-    fprintf(stderr, "\n%2d", ii);
+    fprintf(stderr, "\n%2d", board_size - i);
     
     for (j = 0; j < board_size; j++) {
-      if (!shadow[POS(i, j)] && BOARD(i, j) == EMPTY)
+      pos = POS(i, j);
+      if (!shadow[pos] && board[pos] == EMPTY)
 	c = '.';
-      else if (!shadow[POS(i, j)] && BOARD(i, j) == WHITE)
+      else if (!shadow[pos] && board[pos] == WHITE)
 	c = 'O';
-      else if (!shadow[POS(i, j)] && BOARD(i, j) == BLACK)
+      else if (!shadow[pos] && board[pos] == BLACK)
 	c = 'X';
-      if (shadow[POS(i, j)] && BOARD(i, j) == EMPTY)
+      if (shadow[pos] && board[pos] == EMPTY)
 	c = ',';
-      else if (shadow[POS(i, j)] && BOARD(i, j) == WHITE)
+      else if (shadow[pos] && board[pos] == WHITE)
 	c = 'o';
-      else if (shadow[POS(i, j)] && BOARD(i, j) == BLACK)
+      else if (shadow[pos] && board[pos] == BLACK)
 	c = 'x';
       
       fprintf(stderr, " %c", c);
     }
     
-    fprintf(stderr, " %d", ii);
+    fprintf(stderr, " %d", board_size - i);
   }
 
   end_draw_board();

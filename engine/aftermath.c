@@ -53,7 +53,7 @@ all_own_neighbors_inessential(int pos, int color)
 
 /* External interface to do_aftermath_genmove().
  *
- * If the suggested move turn out not to be allowed we just return
+ * If the suggested move turns out not to be allowed we just return
  * pass. This is not ideal but also not a big deal. If
  * do_aftermath_genmove() is ever redesigned that would be a good time
  * to integrate allowed_moves.

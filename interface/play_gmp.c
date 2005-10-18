@@ -170,18 +170,16 @@ play_gmp(Gameinfo *gameinfo, int simplified)
 
       if (message == gmp_pass) {
 	++passes;
-        sgftreeAddPlay(&sgftree, to_move, -1, -1);
-	gnugo_play_move(-1, -1, yourcolor);
-	sgffile_output(&sgftree);
+	i = -1;
+	j = -1;
       }
-      else {
-	/* not pass */
+      else
 	passes = 0;
-        sgftreeAddPlay(&sgftree, to_move, i, j);
-	TRACE("\nyour move: %m\n\n", i, j);
-	gnugo_play_move(i, j, yourcolor);
-	sgffile_output(&sgftree);
-      }
+
+      TRACE("\nyour move: %m\n\n", i, j);
+      sgftreeAddPlay(&sgftree, to_move, i, j);
+      gnugo_play_move(i, j, yourcolor);
+      sgffile_output(&sgftree);
 
     }
     else {

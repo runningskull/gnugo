@@ -481,8 +481,8 @@ Pattern F18
 :8,FeEaj,shape(2.98)
 
 
-
 Pattern F19
+
 |..xxX	    go-go invasion at san-san
 |....x
 |..*.x
@@ -513,8 +513,8 @@ Pattern F20
 |.......
 |.......
 +-------
-# I think this is suboptimal, thus the worse shape. /ab
 
+# I think this is suboptimal, thus the worse shape. /ab
 :/,FeEaj, shape(0.94)
 
 
@@ -546,7 +546,6 @@ Pattern F22
 +------
 
 :8,FEaj,shape(1)
-
 
 
 ###################

@@ -48,10 +48,10 @@ static int recursive_connect2(int str1, int str2, int *move,
 			        int has_passed);
 static int recursive_disconnect2(int str1, int str2, int *move,
 				   int has_passed);
-static int recursive_break(int str, const signed char goal[BOARDMAX], int *move,
-			   int has_passed, Hash_data *goal_hash);
-static int recursive_block(int str, const signed char goal[BOARDMAX], int *move,
-			   int has_passed, Hash_data *goal_hash);
+static int recursive_break(int str, const signed char goal[BOARDMAX],
+			   int *move, int has_passed, Hash_data *goal_hash);
+static int recursive_block(int str, const signed char goal[BOARDMAX],
+			   int *move, int has_passed, Hash_data *goal_hash);
 
 static int add_array(int *array, int elt);
 static int element_array(int *array, int elt);

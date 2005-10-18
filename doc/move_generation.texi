@@ -120,7 +120,7 @@ result depends on a ko, e.g. @code{OWL_ATTACK_MOVE_GOOD_KO}. Here
 @code{KO_B} as explained in @ref{Ko}.
 See @file{engine/move_reasons.h} for the full of move reasons.
 
-@strong{NOTE:} Some of these are reasons for @strong{not} playing a move.
+@strong{NOTICE:} Some of these are reasons for @strong{not} playing a move.
 
 More detailed discussion of these move reasons will be found in the
 next section.

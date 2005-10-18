@@ -286,17 +286,6 @@ prepare_for_match(int color)
 }
 
 
-/* Functional version for completeness. Prefer the TRANSFORM2 macro
- * in liberty.h.
- */
-
-void 
-transform2(int i, int j, int *ti, int *tj, int trans)
-{
-  TRANSFORM2(i, j, ti, tj, trans);
-}
-
-
 /*
  * Try all the patterns in the given array at (anchor). Invoke the
  * callback for any that matches. Classes X,O,x,o are checked here. It

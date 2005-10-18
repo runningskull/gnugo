@@ -248,7 +248,7 @@ break_in_goal_from_str(int str, signed char goal[BOARDMAX],
     /* Successful break-in/unsuccessful block. Now where exactly can we
      * erase territory? This is difficult, and the method here is very
      * crude: Wherever we enter the territory when computing the closest
-     * neighbors of (str). Plus at the locaction of the break-in move.
+     * neighbors of (str). Plus at the location of the break-in move.
      * FIXME: This needs improvement.
      */
     int k;

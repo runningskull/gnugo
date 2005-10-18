@@ -243,7 +243,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
       }
       else {
 	pass++;
-	gprintf("%d %s move : PASS!\n", movenum, 
+	gprintf("%d %s move PASS\n", movenum, 
 		next == WHITE ? "white (O)" : "black (X)");
       }
       play_move(move, next);

@@ -279,7 +279,7 @@ find_more_attack_and_defense_moves(int color)
 }
 
 
-/* Do the real job of find_more_attack_and_defense_moves() with given
+/* Do the real job of find_more_owl_attack_and_defense_moves() with given
  * move reason at given position and for given target (`what').  This
  * function is used from induce_secondary_move_reasons() for upgrading
  * one specific move reason only.

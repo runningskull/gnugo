@@ -285,9 +285,6 @@ collect_move_reasons(int color)
  * NULL any move is allowed. Pass is always allowed and will be chosen
  * if the move generation doesn't like any of the allowed moves (or
  * overlooks them).
- *
- * Resignation is indicated by a negatively valued move (which is not
- * a pass)
  */
   
 static int

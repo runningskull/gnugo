@@ -59,6 +59,7 @@ static void find_defense_patterns(void);
 static void defense_callback(int anchor, int color,
 			     struct pattern *pattern, int ll, void *data);
 static void build_worms(void);
+static void report_worm(int pos);
 
 /* A worm or string is a maximal connected set of stones of the same color, 
  * black or white.
@@ -1206,7 +1207,7 @@ propagate_worm(int pos)
 
 /* 
  * propagate_worm2() is a relative to propagate_worm() which can be
- * used when stack>0 but not for the initial construction of the
+ * used when stackp>0 but not for the initial construction of the
  * worms.
  */
 
@@ -1753,7 +1754,7 @@ ascii_report_worm(char *string)
 }
 
 
-void
+static void
 report_worm(int pos)
 {
   int i;

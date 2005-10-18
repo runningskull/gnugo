@@ -130,7 +130,7 @@ tt_free(Transposition_table *table)
 }
 
 
-/* Set result and move. Return value:
+/* Get result and move. Return value:
  *   0 if not found
  *   1 if found, but depth too small to be trusted.  In this case the move
  *     can be used for move ordering.

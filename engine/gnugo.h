@@ -93,9 +93,6 @@ int  gnugo_sethand(int handicap, SGFNode *root);
 
 float gnugo_genmove(int *i, int *j, int color, int *resign);
 
-int  gnugo_attack(int m, int n, int *i, int *j);
-int  gnugo_find_defense(int m, int n, int *i, int *j);
-
 float gnugo_estimate_score(float *upper, float *lower);
 
 /* ================================================================ */

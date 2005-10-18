@@ -163,19 +163,15 @@ make_dragons(int stop_before_owl)
   /* Determine status: ALIVE, DEAD, CRITICAL or UNKNOWN */
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str))
-      if (dragon[str].origin == str && board[str]) {
+      if (dragon[str].origin == str && board[str])
 	dragon[str].crude_status = compute_crude_status(str);
-      }
   
   /* We must update the dragon status at every intersection before we
    * call the owl code. This updates all fields.
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
-      struct dragon_data *dd = &(dragon[str]);
-      
-      dragon[str] = dragon[dd->origin];
-    }
+    if (ON_BOARD(str) && board[str] != EMPTY)
+      dragon[str] = dragon[dragon[str].origin];
   
   find_neighbor_dragons();
 
@@ -315,10 +311,8 @@ make_dragons(int stop_before_owl)
    * we need to copy it to every vertex.  
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
-      struct dragon_data *dd = &(dragon[str]);
-      dragon[str] = dragon[dd->origin];
-    }
+    if (ON_BOARD(str) && board[str] != EMPTY)
+      dragon[str] = dragon[dragon[str].origin];
 
   /* Owl threats. */
   for (str = BOARDMIN; str < BOARDMAX; str++)
@@ -373,10 +367,8 @@ make_dragons(int stop_before_owl)
    * but we need to copy it to every vertex.  
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
-      struct dragon_data *dd = &(dragon[str]);
-      dragon[str] = dragon[dd->origin];
-    }
+    if (ON_BOARD(str) && board[str] != EMPTY)
+      dragon[str] = dragon[dragon[str].origin];
 
   time_report(2, "  owl threats ", NO_MOVE, 1.0);
   
@@ -1430,8 +1422,8 @@ connected_to_eye(int pos, int str, int color, int eye_color,
  */
 static void
 connected_to_eye_recurse(int pos, int str, int color, int eye_color,
-			 struct eye_data *eye, signed char *mx, signed char *me,
-			 int *halfeyes)
+			 struct eye_data *eye, signed char *mx,
+			 signed char *me, int *halfeyes)
 {
   int liberties;
   int libs[MAXLIBS];
@@ -1656,7 +1648,7 @@ join_new_dragons(int d1, int d2)
   ASSERT1(board[d1] == board[d2], d1);
   ASSERT1(IS_STONE(board[d1]), d1);
 
-  /* Don't bother to do anything fance with dragon origins. */
+  /* Don't bother to do anything fancy with dragon origins. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos) && new_dragon_origins[pos] == d2)
       new_dragon_origins[pos] = d1;
@@ -2406,7 +2398,7 @@ ascii_report_dragon(char *string)
 void
 report_dragon(FILE *outfile, int pos)
 {
-  int ii;
+  int w;
   int k;
   struct dragon_data *d = &(dragon[pos]);
   struct dragon_data2 *d2 = &(dragon2[d->id]);
@@ -2475,11 +2467,8 @@ report_dragon(FILE *outfile, int pos)
   gfprintf(outfile, "semeai_attack_certain   %d\n", d2->semeai_attack_certain);
   gfprintf(outfile, "semeai_attack_target    %1m\n", d2->semeai_attack_target);
   gfprintf(outfile, "strings                 ");
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)
-	&& worm[ii].origin == ii
-	&& is_same_dragon(ii, pos))
-	gfprintf(outfile, "%1m ", ii);
+  for (w = first_worm_in_dragon(pos); w != NO_MOVE; w = next_worm_in_dragon(w))
+    gfprintf(outfile, "%1m ", w);
   gfprintf(outfile, "\n");
 }
 

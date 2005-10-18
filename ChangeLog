@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- unused function transform2() removed
+- report_worm() made static in worm.c
+- hashdata_to_string() revised for consistency between 32 and 64 bit platforms 
 - bugfixes in do_aftermath_genmove()
 - adjust readconnect node limit when starting search at higher stackp
 - new function get_depth_modification()

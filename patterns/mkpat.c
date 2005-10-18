@@ -272,7 +272,6 @@ static struct autohelper_func autohelper_functions[] = {
   {"lib2",			1, 0, 0.01, "worm[%s].liberties2"},
   {"lib3",			1, 0, 0.01, "worm[%s].liberties3"},
   {"lib4",			1, 0, 0.01, "worm[%s].liberties4"},
-  {"goallib",			0, 0, 0.01, "goallib"},
   {"lib",			1, 0, 0.01, "countlib(%s)"},
   {"alive",			1, 0, 0.01,
 		"(dragon[%s].status == ALIVE)"},
@@ -1967,7 +1966,8 @@ corner_best_element(struct corner_element *el, int n,
 
 /* Dynamically allocates a new variation structure. */
 static struct corner_variation_b *
-corner_variation_new(int move_offset, signed char xor_att, unsigned char num_stones)
+corner_variation_new(int move_offset, signed char xor_att,
+		     unsigned char num_stones)
 {
   struct corner_variation_b *variation;
    
