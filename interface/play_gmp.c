@@ -109,7 +109,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
 
 #if ORACLE
   if (metamachine && oracle_exists)
-    oracle_clear_board(gnugo_get_boardsize());
+    oracle_clear_board(board_size);
 #endif
 
   sgfOverwritePropertyInt(sgftree.root, "SZ", board_size);
