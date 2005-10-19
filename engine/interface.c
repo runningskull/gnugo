@@ -67,6 +67,7 @@ gnugo_clear_board(int boardsize)
 {
   board_size = boardsize;
   clear_board();
+  init_timers();
 #if 0
   if (metamachine && oracle_exists)
     oracle_clear_board(boardsize);

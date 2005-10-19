@@ -411,7 +411,7 @@ break_territories(int color_to_move, struct influence_data *q, int store,
   struct moyo_data territories;
   int k;
 
-  if (!experimental_break_in || level < 10)
+  if (!experimental_break_in || get_level() < 10)
     return;
 
   influence_get_territory_segmentation(q, &territories);

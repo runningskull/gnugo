@@ -133,7 +133,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
 
   gameinfo->computer_player = mycolor;
   sgf_write_header(sgftree.root, 1, get_random_seed(), komi,
-		   level, chinese_rules);
+		   get_level(), chinese_rules);
   gameinfo->handicap = gnugo_sethand(gameinfo->handicap, sgftree.root);
   sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 
@@ -184,7 +184,10 @@ play_gmp(Gameinfo *gameinfo, int simplified)
     }
     else {
       /* Generate my next move. */
-      float move_value = gnugo_genmove(&i, &j, mycolor, NULL);
+      float move_value;
+      if (autolevel_on)
+	adjust_level_offset(mycolor);
+      move_value = gnugo_genmove(&i, &j, mycolor, NULL);
       gnugo_play_move(i, j, mycolor);
       sgffile_add_debuginfo(sgftree.lastnode, move_value);
       

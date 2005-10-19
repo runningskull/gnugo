@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- complete rework of clock.c, using level adaption logic from play_gtp.c
 - use more tactical moves in do_owl_analyze_semeai()
 - unused function transform2() removed
 - report_worm() made static in worm.c

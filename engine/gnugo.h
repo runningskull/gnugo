@@ -173,6 +173,7 @@ extern int output_flags;       /* amount of output to outfile */
 #define DEBUG_ORACLE_STREAM         0x1000000
 #define DEBUG_LARGE_SCALE           0x1000000
 #define DEBUG_SPLIT_OWL             0x2000000
+#define DEBUG_TIME                  0x4000000
 
 
 #define DEBUG_FLAGS "\
@@ -203,6 +204,7 @@ DEBUG_MISCELLANEOUS         0x800000\n\
 DEBUG_ORACLE_STREAM         0x1000000\n\
 DEBUG_LARGE_SCALE           0x1000000\n\
 DEBUG_SPLIT_OWL             0x2000000\n\
+DEBUG_TIME                  0x4000000\n\
 "
 
 
@@ -239,7 +241,6 @@ extern int hashflags;		/* hash flags */
 extern int fusekidb;            /* use fuseki database */
 extern int disable_fuseki;      /* do not generate fuseki moves */
 extern int josekidb;            /* use joseki database */
-extern int level;		/* controls depth of reading */
 extern int semeai_variations;   /* max variations considered reading semeai */
 extern int showtime;		/* print genmove time */
 extern int showscore;		/* print score */
@@ -271,6 +272,8 @@ extern int mandated_owl_branch_depth;
 extern int mandated_owl_reading_depth;
 extern int mandated_owl_node_limit; 
 extern int mandated_semeai_node_limit; 
+
+extern int autolevel_on;
 
 extern float potential_moves[BOARDMAX];
 

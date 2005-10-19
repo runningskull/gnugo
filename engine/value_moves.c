@@ -3757,12 +3757,12 @@ review_move_reasons(int *the_move, float *value, int color,
   find_more_attack_and_defense_moves(color);
   time_report(2, "  find_more_attack_and_defense_moves", NO_MOVE, 1.0);
 
-  if (level >= 6) {
+  if (get_level() >= 6) {
     find_more_owl_attack_and_defense_moves(color);
     time_report(2, "  find_more_owl_attack_and_defense_moves", NO_MOVE, 1.0);
   }
 
-  if (large_scale && level >= 6) {
+  if (large_scale && get_level() >= 6) {
     find_large_scale_owl_attack_moves(color);
     time_report(2, "  find_large_scale_owl_attack_moves", NO_MOVE, 1.0);
   }

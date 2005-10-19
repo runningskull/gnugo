@@ -92,9 +92,6 @@ int disable_fuseki    = 0;  /* do not generate fuseki moves */
 int josekidb          = 1;  /* use joseki database */
 int showtime          = 0;  /* print time to find move */
 int showscore         = 0;  /* print estimated score */
-int level             = DEFAULT_LEVEL; /* strength; up to 10 supported */
-int min_level         = 0;
-int max_level         = gg_max(DEFAULT_LEVEL, 10);
 int debug             = 0;  /* controls debug output */
 int verbose           = 0;  /* trace level */
 char outfilename[128] = ""; /* output file (-o option) */
@@ -102,6 +99,7 @@ int output_flags      = OUTPUT_DEFAULT; /* amount of output to outfile */
 int limit_search      = 0;  /* limit search to a portion of the board */
 int metamachine       = 0;  /* use metamachine_genmove */
 int oracle_exists     = 0;  /* oracle is available for consultation   */
+int autolevel_on      = 0;  /* Adjust level in GMP or ASCII mode. */
 
 int disable_threat_computation = 0;
 int disable_endgame_patterns   = 0;

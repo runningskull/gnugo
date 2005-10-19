@@ -165,7 +165,7 @@ sgffile_printsgf(int color_to_play, const char *filename)
   sgftree_clear(&sgftree);
   sgftreeCreateHeaderNode(&sgftree, board_size, relative_komi);
   sgf_write_header(sgftree.root, 1, get_random_seed(), relative_komi,
-		   level, chinese_rules);
+		   get_level(), chinese_rules);
   gg_snprintf(str, 128, "GNU Go %s load and print", gg_version());
   sgfOverwriteProperty(sgftree.root, "GN", str);
   

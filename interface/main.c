@@ -337,9 +337,6 @@ main(int argc, char *argv[])
   int seed = 0;
   int seed_specified = 0;
 
-  /* Default parameters for clock and auto level systems. */
-  clock_init(3600, 0, 0);      /* One hour sudden death. */
-
   sgftree_clear(&sgftree);
   gameinfo_clear(&gameinfo, board_size, komi);
   
@@ -780,19 +777,15 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_LEVEL:
-	level = atoi(gg_optarg);
-	if (level > max_level)
-	  max_level = level;
-	if (level < min_level)
-	  min_level = level;
+	set_level(atoi(gg_optarg));
 	break;
 
       case OPT_MIN_LEVEL:
-	min_level = atoi(gg_optarg);
+	set_min_level(atoi(gg_optarg));
 	break;
 
       case OPT_MAX_LEVEL:
-	max_level = atoi(gg_optarg);
+	set_max_level(atoi(gg_optarg));
 	break;
 
       case OPT_LIMIT_SEARCH:
@@ -807,25 +800,19 @@ main(int argc, char *argv[])
 	break;
 
       case OPT_CLOCK_TIME:
-
-	clock_init(atoi(gg_optarg), -1, -1);
-	clock_enable();
+	clock_settings(atoi(gg_optarg), -1, -1);
 	break;
 
       case OPT_CLOCK_BYO_TIME: 
-	clock_init(-1, atoi(gg_optarg), -1);
-	clock_enable();
+	clock_settings(-1, atoi(gg_optarg), -1);
 	break;
 
       case OPT_CLOCK_BYO_PERIOD:
-	clock_init(-1, -1, atoi(gg_optarg));
-	clock_enable();
+	clock_settings(-1, -1, atoi(gg_optarg));
 	break;
 
       case OPT_AUTOLEVEL:
-	clock_init(-1, -1, -1);
-	clock_enable();
-	clock_enable_autolevel();
+	autolevel_on = 1;
 	break;
 	
       case OPT_DEBUG_INFLUENCE:
@@ -1372,7 +1359,6 @@ main(int argc, char *argv[])
   if (profile_patterns)
     report_pattern_profiling();
 
-  clock_report_autolevel(NULL, gameinfo.computer_player);
   sgfFreeNode(sgftree.root); 
 
   return 0;
@@ -1556,8 +1542,7 @@ Options providing detailed reading results etc.:\n\
 static void
 show_help(void)
 {
-  set_depth_values(DEFAULT_LEVEL, 0);
-  printf(USAGE, level);
+  printf(USAGE, DEFAULT_LEVEL);
   printf(USAGE1, (float) DEFAULT_MEMORY);
   printf(USAGE2, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
 }

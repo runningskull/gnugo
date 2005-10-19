@@ -91,7 +91,7 @@ reset_engine()
   clear_break_in_list();
 
   /* Set up depth values (see comments there for details). */
-  set_depth_values(level, 0);
+  set_depth_values(get_level(), 0);
 }
 
 /*
@@ -315,9 +315,6 @@ do_genmove(int color, float pure_threat_value,
   move = PASS_MOVE;  
   *value = 0.0; 
   
-  /* experimental level adapter */
-  clock_adapt_level(&level, color);
-
   /* Prepare pattern matcher and reading code. */
   reset_engine();
 

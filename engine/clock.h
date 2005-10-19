@@ -23,67 +23,25 @@
 #ifndef _CLOCK_H_
 #define _CLOCK_H_
 
-/* ============================================================= *\
- *                        Time handling                          *
- *                          for GNU Go                           *
- *                         __       __                           *
- *                        <  >     <  >                          *
- *                      +--++-------++--+                        *
- *                      |  .'11 12 1'.  |                        *
- *                      |  :10 \    2:  |                        *
- *                      |  :9   @-> 3:  |                        *
- *                      |  :8       4;  |                        *
- *                      |  '..7 6 5..'  |                        *
- *                      |_______________|                        *
- *                                                               *
-\* ============================================================= */
-
-#include <stdio.h>
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 #include "gnugo.h"
 
-#ifdef HAVE_VISUAL_C
-#include <winsock.h>
-#include <io.h>
-#include <time.h>
-#else
-#include <sys/time.h>
-#endif
-
-#ifdef __MINGW32__
-#include <windows.h>
-#include <winsock.h>
-#include <io.h>
-#endif
-
-/* interface */
- 
 /* initialization and activation */
-void clock_init(int time, int byo_time, int byo_stones);
-void clock_enable(void);
+void clock_settings(int time, int byo_time, int byo_stones);
+void init_timers(void);
  
-void clock_enable_autolevel(void);
-
 /* main access */
 void clock_push_button(int color);
-void clock_unpush_button(int color);
-
-/* getting informations about clock */
-int clock_is_byoyomi(int color);
-int clock_is_time_over(int color);
-double clock_get_timer(int color);
-double clock_get_btimer(int color);
-double clock_get_time_left(int color);
-double clock_get_btime_left(int color, int *stones);
-
-/* adaptative system */
-void clock_adapt_level(int *p_level, int color);
-
-/* output */
+void update_time_left(int color, int time_left, int stones);
 void clock_print(int color);
-void clock_report_autolevel(FILE *f, int color);
+int get_clock_settings(int *t, int *byo_t, int *byo_s);
+
+void adjust_level_offset(int color);
+
+/* Access to level settings. */
+int get_level(void);
+void set_level(int new_level);
+void set_max_level(int new_max);
+void set_min_level(int new_min);
 
 
 #endif  /* _CLOCK_H_ */

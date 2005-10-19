@@ -1757,7 +1757,7 @@ defend3(int str, int *move)
     bamboo_rescue_moves(str, liberties, libs, &moves);
   }
 
-  if (level >= 8 && stackp <= backfill2_depth)
+  if (get_level() >= 8 && stackp <= backfill2_depth)
     superstring_break_chain_moves(str, 4, &moves);
 
   if (stackp <= break_chain_depth)
@@ -1775,7 +1775,7 @@ defend3(int str, int *move)
   /* If nothing else works, we try playing a liberty of the
    * super_string.
    */
-  if (level >= 8 && stackp <= backfill2_depth) {
+  if (get_level() >= 8 && stackp <= backfill2_depth) {
     superstring_moves(str, &moves, 3, 0);
     squeeze_moves(str, &moves);
   }
@@ -3217,7 +3217,7 @@ attack2(int str, int *move)
       /* If it is not possible to make a direct atari, we try filling
        * a liberty of the superstring.
        */
-      if (level >= 8
+      if (get_level() >= 8
           && stackp <= backfill_depth
           && (stackp <= superstring_depth || !atari_possible)) {
 	int liberty_cap = 2;
@@ -3365,7 +3365,7 @@ attack3(int str, int *move)
       /* If nothing else works, we try filling a liberty of the
        * super_string.
        */
-      if (level >= 8 && stackp <= backfill2_depth) {
+      if (get_level() >= 8 && stackp <= backfill2_depth) {
 	superstring_moves(str, &moves, 3, 1);
 	squeeze_moves(str, &moves);
       }

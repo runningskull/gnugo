@@ -334,7 +334,7 @@ make_dragons(int stop_before_owl)
 	int dcode = DRAGON2(str).owl_defense_code;
 	int defense_point, second_defense_point;
 	
-	if (level >= 8
+	if (get_level() >= 8
 	    && !disable_threat_computation
 	    && (owl_threats 
 		|| thrashing_stone[str])) {

@@ -61,7 +61,7 @@ play_solo(Gameinfo *gameinfo, int moves)
   sgftree_clear(&sgftree);
   sgftreeCreateHeaderNode(&sgftree, board_size, komi);
   sgf_write_header(sgftree.root, 1, get_random_seed(), 5.5,
-                   level, chinese_rules);
+                   get_level(), chinese_rules);
  
   /* Generate some random moves. */
   if (board_size > 6) {

@@ -35,28 +35,10 @@
 
 /* Internal state that's not part of the engine. */
 static int handicap = 0;
-static int main_time = 0;
-static int byo_yomi_time = 1;
-static int byo_yomi_stones = 0;
 
 static int report_uncertainty = 0;
 static int gtp_orientation = 0;
 
-/* Time handling. Index 0 is the most recent report, index 1 the
- * second most recent report.
- */
-static int black_time_left[2];
-static int black_stones_left[2];
-static int white_time_left[2];
-static int white_stones_left[2];
-static int level_offset;
-
-
-static void gtp_init_time_handling(void);
-static void analyze_time_data(int time_left_data[2], int stones_left_data[2],
-			      int *time_for_last_move,
-			      int *time_left, int *stones_left);
-static void adjust_level_offset(int color);
 static void gtp_print_code(int c);
 static void gtp_print_vertices2(int n, int *moves);
 static void rotate_on_input(int ai, int aj, int *bi, int *bj);
@@ -359,7 +341,7 @@ play_gtp(FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands,
   gtp_set_vertex_transform_hooks(rotate_on_input, rotate_on_output);
 
   /* Initialize time handling. */
-  gtp_init_time_handling();
+  init_timers();
   
   /* Prepare pattern matcher and reading code. */
   reset_engine();
@@ -516,7 +498,7 @@ gtp_clear_board(char *s)
     update_random_seed();
 
   clear_board();
-  gtp_init_time_handling();
+  init_timers();
   
   return gtp_success("");
 }
@@ -627,7 +609,7 @@ gtp_playblack(char *s)
   if (!is_legal(POS(i, j), BLACK))
     return gtp_failure("illegal move");
 
-  play_move(POS(i, j), BLACK);
+  gnugo_play_move(i, j, BLACK);
   return gtp_success("");
 }
 
@@ -658,7 +640,7 @@ gtp_playwhite(char *s)
   if (!is_legal(POS(i, j), WHITE))
     return gtp_failure("illegal move");
 
-  play_move(POS(i, j), WHITE);
+  gnugo_play_move(i, j, WHITE);
   return gtp_success("");
 }
 
@@ -682,7 +664,7 @@ gtp_play(char *s)
   if (!is_legal(POS(i, j), color))
     return gtp_failure("illegal move");
 
-  play_move(POS(i, j), color);
+  gnugo_play_move(i, j, color);
   return gtp_success("");
 }
 
@@ -871,7 +853,7 @@ gtp_loadsgf(char *s)
   handicap = gameinfo.handicap;
   gtp_internal_set_boardsize(board_size);
   reset_engine();
-  gtp_init_time_handling();
+  init_timers();
 
   sgfFreeNode(sgftree.root);
 
@@ -2471,7 +2453,7 @@ gtp_genmove_black(char *s)
 
   move = genmove(BLACK, NULL, NULL);
 
-  play_move(move, BLACK);
+  gnugo_play_move(I(move), J(move), BLACK);
 
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(move), J(move));
@@ -2496,7 +2478,7 @@ gtp_genmove_white(char *s)
 
   move = genmove(WHITE, NULL, NULL);
 
-  play_move(move, WHITE);
+  gnugo_play_move(I(move), J(move), WHITE);
 
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(move), J(move));
@@ -2526,14 +2508,12 @@ gtp_genmove(char *s)
     return gtp_failure("genmove cannot be called when stackp > 0");
 
   adjust_level_offset(color);
-  level += level_offset;
   move = genmove(color, NULL, &resign);
-  level -= level_offset;
 
   if (resign)
     return gtp_success("resign");
 
-  play_move(move, color);
+  gnugo_play_move(I(move), J(move), color);
 
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(move), J(move));
@@ -2708,13 +2688,11 @@ gtp_kgs_genmove_cleanup(char *s)
   capture_all_dead = 1;
   
   adjust_level_offset(color);
-  level += level_offset;
   move = genmove(color, NULL, NULL);
-  level -= level_offset;
 
   capture_all_dead = save_capture_all_dead;
   
-  play_move(move, color);
+  gnugo_play_move(I(move), J(move), color);
 
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(move), J(move));
@@ -2845,8 +2823,7 @@ gtp_set_level(char *s)
   if (sscanf(s, "%d", &new_level) < 1)
     return gtp_failure("level not an integer");
   
-  level = new_level;
-  level_offset = 0;
+  set_level(new_level);
   return gtp_success("");
 }
 
@@ -2901,131 +2878,6 @@ gtp_gg_undo(char *s)
  * time handling *
  *****************/
 
-/* Initialize time data variables and set the level offset to 0. */
-static void
-gtp_init_time_handling(void)
-{
-  int k;
-  for (k = 0; k < 1; k++) {
-    black_time_left[k] = -1;
-    black_stones_left[k] = -1;
-    white_time_left[k] = -1;
-    white_stones_left[k] = -1;
-  }
-  level_offset = 0;
-}
-
-/* Analyze the two most recent time reports and determine the time
- * spent on the last moves, the (effective) number of stones left and
- * the (effective) remaining time.
- */
-static void
-analyze_time_data(int time_left_data[2], int stones_left_data[2],
-		  int *time_for_last_move, int *time_left, int *stones_left)
-{
-  *time_for_last_move = -1;
-  *time_left = -1;
-  *stones_left = -1;
-
-  /* Do we have any time limits. */
-  if (byo_yomi_stones == 0 && byo_yomi_time > 0)
-    return;
-  
-  /* If we don't have time information for the two last moves, just return. */
-  if (time_left_data[1] < 0)
-    return;
-
-  if (stones_left_data[0] == 0) {
-    /* Main time running. */
-    *time_for_last_move = time_left_data[1] - time_left_data[0];
-    *time_left = time_left_data[0] + byo_yomi_time;
-    if (byo_yomi_time > 0)
-      *stones_left = byo_yomi_stones;
-    else {
-      /* Absolute time. Here we aim to be able to play at least X more
-       * moves or a total of Y moves. We choose Y as a third of the
-       * number of vertices and X as 40% of Y. For 19x19 this means
-       * that we aim to play at least a total of 120 moves
-       * (corresponding to a 240 move game) or another 24 moves.
-       */
-      int nominal_moves = board_size * board_size / 3;
-      *stones_left = gg_max(nominal_moves - movenum / 2,
-			    2 * nominal_moves / 5);
-    }
-  }
-  else {
-    if (stones_left_data[1] == 0)
-      *time_for_last_move = time_left_data[1] + (byo_yomi_time
-						 - time_left_data[0]);
-    else if (stones_left_data[1] == stones_left_data[0] + 1)
-      *time_for_last_move = time_left_data[1] - time_left_data[0];
-    else
-      return;
-
-    *time_left = time_left_data[0];
-    *stones_left = stones_left_data[0];
-  }
-}
-
-/* Adjust the level offset given information of current playing speed
- * and remaining time and stones.
- *
- * FIXME: Integrate this code with the one in clock.c. Or maybe rather
- *        replace them both with something better.
- */
-static void
-adjust_level_offset(int color)
-{
-  int time_for_last_move;
-  int time_left;
-  int stones_left;
-
-  if (color == BLACK)
-    analyze_time_data(black_time_left, black_stones_left, &time_for_last_move,
-		      &time_left, &stones_left);
-  else
-    analyze_time_data(white_time_left, white_stones_left, &time_for_last_move,
-		      &time_left, &stones_left);
-
-  if (time_for_last_move < 0)
-    return;
-
-  /* These rules are both crude and ad hoc.
-   *
-   * FIXME: Use rules with at least some theoretical basis.
-   */
-  if (time_left < time_for_last_move * (stones_left + 3))
-    level_offset--;
-  if (time_left < time_for_last_move * stones_left)
-    level_offset--;
-  if (3 * time_left < 2 * time_for_last_move * stones_left)
-    level_offset--;
-  if (2 * time_left < time_for_last_move * stones_left)
-    level_offset--;
-  if (3 * time_left < time_for_last_move * stones_left)
-    level_offset--;
-
-  if (time_for_last_move == 0)
-    time_for_last_move = 1;
-  if (time_left > time_for_last_move * (stones_left + 6))
-    level_offset++;
-  if (time_left > 2 * time_for_last_move * (stones_left + 6))
-    level_offset++;
-
-  if (level + level_offset < min_level)
-    level_offset = min_level - level;
-
-  if (level + level_offset > max_level)
-    level_offset = max_level - level;
-
-  if (1) {
-    if (level_offset != 0) {
-      gprintf("New level %d (%d %C %d %d %d)\n", level + level_offset,
-	      movenum / 2, color, time_for_last_move, time_left, stones_left);
-    }
-  }
-}
-
 /* Function:  Set time allowance
  * Arguments: int main_time, int byo_yomi_time, int byo_yomi_stones
  * Fails:     syntax error
@@ -3037,15 +2889,12 @@ adjust_level_offset(int color)
 static int
 gtp_time_settings(char *s)
 {
-  int a, b, c;
+  int main_time, byoyomi_time, byoyomi_stones;
   
-  if (sscanf(s, "%d %d %d", &a, &b, &c) < 3)
+  if (sscanf(s, "%d %d %d", &main_time, &byoyomi_time, &byoyomi_stones) < 3)
     return gtp_failure("not three integers");
 
-  main_time = a;
-  byo_yomi_time = b;
-  byo_yomi_stones = c;
-
+  clock_settings(main_time, byoyomi_time, byoyomi_stones);
   return gtp_success("");
 }
 
@@ -3073,18 +2922,7 @@ gtp_time_left(char *s)
   if (sscanf(s+n, "%d %d", &time, &stones) < 2)
     return gtp_failure("time and stones not two integers");
 
-  if (color == BLACK) {
-    black_time_left[1] = black_time_left[0];
-    black_stones_left[1] = black_stones_left[0];
-    black_time_left[0] = time;
-    black_stones_left[0] = stones;
-  }
-  else {
-    white_time_left[1] = white_time_left[0];
-    white_stones_left[1] = white_stones_left[0];
-    white_time_left[0] = time;
-    white_stones_left[0] = stones;
-  }
+  update_time_left(color, time, stones);
   
   return gtp_success("");
 }
@@ -3149,7 +2987,7 @@ finish_and_score_game(int seed)
 
   do {
     move = genmove_conservative(next, NULL);
-    play_move(move, next);
+    gnugo_play_move(I(move), J(move), next);
     if (move != PASS_MOVE) {
       pass = 0;
       moves++;

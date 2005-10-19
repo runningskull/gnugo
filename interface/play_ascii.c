@@ -54,6 +54,8 @@ static int showdead = 0;
 static SGFTree sgftree;
 static int resignation_allowed;
 
+static int clock_on = 0;
+
 /* Unreasonable score used to detect missing information. */
 #define NO_SCORE 4711
 /* Keep track of the score estimated before the last computer move. */
@@ -296,6 +298,11 @@ ascii_showboard(void)
   fflush(stdout);
   printf("%s\n\n", letterbar);
   fflush(stdout);
+
+  if (clock_on) {
+    clock_print(WHITE);
+    clock_print(BLACK);
+  }
   
 }  /* end ascii_showboard */
 
@@ -440,7 +447,7 @@ init_sgf(Gameinfo *ginfo)
   sgf_initialized = 1;
 
   sgf_write_header(sgftree.root, 1, get_random_seed(), komi,
-      		   level, chinese_rules);
+      		   get_level(), chinese_rules);
   sgfOverwritePropertyInt(sgftree.root, "HA", ginfo->handicap);
   if (ginfo->handicap > 0)
     sgffile_recordboard(sgftree.root);
@@ -463,6 +470,8 @@ computer_move(Gameinfo *gameinfo, int *passes)
   init_sgf(gameinfo);
 
   /* Generate computer move. */
+  if (autolevel_on)
+    adjust_level_offset(gameinfo->to_move);
   move_value = gnugo_genmove(&i, &j, gameinfo->to_move, &resign);
   if (resignation_allowed && resign) {
     int state = ascii_endgame(gameinfo, 2);
@@ -617,6 +626,9 @@ do_play_ascii(Gameinfo *gameinfo)
   char *command;
   char *tmpstring;
   int state = 1;
+
+  if (get_clock_settings(NULL, NULL, NULL))
+    clock_on = 1;
 
   while (state == 1) {
     state = 0;
@@ -775,8 +787,8 @@ do_play_ascii(Gameinfo *gameinfo)
 	    printf("\nInvalid command syntax!\n");
 	    break;
 	  }
-	  level = num;
-	  printf("\nSet level to %d\n", level);
+	  set_level(num);
+	  printf("\nSet level to %d\n", num);
 	  break;
 
 	case DISPLAY:
