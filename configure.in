@@ -153,7 +153,6 @@ AC_PROG_RANLIB
 dnl required since we use SUBDIRS in Makefile.am
 AC_PROG_MAKE_SET
 
-AC_HEADER_MAJOR
 AC_HEADER_TIME
 
 AC_C_CONST
@@ -245,31 +244,6 @@ AC_CACHE_CHECK(
 
 if test "$gnugo_cv_transparent_unions" = "yes"; then
 	AC_DEFINE(HAVE_TRANSPARENT_UNIONS)
-fi
-
-AH_TEMPLATE([CURSES],
-[Define to use curses for color debugging])
-
-AH_TEMPLATE([HAVE_CURSES_ARROWS],
-[Define if the curses headers defines  KEY_{UP,DOWN,LEFT,RIGHT}])
-
-if test "$curses_header" != "no";then
-  AC_SEARCH_LIBS(initscr,ncurses curses pdcurses termcap terminfo termlib)
-  if test "$ac_cv_search_initscr" != "no";then
-    AC_DEFINE(CURSES)
-    AC_CHECK_FUNCS(vwprintw keypad)
-    AC_CACHE_CHECK(
-	[for KEY_UP],
-	gnugo_cv_decl_key_up,
-	AC_TRY_COMPILE([#include <$curses_header>],
-		[int c=KEY_UP],
-		gnugo_cv_decl_key_up="yes",
-		gnugo_cv_decl_key_up="no")
-    )
-    if test "$gnugo_cv_decl_key_up" = "yes";then
-      AC_DEFINE(HAVE_CURSES_ARROWS)
-    fi
-  fi
 fi
 
 dnl -------- color debugging support -----------
@@ -404,14 +378,6 @@ rm -f \
        patterns/owl_defendpat.c \
        patterns/owl_vital_apat.c
 
-
-dnl ------------ gnugo_path -------------------
-
-
-AH_TEMPLATE([GNUGO_PATH],
-[Give the directory where gnugo was compiled])
-
-AC_DEFINE_UNQUOTED(GNUGO_PATH, "`pwd`")
 
 dnl ------------ Chinese Rules -------------------
 

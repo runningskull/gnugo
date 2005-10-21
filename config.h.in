@@ -12,9 +12,6 @@
 /* Center oriented influence. Disabled by default. */
 #undef COSMIC_GNUGO
 
-/* Define to use curses for color debugging */
-#undef CURSES
-
 /* Default level (strength). Up to 10 supported */
 #undef DEFAULT_LEVEL
 
@@ -30,18 +27,12 @@
 /* GAIN/LOSS codes. Disabled by default. */
 #undef EXPERIMENTAL_OWL_EXT
 
-/* Give the directory where gnugo was compiled */
-#undef GNUGO_PATH
-
 /* The concatenation of the strings "GNU ", and PACKAGE. */
 #undef GNU_PACKAGE
 
 /* Define as 1 to use the grid optimisation, or 2 to run it in self-test mode
    */
 #undef GRID_OPT
-
-/* Define if the curses headers defines KEY_{UP,DOWN,LEFT,RIGHT} */
-#undef HAVE_CURSES_ARROWS
 
 /* Define if you have the <curses.h> header file. */
 #undef HAVE_CURSES_H
@@ -54,9 +45,6 @@
 
 /* Define if you have the `g_vsnprintf' function. */
 #undef HAVE_G_VSNPRINTF
-
-/* Define if you have the `keypad' function. */
-#undef HAVE_KEYPAD
 
 /* Define if you have the <ncurses/curses.h> header file. */
 #undef HAVE_NCURSES_CURSES_H
@@ -91,17 +79,8 @@
 /* Define if you have the `vsnprintf' function. */
 #undef HAVE_VSNPRINTF
 
-/* Define if you have the `vwprintw' function. */
-#undef HAVE_VWPRINTW
-
 /* Large Scale Captures. Disabled by default. */
 #undef LARGE_SCALE
-
-/* Define if `major', `minor', and `makedev' are declared in <mkdev.h>. */
-#undef MAJOR_IN_MKDEV
-
-/* Define if `major', `minor', and `makedev' are declared in <sysmacros.h>. */
-#undef MAJOR_IN_SYSMACROS
 
 /* Oracle. Default not enabled. */
 #undef ORACLE
