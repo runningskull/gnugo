@@ -315,15 +315,20 @@ AC_MSG_RESULT($tmp_color_result)
 
 dnl -------- readline support -------------------
 
+AH_TEMPLATE([READLINE], [Enable GNU Readline support])
+
 if test "$with_readline" = yes ; then
 
     dnl check for a working termcap and readline library
     AC_SEARCH_LIBS(readline,termcap readline)
 
     if test "$ac_cv_search_readline" != "no" ; then
-	AC_DEFINE(READLINE,1,[Enable GNU Readline support])
+	AC_DEFINE(READLINE,1)
+    else
+	AC_DEFINE(READLINE,0)
     fi
-	
+else
+    AC_DEFINE(READLINE,0)
 fi
 
 dnl ---------- grid optimisation ------------
