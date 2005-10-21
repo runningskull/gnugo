@@ -27,7 +27,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef READLINE
+#if READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif
@@ -654,7 +654,7 @@ do_play_ascii(Gameinfo *gameinfo)
       if (opt_showboard)
 	ascii_showboard();
 
-#ifndef READLINE
+#if !READLINE
       /* Print the prompt */
       mprintf("%s(%d): ", color_to_string(gameinfo->to_move), movenum + 1);
 
@@ -994,7 +994,7 @@ do_play_ascii(Gameinfo *gameinfo)
 	if (passes >= 2)
 	  state = ascii_endgame(gameinfo, 0);
       }
-#ifdef READLINE
+#if READLINE
 	free(line_ptr);
 #endif
 
