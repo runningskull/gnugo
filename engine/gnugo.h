@@ -354,7 +354,6 @@ void reset_reading_node_counter(void);
 int get_reading_node_counter(void);
 void reset_connection_node_counter(void);
 int get_connection_node_counter(void);
-void change_owl_node_limit(int new_limit, int *old_value);
 
 
 

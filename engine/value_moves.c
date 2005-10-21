@@ -396,11 +396,10 @@ try_large_scale_owl_attack(int pos, int color, int target, int dist)
 {
   int owl_nodes_before;
   int owl_nodes_used;
-  int old_node_limit;
-  int new_node_limit;
   int kworm = NO_MOVE;
   int acode;
   int save_verbose = verbose;
+  int save_owl_node_limit = owl_node_limit;
   
   ASSERT1(board[target] == OTHER_COLOR(color), pos);
   ASSERT1(!owl_attack_move_reason_known(pos, target), pos);
@@ -417,10 +416,9 @@ try_large_scale_owl_attack(int pos, int color, int target, int dist)
    * distance >= 2.
    */
   if (dist <= 1)
-    new_node_limit = gg_min(350, owl_node_limit);
+    owl_node_limit *= 0.35;
   else
-    new_node_limit = gg_min(150, owl_node_limit);
-  change_owl_node_limit(new_node_limit, &old_node_limit); 
+    owl_node_limit *= 0.15;
 
   if (verbose > 0)
     verbose--;
@@ -445,8 +443,8 @@ try_large_scale_owl_attack(int pos, int color, int target, int dist)
 	owl_nodes_used, dist);
   /* Restore settings. */
   verbose = save_verbose;
-  change_owl_node_limit(old_node_limit, NULL);
   decrease_depth_values(); 
+  owl_node_limit = save_owl_node_limit;
 }
 
 
