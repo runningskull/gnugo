@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- let semeai code pass if no riskless move was found
+- do not hardwire owl node limit for large scale attacks
+- remove many unneeded configure tests
+- READLINE compile (warning) fixes
 - complete rework of clock.c, using level adaption logic from play_gtp.c
 - use more tactical moves in do_owl_analyze_semeai()
 - unused function transform2() removed
