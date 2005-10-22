@@ -627,7 +627,7 @@ do_play_ascii(Gameinfo *gameinfo)
   char *tmpstring;
   int state = 1;
 
-  if (get_clock_settings(NULL, NULL, NULL))
+  if (have_time_settings())
     clock_on = 1;
 
   while (state == 1) {

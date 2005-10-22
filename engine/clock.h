@@ -26,14 +26,14 @@
 #include "gnugo.h"
 
 /* initialization and activation */
-void clock_settings(int time, int byo_time, int byo_stones);
+void clock_settings(int maintyime, int byotime, int byostones);
 void init_timers(void);
  
 /* main access */
 void clock_push_button(int color);
 void update_time_left(int color, int time_left, int stones);
 void clock_print(int color);
-int get_clock_settings(int *t, int *byo_t, int *byo_s);
+int have_time_settings(void);
 
 void adjust_level_offset(int color);
 

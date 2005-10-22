@@ -124,6 +124,8 @@ clock_print(int color)
 /*
  * Initialize the time settings for this game.
  * -1 means "do not modify this value".
+ *
+ *  byo_time > 0 and byo_stones == 0 means no time settings.
  */
 void
 clock_settings(int time, int byo_time, int byo_stones)
@@ -141,15 +143,15 @@ clock_settings(int time, int byo_time, int byo_stones)
  * 0 otherwise.
  */
 int
-get_clock_settings(int *t, int *byo_t, int *byo_s)
+have_time_settings(void)
 {
-  if (t)
-    *t = main_time;
-  if (byo_t)
-    *byo_t = byoyomi_time;
-  if (byo_s)
-    *byo_s = byoyomi_stones;
-  return (main_time >= 0 || byoyomi_time >= 0);
+  /* According to the semantics of the GTP command 'time_settings', the
+   * following signifies no time limits.
+   */
+  if (byoyomi_time > 0 && byoyomi_stones == 0)
+    return 0;
+  else
+    return (main_time >= 0 || byoyomi_time >= 0);
 }
 
 
@@ -182,6 +184,11 @@ update_time_left(int color, int time_left, int stones)
     = ((color == BLACK) ? &black_time_data : &white_time_data);
   int time_used = td->official.time_left - time_left;
 
+  if (time_left > 0)
+    td->time_out = 0;
+  else 
+    td->time_out = 1;
+
   /* Did our estimate for time usage go wrong? */
   if (time_used > 0
       && gg_abs(time_used - td->estimated.time_for_last_move) >= 1.0)
@@ -193,6 +200,8 @@ update_time_left(int color, int time_left, int stones)
     td->estimated.time_left = time_left;
   if (stones > 0)
     td->estimated.in_byoyomi = 1;
+  else
+    td->estimated.in_byoyomi = 0;
 
   td->official.stones = stones;
   td->official.movenum = movenum;
@@ -212,6 +221,9 @@ clock_push_button(int color)
   struct timer_data* const td
     = (color == BLACK) ? &black_time_data : &white_time_data;
   double now = gg_gettimeofday();
+
+  if (!have_time_settings())
+    return;
 
   if (last_movenum >= 0
       && movenum == last_movenum + 1
@@ -274,7 +286,7 @@ analyze_time_data(int color, double *time_for_last_move, double *time_left,
 	               : &white_time_data.estimated;
 
   /* Do we have any time limits. */
-  if (!get_clock_settings(NULL, NULL, NULL))
+  if (!have_time_settings())
     return 0;
 
   /* If we don't have consistent time information yet, just return. */
