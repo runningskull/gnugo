@@ -85,14 +85,9 @@ const char *result_to_string(int result);
 
 
 void gnugo_clear_board(int boardsize);
-void gnugo_play_move(int i, int j, int color);
-int  gnugo_play_sgfnode(SGFNode *node, int to_move);
-int  gnugo_play_sgftree(SGFNode *root, int *until, SGFNode **curnode);
-
-int  gnugo_sethand(int handicap, SGFNode *root);
-
-float gnugo_genmove(int *i, int *j, int color, int *resign);
-
+void gnugo_play_move(int move, int color);
+int gnugo_play_sgfnode(SGFNode *node, int to_move);
+int gnugo_sethand(int handicap, SGFNode *root);
 float gnugo_estimate_score(float *upper, float *lower);
 
 /* ================================================================ */
@@ -102,17 +97,13 @@ float gnugo_estimate_score(float *upper, float *lower);
 
 typedef struct {
   int handicap;
-
   int to_move;		/* whose move it currently is */
   SGFTree game_record;	/* Game record in sgf format. */
-
   int computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
 } Gameinfo;
 
-void gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi);
+void gameinfo_clear(Gameinfo *ginfo);
 void gameinfo_print(Gameinfo *ginfo);
-void gameinfo_load_sgfheader(Gameinfo *gameinfo, SGFNode *head);
-void gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color);
 int gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 			      const char *untilstr, int orientation);
 int gameinfo_play_sgftree(Gameinfo *gameinfo, SGFTree *tree,
@@ -396,6 +387,7 @@ void sgffile_output(SGFTree *tree);
 void sgffile_printsgf(int color_to_play, const char *filename);
 void sgffile_printboard(SGFTree *tree);
 void sgffile_recordboard(SGFNode *node);
+int get_sgfmove(SGFProperty *property);
 
 /* sgfdecide.c */
 void decide_string(int pos);

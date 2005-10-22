@@ -233,6 +233,13 @@ sgffile_recordboard(SGFNode *node)
 }
 
 
+int
+get_sgfmove(SGFProperty *property)
+{
+  return POS(get_moveX(property, board_size), get_moveY(property, board_size));
+}
+
+
 /*
  * Local Variables:
  * tab-width: 8

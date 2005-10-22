@@ -609,7 +609,7 @@ gtp_playblack(char *s)
   if (!is_legal(POS(i, j), BLACK))
     return gtp_failure("illegal move");
 
-  gnugo_play_move(i, j, BLACK);
+  gnugo_play_move(POS(i, j), BLACK);
   return gtp_success("");
 }
 
@@ -640,7 +640,7 @@ gtp_playwhite(char *s)
   if (!is_legal(POS(i, j), WHITE))
     return gtp_failure("illegal move");
 
-  gnugo_play_move(i, j, WHITE);
+  gnugo_play_move(POS(i, j), WHITE);
   return gtp_success("");
 }
 
@@ -664,7 +664,7 @@ gtp_play(char *s)
   if (!is_legal(POS(i, j), color))
     return gtp_failure("illegal move");
 
-  gnugo_play_move(i, j, color);
+  gnugo_play_move(POS(i, j), color);
   return gtp_success("");
 }
 
@@ -839,9 +839,6 @@ gtp_loadsgf(char *s)
   sgftree_clear(&sgftree);
   if (!sgftree_readfile(&sgftree, filename))
     return gtp_failure("cannot open or parse '%s'", filename);
-
-  gameinfo_clear(&gameinfo, 19, 5.5); /* Probably unnecessary. */
-  gameinfo_load_sgfheader(&gameinfo, sgftree.root);
 
   if (nread == 1)
     color_to_move = gameinfo_play_sgftree_rot(&gameinfo, &sgftree, NULL,
@@ -2453,7 +2450,7 @@ gtp_genmove_black(char *s)
 
   move = genmove(BLACK, NULL, NULL);
 
-  gnugo_play_move(I(move), J(move), BLACK);
+  gnugo_play_move(move, BLACK);
 
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(move), J(move));
@@ -2478,7 +2475,7 @@ gtp_genmove_white(char *s)
 
   move = genmove(WHITE, NULL, NULL);
 
-  gnugo_play_move(I(move), J(move), WHITE);
+  gnugo_play_move(move, WHITE);
 
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(move), J(move));
@@ -2513,7 +2510,7 @@ gtp_genmove(char *s)
   if (resign)
     return gtp_success("resign");
 
-  gnugo_play_move(I(move), J(move), color);
+  gnugo_play_move(move, color);
 
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(move), J(move));
@@ -2692,7 +2689,7 @@ gtp_kgs_genmove_cleanup(char *s)
 
   capture_all_dead = save_capture_all_dead;
   
-  gnugo_play_move(I(move), J(move), color);
+  gnugo_play_move(move, color);
 
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(move), J(move));
@@ -2987,7 +2984,7 @@ finish_and_score_game(int seed)
 
   do {
     move = genmove_conservative(next, NULL);
-    gnugo_play_move(I(move), J(move), next);
+    gnugo_play_move(move, next);
     if (move != PASS_MOVE) {
       pass = 0;
       moves++;

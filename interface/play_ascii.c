@@ -461,7 +461,7 @@ init_sgf(Gameinfo *ginfo)
 static int
 computer_move(Gameinfo *gameinfo, int *passes)
 {
-  int i, j;
+  int move;
   float move_value;
   int resign;
   int resignation_declined = 0;
@@ -472,7 +472,7 @@ computer_move(Gameinfo *gameinfo, int *passes)
   /* Generate computer move. */
   if (autolevel_on)
     adjust_level_offset(gameinfo->to_move);
-  move_value = gnugo_genmove(&i, &j, gameinfo->to_move, &resign);
+  move = genmove(gameinfo->to_move, &move_value, &resign);
   if (resignation_allowed && resign) {
     int state = ascii_endgame(gameinfo, 2);
     if (state != -1)
@@ -488,16 +488,16 @@ computer_move(Gameinfo *gameinfo, int *passes)
     current_score_estimate = (int) ((lower_bound + upper_bound) / 2.0);
   }
   
-  mprintf("%s(%d): %m\n", color_to_string(gameinfo->to_move),
-	  movenum+1, i, j);
-  if (is_pass(POS(i, j)))
+  mprintf("%s(%d): %1m\n", color_to_string(gameinfo->to_move),
+	  movenum + 1, move);
+  if (is_pass(move))
     (*passes)++;
   else
     *passes = 0;
 
-  gnugo_play_move(i, j, gameinfo->to_move);
+  gnugo_play_move(move, gameinfo->to_move);
   sgffile_add_debuginfo(sgftree.lastnode, move_value);
-  sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
+  sgftreeAddPlay(&sgftree, gameinfo->to_move, I(move), J(move));
   if (resignation_declined)
     sgftreeAddComment(&sgftree, "GNU Go resignation was declined");
   sgffile_output(&sgftree);
@@ -529,7 +529,7 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
   *passes = 0;
   TRACE("\nyour move: %1m\n\n", move);
   init_sgf(gameinfo);
-  gnugo_play_move(I(move), J(move), gameinfo->to_move);
+  gnugo_play_move(move, gameinfo->to_move);
   sgffile_add_debuginfo(sgftree.lastnode, 0.0);
   sgftreeAddPlay(&sgftree, gameinfo->to_move, I(move), J(move));
   sgffile_output(&sgftree);
@@ -560,7 +560,7 @@ do_pass(Gameinfo *gameinfo, int *passes, int force)
 {
   (*passes)++;
   init_sgf(gameinfo);
-  gnugo_play_move(-1, -1, gameinfo->to_move);
+  gnugo_play_move(PASS_MOVE, gameinfo->to_move);
   sgffile_add_debuginfo(sgftree.lastnode, 0.0);
   sgftreeAddPlay(&sgftree, gameinfo->to_move, -1, -1);
   sgffile_output(&sgftree);
@@ -590,7 +590,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
   sgftree = *tree;
 
   if (filename) {
-    gameinfo_load_sgfheader(gameinfo, sgftree.root);
     gameinfo->to_move = gameinfo_play_sgftree(gameinfo, &sgftree, until);
     sgf_initialized = 1;
   }
@@ -973,7 +972,6 @@ do_play_ascii(Gameinfo *gameinfo)
 	    }
             /* to avoid changing handicap etc. */
             sgf_initialized = 1;
-            gameinfo_load_sgfheader(gameinfo, sgftree.root);
             gameinfo_play_sgftree(gameinfo, &sgftree, NULL);
 	    sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 	  }
@@ -1012,7 +1010,7 @@ do_play_ascii(Gameinfo *gameinfo)
     sgftreeCreateHeaderNode(&sgftree, board_size, komi);
     sgf_initialized = 0;
 
-    gameinfo_clear(gameinfo, board_size, komi);
+    gameinfo_clear(gameinfo);
   }
 }
 

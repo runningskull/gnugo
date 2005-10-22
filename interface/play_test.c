@@ -130,15 +130,11 @@ replay_node(SGFNode *node, int color_to_replay, float *replay_score,
     switch (sgf_prop->name) {
     case SGFAB:
       /* add black */
-      add_stone(POS(get_moveX(sgf_prop, board_size),
-		    get_moveY(sgf_prop, board_size)),
-                BLACK);
+      add_stone(get_sgfmove(sgf_prop), BLACK);
       break;
     case SGFAW:
       /* add white */
-      add_stone(POS(get_moveX(sgf_prop, board_size),
-		    get_moveY(sgf_prop, board_size)),
-                WHITE);
+      add_stone(get_sgfmove(sgf_prop), WHITE);
       break;
     case SGFB:
     case SGFW:
@@ -151,8 +147,7 @@ replay_node(SGFNode *node, int color_to_replay, float *replay_score,
   if (!move_prop)
     return;
 
-  old_move = POS(get_moveX(move_prop, board_size),
-		 get_moveY(move_prop, board_size));
+  old_move = get_sgfmove(move_prop);
   color = (move_prop->name == SGFW) ? WHITE : BLACK;
 
   if (color == color_to_replay || color_to_replay == GRAY) {

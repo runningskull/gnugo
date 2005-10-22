@@ -338,7 +338,7 @@ main(int argc, char *argv[])
   int seed_specified = 0;
 
   sgftree_clear(&sgftree);
-  gameinfo_clear(&gameinfo, board_size, komi);
+  gameinfo_clear(&gameinfo);
   
   /* Weed through all of the command line options. */
   while ((i = gg_getopt_long(argc, argv, 

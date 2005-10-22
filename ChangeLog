@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- remove gnugo_play_sgftree(), gnugo_genmove(), gameinfo_load_sgfheader(),
+  and gameinfo_play_move() from engine/interface.c
+- 1D conversion of gnugo_play_move()
+- new function get_sgfmove()
 - let semeai code pass if no riskless move was found
 - do not hardwire owl node limit for large scale attacks
 - remove many unneeded configure tests

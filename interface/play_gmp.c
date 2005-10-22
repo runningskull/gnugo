@@ -141,6 +141,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
   while (passes < 2) {
 
     if (to_move == yourcolor) {
+      int move;
       /* Get opponent's move from gmp client. */
       message = gmp_check(ge, 1, &j, &i, &error);
 
@@ -169,29 +170,31 @@ play_gmp(Gameinfo *gameinfo, int simplified)
       }
 
       if (message == gmp_pass) {
-	++passes;
-	i = -1;
-	j = -1;
+	passes++;
+	move = PASS_MOVE;
       }
-      else
+      else {
 	passes = 0;
+	move = POS(i, j);
+      }
 
-      TRACE("\nyour move: %m\n\n", i, j);
-      sgftreeAddPlay(&sgftree, to_move, i, j);
-      gnugo_play_move(i, j, yourcolor);
+      TRACE("\nyour move: %1m\n\n", move);
+      sgftreeAddPlay(&sgftree, to_move, I(move), J(move));
+      gnugo_play_move(move, yourcolor);
       sgffile_output(&sgftree);
 
     }
     else {
       /* Generate my next move. */
       float move_value;
+      int move;
       if (autolevel_on)
 	adjust_level_offset(mycolor);
-      move_value = gnugo_genmove(&i, &j, mycolor, NULL);
-      gnugo_play_move(i, j, mycolor);
+      move = genmove(mycolor, &move_value, NULL);
+      gnugo_play_move(move, mycolor);
       sgffile_add_debuginfo(sgftree.lastnode, move_value);
       
-      if (is_pass(POS(i, j))) {
+      if (is_pass(move)) {
 	/* pass */
         sgftreeAddPlay(&sgftree, to_move, -1, -1);
 	gmp_sendPass(ge);
@@ -199,10 +202,10 @@ play_gmp(Gameinfo *gameinfo, int simplified)
       }
       else {
 	/* not pass */
-        sgftreeAddPlay(&sgftree, to_move, i, j);
-	gmp_sendMove(ge, j, i);
+        sgftreeAddPlay(&sgftree, to_move, I(move), J(move));
+	gmp_sendMove(ge, J(move), I(move));
 	passes = 0;
-	TRACE("\nmy move: %m\n\n", i, j);
+	TRACE("\nmy move: %1m\n\n", move);
       }
       sgffile_add_debuginfo(sgftree.lastnode, 0.0);
       sgffile_output(&sgftree);

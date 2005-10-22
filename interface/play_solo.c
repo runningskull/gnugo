@@ -71,7 +71,7 @@ play_solo(Gameinfo *gameinfo, int moves)
 	j = (gg_rand() % 4) + (gg_rand() % (board_size - 4));
       } while (!is_legal(POS(i, j), gameinfo->to_move));
 
-      gnugo_play_move(i, j, gameinfo->to_move);
+      gnugo_play_move(POS(i, j), gameinfo->to_move);
       sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
       sgftreeAddComment(&sgftree, "random move");
       gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
@@ -81,24 +81,25 @@ play_solo(Gameinfo *gameinfo, int moves)
   t1 = gg_cputime();
   memset(&totalstats, '\0', sizeof(totalstats));
   while (passes < 2 && --moves >= 0) {
+    int move;
     reset_owl_node_counter();
-    move_value = gnugo_genmove(&i, &j, gameinfo->to_move, NULL);
+    move = genmove(gameinfo->to_move, &move_value, NULL);
 
-    gnugo_play_move(i, j, gameinfo->to_move);
+    gnugo_play_move(move, gameinfo->to_move);
     sgffile_add_debuginfo(sgftree.lastnode, move_value);
-    sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
+    sgftreeAddPlay(&sgftree, gameinfo->to_move, I(move), J(move));
     sgffile_output(&sgftree);
     gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
 
-    if (POS(i, j) == PASS_MOVE) {
-      ++passes;
+    if (move == PASS_MOVE) {
+      passes++;
       printf("%s(%d): Pass\n", gameinfo->to_move == BLACK ? "Black" : "White",
 	     movenum);
     }
     else {
       passes = 0;
-      gprintf("%s(%d): %m\n", gameinfo->to_move == BLACK ? "Black" : "White",
-	      movenum, i, j);
+      gprintf("%s(%d): %1m\n", gameinfo->to_move == BLACK ? "Black" : "White",
+	      movenum, move);
     }
 
     totalstats.nodes                    += stats.nodes;
@@ -142,7 +143,7 @@ void
 load_and_analyze_sgf_file(Gameinfo *gameinfo)
 {
   SGFTree sgftree;
-  int i, j;
+  int move;
   int next;
   float move_value;
   
@@ -152,18 +153,15 @@ load_and_analyze_sgf_file(Gameinfo *gameinfo)
   if (metamachine)
     sgffile_begindump(&sgftree);
 
-  move_value = gnugo_genmove(&i, &j, next, NULL);
+  move = genmove(next, &move_value, NULL);
 
-  if (is_pass(POS(i, j)))
-    gprintf("%s move: PASS!\n", next == WHITE ? "white (O)" : "black (X)");
-  else
-    gprintf("%s move %m\n", next == WHITE ? "white (O)" : "black (X)", i, j);
+  gprintf("%s move %1m\n", next == WHITE ? "white (O)" : "black (X)", move);
 
   if (metamachine)
     sgffile_enddump(outfilename);
   else {
-    gnugo_play_move(i, j, next);
-    sgftreeAddPlay(&sgftree, next, i, j);
+    gnugo_play_move(move, next);
+    sgftreeAddPlay(&sgftree, next, I(move), J(move));
     sgftreeAddComment(&sgftree, "load and analyze mode");
     sgffile_add_debuginfo(sgftree.lastnode, move_value);
     sgffile_output(&sgftree);
