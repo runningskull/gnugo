@@ -29,8 +29,8 @@ loadsgf games/strategy14.sgf 125
 #? [C12]*
 
 loadsgf games/strategy14.sgf 211
-56 reg_genmove white
-#? [!C9]
+56 restricted_genmove white C9 A7
+#? [A7]
 
 loadsgf games/strategy15.sgf 2
 57 reg_genmove black
@@ -58,14 +58,16 @@ loadsgf games/incident258.sgf 251
 #? [M2]
 
 # incident 169 (from the disastrous Indigo game)
+# D6 is unreasonable. Test it against an arbitrary reasonable move.
 loadsgf games/incident169.sgf 18
-62 reg_genmove white
-#? [!D6]
+62 restricted_genmove white D6 H3
+#? [H3]
 
 # incident 170 (from the disastrous Indigo game)
+# E6 is unreasonable. Test it against an arbitrary reasonable move.
 loadsgf games/incident169.sgf 32
-63 reg_genmove white
-#? [!E6]
+63 restricted_genmove white E6 L6
+#? [L6]
 
 # incident 171 (from the disastrous Indigo game)
 loadsgf games/incident169.sgf 60
@@ -249,21 +251,21 @@ loadsgf games/strategy25.sgf 119
 
 # The game move at P13 is a suicidal blunder.
 loadsgf games/strategy25.sgf 249
-95 reg_genmove black
-#? [!P13]
+95 restricted_genmove black P13 O15
+#? [O15]
 
 loadsgf games/strategy26.sgf 195
-96 reg_genmove black
-#? [!(O1)]
+96 restricted_genmove black J5 O1
+#? [J5]
 
 loadsgf games/strategy26.sgf 209
 97 reg_genmove black
-#? [!(Q1|P2)]
+#? [T8]
 
 # Under no circumstances play the snapback at Q1!
 loadsgf games/strategy26.sgf 237
-98 reg_genmove black
-#? [!(Q1|S1|L5|N7)]
+98 restricted_genmove black T6 Q1 S1 L5 N7
+#? [T6]
 
 # It's pointless to play L5 in order to tactically save Q2. We need to
 # classify the Q2 dragon as inessential.

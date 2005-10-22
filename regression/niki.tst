@@ -35,8 +35,8 @@ loadsgf games/niki.sgf 94
 #? [S9|S10]*
 
 loadsgf games/niki.sgf 106
-6 reg_genmove white
-#? [!S18]
+6 restricted_genmove white S18 P18
+#? [P18]
 
 
 #CATEGORY=PATTERN_TUNING

@@ -23,7 +23,8 @@
 - correct C-code footer in uncompress_fuseki.c for all values of
   NUM_HASHVALUES 
 - play_replay() and replay_node() partially rewritten
-
+- test revisions
+	
 3.7.7 released October 9, 2005
 
 - FSF address corrected in COPYING

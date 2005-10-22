@@ -1,6 +1,10 @@
 # =============================
 # Private test set nicklas1.tst
 # All of these tests passes with version 2.7.222.
+#
+# Note: This is one of the oldest test files in GNU Go. Some of the
+#       negative tests have been removed because a modern GNU Go
+#       would never consider those moves.
 # =============================
 
 # Reset applicable counters
@@ -9,17 +13,20 @@ reset_owl_node_counter
 reset_reading_node_counter
 reset_trymove_counter
 
-loadsgf games/nicklas/nicklas1.sgf 9
-101 reg_genmove black
-#? [!D9]
+# # D9 is too weird to be considered anymore. Removed.
+# loadsgf games/nicklas/nicklas1.sgf 9
+# 101 reg_genmove black
+# #? [!D9]
 
-loadsgf games/nicklas/nicklas2.sgf 5
-201 reg_genmove black
-#? [!G8|D8|F8]
+# # No longer interesting.
+# loadsgf games/nicklas/nicklas2.sgf 5
+# 201 reg_genmove black
+# #? [!G8|D8|F8]
 
-loadsgf games/nicklas/nicklas2.sgf 9
-202 reg_genmove black
-#? [!H8]
+# # H8 is too weird to be considered anymore. Removed.
+# loadsgf games/nicklas/nicklas2.sgf 9
+# 202 reg_genmove black
+# #? [!H8]
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=Combination threat to live / connect.
@@ -64,21 +71,22 @@ loadsgf games/nicklas/nicklas8.sgf 96
 801 reg_genmove black
 #? [P16]
 
+# G2 destroys eyeshape but the semeai can't be won.
 loadsgf games/nicklas/nicklas8.sgf 162
-806 reg_genmove black
-#? [!G2]
+806 restricted_genmove black G2 D8
+#? [D8]
 
 loadsgf games/nicklas/nicklas8.sgf 164
-807 reg_genmove black
-#? [!H1]
+807 restricted_genmove black H1 J2
+#? [J2]
 
 loadsgf games/nicklas/nicklas8.sgf 180
-808 reg_genmove black
-#? [!L2]
+808 restricted_genmove black L2 N6
+#? [N6]
 
 loadsgf games/nicklas/nicklas8.sgf 224
-810 reg_genmove black
-#? [!C19]
+810 restricted_genmove black O7 C19
+#? [O7]
 
 # Moved K15 to K14. /gf ; Added back K14 - both work.
 #SEVERITY=7
@@ -90,7 +98,7 @@ loadsgf games/nicklas/nicklas8.sgf 240
 
 loadsgf games/nicklas/nicklas9.sgf 28
 901 reg_genmove black
-#? [!PASS]
+#? [H8]
 
 loadsgf games/nicklas/nicklas10.sgf 30
 1002 reg_genmove black
@@ -98,31 +106,32 @@ loadsgf games/nicklas/nicklas10.sgf 30
 
 loadsgf games/nicklas/nicklas10.sgf 56
 1003 reg_genmove black
-#? [!J6]
+#? [B1]
 
+# A ko threat would have been appropriate, but none exists.
 loadsgf games/nicklas/nicklas10.sgf 64
 1004 reg_genmove black
-#? [!J9]
+#? [PASS]
 
 loadsgf games/nicklas/nicklas10.sgf 66
 1005 reg_genmove black
-#? [!H7]
+#? [PASS]
 
 loadsgf games/nicklas/nicklas10.sgf 68
 1006 reg_genmove black
-#? [!J7]
+#? [PASS]
 
 loadsgf games/nicklas/nicklas11.sgf 16
-1101 reg_genmove black
-#? [!D11]
+1101 restricted_genmove black D11 C8
+#? [C8]
 
 loadsgf games/nicklas/nicklas11.sgf 174
-1104 reg_genmove black
-#? [!A15]
+1104 restricted_genmove black A15 C1
+#? [C1]
 
 loadsgf games/nicklas/nicklas11.sgf 180
-1105 reg_genmove black
-#? [!H14]
+1105 restricted_genmove black F2 H14
+#? [F2]
 
 # Q6 seems largest but we may want to accept some more moves. The
 # original formulation !F6 isn't very good since a one point reverse
@@ -138,21 +147,19 @@ loadsgf games/nicklas/nicklas11.sgf 242
 1107 reg_genmove black
 #? [N2]*
 
-# Q18 is the proper move to finally settle the position, but not
-# really necessary. Let's just make sure T18 isn't played. /gf
+# Thrashing dragon. Q18 is cleanest but R18 and pass are also acceptable.
 loadsgf games/nicklas/nicklas11.sgf 258
 1108 reg_genmove black
-#? [!T18]
+#? [Q18|R18|PASS]
 
 loadsgf games/nicklas/nicklas11.sgf 260
 1109 reg_genmove black
-#? [!T13]
+#? [Q18]
 
-# O18 is the proper move to finally settle the position, but not
-# really necessary. Let's just make sure T15 isn't played. /gf
+# Thrashing dragon. O18 is the only interesting restraining move.
 loadsgf games/nicklas/nicklas11.sgf 268
 1110 reg_genmove black
-#? [!T15]
+#? [O18|PASS]
 
 loadsgf games/nicklas/nicklas11.sgf 270
 1111 reg_genmove black
@@ -178,9 +185,10 @@ loadsgf games/nicklas/nicklas12.sgf 117
 1208 reg_genmove black
 #? [E19]
 
+# L19 isn't even close to living.
 loadsgf games/nicklas/nicklas12.sgf 121
-1209 reg_genmove black
-#? [!L19]
+1209 restricted_genmove black L19 B14
+#? [B14]
 
 loadsgf games/nicklas/nicklas12.sgf 123
 1210 dragon_status D18
@@ -205,7 +213,7 @@ loadsgf games/nicklas/nicklas12.sgf 259
 
 loadsgf games/nicklas/nicklas13.sgf 57
 1302 reg_genmove black
-#? [!G8]
+#? [J3]
 
 loadsgf games/nicklas/nicklas13.sgf 58
 1303 dragon_status G8
@@ -213,7 +221,7 @@ loadsgf games/nicklas/nicklas13.sgf 58
 
 loadsgf games/nicklas/nicklas13.sgf 73
 1304 reg_genmove black
-#? [!J8]
+#? [PASS]
 
 loadsgf games/nicklas/nicklas14.sgf 51
 1404 reg_genmove black
@@ -230,35 +238,37 @@ loadsgf games/nicklas/nicklas14.sgf 57
 
 loadsgf games/nicklas/nicklas14.sgf 61
 1408 dragon_status A8
-#? [!dead]
+#? [alive]
 
 loadsgf games/nicklas/nicklas15.sgf 196
 1502 reg_genmove black
 #? [D14]
 
 loadsgf games/nicklas/nicklas15.sgf 208
-1504 reg_genmove black
-#? [!F16]
+1504 restricted_genmove black F16 D15
+#? [D15]
 
 loadsgf games/nicklas/nicklas15.sgf 212
 1505 reg_genmove black
-#? [!O11]
+#? [T14]
 
 loadsgf games/nicklas/nicklas15.sgf 224
 1506 reg_genmove black
 #? [S4]
 
-loadsgf games/nicklas/nicklas15.sgf 228
-1507 reg_genmove black
-#? [!T1]
+# # This is virtually identical with 1506, let's skip it.
+# loadsgf games/nicklas/nicklas15.sgf 228
+# 1507 reg_genmove black
+# #? [!T1]
 
-loadsgf games/nicklas/nicklas15.sgf 232
-1508 reg_genmove black
-#? [!F15]
+# # This one too.
+# loadsgf games/nicklas/nicklas15.sgf 232
+# 1508 reg_genmove black
+# #? [!F15]
 
 loadsgf games/nicklas/nicklas15.sgf 258
 1509 reg_genmove black
-#? [!L1]
+#? [T14]
 
 loadsgf games/nicklas/nicklas15.sgf 284
 1510 reg_genmove black
@@ -266,19 +276,19 @@ loadsgf games/nicklas/nicklas15.sgf 284
 
 loadsgf games/nicklas/nicklas15.sgf 296
 1511 reg_genmove black
-#? [!J1]
+#? [PASS]
 
 loadsgf games/nicklas/nicklas15.sgf 298
 1512 reg_genmove black
-#? [!A1]
+#? [PASS]
 
 loadsgf games/nicklas/nicklas16.sgf 22
-1601 reg_genmove black
-#? [!D9]
+1601 restricted_genmove black D9 D7
+#? [D7]
 
 loadsgf games/nicklas/nicklas16.sgf 28
-1602 reg_genmove black
-#? [!H8]
+1602 restricted_genmove black H8 B8
+#? [B8]
 
 # Missed connection. See also connection:26,27
 loadsgf games/nicklas/nicklas16.sgf 38
@@ -307,7 +317,7 @@ loadsgf games/nicklas/nicklas19.sgf 34
 
 loadsgf games/nicklas/nicklas19.sgf 46
 1902 reg_genmove black
-#? [!H4]
+#? [B7]
 
 loadsgf games/nicklas/nicklas19.sgf 52
 1903 reg_genmove black
@@ -321,14 +331,15 @@ loadsgf games/nicklas/nicklas20.sgf 37
 2001 reg_genmove black
 #? [G5]
 
+# Is there any way to live in the upper right? If so that's probably better.
 loadsgf games/nicklas/nicklas20.sgf 41
 2002 reg_genmove black
-#? [!H9]
+#? [J5]
 
-# A slow move
+# White is thrashing but E1 is not a very meaningful move.
 loadsgf games/nicklas/nicklas21.sgf 52
 2101 reg_genmove black
-#? [!E1]
+#? [PASS|A7|A5|D1|A6|G1]
 
 loadsgf games/nicklas/nicklas23.sgf 26
 2301 reg_genmove black

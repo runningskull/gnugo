@@ -27,13 +27,13 @@ loadsgf games/viking1.sgf 189
 
 # Locally S5 is the only move.
 loadsgf games/viking3.sgf 79
-7 reg_genmove white
-#? [!T7]
+7 restricted_genmove white T8 T7 S7 R7 T6 T5 S5 T4 T3 T2 T1 S1 
+#? [S5]
 
 # A1 is of course inferior to B3
 loadsgf games/viking3.sgf 93
-8 reg_genmove white
-#? [!A1]
+8 restricted_genmove white B3 A1
+#? [B3]
 
 # The position cries out for a move at J13.
 loadsgf games/viking3.sgf 103
@@ -45,9 +45,10 @@ loadsgf games/viking3.sgf 113
 10 reg_genmove white
 #? [K16]
 
+# G19 is a very odd move.
 loadsgf games/viking3.sgf 113
-11 reg_genmove white
-#? [!G19]
+11 restricted_genmove white G19 J17
+#? [J17]
 
 loadsgf games/viking3.sgf 137
 12 reg_genmove white

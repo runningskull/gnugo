@@ -26,8 +26,8 @@ loadsgf games/nicklas/nicklas8.sgf 140
 
 # Locally K18 is superior to L17.
 loadsgf games/nicklas/nicklas12.sgf 69
-1202 reg_genmove black
-#? [!L17]
+1202 restricted_genmove black K18 L17
+#? [K18]
 
 # I guess K18, giving up the O17 stones and attacking H17 in exchange,
 # is playable. /ab

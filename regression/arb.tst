@@ -41,8 +41,8 @@ loadsgf games/arb/dumonteil-2.sgf 247
 #? [H13]
 
 loadsgf games/arb/dumonteil-2.sgf 251
-202 reg_genmove black
-#? [!(B19|D15)]
+202 restricted_genmove black B19 D15 F19 F16
+#? [F19|F16]
 
 loadsgf games/arb/dumonteil-3.sgf 193
 203 reg_genmove black
@@ -65,15 +65,16 @@ loadsgf games/arb/dumonteil-5.sgf 83
 # Ko mistake observed in gnugo-2.7.231 --level 8 -M 32
 loadsgf games/arb/dumonteil-5.sgf 125
 221 reg_genmove black
-#? [!H1]
+#? [J9]
 
 loadsgf games/arb/dumonteil-6.sgf 33
 231 reg_genmove black
 #? [F5]*
 
+# Defend against a combination attack.
 loadsgf games/arb/game03.sgf 109
 232 reg_genmove black
-#? [!PASS]
+#? [M9|M10|L10|L11]
 
 loadsgf games/arb/game04.sgf 43
 233 reg_genmove black

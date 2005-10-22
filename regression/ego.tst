@@ -10,8 +10,8 @@ loadsgf games/ego.sgf 12
 # G3 looks good here but is maybe not the only move. E5 is clearly
 # suboptimal, however.
 loadsgf games/ego.sgf 30
-2 reg_genmove white
-#? [!E5]
+2 restricted_genmove white E5 G3
+#? [G3]
 
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=K17 misses H18 threat.
@@ -27,8 +27,8 @@ loadsgf games/ego.sgf 52
 # The descent at G19 is bad shape because it leaves much aji around
 # E18 and gives black an endgame sente move at H19.
 loadsgf games/ego.sgf 54
-4 reg_genmove white
-#? [!(G19|H19|K17)]*
+4 restricted_genmove white G19 H19 K17 F18
+#? [F18]*
 
 #CATEGORY=
 #DESCRIPTION=Why is B15 so bad?  -Trevor
@@ -39,13 +39,13 @@ loadsgf games/ego.sgf 68
 #? [!B15]
 
 loadsgf games/ego.sgf 86
-6 reg_genmove white
-#? [!N5]
+6 restricted_genmove white M5 N5
+#? [M5]
 
 # Unreasonable monkey jump
 loadsgf games/ego.sgf 96
-7 reg_genmove white
-#? [!Q1]
+7 restricted_genmove white Q1 P2
+#? [P2]
 
 #CATEGORY=BORDER_PROTECTION
 #DESCRIPTION=Tough moyo protection.
