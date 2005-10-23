@@ -1236,7 +1236,7 @@ ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
   int stones[MAX_BOARD*MAX_BOARD];
 
   if (sscanf(handicap, "%d", &handi) == 1) {
-    /* Gnu Go is to place handicap */
+    /* GNU Go is to place handicap */
     if (handi < 0 || handi == 1) {
       printf("\nInvalid command syntax!\n");
       return;

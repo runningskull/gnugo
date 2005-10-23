@@ -270,7 +270,7 @@ distribution.
 @end enumerate
 
 The rest of this section gives more details on the various ways
-to compile GNU go for Microsoft platforms.
+to compile GNU Go for for Microsoft platforms.
 
 @menu Using free Unix-environments and GCC
 * DJGPP::      Windows 95/98, MS-DOS and Windows 3.x using DJGPP
@@ -317,13 +317,13 @@ of snprintf.
 Cygwin is a full fledged and rapidly maturing unix environment on top of
 windows. Cygwin installs very easily with the interactive setup program
 available from the cygwin homepage at @url{http://sources.redhat.com/cygwin/}.
-In fact precompiled versions of stable GNU go releases as well as of the cgoban
+In fact precompiled versions of stable GNU Go releases as well as of the cgoban
 X11 GUI can be downloaded through Cygwin's setup. Cygwin's setup also provides
 precompiled packages of most of the unix tools necessary to participate in
 development.
 
 If you want to build GNU Go yourself make sure to download the ncurses packages
-prior to building GNU go. GNU Go compiles out-of-the box using the standard
+prior to building GNU Go. GNU Go compiles out-of-the box using the standard
 Unix build procedure on the Cygwin environment. After installation of cygwin
 and fetching @file{gnugo-3.6.tar.gz} you can type:
 

@@ -6,7 +6,7 @@
 
 @dircategory GNU games
 @direntry
-* GNU go: (gnugo).          The GNU Go program
+* GNU Go: (gnugo).          The GNU Go program
 @end direntry
 
 @set EDITION 3.6
@@ -26,7 +26,7 @@
 
 @sp 1
 @page
-@title{GNU GO 3.6}
+@title{GNU Go 3.6}
 @vskip 0pt plus 1filll
 Copyright @copyright{} 1999, 2000, 2001, 2002, 2003, 2004 and 2005
 by the Free Software Foundation, Inc.
@@ -59,7 +59,7 @@ are respected.
 @node Top
 @top
 @ifinfo
-@unnumbered GNU GO
+@unnumbered GNU Go
 
 This manual documents @code{GNU Go}, a Go program and its sources.
 This is Edition @value{EDITION} of the @cite{GNU Go Program Documentation}

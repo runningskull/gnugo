@@ -206,7 +206,7 @@ diff -u -N -r -x *\.orig -x *\.info* ./interface/gtp.c ../gnugo-2.6.1/gnugo-2.6.
 +++ ../gnugo-2.6.1/gnugo-2.6.1/interface/gtp.c	Tue Aug 14 00:50:36 2001
 @@ -0,0 +1,417 @@
 +/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
-+ * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   *
++ * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see   *
 + * http://www.gnu.org/software/gnugo/ for more information.      *
 + *                                                               *
 + * To facilitate development of the Go Text Protocol, the two    *
@@ -627,7 +627,7 @@ diff -u -N -r -x *\.orig -x *\.info* ./interface/gtp.h ../gnugo-2.6.1/gnugo-2.6.
 +++ ../gnugo-2.6.1/gnugo-2.6.1/interface/gtp.h	Sat Aug  4 00:10:58 2001
 @@ -0,0 +1,83 @@
 +/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
-+ * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   *
++ * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see   *
 + * http://www.gnu.org/software/gnugo/ for more information.      *
 + *                                                               *
 + * To facilitate development of the Go Text Protocol, the two    *
@@ -789,7 +789,7 @@ diff -u -N -r -x *\.orig -x *\.info* ./interface/play_gtp.c ../gnugo-2.6.1/gnugo
 +++ ../gnugo-2.6.1/gnugo-2.6.1/interface/play_gtp.c	Tue Aug 14 01:16:03 2001
 @@ -0,0 +1,377 @@
 +/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
-+ * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   *
++ * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see   *
 + * http://www.gnu.org/software/gnugo/ for more information.      *
 + *                                                               *
 + * Copyright 1999, 2000, 2001 by the Free Software Foundation.   *
