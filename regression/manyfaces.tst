@@ -21,8 +21,8 @@ loadsgf games/mfgg1.sgf 65
 #? [S12]*
 
 loadsgf games/mfgg1.sgf 97
-4 reg_genmove black
-#? [!T6]
+4 restricted_genmove black T6 R5
+#? [R5]
 
 #CATEGORY=FUSEKI_STRATEGY
 #DESCRIPTION=N6 is not terrible - right concept.

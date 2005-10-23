@@ -12,13 +12,14 @@ loadsgf games/strategy2.sgf 5
 2 reg_genmove black
 #? [!G2|D2]
 
-loadsgf games/strategy2.sgf 9
-3 reg_genmove black
-#? [!H1|H2]
-
-loadsgf games/strategy2.sgf 11
-4 reg_genmove black
-#? [!F1]
+# # Current GNU Go would never play those moves. Removed.
+# loadsgf games/strategy2.sgf 9
+# 3 reg_genmove black
+# #? [!H1|H2]
+# 
+# loadsgf games/strategy2.sgf 11
+# 4 reg_genmove black
+# #? [!F1]
 
 loadsgf games/strategy3.sgf 14
 5 reg_genmove white
@@ -112,9 +113,10 @@ loadsgf games/incident165.sgf 142
 18 restricted_genmove black E4 E5 F3 N3
 #? [E4|F3]
 
-loadsgf games/strategy4.sgf
-19 reg_genmove black
-#? [!PASS]
+# # Current GNU Go would never consider passing here. Removed.
+# loadsgf games/strategy4.sgf
+# 19 reg_genmove black
+# #? [!PASS]
 
 
 #CATEGORY=OWL_TUNING
@@ -174,22 +176,22 @@ loadsgf games/strategy5.sgf 14
 #? [C3]
 
 loadsgf games/strategy5.sgf 20
-28 reg_genmove black
-#? [!F2]
+28 restricted_genmove black G3 F2
+#? [G3]
 
 loadsgf games/strategy5.sgf 40
 29 reg_genmove black
 #? [R4]*
 
 loadsgf games/strategy5.sgf 44
-30 reg_genmove black
-#? [!T7]
+30 restricted_genmove black T7 S4
+#? [S4]
 
 # This is a problem with the semeai analyzer and revise_semeai().
 # But there is no semeai.
 loadsgf games/strategy6.sgf 274
 31 reg_genmove black
-#? [!(K19|D17|E16|E15)]
+#? [PASS]
 
 loadsgf games/strategy7.sgf 23
 32 reg_genmove black
@@ -204,21 +206,21 @@ loadsgf games/nicklas/nicklas8.sgf 72
 #? [E17]
 
 loadsgf games/nicklas/nicklas8.sgf 80
-35 reg_genmove black
-#? [!B17]
+35 restricted_genmove black B17 H17
+#? [H17]
 
 loadsgf games/nicklas/nicklas8.sgf 82
-36 reg_genmove black
-#? [!D18]
+36 restricted_genmove black H17 D18
+#? [H17]
 
 loadsgf games/nicklas/nicklas8.sgf 84
-37 reg_genmove black
-#? [!A17|A18|C19]
+37 restricted_genmove black A17 A18 C19 H17
+#? [H17]
 
 # The life code solves this mistake.
 loadsgf games/nicklas/nicklas8.sgf 86
-38 reg_genmove black
-#? [!B19]
+38 restricted_genmove black H17 B19
+#? [H17]
 
 loadsgf games/nicklas/nicklas8.sgf 96
 39 reg_genmove black

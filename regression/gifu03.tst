@@ -31,7 +31,7 @@ loadsgf games/cgf2003/GnuGo-GORO.sgf 90
 # G18 misses the point. More important to cover cut at L17.
 loadsgf games/cgf2003/GnuGo-GORO.sgf 116
 105 restricted_genmove white G18 H17 H16 J16 K16 K17 L16 L17 F17 F16 H18
-#? [!G18|F17|F16|H18]*
+#? [H17|H16|J16|K16|K17|L16|L17]*
 
 # H1 2 points sente.
 loadsgf games/cgf2003/GnuGo-GORO.sgf 174
@@ -224,7 +224,7 @@ loadsgf games/cgf2003/GnuGo-KCC.sgf 201
 # O19 is not the right move if we want to reduce the aji of O18.
 loadsgf games/cgf2003/GnuGo-Katsunari.sgf 71
 701 restricted_genmove black O19 M18 L18 L17
-#? [!O19]
+#? [M18|L18|L17]
 
 # N6 locally better than M6.
 loadsgf games/cgf2003/GnuGo-Katsunari.sgf 107
