@@ -33,8 +33,8 @@ command line by just typing:
 
         gnugo
 
-but it is nicer to run it using CGoban 1 (under X-Windows) or Jago (on
-any platform with a Java runtime environment).
+but it is nicer to run it using CGoban 1 (under X Window System) or Jago (on
+any platform with a Java Runtime Environment).
 
    You can get the most recent version of CGoban 1 from 
 http://sourceforge.net/projects/cgoban1/. The earlier version

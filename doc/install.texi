@@ -57,8 +57,8 @@ command line by just typing:
 @end example
 
 @noindent
-but it is nicer to run it using CGoban 1 (under X-Windows), Jago
-(on any platform with a Java runtime environment) or other
+but it is nicer to run it using CGoban 1 (under X Window System), Jago
+(on any platform with a Java Runtime Environment) or other
 client programs offering a GUI.
 
 You can get the most recent version of CGoban 1 from 

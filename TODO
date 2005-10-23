@@ -156,7 +156,7 @@ are presented here for inspiration.
  * A good GUI.
    A start is being made with GoThic, a goban widget based on the QT
    toolkit.  This is linked from the GNU Go development web page on
-   gnu.org. Other starts have been made based on GTK, but so far
+   gnu.org. Other starts have been made based on GTK+, but so far
    nothing more than a start has been attempted.
 
  * A graphical pattern editor.

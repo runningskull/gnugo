@@ -36,7 +36,7 @@ develop this program.
                     Running GNU Go via CGoban
 
 This is an extremely nice way to run GNU Go. CGoban provides a
-beautiful graphic user interface under X-Windows.
+beautiful graphic user interface under X Window System.
 
 Start CGoban. When the CGoban Control panel comes up, select ``Go
 Modem''. You will get the Go Modem Protocol Setup. Choose one (or
@@ -131,10 +131,10 @@ to list all commands, type `:help'.
 
 Jago, like CGoban is a client capable of providing GNU Go with a
 graphical user interface. Unlike CGoban, it does not require
-X-Windows, so it is an attractive alternative under Windows.
-You will need a Java runtime environment. Obtain Jago at
+X Window System, so it is an attractive alternative under Windows.
+You will need a Java Runtime Environment. Obtain Jago at
 http://www.rene-grothmann.de/jago and follow the links there for the
-Java runtime environment.
+Java Runtime Environment.
 
 
                        Go Modem Protocol

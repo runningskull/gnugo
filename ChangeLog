@@ -3207,7 +3207,7 @@
 - in make_worms() if worm.defend==PASS move not tried
 - in attack_callback() ignore strings with 5 liberties
 - default memory increased to 32Mb
-- configure supports 48Mb and 64Mb models
+- configure supports 48MB and 64MB models
 - minor tuning
 - doc revision
 - vsnprintf error gives warning, not fatal error

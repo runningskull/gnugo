@@ -60,7 +60,7 @@ the older program. You should get a copy with version number 1.12
 or higher.
 
 CGoban is an extremely nice way to run GNU Go. CGoban provides a
-beautiful graphic user interface under X-Windows.
+beautiful graphic user interface under X Window System.
 
 Start CGoban. When the CGoban Control panel comes up, select ``Go
 Modem''. You will get the Go Modem Protocol Setup. Choose one (or
@@ -116,10 +116,10 @@ written in C++ capable of playing with GNU Go, or on IGS.
 client by J.-F. Menon for IGS written in the scripting language Ruby.
 RubyGo is capable of playing with GNU Go using the GTP.
 @item Dingoui (@url{http://dingoui.sourceforge.net/}) is a free
-GMP client written in GTK which can run GNU Go.
+GMP client written in GTK+ which can run GNU Go.
 @item Jago (@url{http://www.rene-grothmann.de/jago/})
 is a GPL'd Java client which works for both Microsoft Windows
-and X-Window System.
+and X Window System.
 @item Sente Software's FreeGoban 
 (@url{http://www.sente.ch/software/goban/freegoban.html}) is a
 well-liked user interface for GNU Go (and potentially other
@@ -149,7 +149,7 @@ GTK+ 2.x and librsvg 2.5.  Supports GNU Go as well as other
 engines.  Can play not only Go, but also a few other board
 games.
 @item Goben (@url{http://www.waz.easynet.co.uk/software.html}),
-a GTP capable front end for GNU Go using GTK libraries from
+a GTP capable front end for GNU Go using GTK+ libraries from
 Wayne Myers. Licensed GPL.
 @end itemize
 

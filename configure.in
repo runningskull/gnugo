@@ -60,7 +60,7 @@ default_semeai_node_limit=500
 default_owl_node_limit=1000
 
 AC_ARG_ENABLE(cache-size,
-  [  --enable-cache-size=n       reserve n Mb RAM for caching (8 default)])
+  [  --enable-cache-size=n       reserve n MB RAM for caching (8 default)])
 
 AC_ARG_ENABLE(level,
   [  --enable-level=n            n = default level (10 standard)])
@@ -197,7 +197,7 @@ if test $ac_cv_func_vsnprintf = no; then
 	   Continuing without glib ])
         fi
     else
-    	   AC_MSG_WARN([Neither vsnprintf nor glib found. Gnugo is
+    	   AC_MSG_WARN([Neither vsnprintf nor glib found. GNU Go is
 	   compiled but it is safer to get glib at
 	   http://www.gtk.org/])
     fi
