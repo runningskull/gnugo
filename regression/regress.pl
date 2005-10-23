@@ -134,7 +134,7 @@ my $one_gg_process = 0;
 my @failed_links;
 my @FAILED_links;
 
-my @counters = qw/life_node owl_node reading_node trymove/;
+my @counters = qw/connection_node owl_node reading_node trymove/;
 
 my %counters;
 
@@ -446,8 +446,8 @@ sub regress_file {
         #print "NOT SKIPPING: $next_cmd\n";
 	$top_moves = "";
 	if ($do_topmove) {
-	  if ($next_cmd =~ /gg_genmove\s+([blackwhite])+/) {
-	    $next_cmd =~ s/gg_genmove\s+([blackwhite]+)/top_moves_$1/;
+	  if ($next_cmd =~ /reg_genmove\s+([blackwhite])+/) {
+	    $next_cmd =~ s/reg_genmove\s+([blackwhite]+)/top_moves_$1/;
 	    $top_moves = 1;
 	  }
 	}
@@ -611,7 +611,7 @@ sub eat_board {
   my $no_dragon_data = 0;
   my %stones;
 
-  if ($prev_cmd =~ /gg_genmove/) {
+  if ($prev_cmd =~ /reg_genmove/) {
     #FIXME: There may be other commands that won't require dragon_data
     #to be regenerated.  Better might be to provide a way to query the
     #engine whether dragon_data is currently available w/out regenerating.
@@ -680,7 +680,7 @@ sub eat_board {
     }
   }
   
-  if ($prev_cmd =~ /^[0-9]*\s*gg_genmove/) {
+  if ($prev_cmd =~ /^[0-9]*\s*reg_genmove/) {
     if (! ($next_cmd =~ /^#\?\s*\[(!)?\(?(.*)\)?\]\*?\s*$/)) {
       print "BAD TEST: $next_cmd\n";
     }
@@ -700,7 +700,7 @@ sub eat_board {
       $stones{$result} .= ";try_wrong;";
     }
   } else {
-    # Experimental - should work for gg_genmove too!
+    # Experimental - should work for reg_genmove too!
     if (! ($next_cmd =~ /^#\?\s*\[(!)?\(?(.*)\)?\]\*?\s*$/)) {
       print "BAD TEST: $next_cmd\n";
     }  #see commend on this regex above.
@@ -757,7 +757,7 @@ sub eat_board {
   }
 
   my %tmarr;
-  if ($prev_cmd =~ /.*gg_genmove\s+([whiteblack]+)/) {
+  if ($prev_cmd =~ /.*reg_genmove\s+([whiteblack]+)/) {
     go_command ("top_moves");
     my $top_moves = <$goprog_out>;
     <$goprog_out>;

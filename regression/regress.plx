@@ -329,7 +329,7 @@ sub fptonum {
   $_;
 }
  
-my @counters = qw/life_node owl_node reading_node trymove/;
+my @counters = qw/connection_node owl_node reading_node trymove/;
 
 if ($move) {
 #CASE 2a - move detail - extract interesting info from trace file.
@@ -512,7 +512,7 @@ if ($num) {
   my $cmdline = "gq -l $1 " . ($2 ? "-L $2 " : "");
   if ($gtpall =~ m@ .* (owl_attack|owl_defend|dragon_status) \s* ([A-Z]\d{1,2}) \s* $ @x) {
     $cmdline .= "--decide-dragon $2 -o x.sgf" ;
-  } elsif ($gtpall =~ m@ .* (gg_genmove\s+[whiteblack]*)  \s* $@x) {
+  } elsif ($gtpall =~ m@ .* (reg_genmove\s+[whiteblack]*)  \s* $@x) {
     $cmdline .= "-t -w -d0x101800";
   } elsif ($gtpall =~ m@ .* (attack|defend) \s* ([A-Z]\d{1,2}) \s* $ @x) {
     $cmdline .= "--decide-string $2 -o x.sgf";

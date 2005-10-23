@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- update regress.pl and regress.plx to count connection nodes instead of
+  life nodes and expect reg_genmove instead of gg_genmove
 - remove gnugo_play_sgftree(), gnugo_genmove(), gameinfo_load_sgfheader(),
   and gameinfo_play_move() from engine/interface.c
 - 1D conversion of gnugo_play_move()
