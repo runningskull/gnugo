@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- GTP command dragon_data fixed to give well-formed output also on empty
+  board
 - update regress.pl and regress.plx to count connection nodes instead of
   life nodes and expect reg_genmove instead of gg_genmove
 - remove gnugo_play_sgftree(), gnugo_genmove(), gameinfo_load_sgfheader(),

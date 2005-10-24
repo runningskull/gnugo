@@ -3935,6 +3935,7 @@ gtp_dragon_data(char *s)
   int i = -1;
   int j = -1;
   int m, n;
+  int newline_needed = 0;
 
   if (sscanf(s, "%*c") >= 0 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
@@ -3949,6 +3950,7 @@ gtp_dragon_data(char *s)
   if (ON_BOARD2(i, j) && BOARD(i, j) == EMPTY)
     gtp_mprintf("%m empty\n", i, j);
   else {
+    newline_needed = 1;
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++)
 	if ((m == i && n == j)
@@ -3958,8 +3960,11 @@ gtp_dragon_data(char *s)
 	  gtp_print_vertex(m, n);
 	  gtp_printf(":\n");
 	  report_dragon(gtp_output_file, POS(m, n));
+	  newline_needed = 0;
 	}
   }
+  if (newline_needed)
+    gtp_printf("\n");
   gtp_printf("\n");
   return GTP_OK;
 }
