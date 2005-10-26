@@ -258,10 +258,11 @@ break_in_goal_from_str(int str, signed char goal[BOARDMAX],
     if (ON_BOARD(move) && goal[move]) {
       non_territory[(*num_non_territory)++] = move;
       if (info_pos)
-	DEBUG(DEBUG_TERRITORY, "%1m: Erasing territory at %1m -a.\n",
-	      info_pos, move);
+	DEBUG(DEBUG_TERRITORY | DEBUG_BREAKIN,
+	      "%1m: Erasing territory at %1m -a.\n", info_pos, move);
       else
-	DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -a.\n", move);
+	DEBUG(DEBUG_TERRITORY | DEBUG_BREAKIN,
+	      "Erasing territory at %1m -a.\n", move);
     }
 
     for (k = 0; k < conn.queue_end; k++) {
@@ -273,10 +274,11 @@ break_in_goal_from_str(int str, signed char goal[BOARDMAX],
 	      || !goal[conn.coming_from[pos]])) {
 	non_territory[(*num_non_territory)++] = pos;
 	if (info_pos)
-	  DEBUG(DEBUG_TERRITORY, "%1m: Erasing territory at %1m -b.\n",
-		info_pos, pos);
+	  DEBUG(DEBUG_TERRITORY | DEBUG_BREAKIN,
+		"%1m: Erasing territory at %1m -b.\n", info_pos, pos);
 	else
-	  DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -b.\n", pos);
+	  DEBUG(DEBUG_TERRITORY | DEBUG_BREAKIN,
+	        "Erasing territory at %1m -b.\n", pos);
 	if (conn.distances[pos] < cut_off_distance)
 	  cut_off_distance = conn.distances[pos];
       }
