@@ -493,6 +493,12 @@ loadsgf games/kgs/Kuksa-GNU.sgf 178
 89 reg_genmove black
 #? [E6]*
 
+# Black H3 captures the H2 stone with ko. Even if the ko should
+# eventually be lost there's no points to lose in trying.
+loadsgf games/gunnar/gunnar21.sgf
+90 reg_genmove black
+#? [H3]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

@@ -128,7 +128,3 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52
 loadsgf games/atari_atari10.sgf
 29 combination_attack white
 #? [K5]
-
-loadsgf games/atari_atari11.sgf
-30 combination_attack black
-#? [H3]
