@@ -1,8 +1,8 @@
 # Q12 might be playable after all but it's very unorthodox and it
 # would be preferrable if GNU Go played some more normal fuseki move.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 5
-1 reg_genmove black
-#? [!Q12]
+1 restricted_genmove black Q12 E3 E4
+#? [E3|E4]
 
 # G14 looks more natural than the played move at G12.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 65
@@ -65,8 +65,8 @@ loadsgf games/olympiad2004/19x19/gnu-ind.sgf 203
 
 # L9 is zero points gote.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 223
-12 reg_genmove black
-#? [!L9]*
+12 restrcited_genmove black L9 F7
+#? [F7]*
 
 # A7 solves the tactical problem as well as B10 but also splits the
 # eyespace into two parts.
@@ -124,8 +124,8 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 28
 
 # K4 is overconcentrated. Which moves more than D14 are good here?
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 42
-106 reg_genmove white
-#? [!K4]
+106 restricted_genmove white D14 K4
+#? [D14]
 
 # With the black stone at R9, R6 is locally better than Q6.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 46
@@ -264,7 +264,7 @@ loadsgf games/olympiad2004/9x9/gnu-mag.sgf 35
 # F6 really bad shape.
 loadsgf games/olympiad2004/9x9/gnu-dbg.sgf 11
 601 restricted_genmove black F7 F6 H4 G3
-#? [!F6]
+#? [F7|H4|G3]
 
 # G6 about as bad shape as one can get. E6 has more promise.
 loadsgf games/olympiad2004/9x9/gnu-dbg.sgf 23

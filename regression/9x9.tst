@@ -216,7 +216,7 @@ loadsgf games/boardspace/GNUGo-GoFigure0.1-200503302359.sgf 41
 
 loadsgf games/bitti-gnug36.sgf 24
 440 restricted_genmove black D6 C6 B7
-#? [!D6]*
+#? [C6|B7]*
 
 # Not A8 as in the game
 loadsgf games/bitti-gnug36.sgf 30

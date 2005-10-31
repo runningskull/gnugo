@@ -7,8 +7,8 @@ loadsgf games/kgs/yagr.sgf 206
 #? [C10]*
 
 loadsgf games/kgs/yagr2.sgf 65
-30 reg_genmove black
-#? [!P18|P17|O17]
+30 restricted_genmove black N19 P19 L18 P18 P17 O17
+#? [L18]
 
 loadsgf games/kgs/yagr3.sgf 78
 40 restricted_genmove white A7 A6
@@ -97,7 +97,7 @@ loadsgf games/kgs/geluba-yagr.sgf 166
 # Don't kill your own group.
 loadsgf games/kgs/yagr-ituyosi.sgf 160
 200 restricted_genmove white K4 M4 L4
-#? [!K4]*
+#? [M4|L4]*
 
 # An "owl attack captures tail" problem
 loadsgf games/kgs/yagr-gab9.2.sgf 158

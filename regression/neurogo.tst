@@ -26,8 +26,8 @@ loadsgf games/FSF-neurogo.sgf 40
 #? [D6]*
 
 loadsgf games/FSF-neurogo.sgf 50
-5 reg_genmove white
-#? [!F8]
+5 restricted_genmove white F8 F9
+#? [F9]
 
 # Tenuki is perhaps acceptable.
 loadsgf games/FSF-neurogo.sgf 86
@@ -47,8 +47,8 @@ loadsgf games/FSF-neurogo.sgf 124
 #? [A18]*
 
 loadsgf games/FSF-neurogo.sgf 136
-10 reg_genmove white
-#? [!A3]
+10 restricted_genmove white A3 B4
+#? [B4]
 
 # Semeai problem.
 loadsgf games/FSF-neurogo.sgf 148
@@ -62,8 +62,8 @@ loadsgf games/FSF-neurogo.sgf 152
 loadsgf games/FSF-neurogo.sgf 176
 # This may be hard to fix at this point but since we
 # can't win the ko we shouldn't start it.
-13 reg_genmove white
-#? [!P7]
+13 restricted_genmove white P7 M7 M8
+#? [M7|M8]
 
 loadsgf games/FSF-neurogo.sgf 178
 14 reg_genmove white

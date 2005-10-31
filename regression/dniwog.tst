@@ -9,8 +9,8 @@ loadsgf games/dniwog.sgf 28
 #? [!S5]
 
 loadsgf games/dniwog.sgf 42
-3 reg_genmove white
-#? [!B5]
+3 restricted_genmove white B5 B2
+#? [B2]
 
 loadsgf games/dniwog.sgf 62
 4 reg_genmove white

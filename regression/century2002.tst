@@ -19,8 +19,8 @@ loadsgf games/century21-2002/golois-gnugo.sgf 183
 
 # B15 and D13 are both locally better. C13 fills a dame.
 loadsgf games/century21-2002/golois-gnugo.sgf 239
-35 reg_genmove black
-#? [!C13]
+35 restricted_genmove black B15 D13 C13
+#? [B15|D13]
 
 loadsgf games/century21-2002/goint-gnugo.sgf 37
 40 reg_genmove black 
@@ -117,8 +117,8 @@ loadsgf games/century21-2002/gnugo-katsunari.sgf 36
 #? [F6]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 58
-210 reg_genmove white
-#? [!A15]
+210 restricted_genmove white A15 C16
+#? [C16]
 
 # a move in the center is bigger than this monkey jump
 loadsgf games/century21-2002/gnugo-katsunari.sgf 76

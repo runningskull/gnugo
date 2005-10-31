@@ -40,8 +40,8 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 56
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 72
-140 reg_genmove black
-#? [!M3|M4]
+140 restricted_genmove black M3 M4 O11
+#? [O11]
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 80
@@ -139,7 +139,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 112
 #New failure GNU Go 3.7.3
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 114
 302 restricted_genmove black C12 F15 M7 B14
-#? [!C12]*
+#? [F15|M7|B14]*
 
 
 #New failure GNU Go 3.7.3

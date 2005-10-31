@@ -7,8 +7,8 @@ reset_trymove_counter
 # Apparently, T9 gets overvalued because the effect on S7 and T6 is
 # counted twice (territorially and strategically)
 loadsgf games/tactics05.sgf
-10 reg_genmove white
-#? [!T9]
+10 restricted_genmove white T9 T8 S9 S8
+#? [S8|S9]
 
 loadsgf games/tactics06.sgf
 20 owl_defend C19

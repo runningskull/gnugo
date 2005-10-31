@@ -21,8 +21,8 @@ loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 157
 
 # L17 is horribly overconcentrated
 loadsgf games/nngs/gnugo-3.3.10-rcde05-200210300235.sgf 27
-4 reg_genmove white
-#? [!L17]
+4 restricted_genmove white L17 O18
+#? [O18]
 
 # G1 is the wrong way to defend G2. Both F2 and K2/K3 are locally better.
 # But what's really urgent is a move around F12.
@@ -39,13 +39,13 @@ loadsgf games/nngs/gnugo-3.3.11-ccwills-200211031528.sgf 35
 
 # O14 adds nothing at all to the position.
 loadsgf games/nngs/niko-gnugo-3.3.11-200211201651.sgf 216
-7 reg_genmove black
-#? [!O14]
+7 restricted_genmove black O14 M19
+#? [M19]
 
 # O13 is completely wasted.
 loadsgf games/nngs/niko-gnugo-3.3.11-200211201651.sgf 222
-8 reg_genmove black
-#? [!O13]
+8 restricted_genmove black M19 O13
+#? [M19]
 
 # Critical to keep black split up.
 loadsgf games/gunnar/gunnar1.sgf 34
@@ -113,12 +113,12 @@ loadsgf games/gunnar/gunnar5.sgf 198
 # superior. A move around K16 may be even better to start with.
 loadsgf games/nngs/gnugo-3.3.16-rubus-200302281805.sgf 17
 21 restricted_genmove white P17 Q17 K16 K17
-#? [!P17]*
+#? [Q17|K16|K17]*
 
 # Same problem as 21 but with slightly different surroundings.
 loadsgf games/nngs/gnugo-3.3.16-rubus-200302281805.sgf 19
 22 restricted_genmove white E17 D17 K16 K17
-#? [!E17]*
+#? [D17|K16|K17]*
 
 # Must not play empty triangle at O5. N5 superior local shape.
 loadsgf games/nngs/gnugo-3.3.16-rubus-200302281805.sgf 69
@@ -361,12 +361,12 @@ loadsgf games/kgs/dogo-TheGNUGo.sgf 42
 # The game move at M1 is just weird. R2 is locally better than Q2.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 44
 64 restricted_genmove black M1 Q2 R2 M5 R5
-#? [!(M1|Q2)]*
+#? [R2|M5|R5]*
 
 # P19 is one point reverse sente. There are many larger moves.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 146
 65 restricted_genmove black P19 Q12 B11 S8
-#? [!P19]*
+#? [Q12|B11|S8]*
 
 # A10 was an overplay. Black should capture it and not fall back.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 162
@@ -476,7 +476,7 @@ loadsgf games/kgs/ben9992000-GNU.sgf 141
 # B6 unreasonable.
 loadsgf games/kgs/haiku-GNU.sgf 93
 86 restricted_genmove black C8 B6
-#? [R8]*
+#? [C8]*
 
 # O5 solves the problem. P4 backfires.
 loadsgf games/kgs/melonhead1-GNU.sgf 127

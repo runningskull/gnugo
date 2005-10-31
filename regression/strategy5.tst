@@ -91,8 +91,8 @@ loadsgf games/strategy47.sgf
 # Black has a combination attack which must be defended correctly against.
 # In particular L5 fails.
 loadsgf games/strategy48.sgf
-274 reg_genmove white
-#? [!L5|M5|N5]
+274 restricted_genmove white L5 M5 N5 M6
+#? [M6]
 
 # Semeai problem. White can make seki, black can kill.
 loadsgf games/strategy49.sgf
@@ -113,8 +113,8 @@ loadsgf games/vaughn.sgf 44
 # Really, anything is better than A18. (B13 and B12 are quite
 # ineffective too but can at least not be repeated...)
 loadsgf games/reading41.sgf 130
-279 reg_genmove black
-#? [!A18]
+279 restricted_genmove black A18 A16 B13 B12 E11
+#? [A16]
 
 loadsgf games/nngs/takeda-gnugo-3.3.23-200307302010.sgf 10
 280 reg_genmove black
