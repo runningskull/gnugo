@@ -259,6 +259,10 @@ loadsgf games/endgame12.sgf
 970 reg_genmove white
 #? [G2]
 
+loadsgf games/nando/auto025.sgf 226
+980 restricted_genmove white F4 Q19
+#? [F4]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
