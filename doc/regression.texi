@@ -316,3 +316,19 @@ generate the html views (to do all regression tests run
 the same directory as @file{regress.plx} resides in.
 
 At this point, you should have a working copy of the html regression views.
+
+Additional notes for Debian users: The Perl GD module can be installed
+by @code{apt-get install libgd-perl}. It may suffice to add this to
+the apache2 configuration:
+
+@example
+<Directory "/var/www/regression">
+	Options +ExecCGI
+	AddHandler cgi-script .plx
+	RedirectMatch ^/regression$ /regression/regress.plx
+</Directory>
+@end example
+
+and then make a link from @file{/var/www/regression} to the GNU Go
+regression directory. The @code{RedirectMatch} statement is only
+needed to set up a shorter entry URL.
