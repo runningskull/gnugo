@@ -258,42 +258,61 @@ sgf output, and dragon status information.
 
 @subsection Setting up the HTML regression Views
 
-This documentation assumes an apache configured as per Debian's Apache 1.3
-distribution, but it should be fairly close to the config for other
-distributions.
+There are many ways configuring Apache to permit CGI scripts, all of them are
+featured in Apache documentation, which can be found at
+@url{http://httpd.apache.org/docs/2.0/howto/cgi.html}
+
+Below you will find one example. 
+
+This documentation assumes an Apache 2.0 included in Fedora Core distribution,
+but it should be fairly close to the config for other distributions.
 
 First, you will need to configure Apache to run CGI scripts in the directory
-you wish to serve the html views from.  To do this, add the following to
-@file{/etc/apache/httpd.conf} (or to a user-specific conf file if applicable):
+you wish to serve the html views from. In @file{/etc/httpd/conf/httpd.conf}
+there should be a line:
+
+@code{DocumentRoot "/var/www/html"}
+
+Search for a line @code{<Directory "/path/to/directory">}, where 
+@code{/path/to/directory} is the same as provided in @code{DocumentRoot},
+then add @code{ExecCGI} to list of @code{Options}.
+The whole section should look like:
 
 @example
-<Directory /path/to/script/>
-    Options +ExecCGI
+<Directory "/var/www/html">
+...
+    Options ... ExecCGI
+...
 </Directory>
 @end example
 
 This allows CGI scripts to be executed in the directory used by regress.plx.
-Next, you need to tell Apache that @file{.plx} is a CGI script ending.  Your
-@file{httpd.conf} file should contain a section @code{<IfModule mod_mime.c>}.
-Within that section, there may or may not be a line:
+Next, you need to tell Apache that @file{.plx} is a CGI script ending. Your
+@file{httpd.conf} file should contain a line:
 
-@code{AddHandler cgi-script ....}
+@code{AddHandler cgi-script ...}
 
-If there isn't already, add it; add @file{.plx} to the list of extensions.
+If there isn't already, add it; add @file{.plx} to the list of extensions,
+so line should look like:
+
+@code{AddHandler cgi-script ... .plx}
 
 You will also need to make sure you have the necessary modules loaded to run
-CGI scripts; mod_cgi and mod_mime should be sufficient.  Your @file{httpd.conf}
-should have the relevant @code{LoadModule} lines; uncomment them if neccessary.
+CGI scripts; mod_cgi and mod_mime should be sufficient. Your @file{httpd.conf}
+should have the relevant @code{LoadModule cgi_module modules/mod_cgi.so} and
+@code{LoadModule mime_module modules/mod_mime.so} lines; uncomment them if
+necessary.
 
-Next, you need to put a copy of @file{regress.plx} in the directory that you
-plan to serve the html views from.
+Next, you need to put a copy of @file{regress.plx} in the @code{DocumentRoot}
+directory @code{/var/www/html} or it subdirectories where you plan to serve the
+html views from.
 
-You will also need to install the Perl module GD, available from CPAN or via
-@code{apt-get install libgd-perl} on Debian.
+You will also need to install the Perl module GD
+(@url{http://search.cpan.org/dist/GD/}), available from CPAN.
 
 Finally, run @file{regression/regress.pl} to create the xml data used to
-generate the html views; then, copy the @file{html/} directory to the same
-directory as @file{regress.plx} resides in.
+generate the html views (to do all regression tests run
+@file{regression/regress.pl -a 1}); then, copy the @file{html/} directory to
+the same directory as @file{regress.plx} resides in.
 
 At this point, you should have a working copy of the html regression views.
-
