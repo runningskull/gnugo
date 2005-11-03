@@ -2615,8 +2615,15 @@ find_connection_moves(int str1, int str2, int color_to_move,
   else
     distance_limit = distances[1] + FP(1.5);
 
+  /* Special case: If the second best move has a distance less than 1,
+   * include it if even if the best move has a very low distance.
+   */
+  if (distances[1] < FP(1.0)
+      && distances[1] > distance_limit)
+    distance_limit = distances[1];
+  
   for (r = 0; r < num_moves; r++) {
-    if (r > 0
+    if (r > 1
 	&& distances[r] > distances[r-1]
 	&& distances[r] - distances[r-1] > (8 - r) * FP(0.2))
       break;

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- find_connection_moves() revised
 - GTP command dragon_data fixed to give well-formed output also on empty
   board
 - update regress.pl and regress.plx to count connection nodes instead of

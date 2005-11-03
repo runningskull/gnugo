@@ -89,6 +89,8 @@ loadsgf games/century21-2002/manyfaces-gnugo.sgf 57
 140 reg_genmove black
 #? [J3|R4|P5]
 
+# B18 is better than A18 by leaving one less ko threat behind. At
+# this time we accept both moves.
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 157
 150 reg_genmove black
 #? [B18]

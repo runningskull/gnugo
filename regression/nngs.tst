@@ -652,7 +652,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 44
 
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 68
-1260 reg_genmove white
+1260 restricted_genmove white F18 G18 L18
 #? [G18|F18]
 
 
