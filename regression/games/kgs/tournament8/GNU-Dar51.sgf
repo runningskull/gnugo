@@ -1,0 +1,21 @@
+(;GM[1]FF[4]
+SZ[9]KM[7.50]
+PW[GNU]WR[13k]
+PB[Dar51]BR[17k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2005-11-06]AP[CGoban:2]
+EV[Eighth KGS Computer Go Tournament - Formal division]RE[B+13.50]
+TM[780]RU[Chinese]
+C[GNU [13k\]: GTP Engine for GNU (white): GNU Go version 3.7.7
+Dar51 [17k\]: GTP Engine for Dar51 (black): Dariush version 3.1.5.6.5, level 7
+]
+RO[4]CA[UTF-8]ST[2]
+;B[ee];W[cg];B[cf];W[dg];B[fg];W[bf];B[fd];W[dc];B[cd];W[cc];B[bc]
+;W[bb];B[be];W[ac];B[bd];W[fb];B[eh];W[gc];B[gd];W[hc]
+C[gunnar [?\]: GNU playing very badly this game.
+];B[hd];W[id];B[ie]
+;W[ic];B[he];W[ab];B[df];W[ec];B[ef];W[ad];B[bg];W[ae];B[af];W[dd]
+;B[fc];W[de];B[ce];W[ca];B[ed];W[eb];B[];W[gb];B[];W[cb];B[];W[ha]
+;B[];W[hb];B[];W[]TB[fe][ge][bf][ff][gf][hf][if][ag][cg][dg][eg][gg]
+[hg][ig][ah][bh][ch][dh][fh][gh][hh][ih][ai][bi][ci][di][ei][fi][gi]
+[hi][ii]TW[aa][ba][da][ea][fa][ga][ia][db][ib])

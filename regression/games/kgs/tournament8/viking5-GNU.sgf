@@ -1,0 +1,78 @@
+(;GM[1]FF[4]
+SZ[9]KM[7.50]
+PW[viking5]PB[GNU]BR[13k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2005-11-06]AP[CGoban:2]
+EV[Eighth KGS Computer Go Tournament - Formal division]RE[B+Resign]
+TM[780]RU[Chinese]
+C[zapp [?\]: This will be interesting
+viking5 [?\]: GTP Engine for viking5 (white): Viking version 5.2.2
+GNU [13k\]: GTP Engine for GNU (black): GNU Go version 3.7.7
+]
+RO[2]CA[UTF-8]ST[2]
+;B[ee];W[ce];B[cd];W[gc];B[de]
+C[gunnar [?\]: Did Viking play second move from opening book?
+];W[eg]
+;B[cf];W[gh]C[zapp [?\]: I did not see it play it
+];B[ec]
+C[gunnar [?\]: (It was very fast.)
+gunnar [?\]: G2 looks a bit low.
+zapp [?\]: Then it was
+]
+;W[fb];B[eb]C[gunnar [?\]: GNU thinks W+6.
+gunnar [?\]: G5 was third move.
+]
+;W[gf];B[dg]C[zapp [?\]: Viking thinks it is 50+50
+gunnar [?\]: W+10 now.
+gunnar [?\]: GNU very pessimistic.
+]
+;W[dh];B[ch]C[zapp [?\]: Should be with big komi
+zapp [?\]: Viking tends to always beat gnu in a game like this
+gunnar [?\]: W+12. It gets worse with every move.
+]
+;W[cg];B[bg]C[gunnar [?\]: C3?
+zapp [?\]: Can be a symptom that Viking is behind
+Dssq [9k?\]: C3 = 9P move
+]
+;W[ei];B[ge]C[gunnar [?\]: Finally G5.
+gunnar [?\]: W+4 now.
+];W[fe]
+;B[fd]C[zapp [?\]: Viking was thinking of H5
+zapp [?\]: but ran out of time
+gunnar [?\]: Ah, F5 didn't look very good.
+]
+;W[ff];B[gd]C[zapp [?\]: I am playing on my laptop today
+zapp [?\]: Last time I had my father 3Ghz machine
+gunnar [?\]: What speed?
+zapp [?\]: 1.7
+]
+;W[hd];B[hb]
+C[zapp [?\]: And that tournament I think the time per game was longer
+]
+;W[hc];B[he]
+C[gunnar [?\]: GNU is playing on a 1.6 GHz Athlon (marketing name XP1900+)
+]
+;W[ea];B[fc]
+C[zapp [?\]: Does it play much stronger using more time on 9x9
+]
+;W[gb]C[gunnar [?\]: Doubtful.
+];B[id]
+C[gunnar [?\]: GNU thinks the corner will die.
+zapp [?\]: For Viking every second makes a difference
+]
+;W[ic];B[ha]C[zapp [?\]: Viking agrees with that
+];W[cb];B[da];W[fa]
+C[zapp [?\]: At 3 minutes per move Viking is pretty good
+];B[db]
+;W[ie];B[hf];W[if];B[hg];W[ig];B[hh]C[zapp [?\]: Good game for gnu
+gunnar [?\]: Looks like white collapsed.
+gunnar [?\]: G2 was a gift.
+zapp [?\]: As a said: at C3 viking probably felt it was behind
+gunnar [?\]: Interesting that they both thought so. :-)
+zapp [?\]: I should have implemented an idea to spend twice the time on first move out of book
+zapp [?\]: I am rerunning Viking for position it played G2
+gunnar [?\]: What is the right move?
+zapp [?\]: 1ply G3 2ply G3 3ply G4
+zapp [?\]: Which means it played G2 because of the random nature of monte carlo eval
+]
+)

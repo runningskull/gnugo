@@ -1,0 +1,19 @@
+(;GM[1]FF[4]
+SZ[9]KM[7.50]
+PW[tlsBot]PB[GNU]BR[13k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2005-11-06]AP[CGoban:2]
+EV[Eighth KGS Computer Go Tournament - Formal division]RE[B+19.50]
+TM[780]RU[Chinese]
+C[tlsBot [?\]: GTP Engine for tlsBot (white): tlsBot version Bookish2CSM-13064473 ; ........... I sometimes have some problems knowing when to pass. If you feel I should pass, and I keep on playing, check to see if you have any groups that have 2 liberties. Defending them should help.
+GNU [13k\]: GTP Engine for GNU (black): GNU Go version 3.7.7
+]
+RO[7]CA[UTF-8]ST[2]
+;B[fe];W[de];B[dd];W[ed];B[ee];W[fd];B[dc];W[cd];B[gd];W[ge];B[fc]
+;W[ff];B[ec];W[ef];B[ce];W[df];B[be];W[hf];B[cg];W[dg];B[ch];W[dh]
+;B[di];W[ei];B[ci];W[eh];B[hd];W[cf];B[bf];W[bd];B[cc];W[bg];B[bh]
+;W[ag];B[ah];W[he];B[ie];W[if];B[id];W[bc];B[bb];W[ae];B[af];W[fb]
+;B[gb];W[fg];B[eb];W[ih];B[ad];W[ib];B[hb];W[ig];B[fd];W[];B[cb];W[]
+;B[hc];W[hh];B[fa];W[hg];B[ac];W[gg];B[ea];W[];B[ab];W[];B[]TB[aa]
+[ba][ca][da][ga][ha][ia][db][fb][ib][bc][gc][ic][bd][cd][ed][ae][ag]
+[bg][ai][bi]TW[gf][eg][fh][gh][fi][gi][hi][ii])

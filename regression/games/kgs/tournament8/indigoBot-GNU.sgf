@@ -1,0 +1,30 @@
+(;GM[1]FF[4]
+SZ[9]KM[7.50]
+PW[indigoBot]WR[18k]
+PB[GNU]BR[13k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2005-11-06]AP[CGoban:2]
+EV[Eighth KGS Computer Go Tournament - Formal division]RE[B+7.50]
+TM[780]RU[Chinese]
+C[GNU [13k\]: GTP Engine for GNU (black): GNU Go version 3.7.7
+indigoBot [18k\]: GTP Engine for indigoBot (white): Indigo2005.9x9 version 3/11/2005
+]
+RO[5]CA[UTF-8]ST[2]
+;B[fe];W[de];B[ed];W[dc];B[dd];W[cd];B[ec];W[ef];B[gg];W[hh];B[hg]
+C[gunnar [?\]: H2 surprise move.
+papateux [7k?\]: yes
+];W[gh];B[fh]
+;W[fg]C[gunnar [?\]: Black F3 better than F2.
+];B[eh];W[gf];B[hf]
+;W[ge];B[he];W[gd];B[ff]C[gunnar [?\]: This is getting wild.
+];W[eg]
+C[MatroidX [9k?\]: yes, but kind of fun :)
+];B[dg];W[ee];B[ce];W[fd]
+;B[cc]C[gunnar [?\]: What a weird game.
+];W[cf];B[bd];W[cg];B[ih]
+;W[fc];B[ch];W[eb];B[db];W[be];B[cd];W[bh];B[ib];W[fb];B[bf];W[bg]
+;B[ae];W[hd];B[id];W[hc];B[ic];W[hb];B[ie];W[bi];B[ea];W[bb];B[cb]
+;W[fa];B[da];W[ba];B[bc];W[ha];B[gi];W[ci];B[dh];W[df];B[ag];W[di]
+;B[ah];W[ei];B[hi];W[ia];B[fi];W[ai];B[af];W[];B[ab];W[];B[ac];W[]
+;B[gh];W[];B[]TB[aa][ba][ca][bb][dc][ad][be][if][ig][hh][ii]TW[ga]
+[gb][gc][fe][ff])

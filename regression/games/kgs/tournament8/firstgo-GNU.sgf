@@ -1,0 +1,21 @@
+(;GM[1]FF[4]
+SZ[9]KM[7.50]
+PW[firstgo]PB[GNU]BR[13k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2005-11-06]AP[CGoban:2]
+EV[Eighth KGS Computer Go Tournament - Formal division]RE[B+73.50]
+TM[780]RU[Chinese]
+C[GNU [13k\]: GTP Engine for GNU (black): GNU Go version 3.7.7
+firstgo [?\]: GTP Engine for firstgo (white): FirstGo version 1.052
+]
+RO[8]CA[UTF-8]ST[2]
+;B[fd];W[gg];B[eg];W[ff];B[de];W[fe];B[eh];W[fc];B[ed];W[dd];B[ge]
+;W[gc];B[gd];W[dc];B[ec];W[df];B[cf];W[ce];B[eb];W[ee];B[hc];W[hb]
+;B[he];W[ic];B[hd];W[id];B[ch];W[dg];B[cg];W[hh];B[ba];W[bg];B[bf]
+;W[cb];B[ca];W[ga];B[ie];W[dh];B[di];W[be];B[bh];W[af];B[ag];W[ea]
+;B[db];W[cd];B[fb];W[fa];B[bb];W[cc];B[fh];W[da];B[gb];W[ae];B[gh]
+;W[hf];B[gf];W[fg];B[ig];W[hg];B[if];W[gi];B[bc];W[ef];B[ei];W[]
+;B[ad];W[ci];B[bi];W[hi];B[bd];W[ab];B[de];W[af];B[ae];W[dc];B[dd]
+;W[ih];B[ci];W[];B[ha];W[ea];B[fa];W[];B[]TB[aa][da][ea][ga][ia][ab]
+[cb][hb][ib][ac][cc][dc][fc][gc][ic][cd][id][be][ce][ee][fe][af][df]
+[ef][ff][hf][bg][dg][fg][gg][hg][ah][dh][hh][ih][ai][fi][gi][hi][ii])

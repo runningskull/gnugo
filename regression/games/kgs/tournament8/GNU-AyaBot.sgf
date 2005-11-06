@@ -1,0 +1,25 @@
+(;GM[1]FF[4]
+SZ[9]KM[7.50]
+PW[GNU]WR[13k]
+PB[AyaBot]PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2005-11-06]AP[CGoban:2]
+EV[Eighth KGS Computer Go Tournament - Formal division]RE[W+0.50]
+TM[780]RU[Chinese]
+C[AyaBot [?\]: GTP Engine for AyaBot (black): Aya version 5.61
+GNU [13k\]: GTP Engine for GNU (white): GNU Go version 3.7.7
+]
+RO[1]CA[UTF-8]ST[2]
+;B[fd];W[cg];B[gf];W[cd];B[df];W[dg];B[cf];W[ef];B[bg];W[ec];B[eg]
+;W[eh];B[fg];W[bh];B[ed];W[dd];B[be];W[fc];B[gc];W[gb];B[ah];W[gd]
+;B[fe];W[hc];B[fh];W[bd];B[he];W[ae];B[bf];W[hd]
+C[impulse [7k\]: was f2 necessary?
+];B[de];W[ge];B[ie]
+C[gunnar [?\]: No.
+];W[id];B[hf];W[af];B[ag];W[ad];B[ce];W[fb];B[dh]
+;W[dc];B[ch];W[hb];B[ci];W[cb];B[ei];W[db]C[gunnar [?\]: Very close.
+]
+;B[bi];W[bc];B[];W[]TB[ee][ef][ff][if][cg][dg][gg][hg][ig][bh][eh]
+[gh][hh][ih][ai][di][fi][gi][hi][ii]TW[aa][ba][ca][da][ea][fa][ga]
+[ha][ia][ab][bb][eb][ib][ac][cc][gc][ic]C[maproom [7k?\]: good game
+]
+)

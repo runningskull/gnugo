@@ -1,0 +1,30 @@
+(;GM[1]FF[4]
+SZ[9]KM[7.50]
+PW[GNU]WR[13k]
+PB[ExBot]BR[17k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2005-11-06]AP[CGoban:2]
+EV[Eighth KGS Computer Go Tournament - Formal division]RE[W+30.50]
+TM[780]RU[Chinese]
+C[GNU [13k\]: GTP Engine for GNU (white): GNU Go version 3.7.7
+ExBot [17k\]: GTP Engine for ExBot (black): Explorer version 6.6.x Nov 4 2005 13:33:59
+]
+RO[3]CA[UTF-8]ST[2]
+;B[eg];W[ee];B[gf];W[ge];B[hf];W[dd];B[cf];W[he];B[bd];W[ff];B[fg]
+;W[cc];B[ie];W[id];B[if];W[hc];B[gh];W[bc];B[cd];W[ad];B[ef];W[ae]
+;B[bf];W[af];B[fe]C[gunnar [?\]: Blitz tournament? :-)
+];W[fd];B[ff]
+;W[bg];B[ch];W[ce];B[be];W[cg]C[ExBoss: yeah
+];B[dh];W[df]
+C[ExBoss: oucch
+];B[bh];W[ah];B[bi];W[ag];B[dg];W[ai];B[];W[ed];B[]
+;W[hd];B[];W[cf]C[ExBoss: g6 works
+];B[];W[gb];B[];W[hb];B[];W[cd]
+;B[];W[gd];B[];W[]TB[gg][hg][ig][eh][fh][hh][ih][ci][di][ei][fi][gi]
+[hi][ii]TW[aa][ba][ca][da][ea][fa][ga][ha][ia][ab][bb][cb][db][eb]
+[fb][ib][ac][dc][ec][fc][gc][ic][bd][be][de][bf]
+C[gunnar [?\]: This was really fast.
+ExBoss: too fast :(
+gunnar [?\]: I don't see how G6 would work.
+]
+)

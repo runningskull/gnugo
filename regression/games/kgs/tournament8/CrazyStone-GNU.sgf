@@ -1,0 +1,49 @@
+(;GM[1]FF[4]
+SZ[9]KM[7.50]
+PW[CrazyStone]PB[GNU]BR[13k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2005-11-06]AP[CGoban:2]
+EV[Eighth KGS Computer Go Tournament - Formal division]RE[W+34.50]
+TM[780]RU[Chinese]
+C[CrazyStone [?\]: GTP Engine for CrazyStone (white): Crazy Stone - CMCSearchPlayer version 0002-14
+GNU [13k\]: GTP Engine for GNU (black): GNU Go version 3.7.7
+]
+RO[6]CA[UTF-8]ST[2]
+;B[ee];W[gc];B[cg];W[fb];B[db];W[gg];B[eg]
+C[gunnar [?\]: D8 not very good. Probably a capping pattern. :-/
+]
+;W[ec];B[bb]C[gunnar [?\]: Ouch.
+RemiCoulom [14k\]: B8 !
+gunnar [?\]: C6 was second choice.
+]
+;W[dd];B[bd];W[hd];B[fh]C[RemiCoulom [14k\]: ugly moves everywhere.
+]
+;W[cc];B[hh]C[gunnar [?\]: Indeed.
+];W[cb];B[ca];W[bc];B[ac];W[gh]
+;B[gi];W[ab];B[aa];W[bh];B[cd];W[dc];B[gf];W[hg]
+C[gunnar [?\]: What's wrong with black D5 now?
+];B[hf];W[ih];B[hi]
+;W[cf];B[ce];W[bf];B[de];W[fi];B[ei];W[ae];B[ad];W[ch];B[dh];W[bg]
+;B[be];W[df];B[dg];W[ef];B[fe]C[ExBoss: dangerous for B
+];W[ff];B[fg]
+;W[ge];B[fd]C[ExBoss: ko
+];W[ed];B[he];W[gd];B[ig]C[ExBoss: blunder
+]
+;W[fc];B[ci]C[gunnar [?\]: Gah.
+];W[af];B[bi];W[id];B[ah];W[ab];B[ai]
+;W[ie];B[if];W[ag];B[di];W[ga];B[gg];W[fe];B[];W[ha];B[]
+C[maproom [7k?\]: remarkable
+];W[fa];B[];W[]TB[hg][eh][gh][ih][fi]
+[ii]TW[aa][ba][ca][da][ea][ia][bb][db][eb][gb][hb][ib][ac][hc][ic]
+[ad][bd][cd][fd][be][ce][de][ee]C[fboissac [11k\]: Bravo remi
+RemiCoulom [14k\]: merci
+RemiCoulom [14k\]: what was black's blunder ?
+fboissac [11k\]: crazy a un bon module de vie et mort
+RemiCoulom [14k\]: F6 ?
+ExBoss: H5 was gote
+RemiCoulom [14k\]: what else could black play ?
+RemiCoulom [14k\]: A4 ?
+ExBoss: A4 right away
+RemiCoulom [14k\]: OK, thanks
+]
+)
