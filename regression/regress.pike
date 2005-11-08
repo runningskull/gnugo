@@ -3,14 +3,10 @@
 static Thread.Queue writing_finished;
 static Thread.Queue reading_finished;
 static int debug = 0;
-static object machine;
 static mapping(int:string) correct_results = ([]);
 static multiset expected_failures = (<>);
 static int timebase;
 static float last_time;
-static float total_time = 0.0;
-static int total_pass = 0;
-static int total_fail = 0;
 static int verbose = 0;
 
 /* General class to manage a high-score list (e.g. of slow tests, tests
@@ -115,12 +111,6 @@ static void finish()
 
 static void program_reader(object f)
 {
-  int move;
-  string stored = "";
-  array(int) nodes = ({0, 0, 0});
-  array(int) total_nodes = ({0, 0, 0});
-  array(int) unexpected_failures = ({});
-  array(int) unexpected_passes = ({});
   int test_number;
   if (debug)
     werror("Waiting for writing to be finished.\n");
@@ -262,8 +252,8 @@ void run_testsuite(string suite_name, string engine,
   object pipe1 = f1->pipe();
   object f2 = Stdio.FILE();
   object pipe2 = f2->pipe();
-  machine = Process.create_process(program_start_array,
-				   (["stdin":pipe1, "stdout":pipe2]));
+  Process.create_process(program_start_array,
+			 (["stdin":pipe1, "stdout":pipe2]));
   thread_create(program_reader, f2);
   thread_create(program_writer, write_queue, f1);
 
