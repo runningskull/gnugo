@@ -1,0 +1,23 @@
+(;
+GM[1]FF[4]AP[NNGS:1.1.18]
+EV[Gifu Challenge 2005]
+RE[B+Resign]
+PW[GNU Go]
+PB[KCC Igo]
+PC[Gifu]
+DT[2005-10-29]
+RU[Japanese]
+SZ[19]TM[2400]KM[6.5]
+
+;B[pd];W[do];B[pp];W[dd];B[fc];W[cf];B[db];W[cc];B[ic];W[dq];B[jq];W[qn]
+;B[qo];W[pn];B[np];W[qj];B[gq]
+;W[nd];B[nc];W[mc];B[oc];W[md];B[qf];W[cb];B[eb];W[cl];B[lb];W[qq];B[rp]
+;W[mb];B[ma];W[na];B[la];W[nb];B[mf];W[le];B[kc];W[je];B[he];W[oe];B[pg]
+;W[og];B[pi];W[jg];B[pk];W[mh];B[ql];W[nn];B[kn];W[oo];B[op];W[rn];B[nl]
+;W[eh];B[em];W[el];B[dn];W[cn];B[eo]
+;W[ep];B[co];W[dp];B[cm];W[bn];B[bm];W[bo];B[dl];W[ck];B[dk];W[cj];B[jk]
+;W[fo];B[gl];W[en];B[fm];W[dm];B[ek];W[dn];B[er];W[dr];B[fr];W[qb];B[qc]
+;W[pb];B[rb];W[pc];B[qd];W[od];B[ho];W[fe];B[mj];W[ra];B[rc];W[es];B[kf]
+;W[ke];B[lf];W[kh];B[ng];W[nf];B[oh];W[jf];B[of];W[ne];B[mg];W[lc];B[kb]
+;W[li];B[lj];W[kj];B[kk];W[hg];B[gd];W[jj];B[ij];W[ii];B[hj]
+;)
