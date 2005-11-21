@@ -214,6 +214,7 @@ loadsgf games/trevor/auto/c23.sgf 60
 #? [N5]
 
 
+# See also connection:126.
 loadsgf games/trevor/auto/c23.sgf 72
 450 reg_genmove white
 #? [K5]

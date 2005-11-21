@@ -180,6 +180,19 @@ loadsgf games/nando/auto023.sgf 170
 33 reg_genmove white
 #? [H11]*
 
+loadsgf games/nando/auto026.sgf 118
+34 restricted_genmove white S12 S8
+#? [S8]
+
+# Apparently, a ko depth issue (3.7.7)
+play white T8
+35 attack T8
+#? [3 S8]
+
+loadsgf games/nando/auto027.sgf 165
+36 disconnect L8 N7
+#? [1 L7]
+
 
 #--------------------------------------------------------------
 # Cascade of chain breakings
