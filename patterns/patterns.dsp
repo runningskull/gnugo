@@ -173,36 +173,6 @@ SOURCE=.\owl_vital_apat.c
 
 SOURCE=.\patterns.c
 # End Source File
-# Begin Source File
-
-SOURCE=.\read_attack.c
-
-!IF  "$(CFG)" == "patterns - Win32 Release"
-
-# ADD CPP /O2 /YX
-
-!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
-
-# ADD CPP /YX
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\read_defend.c
-
-!IF  "$(CFG)" == "patterns - Win32 Release"
-
-# ADD CPP /O2 /YX
-
-!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
-
-# ADD CPP /YX
-
-!ENDIF 
-
-# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -811,68 +781,6 @@ InputPath=.\patterns.db
 
 "patterns.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\mkpat -b pat -i patterns.db -i patterns2.db -o patterns.c
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\read_attack.db
-
-!IF  "$(CFG)" == "patterns - Win32 Release"
-
-USERDEP__READ_="$(IntDir)\mkpat.exe"	
-# Begin Custom Build
-IntDir=.\Release
-InputPath=.\read_attack.db
-
-"read_attack.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b read_attack -i ..\patterns\read_attack.db -o read_attack.c
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
-
-USERDEP__READ_="$(IntDir)\mkpat.exe"	
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=.\read_attack.db
-
-"read_attack.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b read_attack -i ..\patterns\read_attack.db -o read_attack.c
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\read_defend.db
-
-!IF  "$(CFG)" == "patterns - Win32 Release"
-
-USERDEP__READ_D="$(IntDir)\mkpat.exe"	
-# Begin Custom Build
-IntDir=.\Release
-InputPath=.\read_defend.db
-
-"read_defend.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b read_defend -i ..\patterns\read_defend.db -o read_defend.c
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
-
-USERDEP__READ_D="$(IntDir)\mkpat.exe"	
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=.\read_defend.db
-
-"read_defend.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b read_defend -i ..\patterns\read_defend.db -o read_defend.c
 
 # End Custom Build
 
