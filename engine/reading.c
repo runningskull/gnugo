@@ -1587,7 +1587,7 @@ defend2(int str, int *move)
   special_rescue4_moves(str, libs, &moves);
   
   /* Only order and test the new set of moves. */
-  order_moves(str, &moves, other, read_function_name, *move);
+  order_moves(str, &moves, color, read_function_name, *move);
   DEFEND_TRY_MOVES(0, &suggest_move);
 
   /* If we haven't found any useful moves in first batches, be more
@@ -1619,7 +1619,7 @@ defend2(int str, int *move)
     break_chain4_moves(str, &moves, be_aggressive);
 
   /* Only order and test the new set of moves. */
-  order_moves(str, &moves, other, read_function_name, *move);
+  order_moves(str, &moves, color, read_function_name, *move);
   DEFEND_TRY_MOVES(0, &suggest_move);
 
   RETURN_RESULT(savecode, savemove, move, "saved move");
@@ -1769,7 +1769,7 @@ defend3(int str, int *move)
   }
 
   /* Only order and test the new set of moves. */
-  order_moves(str, &moves, other, read_function_name, *move);
+  order_moves(str, &moves, color, read_function_name, *move);
   DEFEND_TRY_MOVES(1, &suggest_move);
 
   /* If nothing else works, we try playing a liberty of the
@@ -1784,7 +1784,7 @@ defend3(int str, int *move)
     break_chain3_moves(str, &moves, 0);
 
   /* Only order and test the new set of moves. */
-  order_moves(str, &moves, other, read_function_name, *move);
+  order_moves(str, &moves, color, read_function_name, *move);
   DEFEND_TRY_MOVES(1, &suggest_move);
 
   RETURN_RESULT(savecode, savemove, move, "saved move");
