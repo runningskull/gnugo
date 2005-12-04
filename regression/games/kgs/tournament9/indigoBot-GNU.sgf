@@ -1,471 +1,238 @@
-(;GM[1]FF[4]CA[UTF-8]AP[CGoban:2]ST[2]
-RU[Chinese]SZ[19]KM[7.50]TM[3480]
-PW[indigoBot]PB[GNU]WR[17k]BR[13k]DT[2005-12-04]EV[Ninth KGS Computer Go Tournament - Formal division]RO[1]PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]C[indigoBot [17k\]: GTP Engine for indigoBot (white): Indigo2005 version 2/12/2005
+(;GM[1]FF[4]
+SZ[19]KM[7.50]
+PW[indigoBot]WR[17k]
+PB[GNU]BR[13k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2005-12-04]AP[CGoban:2]
+EV[Ninth KGS Computer Go Tournament - Formal division]RE[B+209.50]
+TM[3480]RU[Chinese]
+C[indigoBot [17k\]: GTP Engine for indigoBot (white): Indigo2005 version 2/12/2005
 GNU [13k\]: GTP Engine for GNU (black): GNU Go version 3.7.7
-]RE[B+209.50]
-;B[qc]CR[qc]BL[3479.516]
-;W[dd]CR[dd]WL[3479.834]
-;B[qp]CR[qp]BL[3479.021]
-;W[dq]CR[dq]WL[3479.715]
-;B[oq]CR[oq]BL[3478.331]
-;W[qj]CR[qj]WL[3479.593]
-;B[do]CR[do]BL[3476.773]
-;W[co]CR[co]WL[3479.392]
-;B[dp]CR[dp]BL[3474.082]
-;W[dn]CR[dn]WL[3479.268]
-;B[cp]CR[cp]BL[3468.752]
-;W[eq]CR[eq]WL[3479.148]
-;B[cn]CR[cn]BL[3459.958]
-;W[bo]CR[bo]WL[3479.029]
-;B[cm]CR[cm]BL[3440.903]
-;W[en]CR[en]WL[3478.909]
-;B[cq]CR[cq]BL[3434.968]
-;W[bn]CR[bn]WL[3478.778]
-;B[ck]CR[ck]BL[3424.988]
-;W[qg]CR[qg]WL[3478.659]
-;B[fc]CR[fc]BL[3419.529]
-;W[eo]CR[eo]WL[3458.532]
-;B[bm]CR[bm]BL[3399.512]
-;W[kc]CR[kc]WL[3426.659]
-;B[ep]CR[ep]BL[3395.714]
-;W[fp]CR[fp]WL[3401.412]
-;B[dr]CR[dr]BL[3380.618]
-;W[jq]CR[jq]WL[3367.931]C[jasonlai [5k\]: lol
 ]
-;B[ic]CR[ic]BL[3371.26]
-;W[db]CR[db]WL[3335.776]
-;B[mc]CR[mc]BL[3364.879]
-;W[fq]CR[fq]WL[3303.199]
-;B[ld]CR[ld]BL[3347.292]
-;W[kd]CR[kd]WL[3272.182]
-;B[ie]CR[ie]BL[3339.712]
-;W[ke]CR[ke]WL[3241.704]
-;B[cf]CR[cf]BL[3334.467]C[jasonlai [5k\]: hows the compter think
+CA[UTF-8]RO[1]ST[2]
+;B[qc];W[dd];B[qp];W[dq];B[oq];W[qj];B[do];W[co];B[dp];W[dn];B[cp]
+;W[eq];B[cn];W[bo];B[cm];W[en];B[cq];W[bn];B[ck];W[qg];B[fc];W[eo]
+;B[bm];W[kc];B[ep];W[fp];B[dr];W[jq]C[jasonlai [5k\]: lol
+];B[ic]
+;W[db];B[mc];W[fq];B[ld];W[kd];B[ie];W[ke];B[cf]
+C[jasonlai [5k\]: hows the compter think
 jasonlai [5k\]: ?.?
-]
-;W[mf]CR[mf]WL[3209.447]
-;B[ee]CR[ee]BL[3324.101]
-;W[bp]CR[bp]WL[3178.715]
-;B[cr]CR[cr]BL[3306.821]
-;W[bq]CR[bq]WL[3160.571]
-;B[br]CR[br]BL[3299.051]
-;W[be]CR[be]WL[3127.769]
-;B[ql]CR[ql]BL[3291.773]C[kalim [12k\]: wow, this is like watching 20k's play
-]
-;W[mq]CR[mq]WL[3097.394]
-;B[fl]CR[fl]BL[3284.024]C[jasonlai [5k\]: 20 k ?.?
-]
-;W[jf]CR[jf]WL[3061.827]
-;B[oc]CR[oc]BL[3272.226]
-;W[de]CR[de]WL[3030.853]
-;B[ff]CR[ff]BL[3263.987]C[jasonlai [5k\]: @@
-]
-;W[df]CR[df]WL[3022.574]
-;B[gs]CR[gs]BL[3256.618]C[jasonlai [5k\]: lol
+];W[mf]
+;B[ee];W[bp];B[cr];W[bq];B[br];W[be];B[ql]
+C[kalim [12k\]: wow, this is like watching 20k's play
+];W[mq];B[fl]
+C[jasonlai [5k\]: 20 k ?.?
+];W[jf];B[oc];W[de];B[ff]
+C[jasonlai [5k\]: @@
+];W[df];B[gs]C[jasonlai [5k\]: lol
 jasonlai [5k\]: yose time lol
 ]
-;W[dg]CR[dg]WL[2999.668]
-;B[ol]CR[ol]BL[3242.128]
-;W[er]CR[er]WL[2989.925]C[olczyk [15k\]: I don't know it takes Whites eye shape.
-]
-;B[ar]CR[ar]BL[3214.891]
-;W[el]CR[el]WL[2986.555]
-;B[fk]CR[fk]BL[3206.207]
-;W[ek]CR[ek]WL[2954.648]
-;B[fm]CR[fm]BL[3195.1]
-;W[ej]CR[ej]WL[2931.194]
-;B[gi]CR[gi]BL[3189.152]
-;W[if]CR[if]WL[2927.507]
-;B[he]CR[he]BL[3181.868]C[kalim [12k\]: i guess white bots thinks left side is his
-]
-;W[ci]CR[ci]WL[2892.893]
-;B[mo]CR[mo]BL[3177.893]C[jasonlai [5k\]: his?
+;W[dg];B[ol];W[er]
+C[olczyk [15k\]: I don't know it takes Whites eye shape.
+];B[ar]
+;W[el];B[fk];W[ek];B[fm];W[ej];B[gi];W[if];B[he]
+C[kalim [12k\]: i guess white bots thinks left side is his
+];W[ci]
+;B[mo]C[jasonlai [5k\]: his?
 kalim [12k\]: is its
+];W[bj]
+C[jasonlai [5k\]: @.@"
+];B[im];W[gg];B[em];W[dm];B[fo]
+C[jasonlai [5k\]: GNU wins lots of game :O
+];W[go];B[fn];W[dl];B[bk]
+;W[io]C[kalim [12k\]: I wonder if it counts the value of its move
 ]
-;W[bj]CR[bj]WL[2880.774]C[jasonlai [5k\]: @.@"
+;B[eb]C[gunnar [?\]: GNU thinks it's ahead by 12.
+];W[fh];B[ji]
+C[olczyk [15k\]: I thinbkm probably more.
+];W[of]
+C[kalim [12k\]: i thought these bots play blitz well, why is it that they have a hour each?
 ]
-;B[im]CR[im]BL[3172.23]
-;W[gg]CR[gg]WL[2850.725]
-;B[em]CR[em]BL[3164.841]
-;W[dm]CR[dm]WL[2847.188]
-;B[fo]CR[fo]BL[3140.834]C[jasonlai [5k\]: GNU wins lots of game :O
-]
-;W[go]CR[go]WL[2835.18]
-;B[fn]CR[fn]BL[3121.231]
-;W[dl]CR[dl]WL[2832.842]
-;B[bk]CR[bk]BL[3112.753]
-;W[io]CR[io]WL[2803.329]C[kalim [12k\]: I wonder if it counts the value of its move
-]
-;B[eb]CR[eb]BL[3093.17]C[gunnar [?\]: GNU thinks it's ahead by 12.
-]
-;W[fh]CR[fh]WL[2773.098]
-;B[ji]CR[ji]BL[3074.603]C[olczyk [15k\]: I thinbkm probably more.
-]
-;W[of]CR[of]WL[2763.893]C[kalim [12k\]: i thought these bots play blitz well, why is it that they have a hour each?
-]
-;B[kn]CR[kn]BL[3054.067]C[Zark [5k\]: that means GNU wont play e1?
+;B[kn]C[Zark [5k\]: that means GNU wont play e1?
 gunnar [?\]: E1 is not on the top ten list.
 ]
-;W[hq]CR[hq]WL[2731.935]C[maproom [7k\]: these events have a variety of time limits, to suit all preferences
+;W[hq]
+C[maproom [7k\]: these events have a variety of time limits, to suit all preferences
 ]
-;B[li]CR[li]BL[3030.813]C[olczyk [15k\]: N11 seems a bit conservative.
-]
-;W[oj]CR[oj]WL[2695.329]C[kalim [12k\]: h3 is baffling
-]
-;B[es]CR[es]BL[3021.04]C[gunnar [?\]: M11, N10 and N11 were all very close.
+;B[li]C[olczyk [15k\]: N11 seems a bit conservative.
+];W[oj]
+C[kalim [12k\]: h3 is baffling
+];B[es]
+C[gunnar [?\]: M11, N10 and N11 were all very close.
 gunnar [?\]: O9 second choice after E1.
 ]
-;W[qe]CR[qe]WL[2665.499]C[jasonlai [5k\]: *.*
-]
-;B[nk]CR[nk]BL[2996.351]
-;W[kp]CR[kp]WL[2636.514]C[gunnar [?\]: GNU now thinks it's ahead by 36.
-]
-;B[rd]CR[rd]BL[2978.255]
-;W[np]CR[np]WL[2625.573]C[jasonlai [5k\]: are you GNU ?
+;W[qe]C[jasonlai [5k\]: *.*
+];B[nk];W[kp]
+C[gunnar [?\]: GNU now thinks it's ahead by 36.
+];B[rd];W[np]
+C[jasonlai [5k\]: are you GNU ?
 jasonlai [5k\]: @.@
 kalim [12k\]: probably the creator
 ]
-;B[on]CR[on]BL[2952.139]
-;W[re]CR[re]WL[2595.086]C[gunnar [?\]: GNU is running on my computer and I have its trace output on screen.
+;B[on];W[re]
+C[gunnar [?\]: GNU is running on my computer and I have its trace output on screen.
 ]
-;B[rk]CR[rk]BL[2926.547]C[olczyk [15k\]: You must have a faster computer then the bot.
+;B[rk]C[olczyk [15k\]: You must have a faster computer then the bot.
 ]
-;W[mh]CR[mh]WL[2560.582]C[jasonlai [5k\]: how to set a bot?
-]
-;B[ri]CR[ri]BL[2907.063]
-;W[no]CR[no]WL[2547.562]C[Zark [5k\]: what level is Gnu set on? (if it is not secret)
+;W[mh]C[jasonlai [5k\]: how to set a bot?
+];B[ri];W[no]
+C[Zark [5k\]: what level is Gnu set on? (if it is not secret)
 gunnar [?\]: Level 14, --large-scale option.
 ]
-;B[nn]CR[nn]BL[2877.446]C[jasonlai [5k\]: which programme do you set the bot?
-]
-;W[pp]CR[pp]WL[2530.604]C[micro [16k\]: GNU is so strong that i can't win@@
+;B[nn]C[jasonlai [5k\]: which programme do you set the bot?
+];W[pp]
+C[micro [16k\]: GNU is so strong that i can't win@@
 jasonlai [5k\]: @@"
 gunnar [?\]: Set? The program connecting it here is called kgsGtp.
 jasonlai [5k\]: how can download it?
 ]
-;B[op]CR[op]BL[2808.533]C[jasonlai [5k\]: i want to make a bot :o
+;B[op]C[jasonlai [5k\]: i want to make a bot :o
 olczyk [15k\]: surf kgs site.
 ]
-;W[oo]CR[oo]WL[2503.193]C[kalim [12k\]: maybe the links in the chat channel will help
+;W[oo]C[kalim [12k\]: maybe the links in the chat channel will help
 ]
-;B[po]CR[po]BL[2790.555]C[olczyk [15k\]: P4 interesting move.
+;B[po]C[olczyk [15k\]: P4 interesting move.
 jasonlai [5k\]: i want to make a killer bot xd
 gunnar [?\]: http://www.weddslist.com/kgs/how/outline.html
 ]
-;W[qq]CR[qq]WL[2467.823]C[jasonlai [5k\]: thank you :D
-]
-;B[pq]CR[pq]BL[2759.007]
-;W[rj]CR[rj]WL[2437.858]
-;B[sj]CR[sj]BL[2727.014]
-;W[pr]CR[pr]WL[2407.207]
-;B[or]CR[or]BL[2648.714]
-;W[hb]CR[hb]WL[2376.702]
-;B[ib]CR[ib]BL[2619.809]
-;W[hc]CR[hc]WL[2343.755]
-;B[hd]CR[hd]BL[2579.633]
-;W[ea]CR[ea]WL[2314.918]
-;B[fb]CR[fb]BL[2560.438]C[LemonEyes [16k\]: oh, okay, found it
-]
-;W[gr]CR[gr]WL[2281.858]
-;B[qi]CR[qi]BL[2542.984]C[kalim [12k\]: hmm, ko or no ko for bot
-]
-;W[pi]CR[pi]WL[2250.829]C[gunnar [?\]: White should worry about M3, but GNU doesn't know about it either.
+;W[qq]C[jasonlai [5k\]: thank you :D
+];B[pq];W[rj];B[sj];W[pr];B[or]
+;W[hb];B[ib];W[hc];B[hd];W[ea];B[fb]
+C[LemonEyes [16k\]: oh, okay, found it
+];W[gr];B[qi]
+C[kalim [12k\]: hmm, ko or no ko for bot
+];W[pi]
+C[gunnar [?\]: White should worry about M3, but GNU doesn't know about it either.
 jasonlai [5k\]: how to get a  Go-playing program -_-"
 gunnar [?\]: Um, never mind, M3 doesn't work.
 ]
-;B[mp]CR[mp]BL[2498.81]C[gunnar [?\]: But N4 does. :-)
-]
-;W[gf]CR[gf]WL[2222.532]
-;B[fs]CR[fs]BL[2473.622]C[LemonEyes [16k\]: I wonder the rank of the programmers
+;B[mp]C[gunnar [?\]: But N4 does. :-)
+];W[gf];B[fs]
+C[LemonEyes [16k\]: I wonder the rank of the programmers
 jasonlai [5k\]: ?.?
 ]
-;W[lq]CR[lq]WL[2194.274]C[LemonEyes [16k\]: It'd be fun to have your own program outsmart you "'at a'boy, I'm so proud"
+;W[lq]
+C[LemonEyes [16k\]: It'd be fun to have your own program outsmart you "'at a'boy, I'm so proud"
 Zark [5k\]: what does Gnu say about top groub?
 ]
-;B[dc]CR[dc]BL[2438.439]
-;W[cc]CR[cc]WL[2188.74]C[jasonlai [5k\]: seki
+;B[dc];W[cc]C[jasonlai [5k\]: seki
 jasonlai [5k\]: lol
 gunnar [?\]: The most active GNU Go programmers range from 4 dan to a couple of kyu.
 ]
-;B[ec]CR[ec]BL[2389.427]C[LemonEyes [16k\]: okay, so that doesn't generally happen
+;B[ec]C[LemonEyes [16k\]: okay, so that doesn't generally happen
 ]
-;W[ge]CR[ge]WL[2161.115]
-;B[cb]CR[cb]BL[2373.24]
-;W[gd]CR[gd]WL[2155.187]
-;B[gc]CR[gc]BL[2343.827]C[gunnar [?\]: No worries on the top now.
+;W[ge];B[cb];W[gd];B[gc]C[gunnar [?\]: No worries on the top now.
 olczyk [15k\]: indigobot dcoers not count liberties well.
 ]
-;W[bb]CR[bb]WL[2131.864]C[LemonEyes [16k\]: what's the best bot on KGS?
-]
-;B[da]CR[da]BL[2319.101]C[LemonEyes [16k\]: what rank i mean
+;W[bb]C[LemonEyes [16k\]: what's the best bot on KGS?
+];B[da]
+C[LemonEyes [16k\]: what rank i mean
 kalim [12k\]: the bot that is playing black I think
 PaperTiger [12k\]: 12k
 ]
-;W[rp]CR[rp]WL[2103.746]C[LemonEyes [16k\]: really, is that all?
+;W[rp]C[LemonEyes [16k\]: really, is that all?
 PaperTiger [12k\]: Pretty strong for a bot :)
 olczyk [15k\]: What about gopp?
 Tobamf [6k?\]: comp go is more fun than pro Go
 PaperTiger [12k\]: It's 12k too.
 ]
-;B[rq]CR[rq]BL[2265.318]
-;W[qr]CR[qr]WL[2075.654]C[LemonEyes [16k\]: how about in the whole wide world of computer go? how good's the best program?
+;B[rq];W[qr]
+C[LemonEyes [16k\]: how about in the whole wide world of computer go? how good's the best program?
 PaperTiger [12k\]: Same thing.
 ]
-;B[ro]CR[ro]BL[2240.965]C[LemonEyes [16k\]: that's great! I have a new goal!
+;B[ro]C[LemonEyes [16k\]: that's great! I have a new goal!
 PaperTiger [12k\]: The top bots are all at the same level.
 ]
-;W[nq]CR[nq]WL[2043.602]C[PaperTiger [12k\]: To beat the bot or program the best bot?
+;W[nq]C[PaperTiger [12k\]: To beat the bot or program the best bot?
 ]
-;B[bc]CR[bc]BL[2209.549]
-;W[cd]CR[cd]WL[2023.762]C[LemonEyes [16k\]: to beat the best. I don't program, although that would be an exhilarating challenge as well
+;B[bc];W[cd]
+C[LemonEyes [16k\]: to beat the best. I don't program, although that would be an exhilarating challenge as well
 ]
-;B[ba]CR[ba]BL[2166.239]C[Tobamf [6k?\]: it might just turn into a frustrating challenge
+;B[ba]
+C[Tobamf [6k?\]: it might just turn into a frustrating challenge
 ]
-;W[nr]CR[nr]WL[1976.468]C[LemonEyes [16k\]: yeah, i could see that happening too
+;W[nr]C[LemonEyes [16k\]: yeah, i could see that happening too
 ]
-;B[ns]CR[ns]BL[2140.818]C[PaperTiger [12k\]: Gonna be a slow and painful endgame.
+;B[ns]C[PaperTiger [12k\]: Gonna be a slow and painful endgame.
 LemonEyes [16k\]: 6 pts isn't too shabby at this point is it?
 olczyk [15k\]: What would be cool is to have a bot which connects too your brain. So you can  ask it questions and play based on the answers.
 ]
-;W[ih]CR[ih]WL[1948.334]C[PaperTiger [12k\]: <-- Doesn't want robots connected to his brain.
+;W[ih]
+C[PaperTiger [12k\]: <-- Doesn't want robots connected to his brain.
 LemonEyes [16k\]: o3 might have been played, certainly by a human i'd think
 olczyk [15k\]: I do. As long as they are not made by Microsoft.
 ]
-;B[ls]CR[ls]BL[2089.41]C[LemonEyes [16k\]: what would be cool is if a google search were just a thought away, think of the pop-up ads
+;B[ls]
+C[LemonEyes [16k\]: what would be cool is if a google search were just a thought away, think of the pop-up ads
 ]
-;W[ii]CR[ii]WL[1943.519]C[LemonEyes [16k\]: you'd black out and buy a pepsi
-]
-;B[fe]CR[fe]BL[2071.242]C[jasonlai [5k\]: gunnar
+;W[ii]C[LemonEyes [16k\]: you'd black out and buy a pepsi
+];B[fe]
+C[jasonlai [5k\]: gunnar
 jasonlai [5k\]: which programm do you run up th bot?
 ]
-;W[ij]CR[ij]WL[1915.109]C[Tobamf [6k?\]: somehow that doesnt sound so thrilling LemonEyes
+;W[ij]
+C[Tobamf [6k?\]: somehow that doesnt sound so thrilling LemonEyes
 Ambivlnce [14k\]: I thought the idea of a direct jack to the brain was cool ... right up till the pop up ads.
 LemonEyes [16k\]: maybe I'm just a romantic ;)
 ]
-;B[jj]CR[jj]BL[2023.31]
-;W[jk]CR[jk]WL[1898.649]
-;B[ik]CR[ik]BL[2005.066]
-;W[kk]CR[kk]WL[1869.468]
-;B[kl]CR[kl]BL[1965.498]C[kalim [12k\]: indigo just insists on donating stones
-]
-;W[jl]CR[jl]WL[1865.05]
-;B[jm]CR[jm]BL[1941.553]
-;W[lk]CR[lk]WL[1843.701]C[gunnar [?\]: No, GNU is getting itself into trouble.
-]
-;B[mj]CR[mj]BL[1908.233]
-;W[il]CR[il]WL[1836.02]
-;B[gn]CR[gn]BL[1864.034]
-;W[hk]CR[hk]WL[1831.711]
-;B[hn]CR[hn]BL[1846.205]
-;W[ho]CR[ho]WL[1803.579]
-;B[kr]CR[kr]BL[1829.248]
-;W[jr]CR[jr]WL[1770.681]
-;B[gj]CR[gj]BL[1801.932]
-;W[lm]CR[lm]WL[1759.022]
-;B[ln]CR[ln]BL[1765.92]
-;W[mm]CR[mm]WL[1751.329]
-;B[mn]CR[mn]BL[1747.818]
-;W[mk]CR[mk]WL[1745.91]
-;B[nj]CR[nj]BL[1726.845]
-;W[km]CR[km]WL[1733.783]
-;B[jo]CR[jo]BL[1697.847]
-;W[jp]CR[jp]WL[1727.819]C[gunnar [?\]: K5 blunder.
+;B[jj];W[jk];B[ik];W[kk];B[kl]
+C[kalim [12k\]: indigo just insists on donating stones
+];W[jl];B[jm]
+;W[lk]C[gunnar [?\]: No, GNU is getting itself into trouble.
+];B[mj]
+;W[il];B[gn];W[hk];B[hn];W[ho];B[kr];W[jr];B[gj];W[lm];B[ln];W[mm]
+;B[mn];W[mk];B[nj];W[km];B[jo];W[jp]C[gunnar [?\]: K5 blunder.
 kalim [12k\]: ^^
 ]
-;B[kh]CR[kh]BL[1683.949]
-;W[pk]CR[pk]WL[1703.148]C[kalim [12k\]: and indigo didnt catch it
+;B[kh];W[pk]C[kalim [12k\]: and indigo didnt catch it
 gunnar [?\]: There's lots of time to catch on to it.
 Zark [5k\]: question is who will first
 ]
-;B[rg]CR[rg]BL[1611.557]C[gunnar [?\]: GNU has H8 as nineth move for 1.31 points.
+;B[rg]C[gunnar [?\]: GNU has H8 as nineth move for 1.31 points.
 ]
-;W[pl]CR[pl]WL[1697.228]
-;B[cj]CR[cj]BL[1607.383]
-;W[pn]CR[pn]WL[1695.349]C[gunnar [?\]: ???
+;W[pl];B[cj];W[pn]C[gunnar [?\]: ???
 Zark [5k\]: good move!
+];B[pm]
+;W[qn]C[Zark [5k\]: or maybe not
+];B[qm];W[rn];B[sp]
+C[kalim [12k\]: whats it doing for the minute or so between moves?
 ]
-;B[pm]CR[pm]BL[1583.178]
-;W[qn]CR[qn]WL[1692.395]C[Zark [5k\]: or maybe not
+;W[bi];B[ni];W[qh];B[rh];W[rr];B[sr]
+C[Tobamf [6k?\]: it must be doing minuteia
+];W[rm]
+C[Ambivlnce [14k\]: It's composing poetry.
+];B[ph]
+C[kalim [12k\]: loves letters to idiotbot
+];W[oi];B[oh];W[nh];B[ok]
+;W[og];B[pj];W[ps];B[os];W[nd];B[lb];W[nc];B[nb];W[kb];B[od]
+C[kalim [12k\]: sneaky bot
+];W[oe];B[ne];W[pd];B[pc];W[me];B[md]
+;W[le];B[pg];W[hs];B[ds];W[bs];B[nf];W[ng];B[nd];W[cl];B[bl];W[jd]
+;B[qf];W[id];B[ha]C[kalim [12k\]: hey, theres some L and D there
 ]
-;B[qm]CR[qm]BL[1500.439]
-;W[rn]CR[rn]WL[1672]
-;B[sp]CR[sp]BL[1472.959]C[kalim [12k\]: whats it doing for the minute or so between moves?
+;W[an];B[ac];W[am];B[ei];W[ak];B[di];W[fi];B[fj];W[al];B[lg];W[mg]
+;B[fg];W[gh];B[eh];W[dh];B[eg];W[rb];B[sd];W[qd];B[rc];W[bd];B[jg]
+;W[hf];B[gb];W[qb];B[ig];W[hh];B[se];W[pf];B[rf];W[hj];B[hl];W[gl]
+;B[hm];W[kj];B[jh]
+C[gunnar [?\]: White is a bit short in the eye department.
+];W[ko]
+;B[jn];W[hi];B[pe];W[nl];B[gk];W[nm];B[ll];W[ed];B[fd];W[je];B[hc]
+;W[pb];B[ob];W[mr];B[ms];W[lr];B[ad];W[qo];B[pp];W[ks];B[js]
+C[PaperTiger [12k\]: If white was a Unix kernel you'd see a bunch of PANIC in the logs.
 ]
-;W[bi]CR[bi]WL[1661.029]
-;B[ni]CR[ni]BL[1468.856]
-;W[qh]CR[qh]WL[1646.616]
-;B[rh]CR[rh]BL[1464.301]
-;W[rr]CR[rr]WL[1621.135]
-;B[sr]CR[sr]BL[1453.99]C[Tobamf [6k?\]: it must be doing minuteia
-]
-;W[rm]CR[rm]WL[1591.766]C[Ambivlnce [14k\]: It's composing poetry.
-]
-;B[ph]CR[ph]BL[1443.885]C[kalim [12k\]: loves letters to idiotbot
-]
-;W[oi]CR[oi]WL[1565.598]
-;B[oh]CR[oh]BL[1435.95]
-;W[nh]CR[nh]WL[1563.42]
-;B[ok]CR[ok]BL[1432.07]
-;W[og]CR[og]WL[1558.017]
-;B[pj]CR[pj]BL[1429.209]
-;W[ps]CR[ps]WL[1534.003]
-;B[os]CR[os]BL[1414.352]
-;W[nd]CR[nd]WL[1504.25]
-;B[lb]CR[lb]BL[1409.96]
-;W[nc]CR[nc]WL[1474.999]
-;B[nb]CR[nb]BL[1404.371]
-;W[kb]CR[kb]WL[1464.111]
-;B[od]CR[od]BL[1402.146]C[kalim [12k\]: sneaky bot
-]
-;W[oe]CR[oe]WL[1434.102]
-;B[ne]CR[ne]BL[1400.165]
-;W[pd]CR[pd]WL[1410.236]
-;B[pc]CR[pc]BL[1392.643]
-;W[me]CR[me]WL[1384.192]
-;B[md]CR[md]BL[1387.849]
-;W[le]CR[le]WL[1366.898]
-;B[pg]CR[pg]BL[1385.264]
-;W[hs]CR[hs]WL[1359.931]
-;B[ds]CR[ds]BL[1382.486]
-;W[bs]CR[bs]WL[1350.555]
-;B[nf]CR[nf]BL[1378.574]
-;W[ng]CR[ng]WL[1324.092]
-;B[nd]CR[nd]BL[1375.604]
-;W[cl]CR[cl]WL[1320.947]
-;B[bl]CR[bl]BL[1372.255]
-;W[jd]CR[jd]WL[1319.314]
-;B[qf]CR[qf]BL[1369.572]
-;W[id]CR[id]WL[1314.636]
-;B[ha]CR[ha]BL[1367.766]C[kalim [12k\]: hey, theres some L and D there
-]
-;W[an]CR[an]WL[1306.249]
-;B[ac]CR[ac]BL[1365.486]
-;W[am]CR[am]WL[1281.485]
-;B[ei]CR[ei]BL[1362.992]
-;W[ak]CR[ak]WL[1276.446]
-;B[di]CR[di]BL[1355.55]
-;W[fi]CR[fi]WL[1272.312]
-;B[fj]CR[fj]BL[1353.29]
-;W[al]CR[al]WL[1262.14]
-;B[lg]CR[lg]BL[1349.978]
-;W[mg]CR[mg]WL[1255.579]
-;B[fg]CR[fg]BL[1346.193]
-;W[gh]CR[gh]WL[1251.894]
-;B[eh]CR[eh]BL[1344.218]
-;W[dh]CR[dh]WL[1250.284]
-;B[eg]CR[eg]BL[1340.991]
-;W[rb]CR[rb]WL[1230.183]
-;B[sd]CR[sd]BL[1330.592]
-;W[qd]CR[qd]WL[1224.978]
-;B[rc]CR[rc]BL[1325.305]
-;W[bd]CR[bd]WL[1201.923]
-;B[jg]CR[jg]BL[1318.845]
-;W[hf]CR[hf]WL[1199.95]
-;B[gb]CR[gb]BL[1315.384]
-;W[qb]CR[qb]WL[1171.099]
-;B[ig]CR[ig]BL[1313.788]
-;W[hh]CR[hh]WL[1166.809]
-;B[se]CR[se]BL[1312.789]
-;W[pf]CR[pf]WL[1147.07]
-;B[rf]CR[rf]BL[1311.872]
-;W[hj]CR[hj]WL[1143.586]
-;B[hl]CR[hl]BL[1310.76]
-;W[gl]CR[gl]WL[1139.408]
-;B[hm]CR[hm]BL[1309.523]
-;W[kj]CR[kj]WL[1136.135]
-;B[jh]CR[jh]BL[1307.885]C[gunnar [?\]: White is a bit short in the eye department.
-]
-;W[ko]CR[ko]WL[1129.744]
-;B[jn]CR[jn]BL[1305.137]
-;W[hi]CR[hi]WL[1121.983]
-;B[pe]CR[pe]BL[1303.775]
-;W[nl]CR[nl]WL[1120.204]
-;B[gk]CR[gk]BL[1302.68]
-;W[nm]CR[nm]WL[1117.251]
-;B[ll]CR[ll]BL[1301.642]
-;W[ed]CR[ed]WL[1115.911]
-;B[fd]CR[fd]BL[1300.63]
-;W[je]CR[je]WL[1091.798]
-;B[hc]CR[hc]BL[1299.599]
-;W[pb]CR[pb]WL[1066.819]
-;B[ob]CR[ob]BL[1297.973]
-;W[mr]CR[mr]WL[1065.101]
-;B[ms]CR[ms]BL[1295.236]
-;W[lr]CR[lr]WL[1060.936]
-;B[ad]CR[ad]BL[1293.761]
-;W[qo]CR[qo]WL[1055.708]
-;B[pp]CR[pp]BL[1284.877]
-;W[ks]CR[ks]WL[1051.44]
-;B[js]CR[js]BL[1282.855]C[PaperTiger [12k\]: If white was a Unix kernel you'd see a bunch of PANIC in the logs.
-]
-;W[is]CR[is]WL[1037.138]
-;B[ks]CR[ks]BL[1280.347]
-;W[kq]CR[kq]WL[1035.719]
-;B[rp]CR[rp]BL[1278.473]
-;W[so]CR[so]WL[1034.142]
-;B[sn]CR[sn]BL[1277.472]
-;W[sm]CR[sm]WL[1032.257]
-;B[ir]CR[ir]BL[1275.359]
-;W[hr]CR[hr]WL[1030.665]
-;B[rs]CR[rs]BL[1274.06]
-;W[bf]CR[bf]WL[1026.078]
-;B[ae]CR[ae]BL[1273.091]
-;W[so]CR[so]WL[1024.528]
-;B[qs]CR[qs]BL[1271.816]
-;W[bg]CR[bg]WL[1004.093]
-;B[af]CR[af]BL[1270.932]
-;W[ag]CR[ag]WL[987.347]
-;B[ab]CR[ab]BL[1270.318]
-;W[lo]CR[lo]WL[974.088]
-;B[aq]CR[aq]BL[1269.521]
-;W[ap]CR[ap]WL[964.421]
-;B[dj]CR[dj]BL[1268.267]
-;W[lh]CR[lh]WL[963.399]
-;B[ki]CR[ki]BL[1267.462]
-;W[lf]CR[lf]WL[962.169]
-;B[kg]CR[kg]BL[1266.796]
-;W[lp]CR[lp]WL[952.212]
-;B[fr]CR[fr]BL[1266.089]
-;W[ef]CR[ef]WL[945.666]
-;B[in]CR[in]BL[1265.164]
-;W[lj]CR[lj]WL[944.704]
-;B[mi]CR[mi]BL[1264.05]
-;W[gp]CR[gp]WL[943.329]
-;B[qk]CR[qk]BL[1263.324]
-;W[iq]CR[iq]WL[941.022]
-;B[pa]CR[pa]BL[1262.634]
-;W[jb]CR[jb]WL[934.856]
-;B[la]CR[la]BL[1261.991]
-;W[cg]CR[cg]WL[930.727]
-;B[oa]CR[oa]BL[1261.502]
-;W[ce]CR[ce]WL[929.427]
-;B[qe]CR[qe]BL[1261.075]
-;W[]WL[929.427]
-;B[rj]CR[rj]BL[1260.682]
-;W[as]CR[as]WL[919.835]
-;B[cs]CR[cs]BL[1260.084]
-;W[jc]CR[jc]WL[912.455]
-;B[om]CR[om]BL[1259.326]
-;W[ml]CR[ml]WL[911.664]
-;B[ia]CR[ia]BL[1258.875]
-;W[]WL[911.664]
-;B[dk]CR[dk]BL[1258.507]
-;W[]WL[911.664]
-;B[pi]CR[pi]BL[1258.139]
-;W[]WL[911.664]
-;B[dn]CR[dn]BL[1257.808]
-;W[]WL[911.664]
-;B[mb]CR[mb]BL[1257.504]
-;W[]WL[911.664]
-;B[rl]CR[rl]BL[1257.182]
-;W[]WL[911.664]
-;B[sl]CR[sl]BL[1256.855]
-;W[]WL[911.664]
-;B[sn]CR[sn]BL[1256.528]
-;W[]WL[911.664]
-;B[sm]CR[sm]BL[1256.195]
-;W[]WL[911.664]
-;B[rn]CR[rn]BL[1255.784]
-;W[]WL[911.664]
-;B[]BL[1255.784]TW[cf][ah][bh][ch][ai][aj][ao][hp][ip][gq][ir]TB[aa][ca][ea][fa][ga][ja][ka][ma][na][qa][ra][sa][bb][db][hb][jb][kb][pb][qb][rb][sb][jc][kc][lc][nc][sc][gd][id][jd][kd][pd][qd][ge][je][ke][le][me][oe][re][gf][hf][if][jf][kf][lf][mf][of][pf][sf][gg][hg][mg][ng][og][qg][sg][fh][gh][hh][ih][lh][mh][nh][qh][sh][fi][hi][ii][oi][si][ej][hj][ij][kj][lj][oj][qj][ek][hk][ik][jk][kk][lk][mk][pk][sk][cl][dl][el][gl][il][jl][kl][ll][ml][nl][pl][dm][gm][km][lm][mm][nm][rm][en][pn][qn][eo][qo][so][qq][sq][pr][qr][rr][as][bs][ps][ss]C[jasonlai [5k\]: @@"
+;W[is];B[ks];W[kq];B[rp];W[so];B[sn];W[sm];B[ir];W[hr];B[rs];W[bf]
+;B[ae];W[so];B[qs];W[bg];B[af];W[ag];B[ab];W[lo];B[aq];W[ap];B[dj]
+;W[lh];B[ki];W[lf];B[kg];W[lp];B[fr];W[ef];B[in];W[lj];B[mi];W[gp]
+;B[qk];W[iq];B[pa];W[jb];B[la];W[cg];B[oa];W[ce];B[qe];W[];B[rj]
+;W[as];B[cs];W[jc];B[om];W[ml];B[ia];W[];B[dk];W[];B[pi];W[];B[dn]
+;W[];B[mb];W[];B[rl];W[];B[sl];W[];B[sn];W[];B[sm];W[];B[rn];W[];B[]
+TB[aa][ca][ea][fa][ga][ja][ka][ma][na][qa][ra][sa][bb][db][hb][jb]
+[kb][pb][qb][rb][sb][jc][kc][lc][nc][sc][gd][id][jd][kd][pd][qd][ge]
+[je][ke][le][me][oe][re][gf][hf][if][jf][kf][lf][mf][of][pf][sf][gg]
+[hg][mg][ng][og][qg][sg][fh][gh][hh][ih][lh][mh][nh][qh][sh][fi][hi]
+[ii][oi][si][ej][hj][ij][kj][lj][oj][qj][ek][hk][ik][jk][kk][lk][mk]
+[pk][sk][cl][dl][el][gl][il][jl][kl][ll][ml][nl][pl][dm][gm][km][lm]
+[mm][nm][rm][en][pn][qn][eo][qo][so][qq][sq][pr][qr][rr][as][bs][ps]
+[ss]TW[cf][ah][bh][ch][ai][aj][ao][hp][ip][gq][ir]
+C[jasonlai [5k\]: @@"
 ])
