@@ -113,7 +113,7 @@ loadsgf games/incident42.sgf 58
 increase_depths
 trymove B S15
 27 defend P16
-#? [1 T15]
+#? [1 T15|O13|P12]
 popgo
 decrease_depths
 
@@ -296,7 +296,7 @@ loadsgf games/reading05.sgf
 
 loadsgf games/nicklas/nicklas11.sgf 244
 64 defend P8
-#? [3 N1]
+#? [3 N1|R3|R2]
 
 loadsgf games/reading06.sgf
 65 defend S5

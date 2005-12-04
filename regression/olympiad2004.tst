@@ -65,7 +65,7 @@ loadsgf games/olympiad2004/19x19/gnu-ind.sgf 203
 
 # L9 is zero points gote.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 223
-12 restrcited_genmove black L9 F7
+12 restricted_genmove black L9 F7
 #? [F7]*
 
 # A7 solves the tactical problem as well as B10 but also splits the
