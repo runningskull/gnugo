@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- regress.pike can run multiple engines in parallel (-j option)
 - correction of color in order_moves() call in reading.c
 - doc revision, updated instruction for setting up HTML regression views
 - find_connection_moves() revised

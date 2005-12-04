@@ -1,13 +1,8 @@
 #!/usr/bin/env pike
 
-static Thread.Queue writing_finished;
-static Thread.Queue reading_finished;
 static int debug = 0;
-static mapping(int:string) correct_results = ([]);
-static multiset expected_failures = (<>);
-static int timebase;
-static float last_time;
 static int verbose = 0;
+Thread.Queue testsuite_queue;
 
 /* General class to manage a high-score list (e.g. of slow tests, tests
  * with many nodes, ..)
@@ -52,13 +47,18 @@ class Highscorelist
   }
 }
 
+Highscorelist slow_moves;
+int report_slow = 0;
+
 class Testsuite
 {
   string name;
+  mapping(int:string) correct_results = ([]);
+  multiset expected_failures = (<>);
   int reading_nodes;
   int owl_nodes;
   int connection_nodes;
-  float time;
+  float walltime;
   float cputime;
   float uncertainty;
   
@@ -67,6 +67,12 @@ class Testsuite
   array(int) PASS;
   array(int) FAIL;
 
+  Thread.Queue writing_finished;
+  Thread.Queue reading_finished;
+  Thread.Queue write_queue;
+  int timebase;
+  float last_time;
+
   void create(string s)
   {
     name = s;
@@ -74,132 +80,207 @@ class Testsuite
     owl_nodes = 0;
     connection_nodes = 0;
     uncertainty = 0.0;
-    time = 0.0;
+    walltime = 0.0;
     pass = ({});
     fail = ({});
     PASS = ({});
     FAIL = ({});
   }
-}
 
-array(Testsuite) testsuites = ({});
-Testsuite current_testsuite;
-
-Highscorelist slow_moves;
-int report_slow = 0;
-
-void send(Thread.Queue out, string|void s)
-{
-  if (!s) {
-    if (debug)
-      werror("Finishing sending.\n");
+  static void finish()
+  {
+    write("%-37s %7.2f %9d %7d %8d\n", name, cputime, reading_nodes, owl_nodes,
+	  connection_nodes);
   }
-  else {
+
+  static void program_reader(object f)
+  {
+    int test_number;
+    
     if (debug)
-      werror("Sent: " + s + "\n");
-    out->write(s + "\n");
+      werror("Waiting for writing to be finished.\n");
+    writing_finished->read();
+    if (debug)
+      werror("Finished waiting for writing to be finished.\n");
+    
+    while (1) {
+      string s = f->gets();
+      float current_time = time(timebase);
+      if (!s)
+	break;
+      if (debug)
+	werror("Recv: " + s + "\n");
+      
+      int number;
+      string answer;
+      if (sscanf(s, "=%d %s", number, answer)) {
+	if (number < 10000 || number > 10005) {
+	  test_number = (int) number;
+	  string correct = correct_results[test_number];
+	  if (!correct) {
+	    correct = "correct result missing, check the test suite";
+	    correct_results[test_number] = correct;
+	  }
+	  int negate = 0;
+	  if (correct[0] == '!') {
+	    correct = correct[1..];
+	    negate = 1;
+	  }
+	  correct = "^" + correct + "$";
+	  object re = Regexp(correct);
+	  string result = (negate ^ re->match(answer)) ? "pass" : "fail";
+	  
+	  if (result == "pass" && expected_failures[test_number])	{
+	    result = "PASS";
+	  }
+	  if (result == "fail" && !expected_failures[test_number]) {
+	    result = "FAIL";
+	  }
+	  current_testsuite[result] += ({test_number});
+	  walltime += (current_time - last_time);
+	  if (report_slow)
+	    slow_moves->add_score(current_time - last_time,
+				  name + ":" + test_number);
+	  
+	  if (result == "PASS" || result == "FAIL" || verbose)
+	    write("%-15s %s %s [%s]\n", name + ":" + test_number,
+		  result, answer, correct_results[test_number]);
+	  last_time = current_time;
+	}
+	else if (number == 10000)
+	  reading_nodes += (int) answer;
+	else if (number == 10001)
+	  owl_nodes += (int) answer;
+	else if (number == 10002)
+	  connection_nodes += (int) answer;
+	else if (number == 10003)
+	  cputime = (float) answer;
+	else if (number == 10005)
+	  uncertainty += (float) answer;
+	else if (number == 10004)
+	  break;
+      }
+      else if (sscanf(s, "?%s", answer)) {
+	number = -1;
+	sscanf(answer, "%d", number);
+	write("%-15s ?%s\n", name + ":", answer);
+      }
+    }
+    if (debug)
+      werror("Reader closing down.\n");
+    finish();
+    f->close();
+    reading_finished->write("\n");
   }
-}
 
-static void finish()
-{
-  write("%-37s %7.2f %9d %7d %8d\n", current_testsuite->name,
-	current_testsuite->cputime,
-	current_testsuite->reading_nodes, current_testsuite->owl_nodes,
-	current_testsuite->connection_nodes);
-}
-
-static void program_reader(object f)
-{
-  int test_number;
-  if (debug)
-    werror("Waiting for writing to be finished.\n");
-  writing_finished->read();
-  if (debug)
-    werror("Finished Waiting for writing to be finished.\n");
-  while (1) {
-    string s = f->gets();
-    float current_time = time(timebase);
-    if (!s)
-      break;
+  static void program_writer(object f)
+  {
+    while (1) {
+      string s = write_queue->read();
+      if (s == "")
+	break;
+      f->write(s);
+    }
+    f->close();
     if (debug)
-      werror("Recv: " + s + "\n");
+      werror("Writer closed down\n");
+  }
+  
+  void send(string|void s)
+  {
+    if (!s) {
+      if (debug)
+	werror("Finishing sending.\n");
+    }
+    else {
+      if (debug)
+	werror("Sent: " + s + "\n");
+      write_queue->write(s + "\n");
+    }
+  }
+  
+  void run_testsuite(string suite_name, string engine,
+		     array(string) engine_options,
+		     mapping(string:mixed) options,
+		     array(int)|void test_numbers)
+  {
+    array(string) program_start_array = ({engine}) + engine_options;
+    
+    string testsuite = Stdio.read_file(suite_name);
+    if (!testsuite) {
+      werror("Couldn't find " + suite_name + "\n");
+      exit(1);
+    }
+    
+    if (options["valgrind"])
+      program_start_array = ({"valgrind"}) + program_start_array;
+    
+    if (options["check-unoccupied-answers"])
+      testsuite = modify_testsuite(testsuite);
+    
+    writing_finished = Thread.Queue();
+    reading_finished = Thread.Queue();
+    write_queue = Thread.Queue();
+    object f1 = Stdio.File();
+    object pipe1 = f1->pipe();
+    object f2 = Stdio.FILE();
+    object pipe2 = f2->pipe();
+    Process.create_process(program_start_array,
+			   (["stdin":pipe1, "stdout":pipe2]));
+    thread_create(program_reader, f2);
+    thread_create(program_writer, f1);
     
     int number;
     string answer;
-    if (sscanf(s, "=%d %s", number, answer)) {
-      if (number < 10000 || number > 10005) {
-	test_number = (int) number;
-	string correct = correct_results[test_number];
-	if (!correct) {
-	  correct = "correct result missing, check the test suite";
-	  correct_results[test_number] = correct;
-	}
-	int negate = 0;
-	if (correct[0] == '!') {
-	  correct = correct[1..];
-	  negate = 1;
-	}
-	correct = "^" + correct + "$";
-	object re = Regexp(correct);
-	string result = (negate ^ re->match(answer)) ? "pass" : "fail";
-	
-	if (result == "pass" && expected_failures[test_number])	{
-	  result = "PASS";
-	}
-	if (result == "fail" && !expected_failures[test_number]) {
-	  result = "FAIL";
-	}
-	current_testsuite[result] += ({test_number});
-	current_testsuite->time += (current_time - last_time);
- 	if (report_slow)
-	  slow_moves->add_score(current_time - last_time,
-			        current_testsuite->name + ":" + test_number);
-	
-	if (result == "PASS" || result == "FAIL" || verbose)
-	  write("%-15s %s %s [%s]\n",
-		current_testsuite->name + ":" + test_number, result, answer,
-		correct_results[test_number]);
-	last_time = current_time;
+    string expected;
+    
+    timebase = time();
+    last_time = time(timebase);
+    
+    correct_results = ([]);
+    expected_failures = (<>);
+    
+    if (test_numbers && sizeof(test_numbers) == 0)
+      test_numbers = 0;
+    
+    foreach (testsuite/"\n", string s) {
+      if (sscanf(s, "%d", number) == 1) {
+	if (number >= 10000 && number <= 10003)
+	  continue;
+	if (test_numbers && !has_value(test_numbers, number))
+	  continue;
+	if (correct_results[(int) number])
+	  write("Repeated test number " + number + ".\n");
+	send("reset_reading_node_counter");
+	send("reset_owl_node_counter");
+	send("reset_connection_node_counter");
+	send(s);
+	if (sscanf(s, "%*sreg_genmove%*s") == 2)
+	  send("10005 move_uncertainty");
+	send("10000 get_reading_node_counter");
+	send("10001 get_owl_node_counter");
+	send("10002 get_connection_node_counter");
+	send("10003 cputime");
       }
-      else if (number == 10000)
-	current_testsuite->reading_nodes += (int) answer;
-      else if (number == 10001)
-	current_testsuite->owl_nodes += (int) answer;
-      else if (number == 10002)
-	current_testsuite->connection_nodes += (int) answer;
-      else if (number == 10003)
-	current_testsuite->cputime = (float) answer;
-      else if (number == 10005)
-	current_testsuite->uncertainty += (float) answer;
-      else if (number == 10004)
-	break;
+      else if (sscanf(s, "#? [%[^]]]%s", answer, expected)) {
+	correct_results[(int)number] = answer;
+	if (expected == "*")
+	  expected_failures[(int)number] = 1;
+      }
+      else
+	send(write_queue, s);
     }
-    else if (sscanf(s, "?%s", answer)) {
-      number = -1;
-      sscanf(answer, "%d", number);
-      write("%-15s ?%s\n", current_testsuite->name + ":", answer);
-    }
+    
+    if (debug)
+      werror("Signalling finish of writing\n");
+    writing_finished->write("\n");
+    send("10004 cputime");
+    reading_finished->read();
+    send("10004 quit");
   }
-  if (debug)
-    werror("Reader closing down.\n");
-  finish();
-  f->close();
-  reading_finished->write("\n");
 }
 
-static void program_writer(Thread.Queue in, object f)
-{
-  while (1) {
-    string s = in->read();
-    if (s == "")
-      break;
-    f->write(s);
-  }
-  f->close();
-  if (debug)
-    werror("Writer closed down\n");
-}
+array(Testsuite) testsuites = ({});
 
 // Replace all tests in the testsuite with new tests checking whether
 // the given answers are unoccupied vertices.
@@ -227,88 +308,6 @@ string modify_testsuite(string testsuite)
   return s;
 }
 
-void run_testsuite(string suite_name, string engine,
-		   array(string) engine_options, mapping(string:mixed) options,
-		   array(int)|void test_numbers)
-{
-  array(string) program_start_array = ({engine}) + engine_options;
-
-  string testsuite = Stdio.read_file(suite_name);
-  if (!testsuite) {
-    werror("Couldn't find " + suite_name + "\n");
-    exit(1);
-  }
-
-  if (options["valgrind"])
-    program_start_array = ({"valgrind"}) + program_start_array;
-
-  if (options["check-unoccupied-answers"])
-    testsuite = modify_testsuite(testsuite);
-
-  writing_finished = Thread.Queue();
-  reading_finished = Thread.Queue();
-  Thread.Queue write_queue = Thread.Queue();
-  object f1 = Stdio.File();
-  object pipe1 = f1->pipe();
-  object f2 = Stdio.FILE();
-  object pipe2 = f2->pipe();
-  Process.create_process(program_start_array,
-			 (["stdin":pipe1, "stdout":pipe2]));
-  thread_create(program_reader, f2);
-  thread_create(program_writer, write_queue, f1);
-
-  int number;
-  string answer;
-  string expected;
-  
-  timebase = time();
-  last_time = time(timebase);
-  
-  correct_results = ([]);
-  expected_failures = (<>);
-  current_testsuite = Testsuite(suite_name - ".tst");
-  testsuites += ({current_testsuite});
-
-  if (test_numbers && sizeof(test_numbers) == 0)
-    test_numbers = 0;
-  
-  foreach (testsuite/"\n", string s) {
-    if (sscanf(s, "%d", number) == 1) {
-      if (number >= 10000 && number <= 10003)
-	continue;
-      if (test_numbers && !has_value(test_numbers, number))
-	continue;
-      if (correct_results[(int) number])
-	write("Repeated test number " + number + ".\n");
-      send(write_queue, "reset_reading_node_counter");
-      send(write_queue, "reset_owl_node_counter");
-      send(write_queue, "reset_connection_node_counter");
-      send(write_queue, s);
-      if (sscanf(s, "%*sreg_genmove%*s") == 2)
-	send(write_queue, "10005 move_uncertainty");
-      send(write_queue, "10000 get_reading_node_counter");
-      send(write_queue, "10001 get_owl_node_counter");
-      send(write_queue, "10002 get_connection_node_counter");
-      send(write_queue, "10003 cputime");
-    }
-    else if (sscanf(s, "#? [%[^]]]%s", answer, expected)) {
-      correct_results[(int)number] = answer;
-      if (expected == "*")
-	expected_failures[(int)number] = 1;
-    }
-    else
-      send(write_queue, s);
-  }
-  
-  if (debug)
-    werror("Signalling finish of writing\n");
-  writing_finished->write("\n");
-  send(write_queue, "10004 cputime");
-  reading_finished->read();
-  send(write_queue, "10004 quit");
-  send(write_queue, );
-}
-
 void final_report()
 {
   float total_time = 0.0;
@@ -321,7 +320,7 @@ void final_report()
   int number_unexpected_fail = 0;
 
   foreach (testsuites, Testsuite t) {
-    total_time       += t->time;
+    total_time       += t->walltime;
     total_cputime    += t->cputime;
     total_uncertainty += t->uncertainty;
     reading_nodes    += t->reading_nodes;
@@ -395,11 +394,13 @@ int main(int argc, array(string) argv)
 		   ({"slow_moves", Getopt.HAS_ARG, ({"-s", "--slow-moves"})}),
 		   ({"engine", Getopt.HAS_ARG, ({"-e", "--engine"})}),
 		   ({"options", Getopt.HAS_ARG, ({"-o", "--options"})}),
-		   ({"file", Getopt.HAS_ARG, ({"-f", "--file"})})});
+		   ({"file", Getopt.HAS_ARG, ({"-f", "--file"})}),
+		   ({"jobs", Getopt.HAS_ARG, ({"-j", "--jobs"})})});
 
   mapping(string:mixed) options = ([]);
   string engine = "";
   array(string) engine_options = ({});
+  int jobs = 1;
   
   foreach (Getopt.find_all_options(argv, all_options), array(mixed) option) {
     [string name, mixed value] = option;
@@ -443,6 +444,10 @@ int main(int argc, array(string) argv)
 	foreach ((testlist / "\n") - ({""}), string tests)
 	  testsuites |= ({parse_tests(partial_testsuites, tests)});
 	break;
+
+      case "jobs":
+	jobs = (int) value;
+	break;
     }
   }
 
@@ -466,11 +471,42 @@ int main(int argc, array(string) argv)
     }
   }
 
+  if (jobs < 1)
+    jobs = 1;
+
+  testsuite_queue = Thread.Queue();
+  
+  for (int j = 0; j < jobs; j++)
+    thread_create(run_testsuites, engine, engine_options,
+		  options, partial_testsuites);
+  
   foreach(testsuites, string testsuite)
-    run_testsuite(testsuite, engine, engine_options, options,
-		  partial_testsuites[testsuite]);
+    testsuite_queue->write(testsuite);
+
+  for (int j = 0; j < jobs; j++)
+    testsuite_queue->write("");
+
+  while (testsuite_queue->size() > 0)
+    sleep(1);
 
   final_report();
+}
+
+void run_testsuites(string engine, array(string) engine_options,
+		    mapping(string:mixed) options,
+		    mapping(string:array(int)) partial_testsuites)
+{
+  while (1) {
+    string suite_name = testsuite_queue->read();
+    if (suite_name == "")
+      break;
+    
+    Testsuite current_testsuite = Testsuite(suite_name - ".tst");
+    testsuites += ({current_testsuite});
+    
+    current_testsuite->run_testsuite(suite_name, engine, engine_options,
+				     options, partial_testsuites[suite_name]);
+  }
 }
 
 string help_message =
@@ -487,6 +523,7 @@ string help_message =
 "                                ../interface/gnugo.\n"
 "  -o, --options=OPTIONS         Options passed to the engine.\n"
 "  -f, --file=FILE               File containing a list of tests to run.\n"
+"  -j, --jobs=JOBS               Number of testsuites being run in parallel.\n"
 "\n"
 "Tests are listed on the command line in one of the following forms:\n"
 "reading           Run all tests in the testsuite reading.tst.\n"
