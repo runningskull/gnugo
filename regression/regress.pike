@@ -136,7 +136,7 @@ class Testsuite
 	  if (result == "fail" && !expected_failures[test_number]) {
 	    result = "FAIL";
 	  }
-	  current_testsuite[result] += ({test_number});
+	  this_object()[result] += ({test_number});
 	  walltime += (current_time - last_time);
 	  if (report_slow)
 	    slow_moves->add_score(current_time - last_time,
@@ -268,7 +268,7 @@ class Testsuite
 	  expected_failures[(int)number] = 1;
       }
       else
-	send(write_queue, s);
+	send(s);
     }
     
     if (debug)
