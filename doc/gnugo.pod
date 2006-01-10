@@ -171,7 +171,7 @@ Save the played game to I<file> in SGF format.
 
 B<--boardsize I<num>>
 
-Set the board size to use (5-21). Default is 19, other common formats are
+Set the board size to use (1-19). Default is 19, other common formats are
 13 and 9.
 
 B<--color I<color>>

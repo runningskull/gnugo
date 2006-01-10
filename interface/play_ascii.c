@@ -161,7 +161,7 @@ set_handicap_spots(int boardsize)
       /* ...and the middle one. */
       hspots[boardsize/2][boardsize/2] = '+';
     }
-    else {
+    else if (boardsize > 12) {
       /* Place the outer 4... */
       hspots[3][3] = '+';
       hspots[boardsize-4][3] = '+';

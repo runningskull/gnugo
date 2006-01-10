@@ -501,7 +501,11 @@ main(int argc, char *argv[])
 	  int boardsize = atoi(gg_optarg);
 	  
 	  if (boardsize < MIN_BOARD || boardsize > MAX_BOARD) {
-	    fprintf(stderr, "Unsupported board size: %d.\n", boardsize);
+	    fprintf(stderr, "Unsupported board size: %d. ", boardsize);
+	    if (boardsize < MIN_BOARD)
+	      fprintf(stderr, "Min size is %d.\n", MIN_BOARD);
+	    else
+	      fprintf(stderr, "Max size is %d.\n", MAX_BOARD);
 	    fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	    exit(EXIT_FAILURE);
 	  }
