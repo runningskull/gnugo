@@ -1,0 +1,30 @@
+(;GM[1]FF[4]
+SZ[9]KM[7.50]
+PW[GNU]WR[13k]
+PB[AyaBot]PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-01-08]AP[CGoban:2]
+EV[Tenth KGS Computer Go Tournament - Formal division]RE[B+7.50]
+TM[480]RU[Chinese]
+C[AyaBot [?\]: GTP Engine for AyaBot (black): Aya version 5.61
+GNU [13k\]: GTP Engine for GNU (white): GNU Go version 3.7.7
+]
+CA[UTF-8]RO[2]ST[2]
+;B[dc];W[cf];B[fc];W[bc];B[cd];W[bd]C[gunnar [?\]: B7 was really bad.
+]
+;B[ce];W[df]C[burtabel [3d\]: was that from the fuseki library?
+]
+;B[fg];W[be];B[ee];W[eh]C[gunnar [?\]: No, it was valued 26.48.
+]
+;B[eg];W[dh]C[gunnar [?\]: E4 second with 21.42.
+];B[dg];W[cg];B[fh]
+;W[cb];B[db];W[da];B[ea];W[ca];B[ei];W[eb];B[fb];W[fa];B[ga];W[gb]
+;B[ea];W[ha];B[fa]C[gunnar [?\]: Can that work?
+];W[ch]
+C[burtabel [3d\]: no
+];B[cc];W[bb];B[ef];W[di];B[de];W[fi];B[gh]
+;W[gi];B[hh];W[hi];B[ih];W[ei];B[ii];W[bg];B[gc];W[af];B[hb];W[ae]
+;B[ia];W[ag];B[];W[bi];B[];W[bh];B[];W[]TB[ha][eb][gb][ib][ec][hc]
+[ic][dd][ed][fd][gd][hd][id][fe][ge][he][ie][ff][gf][hf][if][gg][hg]
+[ig]TW[aa][ba][ab][ac][ad][bf][ah][ai][ci]
+C[gunnar [?\]: What a depressing game.
+])

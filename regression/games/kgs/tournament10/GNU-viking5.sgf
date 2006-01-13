@@ -1,0 +1,47 @@
+(;GM[1]FF[4]
+SZ[9]KM[7.50]
+PW[GNU]WR[13k]
+PB[viking5]PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-01-08]AP[CGoban:2]
+EV[Tenth KGS Computer Go Tournament - Formal division]RE[W+Resign]
+TM[480]RU[Chinese]
+C[GNU [13k\]: GTP Engine for GNU (white): GNU Go version 3.7.7
+viking5 [?\]: GTP Engine for viking5 (black): Viking version 5.3.1
+]
+CA[UTF-8]RO[4]ST[2]
+;B[ef];W[dc];B[ed];W[ec];B[fc];W[fb];B[gc];W[gg];B[fh];W[gb]
+C[gunnar [?\]: GNU thinks the lower right was killed by F2.
+];B[ge]
+;W[ce]C[burtabel [3d\]: thats not too unreasonable
+];B[cg];W[hb]
+C[gunnar [?\]: But too pessimistic if it wants to win the game.
+]
+;B[bf];W[be];B[he]
+C[zapp [?\]: Viking is still worried about the lower left
+];W[cf]
+C[gunnar [?\]: I'm starting to think that GNU's biggest problem in 9x9 games is that it's foo fond of early second line moves.
+]
+;B[bg];W[dd];B[hc]
+C[burtabel [3d\]: well, only h8 was questionable here
+];W[ee]
+C[burtabel [3d\]: g8 was pretty big I think
+];B[fe];W[af]
+C[zapp [?\]: Actually I had a version of viking that played a lot on the 2nd line and won surprisingly often
+]
+;B[de]C[zapp [?\]: 2nd line on 9x9 is not as bas one might think
+]
+;W[ag];B[bh];W[df];B[ah]C[burtabel [3d\]: both missed danger of d3
+]
+;W[dg]C[burtabel [3d\]: (instead of d4)
+];B[dh];W[eg];B[fg];W[ee]
+;B[ae];W[ff];B[gf];W[ad]
+C[zapp [?\]: Black plays unreasonable because it thouht white was ahead
+]
+;B[af];W[bc];B[ib];W[eh];B[ei];W[ef];B[fd];W[ha];B[ci];W[ia]
+C[gunnar [?\]: W+0.5 according to GNU.
+zapp [?\]: No bugs this time
+zapp [?\]: viking also evaluated it to .5 loss
+burtabel [3d\]: hmm
+burtabel [3d\]: seems it trusts its counting a lot
+]
+)

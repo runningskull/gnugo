@@ -1,0 +1,33 @@
+(;GM[1]FF[4]
+SZ[9]KM[7.50]
+PW[GNU]WR[13k]
+PB[NeuroGo]PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-01-08]EV[Tenth KGS Computer Go Tournament - Formal division]
+RE[W+Resign]
+TM[480]RU[Chinese]
+C[GNU [13k\]: GTP Engine for GNU (white): GNU Go version 3.7.7
+NeuroGo [?\]: GTP Engine for NeuroGo (black): NeuroGo version Dec 22 2005
+]
+CA[UTF-8]RO[3]
+;B[df];W[gc];B[dc];W[cg];B[gf];W[eb];B[cf];W[dg];B[eg];W[eh];B[fg]
+;W[fh];B[gh];W[bf];B[bg];W[bh];B[ch];W[dh];B[be];W[db];B[cc];W[ag]
+;B[hd];W[hc];B[gd];W[cb];B[bb];W[ec];B[dd];W[fd];B[fe];W[id];B[ed]
+;W[ie];B[fc];W[fb];B[ca];W[ae];B[ad];W[bd];B[af];W[bg]
+C[gunnar [?\]: B6 overplay.
+];B[ae];W[gi];B[hi];W[fi];B[hg];W[fd]
+;B[ha];W[he];B[ge];W[ig];B[hb];W[ih];B[hh];W[fc];B[ii];W[hf];B[if]
+;W[ig];B[ib];W[ic];B[ba];W[ga];B[gg];W[da];B[ih];W[ac];B[ce];W[bc]
+;B[fa];W[ab];B[gb];W[aa];B[cd];W[ba];B[if];W[ee]
+C[tromp [-\]: wa7 is cool
+tromp [-\]: hi, gunnar:)
+gunnar [?\]: I never quite understood what was going on there.
+gunnar [?\]: Hi.
+tromp [-\]: gnugo saw under the stones
+tromp [-\]: i mean wb7
+gunnar [?\]: Ah, that cool. :-)
+tromp [-\]: it captures b8
+gunnar [?\]: Not every day you see that in a game.
+tromp [-\]: certainly not
+tromp [-\]: you can be proud of your baby:)
+]
+)

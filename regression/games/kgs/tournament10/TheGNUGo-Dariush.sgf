@@ -1,0 +1,34 @@
+(;GM[1]FF[4]
+SZ[13]KM[7.50]
+PW[TheGNUGo]WR[12k]
+PB[Dariush]BR[14k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-01-08]AP[CGoban:2]
+EV[Tenth KGS Computer Go Tournament - Open division]RE[W+28.50]
+TM[780]RU[Chinese]
+C[TheGNUGo [12k\]: GTP Engine for TheGNUGo (white): GNU Go version 3.7.7
+Dariush [14k\]: GTP Engine for Dariush (black): Dariush version 3.1.5.7, level 7
+]
+CA[UTF-8]RO[2]ST[2]
+;B[kd];W[ic];B[jk];W[je];B[cj];W[ek];B[dc];W[di];B[ci];W[dh];B[ch]
+;W[dg];B[cg];W[hk];B[ki];W[fc];B[dl];W[kb];B[le];W[de];B[ed];W[el]
+;B[dk];W[cf];B[im];W[ih];B[ij];W[hj];B[kg];W[jg];B[bf];W[be];B[bg]
+;W[ae];B[cc];W[bb];B[gl];W[dj];B[gi];W[hl];B[hm];W[hi];B[fl];W[ik]
+;B[em];W[fj];B[jf];W[kf];B[if];W[kh];B[ke];W[lg];B[id];W[jl];B[ji]
+;W[kk];B[fe];W[hc];B[fh];W[fk];B[ef];W[df];B[eg];W[hg]
+C[burtabel [3d\]: W+23 says gnugo
+];B[ge];W[jc];B[jd];W[lf];B[gg]
+;W[lc];B[hf];W[hh];B[ea];W[fb];B[jm];W[jj];B[ll];W[lk];B[gk];W[gj]
+;B[kl];W[fa]C[gunnar [?\]: N2 fairly big.
+];B[lj];W[ml];B[bc]
+C[burtabel [3d\]: well k4 was a little overcautious
+];W[eb];B[ab]
+;W[km];B[bk];W[lm];B[fm];W[il];B[db];W[da];B[ca];W[af];B[me];W[ag]
+;B[ah];W[hd];B[cd];W[ce];B[fi];W[he];B[ie];W[gd];B[ea];W[kc];B[da]
+;W[ld];B[ac];W[md];B[ei];W[ej];B[lh];W[kg];B[ig];W[jh];B[mf];W[mg]
+;B[dm];W[gm];B[hm];W[im];B[gm];W[ee];B[fd];W[gh];B[ec];W[eh];B[fg]
+;W[dd];B[ad];W[bd];B[];W[kj];B[];W[ll];B[];W[gb];B[];W[hb];B[];W[ia]
+;B[];W[ib];B[];W[]TB[aa][ba][bb][cb][je][ff][gf][bh][ai][bi][aj][bj]
+[ak][ck][al][bl][cl][am][bm][cm]TW[ga][ha][ja][ka][la][ma][jb][lb]
+[mb][gc][mc][lh][mh][ii][ji][ki][li][mi][ij][lj][mj][jk][mk][kl][jm]
+[mm])

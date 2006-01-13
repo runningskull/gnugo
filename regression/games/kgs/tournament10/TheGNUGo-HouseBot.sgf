@@ -1,0 +1,36 @@
+(;GM[1]FF[4]
+SZ[13]KM[7.50]
+PW[TheGNUGo]WR[12k]
+PB[HouseBot]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-01-08]AP[CGoban:2]
+EV[Tenth KGS Computer Go Tournament - Open division]TM[780]
+RU[Chinese]
+C[TheGNUGo [12k\]: GTP Engine for TheGNUGo (white): GNU Go version 3.7.7
+HouseBot [?\]: GTP Engine for HouseBot (black): HouseBot version 0.3.2 (Alpha)
+]
+CA[UTF-8]RO[1]ST[2]
+;B[kj];W[dk];B[jc];W[dc];B[gf];W[ke];B[kd];W[je];B[ld];W[ik];B[le]
+;W[ji];B[ki];W[ef];B[jj];W[ij];B[jk];W[hi];B[eh];W[fe];B[ci];W[jh]
+;B[kh];W[gc];B[dj];W[fg];B[cj];W[cg];B[ch];W[bg];B[bh];W[ck];B[id]
+;W[ej];B[ek];W[ei];B[dl];W[cl];B[el];W[bj];B[bi];W[bk];B[dh];W[cm]
+;B[dm];W[fk];B[fj];W[fi];B[gj];W[gl];B[gk];W[fl];B[hk];W[if];B[hl]
+;W[il];B[jl];W[im];B[hm];W[ge];B[lf];W[jm];B[km];W[kl];B[kk];W[ll]
+;B[lk];W[kg];B[lg];W[ib];B[jb];W[hb];B[gi];W[fh];B[lm];W[mm];B[jd]
+;W[kf];B[di];W[km];B[hj];W[ja];B[ka];W[ia];B[kb];W[mk];B[mj];W[ml]
+;B[lh];W[hd];B[gm];W[em];B[bc];W[cb];B[bb];W[be];B[ca];W[cc];B[da]
+;W[eb];B[ba];W[bd];B[ad];W[ae];B[ac];W[ie];B[aj];W[dg];B[ah];W[eg]
+;B[ag];W[af];B[ak];W[al];B[ii];W[ih];B[];W[ic];B[];W[hh];B[];W[db]
+;B[];W[ea];B[];W[ai];B[];W[gh];B[jg];W[ig];B[];W[fm];B[];W[ek];B[]
+;W[he];B[];W[hc];B[];W[bi];B[];W[ag];B[];W[cd];B[];W[]TB[la][ma][lb]
+[mb][kc][lc][mc][md][me][mf][mg][mh][li][mi][lj]TW[aa][ba][ca][da]
+[fa][ga][ha][ab][bb][fb][gb][ac][bc][ec][fc][ad][dd][ed][fd][gd][ce]
+[de][ee][bf][cf][df][ff][gf][hf][jf][gg][hg][jg][ah][bh][ch][dh][eh]
+[ci][di][gi][ii][aj][cj][dj][fj][gj][hj][ak][gk][hk][bl][dl][el][hl]
+[am][bm][dm][gm][hm][lm]C[gunnar [?\]: Quick game.
+HouseBot [?\]: You and the engine seem to disagree about which stones are dead. Sorry, this cannot be solved. You must either accept the engine's choices or adjourn the game. If you think the engine is incorrect, then please contact its author.
+jhouse [11k\]: yeah, housebot is dumb
+TheGNUGo [12k\]: You and the engine seem to disagree about which stones are dead. To solve this problem, you can press "undo", play until all dead stones are removed from the board, then score again.
+jhouse [11k\]: it doesn't vote on dead stones
+]
+)

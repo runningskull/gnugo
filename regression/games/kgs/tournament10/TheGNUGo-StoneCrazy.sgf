@@ -1,0 +1,50 @@
+(;GM[1]FF[4]
+SZ[13]KM[7.50]
+PW[TheGNUGo]WR[12k]
+PB[StoneCrazy]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-01-08]EV[Tenth KGS Computer Go Tournament - Open division]
+RE[W+42.50]
+TM[780]RU[Chinese]
+C[TheGNUGo [12k\]: GTP Engine for TheGNUGo (white): GNU Go version 3.7.7
+StoneCrazy [?\]: GTP Engine for StoneCrazy (black): Crazy Stone version 0003-10
+]
+CA[UTF-8]RO[5]
+;B[ii];W[jj];B[jd];W[kh];B[cg];W[hc];B[gg];W[hk];B[il];W[ik];B[hd]
+;W[gd];B[ec];W[cc];B[gc];W[ic];B[fd];W[eb];B[dk];W[kb];B[id];W[gb]
+;B[ge];W[dc];B[ji];W[kj];B[hl];W[gl];B[ki];W[jl];B[fb];W[ld];B[db]
+;W[cb];B[ea];W[bc];B[li];W[kf];B[le];W[ke];B[kd];W[lc]
+C[burtabel [3d\]: m9 good start there..
+];B[lg];W[lf];B[dd];W[be]
+;B[mf];W[lh];B[el];W[de];B[gh];W[dg];B[gk];W[dh];B[fl];W[gj];B[gm]
+;W[cj];B[cf];W[df];B[dj];W[ci];B[mh]
+C[burtabel [3d\]: CrazyStone is only half a year old?
+];W[kg]
+C[RemiCoulom [12k\]: yes
+];B[cd]C[burtabel [3d\]: impressive work!
+RemiCoulom [12k\]: thanks
+]
+;W[ce]C[RemiCoulom [12k\]: It has a very speculative style.
+];B[bd]
+C[RemiCoulom [12k\]: This is sometimes spectacular
+];W[ad]
+C[RemiCoulom [12k\]: but often very inaccurate.
+];B[ed];W[cl];B[fj]
+;W[ll]
+C[burtabel [3d\]: you don't let it play ranked games here usually?
+]
+;B[hj];W[lj];B[ck];W[bk];B[ac];W[ab]
+C[RemiCoulom [12k\]: It has played a few. The larger the board, the weaker it plays.
+]
+;B[bl]C[RemiCoulom [12k\]: It may be about 25k on 19x19.
+];W[bm]
+;B[aj];W[cm];B[ae];W[ac];B[ba];W[ij];B[gi];W[me];B[al];W[bj];B[ai]
+;W[ga];B[af];W[ag];B[bg];W[bf];B[lk];W[mj];B[ak];W[ah];B[bh];W[af]
+;B[mi];W[mg];B[kk];W[kl];B[jk];W[mk];B[ja];W[jc];B[hb];W[ha];B[fa]
+;W[ib];B[ia];W[hb];B[kc];W[jb];B[lb];W[ka];B[la];W[mb];B[ja];W[ma]
+;B[im];W[ca];B[jm];W[da];B[dl];W[bi];B[dm];W[am];B[eh];W[ff];B[gf]
+;W[di];B[al];W[bl];B[if];W[ei];B[km];W[fh];B[lm];W[kk];B[eb];W[fg]
+;B[jg];W[jh];B[ih];W[jf];B[ig];W[ee];B[je];W[ej];B[ek];W[fe];B[fi]
+;W[ml];B[mm];W[lb];B[hf];W[];B[hh];W[];B[]TB[fc][gd][he][ie][hg][hi]
+[gj][fk][gl][em][fm][hm]TW[aa][ba][ia][ja][la][bb][mc][md][ae][le]
+[cf][ef][mf][bg][cg][eg][lg][bh][ch][eh][ai][aj][ak][jk][lk][al])
