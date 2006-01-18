@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- MAX_STRINGS value corrected
+- new assertions that the next_string pointer hasn't overflowed
 - hash flag bits and -H option removed
 - default size of reading cache set to a fixed number of entries instead
   of a fixed amount of memory, improving platform independence

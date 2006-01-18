@@ -47,14 +47,26 @@
 #define MAX_LIBERTIES 8
 
 
-/* This is an upper bound of the number of strings that can exist on
- * the board simultaneously.  
- * FIXME: This is not sufficiently large;  above stackp==0, the incremental 
- *   board code doesn't necessarily re-use all indices.  This is a problem
- *   only in very pathological cases, and is extremely unlikely to occur in
- *   practice.
+/* This is an upper bound on the number of strings that can exist on
+ * the board simultaneously. Since each string must have at least one
+ * liberty and each empty point can provide a liberty to at most four
+ * strings, at least one out of five board points must be empty.
+ *
+ * FIXME: This is not sufficiently large. Above stackp==0, the
+ *        incremental board code doesn't re-use the entries for
+ *        removed or merged strings, while new strings require new
+ *        entries. This is a problem only in very pathological cases,
+ *        and is extremely unlikely to occur in practice.
+ *
+ *        Actually, in the not all that pathological case of a
+ *        repeated triple ko cycle, each move creates a new string and
+ *        thus makes use of one more string, which relatively quickly
+ *        will exhaust the available strings. For a safe upper bound
+ *        MAX_STRINGS should be set to
+ *        MAX_STACK + 4 * MAX_BOARD * MAX_BOARD / 5.
+ *        It's not clear that it's worth the extra memory, however.
  */
-#define MAX_STRINGS (2 * MAX_BOARD * MAX_BOARD / 3)
+#define MAX_STRINGS (4 * MAX_BOARD * MAX_BOARD / 5)
 
 /* Per gf: Unconditional_life() can get very close to filling the 
  * entire board under certain circumstances. This was discussed in 
