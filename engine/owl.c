@@ -662,7 +662,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   apos = find_origin(apos);
   bpos = find_origin(bpos);
 
-  if (stackp <= semeai_branch_depth && (hashflags & HASH_SEMEAI)
+  if (stackp <= semeai_branch_depth
       && owl_phase
       && tt_get(&ttable, SEMEAI, apos, bpos, depth - stackp, NULL,
 		&value1, &value2, &xpos) == 2) {
@@ -1845,9 +1845,8 @@ do_owl_attack(int str, int *move, int *wormid,
 
   str = find_origin(str);
 
-  if ((hashflags & HASH_OWL_ATTACK)
-      && tt_get(&ttable, OWL_ATTACK, str, NO_MOVE, depth - stackp, NULL, 
-		&value1, &value2, &xpos) == 2) {
+  if (tt_get(&ttable, OWL_ATTACK, str, NO_MOVE, depth - stackp, NULL, 
+	     &value1, &value2, &xpos) == 2) {
 
     TRACE_CACHED_RESULT(value1, xpos);
     if (value1 != 0) {
@@ -2492,9 +2491,8 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
   
   str = find_origin(str);
 
-  if ((hashflags & HASH_OWL_DEFEND)
-      && tt_get(&ttable, OWL_DEFEND, str, NO_MOVE, depth - stackp, NULL, 
-		&value1, &value2, &xpos) == 2) {
+  if (tt_get(&ttable, OWL_DEFEND, str, NO_MOVE, depth - stackp, NULL, 
+	     &value1, &value2, &xpos) == 2) {
     
     TRACE_CACHED_RESULT(value1, xpos);
     if (value1 != 0) {

@@ -2008,8 +2008,7 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
   str1 = find_origin(str1);
   str2 = find_origin(str2);
 
-  if (stackp <= depth && (hashflags & HASH_CONNECT)
-      && !has_passed
+  if (stackp <= depth && !has_passed
       && tt_get(&ttable, CONNECT, str1, str2, depth - stackp, NULL,
 		&value, NULL, &xpos) == 2) {
     TRACE_CACHED_RESULT2(value, value, xpos);
@@ -2178,7 +2177,6 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
   count_variations = save_count_variations;
 
   if (stackp <= depth
-      && (hashflags & HASH_DISCONNECT)
       && tt_get(&ttable, DISCONNECT, str1, str2,
 		depth - stackp, NULL,
 		&value, NULL, &xpos) == 2) {
@@ -2878,9 +2876,7 @@ recursive_break(int str, const signed char goal[BOARDMAX], int *move,
   }
 
   str = find_origin(str);
-  if (stackp <= depth
-      && (hashflags & HASH_BREAK_IN)
-      && !has_passed
+  if (stackp <= depth && !has_passed
       && tt_get(&ttable, BREAK_IN, str, NO_MOVE, depth - stackp, goal_hash,
 		&retval, NULL, &xpos) == 2) {
     /* FIXME: Use move for move ordering if tt_get() returned 1 */
@@ -3000,7 +2996,6 @@ recursive_block(int str, const signed char goal[BOARDMAX], int *move,
   
   str = find_origin(str);
   if (stackp <= depth
-      && (hashflags & HASH_BLOCK_OFF)
       && tt_get(&ttable, BLOCK_OFF, str, NO_MOVE,
 		depth - stackp, goal_hash, &retval, NULL, &xpos) == 2) {
     TRACE_CACHED_RESULT(retval, xpos);

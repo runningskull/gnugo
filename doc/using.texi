@@ -474,7 +474,7 @@ Memory in megabytes used for caching of read results. The default size
 is 8 unless you configure gnugo with the command @command{configure
 --enable-cache-size=@var{size}} before compiling to make @var{size} the
 default (@pxref{Installation}). GNU Go stores results of its reading
-calculations in a Hash table (@pxref{Hashing}). If the Hash table is
+calculations in a hash table (@pxref{Hashing}). If the hash table is
 filled, it is emptied and the reading continues, but some reading may
 have to be repeated that was done earlier, so a larger cache size will
 make GNU Go run faster, provided the cache is not so large that swapping
@@ -741,10 +741,6 @@ dragon and worm debugging you can use @option{-d0x420}.
 @item @option{--debug-flags}
 @quotation
 Print the list of debug flags
-@end quotation
-@item @option{-H}, @option{--hash @var{level}} 
-@quotation
-hash (see @file{engine/gnugo.h} for bits).
 @end quotation
 @item @option{-w}, @option{--worms}
 @quotation

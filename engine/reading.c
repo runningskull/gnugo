@@ -1181,7 +1181,6 @@ do_find_defense(int str, int *move)
     xpos = *move;
 
   if (stackp <= depth
-      && (hashflags & HASH_FIND_DEFENSE)
       && tt_get(&ttable, FIND_DEFENSE, str, NO_MOVE, depth - stackp, NULL, 
 		&retval, NULL, &xpos) == 2) {
     /* Note that if return value is 1 (too small depth), the move will
@@ -2825,7 +2824,6 @@ do_attack(int str, int *move)
    * still be used for move ordering.
    */
   if (stackp <= depth
-      && (hashflags & HASH_ATTACK)
       && tt_get(&ttable, ATTACK, str, NO_MOVE, depth - stackp, NULL, 
 		&retval, NULL, &xpos) == 2) {
     TRACE_CACHED_RESULT(retval, xpos);

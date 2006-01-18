@@ -199,36 +199,7 @@ DEBUG_TIME                  0x4000000\n\
 "
 
 
-
-
-/* hash flag bits 
- *
- * Regarding HASH_DEFAULT:
- * Hashing all functions saves time, but wastes table space, which is
- * bad when the reading is complicated. HASH_DEFAULT is a compromise. 
- *
- * FIXME: This is no longer true with the newer transposition table
- *        and its fancy replacement scheme. We can now hash everything.
- */
-
-#define HASH_FIND_DEFENSE 0x0001  /* NOTE : can specify -d0x... */
-#define HASH_ATTACK       0x0020
-#define HASH_OWL_ATTACK   0x0100
-#define HASH_OWL_DEFEND   0x0200
-#define HASH_SEMEAI       0x0400
-#define HASH_CONNECT      0x0800
-#define HASH_DISCONNECT   0x1000
-#define HASH_BREAK_IN	  0x2000
-#define HASH_BLOCK_OFF	  0x4000
-#define HASH_NOTHING      0
-#define HASH_ALL          0xffff
-#define HASH_DEFAULT      (HASH_ATTACK | HASH_FIND_DEFENSE\
-			   | HASH_OWL_ATTACK | HASH_OWL_DEFEND | HASH_SEMEAI\
-                           | HASH_CONNECT | HASH_DISCONNECT\
-			   | HASH_BREAK_IN | HASH_BLOCK_OFF)
-
 extern int debug;		/* debug flags */
-extern int hashflags;		/* hash flags */
 extern int fusekidb;            /* use fuseki database */
 extern int disable_fuseki;      /* do not generate fuseki moves */
 extern int josekidb;            /* use joseki database */

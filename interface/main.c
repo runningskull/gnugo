@@ -260,7 +260,6 @@ static struct gg_option const long_options[] =
   {"capture-all-dead",   no_argument,   0, OPT_CAPTURE_ALL_DEAD},
   {"play-out-aftermath", no_argument,   0, OPT_PLAY_OUT_AFTERMATH},
   {"cache-size",     required_argument, 0, 'M'},
-  {"hash",           required_argument, 0, 'H'},
   {"worms",          no_argument,       0, 'w'},
   {"moyo",           required_argument, 0, 'm'},
   {"benchmark",      required_argument, 0, 'b'},
@@ -342,7 +341,7 @@ main(int argc, char *argv[])
   
   /* Weed through all of the command line options. */
   while ((i = gg_getopt_long(argc, argv, 
-                            "-ab:B:d:D:EF:gh::H:K:l:L:M:m:o:O:p:r:fsStTvw",
+                            "-ab:B:d:D:EF:gh::K:l:L:M:m:o:O:p:r:fsStTvw",
 			     long_options, NULL)) != EOF)
     {
       switch (i) {
@@ -362,11 +361,7 @@ main(int argc, char *argv[])
 	break;
       case 'd': debug ^= strtol(gg_optarg, NULL, 0);  /* allows 0x... */ break;
       case 'D': mandated_depth = atoi(gg_optarg); break;
-
       case 'M': memory = atof(gg_optarg); break; /* floating point number */
-      case 'H': hashflags = strtol(gg_optarg, NULL, 0);  /* allows 0x... */ 
-	break;
-
       case 'E': printboard = 2; break;
       case 'B': mandated_backfill_depth = atoi(gg_optarg); break;
       case 'F': mandated_fourlib_depth = atoi(gg_optarg); break;
@@ -1450,7 +1445,7 @@ Scoring:\n\
    --score aftermath --capture-all-dead --chinese-rules   Tromp-Taylor score\n\
 \n\
 Cache size (higher=more memory usage, faster unless swapping occurs):\n\
-   -M, --cache-size <megabytes>  RAM cache for caching (default %4.1f Mb)\n\
+   -M, --cache-size <megabytes>  RAM cache for read results (default %4.1f Mb)\n\
 \n\
 "
 
@@ -1498,7 +1493,6 @@ Debugging Options:\n\
    -E, --printeyes               colored display of eye spaces\n\
    -d, --debug <flags>           debugging output (see next item for bits)\n\
        --debug-flags             print the debug flags for previous item\n\
-   -H, --hash <level>            hash (see gnugo.h for bits)\n\
    -w, --worms                   print worm and dragon data and move reasons\n\
    -m, --moyo <level>            moyo debugging, show moyo board\n\
        --debuginfluence <move>   print influence map after making a move\n\

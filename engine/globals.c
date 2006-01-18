@@ -35,8 +35,6 @@
 int thrashing_dragon = NO_MOVE; /* Dead opponent's dragon trying to live. */
 signed char thrashing_stone[BOARDMAX]; /* All thrashing stones. */
 
-int hashflags = HASH_DEFAULT;
-
 float potential_moves[BOARDMAX];
 
 /* Used by reading. */
