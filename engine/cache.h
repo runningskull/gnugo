@@ -96,6 +96,11 @@ typedef struct {
 
 extern Transposition_table ttable;
 
+/* Number of cache entries to use by default if no cache memory usage
+ * has been set explicitly.
+ */
+#define DEFAULT_NUMBER_OF_CACHE_ENTRIES 350000
+
 void tt_free(Transposition_table *table);
 int  tt_get(Transposition_table *table, enum routine_id routine,
 	    int target1, int target2, int remaining_depth,

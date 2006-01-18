@@ -85,9 +85,11 @@ particularly if you are dissatisfied with GNU Go's performance.
 @node Ram Cache
 @subsection Ram Cache
 
-By default, GNU Go makes a cache of 8 Megabytes in RAM for its
+By default, GNU Go makes a cache of about 8 Megabytes in RAM for its
 internal use. The cache is used to store intermediate results during
-its analysis of the position.
+its analysis of the position. More precisely the default cache size is
+350000 entries, which translates to 8.01 MB on typical 32 bit
+platforms and 10.68 MB on typical 64 bit platforms.
 
 Increasing the cache size will often give a modest speed improvement.
 If your system has lots of RAM, consider increasing the cache
@@ -114,7 +116,8 @@ to set the cache size to @code{n} megabytes. For example
 
 @noindent
 creates a cache of size 32 megabytes. If you omit this, your default
-cache size will be 8 MB. You must recompile and reinstall
+cache size will be 8-11 MB as discussed above. Setting cache size
+negative also gives the default size. You must recompile and reinstall
 GNU Go after reconfiguring it by running @command{make} and
 @command{make install}.
 

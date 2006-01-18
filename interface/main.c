@@ -469,8 +469,11 @@ main(int argc, char *argv[])
 		"Owl node limit: %d\n", OWL_NODE_LIMIT);
 	fprintf(stdout,
 		"Semeai node limit: %d\n", SEMEAI_NODE_LIMIT);
-	fprintf(stdout,
-		"Cache size: %d MB\n", DEFAULT_MEMORY);
+	if (DEFAULT_MEMORY == -1)
+	  fprintf(stdout, "Cache size: %d MB (special default value)\n",
+		  DEFAULT_MEMORY);
+	else
+	  fprintf(stdout, "Cache size: %d MB\n", DEFAULT_MEMORY);
 
 	return EXIT_SUCCESS;
 	break;
@@ -1447,7 +1450,7 @@ Scoring:\n\
    --score aftermath --capture-all-dead --chinese-rules   Tromp-Taylor score\n\
 \n\
 Cache size (higher=more memory usage, faster unless swapping occurs):\n\
-   -M, --cache-size <megabytes>  RAM cache for hashing (default %4.1f Mb)\n\
+   -M, --cache-size <megabytes>  RAM cache for caching (default %4.1f Mb)\n\
 \n\
 "
 
@@ -1547,7 +1550,8 @@ static void
 show_help(void)
 {
   printf(USAGE, DEFAULT_LEVEL);
-  printf(USAGE1, (float) DEFAULT_MEMORY);
+  printf(USAGE1, DEFAULT_MEMORY <= 0 ? reading_cache_default_size() :
+	 (float) DEFAULT_MEMORY);
   printf(USAGE2, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
 }
 

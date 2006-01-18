@@ -83,7 +83,9 @@ calculate_hashval_for_tt(Hash_data *hashdata, int routine, int target1,
 
 
 
-/* Initialize the transposition table. */
+/* Initialize the transposition table. Non-positive memsize means use
+ * the default size of DEFAULT_NUMBER_OF_CACHE_ENTRIES entries.
+ */
 
 static void
 tt_init(Transposition_table *table, int memsize)
@@ -94,7 +96,10 @@ tt_init(Transposition_table *table, int memsize)
   hash_init();
   keyhash_init();
 
-  num_entries = memsize / sizeof(table->entries[0]);
+  if (memsize > 0)
+    num_entries = memsize / sizeof(table->entries[0]);
+  else
+    num_entries = DEFAULT_NUMBER_OF_CACHE_ENTRIES;
 
   table->num_entries = num_entries;
   table->entries     = malloc(num_entries * sizeof(table->entries[0]));
@@ -289,6 +294,12 @@ void
 reading_cache_clear()
 {
   tt_clear(&ttable);
+}
+
+float
+reading_cache_default_size()
+{
+  return DEFAULT_NUMBER_OF_CACHE_ENTRIES * sizeof(Hashentry) / 1024.0 / 1024.0;
 }
 
 

@@ -196,6 +196,7 @@ void dfa_match_init(void);
 
 void reading_cache_init(int bytes);
 void reading_cache_clear(void);
+float reading_cache_default_size(void);
 
 /* reading.c */
 int attack(int str, int *move);
