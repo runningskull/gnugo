@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- semeai analysis turned off when there are a huge number of dragons
 - MAX_STRINGS value corrected
 - new assertions that the next_string pointer hasn't overflowed
 - hash flag bits and -H option removed

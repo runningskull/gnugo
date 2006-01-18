@@ -58,8 +58,8 @@ semeai()
   int num_dragons = number_of_dragons;
 
   if (num_dragons > MAX_DRAGONS) {
-    TRACE("Too many dragons!!! Might disregard some semeais.");
-    num_dragons = MAX_DRAGONS;
+    TRACE("Too many dragons!!! Semeai analysis disabled.");
+    return;
   }
 
   for (d1 = 0; d1 < num_dragons; d1++)
@@ -191,6 +191,7 @@ semeai()
 	best_defense = semeai_results_first[d1][d2];
 	defense_move = semeai_move[d1][d2];
 	defense_certain = semeai_certain[d1][d2];
+	gg_assert(board[dragon2[d2].origin] == OTHER_COLOR(board[dragon2[d1].origin]));
 	semeai_defense_target = dragon2[d2].origin;
       }
       if (best_attack < semeai_results_second[d2][d1]
@@ -211,6 +212,7 @@ semeai()
 	update_status(DRAGON(d1).origin, ALIVE, ALIVE);
       dragon2[d1].semeai_defense_point = defense_move;
       dragon2[d1].semeai_defense_certain = defense_certain;
+      gg_assert(board[semeai_defense_target] == OTHER_COLOR(board[dragon2[d1].origin]));
       dragon2[d1].semeai_defense_target = semeai_defense_target;
       dragon2[d1].semeai_attack_point = attack_move;
       dragon2[d1].semeai_attack_certain = attack_certain;
@@ -284,6 +286,7 @@ find_moves_to_make_seki()
 	update_status(str, CRITICAL, CRITICAL);
 	dragon2[d].semeai_defense_point = defend_move;
 	dragon2[d].semeai_defense_certain = certain;
+	gg_assert(board[opponent] == OTHER_COLOR(board[dragon2[d].origin]));
 	dragon2[d].semeai_defense_target = opponent;
 
 	/* We need to determine a proper attack move (the one that
@@ -381,6 +384,7 @@ find_moves_to_make_seki()
 	update_status(str, CRITICAL, CRITICAL);
 	dragon2[d].semeai_defense_point = defend_move;
 	dragon2[d].semeai_defense_certain = certain;
+	gg_assert(board[opponent] == OTHER_COLOR(board[dragon2[d].origin]));
 	dragon2[d].semeai_defense_target = opponent;
 
 	/* We need to determine a proper attack move (the one that
