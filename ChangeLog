@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in unconditional status analysis
 - let --capture-all-dead and --play-out-aftermath be effective also when
   playing out a game for scoring (e.g. --score finish)
 - semeai analysis turned off when there are a huge number of dragons

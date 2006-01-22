@@ -28,15 +28,20 @@
 
 #include "liberty.h"
 
-/* Capture all non-invincible strings of one color except the ones
- * marked in the exceptions array. See the comments to
- * unconditional_life() below for a full explanation of the algorithm.
+/* Capture as many strings of the given color as we can. Played stones
+ * are left on the board and the number of played stones is returned.
+ * Strings marked in the exceptions array are excluded from capturing
+ * attempts. If all non-excepted strings are successfully captured,
+ * *none_invincible is set to one. Set none_invincible to NULL if you
+ * don't need that information.
  */
 static int
-capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
+capture_non_invincible_strings(int color, int exceptions[BOARDMAX],
+			       int *none_invincible)
 {
   int other = OTHER_COLOR(color);
   int something_captured = 1; /* To get into the first turn of the loop. */
+  int string_found = 0;
   int moves_played = 0;
   int save_moves;
   int libs[MAXLIBS];
@@ -48,6 +53,9 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
     /* Nothing captured so far in this turn of the loop. */
     something_captured = 0;
 
+    /* Is there something left to try to capture? */
+    string_found = 0;
+    
     /* Visit all friendly strings on the board. */
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (board[pos] != color || find_origin(pos) != pos)
@@ -55,6 +63,8 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
 
       if (exceptions && exceptions[pos])
 	continue;
+
+      string_found = 1;
       
       /* Try to capture the string at pos. */
       liberties = findlib(pos, MAXLIBS, libs);
@@ -93,6 +103,10 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
 	}
     }
   }
+
+  if (none_invincible)
+    *none_invincible = !string_found;
+  
   return moves_played;
 }
 
@@ -307,7 +321,12 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
   int k, r;
   int moves_played;
   int potential_sekis[BOARDMAX];
+  int none_invincible;
 
+  /* Initialize unconditional_territory array. */
+  memset(unconditional_territory, 0,
+	 sizeof(unconditional_territory[0]) * BOARDMAX);
+  
   /* Find isolated two-stone strings which might be involved in the
    * kind of seki described in the comments.
    */
@@ -339,7 +358,21 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
     }
   }
   
-  moves_played = capture_non_invincible_strings(color, potential_sekis);
+  moves_played = capture_non_invincible_strings(color, potential_sekis,
+						&none_invincible);
+
+  /* If there are no invincible strings, nothing can be unconditionally
+   * settled.
+   */
+  if (none_invincible) {
+    /* Take back all moves. */
+    while (moves_played > 0) {
+      popgo();
+      moves_played--;
+    }
+    return;
+  }
+  
   /* The strings still remaining except those marked in
    * potential_sekis[] are uncapturable. Now see which opponent
    * strings can survive.
@@ -485,7 +518,6 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
   }
   
   /* Identify unconditionally alive stones and unconditional territory. */
-  memset(unconditional_territory, 0, sizeof(int) * BOARDMAX);
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] == color && !potential_sekis[pos]) {
       unconditional_territory[pos] = 1;

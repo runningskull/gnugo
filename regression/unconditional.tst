@@ -1366,3 +1366,16 @@ loadsgf games/unconditional/unconditional8.sgf
 #? [undecided]
 1173 unconditional_status M10
 #? [undecided]
+
+boardsize 2
+clear_board
+play black A1
+play white B2
+1201 unconditional_status A1
+#? [undecided]
+1202 unconditional_status A2
+#? [undecided]
+1203 unconditional_status B1
+#? [undecided]
+1204 unconditional_status B2
+#? [undecided]
