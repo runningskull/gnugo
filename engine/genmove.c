@@ -473,10 +473,10 @@ do_genmove(int color, float pure_threat_value,
    * opponent stones, or if the opponent is trying to live inside
    * our territory and we are clearly ahead, generate an aftermath move.
    */
-  if (move == PASS_MOVE && !doing_scoring) {
+  if (move == PASS_MOVE) {
     if (play_out_aftermath 
 	|| capture_all_dead 
-	|| (thrashing_dragon && pessimistic_score > 15.0))
+	|| (!doing_scoring && thrashing_dragon && pessimistic_score > 15.0))
       move = aftermath_genmove(color, 0, allowed_moves);
       
     /* If we're instructed to capture all dead opponent stones, generate

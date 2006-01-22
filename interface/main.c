@@ -1442,7 +1442,6 @@ Scoring:\n\
    --score estimate        estimate score at loaded position\n\
    --score finish          generate moves to finish game, then score\n\
    --score aftermath       generate moves to finish, use best algorithm\n\
-   --score aftermath --capture-all-dead --chinese-rules   Tromp-Taylor score\n\
 \n\
 Cache size (higher=more memory usage, faster unless swapping occurs):\n\
    -M, --cache-size <megabytes>  RAM cache for read results (default %4.1f Mb)\n\
