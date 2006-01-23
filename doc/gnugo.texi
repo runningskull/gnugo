@@ -28,7 +28,7 @@
 @page
 @title{GNU Go 3.6}
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1999, 2000, 2001, 2002, 2003, 2004 and 2005
+Copyright @copyright{} 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006
 by the Free Software Foundation, Inc.
 @sp 2
 
@@ -64,7 +64,7 @@ are respected.
 This manual documents @code{GNU Go}, a Go program and its sources.
 This is Edition @value{EDITION} of the @cite{GNU Go Program Documentation}
 
-Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005,
+Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006,
 The Free Software Foundation, Inc.
      
 Permission is granted to make and distribute verbatim

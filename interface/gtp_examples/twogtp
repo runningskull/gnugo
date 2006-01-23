@@ -6,7 +6,7 @@
 # Write gnugo@gnu.org or see http://www.gnu.org/software/gnugo/ #
 # for more information.                                         #
 #                                                               #
-# Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005         #
+# Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006   #
 # by the Free Software Foundation.                              #
 #                                                               #
 # This program is free software; you can redistribute it and/or #

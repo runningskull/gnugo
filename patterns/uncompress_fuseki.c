@@ -2,7 +2,7 @@
  * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *
  * http://www.gnu.org/software/gnugo/ for more information.          *
  *                                                                   *
- * Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005             *
+ * Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006       *
  * by the Free Software Foundation.                                  *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *
@@ -43,7 +43,7 @@ uncompress_fuseki boardsize filename db\n\
 # This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       #\n\
 # http://www.gnu.org/software/gnugo/ for more information.          #\n\
 #                                                                   #\n\
-# Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005             #\n\
+# Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006       #\n\
 # by the Free Software Foundation.                                  #\n\
 #                                                                   #\n\
 # This program is free software; you can redistribute it and/or     #\n\
@@ -74,7 +74,7 @@ uncompress_fuseki boardsize filename db\n\
  * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *\n\
  * http://www.gnu.org/software/gnugo/ for more information.          *\n\
  *                                                                   *\n\
- * Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005             *\n\
+ * Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006       *\n\
  * by the Free Software Foundation.                                  *\n\
  *                                                                   *\n\
  * This program is free software; you can redistribute it and/or     *\n\

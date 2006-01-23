@@ -56,7 +56,7 @@ different aspects of GNU Go's internals.
 @node    Copyright
 @section Copyrights
 
-Copyright 1999, 2000, 2001, 2002, 2003, 2004 and 2005
+Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006
 by the Free Software Foundation except as noted below.
 
 All files are under the GNU General Public License (@pxref{GPL}),
