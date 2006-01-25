@@ -420,29 +420,31 @@ try_large_scale_owl_attack(int pos, int color, int target, int dist)
   else
     owl_node_limit *= 0.15;
 
-  if (verbose > 0)
-    verbose--;
+  if (DRAGON2(target).owl_attack_node_count < owl_node_limit) {
+    if (verbose > 0)
+      verbose--;
 
-  owl_nodes_before = get_owl_node_counter(); 
-  acode = owl_does_attack(pos, target, &kworm);
-  owl_nodes_used = get_owl_node_counter() - owl_nodes_before;
-  
-  if (acode >= DRAGON2(target).owl_attack_code
-      && acode == WIN) {
-    add_owl_attack_move(pos, target, kworm, acode);
-    DEBUG(DEBUG_LARGE_SCALE | DEBUG_MOVE_REASONS,
-	  "Move at %1m owl-attacks %1m on a large scale(%s).\n", 
-	  pos, target, result_to_string(acode));
+    owl_nodes_before = get_owl_node_counter(); 
+    acode = owl_does_attack(pos, target, &kworm);
+    owl_nodes_used = get_owl_node_counter() - owl_nodes_before;
+    
+    if (acode >= DRAGON2(target).owl_attack_code
+	&& acode == WIN) {
+      add_owl_attack_move(pos, target, kworm, acode);
+      DEBUG(DEBUG_LARGE_SCALE | DEBUG_MOVE_REASONS,
+	    "Move at %1m owl-attacks %1m on a large scale(%s).\n", 
+	    pos, target, result_to_string(acode));
+    }
+    else
+      DEBUG(DEBUG_LARGE_SCALE,
+	    "Move at %1m isn't a clean large scale attack on %1m (%s).\n",
+	    pos, target, result_to_string(acode));
+    
+    DEBUG(DEBUG_LARGE_SCALE, "  owl nodes used = %d, dist = %d\n", 
+	  owl_nodes_used, dist);
+    /* Restore settings. */
+    verbose = save_verbose;
   }
-  else
-    DEBUG(DEBUG_LARGE_SCALE,
-	  "Move at %1m isn't a clean large scale attack on %1m (%s).\n",
-	  pos, target, result_to_string(acode));
-  
-  DEBUG(DEBUG_LARGE_SCALE, "  owl nodes used = %d, dist = %d\n", 
-	owl_nodes_used, dist);
-  /* Restore settings. */
-  verbose = save_verbose;
   decrease_depth_values(); 
   owl_node_limit = save_owl_node_limit;
 }

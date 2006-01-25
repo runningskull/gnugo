@@ -222,9 +222,12 @@ make_dragons(int stop_before_owl)
 	int acode = 0;
 	int dcode = 0;
 	int kworm = NO_MOVE;
+	int owl_nodes_before = get_owl_node_counter();
 	start_timer(3);
 	acode = owl_attack(str, &attack_point, 
 			   &DRAGON2(str).owl_attack_certain, &kworm);
+	DRAGON2(str).owl_attack_node_count
+	  = get_owl_node_counter() - owl_nodes_before;
 	if (acode != 0) {
 	  DRAGON2(str).owl_attack_point = attack_point;
 	  DRAGON2(str).owl_attack_code = acode;

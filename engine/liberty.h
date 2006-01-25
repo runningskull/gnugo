@@ -900,6 +900,7 @@ struct dragon_data2 {
   int owl_attack_point;    /* vital point for attack                         */
   int owl_attack_code;     /* ko result code                                 */
   int owl_attack_certain;  /* 0 if owl reading node limit is reached         */
+  int owl_attack_node_count;
   int owl_second_attack_point;/* if attacker gets both attack points, wins   */
   int owl_defense_point;   /* vital point for defense                        */
   int owl_defense_code;    /* ko result code                                 */
