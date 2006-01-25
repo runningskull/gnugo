@@ -300,7 +300,7 @@ int DEBUG_func(int level, const char *fmt, ...);
 #define EXAMINE_ALL                 99
 
 void reset_engine(void);
-void examine_position(int how_much);
+void examine_position(int how_much, int aftermath_play);
 void silent_examine_position(int how_much);
 
 

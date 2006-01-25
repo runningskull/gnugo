@@ -645,7 +645,7 @@ void get_influence(const struct influence_data *q,
 		   float territory_value[BOARDMAX],
 		   int influence_regions[BOARDMAX],
 		   int non_territory[BOARDMAX]);
-float influence_score(const struct influence_data *q);
+float influence_score(const struct influence_data *q, int chinese_rules);
 float game_status(int color);
 void resegment_initial_influence(void);
 void influence_mark_non_territory(int pos, int color);

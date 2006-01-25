@@ -898,7 +898,7 @@ do_play_ascii(Gameinfo *gameinfo)
 	  break;
 
 	case CMD_DEAD:
-	  examine_position(FULL_EXAMINE_DRAGONS);
+	  silent_examine_position(FULL_EXAMINE_DRAGONS);
 	  showdead = !showdead;
 	  break;
 
@@ -915,26 +915,26 @@ do_play_ascii(Gameinfo *gameinfo)
 	case CMD_SHOWMOYO:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_MOYO;
-	  examine_position(EXAMINE_DRAGONS);
+	  silent_examine_position(EXAMINE_DRAGONS);
 	  printmoyo = tmp;
 	  break;
 
 	case CMD_SHOWTERRI:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_TERRITORY;
-	  examine_position(EXAMINE_DRAGONS);
+	  silent_examine_position(EXAMINE_DRAGONS);
 	  printmoyo = tmp;
 	  break;
 
 	case CMD_SHOWAREA:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_AREA;
-	  examine_position(EXAMINE_DRAGONS);
+	  silent_examine_position(EXAMINE_DRAGONS);
 	  printmoyo = tmp;
 	  break;
 
 	case CMD_SHOWDRAGONS:
-	  examine_position(EXAMINE_DRAGONS);
+	  silent_examine_position(EXAMINE_DRAGONS);
 	  showboard(1);
 	  break;
 
@@ -980,7 +980,7 @@ do_play_ascii(Gameinfo *gameinfo)
 	  break;
 
 	case CMD_LISTDRAGONS:
-	  examine_position(EXAMINE_DRAGONS);
+	  silent_examine_position(EXAMINE_DRAGONS);
 	  show_dragons();
 	  break;
 

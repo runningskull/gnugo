@@ -2475,7 +2475,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
      * done with help from the owl code. First we must prepare for
      * this though.
      */
-    examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+    examine_position(EXAMINE_DRAGONS_WITHOUT_OWL, 0);
 
     attack_code = owl_attack(str, &attack_point, NULL, NULL);
 

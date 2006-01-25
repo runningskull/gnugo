@@ -2125,7 +2125,7 @@ influence_delta_territory(const struct influence_data *base,
  * computed in advance.
  */
 float
-influence_score(const struct influence_data *q)
+influence_score(const struct influence_data *q, int use_chinese_rules)
 {
   float score = 0.0;
   int ii;
@@ -2133,7 +2133,10 @@ influence_score(const struct influence_data *q)
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii))
       score += q->territory_value[ii];
-  score += black_captured - white_captured + komi;
+  if (use_chinese_rules)
+    score += stones_on_board(WHITE) - stones_on_board(BLACK) + komi;
+  else
+    score += black_captured - white_captured + komi;
 
   return score;
 }

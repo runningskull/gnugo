@@ -54,7 +54,7 @@ static int revise_thrashing_dragon(int color, float our_score,
 static void break_mirror_go(int color);
 static int find_mirror_move(int *move, int color);
 static int should_resign(int color, float optimistic_score, int move);
-static void compute_scores(void);
+static void compute_scores(int use_chinese_rules);
 
 
 /* Reset some things in the engine. 
@@ -102,10 +102,13 @@ reset_engine()
  * The parameter how_much tells us how much of the work we have to do.
  * For move generation we have to do it all.  For debugging we can 
  * sometimes stop a little earlier.
+ *
+ * aftermath_play indicates we are in aftermath playout phase. It's only
+ * effect is to always use chinese rules for the score estimates.
  */
 
 void
-examine_position(int how_much)
+examine_position(int how_much, int aftermath_play)
 {
   int save_verbose = verbose;
 
@@ -148,7 +151,7 @@ examine_position(int how_much)
     
     if (NEEDS_UPDATE(dragons_examined)) {
       make_dragons(0);
-      compute_scores();
+      compute_scores(chinese_rules || aftermath_play);
       /* We have automatically done a partial dragon analysis as well. */
       dragons_examined_without_owl = position_number;
     }
@@ -162,7 +165,7 @@ examine_position(int how_much)
 	   || how_much == EXAMINE_DRAGONS
 	   || how_much == EXAMINE_ALL) {
     initialize_dragon_data();
-    compute_scores();
+    compute_scores(chinese_rules || aftermath_play);
     verbose = save_verbose;
     gg_assert(test_gray_border() < 0);
     return;
@@ -209,7 +212,7 @@ silent_examine_position(int how_much)
   debug = 0;
   printmoyo = 0;
   
-  examine_position(how_much);
+  examine_position(how_much, 0);
 
   verbose = save_verbose;
   sgf_dumptree = save_sgf_dumptree;
@@ -335,7 +338,7 @@ do_genmove(int color, float pure_threat_value,
 
   /* Find out information about the worms and dragons. */
   start_timer(1);
-  examine_position(EXAMINE_ALL);
+  examine_position(EXAMINE_ALL, 0);
   time_report(1, "examine position", NO_MOVE, 1.0);
 
 
@@ -664,7 +667,7 @@ find_mirror_move(int *move, int color)
  * black.
  */
 static void
-compute_scores()
+compute_scores(int use_chinese_rules)
 {
   signed char safe_stones[BOARDMAX];
   float strength[BOARDMAX];
@@ -672,11 +675,11 @@ compute_scores()
   set_strength_data(WHITE, safe_stones, strength);
   compute_influence(EMPTY, safe_stones, strength, &move_influence,
       		    NO_MOVE, "White territory estimate");
-  white_score = influence_score(&move_influence);
+  white_score = influence_score(&move_influence, use_chinese_rules);
   set_strength_data(BLACK, safe_stones, strength);
   compute_influence(EMPTY, safe_stones, strength, &move_influence,
       		    NO_MOVE, "White territory estimate");
-  black_score = influence_score(&move_influence);
+  black_score = influence_score(&move_influence, use_chinese_rules);
 
   if (verbose || showscore) {
     if (white_score == black_score)

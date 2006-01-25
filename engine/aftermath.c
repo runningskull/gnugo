@@ -844,7 +844,7 @@ reduced_genmove(int color)
   reset_engine();
 
   /* Find out information about the worms and dragons. */
-  examine_position(EXAMINE_ALL);
+  examine_position(EXAMINE_ALL, 1);
 
   /* The score will be used to determine when we are safely
    * ahead. So we want the most conservative score.

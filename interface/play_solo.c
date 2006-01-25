@@ -256,14 +256,8 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
   /* Calculate the score. */
   if (method == AFTERMATH)
     score = aftermath_compute_score(next, komi, score_tree);
-  else {
-    /* Before we call estimate_score() we must make sure that the
-     * dragon status is computed. Therefore the call to
-     * examine_position().
-     */
-    examine_position(EXAMINE_ALL);
+  else
     score = gnugo_estimate_score(NULL, NULL);
-  }
   
   if (score < 0.0) {
     sprintf(text, "Black wins by %1.1f points\n", -score);

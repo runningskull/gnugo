@@ -3811,7 +3811,7 @@ gtp_worm_data(char *s)
   if (sscanf(s, "%*c") >= 0 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid color or coordinate");
 
-  examine_position(EXAMINE_WORMS);
+  silent_examine_position(EXAMINE_WORMS);
 
   gtp_start_response(GTP_SUCCESS);
   
@@ -3919,7 +3919,7 @@ gtp_worm_cutstone(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("vertex must not be empty");
 
-  examine_position(EXAMINE_WORMS);
+  silent_examine_position(EXAMINE_WORMS);
 
   return gtp_success(" %d", worm[POS(i, j)].cutstone);
 }
@@ -3943,7 +3943,7 @@ gtp_dragon_data(char *s)
   if (stackp > 0)
     return gtp_failure("dragon data unavailable when stackp > 0");
 
-  examine_position(FULL_EXAMINE_DRAGONS);
+  silent_examine_position(FULL_EXAMINE_DRAGONS);
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -3992,7 +3992,7 @@ gtp_dragon_stones(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("dragon_stones called on an empty vertex");
 
-  examine_position(EXAMINE_DRAGONS);
+  silent_examine_position(EXAMINE_DRAGONS);
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -4036,7 +4036,7 @@ gtp_eye_data(char *s)
   if (stackp > 0)
     return gtp_failure("eye data unavailable when stackp > 0");
 
-  examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -4078,7 +4078,7 @@ gtp_half_eye_data(char *s)
   if (stackp > 0)
     return gtp_failure("half eye data unavailable when stackp > 0");
 
-  examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
 
   gtp_start_response(GTP_SUCCESS);
 

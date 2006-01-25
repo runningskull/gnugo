@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- teach influence_score() about chinese rules
 - copyright notices updated for 2006
 - bugfix in unconditional status analysis
 - let --capture-all-dead and --play-out-aftermath be effective also when
