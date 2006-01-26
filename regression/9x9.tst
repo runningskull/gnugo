@@ -274,10 +274,9 @@ loadsgf games/kgs/tournament8/CrazyStone-GNU.sgf 9
 550 restricted_genmove black B8 C6
 #? [C6]
 
-# B8 is nonsensical. There might be better moves but C6 is easy to see
-# that it's effective.
+# C5 leaves too much aji for white to work with in the corner.
 loadsgf games/kgs/tournament8/CrazyStone-GNU.sgf 33
-560 genmove black
+560 reg_genmove black
 #? [B4]
 
 # E4 is better than E7 since it splits the opponent while saving the
@@ -291,9 +290,9 @@ loadsgf games/kgs/tournament8/firstgo-GNU.sgf 7
 580 restricted_genmove black E2 E6
 #? [E6]
 
-# Important to keep black separated in the center.
+# Important to keep white separated in the center.
 loadsgf games/kgs/tournament8/firstgo-GNU.sgf 19
-590 genmove black
+590 reg_genmove black
 #? [E5]
 
 # B7 is too low and in the wrong direction. Many moves are better.
