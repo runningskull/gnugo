@@ -11001,6 +11001,20 @@ Pattern ED99a
 ; weak(A)
 
 
+Pattern ED100
+# gf New pattern. (3.7.8)
+
+.....	    cut through to weaken
+X.O..
+.XOX.
+..*..
+.....
+-----
+
+:8,OXae
+
+
+
 #####################################################################
 #
 # Center defend/attack patterns

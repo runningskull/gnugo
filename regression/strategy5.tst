@@ -175,6 +175,10 @@ loadsgf games/semeai/semeai19.sgf 42
 293 reg_genmove white
 #? [F17]*
 
+# Very important to separate black.
+loadsgf games/tso_igobot_2006-01-16.sgf 18
+294 restricted_genmove white O6 S6
+#? [S6]
 
 ############ End of Tests #################
 
