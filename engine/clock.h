@@ -26,7 +26,7 @@
 #include "gnugo.h"
 
 /* initialization and activation */
-void clock_settings(int maintyime, int byotime, int byostones);
+void clock_settings(int maintime, int byotime, int byostones);
 void init_timers(void);
  
 /* main access */
