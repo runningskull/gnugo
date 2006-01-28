@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new testfile gifu05.tst
 - don't try large scale attack if original owl reading was expensive
 - teach influence_score() about chinese rules
 - copyright notices updated for 2006
