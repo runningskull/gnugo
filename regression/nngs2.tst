@@ -1,10 +1,3 @@
-# Reset applicable counters
-reset_connection_node_counter
-reset_owl_node_counter
-reset_reading_node_counter
-reset_trymove_counter
-
-
 # See also reading:173
 loadsgf games/nngs/gnugo-3.3.2-Zahlman-200205221717.sgf 207
 1 reg_genmove white
@@ -256,21 +249,3 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 224
 600 reg_genmove white
 #? [B5]*
-
-############ End of Tests #################
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by the life code
-10002 get_connection_node_counter
-#? [0]&
-
-# Report number of trymoves/trykos visited by the test
-10003 get_trymove_counter
-#? [0]&

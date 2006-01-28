@@ -1,7 +1,3 @@
-# Reset applicable counters
-reset_reading_node_counter
-reset_connection_node_counter
-
 # See also test 87.
 loadsgf games/connection1.sgf
 1 same_dragon G17 K17
@@ -181,7 +177,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 164
 54 disconnect B6 D10
 #? [1 C8]*
 55 connect B6 D10
-#? [1 D8|C8]*
+#? [1 (D8|C8)]*
 56 connect B6 F9
 #? [1 D8]
 
@@ -203,11 +199,11 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 216
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 238
 62 connect S18 S14
-#? [1 T15|T17]
+#? [1 (T15|T17)]
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 258
 63 connect N13 N17
-#? [1 N16|O17|P16]
+#? [1 (N16|O17|P16)]
 
 loadsgf games/trevor/auto/b72.sgf 30
 64 disconnect G11 K11
@@ -217,13 +213,13 @@ loadsgf games/trevor/auto/b72.sgf 30
 
 loadsgf games/trevor/auto/b67.sgf 58
 66 disconnect M6 L3
-#? [1 M5|M3]
+#? [1 (M5|M3)]
 67 connect M6 L3
-#? [1 M3|M2|M5]
+#? [1 (M3|M2|M5)]
 68 disconnect M6 L1
-#? [1 M5|M3|M2|M1]
+#? [1 (M5|M3|M2|M1)]
 69 connect M6 L1
-#? [1 M2|M3]
+#? [1 (M2|M3)]
 70 same_dragon M6 L3
 #? [0]
 
@@ -456,9 +452,3 @@ loadsgf games/kgs/ben9992000-GNU.sgf 189
 loadsgf games/trevor/auto/c23.sgf 72
 126 disconnect E8 F6
 #? [1 E6]
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-10001 get_connection_node_counter
-#? [0]&

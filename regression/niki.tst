@@ -1,10 +1,3 @@
-# Reset life node counter
-reset_connection_node_counter
-# Reset owl node counter
-reset_owl_node_counter
-# Reset reading node counter
-reset_reading_node_counter
-
 loadsgf games/niki.sgf 24
 1 reg_genmove white
 #? [E17]
@@ -95,15 +88,3 @@ loadsgf games/niki.sgf 226
 loadsgf games/niki.sgf 214
 14 reg_genmove white
 #? [F16]*
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by the life code
-10002 get_connection_node_counter
-#? [0]&

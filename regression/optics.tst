@@ -1,6 +1,3 @@
-# Reset reading node counter
-reset_reading_node_counter
-
 # Eyes of size 1
 loadsgf games/eyes1.sgf
 101 eval_eye A1
@@ -218,8 +215,3 @@ loadsgf games/marginal_ko.sgf
 #? [1 2 (J1|L2) J1]
 1812 eval_eye S1
 #? [0 1 R2 R2]
-
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&

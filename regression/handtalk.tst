@@ -1,9 +1,4 @@
-
-reset_owl_node_counter
-reset_reading_node_counter
-reset_trymove_counter
-
-# No the right moment to start cosmic go at G7 as in the game.
+# Not the right moment to start cosmic go at G7 as in the game.
 loadsgf games/handtalk/handtalk12.sgf 17
 1 reg_genmove black
 #? [R12|R13|R14|R8|R7|R6]*
@@ -101,22 +96,3 @@ loadsgf games/handtalk/handtalk2.sgf 79
 loadsgf games/handtalk/handtalk2.sgf 137
 21 reg_genmove black 
 #? [R6]
-
-
-############ End of Tests #################
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by the life code
-10002 get_connection_node_counter
-#? [0]&
-
-# Report number of trymoves/trykos visited by the test
-10003 get_trymove_counter
-#? [0]&

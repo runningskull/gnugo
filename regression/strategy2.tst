@@ -1,9 +1,3 @@
-# Reset applicable counters
-reset_connection_node_counter
-reset_owl_node_counter
-reset_reading_node_counter
-reset_trymove_counter
-
 # numbering is continued from strategy.tst.
 
 loadsgf games/strategy14a.sgf
@@ -277,22 +271,3 @@ loadsgf games/strategy26.sgf 251
 loadsgf games/strategy26.sgf 257
 100 reg_genmove black
 #? [M16]
-
-
-############ End of Tests #################
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by the life code
-10002 get_connection_node_counter
-#? [0]&
-
-# Report number of trymoves/trykos visited by the test
-10003 get_trymove_counter
-#? [0]&

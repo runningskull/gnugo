@@ -1,8 +1,4 @@
-# Reset applicable counters
-reset_connection_node_counter
-reset_owl_node_counter
-reset_reading_node_counter
-reset_trymove_counter
+# numbering is continued from strategy3.tst.
 
 loadsgf games/gwe.sgf 231
 # strictly speaking tenuki is possible here. Q1 is of course bad
@@ -356,22 +352,3 @@ loadsgf games/nngs/gnugo-3.1.30-morlvera-200204041921.sgf 154
 loadsgf games/nngs/gnugo-3.1.30-merlin-200204041428.sgf 189
 220 reg_genmove white
 #? [R6]
-
-
-############ End of Tests #################
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by the life code
-10002 get_connection_node_counter
-#? [0]&
-
-# Report number of trymoves/trykos visited by the test
-10003 get_trymove_counter
-#? [0]&

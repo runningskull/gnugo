@@ -1,6 +1,3 @@
-# Reset reading node counter
-reset_reading_node_counter
-
 # incident 2
 loadsgf games/incident2.sgf 212
 1 attack E3
@@ -281,7 +278,7 @@ loadsgf games/incident278.sgf 160
 
 loadsgf games/strategy5.sgf 44
 61 defend S5
-#? [1 S3|S4]
+#? [1 (S3|S4)]
 
 loadsgf games/reading04.sgf 237
 trymove B E1
@@ -649,7 +646,7 @@ loadsgf games/reading35.sgf
 # See also 13x13:78
 loadsgf games/reading36.sgf 23
 165 attack L4
-#? [1 K3|L3]*
+#? [1 (K3|L3)]*
 
 # See also semeai:36
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
@@ -932,7 +929,3 @@ trymove W K12
 popgo
 popgo
 popgo
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&

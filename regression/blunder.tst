@@ -1,9 +1,3 @@
-# Reset applicable counters
-reset_connection_node_counter
-reset_owl_node_counter
-reset_reading_node_counter
-reset_trymove_counter
-
 # This test suite is a collection of blunders. By "blunder" we here
 # mean a move which is worse than passing. Also included are moves
 # which are okay but which GNU Go incorrectly rejects thinking that
@@ -172,4 +166,3 @@ loadsgf games/kgs/2004-04-28-R-dokuganryu-GnuGoCVS.sgf 302
 loadsgf games/blunder24.sgf
 35 gg_genmove white
 #? [!G1]
-

@@ -40,7 +40,3 @@ loadsgf games/dniwog.sgf 96
 loadsgf games/dniwog.sgf 108
 8 reg_genmove white
 #? [!M17]
-
-
-
-

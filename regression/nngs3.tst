@@ -1,5 +1,3 @@
-
-
 # Lazarus-gnugo-3.1.31-200204122203.sgf problems:
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 6
@@ -571,5 +569,3 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 244
 loadsgf games/nngs/gnugo-3.3.10-tsuku-200210241808.sgf 136
 1190 reg_genmove white
 #? [D17]
-
-

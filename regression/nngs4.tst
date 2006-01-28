@@ -1,10 +1,3 @@
-# Reset applicable counters
-reset_connection_node_counter
-reset_owl_node_counter
-reset_reading_node_counter
-reset_trymove_counter
-
-
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 10
 10 reg_genmove white
 #? [E18]
@@ -495,21 +488,3 @@ loadsgf games/nngs/gnugo-3.5.5-liza-200404251750.sgf 176
 loadsgf games/nngs/gnugo-3.5.5-liza-200404251750.sgf 196
 1120 reg_genmove white
 #? [N7]*
-
-############ End of Tests #################
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by the life code
-10002 get_connection_node_counter
-#? [0]&
-
-# Report number of trymoves/trykos visited by the test
-10003 get_trymove_counter
-#? [0]&

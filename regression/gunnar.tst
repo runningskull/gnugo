@@ -1,9 +1,3 @@
-# Reset applicable counters
-reset_connection_node_counter
-reset_owl_node_counter
-reset_reading_node_counter
-reset_trymove_counter
-
 # M19 is a serious blunder.
 loadsgf games/nngs/gnugo-3.3.10-viking4-200210261703.sgf 181
 1 reg_genmove white
@@ -498,21 +492,3 @@ loadsgf games/kgs/Kuksa-GNU.sgf 178
 loadsgf games/gunnar/gunnar21.sgf
 90 reg_genmove black
 #? [H3]
-
-############ End of Tests #################
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by the connection code
-10002 get_connection_node_counter
-#? [0]&
-
-# Report number of trymoves/trykos visited by the test
-10003 get_trymove_counter
-#? [0]&

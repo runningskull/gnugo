@@ -1,10 +1,3 @@
-# Reset applicable counters
-reset_connection_node_counter
-reset_owl_node_counter
-reset_reading_node_counter
-reset_trymove_counter
-
-
 # games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf problems:
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 20
@@ -1001,22 +994,3 @@ loadsgf games/nngs/LordOfPi-gnugo-3.1.20-200201202014.sgf 30
 loadsgf games/nngs/LordOfPi-gnugo-3.1.20-200201202014.sgf 36
 2060 reg_genmove black
 #? [C4|C1|F1]
-
-
-
-################## End of Tests #################
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by the life code
-10002 get_connection_node_counter
-#? [0]&
-
-# Report number of trymoves/trykos visited by the test
-10003 get_trymove_counter
-#? [0]&

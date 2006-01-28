@@ -1,9 +1,3 @@
-# Reset applicable counters
-reset_connection_node_counter
-reset_owl_node_counter
-reset_reading_node_counter
-reset_trymove_counter
-
 loadsgf games/wing-yuhiko-gnugo.sgf 12
 221 restricted_genmove black S4 Q7
 #? [S4]
@@ -179,21 +173,3 @@ loadsgf games/semeai/semeai19.sgf 42
 loadsgf games/tso_igobot_2006-01-16.sgf 18
 294 restricted_genmove white O6 S6
 #? [S6]
-
-############ End of Tests #################
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by the life code
-10002 get_connection_node_counter
-#? [0]&
-
-# Report number of trymoves/trykos visited by the test
-10003 get_trymove_counter
-#? [0]&

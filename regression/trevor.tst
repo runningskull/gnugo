@@ -594,7 +594,7 @@ loadsgf games/trevor/trevor_69.sgf
 #SEVERITY=10
 loadsgf games/trevor/trevor_70.sgf
 700 owl_attack H1
-#? [1 G5|J5|H5|G2]
+#? [1 (G5|J5|H5|G2)]
 
 #CATEGORY=OWL_ESCAPE
 #DESCRIPTION=black gets the killing move, creating a missed cutting point.

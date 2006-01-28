@@ -1,8 +1,3 @@
-# Reset node counters
-reset_reading_node_counter
-reset_owl_node_counter
-reset_connection_node_counter
-
 # Life and death test problems.
 loadsgf games/life_and_death/ld1.sgf
 1 dragon_status B18
@@ -490,16 +485,3 @@ loadsgf games/life_and_death/invasion4.sgf
 loadsgf games/life_and_death/ld20.sgf
 520 owl_defend B4
 #? [2 B3]*
-
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by the life code
-10002 get_connection_node_counter
-#? [0]&

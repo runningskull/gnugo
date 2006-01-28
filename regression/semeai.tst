@@ -1,6 +1,3 @@
-reset_owl_node_counter
-reset_reading_node_counter
-
 # Here is a list of other regressions which should afford
 # semeai tuning. The regressions were run with the version
 # of November 6, 2001 with three different versions of the
@@ -533,14 +530,3 @@ loadsgf games/semeai/semeai17.sgf 64
 loadsgf games/kgs/GNU-minautore.sgf 80
 131 dragon_status P8
 #? [critical T8 (T8|T10|T11|T12)]
-
-########### end of semeai tests #################
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-

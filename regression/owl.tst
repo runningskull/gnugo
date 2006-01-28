@@ -1,8 +1,3 @@
-# Reset owl node counter
-reset_owl_node_counter
-# Reset reading node counter
-reset_reading_node_counter
-
 # incident 66
 loadsgf games/incident66.sgf 52
 1 owl_attack D8
@@ -500,7 +495,7 @@ loadsgf games/owl15.sgf
 # see also test 73
 loadsgf games/incident263.sgf 302
 134 owl_attack S14
-#? [1 S17|S18]
+#? [1 (S17|S18)]
 
 loadsgf games/owl16.sgf
 # attack at N17 almost works
@@ -816,7 +811,7 @@ loadsgf games/filllib9.sgf 121
 # Additionally D7, C8 and some other odd moves work. H9 does not.
 loadsgf games/trevor/trevor_24.sgf 33
 221 owl_defend H8
-#? [1 D8|E8]
+#? [1 (D8|E8)]
 
 # E6 almost kills tactically.
 loadsgf games/trevor/trevor_27.sgf 36
@@ -833,7 +828,7 @@ loadsgf games/ego.sgf 198
 
 loadsgf games/ego.sgf 198
 225 owl_defend T17
-#? [3 Q19|S16]*
+#? [3 (Q19|S16)]*
 
 loadsgf games/owl29.sgf 132
 226 owl_attack J10
@@ -841,7 +836,7 @@ loadsgf games/owl29.sgf 132
 
 loadsgf games/owl30.sgf 172
 227 owl_attack L19
-#? [1 Q19|P17]
+#? [1 (Q19|P17)]
 
 # The cut at D5 fails.
 loadsgf games/nicklas/nicklas18.sgf 17
@@ -956,13 +951,3 @@ loadsgf games/handtalk/handtalk23.sgf 186
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 262 owl_defend E7
 #? [0]*
-
-########### end of tests #####################
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&

@@ -1,4 +1,4 @@
-# Tests from the tournament at the CGF special meeting Janaury 2004
+# Tests from the tournament at the CGF special meeting January 2004.
 
 loadsgf games/cgf2004/aya.sgf 28
 10 reg_genmove white
@@ -33,6 +33,3 @@ loadsgf games/cgf2004/aya.sgf 162
 loadsgf games/cgf2004/aya.sgf 188
 80 reg_genmove white
 #? [Q12|O15]*
-
-
-

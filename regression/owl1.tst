@@ -1,8 +1,3 @@
-# Reset owl node counter
-reset_owl_node_counter
-# Reset reading node counter
-reset_reading_node_counter
-
 # Extremely bad misread. (Made GNU Go play at L9 with the last move before
 # that position.)
 loadsgf games/wing-yuhiko-gnugo.sgf 115
@@ -55,7 +50,7 @@ loadsgf games/owl39.sgf 1
 #? [1 G4]*
 
 274 owl_defend E7
-#? [1 G4|G7|B6]
+#? [1 (G4|G7|B6)]
 
 loadsgf games/owl39.sgf
 275 owl_attack E7
@@ -145,7 +140,7 @@ loadsgf games/owl43.sgf
 
 loadsgf games/owl44.sgf
 296 owl_attack D6
-#? [1 E5|D8]
+#? [1 (E5|D8)]
 
 loadsgf games/nngs/gnugo-3.3.16-ccwills-200302151826.sgf 110
 297 owl_defend C8
@@ -159,7 +154,7 @@ loadsgf games/nngs/halti-gnugo-3.3.17-200303162357.sgf 228
 
 loadsgf games/nngs/wingjk-gnugo-3.3.17-200304070910.sgf
 300 owl_defend Q4
-#? [1 S5|S2]
+#? [1 (S5|S2)]
 
 loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 126
 301 owl_does_defend A12 A13
@@ -196,10 +191,10 @@ loadsgf games/nngs/guestn-gnugo-3.3.17-200304200323.sgf 52
 
 loadsgf games/nngs/gnugo-3.3.18-spewnboy-200304291635.sgf 91
 309 owl_attack N5
-#? [1 L2|L4]
+#? [1 (L2|L4)]
 
 310 owl_defend N5
-#? [1 L2|L4]
+#? [1 (L2|L4)]
 
 loadsgf games/nngs/qly-gnugo-3.3.18-200305022134.sgf 72
 311 owl_attack K6
@@ -391,7 +386,7 @@ loadsgf games/scoring/score39.sgf
 # See also olympiad2004:123.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 242
 355 owl_attack Q3
-#? [1 K3|L3|L1|J2]
+#? [1 (K3|L3|L1|J2)]
 356 owl_defend Q3
 #? [1 L3]*
 
@@ -486,13 +481,3 @@ play white L5
 play white M6
 380 owl_defend O7
 #? [1 P4]*
-
-########### end of tests #####################
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&

@@ -83,7 +83,7 @@ loadsgf golois/Goemate990911-2.sgf
 # S8, T8, T9 and T7 all work. S9 and T10 do not.
 loadsgf golois/Goemate990911-3.sgf
 19 owl_attack R8
-#? [1 S8|T8|T9|T7]
+#? [1 (S8|T8|T9|T7)]
 
 # B can tenuki. J8 and H9 are miai.
 loadsgf golois/Goemate991106-3.sgf

@@ -2,14 +2,6 @@
 # GNU Go mistakes in games against or observed by Teun
 # ==============
 
-
-# Reset life node counter
-reset_connection_node_counter
-# Reset owl node counter
-reset_owl_node_counter
-# Reset reading node counter
-reset_reading_node_counter
-
 loadsgf games/arb/game01.sgf 53
 101 reg_genmove black
 #? [(C2|D2|F2|G2|F1|D1|E1)]
@@ -79,16 +71,3 @@ loadsgf games/arb/game03.sgf 109
 loadsgf games/arb/game04.sgf 43
 233 reg_genmove black
 #? [J9]
-
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#? [0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#? [0]&
-
-# Report number of nodes visited by the life code
-10002 get_connection_node_counter
-#? [0]&
