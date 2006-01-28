@@ -51,12 +51,13 @@ loadsgf games/gifu2005/gnugo-katsu.sgf 224
 1130 reg_genmove white
 #? [S18]
 
-# Two points in sente.
+# Three points in sente.
 loadsgf games/gifu2005/gnugo-katsu.sgf 238
-1140 reg_genmove white
+1140 restricted_genmove white G8 G9 H12 E5
 #? [G8]
 
 loadsgf games/gifu2005/gnugo-katsu.sgf 254
+play black S19
 1150 reg_genmove white
-#? [T14]
+#? [T14|P12|Q12]
 
