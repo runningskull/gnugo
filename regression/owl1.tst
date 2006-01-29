@@ -481,3 +481,18 @@ play white L5
 play white M6
 380 owl_defend O7
 #? [1 P4]*
+
+# Black has easy local life with L10.
+loadsgf games/kgs/GNU-ituyosi.sgf 167
+381 owl_attack P9
+#? [1 (L10|M11|M10)]
+382 owl_defend P9
+#? [1 (L10|K7|K5|Q10)]
+
+# Persistent cache problem. B5 is not included in the active area.
+loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 16
+383 owl_attack C3
+#? [0]
+loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 18
+384 owl_attack C3
+#? [1 (A2|F2)]

@@ -79,5 +79,5 @@ loadsgf games/nngs/gnugo-3.5.5-liza-200404251750.sgf 42
 # P19 as in the game is not so attractive. Better to first isolate 
 # the dragon completely. 
 loadsgf games/kgs/2004-04-10-Shun9137-GnuGoCVS.sgf 243
-17 gg_genmove black
+17 reg_genmove black
 #? [L19|K19]*
