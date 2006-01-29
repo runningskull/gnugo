@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- metamachine enabled in ascii mode (as in GNU Go 3.6)
+- configure option oracle renamed metamachine (as in GNU Go 3.6)
 - new testfile gifu05.tst
 - don't try large scale attack if original owl reading was expensive
 - teach influence_score() about chinese rules

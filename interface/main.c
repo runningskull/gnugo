@@ -1353,7 +1353,14 @@ main(int argc, char *argv[])
       show_version();
       show_copyright();
     }
-  
+
+#if ORACLE
+    if (metamachine) {
+      summon_oracle();
+      oracle_loadsgf(infilename, untilstring);
+    }
+#endif
+
     play_ascii(&sgftree, &gameinfo, infilename, untilstring);
     break;
   }
