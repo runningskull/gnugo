@@ -474,6 +474,12 @@ loadsgf games/owl54.sgf
 130 analyze_semeai D3 G2
 #? [0 0 PASS]*
 
+loadsgf games/CrazyStone1.sgf 56
+133 analyze_semeai D9 G3
+#? [1 2 H2]
+134 analyze_semeai G3 D9
+#? [1 1 H2]
+
 ########### semeai gen_move tests #################
 
 # A6 gives an unfavorable ko while F10 gives seki.
@@ -504,6 +510,11 @@ loadsgf games/semeai/semeai17.sgf 52
 loadsgf games/verybad.sgf 114
 128 restricted_genmove black T15 T17 S17 P19
 #? [!T15]*
+
+# J8 leaves ko aji. (Admittedly a very bad ko for black but still a ko.)
+loadsgf games/CrazyStone1.sgf 50
+132 reg_genmove white
+#? [H9|J4]
 
 ########### semeai status tests #################
 

@@ -173,3 +173,39 @@ loadsgf games/semeai/semeai19.sgf 42
 loadsgf games/tso_igobot_2006-01-16.sgf 18
 294 restricted_genmove white O6 S6
 #? [S6]
+
+# Just play J2 directly.
+loadsgf games/CrazyStone1.sgf 34
+295 reg_genmove white
+#? [J2]
+
+# Play the proper move.
+loadsgf games/CrazyStone2.sgf 17
+296 restricted_genmove black F9 G8
+#? [G8]
+
+# D9 is quite bad. (Not played in the game since it's the wrong player
+# but the move of choice for GNU Go 3.6 and 3.7.7.)
+loadsgf games/CrazyStone2.sgf 34
+297 restricted_genmove white D8 D9
+#? [D8]
+
+# A5 is an overplay since it can't be defended without losing the
+# important eye in the upper left corner. (The list of accepted moves
+# is rather generous and can be
+loadsgf games/CrazyStone2.sgf 49
+298 reg_genmove black
+#? [D2|B7]
+
+# Can't play away any more liberties. Start picking the G8 stones off
+# the board immediately so that no more than the A7 stones need be
+# lost. (There's no time to attack from above.)
+loadsgf games/CrazyStone2.sgf 61
+299 reg_genmove black
+#? [H3]
+
+# Still possible to save most of the stones.
+# See also connection:127.
+loadsgf games/CrazyStone2.sgf 77
+300 reg_genmove black
+#? [H3]

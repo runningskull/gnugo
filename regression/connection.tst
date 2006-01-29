@@ -452,3 +452,8 @@ loadsgf games/kgs/ben9992000-GNU.sgf 189
 loadsgf games/trevor/auto/c23.sgf 72
 126 disconnect E8 F6
 #? [1 E6]
+
+# See also strategy5:300.
+loadsgf games/CrazyStone2.sgf 77
+127 same_dragon A9 G6
+#? [0]

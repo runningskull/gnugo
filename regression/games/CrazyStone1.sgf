@@ -1,0 +1,15 @@
+(;FF[4]CA[ISO8859_1]GN[time-16-2]AP[TwoGtp:0.8pre2]SZ[9]KM[7.5]
+PB[Crazy Stone:0003-11]PW[GNU Go:3.6]DT[2006-01-13]
+C[Black: ./CrazyStone
+White: gnugo --mode gtp --chinese-rules --level 10 --min-level 10
+Result[Black\]: ?
+Result[White\]: B+73.5
+Host: zizi.grappa.univ-lille3.fr (AMD Athlon(tm) 64 Processor 3400+)
+Date: Friday, January 13, 2006 11:22:17 AM CET]
+;B[ee];W[cg];B[cc];W[gc];B[ge];W[he];B[hf];W[hd];B[dd];W[gf]
+;B[gg];W[ff];B[ef];W[fg];B[eg];W[fh];B[eh];W[bg];B[gh];W[fi]
+;B[ei];W[fe];B[fd];W[gd];B[gi];W[ge];B[ig];W[hh];B[fc];W[fb]
+;B[eb];W[gb];B[hi];W[if];B[ie];W[ih];B[be];W[ea];B[db];W[da]
+;B[ca];W[fa];B[id];W[ic];B[bd];W[tt];B[ch];W[tt];B[hb];W[ib]
+;B[ha];W[hg];B[ii];W[if];B[ie];W[hc];B[hh];W[tt];B[cb];W[tt]
+;B[ec];W[tt];B[dh];W[tt];B[tt])
