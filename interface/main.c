@@ -483,14 +483,14 @@ main(int argc, char *argv[])
 	
       case OPT_HANDICAPSTONES:
 	{
-	  int handicap = atoi(gg_optarg);
+	  int requested_handicap = atoi(gg_optarg);
 	  
-	  if (handicap < 0 || handicap > MAX_HANDICAP) {
-	    fprintf(stderr, "Unsupported handicap: %d.\n", handicap);
+	  if (requested_handicap < 0 || requested_handicap > MAX_HANDICAP) {
+	    fprintf(stderr, "Unsupported handicap: %d.\n", requested_handicap);
 	    fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	    exit(EXIT_FAILURE);
 	  }
-	  gameinfo.handicap = handicap;
+	  gameinfo.handicap = requested_handicap;
 	}
         break;
       
@@ -950,7 +950,7 @@ main(int argc, char *argv[])
   }
   else
   /* Initialize and empty sgf tree if there was no infile. */
-    sgftreeCreateHeaderNode(&sgftree, board_size, komi);
+    sgftreeCreateHeaderNode(&sgftree, board_size, komi, handicap);
 
   /* Set the game_record to be identical to the loaded one or the
    * newly created empty sgf tree.

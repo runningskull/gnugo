@@ -226,8 +226,8 @@ dump_board_sgf(void)
     if (ON_BOARD(pos))
       initial_colors_found |= initial_board[pos];
   
-  fprintf(stderr, "(;GM[1]FF[4]SZ[%d]KM[%.1f]GN[GNU Go %s stepped on a bug]\n",
-	  board_size, komi, gg_version());
+  fprintf(stderr, "(;GM[1]FF[4]SZ[%d]KM[%.1f]HA[%d]GN[GNU Go %s stepped on a bug]\n",
+	  board_size, komi, handicap, gg_version());
 
   for (color = WHITE; color <= BLACK; color++) {
     if (initial_colors_found & color) {

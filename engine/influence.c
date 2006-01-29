@@ -2133,8 +2133,9 @@ influence_score(const struct influence_data *q, int use_chinese_rules)
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii))
       score += q->territory_value[ii];
+  
   if (use_chinese_rules)
-    score += stones_on_board(WHITE) - stones_on_board(BLACK) + komi;
+    score += stones_on_board(WHITE) - stones_on_board(BLACK) + komi + handicap;
   else
     score += black_captured - white_captured + komi;
 
@@ -2142,76 +2143,32 @@ influence_score(const struct influence_data *q, int use_chinese_rules)
 }
 
 
-/* Uses initial_influence to estimate :
- *
- * - the score (balance in terms of solid territory)
- * - the "power" (balance in terms of influence)
- * - the game advancement (fuseki, chuban, yose)
- *     returned as a value between 0.0 (start) and 1.0 (game over)
- *
- * The algorythm uses a 'chinese rules'-like method to estimate the
- * score, so prisoners and dead stones are just ignored.
- */
-static float
-influence_evaluate_position(int color, float *power, float *game_status)
-{
-  struct influence_data *iq = INITIAL_INFLUENCE(color);
-  struct influence_data *oq = OPPOSITE_INFLUENCE(color);
-  float score = 0.0;
-  float power_balance = 0.0;
-  int count = 0;
-  int non_territory = 0;
-  int ii;
-
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      if (iq->safe[ii]) {
-	/* chinese-style scoring, a safe stone is 1 point */
-        score += (board[ii] == WHITE ? 1 : -1);
-	count += WEIGHT_TERRITORY;
-      }
-      else if (whose_territory(iq, ii) != EMPTY
-	       && whose_territory(oq, ii) != EMPTY) {
-	  /* chinese-style scoring, add 1 point max, not 2 */
-	score += (iq->territory_value[ii] > 0 ? 1 : -1);
-	count += WEIGHT_TERRITORY;
-      }
-      else if (whose_moyo(oq, ii) != EMPTY) {
-	power_balance += oq->white_influence[ii] - oq->black_influence[ii];
-	non_territory++;
-	count += WEIGHT_MOYO;
-      }
-      else if (whose_area(oq, ii) != EMPTY) {
-	power_balance += oq->white_influence[ii] - oq->black_influence[ii];
-	non_territory++;
-	count += WEIGHT_AREA;
-      }
-      else {
-	power_balance += oq->white_influence[ii] - oq->black_influence[ii];
-	non_territory++;
-      }
-    }
-
-  score += komi;
-
-  if (power)
-    *power = power_balance / non_territory;
-  if (game_status)
-    *game_status = (float) count
-		   / (WEIGHT_TERRITORY * board_size * board_size);
-
-  return score;
-}
-
-/* Export game advancement status (fuseki, chuban, yose)
- * Returned as a value between 0.0 (start) and 1.0 (game over)
+/* Uses initial_influence to estimate the game advancement (fuseki,
+ * chuban, yose) returned as a value between 0.0 (start) and 1.0 (game
+ * over)
  */
 float
 game_status(int color)
 {
-  float status;
-  influence_evaluate_position(color, NULL, &status);
-  return status;
+  struct influence_data *iq = INITIAL_INFLUENCE(color);
+  struct influence_data *oq = OPPOSITE_INFLUENCE(color);
+  int count = 0;
+  int ii;
+
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+    if (ON_BOARD(ii)) {
+      if (iq->safe[ii])
+	count += WEIGHT_TERRITORY;
+      else if (whose_territory(iq, ii) != EMPTY
+	       && whose_territory(oq, ii) != EMPTY)
+	count += WEIGHT_TERRITORY;
+      else if (whose_moyo(oq, ii) != EMPTY)
+	count += WEIGHT_MOYO;
+      else if (whose_area(oq, ii) != EMPTY)
+	count += WEIGHT_AREA;
+    }
+
+  return (float) count / (WEIGHT_TERRITORY * board_size * board_size);
 }
 
 

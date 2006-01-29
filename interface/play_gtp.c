@@ -34,8 +34,6 @@
 #include "gg_utils.h"
 
 /* Internal state that's not part of the engine. */
-static int handicap = 0;
-
 static int report_uncertainty = 0;
 static int gtp_orientation = 0;
 
@@ -847,7 +845,6 @@ gtp_loadsgf(char *s)
     color_to_move = gameinfo_play_sgftree_rot(&gameinfo, &sgftree, untilstring,
                                               gtp_orientation);
 
-  handicap = gameinfo.handicap;
   gtp_internal_set_boardsize(board_size);
   reset_engine();
   init_timers();
@@ -2995,7 +2992,7 @@ finish_and_score_game(int seed)
     next = OTHER_COLOR(next);
   } while (pass < 2 && moves < board_size * board_size);
 
-  final_score = aftermath_compute_score(next, komi, NULL);
+  final_score = aftermath_compute_score(next, NULL);
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       final_status[i][j] = aftermath_final_status(next, POS(i, j));

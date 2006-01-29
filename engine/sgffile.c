@@ -120,7 +120,7 @@ sgffile_begindump(SGFTree *tree)
     sgf_dumptree = tree;
   
   sgftree_clear(sgf_dumptree);
-  sgftreeCreateHeaderNode(sgf_dumptree, board_size, 0.0);
+  sgftreeCreateHeaderNode(sgf_dumptree, board_size, komi, handicap);
   sgffile_printboard(sgf_dumptree);
 }
 
@@ -163,9 +163,9 @@ sgffile_printsgf(int color_to_play, const char *filename)
   relative_komi = komi + black_captured - white_captured;
   
   sgftree_clear(&sgftree);
-  sgftreeCreateHeaderNode(&sgftree, board_size, relative_komi);
+  sgftreeCreateHeaderNode(&sgftree, board_size, relative_komi, handicap);
   sgf_write_header(sgftree.root, 1, get_random_seed(), relative_komi,
-		   get_level(), chinese_rules);
+		   handicap, get_level(), chinese_rules);
   gg_snprintf(str, 128, "GNU Go %s load and print", gg_version());
   sgfOverwriteProperty(sgftree.root, "GN", str);
   

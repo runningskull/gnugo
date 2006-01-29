@@ -134,66 +134,73 @@ static const int places[][2] = {
 
 /*
  * Sets up fixed handicap placement stones, returning the number of
- * placed handicap stones.
+ * placed handicap stones and also setting the global variable
+ * handicap to the same value.
  */
 
 int
-place_fixed_handicap(int handicap)
+place_fixed_handicap(int desired_handicap)
 {
-  int x;
-  int maxhand;
+  int r;
+  int max_handicap;
+  int remaining_stones;
   int three = board_size > 11 ? 3 : 2;
   int mid = board_size/2;
-  int retval = handicap;
 
   /* A handicap of 1 just means that B plays first, no komi.
    * Black is not told where to play the first stone so no handicap
    * is set. 
    */
-  if (handicap < 2)
+  if (desired_handicap < 2) {
+    handicap = 0;
     return 0;
+  }
+  
   if ((board_size % 2 == 1) && (board_size >= 9))
-    maxhand = 9;
+    max_handicap = 9;
   else if (board_size >= 7)
-    maxhand = 4;
+    max_handicap = 4;
   else
-    maxhand = 0;
+    max_handicap = 0;
 
   /* It's up to the caller of this function to notice if the handicap
    * was too large for fixed placement and act upon that.
    */
-  if (handicap > maxhand) {
-    handicap = maxhand;
-    retval = maxhand;
-  }
+  if (desired_handicap > max_handicap)
+    handicap = max_handicap;
+  else
+    handicap = desired_handicap;
 
+  remaining_stones = handicap;
   /* special cases: 5 and 7 */
-  if (handicap == 5 || handicap == 7) {
+  if (desired_handicap == 5 || desired_handicap == 7) {
     add_stone(POS(mid, mid), BLACK);
-    handicap--;
+    remaining_stones--;
   }
 
-  for (x = 0; x < handicap; ++x) {
-    int i = places[x][0];
-    int j = places[x][1];
+  for (r = 0; r < remaining_stones; r++) {
+    int i = places[r][0];
+    int j = places[r][1];
 
-    /* translate the encoded values to board co-ordinates */
-    if (i == 2)  i = three;	/* 2 or 3 */
-    if (i == -2) i = -three;
-
-    if (j == 2)  j = three;
-    if (j == -2) j = -three;
-
-    if (i == 0) i = mid;
-    if (j == 0) j = mid;
-
-    if (i < 0) i += board_size-1;
-    if (j < 0) j += board_size-1;
-
+    /* Translate the encoded values to board co-ordinates. */
+    if (i == 2)
+      i = three;	/* 2 or 3 */
+    else if (i == 0)
+      i = mid;
+    else if (i == -2)
+      i = board_size - 1 - three;
+    
+    if (j == 2)
+      j = three;
+    else if (j == 0)
+      j = mid;
+    else if (j == -2)
+      j = board_size - 1 - three;
+    
     add_stone(POS(i, j), BLACK);
   }
 
-  return retval;
+  return handicap;
 }
 
 
@@ -215,16 +222,23 @@ static void free_handicap_callback(int anchor, int color,
 				   struct pattern *pattern,
 				   int ll, void *data);
 
+/*
+ * Sets up free placement handicap stones, returning the number of
+ * placed handicap stones and also setting the global variable
+ * handicap to the same value.
+ */
 int
-place_free_handicap(int handicap)
+place_free_handicap(int desired_handicap)
 {
-  gg_assert(handicap == 0 || handicap >= 2);
+  gg_assert(desired_handicap == 0 || desired_handicap >= 2);
 
-  if (handicap == 0)
+  if (desired_handicap == 0) {
+    handicap = 0;
     return 0;
+  }
 
-  total_handicap_stones = handicap;
-  remaining_handicap_stones = handicap;
+  total_handicap_stones = desired_handicap;
+  remaining_handicap_stones = desired_handicap;
 
   /* First place black stones in the four corners to enable the
    * pattern matching scheme.
@@ -265,9 +279,9 @@ place_free_handicap(int handicap)
   }
 
   /* Set handicap to the number of actually placed stones. */
-  handicap -= remaining_handicap_stones;
+  handicap = desired_handicap - remaining_handicap_stones;
 
-  /* Reset these to invalid values, so that improper used of handicap
+  /* Reset these to invalid values, so that improper use of handicap
    * helper functions can be detected.
    */
   total_handicap_stones = -1;

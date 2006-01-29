@@ -67,7 +67,7 @@ static void ascii_count(Gameinfo *gameinfo);
 static void showcapture(char *line);
 static void showdefense(char *line);
 static void ascii_goto(Gameinfo *gameinfo, char *line);
-static void ascii_free_handicap(Gameinfo *gameinfo, char *handicap);
+static void ascii_free_handicap(Gameinfo *gameinfo, char *handicap_string);
 
 /* If sgf game info is written can't reset parameters like handicap, etc. */
 static int sgf_initialized;
@@ -447,8 +447,7 @@ init_sgf(Gameinfo *ginfo)
   sgf_initialized = 1;
 
   sgf_write_header(sgftree.root, 1, get_random_seed(), komi,
-      		   get_level(), chinese_rules);
-  sgfOverwritePropertyInt(sgftree.root, "HA", ginfo->handicap);
+      		   ginfo->handicap, get_level(), chinese_rules);
   if (ginfo->handicap > 0)
     sgffile_recordboard(sgftree.root);
 }
@@ -1007,7 +1006,7 @@ do_play_ascii(Gameinfo *gameinfo)
     /* Free the sgf tree and prepare for a new game. */
     sgfFreeNode(sgftree.root);
     sgftree_clear(&sgftree);
-    sgftreeCreateHeaderNode(&sgftree, board_size, komi);
+    sgftreeCreateHeaderNode(&sgftree, board_size, komi, gameinfo->handicap);
     sgf_initialized = 0;
 
     gameinfo_clear(gameinfo);
@@ -1228,14 +1227,14 @@ ascii_goto(Gameinfo *gameinfo, char *line)
 
 
 static void
-ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
+ascii_free_handicap(Gameinfo *gameinfo, char *handicap_string)
 {
   int handi;
   int i;
   char line[80];
   int stones[MAX_BOARD*MAX_BOARD];
 
-  if (sscanf(handicap, "%d", &handi) == 1) {
+  if (sscanf(handicap_string, "%d", &handi) == 1) {
     /* GNU Go is to place handicap */
     if (handi < 0 || handi == 1) {
       printf("\nInvalid command syntax!\n");

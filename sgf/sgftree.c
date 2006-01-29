@@ -156,12 +156,13 @@ sgftreeAddPlayLast(SGFTree *tree, int color, int movex, int movey)
 
 
 void
-sgftreeCreateHeaderNode(SGFTree *tree, int boardsize, float komi)
+sgftreeCreateHeaderNode(SGFTree *tree, int boardsize, float komi, int handicap)
 {
   SGFNode *root = sgfNewNode();
 
   sgfAddPropertyInt(root, "SZ", boardsize);
   sgfAddPropertyFloat(root, "KM", komi);
+  sgfAddPropertyInt(root, "HA", handicap);
   tree->root = root;
   tree->lastnode = root;
 }

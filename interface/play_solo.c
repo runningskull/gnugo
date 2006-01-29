@@ -59,8 +59,8 @@ play_solo(Gameinfo *gameinfo, int moves)
   komi = 5.5;
 
   sgftree_clear(&sgftree);
-  sgftreeCreateHeaderNode(&sgftree, board_size, komi);
-  sgf_write_header(sgftree.root, 1, get_random_seed(), 5.5,
+  sgftreeCreateHeaderNode(&sgftree, board_size, komi, handicap);
+  sgf_write_header(sgftree.root, 1, get_random_seed(), 5.5, handicap,
                    get_level(), chinese_rules);
  
   /* Generate some random moves. */
@@ -219,7 +219,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
      * available solution.
      */
     sgftreeCreateHeaderNode(&local_tree, board_size,
-			    komi + black_captured - white_captured);
+			    komi + black_captured - white_captured, handicap);
     sgffile_printboard(&local_tree);
     sgfAddProperty(local_tree.lastnode, "PL",
 		   gameinfo->to_move == WHITE ? "W" : "B");
@@ -255,7 +255,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
   
   /* Calculate the score. */
   if (method == AFTERMATH)
-    score = aftermath_compute_score(next, komi, score_tree);
+    score = aftermath_compute_score(next, score_tree);
   else
     score = gnugo_estimate_score(NULL, NULL);
   

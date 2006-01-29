@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new global variable handicap
+- chinese scoring adds the number of handicap stones in addition to the
+  komi to white's score
+- include handicap in sgf headers
+- dead code removed from influence_evaluate_position() and the rest moved
+  to game_status()
 - metamachine enabled in ascii mode (as in GNU Go 3.6)
 - configure option oracle renamed metamachine (as in GNU Go 3.6)
 - new testfile gifu05.tst

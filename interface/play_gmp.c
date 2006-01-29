@@ -57,7 +57,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
     mycolor = 0;
 
   sgftree_clear(&sgftree);
-  sgftreeCreateHeaderNode(&sgftree, board_size, komi);
+  sgftreeCreateHeaderNode(&sgftree, board_size, komi, gameinfo->handicap);
 
   ge = gmp_create(0, 1);
   TRACE("board size=%d\n", board_size);
@@ -133,7 +133,7 @@ play_gmp(Gameinfo *gameinfo, int simplified)
 
   gameinfo->computer_player = mycolor;
   sgf_write_header(sgftree.root, 1, get_random_seed(), komi,
-		   get_level(), chinese_rules);
+		   gameinfo->handicap, get_level(), chinese_rules);
   gameinfo->handicap = gnugo_sethand(gameinfo->handicap, sgftree.root);
   sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 

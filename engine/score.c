@@ -421,7 +421,7 @@ old_estimate_score(float *upper, float *lower)
   }
 
   if (chinese_rules)
-    u = white_area - black_area + komi;
+    u = white_area - black_area + komi + handicap;
   else {
     DEBUG(DEBUG_SCORING,
 	  "black captured: %d\nwhite captured: %d\nkomi: %f\n",
@@ -495,7 +495,7 @@ old_estimate_score(float *upper, float *lower)
     }
 
     if (chinese_rules)
-      l = white_area - black_area + komi;
+      l = white_area - black_area + komi + handicap;
     else {
       DEBUG(DEBUG_SCORING,
 	    "black captured: %d\nwhite captured: %d\nkomi: %f\n",

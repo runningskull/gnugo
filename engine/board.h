@@ -193,6 +193,7 @@ extern int          move_history_pos[MAX_MOVE_HISTORY];
 extern int          move_history_pointer;
 
 extern float        komi;
+extern int          handicap;     /* used internally in chinese scoring */
 extern int          movenum;      /* movenumber - used for debug output */
 		    
 extern signed char  shadow[BOARDMAX];      /* reading tree shadow */
@@ -223,6 +224,7 @@ struct board_state {
   int move_history_pointer;
 
   float komi;
+  int handicap;
   int move_number;
 };
 

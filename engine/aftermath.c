@@ -28,9 +28,6 @@
 #include <string.h>
 #include "liberty.h"
 
-static SGFTree *aftermath_sgftree;
-
-
 static int do_aftermath_genmove(int color,
 				int under_control[BOARDMAX],
 				int do_capture_dead_stones);
@@ -887,7 +884,8 @@ reduced_genmove(int color)
 
 /* Preliminary function for playing through the aftermath. */
 static void
-do_play_aftermath(int color, struct aftermath_data *a)
+do_play_aftermath(int color, struct aftermath_data *a,
+		  SGFTree *aftermath_sgftree)
 {
   int move;
   int pass = 0;
@@ -937,7 +935,7 @@ do_play_aftermath(int color, struct aftermath_data *a)
 static struct aftermath_data aftermath;
 
 static void
-play_aftermath(int color)
+play_aftermath(int color, SGFTree *aftermath_sgftree)
 {
   int pos;
   struct board_state saved_board;
@@ -975,7 +973,7 @@ play_aftermath(int color)
   a->black_area = 0;
   
   store_board(&saved_board);
-  do_play_aftermath(color, a);
+  do_play_aftermath(color, a, aftermath_sgftree);
   restore_board(&saved_board);
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -1035,15 +1033,15 @@ play_aftermath(int color)
 }
 
 float
-aftermath_compute_score(int color, float komi, SGFTree *tree)
+aftermath_compute_score(int color, SGFTree *tree)
 {
   struct aftermath_data *a = &aftermath;
-  aftermath_sgftree = tree;
-  play_aftermath(color);
+  play_aftermath(color, tree);
   if (chinese_rules)
     return (a->white_area
 	    - a->black_area
-	    + komi);
+	    + komi
+	    + handicap);
   else
     return (a->white_territory
 	    + a->black_captured
@@ -1062,8 +1060,7 @@ enum dragon_status
 aftermath_final_status(int color, int pos)
 {
   ASSERT_ON_BOARD1(pos);
-  aftermath_sgftree = NULL;
-  play_aftermath(color);
+  play_aftermath(color, NULL);
   return aftermath.final_status[pos];
 }
 

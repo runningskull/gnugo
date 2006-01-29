@@ -87,7 +87,7 @@ const char *result_to_string(int result);
 void gnugo_clear_board(int boardsize);
 void gnugo_play_move(int move, int color);
 int gnugo_play_sgfnode(SGFNode *node, int to_move);
-int gnugo_sethand(int handicap, SGFNode *root);
+int gnugo_sethand(int desired_handicap, SGFNode *node);
 float gnugo_estimate_score(float *upper, float *lower);
 
 /* ================================================================ */
@@ -332,7 +332,7 @@ int genmove(int color, float *value, int *resign);
 int genmove_conservative(int color, float *value);
 
 /* Play through the aftermath. */
-float aftermath_compute_score(int color, float komi, SGFTree *tree);
+float aftermath_compute_score(int color, SGFTree *tree);
 
 /* Basic information gathering. */
 /* worm.c */

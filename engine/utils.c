@@ -1418,7 +1418,7 @@ who_wins(int color, FILE *outfile)
   /* Use the aftermath code to compute the final score. (Slower but
    * more reliable.) 
    */
-  result = aftermath_compute_score(color, komi);
+  result = aftermath_compute_score(color, NULL);
   if (result > 0.0)
     winner = WHITE;
   else {

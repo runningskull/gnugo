@@ -533,12 +533,13 @@ sgfAddPlayLast(SGFNode *node, int who, int movex, int movey)
 
 
 SGFNode *
-sgfCreateHeaderNode(int boardsize, float komi)
+sgfCreateHeaderNode(int boardsize, float komi, int handicap)
 {
     SGFNode *root = sgfNewNode();
 
     sgfAddPropertyInt(root, "SZ", boardsize);
     sgfAddPropertyFloat(root, "KM", komi);
+    sgfAddPropertyInt(root, "HA", handicap);
 
     return root;
 }
@@ -829,7 +830,7 @@ sgf_write_header_reduced(SGFNode *root, int overwrite)
 
 void
 sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
-		 int level, int rules)
+		 int handicap, int level, int rules)
 {
   char str[128];
   int dummy;
@@ -841,6 +842,7 @@ sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
   if (overwrite || !sgfGetIntProperty(root, "RU", &dummy))
     sgfOverwriteProperty(root, "RU", rules ? "Chinese" : "Japanese");
   sgfOverwritePropertyFloat(root, "KM", komi);
+  sgfOverwritePropertyInt(root, "HA", handicap);
 
   sgf_write_header_reduced(root, overwrite);
 }

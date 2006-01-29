@@ -135,15 +135,15 @@ gnugo_play_sgfnode(SGFNode *node, int to_move)
 }
 
 
-/* Interface to placehand. Sets up handicap stones and
- * returns the number of placed handicap stones, updating the sgf file.
+/* Interface to place_fixed_handicap. Sets up handicap stones and
+ * updates the sgf file.
  */
 int
-gnugo_sethand(int handicap, SGFNode *node)
+gnugo_sethand(int desired_handicap, SGFNode *node)
 {
-  int stones = place_fixed_handicap(handicap);
+  place_fixed_handicap(desired_handicap);
   sgffile_recordboard(node);
-  return stones;
+  return handicap;
 }
 
 
@@ -237,16 +237,15 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 			  const char *untilstr, int orientation)
 {
   int bs;
-  int handicap = 0;
   int next = BLACK;
-  
   int untilmove = -1; /* Neither a valid move nor pass. */
   int until = 9999;
   
   if (!sgfGetIntProperty(tree->root, "SZ", &bs))
     bs = 19;
   gnugo_clear_board(bs);
-  
+
+  handicap = 0;
   if (sgfGetIntProperty(tree->root, "HA", &handicap) && handicap > 1)
     next = WHITE;
   gameinfo->handicap = handicap;
@@ -321,7 +320,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 	/* following really should not be needed for proper sgf file */
 	if (stones_on_board(GRAY) == 0 && next == WHITE) {
 	  place_fixed_handicap(gameinfo->handicap);
-	  sgfOverwritePropertyInt(tree->root, "HA", gameinfo->handicap);
+	  sgfOverwritePropertyInt(tree->root, "HA", handicap);
 	}
 	break;
 	      
@@ -331,7 +330,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 	/* following really should not be needed for proper sgf file */
 	if (stones_on_board(GRAY) == 0 && next == WHITE) {
 	  place_fixed_handicap(gameinfo->handicap);
-	  sgfOverwritePropertyInt(tree->root, "HA", gameinfo->handicap);
+	  sgfOverwritePropertyInt(tree->root, "HA", handicap);
 	}
 
 	move = get_sgfmove(prop);

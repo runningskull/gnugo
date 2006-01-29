@@ -92,7 +92,7 @@ SGFNode *sgfAddPlayLast(SGFNode *node, int who, int movex, int movey);
 
 void sgfWriteResult(SGFNode *node, float score, int overwrite);
 void sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
-		      int level, int rules);
+		      int handicap, int level, int rules);
 
 SGFNode *sgfLabel(SGFNode *node, const char *label, int i, int j);
 SGFNode *sgfLabelInt(SGFNode *node, int num, int i, int j);
@@ -108,7 +108,7 @@ SGFNode *sgfStartVariant(SGFNode *node);
 SGFNode *sgfStartVariantFirst(SGFNode *node);
 SGFNode *sgfAddChild(SGFNode *node);
 
-SGFNode *sgfCreateHeaderNode(int boardsize, float komi);
+SGFNode *sgfCreateHeaderNode(int boardsize, float komi, int handicap);
 
 /* Read SGF tree from file. */
 SGFNode *readsgffile(const char *filename);
@@ -152,7 +152,8 @@ void sgftreeBoardChar(SGFTree *tree, int i, int j, char c);
 void sgftreeBoardNumber(SGFTree *tree, int i, int j, int number);
 void sgftreeStartVariant(SGFTree *tree);
 void sgftreeStartVariantFirst(SGFTree *tree);
-void sgftreeCreateHeaderNode(SGFTree *tree, int boardsize, float komi);
+void sgftreeCreateHeaderNode(SGFTree *tree, int boardsize, float komi,
+			     int handicap);
 void sgftreeSetLastNode(SGFTree *tree, SGFNode *lastnode);
 
 

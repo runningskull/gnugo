@@ -363,6 +363,7 @@ store_board(struct board_state *state)
   }
 
   state->komi = komi;
+  state->handicap = handicap;
   state->move_number = movenum;
 }
 
@@ -398,6 +399,7 @@ restore_board(struct board_state *state)
   }
 
   komi = state->komi;
+  handicap = state->handicap;
   movenum = state->move_number;
   
   hashdata_recalc(&board_hash, board, board_ko_pos);
@@ -438,6 +440,8 @@ clear_board(void)
 
   move_history_pointer = 0;
   movenum = 0;
+
+  handicap = 0;
   
   hashdata_recalc(&board_hash, board, board_ko_pos);
   new_position();
