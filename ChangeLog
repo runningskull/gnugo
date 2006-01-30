@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.7.7 released January 30, 2005
+
 - new global variable handicap
 - chinese scoring adds the number of handicap stones in addition to the
   komi to white's score

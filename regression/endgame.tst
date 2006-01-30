@@ -254,4 +254,4 @@ loadsgf games/endgame12.sgf
 
 loadsgf games/nando/auto025.sgf 226
 980 restricted_genmove white E4 F4 Q19
-#? [F4]
+#? [F4]*

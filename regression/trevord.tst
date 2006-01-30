@@ -95,7 +95,7 @@ loadsgf games/trevor/auto/d02.sgf 78
 
 loadsgf games/trevor/auto/d02.sgf 142
 260 reg_genmove white
-#? [Q2]
+#? [Q2]*
 
 
 loadsgf games/trevor/auto/d02.sgf 142

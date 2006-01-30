@@ -8,7 +8,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 20
 #Trying to save L2 is an overplay.
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 22
 110 reg_genmove black
-#? [E2|H5|J5]
+#? [E2|H5|J5]*
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 22
 111 restricted_genmove black L2 L3
@@ -22,7 +22,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 24
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 30
 120 restricted_genmove black S1 Q4 R5
-#? [S1]
+#? [S1]*
 
 
 #new failure GNU Go 3.7.3
@@ -97,7 +97,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 194
 # is urgent. /ab
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 24
 230 reg_genmove black
-#? [E9|G7|H2|K6|N5|D6]
+#? [E9|G7|H2|K6|N5|D6]*
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 30
@@ -145,7 +145,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 114
 #New failure GNU Go 3.7.3
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 116
 304 restricted_genmove black B14 E13 M7
-#? [B14|M7]*
+#? [B14|M7]
 
 
 #New failure GNU Go 3.7.3
@@ -205,7 +205,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 82
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 126
 380 reg_genmove black
-#? [J2]
+#? [J2]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 152
@@ -215,7 +215,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 152
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 156
 400 reg_genmove black
-#? [N14|L13|M13]
+#? [N14|L13|M13]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 204
@@ -264,7 +264,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 90
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 92
 510 reg_genmove black
-#? [G14]*
+#? [G14]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 226
@@ -359,7 +359,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 47
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 57
 710 reg_genmove white
-#? [F16]
+#? [F16]*
 
 # Redundant. /ab
 #loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 59
@@ -383,7 +383,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 57
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 241
 810 reg_genmove white
-#? [J6|J8]
+#? [J6|J8]*
 
 
 #J11 is terrible.
@@ -428,7 +428,7 @@ loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051411.sgf 13
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051411.sgf 19
 890 restricted_genmove white G4 H4 J4
-#? [G4]
+#? [G4]*
 
 
 
@@ -559,7 +559,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 92
 #Yikes! (B19 original move)
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 98
 1100 reg_genmove white
-#? [C18|D14]
+#? [C18|D14]*
 
 
 
@@ -637,7 +637,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 24
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 28
 1230 reg_genmove white
-#? [H7|B5|E7|R14]
+#? [H7|B5|E7|R14]*
 
 
 #Locally, there are better moves than H14
@@ -772,7 +772,7 @@ loadsgf games/nngs/juka-gnugo-3.1.16-200112142153.sgf 6
 # L5 best attack here. /ab
 loadsgf games/nngs/juka-gnugo-3.1.16-200112142153.sgf 8
 1590 reg_genmove black
-#? [L5]
+#? [L5]*
 
 
 #Egads, don't tenuki here!
@@ -865,7 +865,7 @@ loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 202
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 57
 1790 restricted_genmove black O16 P14 S14
-#? [O16]
+#? [O16]*
 
 
 # Now redundant. /ab
@@ -876,7 +876,7 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 57
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 67
 1810 reg_genmove black
-#? [N15]
+#? [N15]*
 
 
 
@@ -907,7 +907,7 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 117
 # F6 connects out either way.
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 135
 1880 reg_genmove black
-#? [F6|G7]
+#? [F6|G7]*
 
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 161

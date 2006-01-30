@@ -390,7 +390,7 @@ loadsgf games/kgs/dogo-TheGNUGo.sgf 190
 # D5 huge.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 198
 71 reg_genmove black
-#? [D5]*
+#? [D5]
 
 # P11 is sente but loses one point since white can then play Q7 in
 # sente.
@@ -491,7 +491,7 @@ loadsgf games/kgs/Kuksa-GNU.sgf 178
 # eventually be lost there's no points to lose in trying.
 loadsgf games/gunnar/gunnar21.sgf
 90 reg_genmove black
-#? [H3]
+#? [H3]*
 
 # Break-in weirdness. P6 does not save the T10 stones.
 loadsgf games/kgs/GNU-roidesnems.sgf 143
@@ -501,21 +501,21 @@ loadsgf games/kgs/GNU-roidesnems.sgf 143
 # B15 cuts off the black stone in the corner. G17 is pointlessly submissive.
 loadsgf games/kgs/GNU-namascae.sgf 102
 92 restricted_genmove white G17 B15
-#? [B15]
+#? [B15]*
 
 # S5 should be 2 points sente and T13 8 points gote. In the game S5
 # was overvalued while T13 was undervalued. (Other moves are bigger
 # here of course.)
 loadsgf games/kgs/GNU-namascae.sgf 118
 93 restricted_genmove white S5 T13
-#? [T13]
+#? [T13]*
 
 # Necessary to protect against J14 cut. L16 and N15 are ineffective.
 loadsgf games/kgs/GNU-namascae.sgf 118
 94 reg_genmove white
-#? [H15|K16]
+#? [H15|K16]*
 
 # Of course O3 isn't an option.
 loadsgf games/gunnar/gunnar22.sgf
 95 reg_genmove white
-#? [P1|S1]
+#? [P1|S1]*

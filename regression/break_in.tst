@@ -47,7 +47,7 @@ popgo
 loadsgf games/trevor/auto/a021.sgf 16
 trymove white F6
 100 block_off D6 E9 F9 E8 F8 G8 H8 F7 G7 H7 G6 H6 G5 H5 G4 H4 G3 H3 
-#? [0]
+#? [0]*
 popgo
 
 

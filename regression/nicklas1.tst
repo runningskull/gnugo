@@ -121,7 +121,7 @@ loadsgf games/nicklas/nicklas11.sgf 16
 
 loadsgf games/nicklas/nicklas11.sgf 174
 1104 restricted_genmove black A15 C1
-#? [C1]
+#? [C1]*
 
 loadsgf games/nicklas/nicklas11.sgf 180
 1105 restricted_genmove black F2 H14
@@ -232,7 +232,7 @@ loadsgf games/nicklas/nicklas14.sgf 57
 
 loadsgf games/nicklas/nicklas14.sgf 61
 1408 dragon_status A8
-#? [alive]
+#? [alive]*
 
 loadsgf games/nicklas/nicklas15.sgf 196
 1502 reg_genmove black

@@ -38,7 +38,7 @@ loadsgf games/kgs/20040507-GnuGoCVS-read.sgf 212
 # tactical reading routines, but fails in the owl context)
 loadsgf games/kgs/20040507-GnuGoCVS-read.sgf 268
 90 reg_genmove white
-#? [T8]*
+#? [T8]
 
 # Semeai related problem. The status of D3 is revised to ALIVE
 # because black can't win the semeai C3 vs. D3 (both live after
@@ -141,7 +141,7 @@ loadsgf games/kgs/yagr-hasenhirn.sgf 71
 # A ladder desaster.
 loadsgf games/kgs/yagr-czarny.sgf 16
 290 reg_genmove white
-#? [B2]*
+#? [B2]
 
 loadsgf games/kgs/yagr-czarny.sgf 24
 300 restricted_genmove white H4 H5

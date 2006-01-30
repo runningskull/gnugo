@@ -154,7 +154,7 @@ loadsgf games/nngs/halti-gnugo-3.3.17-200303162357.sgf 228
 
 loadsgf games/nngs/wingjk-gnugo-3.3.17-200304070910.sgf
 300 owl_defend Q4
-#? [1 (S5|S2)]
+#? [1 (S5|S2)]*
 
 loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 126
 301 owl_does_defend A12 A13
@@ -485,9 +485,9 @@ play white M6
 # Black has easy local life with L10.
 loadsgf games/kgs/GNU-ituyosi.sgf 167
 381 owl_attack P9
-#? [1 (L10|M11|M10)]
+#? [1 (L10|M11|M10)]*
 382 owl_defend P9
-#? [1 (L10|K7|K5|Q10)]
+#? [1 (L10|K7|K5|Q10)]*
 
 # Persistent cache problem. B5 is not included in the active area.
 loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 16
@@ -495,4 +495,4 @@ loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 16
 #? [0]
 loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 18
 384 owl_attack C3
-#? [1 (A2|F2)]
+#? [1 (A2|F2)]*

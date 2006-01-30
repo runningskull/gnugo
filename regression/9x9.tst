@@ -249,61 +249,61 @@ loadsgf games/nodan-guno.sgf 54
 # Mandatory to stay connected.
 loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 6
 510 reg_genmove white
-#? [C4]
+#? [C4]*
 
 # Tenuki from the lower left stones is out of the question. E5 may be
 # best but is complicated. For now we accept any reasonable move that
 # stays on focus. In particular the game move at E7 is not acceptable.
 loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 10
 520 reg_genmove white
-#? [E5|D5|B2|E3|F3|F4]
+#? [E5|D5|B2|E3|F3|F4]*
 
 # F2 needlessly complicated and/or backfires. F3 solid and effective.
 loadsgf games/kgs/tournament8/indigoBot-GNU.sgf 13
 530 restricted_genmove black F2 F3
-#? [F3]
+#? [F3]*
 
 # D8 is too low.
 loadsgf games/kgs/tournament8/CrazyStone-GNU.sgf 5
 540 restricted_genmove black D8 D7
-#? [D7]
+#? [D7]*
 
 # B8 is nonsensical. There might be better moves but C6 is easy to see
 # that it's effective.
 loadsgf games/kgs/tournament8/CrazyStone-GNU.sgf 9
 550 restricted_genmove black B8 C6
-#? [C6]
+#? [C6]*
 
 # C5 leaves too much aji for white to work with in the corner.
 loadsgf games/kgs/tournament8/CrazyStone-GNU.sgf 33
 560 reg_genmove black
-#? [B4]
+#? [B4]*
 
 # E4 is better than E7 since it splits the opponent while saving the
 # cutting stones.
 loadsgf games/kgs/tournament8/tlsBot-GNU.sgf 13
 570 reg_genmove black
-#? [E4]
+#? [E4]*
 
 # More important to close off the center than the edge.
 loadsgf games/kgs/tournament8/firstgo-GNU.sgf 7
 580 restricted_genmove black E2 E6
-#? [E6]
+#? [E6]*
 
 # Important to keep white separated in the center.
 loadsgf games/kgs/tournament8/firstgo-GNU.sgf 19
 590 reg_genmove black
-#? [E5]
+#? [E5]*
 
 # B7 is too low and in the wrong direction. Many moves are better.
 loadsgf games/kgs/tournament10/GNU-AyaBot.sgf 4
 600 restricted_genmove white B7 F4 F3 G3
-#? [F4|F3|G3]
+#? [F4|F3|G3]*
 
 # H9 just doesn't work. The only useful ko threat is E4.
 loadsgf games/kgs/tournament10/GNU-AyaBot.sgf 30
 610 reg_genmove white
-#? [E4]
+#? [E4]*
 
 # A7 is a wonderful move, setting up an under the stones tesuji to
 # capture three stones. The move *was* played in the game and this

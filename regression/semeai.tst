@@ -354,7 +354,7 @@ loadsgf games/semeai/semeai14.sgf
 79 analyze_semeai F9 F7
 #? [1 0 PASS]*
 80 analyze_semeai F7 F9
-#? [1 0 (PASS|E9|E8|J9|H5)]*
+#? [1 0 (PASS|E9|E8|J9|H5)]
 
 loadsgf games/semeai/semeai16.sgf 222
 87 analyze_semeai N19 S18
@@ -514,7 +514,7 @@ loadsgf games/verybad.sgf 114
 # J8 leaves ko aji. (Admittedly a very bad ko for black but still a ko.)
 loadsgf games/CrazyStone1.sgf 50
 132 reg_genmove white
-#? [H9|J4]
+#? [H9|J4]*
 
 ########### semeai status tests #################
 

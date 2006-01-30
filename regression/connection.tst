@@ -315,7 +315,7 @@ loadsgf games/handtalk/handtalk1.sgf 31
 
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 201
 97 disconnect P8 O9
-#? [1 O5]*
+#? [1 O5]
 
 loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 185
 98 disconnect N4 Q6
@@ -351,7 +351,7 @@ loadsgf golois/Aya991113-9.sgf
 # horizon.
 loadsgf games/nicklas/nicklas5.sgf 23
 105 disconnect F8 G6
-#? [1 G7]*
+#? [1 G7]
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 164
 trymove black R14
@@ -409,7 +409,7 @@ popgo
 
 loadsgf games/gunnar/gunnar9.sgf 4
 115 disconnect D10 J7
-#? [1 H7]*
+#? [1 H7]
 
 # See also golife:3 and connection:28.
 loadsgf games/golife.sgf 30
@@ -419,7 +419,7 @@ loadsgf games/golife.sgf 30
 # See also trevor:15.
 loadsgf games/trevor/trevor_15.sgf 
 117 disconnect D7 F7
-#? [3 E7]*
+#? [3 E7]
 
 # See also reading:219.
 loadsgf games/kgs/llk-GNU.sgf 150
@@ -438,22 +438,22 @@ loadsgf games/kgs/GNU-higher.sgf 193
 # This test is extremely important.
 loadsgf games/kgs/perler-GNU.sgf 246
 122 disconnect B18 E15
-#? [3 E16]*
+#? [3 E16]
 
 loadsgf games/kgs/ben9992000-GNU.sgf 189
 123 disconnect E10 F12
-#? [3 E11]*
+#? [3 E11]
 124 connect E10 G10
-#? [1 E11]*
+#? [1 E11]
 125 disconnect E10 G10
-#? [3 E11]*
+#? [3 E11]
 
 # See also trevorc:450.
 loadsgf games/trevor/auto/c23.sgf 72
 126 disconnect E8 F6
-#? [1 E6]
+#? [1 E6]*
 
 # See also strategy5:300.
 loadsgf games/CrazyStone2.sgf 77
 127 same_dragon A9 G6
-#? [0]
+#? [0]*

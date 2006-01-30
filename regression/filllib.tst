@@ -177,4 +177,4 @@ loadsgf games/filllib17.sgf
 # Black must eliminate white's seki potential so that L3 can be played.
 loadsgf games/filllib18.sgf
 50 reg_genmove black
-#? [T2|R2|S1]
+#? [T2|R2|S1]*

@@ -125,7 +125,7 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 28
 # K4 is overconcentrated. Which moves more than D14 are good here?
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 42
 106 restricted_genmove white D14 K4
-#? [D14]
+#? [D14]*
 
 # With the black stone at R9, R6 is locally better than Q6.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 46

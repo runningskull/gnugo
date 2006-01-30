@@ -319,7 +319,7 @@ loadsgf games/nngs/gnugo-3.4-nailer-200308230714.sgf 32
 
 loadsgf games/nngs/joshj-gnugo-3.5.2-200312100558.sgf 14
 760 reg_genmove black
-#? [Q15]*
+#? [Q15]
 
 #something better than Q14
 loadsgf games/nngs/gnugo-3.5.2gf1-vincentkuo-200312162312.sgf 30

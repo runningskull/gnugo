@@ -57,7 +57,7 @@ loadsgf games/FSF-neurogo.sgf 176
 # This may be hard to fix at this point but since we
 # can't win the ko we shouldn't start it.
 13 restricted_genmove white P7 M7 M8
-#? [M7|M8]
+#? [M7|M8]*
 
 loadsgf games/FSF-neurogo.sgf 178
 14 reg_genmove white
