@@ -186,7 +186,7 @@ loadsgf games/CrazyStone2.sgf 17
 
 # D9 is quite bad. (Not played in the game since it's the wrong player
 # but the move of choice for GNU Go 3.6 and 3.7.7.)
-loadsgf games/CrazyStone2.sgf 34
+loadsgf games/CrazyStone2.sgf 18
 297 restricted_genmove white D8 D9
 #? [D8]
 
