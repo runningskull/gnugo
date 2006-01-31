@@ -300,7 +300,7 @@ loadsgf games/test5win.sgf
 
 loadsgf games/test5lose.sgf
 60 analyze_semeai C8 E6
-#? [0 0 PASS]*
+#? [0 0 PASS]
 
 # A15 is a certain seki. A17 gives a ko for life and death of both.
 # The ko is very indirect for white, but it's still a ko. B17
@@ -348,11 +348,11 @@ loadsgf games/semeai/semeai14.sgf
 76 analyze_semeai L2 J3
 #? [1 0 (PASS|N3|K2)]
 77 analyze_semeai A5 A3
-#? [1 0 PASS]*
+#? [1 0 PASS]
 78 analyze_semeai A3 A5
 #? [1 0 (PASS|A6|C6|C1)]
 79 analyze_semeai F9 F7
-#? [1 0 PASS]*
+#? [1 0 PASS]
 80 analyze_semeai F7 F9
 #? [1 0 (PASS|E9|E8|J9|H5)]
 
@@ -478,7 +478,7 @@ loadsgf games/CrazyStone1.sgf 56
 133 analyze_semeai D9 G3
 #? [1 2 H2]
 134 analyze_semeai G3 D9
-#? [1 1 H2]
+#? [1 1 H2]*
 
 ########### semeai gen_move tests #################
 

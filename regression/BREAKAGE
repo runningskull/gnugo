@@ -1,3 +1,11 @@
+========================== 3.7.8-post1 =============================
+
+./regress.sh . semeai.tst
+60 unexpected PASS!
+77 unexpected PASS!
+79 unexpected PASS!
+134 unexpected FAIL: Correct '1 1 H2', got '1 0 H2'
+
 ========================== 3.7.8  ==================================
 
 ./regress.sh . filllib.tst 
