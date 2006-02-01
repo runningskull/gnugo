@@ -123,7 +123,6 @@ libengine_a_SOURCES = \
       printutils.c \
       readconnect.c \
       reading.c \
-      score.c \
       semeai.c \
       sgfdecide.c \
       sgffile.c \
@@ -164,10 +163,10 @@ am_libengine_a_OBJECTS = aftermath.$(OBJEXT) board.$(OBJEXT) \
 	matchpat.$(OBJEXT) move_reasons.$(OBJEXT) movelist.$(OBJEXT) \
 	optics.$(OBJEXT) oracle.$(OBJEXT) owl.$(OBJEXT) \
 	persistent.$(OBJEXT) printutils.$(OBJEXT) readconnect.$(OBJEXT) \
-	reading.$(OBJEXT) score.$(OBJEXT) semeai.$(OBJEXT) \
-	sgfdecide.$(OBJEXT) sgffile.$(OBJEXT) shapes.$(OBJEXT) \
-	showbord.$(OBJEXT) surround.$(OBJEXT) unconditional.$(OBJEXT) \
-	utils.$(OBJEXT) value_moves.$(OBJEXT) worm.$(OBJEXT)
+	reading.$(OBJEXT) semeai.$(OBJEXT) sgfdecide.$(OBJEXT) \
+	sgffile.$(OBJEXT) shapes.$(OBJEXT) showbord.$(OBJEXT) \
+	surround.$(OBJEXT) unconditional.$(OBJEXT) utils.$(OBJEXT) \
+	value_moves.$(OBJEXT) worm.$(OBJEXT)
 libengine_a_OBJECTS = $(am_libengine_a_OBJECTS)
 
 DEFS = @DEFS@
@@ -189,12 +188,12 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/optics.Po $(DEPDIR)/oracle.Po \
 @AMDEP_TRUE@	$(DEPDIR)/owl.Po $(DEPDIR)/persistent.Po \
 @AMDEP_TRUE@	$(DEPDIR)/printutils.Po $(DEPDIR)/readconnect.Po \
-@AMDEP_TRUE@	$(DEPDIR)/reading.Po $(DEPDIR)/score.Po \
-@AMDEP_TRUE@	$(DEPDIR)/semeai.Po $(DEPDIR)/sgfdecide.Po \
-@AMDEP_TRUE@	$(DEPDIR)/sgffile.Po $(DEPDIR)/shapes.Po \
-@AMDEP_TRUE@	$(DEPDIR)/showbord.Po $(DEPDIR)/surround.Po \
-@AMDEP_TRUE@	$(DEPDIR)/unconditional.Po $(DEPDIR)/utils.Po \
-@AMDEP_TRUE@	$(DEPDIR)/value_moves.Po $(DEPDIR)/worm.Po
+@AMDEP_TRUE@	$(DEPDIR)/reading.Po $(DEPDIR)/semeai.Po \
+@AMDEP_TRUE@	$(DEPDIR)/sgfdecide.Po $(DEPDIR)/sgffile.Po \
+@AMDEP_TRUE@	$(DEPDIR)/shapes.Po $(DEPDIR)/showbord.Po \
+@AMDEP_TRUE@	$(DEPDIR)/surround.Po $(DEPDIR)/unconditional.Po \
+@AMDEP_TRUE@	$(DEPDIR)/utils.Po $(DEPDIR)/value_moves.Po \
+@AMDEP_TRUE@	$(DEPDIR)/worm.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -264,7 +263,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/printutils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/readconnect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/reading.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/score.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/semeai.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/sgfdecide.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/sgffile.Po@am__quote@

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- score.c removed from sources
+
 3.7.8 released January 30, 2006
 
 - new global variable handicap

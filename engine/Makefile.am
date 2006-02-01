@@ -44,7 +44,6 @@ libengine_a_SOURCES = \
       printutils.c \
       readconnect.c \
       reading.c \
-      score.c \
       semeai.c \
       sgfdecide.c \
       sgffile.c \
