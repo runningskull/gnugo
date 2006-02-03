@@ -631,8 +631,8 @@ class RegressionViewer
 	traces = ({});
 	engine->trace_callback = collect_traces;
         result = send_command(testcase_command);
-	engine->trace_callback = 0;
 	redraw_board();
+	engine->trace_callback = 0;
     }
 
     static void collect_traces(string s)
@@ -1103,6 +1103,11 @@ class RegressionViewer
 	    else
 		add_continuation_lines = 0;
 	}
+
+	/* Look for blunder devaluation */
+	foreach (traces, string line) 
+	    if (has_prefix(line, "Move at " + vertex + " is"))
+		clist->append(({line, "", ""}));
 
 	clist->columns_autosize();
 	parent->set_title(this_object(), "Move reasons for " + vertex);
