@@ -231,6 +231,7 @@ static void sniff_lunch(int lunch, int *min, int *probable, int *max,
 			struct local_owl_data *owl);
 static void eat_lunch_escape_bonus(int lunch, int *min, int *probable,
 				   int *max, struct local_owl_data *owl);
+static int select_new_goal_origin(int origin, struct local_owl_data *owl);
 static void compute_owl_escape_values(struct local_owl_data *owl);
 static int owl_escape_route(struct local_owl_data *owl);
 static void do_owl_analyze_semeai(int apos, int bpos, 
@@ -2133,20 +2134,15 @@ do_owl_attack(int str, int *move, int *wormid,
        */
       if (IS_STONE(board[str]))
 	origin = str;
-      else {
-	int pos;
-	origin = NO_MOVE;
-	for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-	  if (board[pos] == color && owl->goal[pos] == 1) {
-	    origin = find_origin(pos);
-	    break;
-	  }
-	}
-      }
+      else
+	origin = select_new_goal_origin(NO_MOVE, owl);
 
       /* Test whether the move cut the goal dragon apart. */
-      if (moves[k].cuts[0] != NO_MOVE)
+      if (moves[k].cuts[0] != NO_MOVE) {
 	owl_test_cuts(owl->goal, owl->color, moves[k].cuts);
+	if (!owl->goal[origin])
+	  origin = select_new_goal_origin(origin, owl);
+      }
       mark_goal_in_sgf(owl->goal);
 
       if (origin == NO_MOVE)
@@ -6277,6 +6273,21 @@ eat_lunch_escape_bonus(int lunch, int *min, int *probable, int *max,
 }
 
  
+/* Find a new origin when it has been captured or cut out of the
+ * goal. Used in do_owl_attack()
+ */
+static int
+select_new_goal_origin(int origin, struct local_owl_data *owl)
+{
+  int pos;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (board[pos] == owl->color && owl->goal[pos] == 1)
+      return find_origin(pos);
+
+  return origin;
+}
+
+
 /* Retrieve topological eye values stored in the half_eye[] array of
  * the current owl data.
  *

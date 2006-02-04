@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- carefully select new owl goal origin
 - allow excess strategical value for some single-worm dragons
 - include played move in atari-atari blunder analysis
 - score.c removed from sources
