@@ -2945,9 +2945,13 @@ estimate_strategical_value(int pos, int color, float our_score,
      * be tactically captured or defended by this move, we have
      * already counted the points as territorial value, unless
      * it's assumed to be dead.
+     * However, we still allow strategical excess value (see below)
+     * in case the effective_size is substantially bigger (by 2.0)
+     * than the actualy size.
      */
     if (dragon[aa].status != DEAD
 	&& dragon[aa].size == worm[aa].size
+	&& worm[aa].effective_size < worm[aa].size + 2.0
 	&& (attack_move_reason_known(pos, aa)
 	    || defense_move_reason_known(pos, aa))) {
       TRACE("  %1m:   %f - %1m strategic value already counted - A.\n",
