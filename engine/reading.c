@@ -5045,6 +5045,24 @@ static int cannot_defend_penalty            = -20;
 static int safe_atari_score                 = 8;
 
 
+static void
+sgf_dumpmoves(struct reading_moves *moves, const char *funcname)
+{
+  char buf[500];
+  char *pos;
+  int i, chars;
+  sprintf(buf, "Move order for %s: %n", funcname, &chars);
+  pos = buf + chars;
+  for (i = moves->num_tried; i < moves->num; i++) {
+    sprintf(pos, "%c%d (%d) %n",
+	    J(moves->pos[i]) + 'A' + (J(moves->pos[i]) >= 8),
+	    board_size - I(moves->pos[i]), moves->score[i], &chars);
+    pos += chars;
+  }
+  sgftreeAddComment(sgf_dumptree, buf);
+}
+
+
 /* The string at (str) is under attack. The moves.num moves in
  * (moves) for color have been deemed interesting in
  * the attack or defense of the group. Most of these moves will be
@@ -5074,8 +5092,12 @@ order_moves(int str, struct reading_moves *moves, int color,
   int i, j;
 
   /* Don't bother sorting if only one move, or none at all. */
-  if (moves->num - moves->num_tried < 2)
+  if (moves->num - moves->num_tried < 2) {
+    /* But let's still have a single candidate in the sgf output */
+    if (sgf_dumptree && moves->num > moves->num_tried)
+      sgf_dumpmoves(moves, funcname);
     return;
+  }
 
   /* Assign a score to each move. */
   for (r = moves->num_tried; r < moves->num; r++) {
@@ -5272,20 +5294,8 @@ order_moves(int str, struct reading_moves *moves, int color,
       gprintf("%o  %1M %d\n", moves->pos[i], moves->score[i]);
   }
 
-  if (sgf_dumptree) {
-    char buf[500];
-    char *pos;
-    int chars;
-    sprintf(buf, "Move order for %s: %n", funcname, &chars);
-    pos = buf + chars;
-    for (i = moves->num_tried; i < moves->num; i++) {
-      sprintf(pos, "%c%d (%d) %n",
-	      J(moves->pos[i]) + 'A' + (J(moves->pos[i]) >= 8),
-	      board_size - I(moves->pos[i]), moves->score[i], &chars);
-      pos += chars;
-    }
-    sgftreeAddComment(sgf_dumptree, buf);
-  }
+  if (sgf_dumptree)
+    sgf_dumpmoves(moves, funcname);
 }
 
 
