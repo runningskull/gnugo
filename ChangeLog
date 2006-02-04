@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- use gg_normalize_float2int() in valuate_combinable_pattern_chain() to
+  address platform dependencies
 - carefully select new owl goal origin
 - allow excess strategical value for some single-worm dragons
 - include played move in atari-atari blunder analysis

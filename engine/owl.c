@@ -3680,14 +3680,25 @@ dump_pattern_list(struct matched_patterns_list_data *list)
   struct matched_pattern_data *matched_pattern;
   if (!list->initialized)
     return;
-  gprintf("%oList size %d. %d Patterns in list, %d have been used.\n",
+  gprintf("%oList size %d. %d Patterns in list, %d have been used.",
 	  list->list_size, list->counter, list->used);
   for (i = 0; i < list->counter; i++) {
     matched_pattern = &list->pattern_list[i];
-    gprintf("%o  Pattern %s (orient. %d) at %1m, value %f.\n",
+    gprintf("%o\n  Pattern %s (orient. %d) at %1m, value %f.",
 	    matched_pattern->pattern->name, matched_pattern->ll,
 	    matched_pattern->move, matched_pattern->pattern->value);
+    if (matched_pattern->next_pattern_index != -1)
+      gprintf("%o * ");
   }
+  gprintf("%o\n");
+
+  gprintf("%oCurrent heap ordering: \n");
+  for (i = 0; i < list->heap_num_patterns; i++) {
+    matched_pattern = list->pattern_heap[i];
+    gprintf("%o %s (%1m), %f; ", matched_pattern->pattern->name,
+	    matched_pattern->move, matched_pattern->pattern->value);
+  }
+  gprintf("\n");
 }
 
 
@@ -3835,10 +3846,10 @@ valuate_combinable_pattern_chain(struct matched_patterns_list_data *list,
   }
 
   if (num_move_reasons == 2)
-    return gg_min((int) full_value, 75);
+    return gg_min(gg_normalize_float2int(full_value, 1.0), 75);
   if (num_move_reasons == 3)
-    return gg_min((int) (full_value * 0.85), 90);
-  return gg_min((int) (full_value * 0.75), 99);
+    return gg_min(gg_normalize_float2int(full_value * 0.85, 1.0), 90);
+  return gg_min(gg_normalize_float2int(full_value * 0.75, 1.0), 99);
 }
 
 
