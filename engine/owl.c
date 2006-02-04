@@ -5957,6 +5957,7 @@ owl_substantial(int str)
   int result;
   double start = 0.0;
   struct local_owl_data *owl;
+  int num_moves = 0;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
@@ -5968,7 +5969,6 @@ owl_substantial(int str)
 
   owl->color = OTHER_COLOR(board[str]);
   local_owl_node_counter = 0;
-  gg_assert(stackp == 0);
 
   /* Big strings are always substantial since the biggest nakade is
    * six stones. (There are probably rare exceptions to this
@@ -6008,6 +6008,7 @@ owl_substantial(int str)
       if (get_level() >= 8)
 	increase_depth_values();
       owl->goal[libs[k]] = 1;
+      num_moves++;
     }
     else {
       /* if we can't fill, try swapping with the next liberty */
@@ -6017,10 +6018,11 @@ owl_substantial(int str)
 	  increase_depth_values();
 	owl->goal[libs[k+1]] = 1;
 	libs[k+1] = libs[k];
+	num_moves++;
       }
       else {
 	/* Can't fill the liberties. Give up! */
-	while (stackp > 0) {
+	while (num_moves-- > 0) {
 	  if (get_level() >= 8)
 	    decrease_depth_values();
 	  popgo();
@@ -6041,7 +6043,7 @@ owl_substantial(int str)
     result = 0;
   else
     result = 1;
-  while (stackp > 0) {
+  while (num_moves-- > 0) {
     if (get_level() >= 8)
       decrease_depth_values();
     popgo();

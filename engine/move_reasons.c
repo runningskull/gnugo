@@ -1637,7 +1637,8 @@ mark_safe_stones(int color, int move_pos,
     else
       safe_stones[pos] = 0;
   }
-  safe_stones[move_pos] = move[move_pos].move_safety;
+  safe_stones[move_pos]
+    = move[move_pos].move_safety && safe_move(move_pos, color) == WIN;
 }
 
 

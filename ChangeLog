@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- include played move in atari-atari blunder analysis
 - score.c removed from sources
 
 3.7.8 released January 30, 2006

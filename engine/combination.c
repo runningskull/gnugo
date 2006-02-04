@@ -408,14 +408,14 @@ atari_atari_blunder_size(int color, int move,
   memset(forbidden, 0, sizeof(forbidden));
   memset(defense_points, 0, sizeof(defense_points));
 
-  /* FIXME: Maybe these should be moved after the tryko() below? */
-  compute_aa_status(other, safe_stones);
-  compute_aa_values(other);
-
   /* Accept illegal ko capture here. */
   if (!tryko(move, color, NULL))
     /* Really shouldn't happen. */
     abortgo(__FILE__, __LINE__, "trymove", move);
+
+  compute_aa_status(other, safe_stones);
+  compute_aa_values(other);
+
   increase_depth_values();
 
   aa_val = do_atari_atari(other, &apos, &defense_point, defense_points,
