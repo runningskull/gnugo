@@ -183,6 +183,7 @@ examine_position(int how_much, int aftermath_play)
 
   if (NEEDS_UPDATE(dragons_refinedly_examined)) {
     compute_refined_dragon_weaknesses();
+    compute_strategic_sizes();
   }
   if (how_much == FULL_EXAMINE_DRAGONS) {
     gg_assert(test_gray_border() < 0);

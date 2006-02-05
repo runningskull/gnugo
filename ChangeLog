@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- use .strategic_size in estimate_strategical_value()
+- new field .strategic_size in dragon_data2, includes bonus for weak neighbors
 - use gg_normalize_float2int() in valuate_combinable_pattern_chain() to
   address platform dependencies
 - carefully select new owl goal origin

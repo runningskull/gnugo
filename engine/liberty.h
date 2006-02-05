@@ -306,6 +306,7 @@ void join_dragons(int d1, int d2);
 int dragon_escape(signed char goal[BOARDMAX], int color,
 		  signed char escape_value[BOARDMAX]);
 void compute_refined_dragon_weaknesses(void);
+void compute_strategic_sizes(void);
 
 struct eyevalue;
 void compute_dragon_genus(int d, struct eyevalue *genus, int eye_to_exclude);
@@ -880,6 +881,7 @@ struct dragon_data2 {
   enum dragon_status safety;          /* a more detailed status estimate     */
   float weakness; /* A new (3.4) continuous estimate of the dragon's safety  */
   float weakness_pre_owl;     /* Dragon safety based on pre-owl computations */
+  float strategic_size; /* An effective size including weakness of neighbors */
   int escape_route; /* a measurement of likelihood of escape                 */
   struct eyevalue genus;    /* the number of eyes (approximately)            */
   int heye;     /* coordinates of a half eye                                 */

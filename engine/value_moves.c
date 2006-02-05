@@ -1388,8 +1388,8 @@ connection_value(int dragona, int dragonb, int tt, float margin)
 {
   struct dragon_data2 *da = &DRAGON2(dragona);
   struct dragon_data2 *db = &DRAGON2(dragonb);
-  float sizea = dragon[dragona].effective_size;
-  float sizeb = dragon[dragonb].effective_size;
+  float sizea = da->strategic_size;
+  float sizeb = db->strategic_size;
   int safetya = da->safety;
   int safetyb = db->safety;
   float crude_weakness_a
@@ -2625,7 +2625,7 @@ estimate_strategical_value(int pos, int color, float our_score,
 	     * alone is not enough. The question is whether the dragon is
 	     * threatened or defended by the move or not.  
 	     */
-	    this_value = 1.8 * soft_cap(dragon[bb].effective_size, 15.0)
+	    this_value = 1.8 * soft_cap(DRAGON2(bb).strategic_size, 15.0)
 			 * dragon_weakness(bb, 0);
 
 	    /* If this dragon consists of only one worm and that worm
@@ -2752,7 +2752,7 @@ estimate_strategical_value(int pos, int color, float our_score,
 	      && are_neighbor_dragons(aa, cc)
 	      && are_neighbor_dragons(bb, cc)) {
 	    if (aa == bb)
-	      this_value = 1.6 * dragon[cc].effective_size;
+	      this_value = 1.6 * DRAGON2(cc).strategic_size;
 	    else if (DRAGON2(aa).safety == INESSENTIAL
 		     || DRAGON2(bb).safety == INESSENTIAL) {
 	      if ((DRAGON2(aa).safety == INESSENTIAL
@@ -2761,10 +2761,10 @@ estimate_strategical_value(int pos, int color, float our_score,
 		      && max_lunch_eye_value(bb) == 0))
 		this_value = 0.0;
 	      else
-		this_value = 0.8 * dragon[cc].effective_size;
+		this_value = 0.8 * DRAGON2(cc).strategic_size;
 	    }
 	    else
-	      this_value = 1.7 * dragon[cc].effective_size;
+	      this_value = 1.7 * DRAGON2(cc).strategic_size;
 	    
 	    if (this_value > dragon_value[dragon[cc].origin]) {
 	      dragon_value[dragon[cc].origin] = this_value;
@@ -2846,9 +2846,9 @@ estimate_strategical_value(int pos, int color, float our_score,
 	 */
 	if (use_thrashing_dragon_heuristics
 	    && thrashing_stone[aa])
-	  this_value = 1.7 * dragon[aa].effective_size;
+	  this_value = 1.7 * DRAGON2(aa).strategic_size;
 	else
-	  this_value = 1.8 * soft_cap(dragon[aa].effective_size, 15.0)
+	  this_value = 1.8 * soft_cap(DRAGON2(aa).strategic_size, 15.0)
 		       * dragon_weakness(aa, 1);
 
 	/* No strategical attack value is awarded if the dragon at (aa)
@@ -2912,7 +2912,7 @@ estimate_strategical_value(int pos, int color, float our_score,
 	if (our_score < 0.0)
 	  this_value = 0.0;
 	else 
-	  this_value = gg_min(2*dragon[aa].effective_size, 0.65*our_score);
+	  this_value = gg_min(2*DRAGON2(aa).strategic_size, 0.65*our_score);
 	
 	if (this_value > dragon_value[aa]) {
 	  dragon_value[aa] = this_value;
@@ -2973,7 +2973,7 @@ estimate_strategical_value(int pos, int color, float our_score,
        * excess value as a bonus.
        */
       float excess_value = (dragon_value[aa] - 
-			    2 * dragon[aa].effective_size);
+			    2 * DRAGON2(aa).strategic_size);
       if (excess_value > 0.0) {
 	TRACE("  %1m: %f - strategic bonus for %1m\n", pos, excess_value, aa);
 	tot_value += excess_value;

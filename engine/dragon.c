@@ -2226,6 +2226,62 @@ compute_refined_dragon_weaknesses()
     dragon2[d].weakness = compute_dragon_weakness_value(d);
 }
 
+/* The strategic size is the effective size, plus a bonus for all weak
+ * neighbouring dragons of the opponent.
+ */
+void
+compute_strategic_sizes()
+{
+  float *bonus = calloc(number_of_dragons, sizeof(float));
+  int d;
+  int k;
+
+  for (d = 0; d < number_of_dragons; d++) {
+    /* Compute bonus for all neighbors of dragon (d). The total bonus for
+     * all neighbors is effective_size(d) * weakness(d), and it is given
+     * to a neighbor d2 proportionally to the value of
+     * effective_size(d2) * weakness(d2).
+     */
+    float sum = 0.0;
+    if (dragon2[d].safety == INESSENTIAL)
+      continue;
+    for (k = 0; k < dragon2[d].neighbors; k++) {
+      int d2 = dragon2[d].adjacent[k];
+      if (board[dragon2[d2].origin] == OTHER_COLOR(board[dragon2[d].origin])
+	  && dragon2[d2].safety != INESSENTIAL)
+	sum += DRAGON(d2).effective_size * dragon2[d2].weakness;
+    }
+    if (sum == 0.0)
+      continue;
+    for (k = 0; k < dragon2[d].neighbors; k++) {
+      int d2 = dragon2[d].adjacent[k];
+      if (board[dragon2[d2].origin] == OTHER_COLOR(board[dragon2[d].origin])
+	  && dragon2[d2].safety != INESSENTIAL) {
+	bonus[d2] += ((DRAGON(d2).effective_size * dragon2[d2].weakness) / sum)
+		     * DRAGON(d).effective_size * dragon2[d].weakness;
+	if (0)
+	  gprintf("Dragon %1m receives %f effective size bonus from %1m.\n",
+		  dragon2[d2].origin, 
+		  ((DRAGON(d2).effective_size * dragon2[d2].weakness) / sum)
+		  * DRAGON(d).effective_size * dragon2[d].weakness,
+		  dragon2[d].origin);
+      }
+    }
+  }
+
+  for (d = 0; d < number_of_dragons; d++) {
+    if (0)
+      gprintf("Dragon %1m gets effective size bonus of %f.\n",
+	      dragon2[d].origin, bonus[d]);
+    /* We cap strategic size at 3 * effective_size. (This is ad hoc.) */
+    dragon2[d].strategic_size = gg_min(bonus[d] + DRAGON(d).effective_size,
+				       3 * DRAGON(d).effective_size);
+  }
+
+  free(bonus);
+}
+
+
 /* 
  * Test whether two dragons are the same. Used by autohelpers and elsewhere.
  */
@@ -2420,6 +2476,7 @@ report_dragon(FILE *outfile, int pos)
   gfprintf(outfile, "origin                  %1m\n", d->origin);
   gfprintf(outfile, "size                    %d\n", d->size);
   gfprintf(outfile, "effective_size          %f\n", d->effective_size);
+  gfprintf(outfile, "strategic_size          %f\n", d2->strategic_size);
   gfprintf(outfile, "genus                   %s\n",
 	   eyevalue_to_string(&d2->genus));
   gfprintf(outfile, "heye                    %1m\n", d2->heye);
