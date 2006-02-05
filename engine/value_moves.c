@@ -293,6 +293,8 @@ do_find_more_owl_attack_and_defense_moves(int color, int pos,
   int dd2 = NO_MOVE;
   int save_verbose;
 
+  gg_assert(stackp == 0);
+  
   /* Never consider moves of the send-two-return-one type here. */
   if (send_two_return_one(pos, color))
     return;
@@ -889,6 +891,7 @@ induce_secondary_move_reasons(int color)
 	      if (attack_move
 		  && board[adj1] != board[aa]
 		  && !disconnect(adj1, adj2, NULL)) {
+		popgo();
 		DEBUG(DEBUG_MOVE_REASONS,
 		      "Connection move at %1m induced for %1m/%1m due to attack of %1m\n",
 		      pos, adj1, adj2, aa);
@@ -896,19 +899,19 @@ induce_secondary_move_reasons(int color)
 		do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
 							  find_connection(adj1, adj2));
 	      }
-
-	      if (!attack_move
-		  && board[adj1] != board[aa]
-		  && !string_connect(adj1, adj2, NULL)) {
+	      else if (!attack_move
+		       && board[adj1] != board[aa]
+		       && !string_connect(adj1, adj2, NULL)) {
+		popgo();
 		DEBUG(DEBUG_MOVE_REASONS,
 		      "Cut move at %1m induced for %1m/%1m due to defense of %1m\n",
 		      pos, adj1, adj2, aa);
 		add_cut_move(pos, adj1, adj2);
 	      }
-
-	      if (!attack_move
+	      else if (!attack_move
 		  && board[adj1] == board[aa]
 		  && !disconnect(adj1, adj2, NULL)) {
+		popgo();
 		DEBUG(DEBUG_MOVE_REASONS,
 		      "Connection move at %1m induced for %1m/%1m due to defense of %1m\n",
 		      pos, adj1, adj2, aa);
@@ -916,8 +919,8 @@ induce_secondary_move_reasons(int color)
 		do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
 							  find_connection(adj1, adj2));
 	      }
-
-	      popgo();
+	      else
+		popgo();
 	    }
 	  }
 	}
@@ -1007,21 +1010,25 @@ induce_secondary_move_reasons(int color)
 		  && !is_same_worm(pos3, worm2)) {
 		if (trymove(pos, color, "induce_secondary_move_reasons-B",
 			    worm1)) {
-		  if (!disconnect(pos3, worm1, NULL)) {
+		  int break1 = disconnect(pos3, worm1, NULL);
+		  int break2 = disconnect(pos3, worm2, NULL);
+		  popgo();
+		  
+		  if (!break1) {
 		    add_connection_move(pos, pos3, worm1);
 		    do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
 							      find_connection(pos3, worm1));
 		    DEBUG(DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m\n",
 			  pos, worm1, worm2, pos3, worm1);
 		  }
-		  if (!disconnect(pos3, worm2, NULL)) {
+		  
+		  if (!break2) {
 		    add_connection_move(pos, pos3, worm2);
 		    do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
 							      find_connection(pos3, worm2));
 		    DEBUG(DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m\n",
 			  pos, worm1, worm2, pos3, worm2);
 		  }
-		  popgo();
 		}
 	      }
 	    }
