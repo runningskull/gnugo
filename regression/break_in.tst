@@ -50,4 +50,10 @@ trymove white F6
 #? [0]*
 popgo
 
+# See also century2002:150
+loadsgf games/century21-2002/manyfaces-gnugo.sgf 157
+trymove black A18
+110 break_in E19 A16 B16 A15 B15 A14
+#? [0]
+popgo
 

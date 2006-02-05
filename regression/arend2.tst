@@ -105,3 +105,23 @@ loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 208
 240 reg_genmove black
 #? [N7]*
 
+loadsgf games/kgs/TheGNUGo-Botkiller3.sgf 165
+250 restricted_genmove white D5 E5 D6
+#? [D5]
+
+loadsgf games/kgs/simat-TheGNUGo.sgf 19
+260 reg_genmove black
+#? [E14]
+
+loadsgf games/kgs/TheGNUGo-qsdf.sgf 83
+270 restricted_genmove white A11 A12 B8
+#? [A11|A12]
+
+loadsgf games/hamete_joseki.sgf 37
+280 restricted_genmove black B5 P17 P16 Q12 E6 M3
+#? [B5]
+
+loadsgf games/hamete_joseki.sgf 51
+290 reg_genmove black
+#? [C5]
+

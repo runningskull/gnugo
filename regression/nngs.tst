@@ -63,15 +63,15 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 122
 #? [L4|P2]*
 
 
-#GNU Go 3.7.3 plays K9.  Is this acceptable? --evand
+#GNU Go 3.7.3 plays K9.  Is this acceptable? --evand Yes. /ab.
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 152
 180 reg_genmove black
-#? [L11]*
+#? [L11|K9]
 
-
-loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 160
-190 reg_genmove black
-#? [O11|P12]*
+#
+#loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 160
+#190 reg_genmove black
+##? [O11|P12]*
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 162

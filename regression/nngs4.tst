@@ -257,6 +257,7 @@ loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 152
 620 reg_genmove white
 #? [G13|G14]
 
+# See also connection:128
 loadsgf games/nngs/evand-gnugo-3.3.21-200306130638.sgf 156
 630 reg_genmove black
 #? [B6]

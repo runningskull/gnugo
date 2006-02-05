@@ -457,3 +457,9 @@ loadsgf games/trevor/auto/c23.sgf 72
 loadsgf games/CrazyStone2.sgf 77
 127 same_dragon A9 G6
 #? [0]*
+
+# See also nngs4:630
+loadsgf games/nngs/evand-gnugo-3.3.21-200306130638.sgf 156
+play black C5
+128 connect C4 C8
+#? [1 B6]

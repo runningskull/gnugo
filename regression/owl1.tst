@@ -496,3 +496,11 @@ loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 16
 loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 18
 384 owl_attack C3
 #? [1 (A2|F2)]*
+
+loadsgf games/kgs/TheGNUGo-grasshoper.sgf 288
+385 owl_defend G14
+#? [1 C11]
+
+loadsgf games/kgs/TheGNUGo-rcsteppat.sgf 138 
+386 owl_defend O17
+#? [1 P19]

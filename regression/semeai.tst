@@ -480,6 +480,16 @@ loadsgf games/CrazyStone1.sgf 56
 134 analyze_semeai G3 D9
 #? [1 1 H2]*
 
+# See also strategy3:146
+loadsgf games/incident209.sgf 259
+135 analyze_semeeai R12 Q12
+#? [1 0 R11]
+
+# See also kgs:230
+loadsgf games/kgs/yagr-Kazik.sgf 149
+136 analyze_semeai K19 L19
+#? [0 1 (N16|O13|O12|O11)]
+
 ########### semeai gen_move tests #################
 
 # A6 gives an unfavorable ko while F10 gives seki.

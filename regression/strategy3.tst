@@ -210,7 +210,7 @@ loadsgf games/incident209.sgf 193
 145 reg_genmove white
 #? [S14|T14]
 
-# Incident 210. Semeai mistake.
+# Incident 210. Semeai mistake. See also semeai:135
 loadsgf games/incident209.sgf 259
 146 reg_genmove white
 #? [R11]

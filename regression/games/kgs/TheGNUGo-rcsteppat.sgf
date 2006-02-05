@@ -1,0 +1,21 @@
+(;GM[1]FF[4]CA[UTF-8]AP[CGoban:2]ST[2]
+RU[AGA]SZ[19]HA[3]KM[0.50]TM[60]OT[25/300 Canadian]
+PW[TheGNUGo]PB[rcsteppat]WR[13k]BR[16k]DT[2005-10-31]PC[The Kiseido Go
+Server (KGS) at http://kgs.kiseido.com/]AB[pd][dp][pp]C[TheGNUGo [13k\]:
+GTP Engine for TheGNUGo (white): GNU Go version 3.7.7 ] ;W[dd] ;B[jq]
+;W[pf] ;B[nd] ;W[qd] ;B[qc] ;W[qe] ;B[rc] ;W[qj] ;B[ql] ;W[cn] ;B[co]
+;W[dn] ;B[bn] ;W[bm] ;B[bo] ;W[cl] ;B[fp] ;W[nq] ;B[oq] ;W[np] ;B[nr]
+;W[mr] ;B[or] ;W[lc] ;B[hd] ;W[nb] ;B[pb] ;W[ef] ;B[jc] ;W[le] ;B[fc]
+;W[ec] ;B[fd] ;W[de] ;B[ff] ;W[fg] ;B[gf] ;W[lq] ;B[pn] ;W[lo] ;B[jo]
+;W[lm] ;B[jm] ;W[fj] ;B[fm] ;W[rd] ;B[nf] ;W[lg] ;B[nh] ;W[ph] ;B[nj]
+;W[if] ;B[hg] ;W[lk] ;B[ek] ;W[cj] ;B[ej] ;W[fi] ;B[ei] ;W[dh] ;B[eh]
+;W[fh] ;B[eg] ;W[dg] ;B[eo] ;W[li] ;B[jj] ;W[mj] ;B[nk] ;W[mm] ;B[oi]
+;W[hh] ;B[ig] ;W[kh] ;B[jh] ;W[jg] ;B[ih] ;W[hj] ;B[ij] ;W[fl] ;B[fk]
+;W[el] ;B[gk] ;W[gl] ;B[hk] ;W[gm] ;B[fn] ;W[oe] ;B[ne] ;W[pk] ;B[od]
+;W[pl] ;B[qm] ;W[og] ;B[ng] ;W[ob] ;B[oc] ;W[nl] ;B[nn] ;W[ol] ;B[gn]
+;W[rk] ;B[rl] ;W[kb] ;B[jb] ;W[eb] ;B[fb] ;W[kr] ;B[jr] ;W[no] ;B[oo]
+;W[fa] ;B[ga] ;W[ea] ;B[gb] ;W[je] ;B[jd] ;W[hm] ;B[hn] ;W[fe] ;B[ge]
+;W[ee] ;B[il] ;W[pe] ;B[ra] ;W[sb] ;B[sc] ;W[pa] ;B[rb] ;W[qa] ;B[mb]
+;W[mc] ;B[nc] ;W[lb] ;B[qb] ;W[mk] ;B[oa] ;W[ma] ;B[pa] ;W[kp] ;B[jp]
+;W[js] ;B[is] ;W[ks] ;B[ir] ;W[id] ;B[ic] ;W[ie] ;B[he] ;W[om] ;B[on]
+;W[kn] ;B[mn] ;W[sk] ;B[sl] ;W[qk])
