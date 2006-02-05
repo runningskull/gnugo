@@ -1,0 +1,77 @@
+(;GM[1]FF[4]
+SZ[13]KM[7.50]
+PW[firstgo]PB[GNU]BR[13k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-02-05]
+EV[Eleventh KGS Computer Go Tournament - Formal division]RE[B+161.50]
+TM[1080]RU[Chinese]
+C[GNU [13k\]: GTP Engine for GNU (black): GNU Go version 3.7.8
+firstgo [?\]: GTP Engine for firstgo (white): FirstGo version 1.112
+]
+CA[UTF-8]RO[6]
+;B[jd];W[ie];B[kf];W[ke];B[je];W[kd];B[jg];W[kc];B[if];W[he];B[gg]
+;W[gd]C[gunnar [?\]: Corners are out of vogue!
+];B[eg];W[ei];B[dj]
+;W[fj];B[hj];W[ji];B[dh];W[kj];B[gk];W[gj]
+C[gunnar [?\]: White has managed to split itself into four groups.
+]
+;B[ij];W[di];B[ci];W[dk];B[ck];W[bj];B[cj];W[bk]
+C[gunnar [?\]: So why don't start a fifth?
+];B[bi];W[cl];B[dl];W[ek]
+C[greymatter [24k?\]: Does gnu try to keep fewer groups?
+];B[bl]
+;W[gl];B[ik];W[ii]
+C[gunnar [?\]: Not really, although it has some bonuses to keep connected.
+gunnar [?\]: And some penalties for starting invasions.
+]
+;B[fk];W[el]
+C[greymatter [24k?\]: Ok, firstgo has a bad evaluation. Must get major changes
+]
+;B[ej];W[fh];B[kl];W[dm]
+C[greymatter [24k?\]: gnu is much stronger at this moment.
+];B[bm]
+;W[fl];B[hk]C[gunnar [?\]: Not playing great here though.
+];W[bh]
+C[greymatter [24k?\]: Does gnu use global lookahead?
+gunnar [?\]: No.
+greymatter [24k?\]: One of my problems is to combine the results of different searches. 
+]
+;B[ch];W[bg];B[cc]
+C[greymatter [24k?\]: With a global lookahead, this could be less of a problem?
+]
+;W[cf];B[jc];W[kb]C[gunnar [?\]: Maybe, but I'm doubtful.
+];B[cm]
+;W[al]C[gunnar [?\]: C1 dangerous.
+];B[dl]
+C[greymatter [24k?\]: Because of the increased search depth?
+];W[em]
+;B[cl];W[dc]
+C[elife [5d?\]: why L12 not at K12? I have observed many these kind of moves in gnugo's game
+]
+;B[db];W[ec];B[eb];W[fc]C[gunnar [?\]: Well L12 was firstgo's move.
+greymatter [24k?\]: Thats a move of firstgo...
+]
+;B[fb];W[kk]C[elife [5d?\]: oh :-)
+];B[ll];W[bc];B[cd]
+C[greymatter [24k?\]: K12 is better, firstgo is new program, should be better in the future :^)
+]
+;W[bd];B[id];W[bb];B[cb];W[ic];B[ib];W[hc];B[gb];W[jb];B[hb];W[ca]
+;B[df];W[hi];B[fg];W[gi];B[ce];W[ac];B[be];W[il];B[jl];W[jk];B[hl]
+;W[gf];B[fe];W[hd];B[jf];W[hf];B[hg];W[ih];B[fd];W[lk];B[lf];W[ml]
+;B[mc];W[le];B[me];W[mg];B[mf];W[ld];B[md];W[ig];B[kh];W[ki];B[lh]
+;W[jh];B[li];W[hm];B[im];W[lj];B[lm];W[mi];B[mh];W[bf];B[ff];W[gh]
+;B[mj];W[mk];B[eh];W[mi];B[mm];W[];B[ae];W[jj];B[gm];W[];B[ai];W[]
+;B[lb];W[];B[ka];W[];B[la];W[];B[kg];W[mj];B[hh];W[];B[da];W[];B[ba]
+;W[];B[dg];W[];B[lc];W[];B[ja];W[le];B[ld];W[];B[ke];W[];B[fi]
+C[greymatter [24k?\]: Why is gnu continuing, firstgo sees all of his stones dead
+]
+;W[ii];B[ih];W[lj];B[kj];W[];B[ia];W[];B[de];W[];B[]TB[aa][ca][ea]
+[fa][ga][ha][ma][ab][bb][jb][kb][mb][ac][bc][dc][ec][fc][gc][hc][ic]
+[kc][ad][bd][dd][ed][gd][hd][kd][ee][ge][he][ie][le][af][bf][cf][ef]
+[gf][hf][ag][bg][cg][ig][lg][mg][ah][bh][fh][gh][jh][di][ei][gi][hi]
+[ii][ji][ki][mi][aj][bj][fj][gj][jj][lj][mj][ak][bk][dk][ek][jk][kk]
+[lk][mk][al][el][fl][gl][il][ml][am][dm][em][fm][hm][jm][km]
+C[greymatter [24k?\]: congratulations
+greymatter [24k?\]: I have much to do, but I already knew that :-)
+]
+)

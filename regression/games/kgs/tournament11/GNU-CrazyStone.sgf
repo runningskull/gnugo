@@ -1,0 +1,41 @@
+(;GM[1]FF[4]
+SZ[13]KM[7.50]
+PW[GNU]WR[13k]
+PB[CrazyStone]BR[30k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-02-05]
+EV[Eleventh KGS Computer Go Tournament - Formal division]RE[W+0.50]
+TM[1080]RU[Chinese]
+C[CrazyStone [30k\]: GTP Engine for CrazyStone (black): Crazy Stone version 0003-12
+GNU [13k\]: GTP Engine for GNU (white): GNU Go version 3.7.8
+]
+CA[UTF-8]RO[3]
+;B[gh];W[dj];B[if];W[dh];B[fc];W[ce];B[hh];W[ek];B[di];W[ei];B[hj]
+;W[hl];B[cf];W[df];B[ik]
+C[burtabel [3d\]: just this week I wanted to write some code go generate invasions like L11 here...
+]
+;W[kk];B[ki];W[kg];B[il];W[kd];B[ke];W[le];B[jc];W[lj];B[kl];W[li]
+;B[jd];W[kc];B[kb];W[lb];B[ld];W[lc];B[lf];W[md];B[be];W[kf];B[de]
+;W[cg];B[cd];W[ef];B[je];W[gk];B[ee];W[ll];B[lh];W[kh];B[jh];W[jb]
+;B[ib];W[ka];B[jj];W[lg];B[jg];W[ia];B[jf];W[mf];B[ci];W[bi];B[mg]
+;W[lf];B[cj];W[ck];B[bj];W[bh];B[fj];W[ej];B[bg];W[ch];B[fk];W[fl]
+;B[eh];W[ga];B[ff];W[hb];B[ic];W[db];B[hm];W[gm];B[im];W[eg];B[fh]
+;W[km];B[ah];W[ai];B[bk];W[cl];B[el];W[dl];B[ag];W[bl];B[fi];W[em]
+;B[fg];W[aj];B[dg];W[ak];B[fb];W[fa];B[hc];W[bc];B[ea];W[eb];B[gb]
+;W[da];B[ha];W[cc];B[ea];W[fa];B[ba];W[bb];B[ca];W[aa];B[ac];W[jl]
+;B[bd];W[ja];B[la];W[ma];B[gj];W[kj];B[mb];W[ji];B[la];W[kb];B[ii]
+;W[jk];B[hk];W[gl];B[mc];W[ma];B[jm];W[ij];B[bf];W[jj];B[lm];W[mm]
+;B[ml];W[al];B[ec];W[mh];B[lm];W[kl];B[ig];W[ld];B[ga];W[];B[ef];W[]
+;B[ea];W[];B[gi];W[];B[ad];W[];B[fa];W[];B[hb];W[];B[ab];W[];B[ih]
+;W[];B[hf];W[];B[cb];W[];B[dc];W[];B[]TB[aa][da][bb][db][eb][bc][cc]
+[gc][dd][ed][fd][gd][hd][id][ae][ce][fe][ge][he][ie][af][df][gf][eg]
+[gg][hg][hi]TW[la][mb][mc][me][mg][lh][ci][di][ki][mi][bj][cj][mj]
+[bk][dk][lk][mk][el][ml][am][bm][cm][dm][fm][lm][mm]
+C[burtabel [3d\]: oops
+RemiCoulom [12k\]: !
+Franco [10k\]: lol
+wb [7k\]: :) 
+maproom [8k?\]: please leave your bots running after this  -  there MAY be three more rounds
+burtabel [3d\]: typical monkey jump disaster by GNU Go...
+]
+)

@@ -1,0 +1,78 @@
+(;GM[1]FF[4]
+SZ[13]KM[7.50]
+PW[GNU]WR[13k]
+PB[viking5]PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-02-05]
+EV[Eleventh KGS Computer Go Tournament - Formal division]RE[W+Resign]
+TM[1080]RU[Chinese]
+C[viking5 [?\]: GTP Engine for viking5 (black): Viking version 5.3.1
+GNU [13k\]: GTP Engine for GNU (white): GNU Go version 3.7.8
+]
+CA[UTF-8]RO[4]
+;B[ik];W[kj];B[id];W[ek];B[ed];W[ji];B[gk];W[ei];B[jg];W[hi];B[kl]
+;W[kd];B[je];W[ke];B[ef];W[dh];B[kf];W[lf];B[lg];W[le];B[hj];W[hh]
+C[zapp [?\]: Since Viking only searches 1 ply on 13x13 it appears to vervalue sente moves
+]
+;B[gg];W[cf];B[jc]
+C[burtabel [3d\]: well GNU Go only "searches" 1 ply too
+];W[kc]
+C[burtabel [3d\]: but has a lot of special code to guess the value of (reverse) sente moves
+zapp [?\]: On 9x9 however viking searches 2-4 ply depending on position and stage of the game
+]
+;B[kb];W[lb];B[jb];W[la];B[de];W[ij];B[gi];W[gh];B[fh];W[fi];B[ce]
+;W[bf];B[eg];W[gj];B[hk]C[zapp [?\]: Another bad sente move
+];W[ac]
+C[gunnar [?\]: GNU says B+6.
+];B[cc];W[hg]
+C[burtabel [3d\]: I think W is leading
+gunnar [?\]: Now B+0.10.
+]
+;B[fl];W[el]C[zapp [?\]: Viking thinks white is ahead
+];B[li];W[lj]
+;B[hf]C[gunnar [?\]: GNU agrees now. W+3.
+];W[fk];B[gm];W[jk]
+C[burtabel [3d\]: well of course W should have gotten F2
+];B[jl]
+;W[eh];B[lk];W[kk];B[mk];W[em];B[fg];W[mj];B[lm];W[kh];B[ih];W[kg]
+;B[jf];W[jh];B[ig];W[ii];B[dg];W[cg]
+C[zapp [?\]: Now viking is starting to get desperate
+gunnar [?\]: Viking blundered away some points and now the C7 cut aji is gone.
+]
+;B[bh];W[ch]C[zapp [?\]: Yes, it is to weak tactically in the endgame
+zapp [?\]: I need to use time more efficient
+burtabel [3d\]: before that GNU Go played some negative moves.. (K3, E6)
+]
+;B[be];W[ae];B[ck];W[bi];B[bj];W[ah];B[bl];W[ak]
+C[trogdor [-\]: zapp: tried splitting vikings simulations to several computers?
+]
+;B[aj];W[cl];B[bm];W[al];B[dl];W[dk]
+C[zapp [?\]: This is a thought that is in my mind
+];B[cm]
+C[zapp [?\]: But right now I only have my laptop
+];W[dm]
+C[burtabel [3d\]: easier thought than done..
+];B[jd]
+C[trogdor [-\]: well, for montecarlo it should be easy.
+];W[bb]
+C[zapp [?\]: But a multicore stationary PC is on the wishlist
+];B[cb]
+;W[ba];B[bd]
+C[zapp [?\]: Actually viking code might be unusually easy to parallelize
+]
+;W[ad];B[ml];W[ca];B[db];W[da]
+C[zapp [?\]: Ok, gnu is still the king :-)
+burtabel [3d\]: well Black had a chance in lower left
+burtabel [3d\]: d2 instead of b1 lives?
+gunnar [?\]: No.
+zapp [?\]: If C5 is sent?
+gunnar [?\]: It's not.
+burtabel [3d\]: how can White kill?
+burtabel [3d\]: after D2?
+gunnar [?\]: Down to C1.
+burtabel [3d\]: then Black B1 and A2
+zapp [?\]: I need to enter my bathtub quickly
+zapp [?\]: see you
+gunnar [?\]: Uh, yeah, I was thinking false eye when it wasn't.
+gunnar [?\]: So C2 should have been C1?
+]
+)

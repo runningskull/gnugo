@@ -1,0 +1,75 @@
+(;GM[1]FF[4]
+SZ[13]KM[7.50]
+PW[GNU]WR[13k]
+PB[viking5]PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-02-05]
+EV[Eleventh KGS Computer Go Tournament - Formal division]RE[W+Resign]
+TM[1080]RU[Chinese]
+C[GNU [13k\]: GTP Engine for GNU (white): GNU Go version 3.7.8
+viking5 [?\]: GTP Engine for viking5 (black): Viking version 5.3.1
+]
+CA[UTF-8]RO[2]
+;B[kc];W[dj];B[ec];W[jf];B[ij]
+C[zapp [?\]: burtabel, viking does not use bensons it plays random games to the end
+]
+;W[kj];B[ck];W[ii]
+C[zapp [?\]: And if all random games wins it simply plays any move
+]
+;B[hf]C[burtabel [3d\]: ok i see
+];W[hj];B[dk]
+C[zapp [?\]: But in a close game losing those stones would be a disaster
+]
+;W[ej]C[zapp [?\]: And in 99% of the case it will play correctly
+]
+;B[ek];W[ik]
+C[zapp [?\]: I have actually never tested viking against gnugo on 13x13
+]
+;B[gg];W[eg];B[fk];W[bi];B[bj];W[ee];B[id];W[cj];B[bk];W[ch]
+C[zapp [?\]: Viking thinks it is slightly behind
+];B[je];W[kf];B[cd]
+;W[cf];B[le]C[gunnar [?\]: GNU thinks B+3.
+];W[lf]
+C[burtabel [3d\]: yes after W C8 Black should be leading
+];B[fd]
+;W[be];B[bc];W[gl];B[ig];W[jh]
+C[zapp [?\]: Viking has problems with monkey jumps
+burtabel [3d\]: gnugo too
+]
+;B[ff];W[ke];B[aj];W[ld];B[ef];W[lc]
+C[gunnar [?\]: GNU thinks it's ahead by five points now.
+];B[bg]
+C[zapp [?\]: Viking is also more pessimistic
+];W[ai];B[fj];W[jc]
+;B[eh]C[gunnar [?\]: GNU doesn't seem worried about the left side.
+zapp [?\]: Viking clearly wants to kill this large group
+]
+;W[ic];B[dg]C[burtabel [3d\]: well its dead now
+];W[gb]
+C[zapp [?\]: Not in computer go...
+];B[cg]
+C[gunnar [?\]: Somehow the owl reading found out correctly but didn't play to defend it anyway.
+burtabel [3d\]: maybe semeai overruled it?
+zapp [?\]: This is often what happens when viking beats gnu
+]
+;W[ie];B[fb]
+C[zapp [?\]: It desperately tries something and gnu stumbles on a bug 
+]
+;W[hd];B[gc]C[Gresil [16k\]: viking5 has superior luck code, eh
+]
+;W[hb]
+C[zapp [?\]: Good comment. Since it is based on playing random games to the end it actually measures luck all the time
+]
+;B[fl];W[fm]
+C[zapp [?\]: It plays the move that seems to possibly be the most lucky one
+]
+;B[gi];W[dm];B[gk];W[hl];B[hk];W[il];B[he];W[if];B[el];W[em];B[ga]
+;W[gd]
+C[zapp [?\]: A move ordering problem makes it not see the points in the lower left
+]
+;B[ha];W[ia];B[fa];W[bm];B[cl];W[cm];B[jg];W[kg];B[ih];W[hi];B[hh]
+;W[ji];B[bl];W[ge];B[fe];W[al];B[fh];W[jd];B[kl];W[gf];B[lk];W[hg]
+C[zapp [?\]: It now thinks it is losing
+];B[lj];W[li];B[ml];W[lm]
+;B[mj];W[km];B[gj];W[gh];B[hh];W[ih];B[fg];W[gh];B[jl];W[jm]
+C[burtabel [3d\]: hmm
+])

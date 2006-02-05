@@ -1,0 +1,54 @@
+(;GM[1]FF[4]
+SZ[13]KM[7.50]
+PW[CrazyStone]WR[30k]
+PB[GNU]BR[13k]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-02-05]
+EV[Eleventh KGS Computer Go Tournament - Formal division]RE[B+33.50]
+TM[1080]RU[Chinese]
+C[CrazyStone [30k\]: GTP Engine for CrazyStone (white): Crazy Stone version 0003-12
+GNU [13k\]: GTP Engine for GNU (black): GNU Go version 3.7.8
+]
+CA[UTF-8]RO[5]
+;B[kd];W[eh];B[jh];W[ch];B[kk];W[ed];B[cc];W[kg];B[kh];W[fk];B[cf]
+;W[db];B[dc];W[ec];B[hc];W[fb];B[gb];W[gc];B[hb];W[hd]
+C[gunnar [?\]: Is the upper left quite safe?
+];B[id];W[ic];B[jc]
+;W[bf];B[gd];W[he];B[ge];W[gf];B[hf];W[ie];B[ff];W[ig];B[if];W[je]
+C[burtabel [3d\]: what default level is GNU using now?
+];B[jg];W[gg]
+C[gunnar [?\]: I don't understand a thing of this fight.
+];B[jf]
+;W[fe];B[fc];W[fd];B[gc]C[gunnar [?\]: 15
+];W[ef];B[hk];W[ke];B[ib]
+;W[fg];B[gl];W[ld];B[lc];W[lb];B[el];W[mc];B[kc];W[lh];B[le];W[lf]
+;B[li];W[me];B[kf];W[lg];B[kb];W[ki];B[ji];W[kj];B[lj];W[jj];B[hi]
+;W[hj];B[gj];W[ij];B[ik];W[mb];B[la];W[ka];B[dk];W[ja];B[fj];W[be]
+;B[cj];W[dj];B[di];W[bj];B[bk];W[fa]
+C[gunnar [?\]: I'm not sure GNU understands the semeai in the upper right. G13 is a good move.
+]
+;B[jd];W[le];B[bi]
+C[burtabel [3d\]: i am sure GNU does not understand it...
+];W[ga]
+;B[cg];W[ci]C[gunnar [?\]: Me too. :-(
+];B[ej];W[ma];B[ce];W[ck]
+;B[dh];W[cl];B[bh];W[jb];B[cb];W[cd];B[dd]
+C[RemiCoulom [12k\]: Crazy Stone plays stupid moves because it believes GNU has to reply in K3 to kill K4.
+]
+;W[bl];B[aj];W[ak];B[bj];W[ca];B[ba];W[de];B[da];W[eb];B[bd];W[jl]
+;B[jk];W[ea];B[hg];W[kl]
+C[gunnar [?\]: Strange game, even with computer go standards.
+];B[ll]
+;W[gh];B[hh];W[mh];B[df];W[ee];B[ei];W[eg];B[mi];W[ml];B[mk];W[ic]
+;B[ca];W[lm];B[lk];W[gi];B[fi];W[ih];B[ii];W[em];B[fm];W[al];B[dm]
+;W[fh];B[dg];W[ab];B[bb];W[ad];B[bg];W[ac];B[af];W[ae];B[bc];W[ha]
+;B[dl];W[ag];B[ah];W[aa];B[af];W[kj];B[be];W[hl];B[mm];W[la];B[km]
+;W[fl];B[gk];W[il];B[jm];W[ij];B[ek];W[mg];B[];W[ih];B[];W[jj];B[]
+;W[ki];B[];W[jd];B[];W[kd];B[];W[md];B[];W[id];B[];W[ia];B[];W[]
+TB[aa][ab][ac][ad][cd][ae][bf][ag][ig][ch][ih][ai][ci][ki][dj][hj]
+[ij][jj][kj][mj][ak][ck][fk][al][bl][cl][fl][hl][il][jl][kl][ml][am]
+[bm][cm][em][gm][hm][im][lm]TW[gb][hb][ib][kb][fc][gc][hc][jc][kc]
+[lc][gd][ge][ff][mf]
+C[burtabel [3d\]: think all GNU - games in this tourney were exciting, more because of the fighting than because of the quality of moves...
+]
+)

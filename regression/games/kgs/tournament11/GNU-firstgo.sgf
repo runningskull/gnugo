@@ -1,0 +1,82 @@
+(;GM[1]FF[4]
+SZ[13]KM[7.50]
+PW[GNU]WR[13k]
+PB[firstgo]PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+DT[2006-02-05]
+EV[Eleventh KGS Computer Go Tournament - Formal division]RE[W+148.50]
+TM[1080]RU[Chinese]
+C[GNU [13k\]: GTP Engine for GNU (white): GNU Go version 3.7.8
+firstgo [?\]: GTP Engine for firstgo (black): FirstGo version 1.112
+]
+CA[UTF-8]RO[1]
+;B[gg];W[ci];B[hh];W[de];B[ff];W[dg];B[je];W[ec];B[id];W[ek];B[di]
+;W[eh];B[ej];W[fj];B[ei];W[fi];B[dk];W[el];B[cl];W[cj];B[dj];W[bl]
+;B[fh];W[hj];B[bk];W[ck];B[dh];W[eg];B[dl];W[bj];B[bm];W[ak];B[ch]
+;W[bh];B[cg];W[cf];B[ef];W[df];B[gj]
+C[gunnar [?\]: I'm not entirely impressed by GNU's play.
+];W[bg]
+;B[fk];W[gi];B[hi];W[gk];B[fl];W[gl];B[em]
+C[greymatter [24k?\]: Gnu should have no problem to win with a large amount
+]
+;W[cm]C[greymatter [24k?\]: Hi gunnar
+];B[dd];W[ed];B[dc];W[cd];B[cc]
+;W[bc];B[cb]C[burtabel [3d\]: not a big tournament...
+gunnar [?\]: No, 9x9 seems more popular.
+]
+;W[bb];B[da];W[am];B[ij]C[burtabel [3d\]: huh?
+burtabel [3d\]: a1?
+gunnar [?\]: No idea.
+trogdor [-\]: :)
+]
+;W[ik];B[jj];W[gj];B[gm]C[gunnar [?\]: G4 wasn't stellar either.
+]
+;W[jk];B[hl];W[hk];B[jl]
+C[gunnar [?\]: On the other, neither was K2. :-)
+];W[kj];B[il]
+C[burtabel [3d\]: or G1 or L4...
+];W[kl];B[lk];W[kk];B[bf]
+C[gunnar [?\]: Pretty bad fight in other words.
+];W[eb];B[ee]
+C[burtabel [3d\]: e12 is the best move i have seen so far :)
+];W[be]
+;B[lj]C[gunnar [?\]: It was the second choice when A1 was played.
+]
+;W[ki];B[ii];W[kg];B[ll];W[km];B[mj];W[le];B[lh];W[kh];B[lm];W[li]
+;B[ml]C[gunnar [?\]: Shouldn't have been necessary to let black live.
+burtabel [3d\]: yes but m9 was big too
+gunnar [?\]: GNU is down to level 12 now but playing quite slowly.
+]
+;W[hc];B[mi];W[ic];B[jc];W[jb];B[kb];W[kc];B[jd];W[lb];B[kd];W[lc]
+C[gunnar [?\]: Now level 8 and the speed is up.
+];B[ib];W[ka];B[ja]
+C[gunnar [?\]: Hm, back to 12. Time might become a problem.
+burtabel [3d\]: ko always dangerous for time
+]
+;W[kb]C[al2 [7k\]: there is no ko here
+];B[ld];W[lg];B[mh];W[md]
+C[burtabel [3d\]: L12 will turn up as ko in many reading sequences
+]
+;B[hd];W[gc];B[fd];W[ig]C[al2 [7k\]: ok :)
+];B[ge];W[hf];B[mb];W[af]
+;B[mc];W[ma]
+C[burtabel [3d\]: I think we need alpha-beta cut in all our reading so we dont get killed by kos at higher levels
+]
+;B[mb];W[fg];B[gf];W[gh];B[hg];W[if];B[la];W[ia];B[fc];W[db]
+C[al2 [7k\]: do this reading at high level is in cache ?
+gunnar [?\]: Only one dragon now. That's good for speed.
+]
+;B[fb];W[ca];B[gb];W[hb];B[ha];W[ga];B[fa];W[ea];B[gd];W[jf];B[ha]
+;W[ib];B[lf];W[ga];B[mg];W[ke];B[ha];W[me];B[mf];W[kf];B[ji];W[jh]
+C[al2 [7k\]: whao 
+];B[ie];W[mc];B[];W[fh];B[];W[bf];B[];W[dd];B[]
+;W[cb];B[];W[bi];B[];W[bk];B[];W[bm];B[];W[dm];B[];W[jm];B[];W[]
+TB[mk][mm]TW[aa][ba][da][fa][ga][ha][ja][la][ma][ab][fb][gb][mb][ac]
+[cc][dc][fc][jc][ad][bd][fd][gd][hd][id][jd][kd][ld][ae][ce][ee][fe]
+[ge][he][ie][je][ef][ff][gf][ag][cg][gg][hg][jg][ah][ch][dh][hh][ih]
+[ai][di][ei][hi][ii][ji][aj][dj][ej][ij][jj][dk][ek][fk][al][cl][dl]
+[el][fl][hl][il][jl][em][fm][gm][hm][im]
+C[greymatter [24k?\]: well, congratulations
+burtabel [3d\]: thanks
+greymatter [24k?\]: till next time...
+]
+)
