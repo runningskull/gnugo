@@ -623,17 +623,12 @@ void store_delta_territory_cache(int pos, int color, float move_value,
 			         Hash_data safety_hash);
 
 int whose_territory(const struct influence_data *q, int pos);
-int whose_loose_territory(const struct influence_data *q, int pos);
 int whose_moyo(const struct influence_data *q, int pos);
+int whose_moyo_restricted(const struct influence_data *q, int pos);
 int whose_area(const struct influence_data *q, int pos);
 float influence_territory(const struct influence_data *q, int pos, int color);
-void influence_get_moyo_segmentation(const struct influence_data *q,
-	       			     struct moyo_data *moyo);
-void influence_get_territory_segmentation(const struct influence_data *q,
+void influence_get_territory_segmentation(struct influence_data *q,
 	       			          struct moyo_data *moyo);
-void influence_get_moyo_data(const struct influence_data *q,
-			     int moyo_color[BOARDMAX],
-			     float territory_value[BOARDMAX]);
 void get_influence(const struct influence_data *q,
 		   float white_influence[BOARDMAX],
 		   float black_influence[BOARDMAX],
@@ -648,7 +643,6 @@ void get_influence(const struct influence_data *q,
 		   int non_territory[BOARDMAX]);
 float influence_score(const struct influence_data *q, int chinese_rules);
 float game_status(int color);
-void resegment_initial_influence(void);
 void influence_mark_non_territory(int pos, int color);
 int influence_considered_lively(const struct influence_data *q, int pos);
 void influence_erase_territory(struct influence_data *q, int pos, int color);
@@ -931,8 +925,6 @@ struct dragon_data2 *dragon2_func(int pos);
 extern float white_score, black_score;
 
 /* Global variables to tune strategy. */
-
-extern int use_optimistic_territory;
 
 extern float minimum_value_weight;
 extern float maximum_value_weight;

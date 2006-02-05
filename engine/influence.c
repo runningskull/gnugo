@@ -34,7 +34,6 @@
 static void add_influence_source(int pos, int color, float strength,
                                  float attenuation,
                                  struct influence_data *q);
-static void segment_influence(struct influence_data *q);
 static void print_influence(const struct influence_data *q,
 			    const char *info_string);
 static void print_numeric_influence(const struct influence_data *q,
@@ -47,7 +46,7 @@ static void value_territory(struct influence_data *q);
 static void enter_intrusion_source(int source_pos, int strength_pos,
                                    float strength, float attenuation,
                                    struct influence_data *q);
-static void add_marked_intrusions(struct influence_data *q, int color);
+static void add_marked_intrusions(struct influence_data *q);
  
 
 /* Influence computed for the initial position, i.e. before making
@@ -375,7 +374,7 @@ accumulate_influence(struct influence_data *q, int pos, int color)
 /* Initialize the influence_data structure.  */
 
 static void
-init_influence(struct influence_data *q, int color,
+init_influence(struct influence_data *q,
 	       const signed char safe_stones[BOARDMAX], 
 	       const float strength[BOARDMAX])
 {
@@ -387,7 +386,6 @@ init_influence(struct influence_data *q, int color,
    */
   if (cosmic_gnugo) {
     float t;
-
     if ((board_size != 19) || (movenum <= 2) || ((movenum / 2) % 2))
       cosmic_importance = 0.0;
     else {
@@ -402,9 +400,7 @@ init_influence(struct influence_data *q, int color,
     moyo_data.opp_influence_maximum = t * 30.0  +  (1.0-t) * 30.0;
     
     /* we use the same values for moyo and moyo_restricted */
-    moyo_restricted_data.influence_balance     = moyo_data.influence_balance;
-    moyo_restricted_data.my_influence_minimum  = moyo_data.my_influence_minimum;
-    moyo_restricted_data.opp_influence_maximum = moyo_data.opp_influence_maximum;
+    moyo_restricted_data = moyo_data;
 
     territory_determination_value   = t * 0.95 +  (1.0-t) * 0.95; 
       
@@ -415,12 +411,9 @@ init_influence(struct influence_data *q, int color,
     min_infl_for_territory.values[4] = t * 20.0  +  (1.0-t) * 20.0;
     min_infl_for_territory.values[5] = t * 15.0  +  (1.0-t) * 15.0;
     min_infl_for_territory.values[6] = t * 10.0  +  (1.0-t) * 15.0;   
-    
   }
   else {  
-  
     /* non-cosmic values */
-    
     cosmic_importance = 0.0;
   
     moyo_data.influence_balance     = 7.0;
@@ -440,24 +433,12 @@ init_influence(struct influence_data *q, int color,
     min_infl_for_territory.values[4] = 45.0;
     min_infl_for_territory.values[5] = 50.0;
     min_infl_for_territory.values[6] = 55.0; 
-    
   }
   
-  
-  if (q != &escape_influence) {
-    q->color_to_move = color;
-    if (q->is_territorial_influence)
-      attenuation = TERR_DEFAULT_ATTENUATION;
-    else
-      attenuation = DEFAULT_ATTENUATION;
-  }
-  else {
-    q->color_to_move = EMPTY;
-    if (q->is_territorial_influence)
-      attenuation = 2 * TERR_DEFAULT_ATTENUATION;
-    else
-      attenuation = 2 * DEFAULT_ATTENUATION;
-  }
+  if (q->is_territorial_influence)
+    attenuation = TERR_DEFAULT_ATTENUATION;
+  else
+    attenuation = 2 * DEFAULT_ATTENUATION;
   
   q->intrusion_counter = 0;
 
@@ -533,9 +514,7 @@ add_influence_source(int pos, int color, float strength, float attenuation,
   }
 }
 
-/* Experimental influence: Adds an intrusion as an entry in the list
- * q->intrusions.
- */
+/* Adds an intrusion as an entry in the list q->intrusions.  */
 static void
 enter_intrusion_source(int source_pos, int strength_pos,
                        float strength, float attenuation,
@@ -558,15 +537,12 @@ compare_intrusions(const void *p1, const void *p2)
 {
   const struct intrusion_data *intr1 = p1;
   const struct intrusion_data *intr2 = p2;
-  if (intr1->source_pos - intr2->source_pos != 0) {
+  if (intr1->source_pos - intr2->source_pos != 0)
     return (intr1->source_pos - intr2->source_pos);
-  }
-  else if (intr1->strength_pos - intr2->strength_pos != 0) {
+  else if (intr1->strength_pos - intr2->strength_pos != 0)
     return (intr1->strength_pos - intr2->strength_pos);
-  }
-  else if (intr1->strength > intr2->strength) {
+  else if (intr1->strength > intr2->strength)
     return 1;
-  }
   else
     return -1;
 }
@@ -602,7 +578,7 @@ reset_unblocked_blocks(struct influence_data *q)
  * (100% is if q == &followup_influence, 60% otherwise).
  */
 static void
-add_marked_intrusions(struct influence_data *q, int color)
+add_marked_intrusions(struct influence_data *q)
 {
   int i;
   int j = 0;
@@ -611,6 +587,7 @@ add_marked_intrusions(struct influence_data *q, int color)
   float correction;
   float source_strength;
   float allowed_strength;
+  int color = q->color_to_move;
 
   gg_sort(q->intrusions, q->intrusion_counter, sizeof(q->intrusions[0]),
           compare_intrusions);
@@ -630,12 +607,10 @@ add_marked_intrusions(struct influence_data *q, int color)
       j = i+1;
       continue;
     }
-    if (color == BLACK) {
+    if (color == BLACK)
       source_strength = q->black_strength[source_pos];
-    }
-    else {
+    else
       source_strength = q->white_strength[source_pos];
-    }
 
     /* First loop: Determine correction factor. */
     for (j = i; (j < q->intrusion_counter)
@@ -696,16 +671,8 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
   int k;
   struct influence_data *q = data;
   
-  /* Patterns marked T are only used in "territorial influence",
-   * patterns marked W get ignored other(w)ise.
-   */
-  if (((pattern->class & CLASS_T) && !(q->is_territorial_influence))
-      || ((pattern->class & CLASS_W) && q->is_territorial_influence))
-    return;
-
   /* We also ignore enhancement patterns in territorial influence. */
-  if ((pattern->class & CLASS_E)
-      && q->is_territorial_influence)
+  if ((pattern->class & CLASS_E) && q->is_territorial_influence)
     return;
 
   /* Don't use invasion (I) patterns when scoring. */
@@ -714,20 +681,21 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
   
   /* Loop through pattern elements to see if an A or D pattern
    * can possibly have any effect. If not we can skip evaluating
-   * constraint and/or helper. */
+   * constraint and/or helper.
+   */
   if (pattern->class & (CLASS_A | CLASS_D)) {
     int something_to_do = 0;
+    gg_assert(q->is_territorial_influence);
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
       int blocking_color;
       int ii;
+      /* The order of elements is: All commas, all "!", then other. */
       if (pattern->patn[k].att != ATT_comma
-	  && (!q->is_territorial_influence || pattern->patn[k].att != ATT_not))
-	break;  /* All commas are guaranteed to come first. */
+	  && pattern->patn[k].att != ATT_not)
+	break;  
 
-      /* transform pattern real coordinate */
       ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 
-      /* Territorial connection, making a barrier for opponent influence. */
       if (pattern->class & CLASS_D)
 	blocking_color = color;
       else
@@ -744,82 +712,37 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
       return;
   }
 
-  /* FIXME: Integrate the following loop into the previous one. */
-  
-  /* Require that all O stones in the pattern are tactically safe for
-   * territorial connection patterns of type D and X stones for type
-   * A. Both colors must be tactically safe for patterns of class B.
-   * For patterns of class B, t, D and E, O stones must have non-zero
-   * influence strength. Similarly for patterns of class A and t, X
-   * stones must have non-zero influence strength.
+  /* Require that all O stones in the pattern have non-zero influence
+   * strength for patterns of type D, E, B, t, and all X stones have
+   * non-zero strength for patterns of type A and t.
    *
    * Patterns also having class s are an exception from this rule.
    */
   if ((pattern->class & (CLASS_D | CLASS_A | CLASS_B | CLASS_E | CLASS_t))
       && !(pattern->class & CLASS_s)) {
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-      if ((pattern->patn[k].att == ATT_O
-	   && (pattern->class & (CLASS_D | CLASS_B | CLASS_E | CLASS_t)))
-	  || (pattern->patn[k].att == ATT_X
-	      && (pattern->class & (CLASS_A | CLASS_B | CLASS_t)))) {
-	/* transform pattern real coordinate */
-	int ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
-	if (pattern->class & CLASS_E) {
-	  if ((color == WHITE && q->white_strength[ii] == 0.0)
-	      || (color == BLACK && q->black_strength[ii] == 0.0))
-	    return; /* Match failed. */
-	}
-	/* FIXME: This test is probably not necessary any more. */
-	else if (!(pattern->class & (CLASS_D | CLASS_B | CLASS_t))) {
-	  if ((stackp == 0 && worm[ii].attack_codes[0] != 0)
-	      || attack(ii, NULL) != 0)
-	    return; /* Match failed */
-	}
-	/* One test left for class B and t. */
-	if ((pattern->class & (CLASS_B | CLASS_t))
-	    && pattern->patn[k].att == ATT_O) {
-	  if ((color == WHITE && q->white_strength[ii] == 0.0)
-	      || (color == BLACK && q->black_strength[ii] == 0.0))
-	    return; /* Match failed. */
-	}
-	
+      int ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
+      if (pattern->patn[k].att == ATT_O) {
+	if ((pattern->class & (CLASS_B | CLASS_t | CLASS_E | CLASS_D))
+	    && ((color == WHITE && q->white_strength[ii] == 0.0)
+	        || (color == BLACK && q->black_strength[ii] == 0.0)))
+	  return;
+      }
+      else if (pattern->patn[k].att == ATT_X) {
 	if ((pattern->class & (CLASS_A | CLASS_t))
-	    && pattern->patn[k].att == ATT_X) {
-	  if ((color == BLACK && q->white_strength[ii] == 0.0)
-	      || (color == WHITE && q->black_strength[ii] == 0.0))
-	    return; /* Match failed. */
-	}
-	
-	if (pattern->class & CLASS_D) {
-	  gg_assert(pattern->patn[k].att == ATT_O);
-	  if ((color == WHITE && q->white_strength[ii] == 0.0)
-	      || (color == BLACK && q->black_strength[ii] == 0.0))
-	    return; /* Match failed. */
-	}
+	    && ((color == BLACK && q->white_strength[ii] == 0.0)
+	        || (color == WHITE && q->black_strength[ii] == 0.0)))
+	  return; /* Match failed. */
       }
     }
   }
 
-
   /* If the pattern has a constraint, call the autohelper to see
    * if the pattern must be rejected.
    */
-  if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(ll, pos, color, 0))
-      return;
-  }
-
-  /* If the pattern has a helper, call it to see if the pattern must
-   * be rejected.
-   */
-  if (pattern->helper) {
-    if (!pattern->helper(pattern, ll, pos, color)) {
-      DEBUG(DEBUG_INFLUENCE,
-	    "Influence pattern %s+%d rejected by helper at %1m\n",
-	    pattern->name, ll, pos);
-      return;
-    }
-  }
+  if ((pattern->autohelper_flag & HAVE_CONSTRAINT)
+      && !pattern->autohelper(ll, pos, color, 0))
+    return;
 
   DEBUG(DEBUG_INFLUENCE, "influence pattern '%s'+%d matched at %1m\n",
 	pattern->name, ll, anchor);
@@ -828,9 +751,9 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
   if ((pattern->class & CLASS_t)
       && (pattern->autohelper_flag & HAVE_ACTION)) {
     pattern->autohelper(ll, pos, color, INFLUENCE_CALLBACK);
+    return;
   }
   
-
   /* For I patterns, add a low intensity, both colored, influence
    * source at *.
    */
@@ -856,89 +779,86 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
       attenuation = 1.5;
     }
 
-     /* Increase strength if we're computing escape influence. */
-     if (q == &escape_influence && (pattern->class & CLASS_e))
-       add_influence_source(pos, this_color, 20 * strength, attenuation, q);
-     else
-       add_influence_source(pos, this_color, strength, attenuation, q);
+    /* Increase strength if we're computing escape influence. */
+    if (!q->is_territorial_influence && (pattern->class & CLASS_e))
+      add_influence_source(pos, this_color, 20 * strength, attenuation, q);
+    else
+      add_influence_source(pos, this_color, strength, attenuation, q);
 
-     DEBUG(DEBUG_INFLUENCE,
-	   "  low intensity influence source at %1m, strength %f, color %C\n",
-	   pos, strength, this_color);
-     return;
+    DEBUG(DEBUG_INFLUENCE,
+	  "  low intensity influence source at %1m, strength %f, color %C\n",
+	  pos, strength, this_color);
+    return;
   }
     
   /* For E patterns, add a new influence source of the same color and
    * pattern defined strength at *.
    */
   if (pattern->class & CLASS_E) {
-    add_influence_source(pos, color,
-			 pattern->value, DEFAULT_ATTENUATION, q);
+    add_influence_source(pos, color, pattern->value, DEFAULT_ATTENUATION, q);
     DEBUG(DEBUG_INFLUENCE,
 	  "  extra %C source at %1m, strength %f\n", color,
 	  pos, pattern->value);
     return;
   }
-  
-  /* Loop through pattern elements and perform necessary actions
-   * for A, D, B, and t patterns.
-   */
-  for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-    if (((pattern->class & (CLASS_D | CLASS_A))
-	 && (pattern->patn[k].att == ATT_comma
-	     || (pattern->patn[k].att == ATT_not
-	         && q->is_territorial_influence)))
-	|| ((pattern->class & CLASS_B)
-	    && pattern->patn[k].att == ATT_not)) {
-      /* transform pattern real coordinate */
-      int ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
-      float strength;
 
-      /* Territorial connection, making a barrier for opponent influence. */
-      if (pattern->class & (CLASS_A | CLASS_D)) {
-	int blocking_color;
-	if (pattern->class & CLASS_D)
-	  blocking_color = color;
+  /* For B patterns add intrusions sources at "!" points. */
+  if (pattern->class & CLASS_B) {
+    float strength;
+    if (cosmic_gnugo) {
+      float t = 0.15 + (1.0 - cosmic_importance);
+      t = gg_min(1.0, t);
+      t = gg_max(0.0, t);
+      strength = t * pattern->value;
+    }
+    else 
+      strength = pattern->value;
+    
+    for (k = 0; k < pattern->patlen; ++k)  /* match each point */
+      if (pattern->patn[k].att == ATT_not) {
+	/* transform pattern real coordinate */
+	int ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
+
+	/* Low intensity influence source for the color in turn to move. */  
+	if (q->is_territorial_influence)
+	  enter_intrusion_source(anchor, ii, strength, 
+				 TERR_DEFAULT_ATTENUATION, q);
 	else
-	  blocking_color = OTHER_COLOR(color);
-	DEBUG(DEBUG_INFLUENCE, "  barrier for %s influence at %1m\n",
-	      color_to_string(OTHER_COLOR(blocking_color)), ii);
-	if (pattern->patn[k].att == ATT_comma) {
-	  if (blocking_color == WHITE)
-	    q->black_permeability[ii] = 0.0;
-	  else
-	    q->white_permeability[ii] = 0.0;
-	}
-	/* Weak barrier at !-marked points. */
-	else {
-	  if (blocking_color == WHITE)
-	    q->black_permeability[ii] *= 0.7;
-	  else
-	    q->white_permeability[ii] *= 0.7;
-	  
-	}
-      }
-
-     if (cosmic_gnugo) {
-        float t = 0.15 + (1.0 - cosmic_importance);
-        t = gg_min(1.0, t);
-        t = gg_max(0.0, t);
-        strength = t * pattern->value;
-      }
-      else 
-        strength = pattern->value;
-      
-      /* Low intensity influence source for the color in turn to move. */  
-      if (pattern->class & CLASS_B) {
-        if (q->is_territorial_influence)
-          enter_intrusion_source(anchor, ii, strength, 
-	  		         TERR_DEFAULT_ATTENUATION, q);
-        else
-          add_influence_source(ii, color, strength, 
-                                 DEFAULT_ATTENUATION, q); 
+	  add_influence_source(ii, color, strength, DEFAULT_ATTENUATION, q); 
 	DEBUG(DEBUG_INFLUENCE, "  intrusion at %1m\n", ii);
       }
-            
+    return;
+  }
+  
+
+  gg_assert(pattern->class & (CLASS_D | CLASS_A));
+  /* For A, D patterns, add blocks for all "," or "!" points.  */
+  for (k = 0; k < pattern->patlen; ++k) { /* match each point */
+    if (pattern->patn[k].att == ATT_comma
+	|| pattern->patn[k].att == ATT_not) {
+      /* transform pattern real coordinate */
+      int ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
+      int blocking_color;
+      if (pattern->class & CLASS_D)
+	blocking_color = color;
+      else
+	blocking_color = OTHER_COLOR(color);
+      DEBUG(DEBUG_INFLUENCE, "  barrier for %s influence at %1m\n",
+	    color_to_string(OTHER_COLOR(blocking_color)), ii);
+      if (pattern->patn[k].att == ATT_comma) {
+	if (blocking_color == WHITE)
+	  q->black_permeability[ii] = 0.0;
+	else
+	  q->white_permeability[ii] = 0.0;
+      }
+      /* Weak barrier at !-marked points. */
+      else {
+	if (blocking_color == WHITE)
+	  q->black_permeability[ii] *= 0.7;
+	else
+	  q->white_permeability[ii] *= 0.7;
+	
+      }
     }
   }
 }
@@ -970,30 +890,17 @@ followup_influence_callback(int anchor, int color, struct pattern *pattern,
     return;
 
   t = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
+
   /* If the pattern has a constraint, call the autohelper to see
    * if the pattern must be rejected.
    */
-  if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(ll, t, color, 0))
-      return;
-  }
+  if (pattern->autohelper_flag & HAVE_CONSTRAINT
+      && !pattern->autohelper(ll, t, color, 0))
+    return;
 
-  /* If the pattern has a helper, call it to see if the pattern must
-   * be rejected.
-   */
-  if (pattern->helper) {
-    if (!pattern->helper(pattern, ll, t, color)) {
-      DEBUG(DEBUG_INFLUENCE,
-            "Influence pattern %s+%d rejected by helper at %1m\n",
-            pattern->name, ll, t);
-      return;
-    }
-  }
- 
- /* Actions in B patterns are used as followup specific constraints. */
- if ((pattern->autohelper_flag & HAVE_ACTION)
-     && !pattern->autohelper(ll, t, color,
-                             FOLLOWUP_INFLUENCE_CALLBACK))
+  /* Actions in B patterns are used as followup specific constraints. */
+  if ((pattern->autohelper_flag & HAVE_ACTION)
+      && !pattern->autohelper(ll, t, color, FOLLOWUP_INFLUENCE_CALLBACK))
     return;
 
   DEBUG(DEBUG_INFLUENCE, "influence pattern '%s'+%d matched at %1m\n",
@@ -1052,24 +959,23 @@ influence_erase_territory(struct influence_data *q, int pos, int color)
  * Reset permeability to 1.0 at intrusion points.
  */
 static void
-find_influence_patterns(struct influence_data *q, int color)
+find_influence_patterns(struct influence_data *q)
 {
   int ii;
 
   current_influence = q;
   matchpat(influence_callback, ANCHOR_COLOR, &influencepat_db, q, NULL);
-  if (color != EMPTY)
-    matchpat(influence_callback, color, &barrierspat_db, q, NULL);
+  if (q->color_to_move != EMPTY)
+    matchpat(influence_callback, q->color_to_move, &barrierspat_db, q, NULL);
 
   if (q->is_territorial_influence)
-    add_marked_intrusions(q, color);
+    add_marked_intrusions(q);
 
   /* When color == EMPTY, we introduce a weaker kind of barriers
    * manually instead of searching for patterns.
    */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)
-	&& q->safe[ii]) {
+    if (ON_BOARD(ii) && q->safe[ii]) {
       int k;
       for (k = 0; k < 8; k++) {
 	int d = delta[k];
@@ -1182,21 +1088,20 @@ remove_double_blocks(struct influence_data *q,
 
 /* Do the real work of influence computation. This is called from
  * compute_influence and compute_escape_influence.
+ *
+ * q->is_territorial_influence and q->color_to_move must be set by the caller.
  */
 static void
-do_compute_influence(int color, const signed char safe_stones[BOARDMAX],
+do_compute_influence(const signed char safe_stones[BOARDMAX],
 		     const signed char inhibited_sources[BOARDMAX],
     		     const float strength[BOARDMAX], struct influence_data *q,
 		     int move, const char *trace_message)
 {
   int ii;
-  init_influence(q, color, safe_stones, strength);
+  init_influence(q, safe_stones, strength);
 
   modify_depth_values(stackp - 1);
-  if (q != &escape_influence)
-    find_influence_patterns(q, color);
-  else
-    find_influence_patterns(q, EMPTY);
+  find_influence_patterns(q);
   modify_depth_values(1 - stackp);
   
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
@@ -1211,7 +1116,6 @@ do_compute_influence(int color, const signed char safe_stones[BOARDMAX],
   remove_double_blocks(q, inhibited_sources);
 
   value_territory(q);
-  segment_influence(q);
   
   if ((move == NO_MOVE
        && (printmoyo & PRINTMOYO_INITIAL_INFLUENCE))
@@ -1261,7 +1165,7 @@ compute_influence(int color, const signed char safe_stones[BOARDMAX],
   influence_id++;
   q->id = influence_id;
 
-  do_compute_influence(color, safe_stones, NULL, strength,
+  do_compute_influence(safe_stones, NULL, strength,
 		       q, move, trace_message);
 
   debug = save_debug;
@@ -1285,54 +1189,6 @@ whose_territory(const struct influence_data *q, int pos)
      return WHITE;
 
   return EMPTY;
-}
-
-
-/* whose_loose_territory()
- *
- * Another function that return the color of the player who has
- * (almost) territory at pos. If it's territory for neither color, 
- * EMPTY is returned.
- * If the global flag use_optimistic_territory is set to 1,
- * we use a much looser definition of "territory" (essentially,
- * we use moyo instead of therritory in that case). This will
- * enable us to use the break-in code to break into moyos instead
- * of inside hard territories. 
- */
-int
-whose_loose_territory(const struct influence_data *q, int pos)
-{
-  float bi = q->black_influence[pos];
-  float wi = q->white_influence[pos];
-  int owner;
-
-  ASSERT_ON_BOARD1(pos);
-  
-  /* if the global flag use_optimistic_territory is not 
-     set, be very strict. */
-  if (!use_optimistic_territory)
-    return whose_territory(q, pos);
-  
-  
-  /* If set, we use essentially a somewhat conservative 
-   * version of whose_moyo().  */
-   
-  owner = whose_territory(q, pos);
-  
-  if ((owner == EMPTY) && (bi > 10.0 * wi && bi > 7.0 && wi < 40.0))
-    owner = BLACK;
-  if ((owner == EMPTY) && (wi > 10.0 * bi && wi > 7.0 && bi < 40.0))
-    owner = WHITE;
-
-  if (ON_BOARD(pos) && IS_STONE(board[pos]) && !q->safe[pos]) { 
-    if (0) 
-      TRACE("dead stone : %1m, territory for %s\n", pos,
-                  (owner == WHITE ? "White": 
-                  (owner == BLACK ? "Black": "nobody????")));
-    owner = OTHER_COLOR(board[pos]);
-  }
-    
-  return owner;
 }
 
 
@@ -1367,42 +1223,29 @@ whose_moyo(const struct influence_data *q, int pos)
  * The definition of moyo in terms of the influences is totally ad
  * hoc.
  *
- * This differs from whose_moyo() in that it never counts moyo for
- * tactically unstable stones, which is useful when the surrounding
- * moyo size is estimated. It also doesn't count moyo where there is
- * an eye space inhibition.
+ * It has a slightly different definition of moyo than whose_moyo.
  */
-static int
+int
 whose_moyo_restricted(const struct influence_data *q, int pos)
 {
   float bi = q->black_influence[pos];
   float wi = q->white_influence[pos];
-  int color;
 
   int territory_color = whose_territory(q, pos);
 
-  if (worm[pos].attack_codes[0] != 0
-      && worm[pos].defense_codes[0] != 0)
-    return EMPTY;
-  
   /* default */
   if (territory_color != EMPTY)
-    color = territory_color;
+    return territory_color;
   else if (bi > moyo_restricted_data.influence_balance * wi
            && bi > moyo_restricted_data.my_influence_minimum
            && wi < moyo_restricted_data.opp_influence_maximum)
-    color = BLACK;
+    return BLACK;
   else if (wi > moyo_restricted_data.influence_balance * bi
            && wi > moyo_restricted_data.my_influence_minimum
            && bi < moyo_restricted_data.opp_influence_maximum)
-    color = WHITE; 
+    return WHITE; 
   else
-    color = EMPTY;
-
-  if (cut_possible(pos, OTHER_COLOR(color)))
     return EMPTY;
-  
-  return color;
 }
 
 
@@ -1441,66 +1284,65 @@ value_territory(struct influence_data *q)
   float ratio;
   int k;
 
+  memset(first_guess, 0, BOARDMAX*sizeof(float));
+  memset(q->territory_value, 0, BOARDMAX*sizeof(float));
   /* First loop: guess territory directly from influence. */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      first_guess[ii] = 0.0;
+    if (ON_BOARD(ii)
+	&& !q->safe[ii]) {
+      float diff = 0.0;
+      if (q->white_influence[ii] + q->black_influence[ii] > 0)
+	diff = (q->white_influence[ii] - q->black_influence[ii])
+	       / (q->white_influence[ii] + q->black_influence[ii]);
+      first_guess[ii] = diff * diff * diff;
 
-      if (!q->safe[ii]) {
-        float diff = 0.0;
-        if (q->white_influence[ii] + q->black_influence[ii] > 0)
-          diff = (q->white_influence[ii] - q->black_influence[ii])
-                 / (q->white_influence[ii] + q->black_influence[ii]);
-        first_guess[ii] = diff * diff * diff;
+      /* If both side have small influence, we have to reduce this value.
+       * What we consider "small influence" depends on how central this
+       * intersection lies.
+       *
+       * The values of central on an 11x11 board become:
+       *
+       *  4  5  6  7  7  7  7  7  6  5  4
+       *  5  8  9 10 10 10 10 10  9  8  5
+       *  6  9 12 13 13 13 13 13 12  9  6
+       *  7 10 13 16 16 16 16 16 13 10  7
+       *  7 10 13 16 17 17 17 16 13 10  7
+       *  7 10 13 16 17 18 17 16 13 10  7
+       *  7 10 13 16 17 17 17 16 13 10  7
+       *  7 10 13 16 16 16 16 16 13 10  7
+       *  6  9 12 13 13 13 13 13 12  9  6
+       *  5  8  9 10 10 10 10 10  9  8  5
+       *  4  5  6  7  7  7  7  7  6  5  4
+       */
+      dist_i = gg_min(I(ii), board_size - I(ii) - 1);
+      dist_j = gg_min(J(ii), board_size - J(ii) - 1);
+      if (dist_i > dist_j)
+	dist_i = gg_min(4, dist_i);
+      else
+	dist_j = gg_min(4, dist_j);
+      central = (float) 2 * gg_min(dist_i, dist_j) + dist_i + dist_j;
+      ratio = gg_max(q->black_influence[ii], q->white_influence[ii])
+	      / gg_interpolate(&min_infl_for_territory, central);
 
-	/* If both side have small influence, we have to reduce this value.
-	 * What we consider "small influence" depends on how central this
-	 * intersection lies.
-	 *
-	 * The values of central on an 11x11 board become:
-	 *
-	 *  4  5  6  7  7  7  7  7  6  5  4
-	 *  5  8  9 10 10 10 10 10  9  8  5
-	 *  6  9 12 13 13 13 13 13 12  9  6
-	 *  7 10 13 16 16 16 16 16 13 10  7
-	 *  7 10 13 16 17 17 17 16 13 10  7
-	 *  7 10 13 16 17 18 17 16 13 10  7
-	 *  7 10 13 16 17 17 17 16 13 10  7
-	 *  7 10 13 16 16 16 16 16 13 10  7
-	 *  6  9 12 13 13 13 13 13 12  9  6
-	 *  5  8  9 10 10 10 10 10  9  8  5
-	 *  4  5  6  7  7  7  7  7  6  5  4
-	 */
-        dist_i = gg_min(I(ii), board_size - I(ii) - 1);
-        dist_j = gg_min(J(ii), board_size - J(ii) - 1);
-	if (dist_i > dist_j)
-	  dist_i = gg_min(4, dist_i);
-	else
-	  dist_j = gg_min(4, dist_j);
-	central = (float) 2 * gg_min(dist_i, dist_j) + dist_i + dist_j;
-        ratio = gg_max(q->black_influence[ii], q->white_influence[ii])
-                / gg_interpolate(&min_infl_for_territory, central);
+      /* Do not make this adjustment when scoring unless both
+       * players have non-zero influence.
+       */
+      if (doing_scoring && (q->black_influence[ii] == 0.0
+			    || q->white_influence[ii] == 0.0))
+	ratio = 1.0;
+      
+      first_guess[ii] *= gg_interpolate(&territory_correction, ratio);
 
-	/* Do not make this adjustment when scoring unless both
-	 * players have non-zero influence.
-	 */
-	if (doing_scoring && (q->black_influence[ii] == 0.0
-			      || q->white_influence[ii] == 0.0))
-	  ratio = 1.0;
-	
-        first_guess[ii] *= gg_interpolate(&territory_correction, ratio);
-
-	/* Dead stone, upgrade to territory. Notice that this is not
-         * the point for a prisoner, which is added later. Instead
-         * this is to make sure that the vertex is not regarded as
-         * moyo or area. Also notice that the non-territory
-         * degradation below may over-rule this decision.
-	 */
-	if (board[ii] == BLACK)
-	  first_guess[ii] = 1.0;
-	else if (board[ii] == WHITE)
-	  first_guess[ii] = -1.0;
-      }
+      /* Dead stone, upgrade to territory. Notice that this is not
+       * the point for a prisoner, which is added later. Instead
+       * this is to make sure that the vertex is not regarded as
+       * moyo or area. Also notice that the non-territory
+       * degradation below may over-rule this decision.
+       */
+      if (board[ii] == BLACK)
+	first_guess[ii] = 1.0;
+      else if (board[ii] == WHITE)
+	first_guess[ii] = -1.0;
       q->territory_value[ii] = first_guess[ii];
     }
 
@@ -1509,65 +1351,63 @@ value_territory(struct influence_data *q)
    * neighbor has reduced permeability for the opponent's influence).
    */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      /* Do not overrule dead stone territory above.
-       * FIXME: This does not do what it claims to do. Correcting it
-       * seems to break some tests, though.
-       */
-      if (!q->safe[ii]) {
-	/* Loop over all neighbors. */
-        for (k = 0; k < 4; k++) {
-          if (!ON_BOARD(ii + delta[k]))
-            continue;
-          if (q->territory_value[ii] > 0.0) {
-            /* White territory. */
-            if (!q->safe[ii + delta[k]]) {
-	      float neighbor_val =
-		q->black_permeability[ii + delta[k]]
-		  * first_guess[ii + delta[k]]
-		+ (1.0 - q->black_permeability[ii + delta[k]])
-		  * first_guess[ii];
-              q->territory_value[ii]
-                = gg_max(0, gg_min(q->territory_value[ii], neighbor_val));
-	    }
-          }
-          else {
-            /* Black territory. */
-            if (!q->safe[ii + delta[k]]) {
-	      float neighbor_val =
-		q->white_permeability[ii + delta[k]]
-		  * first_guess[ii + delta[k]]
-		+ (1 - q->white_permeability[ii + delta[k]])
-		  * first_guess[ii];
-              q->territory_value[ii]
-                = gg_min(0, gg_max(q->territory_value[ii], neighbor_val));
-	    }
-          }
-        }
+    if (ON_BOARD(ii)
+	/* Do not overrule dead stone territory above.
+	 * FIXME: This does not do what it claims to do. Correcting it
+	 * seems to break some tests, though.
+	 */
+	&& !q->safe[ii]) {
+      /* Loop over all neighbors. */
+      for (k = 0; k < 4; k++) {
+	if (!ON_BOARD(ii + delta[k]))
+	  continue;
+	if (q->territory_value[ii] > 0.0) {
+	  /* White territory. */
+	  if (!q->safe[ii + delta[k]]) {
+	    float neighbor_val =
+	      q->black_permeability[ii + delta[k]]
+		* first_guess[ii + delta[k]]
+	      + (1.0 - q->black_permeability[ii + delta[k]])
+		* first_guess[ii];
+	    q->territory_value[ii]
+	      = gg_max(0, gg_min(q->territory_value[ii], neighbor_val));
+	  }
+	}
+	else {
+	  /* Black territory. */
+	  if (!q->safe[ii + delta[k]]) {
+	    float neighbor_val =
+	      q->white_permeability[ii + delta[k]]
+		* first_guess[ii + delta[k]]
+	      + (1 - q->white_permeability[ii + delta[k]])
+		* first_guess[ii];
+	    q->territory_value[ii]
+	      = gg_min(0, gg_max(q->territory_value[ii], neighbor_val));
+	  }
+	}
       }
     }
 
   /* Third loop: Nonterritory patterns, points for prisoners. */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      if (!q->safe[ii]) {
-	/* If marked as non-territory for the color currently owning
-         * it, reset the territory value.
-	 */
-	if (q->territory_value[ii] > 0.0
-	    && (q->non_territory[ii] & WHITE))
-	  q->territory_value[ii] = 0.0;
+    if (ON_BOARD(ii)
+	&& !q->safe[ii]) {
+      /* If marked as non-territory for the color currently owning
+       * it, reset the territory value.
+       */
+      if (q->territory_value[ii] > 0.0
+	  && (q->non_territory[ii] & WHITE))
+	q->territory_value[ii] = 0.0;
 
-	if (q->territory_value[ii] < 0.0
-	    && (q->non_territory[ii] & BLACK))
-	  q->territory_value[ii] = 0.0;
-	
-	/* Dead stone, add one to the territory value. */
-	if (board[ii] == BLACK)
-	  q->territory_value[ii] += 1.0;
-	else if (board[ii] == WHITE)
-	  q->territory_value[ii] -= 1.0;
-      }
+      if (q->territory_value[ii] < 0.0
+	  && (q->non_territory[ii] & BLACK))
+	q->territory_value[ii] = 0.0;
+      
+      /* Dead stone, add one to the territory value. */
+      if (board[ii] == BLACK)
+	q->territory_value[ii] += 1.0;
+      else if (board[ii] == WHITE)
+	q->territory_value[ii] -= 1.0;
     }
 }
 
@@ -1581,201 +1421,68 @@ value_territory(struct influence_data *q)
  */
 static void
 segment_region(struct influence_data *q, owner_function_ptr region_owner,
-	       int type, int segmentation[BOARDMAX])
+	       struct moyo_data *regions)
 {
   int ii;
   static signed char marked[BOARDMAX];
+  regions->number = 0;
 
   /* Reset the markings. */
-  memset(marked, 0, sizeof(marked));
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    marked[ii] = 0;
+    regions->segmentation[ii] = 0;
+  }
 
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      if ((!marked[ii]) && region_owner(q, ii) != EMPTY) {
-	/* Found an unlabelled intersection. Use flood filling to find
-         * the rest of the region.
-	 */
-	int size = 0;
-	float terr_val = 0.0;
-	int queue_start = 0;
-	int queue_end = 1;
-	int color = region_owner(q, ii);
-	q->number_of_regions++;
-	marked[ii] = 1;
-	q->queue[0] = ii;
-	while (queue_start < queue_end) {
-	  int tt = q->queue[queue_start];
-	  int k;
-	  queue_start++;
-	  if (!q->safe[tt] || board[tt] != color) {
-	    size++;
-	    if (q->is_territorial_influence)
-	      terr_val += gg_abs(q->territory_value[tt]);
-	  }
-	  segmentation[tt] = q->number_of_regions;
-	  for (k = 0; k < 4; k++) {
-	    int d = delta[k];
-	    if (ON_BOARD(tt + d)
-		&& !marked[tt + d]
-		&& region_owner(q, tt + d) == color) {
-	      q->queue[queue_end] = tt + d;
-	      queue_end++;
-	      marked[tt + d] = 1;
-	    }
+    if (ON_BOARD(ii)
+	&& !marked[ii]
+	&& region_owner(q, ii) != EMPTY) {
+      /* Found an unlabelled intersection. Use flood filling to find
+       * the rest of the region.
+       */
+      int size = 0;
+      float terr_val = 0.0;
+      int queue_start = 0;
+      int queue_end = 1;
+      int color = region_owner(q, ii);
+      regions->number++;
+      marked[ii] = 1;
+      q->queue[0] = ii;
+      while (queue_start < queue_end) {
+	int tt = q->queue[queue_start];
+	int k;
+	queue_start++;
+	if (!q->safe[tt] || board[tt] != color) {
+	  size++;
+	  if (q->is_territorial_influence)
+	    terr_val += gg_abs(q->territory_value[tt]);
+	}
+	regions->segmentation[tt] = regions->number;
+	for (k = 0; k < 4; k++) {
+	  int d = delta[k];
+	  if (ON_BOARD(tt + d)
+	      && !marked[tt + d]
+	      && region_owner(q, tt + d) == color) {
+	    q->queue[queue_end] = tt + d;
+	    queue_end++;
+	    marked[tt + d] = 1;
 	  }
 	}
-	if (color == WHITE)
-	  q->region_type[q->number_of_regions] = WHITE_REGION | type;
-	else
-	  q->region_type[q->number_of_regions] = BLACK_REGION | type;
-	q->region_size[q->number_of_regions] = size;
-	q->region_territorial_value[q->number_of_regions] = terr_val;
-	if (0)
-	  gprintf("Region %d of type %d (color %s) at %1m. Size %d\n",
-		  q->number_of_regions, q->region_type[q->number_of_regions],
-		  color_to_string(color), ii, size);
       }
+      regions->size[regions->number] = size;
+      regions->territorial_value[regions->number] = terr_val;
+      regions->owner[regions->number] = color;
     }
 }
 
-/* Segment the influence map into connected regions of territory,
- * moyo, and area for both colors. The region numbers are stored in
- * the territory_segmentation, moyo_segmentation, and
- * area_segmentation arrays of the influence_data struct respectively.
- * All types of regions use the same numbering, with zero as a dummy
- * for nonregions. The region_type and region_size arrays hold
- * information about each region.
- */
-static void
-segment_influence(struct influence_data *q)
-{
-  int ii;
-  q->number_of_regions = 0;
-  q->region_type[0] = 0;
-  q->region_size[0] = 0;
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      q->territory_segmentation[ii] = 0;
-      q->moyo_segmentation[ii] = 0;
-      q->area_segmentation[ii] = 0;
-    }
-    
-  if (use_optimistic_territory)
-     segment_region(q, whose_loose_territory, 
-                    IS_TERRITORY, q->territory_segmentation);
-  else 
-     segment_region(q, whose_territory, 
-                    IS_TERRITORY, q->territory_segmentation); 
-  segment_region(q, whose_moyo_restricted, IS_MOYO, q->moyo_segmentation);
-  segment_region(q, whose_area,      IS_AREA,      q->area_segmentation);
-}
 
 
-/* Export the moyo segmentation. */
+/* Export a territory segmentation. */
 void
-influence_get_moyo_segmentation(const struct influence_data *q,
-    			        struct moyo_data *moyos)
-{
-  int ii;
-  int min_moyo_id;
-  int max_moyo_id;
-  int i;
-
-  min_moyo_id = MAX_REGIONS;
-  max_moyo_id = 0;
-
-  /* Find out range of region ids used by moyos. */
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      if (q->moyo_segmentation[ii] != 0) {
-        min_moyo_id = gg_min(min_moyo_id, q->moyo_segmentation[ii]);
-        max_moyo_id = gg_max(max_moyo_id, q->moyo_segmentation[ii]);
-      }
-    }
-  moyos->number = max_moyo_id - min_moyo_id + 1;
-
-  /* Export segmentation. */
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      if (q->moyo_segmentation[ii] != 0) {
-        moyos->segmentation[ii]
-	  = q->moyo_segmentation[ii] - min_moyo_id + 1;
-      }
-      else
-        moyos->segmentation[ii] = 0;
-    }
-  
-  /* Export size and owner info. */
-  for (i = min_moyo_id; i <= max_moyo_id; i++) {
-    moyos->size[i - min_moyo_id + 1] = q->region_size[i];
-    moyos->territorial_value[i - min_moyo_id + 1]
-        = q->region_territorial_value[i];
-    if (q->region_type[i] & BLACK_REGION)
-      moyos->owner[i - min_moyo_id + 1] = BLACK;
-    else
-      moyos->owner[i - min_moyo_id + 1] = WHITE;
-  }
-}
-
-
-/* Export the territory segmentation. */
-void
-influence_get_territory_segmentation(const struct influence_data *q,
+influence_get_territory_segmentation(struct influence_data *q,
     			             struct moyo_data *moyos)
 {
-  int ii;
-  int min_moyo_id;
-  int max_moyo_id;
-  int i;
-
-  min_moyo_id = MAX_REGIONS;
-  max_moyo_id = 0;
-
-  /* Find out range of region ids used by moyos. */
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      if (q->territory_segmentation[ii] != 0) {
-        min_moyo_id = gg_min(min_moyo_id, q->territory_segmentation[ii]);
-        max_moyo_id = gg_max(max_moyo_id, q->territory_segmentation[ii]);
-      }
-    }
-  moyos->number = max_moyo_id - min_moyo_id + 1;
-
-  /* Export segmentation. */
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      if (q->territory_segmentation[ii] != 0) {
-        moyos->segmentation[ii]
-	  = q->territory_segmentation[ii] - min_moyo_id + 1;
-      }
-      else
-        moyos->segmentation[ii] = 0;
-    }
-  
-  /* Export size and owner info. */
-  for (i = min_moyo_id; i <= max_moyo_id; i++) {
-    moyos->size[i - min_moyo_id + 1] = q->region_size[i];
-    moyos->territorial_value[i - min_moyo_id + 1]
-        = q->region_territorial_value[i];
-    if (q->region_type[i] & BLACK_REGION)
-      moyos->owner[i - min_moyo_id + 1] = BLACK;
-    else
-      moyos->owner[i - min_moyo_id + 1] = WHITE;
-  }
-}
-
-/* Another function to export a certain amount of moyo data. */
-void
-influence_get_moyo_data(const struct influence_data *q,
-    		        int moyo_color[BOARDMAX],
-			float territory_value[BOARDMAX])
-{
-  int ii;
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      moyo_color[ii] = whose_moyo_restricted(q, ii);
-      territory_value[ii] = gg_abs(q->territory_value[ii]);
-    }
+  segment_region(q, whose_territory, moyos);
 }
 
 
@@ -1802,14 +1509,6 @@ influence_considered_lively(const struct influence_data *q, int pos)
 }
 
 
-/* Redo the segmentation of the initial influence. */
-void
-resegment_initial_influence()
-{
-  segment_influence(&initial_black_influence);
-  segment_influence(&initial_white_influence);
-}
-
 /* Compute a followup influence. It is assumed that the stones that
  * deserve a followup have been marked INFLUENCE_SAVED_STONE in
  * base->safe.
@@ -1827,6 +1526,7 @@ compute_followup_influence(const struct influence_data *base,
 
   memcpy(q, base, sizeof(*q));
   ASSERT1(IS_STONE(q->color_to_move), move);
+  q->color_to_move = color;
  
   /* We mark the saved stones and their neighbors in the goal array.
    */
@@ -1856,7 +1556,7 @@ compute_followup_influence(const struct influence_data *base,
   debug = save_debug;
  
   /* Now add the intrusions. */
-  add_marked_intrusions(q, color);
+  add_marked_intrusions(q);
 
   reset_unblocked_blocks(q);
   
@@ -1941,7 +1641,7 @@ compute_escape_influence(int color, const signed char safe_stones[BOARDMAX],
   if (!(debug & DEBUG_ESCAPE))
     debug &= ~DEBUG_INFLUENCE;
 
-  do_compute_influence(OTHER_COLOR(color), safe_stones, goal, strength,
+  do_compute_influence(safe_stones, goal, strength,
       		       &escape_influence, -1, NULL);
 
   debug = save_debug;
@@ -2081,6 +1781,7 @@ influence_delta_territory(const struct influence_data *base,
 {
   int ii;
   float total_delta = 0.0;
+  float this_delta;
   ASSERT_ON_BOARD1(move);
   ASSERT1(IS_STONE(color), move);
 
@@ -2088,7 +1789,7 @@ influence_delta_territory(const struct influence_data *base,
     if (ON_BOARD(ii)) {
       float new_value = q->territory_value[ii];
       float old_value = base->territory_value[ii];
-      float this_delta = new_value - old_value;
+      this_delta = new_value - old_value;
       /* Negate values if we are black. */
       if (color == BLACK) {
 	new_value = -new_value;
@@ -2097,25 +1798,23 @@ influence_delta_territory(const struct influence_data *base,
       }
       
       if (move != -1
-	  && (this_delta > 0.02
-              || -this_delta > 0.02))
+	  && (this_delta > 0.02 || -this_delta > 0.02))
 	DEBUG(DEBUG_TERRITORY,
 	      "  %1m:   - %1m territory change %f (%f -> %f)\n",
 	      move, ii, this_delta, old_value, new_value);
       total_delta += this_delta;
     }
 
-  {
-    /* Finally, captured stones: */
-    float this_delta = q->captured - base->captured;
-    if (color == BLACK)
-      this_delta = -this_delta;
-    if (move != -1
-	&& this_delta != 0.0)
-      DEBUG(DEBUG_TERRITORY, "  %1m:   - captured stones %f\n",
-	    move, this_delta);
-    total_delta += this_delta;
-  }
+  /* Finally, captured stones: */
+  this_delta = q->captured - base->captured;
+  if (color == BLACK)
+    this_delta = -this_delta;
+  if (move != -1
+      && this_delta != 0.0)
+    DEBUG(DEBUG_TERRITORY, "  %1m:   - captured stones %f\n",
+	  move, this_delta);
+  total_delta += this_delta;
+
   return total_delta;
 }
 

@@ -2469,14 +2469,6 @@ estimate_territorial_value(int pos, int color, float our_score,
 					   OPPOSITE_INFLUENCE(color),
 					   safety_hash)) {
 
-      int saved_optimistic_territory;    
-      saved_optimistic_territory = use_optimistic_territory;
-      /* Use the break-in code to break into moyos if there are
-       * no big critical dragons around. This is disabled for now.
-       */
-      if (0)
-	use_optimistic_territory = (size_of_biggest_critical_dragon() <= 5);  
-
       compute_influence(OTHER_COLOR(color), safe_stones, strength, 
 	  		&move_influence, pos, "after move");
       increase_depth_values();
@@ -2487,7 +2479,6 @@ estimate_territorial_value(int pos, int color, float our_score,
       compute_followup_influence(&move_influence, &followup_influence,
 	  			 pos, "followup");
                                  
-      use_optimistic_territory = saved_optimistic_territory;                             
       if (this_value != 0.0)
 	TRACE("%1m: %f - change in territory\n", pos, this_value);
       else

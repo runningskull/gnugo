@@ -163,7 +163,6 @@ int    slowest_movenum = 0;
 double total_time = 0.0;
 
 
-int use_optimistic_territory = 0;
 float minimum_value_weight  = 1.0;
 float maximum_value_weight  = 1.0;
 float invasion_malus_weight = 1.0;

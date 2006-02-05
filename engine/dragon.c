@@ -148,13 +148,6 @@ make_dragons(int stop_before_owl)
     if (IS_STONE(board[str]) && dragon[str].origin == str)
       DRAGON2(str).escape_route = compute_escape(str, 0);
 
-  /* Update the segmentation of the initial influence before we
-   * compute the surrounding moyo sizes. The reason for this is that
-   * now the eyespace inhibition found by find_cuts() can be taken
-   * into account.
-   */
-  resegment_initial_influence();
-
   /* Set dragon weaknesses according to initial_influence. */
   compute_refined_dragon_weaknesses();
   for (d = 0; d < number_of_dragons; d++)
@@ -2046,14 +2039,11 @@ compute_surrounding_moyo_sizes(const struct influence_data *q)
 {
   int pos;
   int d;
-
   int k;
-  int moyo_color[BOARDMAX];
-  float territory_value[BOARDMAX];
+  int moyo_color;
   float moyo_sizes[BOARDMAX];
   float moyo_values[BOARDMAX];
     
-  influence_get_moyo_data(q, moyo_color, territory_value);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     moyo_sizes[pos] = 0.0;
@@ -2063,28 +2053,29 @@ compute_surrounding_moyo_sizes(const struct influence_data *q)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!ON_BOARD(pos))
       continue;
+    moyo_color = whose_moyo_restricted(q, pos);
     
-    if (moyo_color[pos] == board[pos])
+    if (moyo_color == board[pos])
       continue;
     
-    if (moyo_color[pos] == WHITE) {
+    if (moyo_color == WHITE) {
       for (k = 0; k < number_close_white_worms[pos]; k++) {
 	int w = close_white_worms[pos][k];
 	int dr = dragon[w].origin;
 	
 	moyo_sizes[dr] += 1.0 / number_close_white_worms[pos];
-	moyo_values[dr] += (gg_min(territory_value[pos], 1.0)
+	moyo_values[dr] += (gg_min(influence_territory(q, pos, WHITE), 1.0)
 			    / number_close_white_worms[pos]);
       }
     }
     
-    if (moyo_color[pos] == BLACK) {
+    if (moyo_color == BLACK) {
       for (k = 0; k < number_close_black_worms[pos]; k++) {
 	int w = close_black_worms[pos][k];
 	int dr = dragon[w].origin;
 	
 	moyo_sizes[dr] += 1.0 / number_close_black_worms[pos];
-	moyo_values[dr] += (gg_min(territory_value[pos], 1.0)
+	moyo_values[dr] += (gg_min(influence_territory(q, pos, BLACK), 1.0)
 			    / number_close_black_worms[pos]);
       }
     }

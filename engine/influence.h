@@ -59,22 +59,6 @@
  */
 #define NOT_COMPUTED (-2.0 * MAX_BOARD * MAX_BOARD)
 
-/* Territory, moyo, and area are segmented into connected components
- * and given a number from the same series. These values are used in
- * region_type[].
- */
-#define WHITE_REGION    0
-#define BLACK_REGION    1
-#define IS_TERRITORY    2
-#define IS_MOYO         4
-#define IS_AREA         8
-#define WHITE_TERRI     (WHITE_REGION | IS_TERRITORY)
-#define BLACK_TERRI     (BLACK_REGION | IS_TERRITORY)
-#define WHITE_MOYO      (WHITE_REGION | IS_MOYO)
-#define BLACK_MOYO      (BLACK_REGION | IS_MOYO)
-#define WHITE_AREA      (WHITE_REGION | IS_AREA)
-#define BLACK_AREA      (BLACK_REGION | IS_AREA)
-
 /* Maximum number of regions allowed between territory, moyo, and area.
  * FIXME: This number is vastly exaggerated. Should be possible to
  * come up with a much better upper bound.
@@ -103,14 +87,6 @@ struct influence_data
   float black_attenuation[BOARDMAX];
   float white_permeability[BOARDMAX];
   float black_permeability[BOARDMAX];
-
-  int territory_segmentation[BOARDMAX];
-  int moyo_segmentation[BOARDMAX];
-  int area_segmentation[BOARDMAX];
-  int region_type[MAX_REGIONS];
-  int region_size[MAX_REGIONS];
-  float region_territorial_value[MAX_REGIONS];
-  int number_of_regions;
 
   int is_territorial_influence; /* 0 only if computing escape_influence.*/
 
