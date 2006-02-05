@@ -130,15 +130,15 @@ make_domains(struct eye_data b_eye[BOARDMAX],
   memset(white_domain, 0, sizeof(white_domain));
   memset(false_margins, 0, sizeof(false_margins));
 
+  if (b_eye)
+    memset(b_eye, 0, BOARDMAX * sizeof(b_eye[0]));
+  if (w_eye)
+    memset(w_eye, 0, BOARDMAX * sizeof(w_eye[0]));
+
   /* Initialize eye data and compute the lively array. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos)) {
-      if (b_eye)
-        clear_eye(&(b_eye[pos]));
-      if (w_eye)
-        clear_eye(&(w_eye[pos]));
+    if (ON_BOARD(pos))
       lively[pos] = is_lively(owl_call, pos);
-    }
 
   /* Compute the domains of influence of each color. */
   compute_primary_domains(BLACK, black_domain, lively, false_margins, 1);
