@@ -504,3 +504,9 @@ loadsgf games/kgs/TheGNUGo-grasshoper.sgf 288
 loadsgf games/kgs/TheGNUGo-rcsteppat.sgf 138 
 386 owl_defend O17
 #? [1 P19]
+
+loadsgf games/owl55.sgf 20
+387 owl_defend F4
+#? [1 C3]
+
+

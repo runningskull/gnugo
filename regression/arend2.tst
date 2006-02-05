@@ -125,3 +125,6 @@ loadsgf games/hamete_joseki.sgf 51
 290 reg_genmove black
 #? [C5]
 
+loadsgf games/9x9-1.sgf 23
+300 restricted_genmove D8 E8 F8
+#? [D8]
