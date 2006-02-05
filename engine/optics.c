@@ -93,24 +93,6 @@ static signed char used_index[MAXEYE];
 
 
 /*
- * Clear a struct eye_data.
- */
-
-static void
-clear_eye(struct eye_data *eye)
-{
-  eye->color = 0;
-  eye->esize = 0;
-  eye->msize = 0;
-  eye->origin = NO_MOVE;
-  set_eyevalue(&eye->value, 0, 0, 0, 0);
-  eye->marginal = 0;
-  eye->neighbors = 0;
-  eye->marginal_neighbors = 0;
-}
-
-
-/*
  * make_domains() is called from make_dragons() and from
  * owl_determine_life(). It marks the black and white domains
  * (eyeshape regions) and collects some statistics about each one.
