@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- do not consider moves playing into snapback in
+  do_find_more_owl_attack_and_defense_moves()
+- new function playing_into_snapback() in utils.c
 - only call do_find_more_owl_attack_and_defense_moves() when stackp==0
 - use .strategic_size in estimate_strategical_value()
 - new field .strategic_size in dragon_data2, includes bonus for weak neighbors

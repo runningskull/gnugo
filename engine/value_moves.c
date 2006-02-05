@@ -299,6 +299,10 @@ do_find_more_owl_attack_and_defense_moves(int color, int pos,
   if (send_two_return_one(pos, color))
     return;
 
+  /* Never consider moves playing into snapback here. */
+  if (playing_into_snapback(pos, color))
+    return;
+
   save_verbose = verbose;
   if (verbose > 0)
     verbose --;

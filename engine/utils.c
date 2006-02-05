@@ -1396,6 +1396,26 @@ send_two_return_one(int move, int color)
 }
 
 
+/* Returns true if a move by (color) plays into a snapback. */
+int
+playing_into_snapback(int move, int color)
+{
+  int libs[2];
+  int k;
+  
+  if (approxlib(move, color, 1, NULL) != 0
+      || accuratelib(move, color, 2, libs) != 1)
+    return 0;
+
+  for (k = 0; k < 4; k++)
+    if (board[move + delta[k]] == color
+	&& adjacent_strings(libs[0], move + delta[k]))
+      return 1;
+
+  return 0;
+}
+
+
 /* Score the game and determine the winner */
 
 void
