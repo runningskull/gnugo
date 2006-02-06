@@ -482,7 +482,7 @@ loadsgf games/CrazyStone1.sgf 56
 
 # See also strategy3:146
 loadsgf games/incident209.sgf 259
-135 analyze_semeeai R12 Q12
+135 analyze_semeai R12 Q12
 #? [1 0 R11]
 
 # See also kgs:230
