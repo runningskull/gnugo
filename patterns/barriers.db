@@ -1193,7 +1193,7 @@ Pattern Intrusion5b
 .QX
 !X.
 
-:8,BT,value(30)
+:8,B,value(30)
 
 bfE
 aDc
@@ -1217,28 +1217,28 @@ x..
 >return (!xplay_attack(b,a));
 
 
-Pattern Intrusion7a
-
-QX.
-.!!
-X.x
-
-:8,BW,value(30)
-
-cA.
-b!!
-X.x
-
-;lib(A)==2
->return (!xplay_attack(b,c));
-
+# Pattern Intrusion7a
+# 
+# QX.
+# .!!
+# X.x
+# 
+# :8,BW,value(30)
+# 
+# cA.
+# b!!
+# X.x
+# 
+# ;lib(A)==2
+# >return (!xplay_attack(b,c));
+# 
 
 Pattern Intrusion7b
 
 QX
 !!
 
-:8,BT,value(30)
+:8,B,value(30)
 
 cC
 ba
@@ -1363,7 +1363,7 @@ oQo
 .X!
 ...
 
-:8,OBT,value(30)
+:8,OB,value(30)
 
 odb
 .Ca
