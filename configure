@@ -677,8 +677,8 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-readline     try to use GNU readline for command reading
-  --without-readline  do not use GNU readline (default)
+  --with-readline     try to use GNU Readline for command reading
+  --without-readline  do not use GNU Readline (default)
   --with-curses       try to use curses for colored debugging output (default)
   --without-curses    do not use curses for colored debugging output
 
@@ -3604,17 +3604,17 @@ fi
 done
 
 	if test $ac_cv_func_g_vsnprintf = no; then
-    	   { echo "$as_me:3607: WARNING: glib installation problem.
-	   Continuing without glib " >&5
-echo "$as_me: WARNING: glib installation problem.
-	   Continuing without glib " >&2;}
+    	   { echo "$as_me:3607: WARNING: GLib installation problem.
+	   Continuing without GLib " >&5
+echo "$as_me: WARNING: GLib installation problem.
+	   Continuing without GLib " >&2;}
         fi
     else
-    	   { echo "$as_me:3613: WARNING: Neither vsnprintf nor glib found. GNU Go is
-	   compiled but it is safer to get glib at
+    	   { echo "$as_me:3613: WARNING: Neither vsnprintf nor GLib found. GNU Go is
+	   compiled but it is safer to get GLib at
 	   http://www.gtk.org/" >&5
-echo "$as_me: WARNING: Neither vsnprintf nor glib found. GNU Go is
-	   compiled but it is safer to get glib at
+echo "$as_me: WARNING: Neither vsnprintf nor GLib found. GNU Go is
+	   compiled but it is safer to get GLib at
 	   http://www.gtk.org/" >&2;}
     fi
 fi
@@ -4186,9 +4186,8 @@ fi
 
 if test "$ac_compiler_gnu" = "yes"; then
 
-    GCC_VERSION=`$CC --version | sed '1!D;s/^[^0-9]*\([0-9]\+\.[0-9]\+\).*$/\1/'`
-   GCC_MAJOR_VERSION=`echo $GCC_VERSION | sed 's/^\([0-9]\+\).*$/\1/'`
-   GCC_MINOR_VERSION=`echo $GCC_VERSION | sed 's/^[0-9]\+\.\(.*\)$/\1/'`
+    GCC_MAJOR_VERSION=`echo __GNUC__ | $CC -E -xc - | tail -n 1`
+  GCC_MINOR_VERSION=`echo __GNUC_MINOR__ | $CC -E -xc - | tail -n 1`
 
   GNU_GO_WARNINGS='-Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wundef'
 
@@ -4205,13 +4204,13 @@ fi
 if test "$enable_socket_support" != "no"; then
   # Check for all required headers, macros, structures and functions
   # at once.
-  echo "$as_me:4208: checking whether socket support can be compiled" >&5
+  echo "$as_me:4207: checking whether socket support can be compiled" >&5
 echo $ECHO_N "checking whether socket support can be compiled... $ECHO_C" >&6
 if test "${gnugo_cv_sockets_supported+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cat >conftest.$ac_ext <<_ACEOF
-#line 4214 "configure"
+#line 4213 "configure"
 #include "confdefs.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -4236,16 +4235,16 @@ main ()
 }
 _ACEOF
 rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:4239: \"$ac_link\"") >&5
+if { (eval echo "$as_me:4238: \"$ac_link\"") >&5
   (eval $ac_link) 2>&5
   ac_status=$?
-  echo "$as_me:4242: \$? = $ac_status" >&5
+  echo "$as_me:4241: \$? = $ac_status" >&5
   (exit $ac_status); } &&
          { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:4245: \"$ac_try\"") >&5
+  { (eval echo "$as_me:4244: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
-  echo "$as_me:4248: \$? = $ac_status" >&5
+  echo "$as_me:4247: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   gnugo_cv_sockets_supported="yes"
 else
@@ -4255,7 +4254,7 @@ gnugo_cv_sockets_supported="no"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
 fi
-echo "$as_me:4258: result: $gnugo_cv_sockets_supported" >&5
+echo "$as_me:4257: result: $gnugo_cv_sockets_supported" >&5
 echo "${ECHO_T}$gnugo_cv_sockets_supported" >&6
 
   if test "$gnugo_cv_sockets_supported" = "yes"; then
@@ -4265,7 +4264,7 @@ EOF
 
   else
     if test "$enable_socket_support" = "yes"; then
-      { { echo "$as_me:4268: error:
+      { { echo "$as_me:4267: error:
 *** Socket support was requested, but cannot be compiled on your system. ***
 *** If you think this is a mistake, please report it to <gnugo@gnu.org>. ***" >&5
 echo "$as_me: error:
@@ -4273,7 +4272,7 @@ echo "$as_me: error:
 *** If you think this is a mistake, please report it to <gnugo@gnu.org>. ***" >&2;}
    { (exit 1); exit 1; }; };
     else
-      { echo "$as_me:4276: WARNING:
+      { echo "$as_me:4275: WARNING:
 *** Unable to compile socket support on your system.  It will be disabled. ***
 ***  If you think this is a mistake, please report it to <gnugo@gnu.org>.  ***" >&5
 echo "$as_me: WARNING:
@@ -4366,7 +4365,7 @@ DEFS=-DHAVE_CONFIG_H
 : ${CONFIG_STATUS=./config.status}
 ac_clean_files_save=$ac_clean_files
 ac_clean_files="$ac_clean_files $CONFIG_STATUS"
-{ echo "$as_me:4369: creating $CONFIG_STATUS" >&5
+{ echo "$as_me:4368: creating $CONFIG_STATUS" >&5
 echo "$as_me: creating $CONFIG_STATUS" >&6;}
 cat >$CONFIG_STATUS <<_ACEOF
 #! $SHELL
@@ -4542,7 +4541,7 @@ cat >>$CONFIG_STATUS <<\EOF
     echo "$ac_cs_version"; exit 0 ;;
   --he | --h)
     # Conflict between --help and --header
-    { { echo "$as_me:4545: error: ambiguous option: $1
+    { { echo "$as_me:4544: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -4561,7 +4560,7 @@ Try \`$0 --help' for more information." >&2;}
     ac_need_defaults=false;;
 
   # This is an error.
-  -*) { { echo "$as_me:4564: error: unrecognized option: $1
+  -*) { { echo "$as_me:4563: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -4617,7 +4616,7 @@ do
   "config.vc" ) CONFIG_FILES="$CONFIG_FILES config.vc:config.vcin" ;;
   "default-1" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-  *) { { echo "$as_me:4620: error: invalid argument: $ac_config_target" >&5
+  *) { { echo "$as_me:4619: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
   esac
@@ -4856,7 +4855,7 @@ done; }
   esac
 
   if test x"$ac_file" != x-; then
-    { echo "$as_me:4859: creating $ac_file" >&5
+    { echo "$as_me:4858: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
     rm -f "$ac_file"
   fi
@@ -4874,7 +4873,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:4877: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:4876: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -4887,7 +4886,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:4890: error: cannot find input file: $f" >&5
+           { { echo "$as_me:4889: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
@@ -4948,7 +4947,7 @@ for ac_file in : $CONFIG_HEADERS; do test "x$ac_file" = x: && continue
   * )   ac_file_in=$ac_file.in ;;
   esac
 
-  test x"$ac_file" != x- && { echo "$as_me:4951: creating $ac_file" >&5
+  test x"$ac_file" != x- && { echo "$as_me:4950: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
 
   # First look for the input files in the build tree, otherwise in the
@@ -4959,7 +4958,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:4962: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:4961: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -4972,7 +4971,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:4975: error: cannot find input file: $f" >&5
+           { { echo "$as_me:4974: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
@@ -5089,7 +5088,7 @@ cat >>$CONFIG_STATUS <<\EOF
   rm -f $tmp/in
   if test x"$ac_file" != x-; then
     if cmp -s $ac_file $tmp/config.h 2>/dev/null; then
-      { echo "$as_me:5092: $ac_file is unchanged" >&5
+      { echo "$as_me:5091: $ac_file is unchanged" >&5
 echo "$as_me: $ac_file is unchanged" >&6;}
     else
       ac_dir=`$as_expr X"$ac_file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \

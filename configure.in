@@ -517,9 +517,8 @@ AC_SUBST(GNU_GO_WARNINGS)
 if test "$ac_compiler_gnu" = "yes"; then
 
   dnl M4 escaping of brackets
-  [GCC_VERSION=`$CC --version | sed '1!D;s/^[^0-9]*\([0-9]\+\.[0-9]\+\).*$/\1/'`
-   GCC_MAJOR_VERSION=`echo $GCC_VERSION | sed 's/^\([0-9]\+\).*$/\1/'`
-   GCC_MINOR_VERSION=`echo $GCC_VERSION | sed 's/^[0-9]\+\.\(.*\)$/\1/'`]
+  GCC_MAJOR_VERSION=`echo __GNUC__ | $CC -E -xc - | tail -n 1`
+  GCC_MINOR_VERSION=`echo __GNUC_MINOR__ | $CC -E -xc - | tail -n 1`
 
   GNU_GO_WARNINGS='-Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wundef'
 
