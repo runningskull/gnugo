@@ -509,4 +509,11 @@ loadsgf games/owl55.sgf 20
 387 owl_defend F4
 #? [1 C3]
 
+loadsgf games/9x9-2.sgf 28
+388 owl_attack C3
+#? [1 A2]
+
+loadsgf games/9x9-3.sgf 37
+389 owl_attack E3
+#? [0]
 
