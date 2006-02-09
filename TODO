@@ -154,7 +154,7 @@ of them are down-to-earth, and some are just blue sky ramblings.  They
 are presented here for inspiration.
 
  * A good GUI.
-   A start is being made with GoThic, a goban widget based on the QT
+   A start is being made with GoThic, a goban widget based on the Qt
    toolkit.  This is linked from the GNU Go development web page on
    gnu.org. Other starts have been made based on GTK+, but so far
    nothing more than a start has been attempted.

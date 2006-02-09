@@ -101,10 +101,10 @@
 ;; - talk GTP over the network
 ;; - "assist minor mode" (see gnugo-extra.el for work in progress)
 ;; - using assist minor mode, gnugo-v-gnugo (ibid)
-;; - extract GNUGO Board mode and sgf stuff into sgf.el; make gnugo.el use it
+;; - extract GNU Go Board mode and sgf stuff into sgf.el; make gnugo.el use it
 ;; - make gnugo (the external program) support query (read-only) thread
 ;;   so as to be able to lift "still waiting" restriction
-;; - alternatively, extend GNUGO Board mode to manage another subprocess
+;; - alternatively, extend GNU Go Board mode to manage another subprocess
 ;;   dedicated to analysis (no genmove)
 ;; - command `C' to add a comment to the sgf tree
 ;; - command `C-u =' to label a position
@@ -204,16 +204,16 @@ For more information on GTP and GNU Go, feel free to visit:
 http://www.gnu.org/software/gnugo")
 
 (defvar gnugo-board-mode-map nil
-  "Keymap for GNUGO Board mode.")
+  "Keymap for GNU Go Board mode.")
 
 (defvar gnugo-board-mode-hook nil
-  "*Hook run when entering GNUGO Board mode.")
+  "*Hook run when entering GNU Go Board mode.")
 
 (defvar gnugo-post-move-hook nil
   "*Normal hook run after a move and before the board is refreshed.
 Hook functions can prevent the call to `gnugo-refresh' by evaluating:
   (setq inhibit-gnugo-refresh t)
-Initially, when `run-hooks' is called, the current buffer is the GNUGO
+Initially, when `run-hooks' is called, the current buffer is the GNU Go
 Board buffer of the game.  Hook functions that switch buffers must take
 care not to call (directly or indirectly through some other function)
 `gnugo-put' or `gnugo-get' after the switch.")
@@ -239,7 +239,7 @@ character in the string, then the next, and so on until the string (and/or
 the viewer) is exhausted.")
 
 (defvar gnugo-mode-line "~b ~w :~m ~n :~u"
-  "*A `mode-line-format'-compliant value for GNUGO Board mode.
+  "*A `mode-line-format'-compliant value for GNU Go Board mode.
 If a single string, the following special escape sequences are
 replaced with their associated information:
   ~b,~w  black,white captures (a number)
@@ -310,7 +310,7 @@ Return the difference in the format of a time value."
 \(This docstring is shared by `gnugo-put' and `gnugo-get'.\)
 
 There are many properties, each named by a keyword, that record and control
-how gnugo.el manages each game.  Each GNUGO Board buffer has its own set
+how gnugo.el manages each game.  Each GNU Go Board buffer has its own set
 of properties, stored in the hash table `gnugo-state'.  Here we document
 some of the more stable properties.  You may wish to use them as part of
 a `gnugo-post-move-hook' function, for example.  Be careful to preserve
@@ -370,11 +370,11 @@ things stabilize probably more of them will be added to this docstring."))
   (put 'gnugo-get 'function-documentation docs))
 
 (defun gnugo-board-buffer-p (&optional buffer)
-  "Return non-nil if BUFFER is a GNUGO Board buffer."
+  "Return non-nil if BUFFER is a GNU Go Board buffer."
   (with-current-buffer (or buffer (current-buffer)) gnugo-state))
 
 (defun gnugo-board-user-play-ok-p (&optional buffer)
-  "Return non-nil if BUFFER is a GNUGO Board buffer ready for a user move."
+  "Return non-nil if BUFFER is a GNU Go Board buffer ready for a user move."
   (with-current-buffer (or buffer (current-buffer))
     (and gnugo-state (not (gnugo-get :waitingp)))))
 
@@ -885,7 +885,7 @@ For all other values of RSEL, do nothing and return nil."
     (create-image new 'xpm t :ascent 'center)))
 
 (defun gnugo-refresh (&optional nocache)
-  "Update GNUGO Board buffer display.
+  "Update GNU Go Board buffer display.
 While a game is in progress, parenthesize the last-played stone (no parens
 for pass).  If the buffer is currently displayed in the selected window,
 recenter the board (presuming there is extra space in the window).  Update
@@ -1083,7 +1083,7 @@ its move."
       (error "Not a proper position point")))
 
 (defun gnugo-move ()
-  "Make a move on the GNUGO Board buffer.
+  "Make a move on the GNU Go Board buffer.
 The position is computed from current point.
 Signal error if done out-of-turn or if game-over.
 To start a game try M-x gnugo."
@@ -1116,7 +1116,7 @@ To start a game try M-x gnugo."
     (gnugo-move)))
 
 (defun gnugo-pass ()
-  "Make a pass on the GNUGO Board buffer.
+  "Make a pass on the GNU Go Board buffer.
 Signal error if done out-of-turn or if game-over.
 To start a game try M-x gnugo."
   (interactive)
@@ -1203,7 +1203,7 @@ To start a game try M-x gnugo."
   (message "Computing %s ... done." command))
 
 (defun gnugo-worm-stones ()
-  "In the GNUGO Board buffer, animate \"worm\" at current position.
+  "In the GNU Go Board buffer, animate \"worm\" at current position.
 Signal error if done out-of-turn or if game-over.
 See variable `gnugo-animation-string' for customization."
   (interactive)
@@ -1218,7 +1218,7 @@ Signal error if done out-of-turn or if game-over."
   (gnugo-display-group-data "worm_data" "*gnugo worm data*"))
 
 (defun gnugo-dragon-stones ()
-  "In the GNUGO Board buffer, animate \"dragon\" at current position.
+  "In the GNU Go Board buffer, animate \"dragon\" at current position.
 Signal error if done out-of-turn or if game-over.
 See variable `gnugo-animation-string' for customization."
   (interactive)
@@ -1233,7 +1233,7 @@ Signal error if done out-of-turn or if game-over."
   (gnugo-display-group-data "dragon_data" "*gnugo dragon data*"))
 
 (defun gnugo-toggle-dead-group ()
-  "In a GNUGO Board buffer, during game-over, toggle a group as dead.
+  "In a GNU Go Board buffer, during game-over, toggle a group as dead.
 The group is selected from current position (point).  Signal error if
 not in game-over or if there is no group at that position.
 
@@ -1472,7 +1472,7 @@ it using gnugo-redo.)"
   (gnugo-redo))
 
 (defun gnugo-magic-undo (spec &optional noalt)
-  "Undo moves on the GNUGO Board, based on SPEC, a string or number.
+  "Undo moves on the GNU Go Board, based on SPEC, a string or number.
 If SPEC is a string in the form of a board position (e.g., \"T19\"),
 check that the position is occupied by a stone of the user's color,
 and if so, remove moves from the history until that position is clear.
@@ -1751,7 +1751,7 @@ This info is also added to the game tree.  See `gnugo-write-sgf-file'."
       (setcar n1p (append `((:RE . ,result)
                             (:C . ,blurb))
                           (car n1p))))
-    (switch-to-buffer (format "%s*GNUGO Final Score*"
+    (switch-to-buffer (format "%s*GNU Go Final Score*"
                               (gnugo-get :diamond)))
     (when (= 0 (buffer-size))
       (insert blurb))))
@@ -1821,7 +1821,7 @@ NOTE: At this time, GTP command handling specification is still
               (run-hooks 'hook))))))))
 
 ;;;---------------------------------------------------------------------------
-;;; Major mode for interacting with a GNUGO subprocess
+;;; Major mode for interacting with a GNU Go subprocess
 
 (put 'gnugo-board-mode 'mode-class 'special)
 (defun gnugo-board-mode ()
@@ -1895,7 +1895,7 @@ Default keybindings:
   or C-x C-s
 
   l             Run `gnugo-read-sgf-file'."
-  (switch-to-buffer (generate-new-buffer "(Uninitialized GNUGO Board)"))
+  (switch-to-buffer (generate-new-buffer "(Uninitialized GNU Go Board)"))
   (buffer-disable-undo)                 ; todo: undo undo undoing
   (kill-all-local-variables)
   (setq truncate-lines t)

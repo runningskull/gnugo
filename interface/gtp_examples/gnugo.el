@@ -1,4 +1,4 @@
-;;; ID: $Id: gnugo.el,v 1.4 2005-06-12 09:34:14 gf Exp $
+;;; ID: $Id: gnugo.el,v 1.5 2006-02-09 18:50:10 arend Exp $
 ;;;
 ;;; This is GNU Go, a Go program. Contact gnugo@gnu.org, or see
 ;;; http://www.gnu.org/software/gnugo/ for more information.   
@@ -43,10 +43,10 @@
 ;;; Variables
 
 (defvar gnugo-board-mode-map nil
-  "Keymap for GNUGO Board mode.")
+  "Keymap for GNU Go Board mode.")
 
 (defvar gnugo-option-history nil
-  "History of additional GNUGO command-line options.")
+  "History of additional GNU Go command-line options.")
 
 (defvar gnugo-animation-string
   (let ((jam "*#") (blink " #") (spin "-\\|/") (yada "*-*!"))
@@ -488,7 +488,7 @@ by how many stones)."
                 (put cmd 'gnugo-post-function nil)))))))))
 
 ;;;---------------------------------------------------------------------------
-;;; Major mode for interacting with a GNUGO subprocess
+;;; Major mode for interacting with a GNU Go subprocess
 
 (defun gnugo-board-mode ()
   "In this mode, keys do not self insert.
@@ -521,14 +521,14 @@ Here are the default keybindings:
   !             Estimate score (at any time).
 
   : or ;        Extended command.  Type in a string to be passed (quite
-                indirectly) to the GNUGO subprocess.  Output and emacs
+                indirectly) to the GNU Go subprocess.  Output and emacs
                 behavior depend on which command is given.  Try `help'
                 to get a list of all commands.  Note that some commands
                 may confuse gnugo.el."
   (kill-all-local-variables)
   (use-local-map gnugo-board-mode-map)
   (setq major-mode 'gnugo-board-mode)
-  (setq mode-name "GNUGO Board"))
+  (setq mode-name "GNU Go Board"))
 
 ;;;---------------------------------------------------------------------------
 ;;; Entry point
@@ -659,4 +659,4 @@ See also variable `gnugo-option-history'."
 
 (provide 'gnugo)
 
-;;; $RCSfile: gnugo.el,v $$Revision: 1.4 $ ends here
+;;; $RCSfile: gnugo.el,v $$Revision: 1.5 $ ends here

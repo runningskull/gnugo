@@ -34,8 +34,8 @@ dnl These set variables $enable_color and $with_curses to "no" if disabled
 dnl "yes" if enabled, or undefined if not specified
 
 AC_ARG_WITH(readline,
- [  --with-readline     try to use GNU readline for command reading
-  --without-readline  do not use GNU readline (default)])
+ [  --with-readline     try to use GNU Readline for command reading
+  --without-readline  do not use GNU Readline (default)])
 
 AC_ARG_WITH(curses,
  [  --with-curses       try to use curses for colored debugging output (default)
@@ -184,7 +184,7 @@ dnl vsnprintf not universally available
 dnl usleep not available in Unicos and mingw32
 AC_CHECK_FUNCS(vsnprintf gettimeofday usleep times)
 
-dnl if snprintf not available try to use g_snprintf from glib
+dnl if snprintf not available try to use g_snprintf from GLib
 if test $ac_cv_func_vsnprintf = no; then
     AC_CHECK_PROG(glibconfig,glib-config,yes,no)
     if test $ac_cv_prog_glibconfig = yes;then
@@ -195,12 +195,12 @@ if test $ac_cv_func_vsnprintf = no; then
 	AC_CHECK_FUNCS(g_vsnprintf)
 	AC_CHECK_HEADERS(glib.h)
 	if test $ac_cv_func_g_vsnprintf = no; then
-    	   AC_MSG_WARN([glib installation problem.
-	   Continuing without glib ])
+    	   AC_MSG_WARN([GLib installation problem.
+	   Continuing without GLib ])
         fi
     else
-    	   AC_MSG_WARN([Neither vsnprintf nor glib found. GNU Go is
-	   compiled but it is safer to get glib at
+    	   AC_MSG_WARN([Neither vsnprintf nor GLib found. GNU Go is
+	   compiled but it is safer to get GLib at
 	   http://www.gtk.org/])
     fi
 fi

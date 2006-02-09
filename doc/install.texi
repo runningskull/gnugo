@@ -273,7 +273,7 @@ distribution.
 @end enumerate
 
 The rest of this section gives more details on the various ways
-to compile GNU Go for for Microsoft platforms.
+to compile GNU Go for Microsoft platforms.
 
 @menu Using free Unix-environments and GCC
 * DJGPP::      Windows 95/98, MS-DOS and Windows 3.x using DJGPP
@@ -311,7 +311,7 @@ executable as follows:
        make
 @end example
 
-Optionally you can download glib for DJGPP to get a working version
+Optionally you can download GLib for DJGPP to get a working version
 of snprintf.
 
 @node Cygwin

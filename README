@@ -104,7 +104,7 @@ to list all commands, type `:help'.
    * `Return' or `Space'
           Select point as the next move.  An error is signalled for
           invalid locations.  Illegal locations, on the other hand,
-          show up in the GNUGO Console buffer.
+          show up in the GNU Go Console buffer.
 
    * `q' or `Q'
           Quit. Both Board and Console buffers are deleted.
@@ -123,7 +123,7 @@ to list all commands, type `:help'.
 
    * `:'
           Extended command.  Type in a string to be passed directly to
-          the inferior GNUGO process."
+          the inferior GNU Go process."
 
 
 

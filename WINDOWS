@@ -67,7 +67,7 @@ executable as follows:
        ./configure
        make
 
-Optionally you can download glib for DJGPP to get a working version
+Optionally you can download GLib for DJGPP to get a working version
 of snprintf.
 
 B) Windows NT, Windows 95/98 using Cygwin
@@ -92,8 +92,8 @@ contains the emulation layer for Unix.
 
    <http://cygwin.com/>
 
-   Optionally you can use glib to get a working version of snprintf.
-Glib builds out of the box on cygwin.
+   Optionally you can use GLib to get a working version of snprintf.
+GLib builds out of the box on cygwin.
 
 C) Windows NT, Windows 95/98 using MINGW32
 
