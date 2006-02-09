@@ -8,8 +8,8 @@ loadsgf games/trevor/auto/c01.sgf 42
 
 
 loadsgf games/trevor/auto/c01.sgf 44
-110 reg_genmove white
-#? [!B7]
+110 restricted_genmove white B7 A10
+#? [A10]
 
 
 
@@ -57,8 +57,8 @@ loadsgf games/trevor/auto/c09.sgf 100
 
 #locally A6 is better than A5
 loadsgf games/trevor/auto/c11.sgf 36
-190 reg_genmove white
-#? [!A5]
+190 restricted_genmove white A5 A6
+#? [A6]
 
 
 loadsgf games/trevor/auto/c11.sgf 72
@@ -114,8 +114,8 @@ loadsgf games/trevor/auto/c14.sgf 34
 
 
 loadsgf games/trevor/auto/c14.sgf 70
-280 reg_genmove white
-#? [!N13]
+280 restricted_genmove white N13 N10
+#? [N10]
 
 
 
@@ -186,13 +186,13 @@ loadsgf games/trevor/auto/c18.sgf 102
 # games/trevor/auto/c20.sgf problems:
 
 loadsgf games/trevor/auto/c20.sgf 30
-400 reg_genmove white
-#? [!J11]
+400 restricted_genmove white H11 J11
+#? [H11]
 
 
 loadsgf games/trevor/auto/c20.sgf 36
-410 reg_genmove white
-#? [!H13]
+410 restricted_genmove white H13 G12 G13 F12 F13
+#? [G12]
 
 
 loadsgf games/trevor/auto/c20.sgf 58
@@ -235,8 +235,8 @@ loadsgf games/trevor/auto/c23.sgf 96
 # games/trevor/auto/c24.sgf problems:
 
 loadsgf games/trevor/auto/c24.sgf 24
-480 reg_genmove white
-#? [!L11]
+480 restricted_genmove white L11 H12
+#? [H12]
 
 
 loadsgf games/trevor/auto/c24.sgf 34
@@ -294,8 +294,8 @@ loadsgf games/trevor/auto/c30.sgf 80
 
 
 loadsgf games/trevor/auto/c30.sgf 92
-570 reg_genmove white
-#? [!N9]
+570 restricted_genmove white N9 M10
+#? [M10]
 
 
 loadsgf games/trevor/auto/c30.sgf 98
@@ -351,18 +351,20 @@ loadsgf games/trevor/auto/c36.sgf 62
 # games/trevor/auto/c38.sgf problems:
 
 loadsgf games/trevor/auto/c38.sgf 32
-660 reg_genmove white
-#? [!N5]
+660 restricted_genmove white N5 M4
+#? [M4]
 
 
 loadsgf games/trevor/auto/c38.sgf 44
-670 reg_genmove white
-#? [!G2]
+670 restricted_genmove white G1 G2
+#? [G1]
 
 
+# G13 and G10 are the only ko threats. Since the ko cannot be won passing is
+# also acceptable.
 loadsgf games/trevor/auto/c38.sgf 112
 680 reg_genmove white
-#? [!A10]
+#? [G13|G10|PASS]
 
 
 
@@ -376,7 +378,7 @@ loadsgf games/trevor/auto/c39.sgf 58
 
 loadsgf games/trevor/auto/c39.sgf 76
 700 reg_genmove white
-#? [!E9]
+#? [F8]
 
 
 loadsgf games/trevor/auto/c39.sgf 106
@@ -411,19 +413,20 @@ loadsgf games/trevor/auto/c43.sgf 22
 #? [!J3]
 
 
-loadsgf games/trevor/auto/c43.sgf 30
-750 reg_genmove white
-#? [!H1]
+# # This is a duplicate of 410.
+# loadsgf games/trevor/auto/c43.sgf 30
+# 750 reg_genmove white
+# #? [!H1]
 
-
-loadsgf games/trevor/auto/c43.sgf 50
-760 reg_genmove white
-#? [!L11]
+# # This is a near duplicate of 480.
+# loadsgf games/trevor/auto/c43.sgf 50
+# 760 reg_genmove white
+# #? [!L11]
 
 
 loadsgf games/trevor/auto/c43.sgf 56
-770 reg_genmove white
-#? [!A7]
+770 restricted_genmove white B6 A7
+#? [B6]
 
 
 
@@ -447,7 +450,7 @@ loadsgf games/trevor/auto/c45.sgf 78
 
 loadsgf games/trevor/auto/c45.sgf 88
 810 reg_genmove white
-#? [!D3]
+#? [D7]
 
 
 
@@ -563,8 +566,8 @@ loadsgf games/trevor/auto/c60.sgf 32
 
 
 loadsgf games/trevor/auto/c60.sgf 46
-990 reg_genmove white
-#? [!B8|M5]
+990 restricted_genmove white B8 A8
+#? [A8]
 
 
 loadsgf games/trevor/auto/c60.sgf 64
@@ -598,7 +601,7 @@ loadsgf games/trevor/auto/c61.sgf 42
 
 loadsgf games/trevor/auto/c61.sgf 88
 1050 reg_genmove white
-#? [!C13]
+#? [K11|J10]
 
 
 loadsgf games/trevor/auto/c61.sgf 92
@@ -627,12 +630,12 @@ loadsgf games/trevor/auto/c62.sgf 48
 
 loadsgf games/trevor/auto/c62.sgf 106
 1100 reg_genmove white
-#? [!J8|H8]
+#? [F11]
 
 
 loadsgf games/trevor/auto/c62.sgf 110
-1110 reg_genmove white
-#? [!G7]
+1110 restricted_genmove white G7 G6 F7 E6
+#? [G6]
 
 
 loadsgf games/trevor/auto/c62.sgf 118
@@ -651,7 +654,7 @@ loadsgf games/trevor/auto/c62.sgf 120
 
 loadsgf games/trevor/auto/c62.sgf 130
 1140 reg_genmove white
-#? [!L13]
+#? [PASS]
 
 
 
@@ -706,8 +709,8 @@ loadsgf games/trevor/auto/c68.sgf 44
 # games/trevor/auto/c69.sgf problems:
 
 loadsgf games/trevor/auto/c69.sgf 14
-1220 reg_genmove white
-#? [!M9]
+1220 restricted_genmove white M9 M7
+#? [M7]
 
 
 
@@ -732,9 +735,10 @@ loadsgf games/trevor/auto/c70.sgf 16
 #? [!C2]
 
 
-loadsgf games/trevor/auto/c70.sgf 38
-1260 reg_genmove white
-#? [!A6]
+# # Duplicate of 660.
+# loadsgf games/trevor/auto/c70.sgf 38
+# 1260 reg_genmove white
+# #? [!A6]
 
 
 loadsgf games/trevor/auto/c70.sgf 48
@@ -757,13 +761,13 @@ loadsgf games/trevor/auto/c72.sgf 18
 
 
 loadsgf games/trevor/auto/c72.sgf 24
-1300 reg_genmove white
-#? [!L5]
+1300 restricted_genmove white L5 M3
+#? [M3]
 
 
 loadsgf games/trevor/auto/c72.sgf 28
-1310 reg_genmove white
-#? [!N4]
+1310 restricted_genmove white M3 N4 N3 M2
+#? [M3]
 
 
 loadsgf games/trevor/auto/c72.sgf 64
@@ -923,7 +927,7 @@ loadsgf games/trevor/auto/c84.sgf 66
 
 loadsgf games/trevor/auto/c84.sgf 94
 1560 reg_genmove white
-#? [!M13]
+#? [H7|J6|J5]
 
 
 
