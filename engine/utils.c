@@ -627,6 +627,55 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
 }
 
 
+/* The function play_lib_n() plays a sequence of moves, alternating
+ * between the players and starting with color. After having played
+ * through the sequence, the last coordinate gives a target for liberty
+ * counting. The number of liberties is returned.
+ *
+ * If only one move is to be played and that stone is the target,
+ * accuratelib (or approxlib if appropriate) is more efficient.
+ */
+
+int 
+play_lib_n(int color, int num_moves, ...)
+{
+  va_list ap;
+  int mcolor = color;
+  int libs = 0;
+  int i;
+  int played_moves = 0;
+  int apos;
+  int ypos;
+
+  va_start(ap, num_moves);
+
+  /* Do all the moves with alternating colors. */
+  for (i = 0; i < num_moves; i++) {
+    apos = va_arg(ap, int);
+
+    if (apos != NO_MOVE
+	&& (trymove(apos, mcolor, "play_connect_n", NO_MOVE)
+	    || tryko(apos, mcolor, "play_connect_n")))
+      played_moves++;
+    mcolor = OTHER_COLOR(mcolor);
+  }
+
+  /* Now do the real work. */
+  ypos = va_arg(ap, int);
+  if (board[ypos] == EMPTY)
+    libs = 0;
+  else
+    libs = countlib(ypos);
+  
+  /* Pop all the moves we could successfully play. */
+  for (i = 0; i < played_moves; i++)
+    popgo();
+
+  va_end(ap);
+  return libs;
+}
+
+
 
 /* 
  * It is assumed in reading a ladder if stackp >= depth that

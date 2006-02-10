@@ -207,6 +207,7 @@ static int owl_estimate_life(struct local_owl_data *owl,
 static int modify_stupid_eye_vital_point(struct local_owl_data *owl,
 					 int *vital_point,
 					 int is_attack_point);
+static int modify_eyefilling_move(int *move, int color);
 static int estimate_lunch_half_eye_bonus(int lunch,
 			struct half_eye_data half_eye[BOARDMAX]);
 static void owl_mark_dragon(int apos, int bpos,
@@ -2686,6 +2687,7 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
 	  break;
       
       mpos = moves[k].pos;
+      modify_eyefilling_move(&mpos, color);
       ASSERT_ON_BOARD1(mpos);
       
       /* Have we already tested this move? */
@@ -3483,6 +3485,56 @@ modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
   return 0;
 }
 
+
+/* The purpose of this function is to avoid moves which needlessly
+ * fill in an eye. A typical example, from ld_owl:188, is
+ *
+ * -----+
+ * .O.OX|
+ * XOOXX|
+ * XXOOX|
+ * .XXO.|
+ * ..XOO|
+ * ..XXX|
+ *
+ * where various patterns manage to propose the eye-filling move on
+ * the top edge instead of capturing the opponent stones and get two
+ * solid eyes. This function modifies the move accordingly.
+ */
+static int
+modify_eyefilling_move(int *move, int color)
+{
+  int k;
+  int r;
+  int other = OTHER_COLOR(color);
+  /* Only do this for a small eye. */
+  for (k = 0; k < 4; k++)
+    if (ON_BOARD(*move + delta[k]) && board[*move + delta[k]] != color)
+      return 0;
+
+  for (r = 4; r < 8; r++)
+    if (board[*move + delta[r]] == other
+	&& countlib(*move + delta[r]) == 1) {
+      for (k = 0; k < 4; k++)
+	if (board[*move + delta[k]] == color
+	    && countlib(*move + delta[k]) == 1
+	    && !adjacent_strings(*move + delta[r], *move + delta[k]))
+	  break;
+
+      if (k == 4) {
+	int new_move;
+	findlib(*move + delta[r], 1, &new_move);
+	TRACE("Changing eyefilling move at %1m to capture at %1m.\n",
+	      *move, new_move);
+	*move = new_move;
+	return 1;
+      }
+    }
+  
+  return 0;    
+}
+
+
 /* 
  * Generates up to max_moves moves, attempting to attack or defend the goal
  * dragon. The found moves are put in moves, an array of owl_move_data
@@ -3495,7 +3547,8 @@ modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
  * pattern list. WATCH OUT: This has to be matched with a call to
  * close_pattern_list(pattern_list)!!!
  *
- * Returns 1 if at least one move is found, or 0 if no move is found.  */
+ * Returns 1 if at least one move is found, or 0 if no move is found.
+ */
 
 static void
 owl_shapes(struct matched_patterns_list_data *pattern_list,

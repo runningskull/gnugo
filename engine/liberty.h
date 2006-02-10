@@ -536,6 +536,7 @@ int play_attack_defend_n(int color, int do_attack, int num_moves, ...);
 int play_attack_defend2_n(int color, int do_attack, int num_moves, ...);
 int play_break_through_n(int color, int num_moves, ...);
 int play_connect_n(int color, int do_connect, int num_moves, ...);
+int play_lib_n(int color, int num_moves, ...);
 int cut_possible(int pos, int color);
 int defend_against(int move, int color, int apos);
 int somewhere(int color, int check_alive, int num_moves, ...);
