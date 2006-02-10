@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- do not reset permeability around dead stones
 - do not consider moves playing into snapback in
   do_find_more_owl_attack_and_defense_moves()
 - new function playing_into_snapback() in utils.c

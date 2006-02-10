@@ -971,23 +971,35 @@ find_influence_patterns(struct influence_data *q)
   if (q->is_territorial_influence)
     add_marked_intrusions(q);
 
-  /* When color == EMPTY, we introduce a weaker kind of barriers
-   * manually instead of searching for patterns.
+  /* Additionally, we introduce a weaker kind of barriers around living
+   * stones.
    */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii) && q->safe[ii]) {
+    if (ON_BOARD(ii) && !q->safe[ii]) {
       int k;
+      float black_reduction = 1.0;
+      float white_reduction = 1.0;
       for (k = 0; k < 8; k++) {
 	int d = delta[k];
-	if (ON_BOARD(ii + d) && !q->safe[ii + d]) {
+	if (IS_STONE(board[ii + d]) && q->safe[ii + d]) {
 	  /* Reduce less diagonally. */
 	  float reduction = (k < 4) ? 0.25 : 0.65;
-	  if (board[ii] == BLACK)
-	    q->white_permeability[ii + d] *= reduction;
+	  if (board[ii + d] == BLACK)
+	    white_reduction *= reduction;
 	  else
-	    q->black_permeability[ii + d] *= reduction;
+	    black_reduction *= reduction;
+	}
+	else if (IS_STONE(board[ii + d]) && !q->safe[ii + d]) {
+	  if (board[ii + d] == BLACK)
+	    white_reduction = -100.0;
+	  else
+	    black_reduction = -100.0;
 	}
       }
+      if (black_reduction > 0.0)
+	q->black_permeability[ii] *= black_reduction;
+      if (white_reduction > 0.0)
+	q->white_permeability[ii] *= white_reduction;
     }
 
   reset_unblocked_blocks(q);
