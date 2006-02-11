@@ -19,6 +19,7 @@
 - include played move in atari-atari blunder analysis
 - score.c removed from sources
 - owl tuning
+- tuning
 - new and revised tests
 
 3.7.8 released January 30, 2006
