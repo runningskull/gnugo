@@ -94,7 +94,6 @@ int debug             = 0;  /* controls debug output */
 int verbose           = 0;  /* trace level */
 char outfilename[128] = ""; /* output file (-o option) */
 int output_flags      = OUTPUT_DEFAULT; /* amount of output to outfile */
-int limit_search      = 0;  /* limit search to a portion of the board */
 int metamachine       = 0;  /* use metamachine_genmove */
 int oracle_exists     = 0;  /* oracle is available for consultation   */
 int autolevel_on      = 0;  /* Adjust level in GMP or ASCII mode. */

@@ -255,7 +255,6 @@ static struct gtp_command commands[] = {
   {"last_move",    	      gtp_last_move},
   {"level",        	      gtp_set_level},
   {"limit_search",     	      gtp_limit_search},
-  {"limit_search",            gtp_limit_search},
   {"list_commands",    	      gtp_list_commands},
   {"list_stones",    	      gtp_list_stones},
   {"loadsgf",          	      gtp_loadsgf},
@@ -4481,7 +4480,7 @@ gtp_set_search_diamond(char *s)
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
   
-  limit_search = 1;
+  set_limit_search(1);
   set_search_diamond(POS(i, j));
   return gtp_success("");
 }
@@ -4512,7 +4511,7 @@ gtp_limit_search(char *s)
 
   if (sscanf(s, "%d", &value) < 1)
     return gtp_failure("invalid value for search limit");
-  limit_search = value;
+  set_limit_search(value);
   return gtp_success("");
 }
 
@@ -4527,7 +4526,7 @@ gtp_set_search_limit(char *s)
   int i, j;
 
   gtp_decode_coord(s, &i, &j);
-  set_search_limit(POS(i, j), 1);
+  set_search_mask(POS(i, j), 1);
   return gtp_success("");
 }
   

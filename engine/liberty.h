@@ -500,9 +500,10 @@ void owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
 				   int *semeai_result_certain,
 				   int recompute_dragons);
 
+void set_limit_search(int value);
 void set_search_diamond(int pos);
 void reset_search_mask(void);
-void set_search_limit(int pos, int value);
+void set_search_mask(int pos, int value);
 int oracle_play_move(int pos, int color);
 void consult_oracle(int color);
 void summon_oracle(void);

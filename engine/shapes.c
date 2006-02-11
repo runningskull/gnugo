@@ -233,10 +233,6 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   /* Pick up the location of the move */
   move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
 
-  /* For restricted search, the pattern must intersect the search area */
-  if (limit_search && !within_search_area(move))
-    return;
-
   /* For some classes of patterns we need to find all dragons present
    * in the pattern.
    */
@@ -537,10 +533,6 @@ joseki_callback(int move, int color, struct corner_pattern *pattern,
   /* Dragons of other color. */
   int your_dragons[MAX_DRAGONS_PER_PATTERN];
   int your_ndragons = 0;
-
-  /* For restricted search, the pattern must intersect the search area. */
-  if (limit_search && !within_search_area(move))
-    return;
 
   /* For urgent joseki patterns we need to find all dragons present in the
    * pattern since such patterns are assumed to have strategical effect on

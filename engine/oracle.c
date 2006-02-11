@@ -342,7 +342,7 @@ static int
 do_metamachine_genmove(int color, int width, float *value);
 
 int
-metamachine_genmove(int color, float *value)
+metamachine_genmove(int color, float *value, int limit_search)
 {
   int move;
   int pos;

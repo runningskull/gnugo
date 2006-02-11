@@ -239,7 +239,6 @@ extern int autolevel_on;
 
 extern float potential_moves[BOARDMAX];
 
-extern int limit_search;  /* limit move search to a portion of the board */
 extern int oracle_exists; /* oracle is available for consultation        */
 extern int metamachine;   /* use metamachine_genmove                     */
 

@@ -36,6 +36,13 @@
  */
 #define NEEDS_UPDATE(x) (x != position_number ? (x = position_number, 1) : 0)
 
+/* Mark a limited search area. If limit_search != 1, genmove
+ * will only return moves within the area marked by the array
+ * search_mask.
+ */
+static int limit_search = 0;
+static int search_mask[BOARDMAX];
+
 static int do_genmove(int color, float pure_threat_value,
 		      int allowed_moves[BOARDMAX], float *value, int *resign);
 
@@ -238,14 +245,17 @@ genmove(int color, float *value, int *resign)
 
 #if ORACLE
   if (metamachine) {
-    move = metamachine_genmove(color, value);
+    move = metamachine_genmove(color, value, limit_search);
     gg_assert(stackp == 0);
     if (move != PASS_MOVE)
       return move;
   }
 #endif
 
-  move = do_genmove(color, 0.4, NULL, value, resign);
+  if (limit_search)
+    move = do_genmove(color, 0.4, search_mask, value, resign);
+  else
+    move = do_genmove(color, 0.4, NULL, value, resign);
   gg_assert(move == PASS_MOVE || ON_BOARD(move));
 
   return move;
@@ -394,8 +404,7 @@ do_genmove(int color, float pure_threat_value,
   time_report(1, "generate move reasons", NO_MOVE, 1.0);
   
   /* Try to find empty corner moves. */
-  if (!limit_search)
-    fuseki(color);
+  fuseki(color);
   gg_assert(stackp == 0);
 
   /* Look for moves to break mirror play by the opponent. */
@@ -405,7 +414,7 @@ do_genmove(int color, float pure_threat_value,
    * dragon dangerous and change its status from DEAD to
    * UNKNOWN. Otherwise, pretend there is no thrashing dragon.
    */
-  if (!doing_scoring && !limit_search)
+  if (!doing_scoring)
     use_thrashing_dragon_heuristics
       = revise_thrashing_dragon(color, pessimistic_score, 5.0);
   
@@ -429,7 +438,7 @@ do_genmove(int color, float pure_threat_value,
 
 
   /* If the move value is 6 or lower, we look for endgame patterns too. */
-  if (*value <= 6.0 && !disable_endgame_patterns && !limit_search) {
+  if (*value <= 6.0 && !disable_endgame_patterns) {
     endgame_shapes(color);
     endgame(color);
     gg_assert(stackp == 0);
@@ -772,16 +781,14 @@ should_resign(int color, float optimistic_score, int move)
  *                Mark a limited search area                         *
 \*********************************************************************/
 
-/* Mark a limited search area. Only affects the engine if the
- * global variable limit_search is nonzero. In this case, genmove
- * will only return moves within the area marked by the array
- * search_mask.
- */
+/* Activate or deactivate search limit. */
+void
+set_limit_search(int value)
+{
+  limit_search = value;
+}
 
-static int search_mask[BOARDMAX];
-
-/* The following function marks a diamond of radius 6 with center pos.
- */
+/* The following function marks a diamond of radius 6 with center pos.  */
 
 void
 set_search_diamond(int pos)
@@ -813,7 +820,7 @@ reset_search_mask()
 /* marks a single vertex */
 
 void
-set_search_limit(int pos, int value)
+set_search_mask(int pos, int value)
 {
   search_mask[pos] = value;
 }

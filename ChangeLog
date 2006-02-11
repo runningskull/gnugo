@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- unify internal handling of limit_search and restricted_genmove
 - new function play_lib_n() in utils.c and autohelper functions
   oplay_lib/xplay_lib
 - new static function modify_eyefilling_move() in owl.c
