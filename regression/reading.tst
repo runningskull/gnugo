@@ -929,3 +929,21 @@ trymove W K12
 popgo
 popgo
 popgo
+
+# See also olympiad2004:112
+loadsgf games/olympiad2004/19x19/int-gnu.sgf 96
+trymove white T13
+221 defend Q16
+#? [1 Q14]
+popgo
+
+# See also ninestones:370
+loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 78
+trymove black T3
+trymove white S1
+trymove black R5
+370 defend S4
+#? [1 S5]
+popgo
+popgo
+popgo
