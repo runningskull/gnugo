@@ -234,3 +234,72 @@ play black C8
 play white G7
 670 reg_genmove black
 #? [H7]
+
+loadsgf games/9handicap.sgf 24
+680 reg_genmove black
+#? [A18|A14]
+
+loadsgf games/9handicap.sgf 34
+690 restricted_genmove black G16 J16
+#? [J16]
+
+loadsgf games/9handicap.sgf 40
+700 restricted_genmove black M14 K15
+#? [K15]
+
+loadsgf games/9handicap.sgf 56
+710 restricted_genmove black B10 C10
+#? [C10]
+
+loadsgf games/9handicap.sgf 82
+720 reg_genmove black
+#? [J3|K3|K2]
+
+loadsgf games/9handicap.sgf 86
+730 reg_genmove black
+#? [K2]
+
+loadsgf games/9handicap.sgf 136
+740 reg_genmove black
+#? [T16]
+
+loadsgf games/9handicap.sgf 214
+750 restricted_genmove black K12 K13
+#? [K12]
+
+loadsgf games/9handicap.sgf 274
+760 reg_genmove black
+#? [J10]
+
+loadsgf games/9handicap.sgf 278
+770 restricted_genmove black T9 Q19
+#? [Q19]
+
+loadsgf games/9handicap.sgf 290
+780 reg_genmove black
+#? [B2]
+
+# Not D7 as in the game!
+loadsgf games/9handicap.sgf 328
+790 reg_genmove black
+#? [B1]
+
+# Connect safely
+loadsgf games/9handicap.sgf 334
+800 restricted_genmove black K1 K2
+#? [K1]
+
+# This is very tricky. Both the dragons G16 and L14 are dead in semeai
+# by themselves, but taking the whole board, they have become critical.
+# I think F1 is the only move to capture both of them!
+# (And H18 played in the game is too ugly for words...)
+loadsgf games/9handicap.sgf 360
+810 reg_genmove black
+#? [F1]
+
+# Black cannot capture both dragons anymore. At least pick one to capture!
+loadsgf games/9handicap.sgf 362
+820 reg_genmove black
+#? [F1|J11|N13]
+
+

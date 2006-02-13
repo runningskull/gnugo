@@ -942,8 +942,13 @@ loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 78
 trymove black T3
 trymove white S1
 trymove black R5
-370 defend S4
+222 defend S4
 #? [1 S5]
 popgo
 popgo
 popgo
+
+loadsgf games/9handicap.sgf 280
+223 attack O18
+#? [3 T19]
+
