@@ -2966,8 +2966,7 @@ estimate_strategical_value(int pos, int color, float our_score,
      */
     if (attack_move_reason_known(pos, aa)
 	|| defense_move_reason_known(pos, aa)
-	|| ((owl_attack_move_reason_known(pos, aa)
-	     || owl_defense_move_reason_known(pos, aa))
+	|| (owl_move_reason_known(pos, aa)
 	    && dragon[aa].status == CRITICAL)
 	|| move_reason_known(pos, SEMEAI_MOVE, aa)) {
       /* But if the strategical value was larger than the territorial
