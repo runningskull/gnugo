@@ -399,6 +399,7 @@ loadsgf games/trevor/auto/d32.sgf 198
 #? [B18]
 
 
+# See also owl1:390-392.
 loadsgf games/trevor/auto/d32.sgf 240
 790 reg_genmove white
 #? [P14]

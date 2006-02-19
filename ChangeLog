@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- in estimate_territorial_value(), let stones have influence strength also
+  when their safety depends on ko	
 - unify internal handling of limit_search and restricted_genmove
 - new function play_lib_n() in utils.c and autohelper functions
   oplay_lib/xplay_lib

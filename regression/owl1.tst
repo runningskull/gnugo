@@ -517,3 +517,11 @@ loadsgf games/9x9-3.sgf 37
 389 owl_attack E3
 #? [0]
 
+# See also trevord:790.
+loadsgf games/trevor/auto/d32.sgf 240
+390 owl_attack Q14
+#? [3 P14]
+391 owl_defend Q14
+#? [1 P14]
+392 owl_does_defend T13 Q14
+#? [2]
