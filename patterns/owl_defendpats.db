@@ -5713,6 +5713,7 @@ a.b
 
 
 Pattern D1322
+# gf Constraint revised. (3.7.9)
 
 .*O
 OXO      connect to friendly dragon by atari
@@ -5722,7 +5723,7 @@ OXO      connect to friendly dragon by atari
 .*b
 aCb
 
-;(!owl_goal_dragon(a) || !owl_goal_dragon(b)) && lib(C) <= 2
+;(!owl_goal_dragon(a) || !owl_goal_dragon(b)) && lib(C) <= 2 && lib(a) > 1
 
 
 Pattern D1323
@@ -5774,6 +5775,7 @@ a.b
 
 
 Pattern D1325
+# gf Constraint revised. (3.7.9)
 
 .*O
 OXO      connect to friendly dragon by atari to escape
@@ -5783,7 +5785,7 @@ OXO      connect to friendly dragon by atari to escape
 .*b
 aCb
 
-;(owl_escape_value(a)>0 || owl_escape_value(b)>0) && lib(C) <= 2
+;(owl_escape_value(a)>0 || owl_escape_value(b)>0) && lib(C) <= 2 && lib(a) > 1
 
 
 Pattern D1326
@@ -5795,32 +5797,6 @@ O*O      connect to escape
 a*b
 
 ;owl_escape_value(a)>0 || owl_escape_value(b)>0
-
-
-Pattern D1327
-
-*.O
-O.O      connect by bamboo joint to escape
-
-:8,E,value(36)
-
-*.b
-a.b
-
-;owl_escape_value(a)>0 || owl_escape_value(b)>0
-
-
-Pattern D1328
-
-.*O
-OXO      connect to friendly dragon by atari to escape
-
-:8,E,value(36)
-
-.*b
-aCb
-
-;(owl_escape_value(a)>0 || owl_escape_value(b)>0) && lib(C) <= 2
 
 
 Pattern D1329
