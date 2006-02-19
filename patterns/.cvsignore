@@ -16,12 +16,14 @@ fusekipat.c
 fuseki*.c
 joseki
 hoshi*.db
+gogo.db
 komoku.db
 sansan.db
 mokuhazushi.db
 takamoku.db
 josekidb.c
 extract_fuseki
+uncompress_fuseki
 owl_vital_apat.c
 owl_defendpat.c
 read_attack.c
