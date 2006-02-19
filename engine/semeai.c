@@ -210,10 +210,12 @@ semeai()
 	update_status(DRAGON(d1).origin, CRITICAL, CRITICAL);
       else if (best_attack == 0 && attack_certain)
 	update_status(DRAGON(d1).origin, ALIVE, ALIVE);
+      dragon2[d1].semeai_defense_code = best_defense;
       dragon2[d1].semeai_defense_point = defense_move;
       dragon2[d1].semeai_defense_certain = defense_certain;
       gg_assert(board[semeai_defense_target] == OTHER_COLOR(board[dragon2[d1].origin]));
       dragon2[d1].semeai_defense_target = semeai_defense_target;
+      dragon2[d1].semeai_attack_code = best_attack;
       dragon2[d1].semeai_attack_point = attack_move;
       dragon2[d1].semeai_attack_certain = attack_certain;
       dragon2[d1].semeai_attack_target = semeai_attack_target;
@@ -284,6 +286,7 @@ find_moves_to_make_seki()
 	      defend_move, str, opponent);
 	dragon2[d].semeais++;
 	update_status(str, CRITICAL, CRITICAL);
+	dragon2[d].semeai_defense_code = resulta;
 	dragon2[d].semeai_defense_point = defend_move;
 	dragon2[d].semeai_defense_certain = certain;
 	gg_assert(board[opponent] == OTHER_COLOR(board[dragon2[d].origin]));
@@ -296,8 +299,10 @@ find_moves_to_make_seki()
 	owl_analyze_semeai_after_move(defend_move, OTHER_COLOR(color),
 				      str, opponent, &resulta, NULL,
 				      NULL, 1, NULL, 0);
-	if (resulta != WIN)
+	if (resulta != WIN) {
+	  dragon2[d].semeai_attack_code = REVERSE_RESULT(resulta);
 	  dragon2[d].semeai_attack_point = defend_move;
+	}
 	else {
 	  int k;
 	  int libs[MAXLIBS];
@@ -308,6 +313,7 @@ find_moves_to_make_seki()
 					  str, opponent, &resulta, NULL,
 					  NULL, 1, NULL, 0);
 	    if (resulta != WIN) {
+	      dragon2[d].semeai_attack_code = REVERSE_RESULT(resulta);
 	      dragon2[d].semeai_attack_point = libs[k];
 	      break;
 	    }
@@ -317,6 +323,7 @@ find_moves_to_make_seki()
 	    DEBUG(DEBUG_SEMEAI,
 		  "No move to attack in semeai (%1m vs %1m), seki assumed.\n",
 		  str, opponent);
+	    dragon2[d].semeai_attack_code = 0;
 	    dragon2[d].semeai_attack_point = NO_MOVE;
 	    update_status(str, ALIVE, ALIVE_IN_SEKI);
 	  }
@@ -382,6 +389,7 @@ find_moves_to_make_seki()
 	      defend_move, str, opponent);
 	dragon2[d].semeais++;
 	update_status(str, CRITICAL, CRITICAL);
+	dragon2[d].semeai_defense_code = resulta;
 	dragon2[d].semeai_defense_point = defend_move;
 	dragon2[d].semeai_defense_certain = certain;
 	gg_assert(board[opponent] == OTHER_COLOR(board[dragon2[d].origin]));
@@ -394,8 +402,10 @@ find_moves_to_make_seki()
 	owl_analyze_semeai_after_move(defend_move, OTHER_COLOR(color),
 				      str, opponent, &resulta, NULL,
 				      NULL, 1, NULL, 0);
-	if (resulta != WIN)
+	if (resulta != WIN) {
+	  dragon2[d].semeai_attack_code = REVERSE_RESULT(resulta);
 	  dragon2[d].semeai_attack_point = defend_move;
+	}
 	else {
 	  int k;
 	  int libs[MAXLIBS];
@@ -406,6 +416,7 @@ find_moves_to_make_seki()
 					  str, opponent, &resulta, NULL,
 					  NULL, 1, NULL, 0);
 	    if (resulta != WIN) {
+	      dragon2[d].semeai_attack_code = REVERSE_RESULT(resulta);
 	      dragon2[d].semeai_attack_point = libs[k];
 	      break;
 	    }
@@ -415,6 +426,7 @@ find_moves_to_make_seki()
 	    DEBUG(DEBUG_SEMEAI,
 		  "No move to attack in semeai (%1m vs %1m), seki assumed.\n",
 		  str, opponent);
+	    dragon2[d].semeai_attack_code = 0;
 	    dragon2[d].semeai_attack_point = NO_MOVE;
 	    update_status(str, ALIVE, ALIVE_IN_SEKI);
 	  }

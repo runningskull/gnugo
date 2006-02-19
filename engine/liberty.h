@@ -888,9 +888,11 @@ struct dragon_data2 {
   int surround_size;           /* Size of the surrounding area               */
 
   int semeais;         /* number of semeais in which the dragon is involved  */
+  int semeai_defense_code ;/* Result code for semeai defense.                */
   int semeai_defense_point;/* Move found by semeai code to rescue dragon     */
   int semeai_defense_certain;
   int semeai_defense_target; /* The opponent dragon involved in the semeai   */
+  int semeai_attack_code ; /* Result code for semeai attack.                 */
   int semeai_attack_point; /* Move found by semeai code to kill dragon       */
   int semeai_attack_certain;
   int semeai_attack_target; /* The opponent dragon involved in the semeai    */

@@ -726,7 +726,9 @@ initialize_supplementary_dragon_data(void)
     set_eyevalue(&dragon2[d].genus, 0, 0, 0, 0);
 
     dragon2[d].semeais                  = 0;
+    dragon2[d].semeai_defense_code	= 0;
     dragon2[d].semeai_defense_point	= NO_MOVE;
+    dragon2[d].semeai_attack_code	= 0;
     dragon2[d].semeai_attack_point	= NO_MOVE;
     dragon2[d].owl_attack_point         = NO_MOVE;
     dragon2[d].owl_attack_code          = 0;
@@ -1573,9 +1575,13 @@ show_dragons(void)
       }
       if (dd->status == CRITICAL && d2->semeais) {
 	if (d2->semeai_defense_point)
-	  gprintf("... semeai defense move at %1m\n", d2->semeai_defense_point);
+	  gprintf("... semeai defense move at %1m, result code %s\n",
+		  d2->semeai_defense_point,
+		  result_to_string(d2->semeai_defense_code));
 	if (d2->semeai_attack_point)
-	  gprintf("... semeai attack move at %1m\n", d2->semeai_attack_point);
+	  gprintf("... semeai attack move at %1m, result code %s\n",
+		  d2->semeai_attack_point,
+		  result_to_string(d2->semeai_attack_code));
       }
       gprintf("... neighbors");
       for (k = 0; k < d2->neighbors; k++) {
@@ -2509,11 +2515,13 @@ report_dragon(FILE *outfile, int pos)
   gfprintf(outfile, "owl_attack_kworm        %1m\n", d2->owl_attack_kworm);
   gfprintf(outfile, "owl_defense_kworm       %1m\n", d2->owl_defense_kworm);
   gfprintf(outfile, "semeais                 %d\n", d2->semeais);
+  gfprintf(outfile, "semeai_defense_code     %d\n", d2->semeai_defense_code);
   gfprintf(outfile, "semeai_defense_point    %1m\n", d2->semeai_defense_point);
   gfprintf(outfile, "semeai_defense_certain  %d\n",
 	   d2->semeai_defense_certain);
   gfprintf(outfile, "semeai_defense_target   %1m\n",
       	   d2->semeai_defense_target);
+  gfprintf(outfile, "semeai_attack_code      %d\n", d2->semeai_attack_code);
   gfprintf(outfile, "semeai_attack_point     %1m\n", d2->semeai_attack_point);
   gfprintf(outfile, "semeai_attack_certain   %d\n", d2->semeai_attack_certain);
   gfprintf(outfile, "semeai_attack_target    %1m\n", d2->semeai_attack_target);
