@@ -1,6 +1,7 @@
-loadsgf games/nngs/looknglass-gnugo-3.1.26-200203042158.sgf 30
-1 reg_genmove black
-#? [!A16]
+# # Retired.
+# loadsgf games/nngs/looknglass-gnugo-3.1.26-200203042158.sgf 30
+# 1 reg_genmove black
+# #? [!A16]
 
 #CATEGORY=OWL_TUNING
 loadsgf games/nngs/looknglass-gnugo-3.1.26-200203042158.sgf 70
@@ -69,8 +70,8 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 34
 #? [L3|L4|J3]*
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 38
-18 reg_genmove white
-#? [!L2]
+18 restricted_genmove white J2 K2 L2 H3 J3
+#? [J2]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 16
 19 reg_genmove white
@@ -81,8 +82,8 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 36
 #? [F17]*
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 40
-21 reg_genmove white
-#? [!M6]
+21 restricted_genmove white M6 N5
+#? [N5]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 92
 22 reg_genmove white
@@ -112,10 +113,12 @@ loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 126
 28 reg_genmove white
 #? [J18]
 
-# GNU Go 3.1.27 invades the 3-3 point too early
-loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 6
-29 reg_genmove white
-#? [!R17]
+# # GNU Go 3.1.27 invades the 3-3 point too early
+# # Retired. With the position in the fuseki database the test is not
+# # very interesting anymore.
+# loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 6
+# 29 reg_genmove white
+# #? [!R17]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 10
 30 reg_genmove white
@@ -131,8 +134,8 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 34
 #? [L12|K16|H16]*
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203132324.sgf 90
-33 reg_genmove white
-#? [!S9]
+33 restricted_genmove white S9 S10
+#? [S10]
 
 loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 30
 34 reg_genmove white
@@ -178,10 +181,14 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 46
 45 reg_genmove white
 #? [!B10]
 
-# defense of the top right is urgent
-loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 54
-46 reg_genmove white
-#? [!J5]
+# # defense of the top right is urgent
+# # Is it really? The top right is worth about 30 points but black has
+# # to overcome a two-stage ko to get them. It's not clear there's no
+# # bigger move on the board.
+# # Test retired. See instead ld_owl:70.
+# loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 54
+# 46 reg_genmove white
+# #? [!J5]
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 12
 47 reg_genmove white
