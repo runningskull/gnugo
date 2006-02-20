@@ -997,4 +997,23 @@ bXO
 ;xlib(a)==3 && oplay_lib(*,a,b,b)>1
 
 
+Pattern VA56
+# gf New pattern. (3.7.9)
+# See ld_owl:326.
+
+xXOo    destroy eye
+X.XO
+OX.*
+----
+
+:8,-,value(45)
+
+xXOo
+XaXO
+OX.*
+----
+
+;owl_mineye(a)==1
+
+
 # END OF FILE
