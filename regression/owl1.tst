@@ -525,3 +525,10 @@ loadsgf games/trevor/auto/d32.sgf 240
 #? [1 P14]
 392 owl_does_defend T13 Q14
 #? [2]
+
+# See also semeai:139,140.
+loadsgf games/semeai/semeai16.sgf 222
+393 owl_attack F9
+#? [1 (E9|G7)]
+394 owl_defend F9
+#? [1 G9]

@@ -490,6 +490,18 @@ loadsgf games/kgs/yagr-Kazik.sgf 149
 136 analyze_semeai K19 L19
 #? [0 1 (N16|O13|O12|O11)]
 
+loadsgf games/semeai/semeai16.sgf 222
+137 analyze_semeai A5 A2
+#? [1 0 F1]
+138 analyze_semeai A2 A5
+#? [1 1 (D1|F1|H1)]
+
+# See also owl1:393,394.
+139 analyze_semeai F9 H9
+#? [1 1 G9]
+140 analyze_semeai H9 F9
+#? [1 1 (E9|G7)]
+
 ########### semeai gen_move tests #################
 
 # A6 gives an unfavorable ko while F10 gives seki.
