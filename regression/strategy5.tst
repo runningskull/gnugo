@@ -209,3 +209,8 @@ loadsgf games/CrazyStone2.sgf 61
 loadsgf games/CrazyStone2.sgf 77
 300 reg_genmove black
 #? [H3]*
+
+# B1 is the biggest way to defend the B7 dragon.
+loadsgf games/strategy51.sgf
+301 reg_genmove black
+#? [B1]

@@ -3806,11 +3806,11 @@ Pattern D844
 
 :8,-,value(40)
 
-|.OO
+|bOO
 |.*a
 +---
 
-;owl_proper_eye(a) && owl_big_eyespace(a)
+;owl_proper_eye(a) && owl_proper_eye(b) && owl_big_eyespace(a)
 
 
 Pattern D845
