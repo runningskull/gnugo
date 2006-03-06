@@ -527,7 +527,7 @@ loadsgf games/trevor/auto/d32.sgf 240
 #? [2]
 
 # See also semeai:139,140.
-loadsgf games/semeai/semeai16.sgf 222
+loadsgf games/semeai/semeai21.sgf
 393 owl_attack F9
 #? [1 (E9|G7)]
 394 owl_defend F9

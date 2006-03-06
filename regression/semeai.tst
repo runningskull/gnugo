@@ -490,7 +490,7 @@ loadsgf games/kgs/yagr-Kazik.sgf 149
 136 analyze_semeai K19 L19
 #? [0 1 (N16|O13|O12|O11)]
 
-loadsgf games/semeai/semeai16.sgf 222
+loadsgf games/semeai/semeai21.sgf
 137 analyze_semeai A5 A2
 #? [1 0 F1]
 138 analyze_semeai A2 A5
