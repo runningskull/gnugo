@@ -917,7 +917,7 @@ main(int argc, char *argv[])
       case OPT_PRINT_LEVELS:
 	{
 	  int lev;
-	  for (lev = 10; lev > 0; lev--)
+	  for (lev = 12; lev >= 0; lev--)
 	    set_depth_values(lev, 1);
 	}
 	return EXIT_SUCCESS;
@@ -1397,7 +1397,8 @@ show_version(void)
 
 #define USAGE "\n\
 Usage: gnugo [-opts]\n\
-Examples:\
+\n\
+Examples:\n\
   gnugo --mode gtp --level 5\n\
          To play against gnugo in level 5 from a GTP client\n\
   gnugo --mode ascii -l game.sgf -L 123\n\
@@ -1410,29 +1411,59 @@ Main Options:\n\
                          or 'gtp'). Default is ASCII.\n\
                          If no terminal is detected GMP (Go Modem Protocol)\n\
                          will be assumed.\n\
-       --quiet           Don't print copyright and informational messages\n\
+       --quiet  --silent Don't print copyright and informational messages\n\
        --level <amount>  strength (default %d)\n\
        --never-resign    Forbid GNU Go to resign\n\
        --resign-allowed  Allow resignation (default)\n\
-       --gtp-input <file>Read gtp commands from file instead of stdin\n\
-       --gtp-connect [HOST:]PORT\n\
-                         Connect to given host (127.0.0.1 if omitted) and port\n\
-                         and receive GTP commands on the established connection\n\
-       --gtp-listen [HOST:]PORT\n\
-                         Wait for the first TCP/IP connection on the given port\n\
-                         (if HOST is specified, only to that host)\n\
    -l, --infile <file>   Load name sgf file\n\
    -L, --until <move>    Stop loading just before move is played. <move>\n\
                          can be the move number or location (eg L10).\n\
    -o, --outfile <file>  Write sgf output to file\n\
-   --printsgf <file>     Write position as a diagram to file (use with -l)\n\
+       --printsgf <file>     Write position as a diagram to file (use with -l)\n\
+\n\
+Scoring:\n\
+   --score estimate      estimate score at loaded position\n\
+   --score finish        generate moves to finish game, then score\n\
+   --score aftermath     generate moves to finish, use best algorithm\n\
+\n\
 "
 
 #define USAGE1 "\
+Game Options:\n\
+Used with --mode ascii (or other modes for non-interactive settings)\n\
+   --boardsize num   Set the board size to use (%d--%d)\n\
+   --color <color>   Choose your color ('black' or 'white')\n\
+   --handicap <num>  Set the number of handicap stones (0--%d)\n\
+   --komi <num>      Set the komi\n\
+   --clock <sec>     Initialize the timer.\n\
+   --byo-time <sec>  Initialize the byo-yomi timer.\n\
+   --byo-period <stones>  Initialize the byo-yomi period.\n\
+\n\
+   --japanese-rules     (default)\n\
+   --chinese-rules\n\
+   --allow-suicide\n\
+\n\
+   --play-out-aftermath\n\
+   --capture-all-dead\n\
+\n\
    --min-level <amount>         minimum level for adjustment schemes\n\
    --max-level <amount>         maximum level for adjustment schemes\n\
    --autolevel                  adapt gnugo level during game to respect\n\
                                 the time specified by --clock <sec>.\n\
+\n\
+Connection options\n\
+   --gtp-input <file>Read gtp commands from file instead of stdin\n\
+   --gtp-connect [HOST:]PORT\n\
+                     Connect to given host (127.0.0.1 if omitted) and port\n\
+                     and receive GTP commands on the established connection\n\
+   --gtp-listen [HOST:]PORT\n\
+                     Wait for the first TCP/IP connection on the given port\n\
+                     (if HOST is specified, only to that host)\n\
+   --gtp-version\n\
+\n\
+"
+
+#define USAGE2 "\
 Experimental options:\n\
    --with-break-in         use the break-in code (on at level 10 by default)\n\
    --without-break-in      do not use the break-in code\n\
@@ -1445,25 +1476,16 @@ Experimental options:\n\
    --nojosekidb            turn off joseki database\n\
    --mirror                try to play mirror go\n\
    --mirror-limit <n>      stop mirroring when n stones on board\n\n\
-Scoring:\n\
-   --score estimate        estimate score at loaded position\n\
-   --score finish          generate moves to finish game, then score\n\
-   --score aftermath       generate moves to finish, use best algorithm\n\
+   --alternate-connections\n\
+   --experimental-connections\n\
+   --experimental-owl-ext\n\
+   --experimental-semeai\n\
+   --standard-connections\n\
+   --standard-semeai\n\
+   --oracle                Read the documentation\n\
 \n\
 Cache size (higher=more memory usage, faster unless swapping occurs):\n\
    -M, --cache-size <megabytes>  RAM cache for read results (default %4.1f Mb)\n\
-\n\
-"
-
-#define USAGE2 "\
-Game Options: (--mode ascii)\n\
-       --boardsize num   Set the board size to use (%d--%d)\n\
-       --color <color>   Choose your color ('black' or 'white')\n\
-       --handicap <num>  Set the number of handicap stones (0--%d)\n\
-       --komi <num>      Set the komi\n\
-       --clock <sec>     Initialize the timer.\n\
-       --byo-time <sec>  Initialize the byo-yomi timer.\n\
-       --byo-period <stones>  Initialize the byo-yomi period.\n\
 \n\
 Informative Output:\n\
    -v, --version         Display the version and copyright of GNU Go\n\
@@ -1473,7 +1495,6 @@ Informative Output:\n\
        --copyright       Display copyright notice\n\
 \n\
 "
-
 
 #define COPYRIGHT \
 "Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006\n\
@@ -1502,7 +1523,7 @@ Debugging Options:\n\
        --debug-flags             print the debug flags for previous item\n\
    -w, --worms                   print worm and dragon data and move reasons\n\
    -m, --moyo <level>            moyo debugging, show moyo board\n\
-       --debuginfluence <move>   print influence map after making a move\n\
+       --debug-influence <move>   print influence map after making a move\n\
    -b, --benchmark num           benchmarking mode - can be used with -l\n\
    -S, --statistics              print statistics (for debugging purposes)\n\n\
        --profile-patterns        print statistics for pattern usage\n\
@@ -1515,10 +1536,16 @@ Debugging Options:\n\
        --showscore               print estimated score\n\
    -r, --seed number             set random number seed\n\
        --gtp-dump-commands <file>dump commands received in GTP mode\n\
+       --gtp-initial-orientation\n\
+       --orientation\n\
+\n\
 "
 
 #define USAGE_DEBUG2 "\
 Options affecting depth settings and playing strength:\n\
+   --print-levels        shows all this values for levels 12 to 0\n\
+\n\
+   Default values for the default level (%d):\n\
    -D, --depth <depth>          deep reading cutoff (default %d)\n\
    -B, --backfill-depth <depth> deep reading cutoff (default %d)\n\
    -F, --fourlib-depth <depth>  deep reading cutoff (default %d)\n\
@@ -1532,14 +1559,23 @@ Options affecting depth settings and playing strength:\n\
    --owl-branch <depth>         owl branching depth (default %d)\n\
    --owl-reading <depth>        owl reading depth (default %d)\n\
    --owl-node-limit <limit>     max nodes for owl reading (default %d)\n\
+   --semeai-node-limit <limit>  max nodes for semeai reading (default %d)\n\
+\n\
 Options providing detailed reading results etc.:\n\
    --decide-string <string>     can this string live? (try with -o)\n\
    --decide-connection <str/str> can these strings connect? (try with -o)\n\
    --decide-dragon <dragon>     can this dragon live? (try with -o or -t)\n\
+   --decide-dragon-data\n\
+   --decide-owl\n\
    --decide-position            evaluate all dragons (try with -o or -t)\n\
    --decide-eye <string>        evaluate the eye\n\
    --decide-combination         search for combination attack (try with -o)\n\
-   --genmove <color>            generate a move for color\n\
+   --decide-oracle\n\
+   --decide-semeai\n\
+   --decide-tactical-semeai\n\
+   --decide-surrounded\n\
+   --limit-search\n\
+\n\
 "
 
 
@@ -1551,20 +1587,21 @@ static void
 show_help(void)
 {
   printf(USAGE, DEFAULT_LEVEL);
-  printf(USAGE1, DEFAULT_MEMORY <= 0 ? reading_cache_default_size() :
+  printf(USAGE1, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
+  printf(USAGE2, DEFAULT_MEMORY <= 0 ? reading_cache_default_size() :
 	 (float) DEFAULT_MEMORY);
-  printf(USAGE2, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
 }
 
 
 static void
 show_debug_help(void)
 {
+  set_depth_values(DEFAULT_LEVEL,0);
   printf(USAGE_DEBUG USAGE_DEBUG2, 
-	 depth, backfill_depth, fourlib_depth, ko_depth, branch_depth,
+	 DEFAULT_LEVEL, depth, backfill_depth, fourlib_depth, ko_depth, branch_depth,
 	 backfill2_depth, break_chain_depth, superstring_depth, aa_depth, 
 	 owl_distrust_depth, owl_branch_depth,
-	 owl_reading_depth, owl_node_limit);
+	 owl_reading_depth, owl_node_limit, semeai_node_limit);
 }
 
 static void 
