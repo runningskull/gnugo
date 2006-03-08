@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- fix assertion failur in semeai()
 - semeai attack and defense codes added to struct dragon_data2
 - in estimate_territorial_value(), let stones have influence strength also
   when their safety depends on ko	

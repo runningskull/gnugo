@@ -174,8 +174,8 @@ semeai()
     int best_attack = 0;
     int defense_move = PASS_MOVE;
     int attack_move = PASS_MOVE;
-    int defense_certain = 0;
-    int attack_certain = 0;
+    int defense_certain = -1;
+    int attack_certain = -1;
     int semeai_attack_target = NO_MOVE;
     int semeai_defense_target = NO_MOVE;
     
@@ -213,7 +213,9 @@ semeai()
       dragon2[d1].semeai_defense_code = best_defense;
       dragon2[d1].semeai_defense_point = defense_move;
       dragon2[d1].semeai_defense_certain = defense_certain;
-      gg_assert(board[semeai_defense_target] == OTHER_COLOR(board[dragon2[d1].origin]));
+      ASSERT1(board[semeai_defense_target]
+	      == OTHER_COLOR(board[dragon2[d1].origin]),
+	      dragon2[d1].origin);
       dragon2[d1].semeai_defense_target = semeai_defense_target;
       dragon2[d1].semeai_attack_code = best_attack;
       dragon2[d1].semeai_attack_point = attack_move;

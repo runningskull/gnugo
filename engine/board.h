@@ -430,7 +430,7 @@ void abortgo(const char *file, int line, const char *msg, int pos)
 #define ASSERT1(x, pos) if (x) ; else abortgo(__FILE__, __LINE__, #x, pos)
 #endif
 
-#define gg_assert(x) ASSERT1(x, NO_MOVE);
+#define gg_assert(x) ASSERT1(x, NO_MOVE)
 
 /* Are we using valgrind memory checking? */
 #if USE_VALGRIND
