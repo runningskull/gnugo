@@ -2,7 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- fix assertion failur in semeai()
+- new GTP command advance_random_seed <games>
+- make update_random_seed() deterministic
+- fix assertion failure in semeai()
 - semeai attack and defense codes added to struct dragon_data2
 - in estimate_territorial_value(), let stones have influence strength also
   when their safety depends on ko	

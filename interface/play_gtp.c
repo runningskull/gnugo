@@ -48,6 +48,7 @@ static void rotate_on_output(int ai, int aj, int *bi, int *bj);
 DECLARE(gtp_aa_confirm_safety);
 DECLARE(gtp_accurate_approxlib);
 DECLARE(gtp_accuratelib);
+DECLARE(gtp_advance_random_seed);
 DECLARE(gtp_all_legal);
 DECLARE(gtp_all_move_values);
 DECLARE(gtp_analyze_eyegraph);
@@ -184,6 +185,7 @@ static struct gtp_command commands[] = {
   {"aa_confirm_safety",       gtp_aa_confirm_safety},
   {"accurate_approxlib",      gtp_accurate_approxlib},
   {"accuratelib",             gtp_accuratelib},
+  {"advance_random_seed",     gtp_advance_random_seed},
   {"all_legal",        	      gtp_all_legal},
   {"all_move_values",         gtp_all_move_values},
   {"analyze_eyegraph", 	      gtp_analyze_eyegraph},
@@ -4379,6 +4381,26 @@ gtp_set_random_seed(char *s)
   return gtp_success("");
 }
 
+
+/* Function:  Advance the random seed by a number of games.
+ * Arguments: integer
+ * Fails:     invalid data
+ * Returns:   New random seed.
+ */
+static int
+gtp_advance_random_seed(char *s)
+{
+  int i;
+  int games;
+  if (sscanf(s, "%d", &games) < 1
+      || games < 0)
+    return gtp_failure("invalid number of games");
+  
+  for (i = 0; i < games; i++)
+    update_random_seed();
+
+  return gtp_success("%d", get_random_seed());
+}
 
 /***************
  * surrounding *

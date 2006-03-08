@@ -528,12 +528,15 @@ set_random_seed(unsigned int seed)
   gg_srand(seed);
 }
 
-/* Update the random seed with the current value in the random sequence.
- * This should be called at the start of each new game.
+/* Update the random seed. This should be called at the start of each
+ * new game.
+ * We reset the random seed before obtaining a new one, to make the
+ * next random seed depend deterministically on the old one.
  */
 void
 update_random_seed(void)
 {
+  gg_srand(random_seed);
   random_seed = gg_rand();
   /* Since random seed 0 has a special interpretation when given as
    * command line argument with the -r option, we make sure to avoid

@@ -1023,6 +1023,13 @@ Arguments: integer
 Fails:     invalid data
 Returns:   nothing
 @end verbatim
+@cindex advance_random_seed
+@item advance_random_seed: Advance the random seed by a number of games.
+@verbatim
+Arguments: integer
+Fails:     invalid data
+Returns:   New random seed.
+@end verbatim
 @cindex is_surrounded
 @item is_surrounded: Determine if a dragon is surrounded
 @verbatim
