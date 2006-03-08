@@ -311,3 +311,7 @@ loadsgf games/kgs/tournament10/GNU-AyaBot.sgf 30
 loadsgf games/kgs/tournament10/GNU-NeuroGo.sgf 68
 620 reg_genmove white
 #? [A7]
+
+loadsgf games/9x9-4.sgf 13
+630 reg_genmove black
+#? [J5]
