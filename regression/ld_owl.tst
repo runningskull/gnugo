@@ -193,7 +193,7 @@ loadsgf games/life_and_death/ld13.sgf
 loadsgf games/life_and_death/ld9.sgf
 play white E1
 70 owl_attack C4
-#? [2 B2]
+#? [2 B2]*
 
 loadsgf games/life_and_death/lunches.sgf
 101 dragon_status A17
@@ -408,13 +408,13 @@ loadsgf games/life_and_death/mixed3.sgf
 
 loadsgf games/life_and_death/mixed4.sgf
 326 owl_attack B11
-#? [1 B13]*
+#? [1 B13]
 327 owl_attack L12
-#? [1 M13]*
+#? [1 M13]
 328 owl_attack K5
-#? [1 (N5|N3|J2)]
+#? [1 (N5|N3|J2)]*
 329 owl_defend K5
-#? [1 N3]
+#? [1 N3]*
 
 # tough under the stones problem from Sensei's Library
 loadsgf games/owl47.sgf 5

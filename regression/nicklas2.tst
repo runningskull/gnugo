@@ -17,7 +17,7 @@
 #    should be in nicklas3.tst (harder problems).
 loadsgf games/nicklas/nicklas1.sgf 29
 102 reg_genmove black
-#? [D4]*
+#? [D4]
 
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=I think G9 is not too terrible here. Very difficult to see.-trevor
@@ -63,7 +63,7 @@ loadsgf games/nicklas/nicklas9.sgf 28
 # point.
 loadsgf games/nicklas/nicklas9.sgf 50
 904 reg_genmove black
-#? [B1|E1]*
+#? [B1|E1]
 
 loadsgf games/nicklas/nicklas10.sgf 18
 1001 reg_genmove black
@@ -132,7 +132,7 @@ loadsgf games/nicklas/nicklas18.sgf 45
 #SEVERITY=5
 loadsgf games/nicklas/nicklas21.sgf 72
 2102 reg_genmove black
-#? [PASS]*
+#? [PASS]
 
 
 #CATEGORY=ENDGAME_TUNING
@@ -141,7 +141,7 @@ loadsgf games/nicklas/nicklas21.sgf 72
 #See also nicklas2.tst?2102
 loadsgf games/nicklas/nicklas21.sgf 74
 2103 reg_genmove black
-#? [PASS]*
+#? [PASS]
 
 loadsgf games/nicklas/nicklas21.sgf 76
 2104 reg_genmove black

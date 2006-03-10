@@ -139,7 +139,7 @@ loadsgf games/mertin13x13/GHGN3.sgf 38
 # J9 is huge.
 loadsgf games/mertin13x13/GNGH2.sgf 23
 14 reg_genmove black
-#? [J9]*
+#? [J9]
 
 # N11 is meaningless.
 loadsgf games/mertin13x13/GNGH2.sgf 71

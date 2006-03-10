@@ -49,7 +49,7 @@ loadsgf games/handtalk/handtalk23.sgf 26
 # B9 is quite bad here.
 loadsgf games/handtalk/handtalk23.sgf 30
 11 reg_genmove white
-#? [C11|D10]*
+#? [C11|D10]
 
 # The balance of power between J11 and H8 is the issue at the moment.
 # Maybe other moves possible.

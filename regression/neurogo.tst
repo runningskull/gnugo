@@ -130,4 +130,4 @@ loadsgf games/FSF-neurogo.sgf 96
 27 owl_defend B16
 #? [0]
 28 reg_genmove white
-#? [O2]
+#? [O2]*

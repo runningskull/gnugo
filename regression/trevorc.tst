@@ -115,7 +115,7 @@ loadsgf games/trevor/auto/c14.sgf 34
 
 loadsgf games/trevor/auto/c14.sgf 70
 280 restricted_genmove white N13 N10
-#? [N10]
+#? [N10]*
 
 
 
@@ -192,7 +192,7 @@ loadsgf games/trevor/auto/c20.sgf 30
 
 loadsgf games/trevor/auto/c20.sgf 36
 410 restricted_genmove white H13 G12 G13 F12 F13
-#? [G12]
+#? [G12]*
 
 
 loadsgf games/trevor/auto/c20.sgf 58
@@ -534,7 +534,7 @@ loadsgf games/trevor/auto/c54.sgf 78
 
 loadsgf games/trevor/auto/c55.sgf 58
 940 reg_genmove white
-#? [G1]
+#? [G1]*
 
 
 loadsgf games/trevor/auto/c55.sgf 92
@@ -572,7 +572,7 @@ loadsgf games/trevor/auto/c60.sgf 46
 
 loadsgf games/trevor/auto/c60.sgf 64
 1000 reg_genmove white
-#? [N9|M11]*
+#? [N9|M11]
 
 
 
@@ -601,7 +601,7 @@ loadsgf games/trevor/auto/c61.sgf 42
 
 loadsgf games/trevor/auto/c61.sgf 88
 1050 reg_genmove white
-#? [K11|J10]
+#? [K11|J10]*
 
 
 loadsgf games/trevor/auto/c61.sgf 92
@@ -945,7 +945,7 @@ loadsgf games/trevor/auto/c86.sgf 44
 
 loadsgf games/trevor/auto/c88.sgf 72
 1580 reg_genmove white
-#? [C8]*
+#? [C8]
 
 
 loadsgf games/trevor/auto/c88.sgf 80

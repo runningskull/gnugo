@@ -499,36 +499,36 @@ loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 18
 
 loadsgf games/kgs/TheGNUGo-grasshoper.sgf 288
 385 owl_defend G14
-#? [1 C11]
+#? [1 C11]*
 
 loadsgf games/kgs/TheGNUGo-rcsteppat.sgf 138 
 386 owl_defend O17
-#? [1 P19]
+#? [1 P19]*
 
 loadsgf games/owl55.sgf 20
 387 owl_defend F4
-#? [1 C3]
+#? [1 C3]*
 
 loadsgf games/9x9-2.sgf 28
 388 owl_attack C3
-#? [1 A2]
+#? [1 A2]*
 
 loadsgf games/9x9-3.sgf 37
 389 owl_attack E3
-#? [0]
+#? [0]*
 
 # See also trevord:790.
 loadsgf games/trevor/auto/d32.sgf 240
 390 owl_attack Q14
-#? [3 P14]
+#? [3 P14]*
 391 owl_defend Q14
 #? [1 P14]
 392 owl_does_defend T13 Q14
-#? [2]
+#? [2]*
 
 # See also semeai:139,140.
 loadsgf games/semeai/semeai21.sgf
 393 owl_attack F9
 #? [1 (E9|G7)]
 394 owl_defend F9
-#? [1 G9]
+#? [1 G9]*

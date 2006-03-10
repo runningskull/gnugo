@@ -4,7 +4,7 @@ loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 26
 
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 36
 20 reg_genmove black
-#? [H2|H3]
+#? [H2|H3]*
 
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 42
 30 reg_genmove black
@@ -66,7 +66,7 @@ loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 64
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 108
 220 reg_genmove black
-#? [P9|P8]*
+#? [P9|P8]
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 118
 230 restricted_genmove black P11 K2 H13
@@ -129,7 +129,7 @@ loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 76
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 78
 370 reg_genmove black
-#? [R5]
+#? [R5]*
 
 loadsgf games/nngs/juka-gnugo-3.3.16-200302072106.sgf 4
 380 reg_genmove black
@@ -141,7 +141,7 @@ loadsgf games/nngs/juka-gnugo-3.3.16-200302072106.sgf 8
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 164
 490 restricted_genmove black S10 R10
-#? [R10]*
+#? [R10]
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 200
 500 reg_genmove black
@@ -237,7 +237,7 @@ play white G7
 
 loadsgf games/9handicap.sgf 24
 680 reg_genmove black
-#? [A18|A14]
+#? [A18|A14]*
 
 loadsgf games/9handicap.sgf 34
 690 restricted_genmove black G16 J16
@@ -245,7 +245,7 @@ loadsgf games/9handicap.sgf 34
 
 loadsgf games/9handicap.sgf 40
 700 restricted_genmove black M14 K15
-#? [K15]
+#? [K15]*
 
 loadsgf games/9handicap.sgf 56
 710 restricted_genmove black B10 C10
@@ -253,19 +253,19 @@ loadsgf games/9handicap.sgf 56
 
 loadsgf games/9handicap.sgf 82
 720 reg_genmove black
-#? [J3|K3|K2]
+#? [J3|K3|K2]*
 
 loadsgf games/9handicap.sgf 86
 730 reg_genmove black
-#? [K2]
+#? [K2]*
 
 loadsgf games/9handicap.sgf 136
 740 reg_genmove black
-#? [T16]
+#? [T16]*
 
 loadsgf games/9handicap.sgf 214
 750 restricted_genmove black K12 K13
-#? [K12]
+#? [K12]*
 
 loadsgf games/9handicap.sgf 274
 760 reg_genmove black
@@ -273,11 +273,11 @@ loadsgf games/9handicap.sgf 274
 
 loadsgf games/9handicap.sgf 278
 770 restricted_genmove black T9 Q19
-#? [Q19]
+#? [Q19]*
 
 loadsgf games/9handicap.sgf 290
 780 reg_genmove black
-#? [B2]
+#? [B2]*
 
 # Not D7 as in the game!
 loadsgf games/9handicap.sgf 328
@@ -287,7 +287,7 @@ loadsgf games/9handicap.sgf 328
 # Connect safely
 loadsgf games/9handicap.sgf 334
 800 restricted_genmove black K1 K2
-#? [K1]
+#? [K1]*
 
 # This is very tricky. Both the dragons G16 and L14 are dead in semeai
 # by themselves, but taking the whole board, they have become critical.
@@ -295,7 +295,7 @@ loadsgf games/9handicap.sgf 334
 # (And H18 played in the game is too ugly for words...)
 loadsgf games/9handicap.sgf 360
 810 reg_genmove black
-#? [F1]
+#? [F1]*
 
 # Black cannot capture both dragons anymore. At least pick one to capture!
 loadsgf games/9handicap.sgf 362

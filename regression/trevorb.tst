@@ -4,7 +4,7 @@
 
 loadsgf games/trevor/auto/b01.sgf 48
 100 reg_genmove white
-#? [B1]*
+#? [B1]
 
 
 loadsgf games/trevor/auto/b01.sgf 56
@@ -29,7 +29,7 @@ loadsgf games/trevor/auto/b02.sgf 46
 
 loadsgf games/trevor/auto/b02.sgf 48
 140 reg_genmove white
-#? [L2|K2]
+#? [L2|K2]*
 
 
 
@@ -107,7 +107,7 @@ loadsgf games/trevor/auto/b16.sgf 10
 
 loadsgf games/trevor/auto/b16.sgf 74
 260 reg_genmove white
-#? [J4]*
+#? [J4]
 
 
 loadsgf games/trevor/auto/b16.sgf 86
@@ -118,7 +118,7 @@ loadsgf games/trevor/auto/b16.sgf 86
 #B4 is a better ko threat than A4
 loadsgf games/trevor/auto/b16.sgf 96
 280 restricted_genmove white A4 B4 A3
-#? [B4]
+#? [B4]*
 
 
 
@@ -129,7 +129,7 @@ loadsgf games/trevor/auto/b16.sgf 96
 #for example, C3, E10, E9
 loadsgf games/trevor/auto/b17.sgf 54
 290 restricted_genmove white E9 E10 E13
-#? [E9|E10]*
+#? [E9|E10]
 
 
 
@@ -216,7 +216,7 @@ loadsgf games/trevor/auto/b28.sgf 28
 
 loadsgf games/trevor/auto/b28.sgf 44
 410 restricted_genmove white H12 J12
-#? [J12]
+#? [J12]*
 
 
 loadsgf games/trevor/auto/b28.sgf 64

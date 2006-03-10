@@ -216,7 +216,7 @@ loadsgf games/trevor/trevor_21.sgf 22
 # Black seems not to see the cut coming.
 loadsgf games/trevor/trevor_22.sgf 23
 220 reg_genmove black
-#? [E8]
+#? [E8]*
 
 # F2 is not really sente, nor useful if it were!
 loadsgf games/trevor/trevor_23.sgf 27

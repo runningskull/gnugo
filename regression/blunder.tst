@@ -75,7 +75,7 @@ loadsgf games/blunder12.sgf 252
 
 loadsgf games/blunder12.sgf 258
 17 reg_genmove white
-#? [R7]
+#? [R7]*
 
 # A simplification of incident 136. Black E6 is a bad blunder.
 loadsgf games/blunder13.sgf

@@ -11,7 +11,7 @@ loadsgf games/viking1.sgf 23
 
 loadsgf games/viking1.sgf 65
 3 reg_genmove white 
-#? [M15|B7]*
+#? [M15|B7]
 
 loadsgf games/viking1.sgf 135
 4 reg_genmove white 

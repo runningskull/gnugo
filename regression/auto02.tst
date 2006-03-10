@@ -26,11 +26,11 @@ loadsgf games/auto_gen/auto009.sgf 94
 
 loadsgf games/auto_gen/auto010.sgf 66
 7 owl_attack Q17
-#? [1 (S15|R15)]*
+#? [1 (S15|R15)]
 
 loadsgf games/auto_gen/auto010.sgf 64
 8 owl_attack Q17
-#? [!0]*
+#? [!0]
 
 loadsgf games/auto_gen/auto010.sgf 77
 9 owl_attack C18

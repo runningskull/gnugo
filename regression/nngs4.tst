@@ -95,7 +95,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 242
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 246
 250 reg_genmove black
-#? [F7]*
+#? [F7]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 258
 260 reg_genmove black
@@ -224,7 +224,7 @@ loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 40
 # New failure (3.3.18)
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 66
 560 restricted_genmove white B13 F7
-#? [B13]
+#? [B13]*
 
 # New failure (3.3.18)
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 86
@@ -384,7 +384,7 @@ loadsgf games/nngs/gnugo-3.5.2gf1-guest-200312260740.sgf 22
 
 loadsgf games/nngs/gnugo-3.5.2gf1-guest-200312260740.sgf 34
 890 reg_genmove white
-#? [!B18]*
+#? [!B18]
 
 loadsgf games/nngs/chuck-gnugo-3.5.2gf1-200312261847.sgf 88
 900 reg_genmove black
@@ -428,7 +428,7 @@ loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 78
 
 loadsgf games/nngs/gnugo-3.5.3-JanErik-200401081615.sgf 10
 990 reg_genmove white
-#? [R16|R15|Q15]*
+#? [R16|R15|Q15]
 
 loadsgf games/nngs/gnugo-3.5.3-JanErik-200401081615.sgf 22
 1000 reg_genmove white
@@ -454,7 +454,7 @@ loadsgf games/nngs/gnugo-3.5.3-JanErik-200401081615.sgf 90
 
 loadsgf games/nngs/ccwills-gnugo-3.5.3-200401100810.sgf 55
 1050 reg_genmove black
-#? [O9|O10]
+#? [O9|O10]*
 
 #O6 is pointless
 loadsgf games/nngs/ccwills-gnugo-3.5.3-200401100810.sgf 73

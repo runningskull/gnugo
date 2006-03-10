@@ -13,7 +13,7 @@ loadsgf games/olympiad2004/19x19/gnu-ind.sgf 65
 # larger moves on the board.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 79
 3 reg_genmove black
-#? [!Q10]*
+#? [!Q10]
 
 # N16 does connect but completely misses the point. GNU Go would win
 # big by just making sure that the thrashing white group in the center

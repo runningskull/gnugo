@@ -87,7 +87,7 @@ loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 96
 
 loadsgf games/kgs/geluba-yagr.sgf 164
 180 reg_genmove black
-#? [C4|C3|D3]*
+#? [C4|C3|D3]
 
 # Only way to control damage: sacrifice the three stones at E3
 loadsgf games/kgs/geluba-yagr.sgf 166
@@ -112,11 +112,11 @@ loadsgf games/kgs/yagr-Sapojnik.sgf 80
 # Win the semeai!
 loadsgf games/kgs/yagr-Kazik.sgf 149
 230 reg_genmove white
-#? [J12|J11|L10|L9|J19]
+#? [J12|J11|L10|L9|J19]*
 
 loadsgf games/kgs/yagr-yudeta.sgf 257
 240 reg_genmove white
-#? [B7]*
+#? [B7]
 
 # This should be a different game, but I don't know which one.
 ## In the game, GNU Go ran on the first line until the very end :((
@@ -190,7 +190,7 @@ loadsgf games/kgs/evand-TheGNUGo.sgf 10
 #N12 is really bad
 loadsgf games/kgs/evand-TheGNUGo.sgf 12
 400 reg_genmove black
-#? [P8|P7|Q13]*
+#? [P8|P7|Q13]
 
 #cut and fight somewhere
 loadsgf games/kgs/evand-TheGNUGo.sgf 20
@@ -250,7 +250,7 @@ loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 34
 # Black has at least the Q6 threat and should fight the ko.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 52
 530 reg_genmove black
-#? [P14]*
+#? [P14]
 
 # The game move A8 is funny. A stone at A5 or A11 would maybe
 # have a chance to influence something around.

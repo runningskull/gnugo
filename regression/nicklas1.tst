@@ -232,7 +232,7 @@ loadsgf games/nicklas/nicklas14.sgf 57
 
 loadsgf games/nicklas/nicklas14.sgf 61
 1408 dragon_status A8
-#? [alive]*
+#? [alive]
 
 loadsgf games/nicklas/nicklas15.sgf 196
 1502 reg_genmove black
@@ -307,7 +307,7 @@ loadsgf games/nicklas/nicklas18.sgf 15
 
 loadsgf games/nicklas/nicklas19.sgf 34
 1901 reg_genmove black
-#? [B7]*
+#? [B7]
 
 loadsgf games/nicklas/nicklas19.sgf 46
 1902 reg_genmove black

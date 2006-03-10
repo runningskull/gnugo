@@ -1,7 +1,7 @@
 # See also reading:173
 loadsgf games/nngs/gnugo-3.3.2-Zahlman-200205221717.sgf 207
 1 reg_genmove white
-#? [B1|A2]*
+#? [B1|A2]
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 22
 10 reg_genmove black

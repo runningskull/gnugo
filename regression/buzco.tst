@@ -14,7 +14,7 @@ loadsgf games/buzco1.sgf 28
 
 loadsgf games/buzco1.sgf 36
 4 reg_genmove black
-#? [D13]
+#? [D13]*
 
 loadsgf games/buzco1.sgf 70
 5 reg_genmove black

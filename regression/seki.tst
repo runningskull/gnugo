@@ -248,7 +248,7 @@ loadsgf games/seki08.sgf
 # B2 leaves white the option to make ko.
 play white B1
 403 reg_genmove black
-#? [C1|C2]
+#? [C1|C2]*
 
 play black C1
 404 reg_genmove white
@@ -357,7 +357,7 @@ loadsgf games/seki12.sgf
 # favor unless white accepts gote.
 play white B2
 803 reg_genmove black
-#? [C2]*
+#? [C2]
 
 # B1 also makes seki but white definitely ends in gote.
 play black C2

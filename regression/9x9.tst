@@ -93,7 +93,7 @@ loadsgf games/nngs/sjfried-gnugo-3.5.2gf1-200312130838.sgf 14
 
 loadsgf games/nngs/sjfried-gnugo-3.5.2gf1-200312130838.sgf 16
 197 reg_genmove black
-#? [E8|H5]*
+#? [E8|H5]
 
 #D4 only move to connect all black stones. /ab
 loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312130817.sgf 14
@@ -256,7 +256,7 @@ loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 6
 # stays on focus. In particular the game move at E7 is not acceptable.
 loadsgf games/kgs/tournament8/GNU-AyaBot.sgf 10
 520 reg_genmove white
-#? [E5|D5|B2|E3|F3|F4]*
+#? [E5|D5|B2|E3|F3|F4]
 
 # F2 needlessly complicated and/or backfires. F3 solid and effective.
 loadsgf games/kgs/tournament8/indigoBot-GNU.sgf 13
@@ -266,13 +266,13 @@ loadsgf games/kgs/tournament8/indigoBot-GNU.sgf 13
 # D8 is too low.
 loadsgf games/kgs/tournament8/CrazyStone-GNU.sgf 5
 540 restricted_genmove black D8 D7
-#? [D7]*
+#? [D7]
 
 # B8 is nonsensical. There might be better moves but C6 is easy to see
 # that it's effective.
 loadsgf games/kgs/tournament8/CrazyStone-GNU.sgf 9
 550 restricted_genmove black B8 C6
-#? [C6]*
+#? [C6]
 
 # C5 leaves too much aji for white to work with in the corner.
 loadsgf games/kgs/tournament8/CrazyStone-GNU.sgf 33
@@ -314,4 +314,4 @@ loadsgf games/kgs/tournament10/GNU-NeuroGo.sgf 68
 
 loadsgf games/9x9-4.sgf 13
 630 reg_genmove black
-#? [J5]
+#? [J5]*

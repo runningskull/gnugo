@@ -95,7 +95,7 @@ loadsgf games/trevor/auto/d02.sgf 78
 
 loadsgf games/trevor/auto/d02.sgf 142
 260 reg_genmove white
-#? [Q2]*
+#? [Q2]
 
 
 loadsgf games/trevor/auto/d02.sgf 142
@@ -402,7 +402,7 @@ loadsgf games/trevor/auto/d32.sgf 198
 # See also owl1:390-392.
 loadsgf games/trevor/auto/d32.sgf 240
 790 reg_genmove white
-#? [P14]
+#? [P14]*
 
 
 loadsgf games/trevor/auto/d32.sgf 244

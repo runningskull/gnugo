@@ -97,7 +97,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 194
 # is urgent. /ab
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 24
 230 reg_genmove black
-#? [E9|G7|H2|K6|N5|D6]*
+#? [E9|G7|H2|K6|N5|D6]
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 30
@@ -815,7 +815,7 @@ loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 12
 #B18 possibly?  !A15
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 50
 1670 reg_genmove black
-#? [C18]*
+#? [C18]
 
 
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 56

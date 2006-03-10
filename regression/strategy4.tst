@@ -14,7 +14,7 @@ loadsgf games/gwe.sgf 241
 
 loadsgf games/strategy36.sgf
 153 reg_genmove black
-#? [Q9]
+#? [Q9]*
 
 loadsgf games/strategy37.sgf
 154 reg_genmove white
@@ -81,7 +81,7 @@ loadsgf games/strategy39.sgf 178
 
 loadsgf games/incident94.sgf 114
 166 reg_genmove white
-#? [D11]
+#? [D11]*
 
 # Tenuki instead of urgent edge joseki move.
 loadsgf games/strategy40.sgf 10
@@ -263,7 +263,7 @@ loadsgf games/bretz.sgf 212
 
 loadsgf games/juka1.sgf 8
 201 reg_genmove black
-#? [D5]*
+#? [D5]
 
 loadsgf games/juka1.sgf 14
 202 reg_genmove black

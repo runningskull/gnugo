@@ -22,7 +22,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 34
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 38
 140 reg_genmove black
-#? [D9]*
+#? [D9]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 44
@@ -195,17 +195,17 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 22
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 24
 470 reg_genmove black
-#? [!J17]*
+#? [!J17]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 32
 480 reg_genmove black
-#? [N14|O14]*
+#? [N14|O14]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 42
 490 reg_genmove black
-#? [P15]
+#? [P15]*
 
 
 #This seems like a bogus problem.
@@ -310,7 +310,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 54
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 56
 710 reg_genmove black
-#? [Q2]
+#? [Q2]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 66
@@ -349,7 +349,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 194
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 16
 780 reg_genmove black
-#? [E17]*
+#? [E17]
 
 
 # FIXME: Test cases 790-860 all need revision to take the semeai in
@@ -467,7 +467,7 @@ loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 160
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 202
 1000 reg_genmove black
-#? [L17]*
+#? [L17]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 216

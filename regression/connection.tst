@@ -462,4 +462,4 @@ loadsgf games/CrazyStone2.sgf 77
 loadsgf games/nngs/evand-gnugo-3.3.21-200306130638.sgf 156
 play black C5
 128 connect C4 C8
-#? [1 B6]
+#? [1 B6]*

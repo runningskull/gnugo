@@ -71,7 +71,7 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 34
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 38
 18 restricted_genmove white J2 K2 L2 H3 J3
-#? [J2]
+#? [J2]*
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 16
 19 reg_genmove white
@@ -83,7 +83,7 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 36
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 40
 21 restricted_genmove white M6 N5
-#? [N5]
+#? [N5]*
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 92
 22 reg_genmove white

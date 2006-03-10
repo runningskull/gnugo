@@ -158,7 +158,7 @@ loadsgf games/gunnar/gunnar9.sgf 1
 # F18 should be a better and bigger way to live than B18.
 loadsgf games/nngs/gnugo-3.3.18-overziel7-200304281000.sgf 110
 30 restricted_genmove white F18 B18
-#? [F18]*
+#? [F18]
 
 # F18 is clearly bigger and better shape than E17.
 loadsgf games/nngs/gnugo-3.3.18-overziel7-200304281000.sgf 120
@@ -419,7 +419,7 @@ loadsgf games/kgs/GNU-higher.sgf 193
 # R2 can't live. Necessary to find a ko threat.
 loadsgf games/kgs/GNU-HISOKA10.sgf 226
 76 restricted_genmove white P1 R2 G17
-#? [G17]*
+#? [G17]
 
 # G8 is biggest by far.
 loadsgf games/kgs/GNU-marfan.sgf 183
@@ -454,7 +454,7 @@ loadsgf games/kgs/sade-GNU.sgf 253
 # M10 is clearly better than N10.
 loadsgf games/kgs/sade-GNU.sgf 265
 83 restricted_genmove black M10 N10
-#? [M10]
+#? [M10]*
 
 # P13 is clearly better than O13.
 loadsgf games/kgs/GNU-bassanio.sgf 164
@@ -491,7 +491,7 @@ loadsgf games/kgs/Kuksa-GNU.sgf 178
 # eventually be lost there's no points to lose in trying.
 loadsgf games/gunnar/gunnar21.sgf
 90 reg_genmove black
-#? [H3]*
+#? [H3]
 
 # Break-in weirdness. P6 does not save the T10 stones.
 loadsgf games/kgs/GNU-roidesnems.sgf 143
@@ -508,7 +508,7 @@ loadsgf games/kgs/GNU-namascae.sgf 102
 # here of course.)
 loadsgf games/kgs/GNU-namascae.sgf 118
 93 restricted_genmove white S5 T13
-#? [T13]*
+#? [T13]
 
 # Necessary to protect against J14 cut. L16 and N15 are ineffective.
 loadsgf games/kgs/GNU-namascae.sgf 118

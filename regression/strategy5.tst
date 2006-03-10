@@ -182,7 +182,7 @@ loadsgf games/CrazyStone1.sgf 34
 # Play the proper move.
 loadsgf games/CrazyStone2.sgf 17
 296 restricted_genmove black F9 G8
-#? [G8]*
+#? [G8]
 
 # D9 is quite bad. (Not played in the game since it's the wrong player
 # but the move of choice for GNU Go 3.6 and 3.7.7.)
@@ -195,7 +195,7 @@ loadsgf games/CrazyStone2.sgf 18
 # is rather generous and can be
 loadsgf games/CrazyStone2.sgf 49
 298 reg_genmove black
-#? [D2|B7]*
+#? [D2|B7]
 
 # Can't play away any more liberties. Start picking the G8 stones off
 # the board immediately so that no more than the A7 stones need be

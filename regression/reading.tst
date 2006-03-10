@@ -934,7 +934,7 @@ popgo
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 96
 trymove white T13
 221 defend Q16
-#? [1 Q14]
+#? [1 Q14]*
 popgo
 
 # See also ninestones:370

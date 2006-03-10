@@ -184,7 +184,7 @@ loadsgf games/endgame10.sgf
 # K5 is best, although in absence of other worthy moves it doesn't matter.
 loadsgf games/endgame11.sgf
 880 reg_genmove white
-#? [K5]
+#? [K5]*
 # T4 is one point in ko, while T5 and S6 are filling dame only.
 890 restricted_genmove white T4 T5 S6
 #? [T4]

@@ -2,7 +2,7 @@
 
 loadsgf games/arion.sgf 33
 1 gg_genmove black 1
-#? [Q6]*
+#? [Q6]
 
 loadsgf games/arion.sgf 63
 2 reg_genmove black
@@ -12,7 +12,7 @@ loadsgf games/arion.sgf 63
 # sounder than a move near P6.
 loadsgf games/arion.sgf 69
 3 restricted_genmove black J3 O6 P7 O5 O7 N6
-#? [J3]*
+#? [J3]
 
 loadsgf games/arion.sgf 139
 4 reg_genmove black

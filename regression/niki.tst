@@ -25,7 +25,7 @@ loadsgf games/niki.sgf 92
 #looks okay. Otherwise we need to fix the owl reading. /gf
 loadsgf games/niki.sgf 94
 5 reg_genmove white
-#? [S9|S10]*
+#? [S9|S10]
 
 loadsgf games/niki.sgf 106
 6 restricted_genmove white S18 P18

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.7.9 released March 10, 2006
+
 - new GTP command advance_random_seed <games>
 - make update_random_seed() deterministic
 - fix assertion failure in semeai()

@@ -50,7 +50,7 @@ loadsgf games/strategy27.sgf 220
 
 loadsgf games/me.sgf 44
 111 reg_genmove black
-#? [K3]*
+#? [K3]
 
 loadsgf games/me.sgf 84
 112 reg_genmove black
@@ -86,7 +86,7 @@ loadsgf games/incident240.sgf 65
 # incident 241
 loadsgf games/incident240.sgf 69
 119 reg_genmove black
-#? [D9|J3]*
+#? [D9|J3]
 
 # incident 221
 loadsgf games/incident221.sgf 35
