@@ -62,6 +62,8 @@
 # b  :  This move is maybe not connected to the goal dragon and should
 #       therefore be included only after closer examination.
 #
+# a  :  This move connects all O stones in the pattern to the goal.
+#
 #################
 #
 # The patterns in this database are sorted into the following
@@ -4222,7 +4224,7 @@ OXO            connect underneath in sente
 .*.
 ---
 
-:|,-,value(90)
+:|,a,value(90)
 
 bAc
 .*.
@@ -5231,7 +5233,7 @@ OX         connect out
 .*
 XO
 
-:8,E,value(90)
+:8,Ea,value(90)
 
 cb
 a*
@@ -5246,7 +5248,7 @@ OX         connect out
 *.
 XO
 
-:8,E,value(89)
+:8,Ea,value(89)
 
 cX
 *a
@@ -5261,7 +5263,7 @@ Pattern D1301
 O*.O
 ....
 
-:8,-,value(90)
+:8,a,value(90)
 
 ?Xc?
 f*ag
@@ -5278,7 +5280,7 @@ Pattern D1301b
 O*.O
 .xo?
 
-:8,-,value(90)
+:8,a,value(90)
 
 ?Xo?
 a*.b
@@ -5295,7 +5297,7 @@ OX?        try to connect out
 .*O
 .??
 
-:8,-,value(80)
+:8,a,value(80)
 
 bX?
 a*c
@@ -5701,7 +5703,7 @@ Pattern D1321
 *.O
 O.O      connect to friendly dragon by bamboo joint
 
-:8,n,value(36)
+:8,na,value(36)
 
 *.b
 a.b
@@ -5715,7 +5717,7 @@ Pattern D1321b
 *.O
 O.O      connect to strong friendly dragon by bamboo joint
 
-:8,n,value(91)
+:8,na,value(91)
 
 *.b
 a.b
@@ -5729,7 +5731,7 @@ Pattern D1322
 .*O
 OXO      connect to friendly dragon by atari
 
-:8,n,value(36)
+:8,na,value(36)
 
 .*b
 aCb
@@ -5777,7 +5779,7 @@ Pattern D1324
 *.O
 O.O      connect by bamboo joint to escape
 
-:8,nE,value(86)
+:8,nEa,value(86)
 
 *.b
 a.b
@@ -5791,7 +5793,7 @@ Pattern D1325
 .*O
 OXO      connect to friendly dragon by atari to escape
 
-:8,nE,value(86)
+:8,nEa,value(86)
 
 .*b
 aCb
@@ -6010,7 +6012,7 @@ OX*O
 ....
 ----
 
-:8,E,value(85)
+:8,Ea,value(85)
 
 obX?
 cX*d
@@ -6144,14 +6146,14 @@ Pattern D1345
 OXO        atari to connect
 .*.
 
-:8,bE,value(85)
+:8,bEa,value(85)
 
 cDe
 a*b
 
 ;lib(D)==2 && lib(c)>1 && lib(e)>1
 ;&& (owl_escape_value(c)>0 || owl_escape_value(e)>0)
-;&& oplay_attack(*,?,a,b,b)
+;&& !oplay_disconnect(*,b,a,c,e)
 
 
 Pattern D1346
@@ -6178,7 +6180,7 @@ XO*
 ...
 ---
 
-:8,-,value(75)
+:8,a,value(75)
 
 OX?
 AO*
@@ -6193,7 +6195,7 @@ Pattern D1348
 O.?	    connect to friendly dragon to escape
 .*O
 
-:8,nE,value(36)
+:8,nEa,value(36)
 
 a.?
 .*b
@@ -6207,7 +6209,7 @@ Pattern D1348b
 O.?	    connect to strong friendly dragon to escape
 .*O
 
-:8,nE,value(90)
+:8,nEa,value(90)
 
 a.?
 .*b
@@ -6221,7 +6223,7 @@ Pattern D1348c
 Oxx	    connect to strong friendly dragon to escape
 .*O
 
-:8,nE,value(90)
+:8,nEa,value(90)
 
 axx
 .*b
@@ -6236,7 +6238,7 @@ O.?	    connect to strong friendly dragon to escape
 .*.
 ?.O
 
-:8,nE,value(90)
+:8,nEa,value(90)
 
 a.?
 .*.
@@ -6279,7 +6281,7 @@ Pattern D1352
 O.OX          escape or threaten to
 ..*O
 
-:8,-,value(80)
+:8,a,value(80)
 
 ObaX
 dc*O
@@ -6409,7 +6411,7 @@ Pattern D1358
 O..?         connect to escape
 O.*O
 
-:8,E,value(61)
+:8,Ea,value(61)
 
 bde?
 bc*a
@@ -6697,7 +6699,7 @@ OoX?
 x.*O
 ----
 
-:8,E,value(75)
+:8,Ea,value(75)
 
 bdE?
 xc*a
@@ -6787,7 +6789,7 @@ Pattern D1381
 O*.
 ?XO
 
-:8,E,value(70)
+:8,Ea,value(70)
 
 O*a
 ?CB
@@ -6803,7 +6805,7 @@ Pattern D1382
 *X
 O.
 
-:8,E,value(70)
+:8,Ea,value(70)
 
 cA
 *d
@@ -6946,13 +6948,14 @@ OX*X
 
 Pattern D1389
 # gf New pattern. (3.3.18)
+# gf Added a classification. (3.7.10)
 # See also D1340.
 
 OX.O
 ?*.?
 ----
 
-:8,E,value(84)
+:8,Ea,value(84)
 
 aX.b
 ?*.?
@@ -6990,7 +6993,7 @@ Pattern D1391
 .O*O 	    connect out
 OX??
 
-:8,-,value(80)
+:8,a,value(80)
 
 bO*a
 dC??
@@ -7038,7 +7041,7 @@ Pattern D1394
 O.O*	    connect out!
 ??XO
 
-:8,B,value(70)
+:8,a,value(70)
 
 A.O*
 ??XB

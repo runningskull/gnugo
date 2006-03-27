@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new enum same_dragon_value in owl.c
+- new owl_defendpats.db classification "a" for patterns connecting all
+  friendly stones to the goal
+- owl tuning
+
 3.7.9 released March 10, 2006
 
 - new GTP command advance_random_seed <games>

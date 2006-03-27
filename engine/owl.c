@@ -118,15 +118,27 @@ static int owl_goal_worm[MAX_GOAL_WORMS];
 
 #define MAX_CUTS 5
 
+enum same_dragon_value {
+  SAME_DRAGON_NOT_CONNECTED,
+  SAME_DRAGON_MAYBE_CONNECTED,
+  SAME_DRAGON_CONNECTED,
+  SAME_DRAGON_ALL_CONNECTED
+};
+
+struct matched_pattern_data;
+
 struct owl_move_data {
   int pos;          /* move coordinate */
   int value;        /* value */
   const char *name; /* name of the pattern suggesting the move */
-  int same_dragon;  /* whether the move extends the dragon or not */
+  /* whether the move extends the dragon or not */
+  enum same_dragon_value same_dragon;
   int lunch;	    /* Position of a lunch, if applicable.*/
   int escape;       /* true if an escape pattern is matched */
   int defense_pos;  /* defense coordinate for vital owl attack patterns. */
   int cuts[MAX_CUTS]; /* strings of the goal that might get cut off */
+  /* pointer to pattern data, used for SAME_DRAGON_ALL_CONNECTED */
+  struct matched_pattern_data *pattern_data;
 };
 
 #define USE_BDIST 1
@@ -187,8 +199,10 @@ static void owl_shapes_callback(int anchor, int color,
 				struct pattern *pattern_db,
 				int ll, void *data);
 static void owl_add_move(struct owl_move_data *moves, int move, int value,
-			 const char *reason, int same_dragon, int lunch,
-			 int escape, int defense_pos, int max_moves);
+			 const char *reason,
+			 enum same_dragon_value same_dragon, int lunch,
+			 int escape, int defense_pos, int max_moves,
+			 struct matched_pattern_data *pattern_data);
 static void owl_determine_life(struct local_owl_data *owl,
 			       struct local_owl_data *second_owl,
 			       int does_attack,
@@ -216,8 +230,10 @@ static void owl_mark_dragon(int apos, int bpos,
 static void owl_mark_worm(int apos, int bpos,
 			  struct local_owl_data *owl);
 static void owl_mark_boundary(struct local_owl_data *owl);
-static void owl_update_goal(int pos, int same_dragon, int lunch,
-			    struct local_owl_data *owl, int semeai_call);
+static void owl_update_goal(int pos, enum same_dragon_value same_dragon,
+			    int lunch, struct local_owl_data *owl,
+			    int semeai_call,
+			    struct matched_pattern_data *pattern_data);
 static void owl_test_cuts(signed char goal[BOARDMAX], int color,
 		          int cuts[MAX_CUTS]);
 static void componentdump(const signed char component[BOARDMAX]);
@@ -246,8 +262,9 @@ static int semeai_trymove_and_recurse(int apos, int bpos,
 				      int owl_phase,
 				      int move, int color, int ko_allowed,
 				      int move_value, const char *move_name,
-				      int same_dragon, int lunch,
-				      int *semeai_move,
+				      enum same_dragon_value same_dragon,
+				      struct matched_pattern_data *pattern_data,
+				      int lunch, int *semeai_move,
 				      int *this_resulta, int *this_resultb);
 static void semeai_add_sgf_comment(int value, int owl_phase);
 static int semeai_trust_tactical_attack(int str);
@@ -556,7 +573,8 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
 			  resulta, resultb, semeai_move, 0, owl);
   else {
     semeai_trymove_and_recurse(bpos, apos, owlb, owla, owl,
-			       move, color, 1, 0, "mandatory move", 1, NO_MOVE,
+			       move, color, 1, 0, "mandatory move",
+			       SAME_DRAGON_MAYBE_CONNECTED, NULL, NO_MOVE,
 			       semeai_move, resultb, resulta);
     *resulta = REVERSE_RESULT(*resulta);
     *resultb = REVERSE_RESULT(*resultb);
@@ -703,7 +721,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     moves[k].pos = 0;
     moves[k].value = -1;
     moves[k].name = NULL;
-    moves[k].same_dragon = 2;
+    moves[k].same_dragon = SAME_DRAGON_CONNECTED;
     moves[k].lunch = NO_MOVE;
     clear_cut_list(moves[k].cuts);
   }
@@ -742,14 +760,16 @@ do_owl_analyze_semeai(int apos, int bpos,
 	else if (acode != 0
 		 && find_defense(semeai_worms[sworm], NULL)) {
 	  critical_semeai_worms[sworm] = 1;
-	  owl_add_move(moves, upos, 105, "attack semeai worm", 1,
-		       NO_MOVE, 0, NO_MOVE, MAX_SEMEAI_MOVES);
+	  owl_add_move(moves, upos, 105, "attack semeai worm",
+		       SAME_DRAGON_MAYBE_CONNECTED,
+		       NO_MOVE, 0, NO_MOVE, MAX_SEMEAI_MOVES, NULL);
 	  TRACE("Added %1m %d (-1)\n", upos, 105);
 	}
 	else if (acode == WIN
 		 && important_semeai_worms[sworm]) {
-	  owl_add_move(moves, upos, 100, "attack semeai worm", 1,
-		       NO_MOVE, 0, NO_MOVE, MAX_SEMEAI_MOVES);
+	  owl_add_move(moves, upos, 100, "attack semeai worm",
+		       SAME_DRAGON_MAYBE_CONNECTED,
+		       NO_MOVE, 0, NO_MOVE, MAX_SEMEAI_MOVES, NULL);
 	  TRACE("Added %1m %d (-1)\n", upos, 100);
 	}
       }
@@ -767,8 +787,9 @@ do_owl_analyze_semeai(int apos, int bpos,
 	if (attack(semeai_worms[sworm], NULL)
 	    && find_defense(semeai_worms[sworm], &upos)) {
 	  critical_semeai_worms[sworm] = 1;
-	  owl_add_move(moves, upos, 85, "defend semeai worm", 1, NO_MOVE,
-	      	       0, NO_MOVE, MAX_SEMEAI_MOVES);
+	  owl_add_move(moves, upos, 85, "defend semeai worm",
+		       SAME_DRAGON_MAYBE_CONNECTED, NO_MOVE,
+	      	       0, NO_MOVE, MAX_SEMEAI_MOVES, NULL);
 	  TRACE("Added %1m %d (0)\n", upos, 85);
 	}
       }
@@ -1006,8 +1027,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 				     owla, owlb, 50,
 				     critical_semeai_worms);
       owl_add_move(moves, outside_liberty.pos, move_value,
-		   "safe outside liberty", 0, NO_MOVE, 0, NO_MOVE,
-		   MAX_SEMEAI_MOVES);
+		   "safe outside liberty", SAME_DRAGON_NOT_CONNECTED,
+		   NO_MOVE, 0, NO_MOVE, MAX_SEMEAI_MOVES, NULL);
       riskless_move_found = 1;
       TRACE("Added %1m %d (5)\n", outside_liberty.pos, move_value);
     }
@@ -1016,8 +1037,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 				     owla, owlb, 50,
 				     critical_semeai_worms);
       owl_add_move(moves, backfill_outside_liberty.pos, move_value,
-		   "backfilling move", 0, NO_MOVE, 0,
-		   NO_MOVE, MAX_SEMEAI_MOVES);
+		   "backfilling move", SAME_DRAGON_NOT_CONNECTED, NO_MOVE, 0,
+		   NO_MOVE, MAX_SEMEAI_MOVES, NULL);
       riskless_move_found = 1;
       TRACE("Added %1m %d (6)\n", backfill_outside_liberty.pos, move_value);
     }
@@ -1027,8 +1048,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 				     owla, owlb, 10,
 				     critical_semeai_worms);
       owl_add_move(moves, common_liberty.pos, move_value,
-		   "safe common liberty", 1, NO_MOVE, 0,
-		   NO_MOVE, MAX_SEMEAI_MOVES);
+		   "safe common liberty", SAME_DRAGON_MAYBE_CONNECTED,
+		   NO_MOVE, 0, NO_MOVE, MAX_SEMEAI_MOVES, NULL);
       if (semeai_is_riskless_move(common_liberty.pos, owla))
 	riskless_move_found = 1;
       TRACE("Added %1m %d (7)\n", common_liberty.pos, move_value);
@@ -1038,8 +1059,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 				     owla, owlb, 10,
 				     critical_semeai_worms);
       owl_add_move(moves, backfill_common_liberty.pos, move_value,
-		   "backfilling move", 0, NO_MOVE, 0,
-		   NO_MOVE, MAX_SEMEAI_MOVES);
+		   "backfilling move", SAME_DRAGON_NOT_CONNECTED, NO_MOVE, 0,
+		   NO_MOVE, MAX_SEMEAI_MOVES, NULL);
       if (semeai_is_riskless_move(backfill_common_liberty.pos, owla))
 	riskless_move_found = 1;
       TRACE("Added %1m %d (6)\n", backfill_common_liberty.pos, move_value);
@@ -1054,8 +1075,9 @@ do_owl_analyze_semeai(int apos, int bpos,
       int move = semeai_propose_eyespace_filling_move(owla, owlb);
 
       if (move) {
-	owl_add_move(moves, move, 70, "eyespace filling", 0, NO_MOVE,
-	    	     0, NO_MOVE, MAX_SEMEAI_MOVES);
+	owl_add_move(moves, move, 70, "eyespace filling",
+		     SAME_DRAGON_NOT_CONNECTED, NO_MOVE,
+	    	     0, NO_MOVE, MAX_SEMEAI_MOVES, NULL);
       }
     }
 
@@ -1097,8 +1119,9 @@ do_owl_analyze_semeai(int apos, int bpos,
 				   owl_phase, mpos, color,
 				   best_resulta == 0 || best_resultb == 0,
 				   moves[k].value, moves[k].name,
-				   moves[k].same_dragon, moves[k].lunch,
-				   NULL, &this_resulta, &this_resultb)) {
+				   moves[k].same_dragon, moves[k].pattern_data,
+				   moves[k].lunch, NULL,
+				   &this_resulta, &this_resultb)) {
       tested_moves++;
       if (this_resultb == WIN && this_resulta == WIN) {
 	/* Ideal result, no need to try any more moves. */
@@ -1249,7 +1272,9 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
 			   int owl_phase,
 			   int move, int color, int ko_allowed,
 			   int move_value, const char *move_name,
-			   int same_dragon, int lunch, int *semeai_move,
+			   enum same_dragon_value same_dragon,
+			   struct matched_pattern_data *pattern_data,
+			   int lunch, int *semeai_move,
 			   int *this_resulta, int *this_resultb)
 {
   int ko_move = 0;
@@ -1275,11 +1300,11 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
   push_owl(&owlb);
 
   if (owla->color == color) {
-    owl_update_goal(move, same_dragon, lunch, owla, 1);
+    owl_update_goal(move, same_dragon, lunch, owla, 1, pattern_data);
     owl_update_boundary_marks(move, owlb);
   }
   else {
-    owl_update_goal(move, same_dragon, lunch, owlb, 1);
+    owl_update_goal(move, same_dragon, lunch, owlb, 1, pattern_data);
     owl_update_boundary_marks(move, owla);
   }
   mark_goal_in_sgf(owla->goal);
@@ -1418,7 +1443,8 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
 {
   int move;
   int move_value;
-  int same_dragon;
+  enum same_dragon_value same_dragon;
+  struct matched_pattern_data *pattern_data = NULL;
   int k;
   
   for (k = 0; k < MAX_MOVES-1; k++) {
@@ -1444,12 +1470,14 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
     if (guess_same_dragon) {
       if (liberty_of_goal(move, owla)
 	  || second_liberty_of_goal(move, owla))
-	same_dragon = 1;
+	same_dragon = SAME_DRAGON_MAYBE_CONNECTED;
       else
-	same_dragon = 0;
+	same_dragon = SAME_DRAGON_NOT_CONNECTED;
     }
-    else
+    else {
       same_dragon = owl_moves[k].same_dragon;
+      pattern_data = owl_moves[k].pattern_data;
+    }
 
     mw[move] = 1;
     move_value = (semeai_move_value(move, owla, owlb, owl_moves[k].value,
@@ -1457,7 +1485,7 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
 		  + value_bonus);
     owl_add_move(semeai_moves, move, move_value, owl_moves[k].name, 
 		 same_dragon, NO_MOVE, owl_moves[k].escape,
-		 NO_MOVE, MAX_SEMEAI_MOVES);
+		 NO_MOVE, MAX_SEMEAI_MOVES, pattern_data);
     TRACE("Added %1m %d\n", move, move_value);
   }
 }
@@ -1703,9 +1731,10 @@ clear_owl_move_data(struct owl_move_data moves[MAX_MOVES])
     moves[k].pos = NO_MOVE;
     moves[k].value = -1;
     moves[k].name = NULL;
-    moves[k].same_dragon = 2;
+    moves[k].same_dragon = SAME_DRAGON_CONNECTED;
     moves[k].escape = 0;
     moves[k].lunch = NO_MOVE;
+    moves[k].pattern_data = NULL;
     clear_cut_list(moves[k].cuts);
   }
 }
@@ -1714,14 +1743,15 @@ static void
 set_single_owl_move(struct owl_move_data moves[MAX_MOVES],
     		    int pos, const char *name)
 {
-  moves[0].pos         = pos;
-  moves[0].value       = 25;
-  moves[0].name        = name;
-  moves[0].same_dragon = 1;
-  moves[0].escape      = 0;
-  moves[0].lunch       = NO_MOVE;
+  moves[0].pos          = pos;
+  moves[0].value        = 25;
+  moves[0].name         = name;
+  moves[0].same_dragon  = SAME_DRAGON_MAYBE_CONNECTED;
+  moves[0].escape       = 0;
+  moves[0].lunch        = NO_MOVE;
+  moves[0].pattern_data = NULL;
   clear_cut_list(moves[0].cuts);
-  moves[1].value       = 0;
+  moves[1].value        = 0;
 }
 
 
@@ -2716,7 +2746,8 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
       /* Add the stone just played to the goal dragon, unless the
        * pattern explicitly asked for not doing this.
        */
-      owl_update_goal(mpos, moves[k].same_dragon, moves[k].lunch, owl, 0);
+      owl_update_goal(mpos, moves[k].same_dragon, moves[k].lunch, owl, 0,
+		      moves[k].pattern_data);
       mark_goal_in_sgf(owl->goal);
 
       if (!ko_move) {
@@ -2832,7 +2863,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
 	if (trymove(moves[k].pos, color, moves[k].name, target)) {
 	  owl->lunches_are_current = 0;
 	  owl_update_goal(moves[k].pos, moves[k].same_dragon,
-	      		  moves[k].lunch, owl, 0);
+	      		  moves[k].lunch, owl, 0, moves[k].pattern_data);
 	  if (do_owl_defend(target, &move2, NULL, owl, 0) == WIN) {
 	    move = moves[k].pos;
 	    popgo();
@@ -2947,8 +2978,8 @@ owl_estimate_life(struct local_owl_data *owl,
      * Let's try to defend against it.
      */
     owl_add_move(vital_moves, dummy_moves[0].defense_pos,
-		 dummy_moves[0].value, dummy_moves[0].name, 2, NO_MOVE,
-		 0, NO_MOVE, MAX_MOVES);
+		 dummy_moves[0].value, dummy_moves[0].name,
+		 SAME_DRAGON_CONNECTED, NO_MOVE, 0, NO_MOVE, MAX_MOVES, NULL);
   }
 
   return 0;
@@ -3161,8 +3192,9 @@ owl_determine_life(struct local_owl_data *owl,
 		  attack_point);
 
 	  if (attack_point != NO_MOVE) {
-	    owl_add_move(moves, attack_point, value, reason, 1, NO_MOVE,
-			 0, NO_MOVE, MAX_MOVES);
+	    owl_add_move(moves, attack_point, value, reason,
+			 SAME_DRAGON_MAYBE_CONNECTED, NO_MOVE,
+			 0, NO_MOVE, MAX_MOVES, NULL);
 	    vital_values[attack_point] = value;
 	    eyes_attack_points[num_eyes] = attack_point;
 	  }
@@ -3216,8 +3248,9 @@ owl_determine_life(struct local_owl_data *owl,
 		  defense_point);
 
 	  if (defense_point != NO_MOVE) {
-	    owl_add_move(moves, defense_point, value, reason, 1, NO_MOVE,
-			 0, NO_MOVE, MAX_MOVES);
+	    owl_add_move(moves, defense_point, value, reason,
+			 SAME_DRAGON_MAYBE_CONNECTED, NO_MOVE,
+			 0, NO_MOVE, MAX_MOVES, NULL);
 	    vital_values[defense_point] = value;
 	  }
 	}
@@ -3291,7 +3324,8 @@ owl_determine_life(struct local_owl_data *owl,
 		owl->lunch[lunch], defense_point, value,
 		lunch_probable, lunch_max);
 	  owl_add_move(moves, defense_point, value,
-	      	       "save lunch", 1, NO_MOVE, 0, NO_MOVE, MAX_MOVES);
+	      	       "save lunch", SAME_DRAGON_MAYBE_CONNECTED,
+		       NO_MOVE, 0, NO_MOVE, MAX_MOVES, NULL);
 	}
 	else {
 	  attack_point = improve_lunch_attack(owl->lunch[lunch],
@@ -3307,10 +3341,12 @@ owl_determine_life(struct local_owl_data *owl,
 	  if (owl->lunch_attack_code[lunch] ==  WIN
 	      || is_illegal_ko_capture(attack_point, owl->color))
 	    owl_add_move(moves, attack_point, value, "eat lunch",
-			 1, owl->lunch[lunch], 0, NO_MOVE, MAX_MOVES);
+			 SAME_DRAGON_MAYBE_CONNECTED, owl->lunch[lunch],
+			 0, NO_MOVE, MAX_MOVES, NULL);
 	  else
 	    owl_add_move(moves, attack_point, value, "eat lunch",
-			 1, NO_MOVE, 0, NO_MOVE, MAX_MOVES);
+			 SAME_DRAGON_MAYBE_CONNECTED, NO_MOVE, 0, NO_MOVE,
+			 MAX_MOVES, NULL);
 	  num_lunches++;
 	  eyevalue_list[num_eyes++] = e;
 	}
@@ -4162,6 +4198,7 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 
   while (list->heap_num_patterns > 0) {
     int k;
+    struct matched_pattern_data *pattern_data;
     struct pattern *pattern;
     int move;
     int value;
@@ -4173,6 +4210,7 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
     if (list->pattern_heap[0]->value < cutoff)
       break;
 
+    pattern_data = list->pattern_heap[0];
     pattern = list->pattern_heap[0]->pattern;
     move    = list->pattern_heap[0]->move;
     value   = list->pattern_heap[0]->value;
@@ -4240,16 +4278,22 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 	}
 
 	if (pattern->class & CLASS_B)
-	  moves[k].same_dragon = 0;
-	else if (pattern->class & CLASS_b) {
+	  moves[k].same_dragon = SAME_DRAGON_NOT_CONNECTED;
+	else if (pattern->class & CLASS_a) {
+	  moves[k].same_dragon = SAME_DRAGON_ALL_CONNECTED;
+	  moves[k].pattern_data = pattern_data;
+	}
+	else if (!(pattern->class & CLASS_b))
+	  moves[k].same_dragon = SAME_DRAGON_CONNECTED;
+	else {
 	  int i;
-	  int same_dragon = 1;
+	  enum same_dragon_value same_dragon = SAME_DRAGON_MAYBE_CONNECTED;
 
 	  /* If we do not yet know whether the move belongs to the
 	   * same dragon, we see whether another pattern can clarify.
 	   */
 	  for (i = 0; i < list->heap_num_patterns; i++) {
-	    struct matched_pattern_data *pattern_data = list->pattern_heap[i];
+	    pattern_data = list->pattern_heap[i];
 
 	    if (pattern_data->pattern
 		&& pattern_data->move == move
@@ -4260,9 +4304,13 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 		TRACE("Additionally pattern %s found at %1m\n",
 		      pattern_data->pattern->name, move);
 		if (pattern_data->pattern->class & CLASS_B)
-		  same_dragon = 0;
+		  same_dragon = SAME_DRAGON_NOT_CONNECTED;
+		else if (pattern_data->pattern->class & CLASS_a) {
+		  same_dragon = SAME_DRAGON_ALL_CONNECTED;
+		  moves[k].pattern_data = pattern_data;
+		}
 		else
-		  same_dragon = 2;
+		  same_dragon = SAME_DRAGON_CONNECTED;
 
 		break;
 	      }
@@ -4271,8 +4319,6 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 
 	  moves[k].same_dragon = same_dragon;
 	}
-	else
-	  moves[k].same_dragon = 2;
       }
       else {
 	moves[k].name = "Pattern combination";
@@ -4287,9 +4333,13 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 	 *	  chain didn't match, this will not work at all.
 	 */
 	if (pattern && pattern->class & CLASS_B)
-	  moves[k].same_dragon = 0;
+	  moves[k].same_dragon = SAME_DRAGON_NOT_CONNECTED;
+	else if (pattern && pattern->class & CLASS_a) {
+	  moves[k].same_dragon = SAME_DRAGON_ALL_CONNECTED;
+	  moves[k].pattern_data = list->pattern_heap[0];
+	}
 	else
-	  moves[k].same_dragon = 2;
+	  moves[k].same_dragon = SAME_DRAGON_CONNECTED;
       }
 
       if (pattern && pattern->class & CLASS_E)
@@ -4338,7 +4388,7 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
   int tval;  /* trial move and its value */
   int move;
   struct owl_move_data *moves = data; /* considered moves passed as data */
-  int same_dragon = 1;
+  enum same_dragon_value same_dragon = SAME_DRAGON_MAYBE_CONNECTED;
   int escape = 0;
   int defense_pos;
 
@@ -4395,11 +4445,23 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
   TRACE("Pattern %s found at %1m with value %d\n", pattern->name, move, tval);
 
   if (pattern->class & CLASS_B)
-    same_dragon = 0;
+    same_dragon = SAME_DRAGON_NOT_CONNECTED;
   else if (pattern->class & CLASS_b)
-    same_dragon = 1;
+    same_dragon = SAME_DRAGON_MAYBE_CONNECTED;
+  else if (pattern->class & CLASS_a) {
+    same_dragon = SAME_DRAGON_ALL_CONNECTED;
+    /* FIXME: Currently this code is only used with vital attack
+     * moves, so there is no use for the "a" classification. If it
+     * would be needed in the future it's necessary to set up a struct
+     * matched_pattern_data here to be passed to owl_add_move(). This
+     * is not all that simple with respect to memory management
+     * however. Notice that a local variable in this function would go
+     * out of scope too early.
+     */
+    gg_assert(0);
+  }
   else
-    same_dragon = 2;
+    same_dragon = SAME_DRAGON_CONNECTED;
 
   if (pattern->class & CLASS_E)
     escape = 1;
@@ -4416,7 +4478,7 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
   }
   
   owl_add_move(moves, move, tval, pattern->name, same_dragon, NO_MOVE,
-      	       escape, defense_pos, MAX_MOVES);
+      	       escape, defense_pos, MAX_MOVES, NULL);
 }
 
 
@@ -4424,8 +4486,9 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
 
 static void
 owl_add_move(struct owl_move_data *moves, int move, int value,
-	     const char *reason, int same_dragon, int lunch,
-	     int escape, int defense_pos, int max_moves)
+	     const char *reason, enum same_dragon_value same_dragon, int lunch,
+	     int escape, int defense_pos, int max_moves,
+	     struct matched_pattern_data *pattern_data)
 {
   int k;
 
@@ -4443,8 +4506,10 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
     if (moves[k].value == -1)
       break;
     if (moves[k].pos == move) {
-      if (same_dragon > moves[k].same_dragon)
+      if (same_dragon > moves[k].same_dragon) {
 	moves[k].same_dragon = same_dragon;
+	moves[k].pattern_data = pattern_data;
+      }
       if (!moves[k].escape)
 	escape = 0;
       break;
@@ -4471,6 +4536,7 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
          * dragon under consideration.
 	 */
 	moves[k].same_dragon = same_dragon;
+	moves[k].pattern_data = pattern_data;
 	moves[k].lunch = lunch;
 	moves[k].escape = escape;
 	moves[k].defense_pos = defense_pos;
@@ -4661,14 +4727,21 @@ owl_mark_boundary(struct local_owl_data *owl)
 }
 
 /* Add the stone just played to the goal dragon if same_dragon is
- * 2. We also add all stones belonging to the same generalized string
- * to the goal. If same_dragon is 1, we only add the stones if at
- * least one stone of the generalized string already was part of the
- * goal. If same_dragon is 0, we don't add any stones at all.
+ * SAME_DRAGON_CONNECTED. We also add all stones belonging to the same
+ * generalized string to the goal. If same_dragon is
+ * SAME_DRAGON_MAYBE_CONNECTED, we only add the stones if at least one
+ * stone of the generalized string already was part of the goal. If
+ * same_dragon is SAME_DRAGON_NOT_CONNECTED, we don't add any stones
+ * at all.
+ *
+ * The SAME_DRAGON_ALL_CONNECTED case is like SAME_DRAGON_CONNECTED
+ * but additionally all other own stones in the pattern suggesting the
+ * move are also added to the goal.
  */
 static void
-owl_update_goal(int pos, int same_dragon, int lunch,
-    		struct local_owl_data *owl, int semeai_call)
+owl_update_goal(int pos, enum same_dragon_value same_dragon, int lunch,
+    		struct local_owl_data *owl, int semeai_call,
+		struct matched_pattern_data *pattern_data)
 {
   int stones[MAX_BOARD * MAX_BOARD];
   int num_stones;
@@ -4682,7 +4755,7 @@ owl_update_goal(int pos, int same_dragon, int lunch,
   sgf_dumptree = NULL;
   count_variations = 0;
   
-  if (same_dragon == 0)
+  if (same_dragon == SAME_DRAGON_NOT_CONNECTED)
     num_stones = findstones(pos, MAX_BOARD*MAX_BOARD, stones);
   else if (semeai_call)
     find_superstring_conservative(pos, &num_stones, stones);
@@ -4696,7 +4769,7 @@ owl_update_goal(int pos, int same_dragon, int lunch,
   /* If same_dragon field is 1, only add if the played stone
    * clearly is in contact with the goal dragon.
    */
-  if (same_dragon <= 1) {
+  if (same_dragon <= SAME_DRAGON_MAYBE_CONNECTED) {
     do_add = 0;
     for (k = 0; k < num_stones; k++)
       if (owl->goal[stones[k]] != 0) {
@@ -4727,6 +4800,31 @@ owl_update_goal(int pos, int same_dragon, int lunch,
 	mark_string(adjs[k], owl->goal, 2);
 	mark_string(adjs[k], owl->cumulative_goal, 2);
       }
+  }
+
+  /* Now we handle the SAME_DRAGON_ALL_CONNECTED case. The move has
+   * already been added to the goal above, so it remains to find all
+   * other friendly stones in the pattern and add them too. We do that
+   * by a recursive call to this function in SAME_DRAGON_CONNECTED mode.
+   * This is maybe not the most elegant technique, however.
+   */
+  if (same_dragon == SAME_DRAGON_ALL_CONNECTED) {
+    gg_assert(pattern_data != NULL);
+    for (k = 0; k < pattern_data->pattern->patlen; k++) {
+      int pos2;
+      
+      /* all the following stuff (currently) applies only at occupied cells */
+      if (pattern_data->pattern->patn[k].att != ATT_O)
+	continue;
+      
+      /* transform pattern real coordinate */
+      pos2 = AFFINE_TRANSFORM(pattern_data->pattern->patn[k].offset,
+			      pattern_data->ll, pattern_data->anchor);
+
+      if (!owl->goal[pos2])
+	owl_update_goal(pos2, SAME_DRAGON_CONNECTED, NO_MOVE, owl, semeai_call,
+			pattern_data);
+    }
   }
 
   if (1 && verbose)
@@ -5501,7 +5599,7 @@ owl_connection_defends(int move, int target1, int target2)
   init_owl(&owl, target1, target2, NO_MOVE, 1, NULL);
 
   if (trymove(move, color, "owl_connection_defends", target1)) {
-    owl_update_goal(move, 1, NO_MOVE, owl, 0);
+    owl_update_goal(move, SAME_DRAGON_MAYBE_CONNECTED, NO_MOVE, owl, 0, NULL);
     if (!do_owl_attack(move, NULL, NULL, owl, 0))
       result = WIN;
     owl->lunches_are_current = 0;
@@ -6669,7 +6767,7 @@ init_owl(struct local_owl_data **owl, int target1, int target2, int move,
   (*owl)->lunches_are_current = 0;
   owl_mark_dragon(target1, target2, *owl, new_dragons);
   if (move != NO_MOVE)
-    owl_update_goal(move, 1, NO_MOVE, *owl, 0);
+    owl_update_goal(move, SAME_DRAGON_MAYBE_CONNECTED, NO_MOVE, *owl, 0, NULL);
   compute_owl_escape_values(*owl);
 }
 

@@ -199,7 +199,7 @@ loadsgf games/boardspace/GNUGo-GoFigure0.1-200503171816.sgf 17
 
 loadsgf games/boardspace/GNUGo-GoFigure0.1-200503171816.sgf 35
 400 reg_genmove black
-#? [A5]*
+#? [A5|B3]*
 
 loadsgf games/boardspace/GNUGo-GoFigure0.1-200503181316.sgf 11
 410 reg_genmove black
