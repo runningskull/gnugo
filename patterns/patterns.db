@@ -3415,6 +3415,7 @@ Pattern EB4
 
 
 Pattern EB5
+# gf Constraint added. See gunnar:86. (3.7.10)
 
 ??..X?            long slide
 oO....
@@ -3423,6 +3424,14 @@ oO....
 ------
 
 :8,OXed
+
+??..X?
+oca...
+..b.*.
+......
+------
+
+;!oplay_disconnect(*,a,b,*,c)
 
 
 Pattern EB6
@@ -5225,6 +5234,27 @@ X*a.
 ----
 
 ; !xplay_attack_either(*,a,b,*,b)
+
+
+Pattern EB712b
+# gf New pattern. (3.7.10)
+# Probably bigger reverse followup in reality
+# See trevora:340 and trevorb:370.
+
+?*O..          block on top
+OXO..
+.X...
+-----
+
+:8,Xe,reverse_followup(6)
+
+?*d..
+eXdb.
+.Xca.
+-----
+
+;alive(d) && !xplay_attack_either(c,a,b,c,b) && oplay_attack(*,c,c)
+;&& !oplay_connect(c,*,d,e)
 
 
 Pattern EB713
@@ -11160,25 +11190,26 @@ cEa.
 >test_attack_either_move(D,E);
 
 
-Pattern CD41
-
-?o?     don't double atari if it backfires
-?..
-.OX
-OX*
-?.?
-
-:8,-
-
-?o?
-?.b
-ceX
-dX*
-?a?
-
-;!oplay_defend_both(*,a,b,c,d,e)
-
->antisuji(*);
+# Pattern CD41
+# # gf Too general, removed. See gunnar:87. (3.7.10)
+# 
+# ?o?     don't double atari if it backfires
+# ?..
+# .OX
+# OX*
+# ?.?
+# 
+# :8,-
+# 
+# ?o?
+# ?.b
+# ceX
+# dX*
+# ?a?
+# 
+# ;!oplay_defend_both(*,a,b,c,d,e)
+# 
+# >antisuji(*);
 
 
 Pattern CD43
@@ -14417,22 +14448,23 @@ Pattern RE3
 > replace(a,*)
 
 
-Pattern RE4
-# tm New Pattern (3.1.17)
-
-?O.|	push before blocking
-*XX|
-OO.|
-
-:8,-
-
-?O.|
-*BX|
-OOa|
-
-; oplay_attack(*,a,B)
-
-> replace(a,*)
+# Pattern RE4
+# # tm New Pattern (3.1.17)
+# # gf This is too general as gunnar:95 shows. Removed. (3.7.10)
+# 
+# ?O.|	push before blocking
+# *XX|
+# OO.|
+# 
+# :8,-
+# 
+# ?O.|
+# *BX|
+# OOa|
+# 
+# ; oplay_attack(*,a,B)
+# 
+# > replace(a,*)
 
 
 Pattern RE5

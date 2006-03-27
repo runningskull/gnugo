@@ -3066,16 +3066,17 @@ oOX
 
 Pattern Sente13e
 # gf New pattern. (3.7.4)
+# gf Removed O classification and revised constraint. (3.7.10)
 
 *.O
 ?O?
 
-:8,sO
+:8,s
 
 *ba
 ?O?
 
-;lib(a) == 2 && !attack(a) && olib(b) > 2 && safe_omove(*)
+;alive(a) && lib(a) == 2 && !attack(a) && olib(b) > 2 && safe_omove(*)
 ;&& safe_xmove(b) && oplay_attack(*,b,b)==WIN
 # Action adds a reverse followup value.
 >defend_against_atari(a)

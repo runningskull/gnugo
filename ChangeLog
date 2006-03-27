@@ -6,6 +6,8 @@
 - new owl_defendpats.db classification "a" for patterns connecting all
   friendly stones to the goal
 - owl tuning
+- influence tuning
+- tuning
 
 3.7.9 released March 10, 2006
 

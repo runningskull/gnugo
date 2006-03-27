@@ -2266,6 +2266,27 @@ cDO
 >return !safe_xmove(a) && !oplay_defend_both(c,b,a,b,D);
 
 
+Pattern Intrusion63
+# gf New pattern. (3.7.10)
+# Try to discourage unreasonable hane. See gunnar:85.
+
+.oOO?
+.OX.X
+.QX..
+.X..!
+-----
+
+:8,B,value(50)
+
+.oOO?
+.OXcD
+.QX..
+aXb.!
+-----
+
+;olib(a)>1 && !oplay_connect(a,b,c,b,D)
+
+
 #########################################################
 #                                                       #
 #                 Nonterritory patterns                 #

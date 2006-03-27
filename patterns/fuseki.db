@@ -990,6 +990,7 @@ X.*..abc
 
 
 Pattern F401
+# gf Added constraint. See gunnar:92. (3.7.10)
 
 x......xx     make 2 space extension on third row
 x.*..O.xx
@@ -999,13 +1000,13 @@ x.*..O.xx
 
 :8,edj
 
-x......ab
+x.e....ab
 x.*..O.cd
 .......??
 .......??
 ---------
 
-; x_alive_somewhere(a,b,c,d)
+; x_alive_somewhere(a,b,c,d) && !oterri(e)
 
 
 Pattern F402
