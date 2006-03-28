@@ -69,10 +69,11 @@ loadsgf games/trevor/auto/a007.sgf 25
 
 # games/trevor/auto/a008.sgf problems:
 
-#Quite passive.
-loadsgf games/trevor/auto/a008.sgf 10
-180 reg_genmove white
-#? [!F3]
+# No longer interesting, removed.
+# #Quite passive.
+# loadsgf games/trevor/auto/a008.sgf 10
+# 180 reg_genmove white
+# #? [!F3]
 
 
 
@@ -149,10 +150,11 @@ loadsgf games/trevor/auto/a015.sgf 20
 
 # games/trevor/auto/a016.sgf problems:
 
-#Locally, E5 better than E4.
-loadsgf games/trevor/auto/a016.sgf 18
-280 reg_genmove white
-#? [!E4]
+# Neither move is good. Removed.
+# #Locally, E5 better than E4.
+# loadsgf games/trevor/auto/a016.sgf 18
+# 280 reg_genmove white
+# #? [!E4]
 
 
 
@@ -194,18 +196,19 @@ loadsgf games/trevor/auto/a018.sgf 14
 
 #In this shape, G5 is best, not J6.
 loadsgf games/trevor/auto/a018.sgf 18
-340 reg_genmove white
-#? [!J6]
+340 restricted_genmove white G5 J6
+#? [G5]
 
 
 
 
 # games/trevor/auto/a019.sgf problems:
 
-#H3 is terrible.
-loadsgf games/trevor/auto/a019.sgf 6
-350 reg_genmove white
-#? [!H3]
+# H3 is no longer valued anywhere close to the top. Removed.
+# #H3 is terrible.
+# loadsgf games/trevor/auto/a019.sgf 6
+# 350 reg_genmove white
+# #? [!H3]
 
 
 
@@ -255,7 +258,7 @@ loadsgf games/trevor/auto/a024.sgf 12
 #Last chance to invade.
 loadsgf games/trevor/auto/a025.sgf 12
 410 reg_genmove white
-#? [!(J7|D1)]
+#? [C7|C6|D7]
 
 
 
@@ -304,8 +307,8 @@ loadsgf games/trevor/auto/a030.sgf 22
 
 #For a ko threat, D3 is better.
 loadsgf games/trevor/auto/a031.sgf 28
-470 reg_genmove white
-#? [!E2]
+470 restricted_genmove white D3 E2
+#? [D3]
 
 
 #Sacrificing these two for the rest seems best.
@@ -356,9 +359,11 @@ loadsgf games/trevor/auto/a035.sgf 42
 531 owl_does_defend H4 E6
 #? [1]*
 
+# A1 is a blunder, made more clear by filling F5.
 loadsgf games/trevor/auto/a035.sgf 50
+play white F5
 540 reg_genmove white
-#? [!A1]
+#? [F2|G2|E3]
 
 
 loadsgf games/trevor/auto/a035.sgf 51
@@ -372,14 +377,14 @@ loadsgf games/trevor/auto/a035.sgf 51
 
 #D4 is huge.  Other moves possible.
 loadsgf games/trevor/auto/a036.sgf 6
-560 reg_genmove white
-#? [!B4]
+560 restricted_genmove white B4 D4
+#? [D4]
 
 
 #Breaking into black's area is required.
 loadsgf games/trevor/auto/a036.sgf 10
-570 reg_genmove white
-#? [!B5]
+570 restricted_genmove white B5 D4
+#? [D4]
 
 
 #E6 is bigger, and enough to win.
@@ -394,8 +399,8 @@ loadsgf games/trevor/auto/a036.sgf 26
 
 #B4 almost always better in this shape.
 loadsgf games/trevor/auto/a037.sgf 12
-600 reg_genmove white
-#? [!A5]
+600 restricted_genmove white A5 B4
+#? [B4]
 
 
 
@@ -430,7 +435,5 @@ loadsgf games/trevor/auto/a039.sgf 18
 
 #C8 is an overplay.
 loadsgf games/trevor/auto/a041.sgf 12
-660 reg_genmove white
-#? [!C8]
-
-
+660 restricted_genmove white C8 D8
+#? [D8]

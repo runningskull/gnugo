@@ -40,8 +40,8 @@ loadsgf games/ssstator.sgf 136
 
 # E16 is completely aimless and ineffective.
 loadsgf games/strategy38.sgf 51
-158 reg_genmove black
-#? [!E16]
+158 restricted_genmove black E16 R18
+#? [R18]
 
 loadsgf games/strategy38.sgf 117
 159 reg_genmove black
@@ -103,8 +103,8 @@ loadsgf games/strategy41.sgf
 
 # White can't play G19. Locally this move must be at G18.
 loadsgf games/strategy42.sgf 174
-170 reg_genmove white
-#? [!G19]
+170 restricted_genmove white G18 G19
+#? [G18]
 
 # T19 is out of the question. Locally T17 is better but the correct
 # move is A5.
@@ -116,8 +116,8 @@ loadsgf games/strategy42.sgf 188
 # doesn't utilize the full ko potential of the position. Locally M8 is
 # superior.
 loadsgf games/strategy42.sgf 214
-172 reg_genmove white
-#? [!N9]
+172 restricted_genmove white M8 N9
+#? [M8]
 
 #CATEGORY=KO
 #DESCRIPTION=GNU Go lacks sufficient Ko understanding
@@ -234,8 +234,8 @@ loadsgf games/bretz.sgf 58
 #? [A13]*
 
 loadsgf games/bretz.sgf 88
-195 reg_genmove black
-#? [!S14]
+195 restricted_genmove black S13 S14
+#? [S13]
 
 loadsgf games/bretz.sgf 100
 196 reg_genmove black
@@ -278,13 +278,13 @@ loadsgf games/juka1.sgf 28
 #? [B2]*
 
 loadsgf games/juka1.sgf 48
-205 reg_genmove black
-#? [!O11]
+205 restricted_genmove black O11 P11
+#? [P11]
 
 #CATEGORY=SEMEAI
 #DESCRIPTION=K6 does take K8 to no eyes, but...
 #SEVERITY=8
-#GNU Go misses that K10 (large B group) has way few liberties
+#GNU Go misses that K10 (large B group) has way fewer liberties
 #than O9 group, hense missing importance of cutting off K8.
 loadsgf games/strategy45.sgf
 206 reg_genmove black
@@ -292,8 +292,8 @@ loadsgf games/strategy45.sgf
 
 # T6 fails badly. Locally S9 looks best.
 loadsgf games/owl30.sgf 84
-207 reg_genmove black
-#? [!T6]
+207 restricted_genmove black R9 S9 T6
+#? [S9]
 
 loadsgf games/lordofpi.sgf 36
 208 reg_genmove black
@@ -301,8 +301,8 @@ loadsgf games/lordofpi.sgf 36
 
 # A4 allows W to make seki
 loadsgf games/lordofpi.sgf 46
-209 reg_genmove black
-#? [!A4]
+209 restricted_genmove black A1 A3 A4 C1 D3
+#? [A3]
 
 loadsgf games/lordofpi.sgf 52
 210 reg_genmove black
@@ -325,10 +325,11 @@ loadsgf games/strategy46.sgf 174
 214 reg_genmove white
 #? [D2]
 
-# CD103a incorrectly thinks E7 defends against a combination attack.
-loadsgf games/owl33.sgf 200
-215 reg_genmove black
-#? [!E7]
+# No longer interesting. Removed.
+# # CD103a incorrectly thinks E7 defends against a combination attack.
+# loadsgf games/owl33.sgf 200
+# 215 reg_genmove black
+# #? [!E7]
 
 # B6 is too slow at this time.
 loadsgf games/handtalk/handtalk1.sgf 45
@@ -341,8 +342,8 @@ loadsgf games/handtalk/handtalk1.sgf 49
 
 # locally F12 is better. Similar problem at move 51
 loadsgf games/handtalk/handtalk1.sgf 55
-218 reg_genmove black
-#? [!E12]
+218 restricted_genmove black C14 E12 F12
+#? [F12]
 
 # lots of good problems in this game
 loadsgf games/nngs/gnugo-3.1.30-morlvera-200204041921.sgf 154
