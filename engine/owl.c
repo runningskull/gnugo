@@ -687,8 +687,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       && tt_get(&ttable, SEMEAI, apos, bpos, depth - stackp, NULL,
 		&value1, &value2, &xpos) == 2) {
     TRACE_CACHED_RESULT2(value1, value2, xpos);
-    if (value1 != 0)
-      *move = xpos;
+    *move = xpos;
       
     *resulta = value1;
     *resultb = value2;
@@ -1318,7 +1317,7 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
     /* FIXME: Are all owl_data fields and relevant static
      * variables properly set up for a call to do_owl_attack()?
      */
-    *this_resulta = REVERSE_RESULT(do_owl_attack(apos, NULL, NULL, owla, 0));
+    *this_resulta = REVERSE_RESULT(do_owl_attack(apos, semeai_move, NULL, owla, 0));
     *this_resultb = *this_resulta;
   }
   else {
@@ -1881,10 +1880,9 @@ do_owl_attack(int str, int *move, int *wormid,
 	     &value1, &value2, &xpos) == 2) {
 
     TRACE_CACHED_RESULT(value1, xpos);
-    if (value1 != 0) {
-      if (move)
-	*move = xpos;
-    }
+    if (move)
+      *move = xpos;
+
     if (value1 == GAIN) {
       if (wormid) {
 	if (goal_worms_computed)
@@ -2169,7 +2167,7 @@ do_owl_attack(int str, int *move, int *wormid,
 	origin = select_new_goal_origin(NO_MOVE, owl);
 
       /* Test whether the move cut the goal dragon apart. */
-      if (moves[k].cuts[0] != NO_MOVE) {
+      if (moves[k].cuts[0] != NO_MOVE && origin != NO_MOVE) {
 	owl_test_cuts(owl->goal, owl->color, moves[k].cuts);
 	if (!owl->goal[origin])
 	  origin = select_new_goal_origin(origin, owl);
@@ -2522,10 +2520,9 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
 	     &value1, &value2, &xpos) == 2) {
     
     TRACE_CACHED_RESULT(value1, xpos);
-    if (value1 != 0) {
-      if (move)
-	*move = xpos;
-    }
+    if (move)
+      *move = xpos;
+
     if (value1 == LOSS) {
       if (wormid) {
 	if (goal_worms_computed)

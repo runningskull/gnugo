@@ -1280,7 +1280,9 @@ store_persistent_semeai_cache(enum routine_id routine,
   int pos;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    goal[pos] = goala[pos] || goalb[pos];
+    if (ON_BOARD(pos))
+      goal[pos] = goala[pos] || goalb[pos];
+
   store_persistent_cache(&semeai_cache, routine,
       			 apos, bpos, cpos, color, goal_hash,
 			 resulta, resultb, move, NO_MOVE,
