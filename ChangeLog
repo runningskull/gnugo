@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- do not try to add an sgf circle for pass moves in replay_node()
 - new enum same_dragon_value in owl.c
 - new owl_defendpats.db classification "a" for patterns connecting all
   friendly stones to the goal

@@ -194,7 +194,8 @@ replay_node(SGFNode *node, int color_to_replay, float *replay_score,
 		    "GNU Go plays %s (%.2f) - Game move %s (%.2f)",
 		    location_to_string(new_move), new_move_value,
 		    location_to_string(old_move), old_move_value);
-	sgfCircle(node, I(new_move), J(new_move));
+	if (new_move != PASS_MOVE)
+	  sgfCircle(node, I(new_move), J(new_move));
       }
     }
     else
