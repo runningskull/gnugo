@@ -20,7 +20,7 @@ TST = 13x13b.tst 13x13.tst arb.tst arend2.tst arend.tst \
       thrash.tst trevora.tst trevorb.tst trevorc.tst \
       trevord.tst trevor.tst vie.tst viking.tst gifu03.tst seki.tst \
       9x9.tst unconditional.tst cgf2004.tst kgs.tst olympiad2004.tst \
-      tiny.tst gifu05.tst
+      tiny.tst gifu05.tst 13x13c.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
 
@@ -358,3 +358,4 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) olympiad2004.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) tiny.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) gifu05.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) 13x13c.tst $(GG_OPTIONS)

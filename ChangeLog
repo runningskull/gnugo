@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new testfile 13x13c.tst
 - do not try to add an sgf circle for pass moves in replay_node()
 - new enum same_dragon_value in owl.c
 - new owl_defendpats.db classification "a" for patterns connecting all
@@ -9,7 +10,7 @@
 - owl tuning
 - influence tuning
 - tuning
-- revised tests
+- new and revised tests
 
 3.7.9 released March 10, 2006
 
