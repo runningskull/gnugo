@@ -502,6 +502,21 @@ loadsgf games/semeai/semeai21.sgf
 140 analyze_semeai H9 F9
 #? [1 1 (E9|G7)]
 
+loadsgf games/semeai/semeai22.sgf 1
+141 analyze_semeai A4 E3
+#? [2 2 (F1|F2|F3)]
+142 analyze_semeai E3 A4
+#? [2 2 (A1|A3)]
+
+# White has no local move but can pass for a good ko.
+# See also reading:224-227.
+loadsgf games/semeai/semeai22.sgf 7
+143 analyze_semeai A4 E3
+#? [3 3 (F1|F3)]
+144 analyze_semeai E3 A4
+#? [2 2 PASS]
+
+
 ########### semeai gen_move tests #################
 
 # A6 gives an unfavorable ko while F10 gives seki.

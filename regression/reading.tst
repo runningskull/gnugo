@@ -952,3 +952,13 @@ loadsgf games/9handicap.sgf 280
 223 attack O18
 #? [3 T19]
 
+# See also semeai:143-144.
+loadsgf games/semeai/semeai22.sgf 7
+224 attack A4
+#? [2 PASS]
+225 defend A4
+#? [3 (F1|F3)]
+226 defend E3
+#? [2 PASS]
+227 attack E3
+#? [3 (F1|F3)]
