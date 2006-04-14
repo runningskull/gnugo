@@ -79,14 +79,13 @@
 
 ############## semeai tests #################
 #
-# These tests do not call genmove. Genmove tests and status tests come
-# at the bottom of the test suite.
-#
-# after analyze_semeai [dragon1] [dragon2]
+# After analyze_semeai [dragon1] [dragon2]
 # the results are returned in the form (result1) (result2).
 # These are the results of the defense of dragon1 and the attack
 # of dragon2 assuming that the dragon1 player moves first. Thus
-# a result 1 0 typically means seki, while a 1 1 result means a kill.
+# a result 1 0 typically means seki, while a 1 1 result means a kill
+# and 0 0 means the semeai is lost. In addition to seki, 1 0 may mean
+# that both dragons gain independent life.
 
 loadsgf games/semeai/semeai6.sgf
 1 analyze_semeai C1 E1
@@ -184,6 +183,12 @@ loadsgf golois/Goemate990902-1.sgf
 
 28 analyze_semeai R7 Q7
 #? [1 1 S9]
+
+# A6 gives an unfavorable ko while F10 gives seki.
+# Since there are no ko threats, and F10 is enough to win, it is preferred.
+loadsgf games/semeai/semeaiko1.sgf
+29 reg_genmove black
+#? [F10]*
 
 loadsgf games/strategy11.sgf 127
 30 analyze_semeai B3 G4
@@ -356,29 +361,51 @@ loadsgf games/semeai/semeai14.sgf
 80 analyze_semeai F7 F9
 #? [1 0 (PASS|E9|E8|J9|H5)]
 
+loadsgf games/semeai/semeai15.sgf
+81 dragon_status H7
+#? [dead]
+82 dragon_status J7
+#? [alive]
+83 dragon_status J9
+#? [dead]
+84 dragon_status E13
+#? [dead]
+85 dragon_status A13
+#? [alive]
+86 dragon_status C11
+#? [critical A2 A2]
+
 loadsgf games/semeai/semeai16.sgf 222
 87 analyze_semeai N19 S18
 #? [1 1 (Q19|S19|T18|T16)]
 88 analyze_semeai S18 N19
 #? [2 0 T12]*
+89 reg_genmove black
+#? [Q19|S19|T18|T16]*
 
 loadsgf games/semeai/semeai16.sgf 224
 90 analyze_semeai N19 S18
 #? [1 3 (Q19|S19|T18|T16)]*
 91 analyze_semeai S18 N19
 #? [2 0 Q17]*
+92 reg_genmove black
+#? [Q19|S19|T18|T16]
 
 loadsgf games/semeai/semeai16.sgf 226
 93 analyze_semeai N19 S18
 #? [1 3 S19]*
 94 analyze_semeai S18 N19
 #? [1 1 S19]
+95 reg_genmove black
+#? [S19]
 
 loadsgf games/semeai/semeai16.sgf 230
 96 analyze_semeai N19 S18
 #? [1 0 S19]
 97 analyze_semeai S18 N19
 #? [1 1 S19]*
+98 reg_genmove black
+#? [S19]
 
 loadsgf games/nngs/beedee-gnugo-3.5.3-200401140035.sgf 280
 99 analyze_semeai R13 Q13
@@ -400,6 +427,10 @@ loadsgf games/semeai/semeai17.sgf 52
 106 analyze_semeai E9 G8
 #? [1 0 (D6|C7)]*
 
+# Doubtful whether C7 should be accepted even if it kills all white.
+107 reg_genmove black
+#? [D6|C7]*
+
 loadsgf games/semeai/semeai17.sgf 60
 108 analyze_semeai G8 H2
 #? [1 1 J2]*
@@ -417,6 +448,10 @@ loadsgf games/semeai/semeai17.sgf 64
 #? [1 0 PASS]
 113 analyze_semeai H2 G8
 #? [1 0 PASS]
+114 dragon_status G8
+#? [alive]
+115 dragon_status H2
+#? [alive]
 
 loadsgf games/kgs/yagr-nigiri.sgf 214
 116 analyze_semeai F19 F16
@@ -466,6 +501,10 @@ loadsgf games/verybad.sgf 114
 127 analyze_semeai Q17 Q16
 #? [2 2 (O15|O14|R13)]
 
+# Take the ko last.
+128 restricted_genmove black T15 T17 S17 P19
+#? [!T15]*
+
 loadsgf games/verybad.sgf 118
 129 analyze_semeai Q16 Q17
 #? [3 3 (Q19|S17|T17)]
@@ -473,6 +512,15 @@ loadsgf games/verybad.sgf 118
 loadsgf games/owl54.sgf
 130 analyze_semeai D3 G2
 #? [0 0 PASS]*
+
+loadsgf games/kgs/GNU-minautore.sgf 80
+131 dragon_status P8
+#? [critical T8 (T8|T10|T11|T12)]
+
+# J8 leaves ko aji. (Admittedly a very bad ko for black but still a ko.)
+loadsgf games/CrazyStone1.sgf 50
+132 reg_genmove white
+#? [H9|J4]*
 
 loadsgf games/CrazyStone1.sgf 56
 133 analyze_semeai D9 G3
@@ -515,66 +563,3 @@ loadsgf games/semeai/semeai22.sgf 7
 #? [3 3 (F1|F3)]
 144 analyze_semeai E3 A4
 #? [2 2 PASS]
-
-
-########### semeai gen_move tests #################
-
-# A6 gives an unfavorable ko while F10 gives seki.
-# Since there are no ko threats, and F10 is enough to win, it is preferred.
-loadsgf games/semeai/semeaiko1.sgf
-29 reg_genmove black
-#? [F10]*
-
-loadsgf games/semeai/semeai16.sgf 222
-89 reg_genmove black
-#? [Q19|S19|T18|T16]*
-loadsgf games/semeai/semeai16.sgf 224
-92 reg_genmove black
-#? [Q19|S19|T18|T16]
-loadsgf games/semeai/semeai16.sgf 226
-95 reg_genmove black
-#? [S19]
-loadsgf games/semeai/semeai16.sgf 230
-98 reg_genmove black
-#? [S19]
-
-# Doubtful whether C7 should be accepted even if it kills all white.
-loadsgf games/semeai/semeai17.sgf 52
-107 reg_genmove black
-#? [D6|C7]*
-
-# Take the ko last.
-loadsgf games/verybad.sgf 114
-128 restricted_genmove black T15 T17 S17 P19
-#? [!T15]*
-
-# J8 leaves ko aji. (Admittedly a very bad ko for black but still a ko.)
-loadsgf games/CrazyStone1.sgf 50
-132 reg_genmove white
-#? [H9|J4]*
-
-########### semeai status tests #################
-
-loadsgf games/semeai/semeai15.sgf
-81 dragon_status H7
-#? [dead]
-82 dragon_status J7
-#? [alive]
-83 dragon_status J9
-#? [dead]
-84 dragon_status E13
-#? [dead]
-85 dragon_status A13
-#? [alive]
-86 dragon_status C11
-#? [critical A2 A2]
-
-loadsgf games/semeai/semeai17.sgf 64
-114 dragon_status G8
-#? [alive]
-115 dragon_status H2
-#? [alive]
-
-loadsgf games/kgs/GNU-minautore.sgf 80
-131 dragon_status P8
-#? [critical T8 (T8|T10|T11|T12)]

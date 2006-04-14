@@ -89,8 +89,10 @@ class Testsuite
 
   static void finish()
   {
-    write("%-37s %7.2f %9d %7d %8d\n", name, cputime, reading_nodes, owl_nodes,
-	  connection_nodes);
+    // Write nothing if no test from the file was run at all.
+    if (sizeof(pass) + sizeof(fail) + sizeof(PASS) + sizeof(FAIL) > 0)
+      write("%-37s %7.2f %9d %7d %8d\n", name, cputime, reading_nodes,
+	    owl_nodes, connection_nodes);
   }
 
   static void program_reader(object f)
@@ -244,10 +246,14 @@ class Testsuite
       test_numbers = 0;
     
     foreach (testsuite/"\n", string s) {
-      if (sscanf(s, "%d", number) == 1) {
+      string command;
+      if (sscanf(s, "%d %s", number, command) == 2) {
+	command = (command / " ")[0];
 	if (number >= 10000 && number <= 10003)
 	  continue;
 	if (test_numbers && !has_value(test_numbers, number))
+	  continue;
+	if (sizeof(allowed_commands) > 0 && !allowed_commands[command])
 	  continue;
 	if (correct_results[(int) number])
 	  write("Repeated test number " + number + ".\n");
@@ -281,6 +287,7 @@ class Testsuite
 }
 
 array(Testsuite) testsuites = ({});
+multiset(string) allowed_commands = (<>);
 
 // Replace all tests in the testsuite with new tests checking whether
 // the given answers are unoccupied vertices.
@@ -395,7 +402,8 @@ int main(int argc, array(string) argv)
 		   ({"engine", Getopt.HAS_ARG, ({"-e", "--engine"})}),
 		   ({"options", Getopt.HAS_ARG, ({"-o", "--options"})}),
 		   ({"file", Getopt.HAS_ARG, ({"-f", "--file"})}),
-		   ({"jobs", Getopt.HAS_ARG, ({"-j", "--jobs"})})});
+		   ({"jobs", Getopt.HAS_ARG, ({"-j", "--jobs"})}),
+		   ({"limit-commands", Getopt.HAS_ARG, ({"-l", "--limit-commands"})})});
 
   mapping(string:mixed) options = ([]);
   string engine = "";
@@ -447,6 +455,11 @@ int main(int argc, array(string) argv)
 
       case "jobs":
 	jobs = (int) value;
+	break;
+
+      case "limit-commands":
+	foreach (value / ",", string command)
+	  allowed_commands[command] = 1;
 	break;
     }
   }
@@ -524,6 +537,7 @@ string help_message =
 "  -o, --options=OPTIONS         Options passed to the engine.\n"
 "  -f, --file=FILE               File containing a list of tests to run.\n"
 "  -j, --jobs=JOBS               Number of testsuites being run in parallel.\n"
+"  -l, --limit-commands=COMMANDS Only run tests having certain GTP commands.\n"
 "\n"
 "Tests are listed on the command line in one of the following forms:\n"
 "reading           Run all tests in the testsuite reading.tst.\n"
@@ -537,7 +551,10 @@ string help_message =
 "each line.\n"
 "\n"
 "If no test suite is listed on the command line or read from file, then all\n"
-"regressions listed in Makefile.am will be run.\n";
+"regressions listed in Makefile.am will be run.\n"
+"\n"
+"The --limit-commands option takes a comma separated list of GTP commands,\n"
+"e.g. '--limit-commands=attack,defend' to only run tactical reading tests.\n";
 
 /*
  * Local Variables:

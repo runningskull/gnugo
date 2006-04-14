@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- semeai.tst reordered
+- new option --limit-commands to regress.pike
 - new testfile 13x13c.tst
 - do not try to add an sgf circle for pass moves in replay_node()
 - new enum same_dragon_value in owl.c
