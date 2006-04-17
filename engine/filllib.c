@@ -201,7 +201,7 @@ fill_liberty(int *move, int color)
 	*move = pos;
 	return 1;
       }
-      else if (defense_point != NO_MOVE) {
+      else if (defense_point != NO_MOVE && is_legal(defense_point, color)) {
 	/* Safety not confirmed because the move at (pos) would set
 	 * up a double threat. (defense_point) is assumed to defend
 	 * against this threat.
