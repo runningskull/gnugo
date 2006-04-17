@@ -81,3 +81,14 @@ loadsgf games/nngs/gnugo-3.5.5-liza-200404251750.sgf 42
 loadsgf games/kgs/2004-04-10-Shun9137-GnuGoCVS.sgf 243
 17 reg_genmove black
 #? [L19|K19]*
+
+# GNU Go 3.7.9 tries an illegal, supposedly liberty filling, move at A1.
+loadsgf games/cgos/60311.sgf
+18 reg_genmove black
+#? [C4|A3|A5]
+
+# GNU Go 3.7.9 tries a simple ko violation at C9.
+loadsgf games/cgos/58273.sgf
+19 reg_genmove black
+#? [J9|F9]
+

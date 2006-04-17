@@ -178,3 +178,8 @@ loadsgf games/filllib17.sgf
 loadsgf games/filllib18.sgf
 50 reg_genmove black
 #? [T2|R2|S1]*
+
+# GNU Go 3.7.9  tries an illegal liberty filling move at J4.
+loadsgf games/filllib19.sgf
+51 reg_genmove black
+#? [D6|B2]

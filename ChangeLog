@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- detect_tactical_blunder() revised to avoid finding illegal defense moves
 - semeai.tst reordered
 - new option --limit-commands to regress.pike
 - new testfile 13x13c.tst

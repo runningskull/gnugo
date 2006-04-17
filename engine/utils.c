@@ -1182,14 +1182,31 @@ detect_tactical_blunder(int move, int color, int *defense_point,
 	|| pos == move)
       continue;
     
-    /* First, we look for a new tactical attack. */
+    /* First, we look for a new tactical attack.
+     * FIXME: Verify that the tactically attacked stone matters. See
+     *        e.g. the D6 move in filllib:51 which invites a harmless
+     *        tactical attack of A4.
+     */
     if (board[pos] == color
 	&& ((safe_stones && safe_stones[pos])
 	    || (!safe_stones && worm[pos].attack_codes[0] == 0))
 	&& attack(pos, NULL)) {
       /* A safe worm of ours has become attackable. */
-      if (defense_point)
+      if (defense_point) {
 	find_defense(pos, defense_point);
+	/* Check that this move is legal and effective also on the
+	 * original board, otherwise find a tactical defense there
+	 * instead.
+	 */
+	popgo();
+	
+	if (!is_legal(*defense_point, color)
+	    || play_attack_defend_n(color, 1, 1, *defense_point, pos))
+	  find_defense(pos, defense_point);
+	
+	/* Redo the move, we know that it won't fail. */
+	trymove(move, color, NULL, NO_MOVE);
+      }
       verbose = save_verbose;
       TRACE("After %1m Worm at %1m becomes attackable.\n", move, pos);
       verbose = current_verbose;
