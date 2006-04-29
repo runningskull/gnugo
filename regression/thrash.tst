@@ -92,3 +92,55 @@ loadsgf games/cgos/58273.sgf
 19 reg_genmove black
 #? [J9|F9]
 
+# Don't play send-two-return-one with F4, especially not when positional
+# superko is used.
+# See also reading:228.
+loadsgf games/cgos/879.sgf 68
+20 reg_genmove white
+#? [A9|A8|F2]
+
+# Don't play into ko needlessly with E1.
+loadsgf games/cgos/30527.sgf 71
+21 reg_genmove black
+#? [A3|D1|G9|C5|C6|D8|E7|F5|F4]
+
+# Don't play send-two-return-one with J9, especially not when positional
+# superko is used.
+loadsgf games/cgos/30527.sgf 73
+22 restricted_genmove black G9 J9
+#? [G9]
+
+# The ko at J6 is an irrelevant distration. Start with filling the
+# safe outer liberties.
+loadsgf games/cgos/994.sgf 76
+23 reg_genmove white
+#? [A5|D7]
+
+# Fill the outer ko at J7 first and there's nothing black can do.
+loadsgf games/cgos/994.sgf 78
+24 restricted_genmove white J1 J7
+#? [J7]
+
+loadsgf games/cgos/13435.sgf 74
+25 reg_genmove white
+#? [A5|C7]
+
+loadsgf games/cgos/31446.sgf 88
+26 reg_genmove white
+#? [E1|A1]
+
+# Fill a ko before taking another one.
+loadsgf games/cgos/37169.sgf 86
+27 reg_genmove white
+#? [J6]
+loadsgf games/cgos/37169.sgf 88
+28 reg_genmove white
+#? [A2]
+loadsgf games/cgos/37169.sgf 90
+29 reg_genmove white
+#? [D3]
+
+loadsgf games/cgos/26449.sgf 47
+30 reg_genmove black
+#? [J4|J7]
+

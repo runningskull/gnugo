@@ -315,3 +315,18 @@ loadsgf games/kgs/tournament10/GNU-NeuroGo.sgf 68
 loadsgf games/9x9-4.sgf 13
 630 reg_genmove black
 #? [J5]*
+
+# A8 secures seki, winning the game. On the other hand black can't
+# start the ko anyway, so the ordinary endgame moves are also good.
+# The game move at D9 is not good at all, however.
+# See also reading:229,230, owl1:395,396, and semeai:145,146.
+loadsgf games/cgos/25811.sgf 52
+640 reg_genmove white
+#? [A8|G6|J6]
+
+# Necessary to start capturing from the left. The game move at J1 is
+# of course futile.
+# See also reading:231.
+loadsgf games/cgos/14198.sgf 53
+650 reg_genmove black
+#? [E1]

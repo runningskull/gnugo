@@ -563,3 +563,10 @@ loadsgf games/semeai/semeai22.sgf 7
 #? [3 3 (F1|F3)]
 144 analyze_semeai E3 A4
 #? [2 2 PASS]
+
+# See also 9x9:640.
+loadsgf games/cgos/25811.sgf 52
+145 analyze_semeai E9 B8
+#? [2 2 PASS]
+146 analyze_semeai B8 E9
+#? [3 3 (A7|B9)]

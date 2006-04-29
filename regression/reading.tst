@@ -962,3 +962,23 @@ loadsgf games/semeai/semeai22.sgf 7
 #? [2 PASS]
 227 attack E3
 #? [3 (F1|F3)]
+
+# See also thrash:20.
+loadsgf games/cgos/879.sgf 68
+play black F4
+228 attack F6
+#? [1 (A9|A8|PASS)]
+
+# See also 9x9:640.
+loadsgf games/cgos/25811.sgf 52
+229 attack E9
+#? [3 (A7|B9)]
+230 defend E9
+#? [2 PASS]
+
+# The send-two-return-one move at J1 is totally ineffective but
+# causes horizon effects.
+# See also 9x9:650.
+loadsgf games/cgos/14198.sgf 53
+231 attack G2
+#? [2 E1]

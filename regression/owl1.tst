@@ -532,3 +532,10 @@ loadsgf games/semeai/semeai21.sgf
 #? [1 (E9|G7)]
 394 owl_defend F9
 #? [1 G9]*
+
+# See also 9x9:640.
+loadsgf games/cgos/25811.sgf 52
+395 owl_attack E9
+#? [3 (A7|B9)]
+396 owl_defend E9
+#? [2 PASS]
