@@ -1663,7 +1663,7 @@ show_copyright(void)
 }
 
 
-#if ENABLE_SOCKET_SUPPORT
+#ifdef ENABLE_SOCKET_SUPPORT
 
 
 #if !defined(_WIN32) && !defined(_WIN32_WCE)
