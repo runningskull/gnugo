@@ -206,9 +206,6 @@ in the same way as it is used for worms.  Half eyes are already
 halfway done.  The moves are stored, but not the attack and defend
 codes (LOSE, KO_A, KO_B and WIN).
 @item Make the cache not waste storage on 64 bit systems.
-@item  Implement detection of superko violation in the board code. We
-probably only want this optionally in @code{play_move()} and in a variant
-of @code{is_legal()}.
 @item The dragon data is split into two arrays, @code{dragon[]}
 and @code{dragon2[]}. The dragon2 array only have one entry per dragon, in
 contrast to the dragon array where all the data is stored once for every

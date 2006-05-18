@@ -605,7 +605,7 @@ gtp_playblack(char *s)
   else if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
 
-  if (!is_legal(POS(i, j), BLACK))
+  if (!is_allowed_move(POS(i, j), BLACK))
     return gtp_failure("illegal move");
 
   gnugo_play_move(POS(i, j), BLACK);
@@ -636,7 +636,7 @@ gtp_playwhite(char *s)
   else if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
   
-  if (!is_legal(POS(i, j), WHITE))
+  if (!is_allowed_move(POS(i, j), WHITE))
     return gtp_failure("illegal move");
 
   gnugo_play_move(POS(i, j), WHITE);
@@ -660,7 +660,7 @@ gtp_play(char *s)
   if (!gtp_decode_move(s, &color, &i, &j))
     return gtp_failure("invalid color or coordinate");
 
-  if (!is_legal(POS(i, j), color))
+  if (!is_allowed_move(POS(i, j), color))
     return gtp_failure("illegal move");
 
   gnugo_play_move(POS(i, j), color);
@@ -1025,7 +1025,7 @@ gtp_is_legal(char *s)
   if (!gtp_decode_move(s, &color, &i, &j))
     return gtp_failure("invalid color or coordinate");
 
-  return gtp_success("%d", is_legal(POS(i, j), color));
+  return gtp_success("%d", is_allowed_move(POS(i, j), color));
 }
 
 
@@ -1048,7 +1048,7 @@ gtp_all_legal(char *s)
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
-      if (BOARD(i, j) == EMPTY && is_legal(POS(i, j), color)) {
+      if (BOARD(i, j) == EMPTY && is_allowed_move(POS(i, j), color)) {
 	movei[moves] = i;
 	movej[moves++] = j;
       }

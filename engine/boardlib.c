@@ -39,12 +39,14 @@ int          initial_white_captured;
 int          initial_black_captured;
 int          move_history_color[MAX_MOVE_HISTORY];
 int          move_history_pos[MAX_MOVE_HISTORY];
+Hash_data    move_history_hash[MAX_MOVE_HISTORY];
 int          move_history_pointer;
 
 float komi = 0.0;
 int handicap = 0;
 int movenum;
-int allow_suicide = 0;  /* allow opponent to make suicide moves */
+enum suicide_rules suicide_rule = FORBIDDEN;
+enum ko_rules ko_rule = SIMPLE;
 
 
 signed char shadow[BOARDMAX];

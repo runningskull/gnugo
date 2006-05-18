@@ -23,10 +23,26 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
+#include <stdarg.h>
+#include "config.h"
 #include "sgftree.h"
 #include "winsocket.h"
-#include "config.h"
-#include <stdarg.h>
+
+/* This type is used to store each intersection on the board.
+ *
+ * On a 486, char is best, since the time taken to push and pop
+ * becomes significant otherwise. On other platforms, an int may
+ * be better, e.g. if memcpy() is particularly fast, or if
+ * character access is very slow.
+ */
+
+typedef unsigned char Intersection;
+
+/* FIXME: This is very ugly but we can't include hash.h until we have
+ * defined Intersection. And we do need to include it before using
+ * Hash_data.
+ */
+#include "hash.h"
 
 /* local versions of absolute value, min and max */
 
@@ -117,18 +133,6 @@ const char *color_to_string(int color);
 #define OTHER_COLOR(color)      (WHITE+BLACK-(color))
 #define IS_STONE(arg)           ((arg) == WHITE || (arg) == BLACK)
 
-/* This type is used to store each intersection on the board.
- *
- * On a 486, char is best, since the time taken to push and pop
- * becomes significant otherwise. On other platforms, an int may
- * be better, e.g. if memcpy() is particularly fast, or if
- * character access is very slow.
- */
-
-typedef unsigned char Intersection;
-
-
-
 /* Note that POS(-1, -1) == 0
  * DELTA() is defined so that POS(i+di, j+dj) = POS(i, j) + DELTA(di, dj).
  */
@@ -190,6 +194,7 @@ extern int          initial_white_captured;
 extern int          initial_black_captured;
 extern int          move_history_color[MAX_MOVE_HISTORY];
 extern int          move_history_pos[MAX_MOVE_HISTORY];
+extern Hash_data    move_history_hash[MAX_MOVE_HISTORY];
 extern int          move_history_pointer;
 
 extern float        komi;
@@ -198,8 +203,21 @@ extern int          movenum;      /* movenumber - used for debug output */
 		    
 extern signed char  shadow[BOARDMAX];      /* reading tree shadow */
 
-extern int chinese_rules;
-extern int allow_suicide;
+enum suicide_rules {
+  FORBIDDEN,
+  ALLOWED,
+  ALL_ALLOWED
+};
+extern enum suicide_rules suicide_rule;
+
+enum ko_rules {
+  SIMPLE,
+  NONE,
+  PSK,
+  SSK
+};
+extern enum ko_rules ko_rule;
+
 
 extern int stackp;                /* stack pointer */
 extern int count_variations;      /* count (decidestring) */
@@ -221,6 +239,7 @@ struct board_state {
   int initial_black_captured;
   int move_history_color[MAX_MOVE_HISTORY];
   int move_history_pos[MAX_MOVE_HISTORY];
+  Hash_data move_history_hash[MAX_MOVE_HISTORY];
   int move_history_pointer;
 
   float komi;
@@ -280,6 +299,7 @@ int is_pass(int pos);
 int is_legal(int pos, int color);
 int is_suicide(int pos, int color);
 int is_illegal_ko_capture(int pos, int color);
+int is_allowed_move(int pos, int color);
 int is_ko(int pos, int color, int *ko_pos);
 int is_ko_point(int pos);
 int does_capture_something(int pos, int color);

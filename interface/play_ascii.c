@@ -520,7 +520,7 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
     return 0;
   }
   
-  if (!is_legal(move, gameinfo->to_move)) {
+  if (!is_allowed_move(move, gameinfo->to_move)) {
     printf("\nIllegal move: %s", command);
     return 0;
   }

@@ -69,7 +69,7 @@ play_solo(Gameinfo *gameinfo, int moves)
       do {
 	i = (gg_rand() % 4) + (gg_rand() % (board_size - 4));
 	j = (gg_rand() % 4) + (gg_rand() % (board_size - 4));
-      } while (!is_legal(POS(i, j), gameinfo->to_move));
+      } while (!is_allowed_move(POS(i, j), gameinfo->to_move));
 
       gnugo_play_move(POS(i, j), gameinfo->to_move);
       sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);

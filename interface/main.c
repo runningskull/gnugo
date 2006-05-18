@@ -143,7 +143,13 @@ enum {OPT_BOARDSIZE = 127,
       OPT_OWL_THREATS,
       OPT_NO_OWL_THREATS,
       OPT_JAPANESE_RULES,
+      OPT_FORBID_SUICIDE,
       OPT_ALLOW_SUICIDE,
+      OPT_ALLOW_ALL_SUICIDE,
+      OPT_SIMPLE_KO,
+      OPT_NO_KO,
+      OPT_POSITIONAL_SUPERKO,
+      OPT_SITUATIONAL_SUPERKO,
       OPT_CAPTURE_ALL_DEAD,
       OPT_PLAY_OUT_AFTERMATH,
       OPT_MIRROR,
@@ -249,16 +255,22 @@ static struct gg_option const long_options[] =
   {"standard-connections",  no_argument, 0, OPT_STANDARD_CONNECTIONS},
   {"standard-semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
   {"alternate-connections",  no_argument, 0, OPT_ALTERNATE_CONNECTIONS},
-  {"with-break-in",  	no_argument, 0, OPT_WITH_BREAK_IN},
-  {"without-break-in",  no_argument, 0, OPT_WITHOUT_BREAK_IN},
-  {"cosmic-gnugo",   no_argument, 0, OPT_COSMIC_GNUGO},
-  {"no-cosmic-gnugo",   no_argument, 0, OPT_NO_COSMIC_GNUGO},
-  {"large-scale",    no_argument, 0, OPT_LARGE_SCALE},
-  {"no-large-scale",    no_argument, 0, OPT_NO_LARGE_SCALE},
-  {"options",        no_argument, 0, OPT_OPTIONS},
-  {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
-  {"capture-all-dead",   no_argument,   0, OPT_CAPTURE_ALL_DEAD},
-  {"play-out-aftermath", no_argument,   0, OPT_PLAY_OUT_AFTERMATH},
+  {"with-break-in",  	   no_argument, 0, OPT_WITH_BREAK_IN},
+  {"without-break-in",     no_argument, 0, OPT_WITHOUT_BREAK_IN},
+  {"cosmic-gnugo",         no_argument, 0, OPT_COSMIC_GNUGO},
+  {"no-cosmic-gnugo",      no_argument, 0, OPT_NO_COSMIC_GNUGO},
+  {"large-scale",          no_argument, 0, OPT_LARGE_SCALE},
+  {"no-large-scale",       no_argument, 0, OPT_NO_LARGE_SCALE},
+  {"options",              no_argument, 0, OPT_OPTIONS},
+  {"forbid-suicide",       no_argument, 0, OPT_FORBID_SUICIDE},
+  {"allow-suicide",        no_argument, 0, OPT_ALLOW_SUICIDE},
+  {"allow-all-suicide",    no_argument, 0, OPT_ALLOW_ALL_SUICIDE},
+  {"simple-ko",            no_argument, 0, OPT_SIMPLE_KO},
+  {"no-ko",                no_argument, 0, OPT_NO_KO},
+  {"positional-superko",   no_argument, 0, OPT_POSITIONAL_SUPERKO},
+  {"situational-superko",  no_argument, 0, OPT_SITUATIONAL_SUPERKO},
+  {"capture-all-dead",     no_argument, 0, OPT_CAPTURE_ALL_DEAD},
+  {"play-out-aftermath",   no_argument, 0, OPT_PLAY_OUT_AFTERMATH},
   {"cache-size",     required_argument, 0, 'M'},
   {"worms",          no_argument,       0, 'w'},
   {"moyo",           required_argument, 0, 'm'},
@@ -583,8 +595,32 @@ main(int argc, char *argv[])
 	large_scale = 0;
 	break;
 
+      case OPT_FORBID_SUICIDE:
+	suicide_rule = FORBIDDEN;
+	break;
+
       case OPT_ALLOW_SUICIDE:
-	allow_suicide = 1;
+	suicide_rule = ALLOWED;
+	break;
+
+      case OPT_ALLOW_ALL_SUICIDE:
+	suicide_rule = ALL_ALLOWED;
+	break;
+
+      case OPT_SIMPLE_KO:
+	ko_rule = SIMPLE;
+	break;
+
+      case OPT_NO_KO:
+	ko_rule = NONE;
+	break;
+
+      case OPT_POSITIONAL_SUPERKO:
+	ko_rule = PSK;
+	break;
+
+      case OPT_SITUATIONAL_SUPERKO:
+	ko_rule = SSK;
 	break;
 
       case OPT_CAPTURE_ALL_DEAD:
@@ -1441,7 +1477,13 @@ Used with --mode ascii (or other modes for non-interactive settings)\n\
 \n\
    --japanese-rules     (default)\n\
    --chinese-rules\n\
-   --allow-suicide\n\
+   --forbid-suicide      Forbid suicide. (default)\n\
+   --allow-suicide       Allow suicide except single-stone suicide.\n\
+   --allow-all-suicide   Allow all suicide moves.\n\
+   --simple-ko           Forbid simple ko recapture. (default)\n\
+   --no-ko               Allow any ko recapture.\n\
+   --positional-superko  Positional superko restrictions.\n\
+   --situational-superko Situational superko restrictions.\n\
 \n\
    --play-out-aftermath\n\
    --capture-all-dead\n\

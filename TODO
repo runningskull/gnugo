@@ -61,10 +61,6 @@ order of perceived difficulty.
 
  * Make the cache not waste storage on 64 bit systems.
 
- * Implement detection of superko violation in the board code. We
-   probably only want this optionally in play_move() and in a variant
-   of is_legal().
-
  * The dragon data is split into two arrays, dragon[] and dragon2[].
    The dragon2 array only have one entry per dragon, in contrast to
    the dragon array where all the data is stored once for every

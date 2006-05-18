@@ -300,12 +300,15 @@ static int string_mark;
 
 
 /* Forward declarations. */
+static void really_do_trymove(int pos, int color);
 static int do_trymove(int pos, int color, int ignore_ko);
 static void undo_trymove(void);
 
 static int do_approxlib(int pos, int color, int maxlib, int *libs);
 static int slow_approxlib(int pos, int color, int maxlib, int *libs);
 static int do_accuratelib(int pos, int color, int maxlib, int *libs);
+
+static int is_superko_violation(int pos, int color, enum ko_rules type);
 
 static void new_position(void);
 static int propagate_string(int stone, int str);
@@ -360,6 +363,7 @@ store_board(struct board_state *state)
   for (k = 0; k < move_history_pointer; k++) {
     state->move_history_color[k] = move_history_color[k];
     state->move_history_pos[k] = move_history_pos[k];
+    state->move_history_hash[k] = move_history_hash[k];
   }
 
   state->komi = komi;
@@ -396,6 +400,7 @@ restore_board(struct board_state *state)
   for (k = 0; k < move_history_pointer; k++) {
     move_history_color[k] = state->move_history_color[k];
     move_history_pos[k] = state->move_history_pos[k];
+    move_history_hash[k] = state->move_history_hash[k];
   }
 
   komi = state->komi;
@@ -598,6 +603,45 @@ tryko(int pos, int color, const char *message)
   return 1;
 }
 
+/* Really, really make a temporary move. It is assumed that all
+ * necessary checks have already been made and likewise that various
+ * administrative bookkeeping outside of the actual board logic has
+ * either been done or is not needed.
+ */
+static void
+really_do_trymove(int pos, int color)
+{
+  BEGIN_CHANGE_RECORD();
+  PUSH_VALUE(board_ko_pos);
+
+  /*
+   * FIXME: Do we really have to store board_hash in a stack?
+   *
+   * Answer: No, we don't.  But for every stone that we add
+   *         or remove, we must call hashdata_invert_stone(). This is
+   *         not difficult per se, but the whole board.c 
+   *         will have to be checked, and there is lots of room
+   *         for mistakes.
+   *
+   *         At the same time, profiling shows that storing the
+   *         hashdata in a stack doesn't take a lot of time, so
+   *         this is not an urgent FIXME.
+   */
+  memcpy(&board_hash_stack[stackp], &board_hash, sizeof(board_hash));
+
+  if (board_ko_pos != NO_MOVE)
+    hashdata_invert_ko(&board_hash, board_ko_pos);
+
+  board_ko_pos = NO_MOVE;
+  
+  stackp++;
+
+  if (pos != PASS_MOVE) {
+    PUSH_VALUE(black_captured);
+    PUSH_VALUE(white_captured);
+    do_play_move(pos, color);
+  }
+}
 
 /*
  * Do the main work of trymove() and tryko(), i.e. the common parts.
@@ -663,35 +707,7 @@ do_trymove(int pos, int color, int ignore_ko)
   stack[stackp] = pos;
   move_color[stackp] = color;
 
-  /*
-   * FIXME: Do we really have to store board_hash in a stack?
-   *
-   * Answer: No, we don't.  But for every stone that we add
-   *         or remove, we must call hashdata_invert_stone(). This is
-   *         not difficult per se, but the whole board.c 
-   *         will have to be checked, and there is lots of room
-   *         for mistakes.
-   *
-   *         At the same time, profiling shows that storing the
-   *         hashdata in a stack doesn't take a lot of time, so
-   *         this is not an urgent FIXME.
-   */
-  BEGIN_CHANGE_RECORD();
-  PUSH_VALUE(board_ko_pos);
-  memcpy(&board_hash_stack[stackp], &board_hash, sizeof(board_hash));
-
-  if (board_ko_pos != NO_MOVE)
-    hashdata_invert_ko(&board_hash, board_ko_pos);
-
-  board_ko_pos = NO_MOVE;
-  
-  stackp++;
-
-  if (pos != PASS_MOVE) {
-    PUSH_VALUE(black_captured);
-    PUSH_VALUE(white_captured);
-    do_play_move(pos, color);
-  }
+  really_do_trymove(pos, color);
 
   return 1;
 }
@@ -704,12 +720,8 @@ do_trymove(int pos, int color, int ignore_ko)
 void
 popgo()
 {
-  stackp--;
-  
   undo_trymove();
   
-  memcpy(&board_hash, &(board_hash_stack[stackp]), sizeof(board_hash));
-
   if (sgf_dumptree) {
     char buf[100];
     int is_tryko = 0;
@@ -733,25 +745,14 @@ popgo()
 }
 
 
-#if 0
-
-/* Silent version of popgo(), suitable for use if you have called
- * do_trymove() without passing through trymove() or tryko().
- */
-
-static void
-silent_popgo(void)
-{
-  stackp--;
-  undo_trymove();
-  memcpy(&board_hash, &(board_hash_stack[stackp]), sizeof(board_hash));
-}
-
-#endif
-
 /* Restore board state to the position before the last move. This is
  * accomplished by popping everything that was stored on the stacks
- * since the last BEGIN_CHANGE_RECORD().
+ * since the last BEGIN_CHANGE_RECORD(). Also stackp is decreased and
+ * board hash is restored from stack.
+ *
+ * This undoes the effects of do_trymove() or really_do_trymove() and
+ * is appropriate to call instead of popgo() if you have not passed
+ * through trymove() or tryko().
  */
 
 static void
@@ -766,6 +767,9 @@ undo_trymove()
 
   POP_MOVE();
   POP_VERTICES();
+  
+  stackp--;
+  memcpy(&board_hash, &(board_hash_stack[stackp]), sizeof(board_hash));
 }
 
 
@@ -960,6 +964,7 @@ play_move(int pos, int color)
     for (k = number_collapsed_moves; k < move_history_pointer; k++) {
       move_history_color[k - number_collapsed_moves] = move_history_color[k];
       move_history_pos[k - number_collapsed_moves] = move_history_pos[k];
+      move_history_hash[k - number_collapsed_moves] = move_history_hash[k];
     }
     move_history_pointer -= number_collapsed_moves;
 
@@ -972,6 +977,9 @@ play_move(int pos, int color)
 
   move_history_color[move_history_pointer] = color;
   move_history_pos[move_history_pointer] = pos;
+  move_history_hash[move_history_pointer] = board_hash;
+  if (board_ko_pos != NO_MOVE)
+    hashdata_invert_ko(&move_history_hash[move_history_pointer], board_ko_pos);
   move_history_pointer++;
   
   play_move_no_history(pos, color, 1);
@@ -1057,8 +1065,13 @@ is_pass(int pos)
 
 
 /*
- * is_legal(pos, color) determines whether the move (color) at
- * pos is legal.
+ * is_legal(pos, color) determines whether the move (color) at pos is
+ * legal. This is for internal use in the engine and always assumes
+ * that suicide is allowed and only simple ko restrictions, no
+ * superko, regardless of the rules actually used in the game.
+ *
+ * Use is_allowed_move() if you want to take alternative suicide and
+ * ko rules into account.
  */
 
 int 
@@ -1076,11 +1089,18 @@ is_legal(int pos, int color)
     return 0;
 
   /* 3. The location must not be the ko point. */
-  if (pos == board_ko_pos)
+  if (pos == board_ko_pos) {
+    /*    The ko position is guaranteed to have all neighbors of the
+     *    same color, or off board. If that color is the same as the
+     *    move the ko is being filled, which is always allowed. This
+     *    could be tested with has_neighbor() but here a faster test
+     *    suffices.
+     */
     if (board[WEST(pos)] == OTHER_COLOR(color)
 	|| board[EAST(pos)] == OTHER_COLOR(color)) {
       return 0;
     }
+  }
 
   /* Check for stack overflow. */
   if (stackp >= MAXSTACK-2) {
@@ -1094,7 +1114,7 @@ is_legal(int pos, int color)
   }
 
   /* Check for suicide. */
-  if (!allow_suicide && is_suicide(pos, color))
+  if (is_suicide(pos, color))
     return 0;
   
   return 1;
@@ -1154,6 +1174,67 @@ is_illegal_ko_capture(int pos, int color)
   return (pos == board_ko_pos
 	  && ((board[WEST(pos)] == OTHER_COLOR(color))
 	      || (board[EAST(pos)] == OTHER_COLOR(color))));
+}
+
+/*
+ * is_allowed_move(int pos, int color) determines whether a move is
+ * legal with respect to the suicide and ko rules in play.
+ *
+ * This function is only valid when stackp == 0 since there is no
+ * tracking of superko for trymoves.
+ */
+int
+is_allowed_move(int pos, int color)
+{
+  gg_assert(stackp == 0);
+
+  /* 1. A pass move is always legal, no matter what. */
+  if (pos == PASS_MOVE)
+    return 1;
+
+  /* 2. The move must be inside the board. */
+  ASSERT_ON_BOARD1(pos);
+
+  /* 3. The location must be empty. */
+  if (board[pos] != EMPTY) 
+    return 0;
+
+  /* 4. Simple ko repetition is only allowed if no ko rule is in use.
+   *    For superko rules this check is redundant.
+   *
+   *    The ko position is guaranteed to have all neighbors of the
+   *    same color, or off board. If that color is the same as the
+   *    move the ko is being filled, which is always allowed. This
+   *    could be tested with has_neighbor() but here a faster test
+   *    suffices.
+   */
+  if (ko_rule != NONE
+      && pos == board_ko_pos
+      && (board[WEST(pos)] == OTHER_COLOR(color)
+	  || board[EAST(pos)] == OTHER_COLOR(color)))
+    return 0;
+
+  /* 5. Check for suicide. Suicide rule options:
+   *    FORBIDDEN   - No suicides allowed.
+   *    ALLOWED     - Suicide of more than one stone allowed.
+   *    ALL_ALLOWED - All suicides allowed.
+   */
+  if (is_suicide(pos, color))
+    if (suicide_rule == FORBIDDEN
+	|| (suicide_rule == ALLOWED
+	    && !has_neighbor(pos, color)))
+      return 0;
+
+  /* 6. Check for whole board repetitions. The superko options are
+   *    SIMPLE, NONE - No superko restrictions.
+   *    PSK          - Repetition of a previous position forbidden.
+   *    SSK          - Repetition of a previous position with the same
+   *                   player to move forbidden.
+   */
+  if (is_superko_violation(pos, color, ko_rule))
+    return 0;
+  
+  return 1;
 }
 
 /* Necessary work to set the new komaster state. */
@@ -2937,6 +3018,51 @@ is_ko_point(int pos)
   return 0;
 }
 
+
+/* Return true if a move by color at pos is a superko violation
+ * according to the specified type of ko rules. This function does not
+ * detect simple ko unless it's also a superko violation.
+ *
+ * The superko detection is done by comparing board hashes from
+ * previous positions. For this to work correctly it's necessary to
+ * remove the contribution to the hash from the simple ko position.
+ * The move_history_hash array contains board hashes for previous
+ * positions, also without simple ko position contributions.
+ */
+static int
+is_superko_violation(int pos, int color, enum ko_rules type)
+{
+  Hash_data this_board_hash = board_hash;
+  Hash_data new_board_hash;
+  int k;
+
+  /* No superko violations if the ko rule is not a superko rule. */
+  if (type == NONE || type == SIMPLE)
+    return 0;
+
+  if (board_ko_pos != NO_MOVE)
+    hashdata_invert_ko(&this_board_hash, board_ko_pos);
+
+  really_do_trymove(pos, color);
+  new_board_hash = board_hash;
+  if (board_ko_pos != NO_MOVE)
+    hashdata_invert_ko(&new_board_hash, board_ko_pos);
+  undo_trymove();
+
+  /* The current position is only a problem with positional superko
+   * and a single stone suicide.
+   */
+  if (type == PSK && hashdata_is_equal(this_board_hash, new_board_hash))
+    return 1;
+
+  for (k = move_history_pointer - 1; k >= 0; k--)
+    if (hashdata_is_equal(move_history_hash[k], new_board_hash)
+	&& (type == PSK
+	    || move_history_color[k] == OTHER_COLOR(color)))
+      return 1;
+
+  return 0;
+}
 
 /* Returns 1 if at least one string is captured when color plays at pos.
  */

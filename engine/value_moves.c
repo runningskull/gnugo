@@ -3428,13 +3428,18 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
 
   ko_move_target = get_biggest_owl_target(ko_move);
   
-  /* Find the ko stone. */
-  for (k = 0; k <= 3; k++) {
-    ko_stone = ko_move + delta[k];
-    if (ON_BOARD(ko_stone) && countlib(ko_stone) == 1)
-      break;
+  /* If the move is a simple ko recapture, find the ko stone. (If
+   * it's not a simple ko recapture, then the move must be a superko
+   * violation.)
+   */
+  if (is_illegal_ko_capture(ko_move, color)) {
+    for (k = 0; k <= 3; k++) {
+      ko_stone = ko_move + delta[k];
+      if (ON_BOARD(ko_stone) && countlib(ko_stone) == 1)
+	break;
+    }
+    ASSERT_ON_BOARD1(ko_stone);
   }
-  ASSERT_ON_BOARD1(ko_stone);
   
   TRACE("Reevaluating ko threats.\n");
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -3498,8 +3503,12 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
     /* If there is no threat recorded, the followup value is probably
      * contributed by a pattern. We can do nothing but accept this value.
      * (although this does cause problems).
+     *
+     * FIXME: In the case of superko violation we have no ko_stone.
+     * Presumably some of the tests below should be applicable anyway.
+     * Currently we just say that any threat is ok.
      */
-    if (type == -1)
+    if (type == -1 || ko_stone == NO_MOVE)
       threat_does_work = 1;
     else {
       if (trymove(pos, color, "reevaluate_ko_threats", ko_move)) {
@@ -3693,7 +3702,9 @@ find_best_move(int *the_move, float *value, int color,
     /* If the best move is an illegal ko capture, reevaluate ko
      * threats and search again.
      */
-    if (best_value > 0.0 && is_illegal_ko_capture(best_move, color)) {
+    if (best_value > 0.0
+	&& (is_illegal_ko_capture(best_move, color)
+	    || !is_allowed_move(best_move, color))) {
       TRACE("Move at %1m would be an illegal ko capture.\n", best_move);
       reevaluate_ko_threats(best_move, color, best_value);
       redistribute_points();

@@ -508,6 +508,13 @@ do_genmove(int color, float pure_threat_value,
     }
   }
 
+  /* If we somehow have managed to generate an illegal move, pass instead. */
+  if (!is_allowed_move(move, color)) {
+    TRACE("ILLEGAL MOVE GENERATED. Passing instead.\n");
+    move = PASS_MOVE;
+    *value = -1.0;
+  }
+  
   /* If no move is found then pass. */
   if (move == PASS_MOVE) {
     TRACE("I pass.\n");

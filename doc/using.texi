@@ -496,6 +496,43 @@ game.
 Use Japanese Rules. This is the default unless you specify
 @option{--enable-chinese-rules} as a configure option.
 @end quotation
+@item @option{--forbid-suicide} 
+@quotation
+Do not allow suicide moves (playing a stone so that it ends up without
+liberties and is therefore immediately removed). This is the default.
+@end quotation
+@item @option{--allow-suicide} 
+@quotation
+Allow suicide moves, except single-stone suicide. The latter would not
+change the board at all and pass should be used instead.
+@end quotation
+@item @option{--allow-all-suicide} 
+@quotation
+Allow suicide moves, including single-stone suicide. This is only
+interesting in exceptional cases. Normally the
+@option{--allow-suicide} option should be used instead.
+@end quotation
+@item @option{--simple-ko} 
+@quotation
+Do not allow an immediate recapture of a ko so that the previous
+position is recreated. Repetition of earlier positions than that are
+allowed. This is default.
+@end quotation
+@item @option{--no-ko} 
+@quotation
+Allow all kinds of board repetition.
+@end quotation
+@item @option{--positional-superko} 
+@quotation
+Forbid repetition of any earlier board position. This only applies to
+moves on the board; passing is always allowed.
+@end quotation
+@item @option{--situational-superko} 
+@quotation
+Forbid repetition of any earlier board position with the same player
+to move. This only applies to moves on the board; passing is always
+allowed.
+@end quotation
 @item @option{--copyright}: Display the copyright notice
 @item @option{--version} or @option{-v}: Print the version number
 @item @option{--printsgf @var{filename}}: 
