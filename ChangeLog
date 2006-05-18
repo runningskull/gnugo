@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- gnugo.dsw and uncompress_fuseki.dsp revised
 - configure.in revised to improve socket support detection on windows
 - gameinfo_play_sgftree_rot() revised to fail gracefully
 - new static functions really_do_trymove() and is_superko_violation()

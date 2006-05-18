@@ -32,8 +32,8 @@ RSC=rc.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release"
-# PROP BASE Intermediate_Dir "Release"
+# PROP BASE Output_Dir "uncompress_fuseki___Win32_Release"
+# PROP BASE Intermediate_Dir "uncompress_fuseki___Win32_Release"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
@@ -42,7 +42,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /GX /Zi /O2 /I ".." /I "..\utils" /I "..\engine" /I "..\sgf" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "HAVE_CONFIG_H" /Fd"Release/uncompress_fuseki" /FD /c
+# ADD CPP /W3 /GX /O2 /I "." /I ".." /I "../sgf" /I "../engine" /I "../utils" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "HAVE_CONFIG_H" /FD /c
+# SUBTRACT CPP /nologo /YX
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -50,14 +51,14 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 ..\utils\Release\utils.lib .\Release\dfa.lib ..\engine\Release\board.lib ..\sgf\Release\sgf.lib /nologo /subsystem:console /debug /machine:I386
+# ADD LINK32 sgf.lib engine.lib utils.lib /nologo /subsystem:console /machine:I386 /out:"Release/uncompress_fuseki.exe" /libpath:"../sgf/Release/" /libpath:"../engine/Release/" /libpath:"../utils/Release/" /libpath:"./Release/"
 
 !ELSEIF  "$(CFG)" == "uncompress_fuseki - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Output_Dir "uncompress_fuseki___Win32_Debug"
+# PROP BASE Intermediate_Dir "uncompress_fuseki___Win32_Debug"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
@@ -66,7 +67,8 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /W2 /Gm /GX /ZI /Od /I ".." /I "..\utils" /I "..\engine" /I "..\sgf" /D "_DEBUG" /D "HAVE_CONFIG_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /Fd"Debug/uncompress_fuseki" /FD /GZ /c
+# ADD CPP /W3 /Gm /GX /Zi /Od /I "." /I ".." /I "../sgf" /I "../engine" /I "../utils" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "HAVE_CONFIG_H" /FR /FD /GZ /c
+# SUBTRACT CPP /nologo /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -74,7 +76,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\utils\Debug\utils.lib .\Debug\dfa.lib ..\engine\Debug\board.lib ..\sgf\Debug\sgf.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"Debug/uncompress_fuseki.exe" /pdbtype:sept
+# SUBTRACT LINK32 /incremental:no /nodefaultlib
 
 !ENDIF 
 
@@ -94,284 +97,9 @@ SOURCE=.\uncompress_fuseki.c
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # End Group
+# Begin Group "Resource Files"
+
+# PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# End Group
 # End Target
 # End Project
---X1bOJ3K7DJ5YkBrT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="gnugo.dsw"
-
-Microsoft Developer Studio Workspace File, Format Version 6.00
-# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
-
-###############################################################################
-
-Project: "board"=.\engine\board.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name utils
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "dfa"=.\patterns\dfa.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "engine"=.\engine\engine.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name sgf
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "fuseki"=.\patterns\fuseki.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name sgf
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name sgfgen
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name engine
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name patterns
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name dfa
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "gnugo"=.\interface\gnugo.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name board
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name engine
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name joseki
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name mkeyes
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name mkpat
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name sgf
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name sgfgen
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name utils
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name fuseki
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name patterns
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name dfa
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "joseki"=.\patterns\joseki.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name sgf
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name board
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name utils
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "mkeyes"=.\patterns\mkeyes.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name utils
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "mkpat"=.\patterns\mkpat.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name utils
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name dfa
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "patterns"=.\patterns\patterns.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name joseki
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name mkeyes
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name mkpat
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name uncompress_fuseki
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "sgf"=.\sgf\sgf.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name sgfgen
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name utils
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "sgfgen"=.\sgf\sgfgen.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name utils
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "uncompress_fuseki"=.\patterns\uncompress_fuseki.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name utils
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name board
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name sgf
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "utils"=.\utils\utils.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Global:
-
-Package=<5>
-{{{
-}}}
-
-Package=<3>
-{{{
-}}}
-
-###############################################################################
-

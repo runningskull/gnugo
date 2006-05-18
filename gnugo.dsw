@@ -188,6 +188,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name mkpat
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name uncompress_fuseki
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -220,6 +223,27 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name utils
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "uncompress_fuseki"=.\patterns\uncompress_fuseki.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name utils
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name board
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name sgf
     End Project Dependency
 }}}
 
