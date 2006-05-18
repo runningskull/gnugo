@@ -589,7 +589,12 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
   sgftree = *tree;
 
   if (filename) {
-    gameinfo->to_move = gameinfo_play_sgftree(gameinfo, &sgftree, until);
+    /* No need to check for failure here since that was already done
+     * when it was loaded in main().
+     *
+     * FIXME: Why do we load the game again?
+     */
+    gameinfo_play_sgftree(gameinfo, &sgftree, until);
     sgf_initialized = 1;
   }
   else {
@@ -970,9 +975,12 @@ do_play_ascii(Gameinfo *gameinfo)
 	      break;
 	    }
             /* to avoid changing handicap etc. */
-            sgf_initialized = 1;
-            gameinfo_play_sgftree(gameinfo, &sgftree, NULL);
-	    sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
+	    if (gameinfo_play_sgftree(gameinfo, &sgftree, NULL) == EMPTY)
+	      fprintf(stderr, "Cannot load '%s'\n", tmpstring);
+	    else {
+	      sgf_initialized = 1;
+	      sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
+	    }
 	  }
 	  else
 	    printf("Please specify a filename\n");

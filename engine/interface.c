@@ -224,7 +224,8 @@ rotate1(int pos, int orientation)
  * Play the moves in an SGF tree. Walk the main variation, actioning
  * the properties into the playing board.
  *
- * Returns the color of the next move to be made.
+ * Returns the color of the next move to be made. The returned color
+ * being EMPTY signals a failure to load the file.
  *
  * Head is an sgf tree. 
  * Untilstr is an optional string of the form either 'L12' or '120'
@@ -243,19 +244,29 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
   
   if (!sgfGetIntProperty(tree->root, "SZ", &bs))
     bs = 19;
-  gnugo_clear_board(bs);
-
+  
+  if (bs < MIN_BOARD || bs > MAX_BOARD) {
+    if (bs < MIN_BOARD)
+      gprintf("Boardsize too small.\n");
+    else
+      gprintf("Boardsize too large.\n");
+    
+    return EMPTY;
+  }
+  
   handicap = 0;
   if (sgfGetIntProperty(tree->root, "HA", &handicap) && handicap > 1)
     next = WHITE;
   gameinfo->handicap = handicap;
   
   if (handicap > bs * bs - 1 || handicap < 0) {
-    fprintf(stderr, " Handicap HA[%d] is unreasonable.\n", handicap);
-    fprintf(stderr, " Modify SGF file.\n");
-    exit(EXIT_FAILURE);
+    gprintf(" Handicap HA[%d] is unreasonable.\n Modify SGF file.\n",
+	    handicap);
+    return EMPTY;
   }
   
+  gnugo_clear_board(bs);
+
   if (!sgfGetFloatProperty(tree->root, "KM", &komi)) {
     if (gameinfo->handicap == 0)
       komi = 5.5;
@@ -349,6 +360,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 	else {
 	  gprintf("WARNING: Move off board or on occupied position found in sgf-file.\n");
 	  gprintf("Move at %1m ignored, trying to proceed.\n", move);
+	  gameinfo->to_move = next;
 	  return next;
 	}
 

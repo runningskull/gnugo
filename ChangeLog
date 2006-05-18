@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- gameinfo_play_sgftree_rot() revised to fail gracefully
 - new static functions really_do_trymove() and is_superko_violation()
   in board.c 
 - board hashes stored in the move history

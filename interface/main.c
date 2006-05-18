@@ -982,7 +982,11 @@ main(int argc, char *argv[])
       exit(EXIT_FAILURE);
     }
     
-    gameinfo_play_sgftree_rot(&gameinfo, &sgftree, untilstring, orientation);
+    if (gameinfo_play_sgftree_rot(&gameinfo, &sgftree, untilstring,
+				  orientation) == EMPTY) {
+      fprintf(stderr, "Cannot load '%s'\n", infilename);
+      exit(EXIT_FAILURE);
+    }
   }
   else
   /* Initialize and empty sgf tree if there was no infile. */

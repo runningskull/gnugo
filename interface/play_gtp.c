@@ -846,6 +846,9 @@ gtp_loadsgf(char *s)
     color_to_move = gameinfo_play_sgftree_rot(&gameinfo, &sgftree, untilstring,
                                               gtp_orientation);
 
+  if (color_to_move == EMPTY)
+    return gtp_failure("cannot load '%s'", filename);
+  
   gtp_internal_set_boardsize(board_size);
   reset_engine();
   init_timers();
