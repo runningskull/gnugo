@@ -832,8 +832,11 @@ find_worm_attacks_and_defenses()
     for (k = 0; k < liberties; k++) {
       int pos = libs[k];
       if (!attack_move_known(pos, str)) {
-	/* Try to attack on the liberty. */
-	if (trymove(pos, other, "make_worms", str)) {
+	/* Try to attack on the liberty. Don't consider
+	 * send-two-return-one moves.
+	 */
+	if (!send_two_return_one(pos, other)
+	    && trymove(pos, other, "make_worms", str)) {
 	  if (board[str] == EMPTY || attack(str, NULL)) {
 	    if (board[str] == EMPTY)
 	      dcode = 0;

@@ -310,6 +310,8 @@ make_dragons(int stop_before_owl)
     if (ON_BOARD(str) && board[str] != EMPTY)
       dragon[str] = dragon[dragon[str].origin];
 
+  identify_thrashing_dragons();
+  
   /* Owl threats. */
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str) 
@@ -329,7 +331,7 @@ make_dragons(int stop_before_owl)
 	int acode = DRAGON2(str).owl_attack_code;
 	int dcode = DRAGON2(str).owl_defense_code;
 	int defense_point, second_defense_point;
-	
+
 	if (get_level() >= 8
 	    && !disable_threat_computation
 	    && (owl_threats 
@@ -418,8 +420,6 @@ make_dragons(int stop_before_owl)
   semeai();
   time_report(2, "  semeai module", NO_MOVE, 1.0);
   
-  identify_thrashing_dragons();
-
   /* Count the non-dead dragons. */
   lively_white_dragons = 0;
   lively_black_dragons = 0;

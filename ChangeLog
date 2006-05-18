@@ -2,6 +2,15 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- identify_thrashing_dragons() called earlier in make_dragons()
+- do not play self-atari while splitting eyespaces in aftermath_genmove()
+- in do_owl_attack(), don't consider send-two-return-one defender moves
+- send-two-return-one moves no longer considered in
+  find_more_attack_and_defense_moves() 
+- send-two-return-one moves no longer considered in
+  find_worm_attacks_and_defenses()
+- string connection bonus for ko captures reduced in move_connects_strings()
+- maximum bonus from secondary move values limited to 0.4 points
 - more legality checking in fill_liberty()
 - detect_tactical_blunder() revised to avoid finding illegal defense moves
 - semeai.tst reordered

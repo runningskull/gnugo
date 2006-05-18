@@ -95,6 +95,8 @@ move_connects_strings(int pos, int color, int to_move)
   /* Do some thresholding. */
   if (fewlibs > 4)
     fewlibs = 4;
+  if (to_move && is_ko(pos, color, NULL) && fewlibs > 1)
+    fewlibs = 1;
   if (fewlibs == 0 && own_strings == 1)
     own_strings = 0;
 
@@ -159,6 +161,10 @@ find_more_attack_and_defense_moves(int color)
   
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
     if (!ON_BOARD(ii))
+      continue;
+
+    /* Don't consider send-two-return-one moves here. */
+    if (send_two_return_one(ii, color))
       continue;
     
     for (k = 0; k < MAX_REASONS; k++) {
@@ -3141,9 +3147,10 @@ value_move_reasons(int pos, int color, float pure_threat_value,
 			+ move[pos].reverse_followup_value);
     }
 
-    tot_value += 0.05 * move[pos].secondary_value;
+    tot_value += soft_cap(0.05 * move[pos].secondary_value, 0.4);
     if (move[pos].secondary_value != 0.0)
-      TRACE("  %1m: %f - secondary\n", pos, 0.05 * move[pos].secondary_value);
+      TRACE("  %1m: %f - secondary\n", pos,
+	    soft_cap(0.05 * move[pos].secondary_value, 0.4));
 
     if (move[pos].numpos_shape + move[pos].numneg_shape > 0) {
       /* shape_factor has already been computed. */

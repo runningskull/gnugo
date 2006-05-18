@@ -93,7 +93,7 @@ aftermath_genmove(int color, int do_capture_dead_stones,
  * 4. Extend an invincible string towards an opponent string or an own
  *    non-invincible string.
  * 5. Split a big eyespace of an alive own dragon without invincible
- *    strings into smaller pieces.
+ *    strings into smaller pieces. Do not play self-atari here.
  * 6. Play a liberty of a dead opponent dragon.
  *
  * Steps 2--4 are interleaved to try to optimize the efficiency of the
@@ -437,6 +437,10 @@ do_aftermath_genmove(int color,
     if (board[pos] != EMPTY || distance[pos] != -1)
       continue;
 
+    /* Do not play self-atari here. */
+    if (is_self_atari(pos, color))
+      continue;
+    
     memset(mx, 0, sizeof(mx));
     
     for (k = 0; k < 8; k++) {

@@ -2050,11 +2050,12 @@ do_owl_attack(int str, int *move, int *wormid,
 	   * attack with this move.
 	   *
 	   * If the move is suicide for us, try to find a backfilling
-	   * move to play instead.
+	   * move to play instead. Do this also if the move is a
+	   * send-two-return-one sacrifice.
 	   */
 	  const char *name = "defense move";
 
-	  if (is_suicide(dpos, other)) {
+	  if (is_suicide(dpos, other) || send_two_return_one(dpos, other)) {
 	    int dpos2;
 	    for (k = 0; k < 4; k++) {
 	      if (board[dpos + delta[k]] == other
