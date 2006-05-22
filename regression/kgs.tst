@@ -107,7 +107,7 @@ loadsgf games/kgs/yagr-gab9.2.sgf 158
 # Connect the monkey jump instead of running nowhere!
 loadsgf games/kgs/yagr-Sapojnik.sgf 80
 220 reg_genmove white
-#? [T10]*
+#? [T10]
 
 # Win the semeai!
 loadsgf games/kgs/yagr-Kazik.sgf 149
@@ -155,7 +155,7 @@ loadsgf games/kgs/yagr-awf.sgf 191
 # Probably owl cut problem. At least have to try to win the semeai.
 loadsgf games/kgs/yagr-Mythenmetz.sgf 156
 320 reg_genmove white
-#? [K12]
+#? [K12]*
 
 loadsgf games/kgs/yagr-FKleolio.sgf 211
 330 reg_genmove white
@@ -172,7 +172,7 @@ loadsgf games/kgs/SURARIN-yagr.sgf 218
 
 loadsgf games/kgs/yagr-digibier.sgf 218
 360 reg_genmove white
-#? [B18]*
+#? [B18]
 
 loadsgf games/kgs/yagr-justre1.sgf 133
 370 restricted_genmove white H11 G12

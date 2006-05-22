@@ -520,7 +520,7 @@ loadsgf games/kgs/GNU-minautore.sgf 80
 # J8 leaves ko aji. (Admittedly a very bad ko for black but still a ko.)
 loadsgf games/CrazyStone1.sgf 50
 132 reg_genmove white
-#? [H9|J4]*
+#? [H9|J4]
 
 loadsgf games/CrazyStone1.sgf 56
 133 analyze_semeai D9 G3
@@ -554,7 +554,7 @@ loadsgf games/semeai/semeai22.sgf 1
 141 analyze_semeai A4 E3
 #? [2 2 (F1|F2|F3)]
 142 analyze_semeai E3 A4
-#? [2 2 (A1|A3)]
+#? [2 2 (A1|A3)]*
 
 # White has no local move but can pass for a good ko.
 # See also reading:224-227.
@@ -562,11 +562,11 @@ loadsgf games/semeai/semeai22.sgf 7
 143 analyze_semeai A4 E3
 #? [3 3 (F1|F3)]
 144 analyze_semeai E3 A4
-#? [2 2 PASS]
+#? [2 2 PASS]*
 
 # See also 9x9:640.
 loadsgf games/cgos/25811.sgf 52
 145 analyze_semeai E9 B8
-#? [2 2 PASS]
+#? [2 2 PASS]*
 146 analyze_semeai B8 E9
-#? [3 3 (A7|B9)]
+#? [3 3 (A7|B9)]*

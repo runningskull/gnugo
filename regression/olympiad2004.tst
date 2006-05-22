@@ -248,7 +248,7 @@ loadsgf games/olympiad2004/9x9/int-gnu.sgf 42
 # Better to allow G7 to get cut off than E3.
 loadsgf games/olympiad2004/9x9/gnu-mag.sgf 9
 501 reg_genmove black
-#? [F3]*
+#? [F3]
 
 # Hane at A6 leads nowhere. The clamp at B5 has more potential.
 # The cut at C6 is captured right out in a ladder.

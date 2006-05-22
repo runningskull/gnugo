@@ -2,33 +2,29 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.7.10 released May 21, 2006
+
 - gnugo.dsw and uncompress_fuseki.dsp revised
 - configure.in revised to improve socket support detection on windows
 - gameinfo_play_sgftree_rot() revised to fail gracefully
-- new static functions really_do_trymove() and is_superko_violation()
-  in board.c 
+- new static really_do_trymove() and is_superko_violation()   in board.c 
 - board hashes stored in the move history
 - is_legal() no longer depends on allow_suicide
-- new function is_allowed_move() to determine legality with respect to
-  current suicide and ko rules 
+- new is_allowed_move() to determine legality for current suicide and ko rules 
 - new global variables suicide_rule and ko_rule
 - illegal moves replaced with passes near the end of do_genmove()
 - reevaluate_ko_threats() revised
-- look for ko threats also if the best move is a superko violation,
-  contingent on superko rules being used 
-- new suicide options --forbid-suicide (default) and
-  --allow-all-suicide, in addition to the earlier --allow-suicide 
-- new ko rule options --simple-ko (default), --no-ko,
-  --positional-superko, and --situational-superko 
-- is_allowed_move() used instead of is_legal() in play_gtp.c,
-  play_ascii.c, and play_solo.c  
+- under superko rules look for ko threats also if best move illegal
+- new options --forbid-suicide (default) and --allow-all-suicide
+- new options --simple-ko (default), --no-ko, --positional-superko, 
+  and --situational-superko 
+- is_allowed_move() used instead of is_legal() in play_gtp.c, play_ascii.c
+  and play_solo.c  
 - identify_thrashing_dragons() called earlier in make_dragons()
 - do not play self-atari while splitting eyespaces in aftermath_genmove()
 - in do_owl_attack(), don't consider send-two-return-one defender moves
-- send-two-return-one moves no longer considered in
-  find_more_attack_and_defense_moves() 
-- send-two-return-one moves no longer considered in
-  find_worm_attacks_and_defenses()
+- send-two-return-one moves not tried in find_more_attack_and_defense_moves() 
+- send-two-return-one moves not tried in   find_worm_attacks_and_defenses()
 - string connection bonus for ko captures reduced in move_connects_strings()
 - maximum bonus from secondary move values limited to 0.4 points
 - more legality checking in fill_liberty()
@@ -38,8 +34,8 @@
 - new testfile 13x13c.tst
 - do not try to add an sgf circle for pass moves in replay_node()
 - new enum same_dragon_value in owl.c
-- new owl_defendpats.db classification "a" for patterns connecting all
-  friendly stones to the goal
+- new owl_defendpats.db classification "a" for connecting all friendly 
+  stones to the goal
 - owl tuning
 - influence tuning
 - tuning

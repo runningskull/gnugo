@@ -86,7 +86,7 @@ loadsgf games/incident94.sgf 114
 # Tenuki instead of urgent edge joseki move.
 loadsgf games/strategy40.sgf 10
 167 reg_genmove black
-#? [D4]*
+#? [D4]
 
 # Safety must come first. This is almost a whole-board semeai.
 loadsgf games/strategy40.sgf 30
@@ -117,7 +117,7 @@ loadsgf games/strategy42.sgf 188
 # superior.
 loadsgf games/strategy42.sgf 214
 172 restricted_genmove white M8 N9
-#? [M8]
+#? [M8]*
 
 #CATEGORY=KO
 #DESCRIPTION=GNU Go lacks sufficient Ko understanding
@@ -279,7 +279,7 @@ loadsgf games/juka1.sgf 28
 
 loadsgf games/juka1.sgf 48
 205 restricted_genmove black O11 P11
-#? [P11]
+#? [P11]*
 
 #CATEGORY=SEMEAI
 #DESCRIPTION=K6 does take K8 to no eyes, but...
@@ -293,7 +293,7 @@ loadsgf games/strategy45.sgf
 # T6 fails badly. Locally S9 looks best.
 loadsgf games/owl30.sgf 84
 207 restricted_genmove black R9 S9 T6
-#? [S9]
+#? [S9]*
 
 loadsgf games/lordofpi.sgf 36
 208 reg_genmove black
@@ -343,7 +343,7 @@ loadsgf games/handtalk/handtalk1.sgf 49
 # locally F12 is better. Similar problem at move 51
 loadsgf games/handtalk/handtalk1.sgf 55
 218 restricted_genmove black C14 E12 F12
-#? [F12]
+#? [F12]*
 
 # lots of good problems in this game
 loadsgf games/nngs/gnugo-3.1.30-morlvera-200204041921.sgf 154

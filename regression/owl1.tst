@@ -87,7 +87,7 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 77
 
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 231
 283 owl_defend J9
-#? [0]*
+#? [0]
 
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 241
 284 owl_defend J9
@@ -536,6 +536,6 @@ loadsgf games/semeai/semeai21.sgf
 # See also 9x9:640.
 loadsgf games/cgos/25811.sgf 52
 395 owl_attack E9
-#? [3 (A7|B9)]
+#? [3 (A7|B9)]*
 396 owl_defend E9
-#? [2 PASS]
+#? [2 PASS]*

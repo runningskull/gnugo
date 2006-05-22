@@ -65,7 +65,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 100
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 168
 170 reg_genmove black
-#? [S6]
+#? [S6]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 184
 190 reg_genmove black

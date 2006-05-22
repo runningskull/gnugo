@@ -199,7 +199,7 @@ loadsgf games/boardspace/GNUGo-GoFigure0.1-200503171816.sgf 17
 
 loadsgf games/boardspace/GNUGo-GoFigure0.1-200503171816.sgf 35
 400 reg_genmove black
-#? [A5|B3]*
+#? [A5|B3]
 
 loadsgf games/boardspace/GNUGo-GoFigure0.1-200503181316.sgf 11
 410 reg_genmove black
@@ -322,11 +322,11 @@ loadsgf games/9x9-4.sgf 13
 # See also reading:229,230, owl1:395,396, and semeai:145,146.
 loadsgf games/cgos/25811.sgf 52
 640 reg_genmove white
-#? [A8|G6|J6]
+#? [A8|G6|J6]*
 
 # Necessary to start capturing from the left. The game move at J1 is
 # of course futile.
 # See also reading:231.
 loadsgf games/cgos/14198.sgf 53
 650 reg_genmove black
-#? [E1]
+#? [E1]*

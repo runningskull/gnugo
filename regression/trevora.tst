@@ -363,7 +363,7 @@ loadsgf games/trevor/auto/a035.sgf 42
 loadsgf games/trevor/auto/a035.sgf 50
 play white F5
 540 reg_genmove white
-#? [F2|G2|E3]
+#? [F2|G2|E3]*
 
 
 loadsgf games/trevor/auto/a035.sgf 51

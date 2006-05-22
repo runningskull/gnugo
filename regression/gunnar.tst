@@ -454,7 +454,7 @@ loadsgf games/kgs/sade-GNU.sgf 253
 # M10 is clearly better than N10.
 loadsgf games/kgs/sade-GNU.sgf 265
 83 restricted_genmove black M10 N10
-#? [M10]*
+#? [M10]
 
 # P13 is clearly better than O13.
 loadsgf games/kgs/GNU-bassanio.sgf 164
@@ -465,17 +465,17 @@ loadsgf games/kgs/GNU-bassanio.sgf 164
 # guaranteed to be better.
 loadsgf games/kgs/ben9992000-GNU.sgf 141
 85 restricted_genmove black T6 R8
-#? [R8]*
+#? [R8]
 
 # B6 unreasonable.
 loadsgf games/kgs/haiku-GNU.sgf 93
 86 restricted_genmove black C8 B6
-#? [C8]*
+#? [C8]
 
 # O5 solves the problem. P4 backfires.
 loadsgf games/kgs/melonhead1-GNU.sgf 127
 87 restricted_genmove black O5 P4 M4 P3 M3 N3 N2 M5 N6
-#? [O5]*
+#? [O5]
 
 # A15 does not solve the atari-atari problem.
 loadsgf games/kgs/melonhead1-GNU.sgf 183
@@ -501,7 +501,7 @@ loadsgf games/kgs/GNU-roidesnems.sgf 143
 # B15 cuts off the black stone in the corner. G17 is pointlessly submissive.
 loadsgf games/kgs/GNU-namascae.sgf 102
 92 restricted_genmove white G17 B15
-#? [B15]*
+#? [B15]
 
 # S5 should be 2 points sente and T13 8 points gote. In the game S5
 # was overvalued while T13 was undervalued. (Other moves are bigger
@@ -518,4 +518,4 @@ loadsgf games/kgs/GNU-namascae.sgf 118
 # Of course O3 isn't an option.
 loadsgf games/gunnar/gunnar22.sgf
 95 reg_genmove white
-#? [P1|S1]*
+#? [P1|S1]

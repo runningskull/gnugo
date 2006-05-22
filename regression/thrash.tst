@@ -114,12 +114,12 @@ loadsgf games/cgos/30527.sgf 73
 # safe outer liberties.
 loadsgf games/cgos/994.sgf 76
 23 reg_genmove white
-#? [A5|D7]
+#? [A5|D7]*
 
 # Fill the outer ko at J7 first and there's nothing black can do.
 loadsgf games/cgos/994.sgf 78
 24 restricted_genmove white J1 J7
-#? [J7]
+#? [J7]*
 
 loadsgf games/cgos/13435.sgf 74
 25 reg_genmove white
@@ -127,7 +127,7 @@ loadsgf games/cgos/13435.sgf 74
 
 loadsgf games/cgos/31446.sgf 88
 26 reg_genmove white
-#? [E1|A1]
+#? [E1|A1]*
 
 # Fill a ko before taking another one.
 loadsgf games/cgos/37169.sgf 86
