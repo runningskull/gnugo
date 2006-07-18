@@ -1090,7 +1090,7 @@ remove_double_blocks(struct influence_data *q,
 			   ? q->black_permeability : q->white_permeability);
     for (k = 0; k < num_blocks; k++) {
       DEBUG(DEBUG_INFLUENCE, "Removing block for %s at %1m.\n",
-	    q->color_to_move, double_blocks[k]);
+	    color_to_string(q->color_to_move), double_blocks[k]);
       permeability[double_blocks[k]] = 1.0;
       accumulate_influence(q, double_blocks[k], q->color_to_move);
     }
