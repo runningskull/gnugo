@@ -451,16 +451,14 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   }
 
   if (surrounded)
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-        if (mf[POS(m, n)]) {
-	  if (mn[POS(m, n)] == 0) {
-	    surrounded = 0;
-	    break;
-	  }
-	  else if (mn[POS(m, n)] == 2)
-	    surrounded = WEAKLY_SURROUNDED;
-        }
+    for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
+      if (mf[dpos]) {
+	if (mn[dpos] == 0) {
+	  surrounded = 0;
+	  break;
+	}
+	else if (mn[dpos] == 2)
+	  surrounded = WEAKLY_SURROUNDED;
       }
 
   /* revise the status for single stone dragons. */

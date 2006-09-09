@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in compute_surroundings()
+
 3.7.10 released May 21, 2006
 
 - gnugo.dsw and uncompress_fuseki.dsp revised
