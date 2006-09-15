@@ -1313,7 +1313,7 @@ compute_active_semeai_area(struct persistent_cache_entry *entry,
   }
 
   compute_active_owl_type_area(goal, BLACK, active_b);
-  compute_active_owl_type_area(goal, WHITE, active_b);
+  compute_active_owl_type_area(goal, WHITE, active_w);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     int value = board[pos];
