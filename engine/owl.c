@@ -2054,6 +2054,11 @@ do_owl_attack(int str, int *move, int *wormid,
 	   * send-two-return-one sacrifice.
 	   */
 	  const char *name = "defense move";
+	  SGFTree *save_sgf_dumptree = sgf_dumptree;
+	  int save_count_variations = count_variations;
+
+	  sgf_dumptree = NULL;
+	  count_variations = 0;
 
 	  if (is_suicide(dpos, other) || send_two_return_one(dpos, other)) {
 	    int dpos2;
@@ -2067,6 +2072,9 @@ do_owl_attack(int str, int *move, int *wormid,
 	    }
 	  }
 
+	  sgf_dumptree = save_sgf_dumptree;
+	  count_variations = save_count_variations;
+	
 	  if (dpos != NO_MOVE) {
 	    set_single_owl_move(shape_moves, dpos, name);
 	    moves = shape_moves;
