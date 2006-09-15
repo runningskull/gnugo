@@ -180,8 +180,8 @@ compute_smaller_goal(int owner, int color_to_move,
 	queue[0] = pos;
 	while (queue_start < queue_end) {
 	  test_gray_border();
-	  for (k = 0; k < 4; k++) {
-	    int pos2 = queue[queue_start] + delta[k];
+	  for (j = 0; j < 4; j++) {
+	    int pos2 = queue[queue_start] + delta[j];
 	    if (!ON_BOARD(pos2))
 	      continue;
 	    ASSERT1(marked[pos2] == 0 || marked[pos2] == mark, pos2);
