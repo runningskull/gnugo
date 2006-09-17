@@ -473,13 +473,16 @@ do_genmove(int color, float pure_threat_value,
    * all missing dame points.
    */
   if (move == PASS_MOVE
-      && fill_liberty(&move, color)
-      && (!allowed_moves || allowed_moves[move])) {
-    *value = 1.0;
-    TRACE("Filling a liberty at %1m\n", move);
-    record_top_move(move, *value);
-    move_considered(move, *value);
-    time_report(1, "fill liberty", NO_MOVE, 1.0);
+      && fill_liberty(&move, color)) {
+    if (!allowed_moves || allowed_moves[move]) {
+      *value = 1.0;
+      TRACE("Filling a liberty at %1m\n", move);
+      record_top_move(move, *value);
+      move_considered(move, *value);
+      time_report(1, "fill liberty", NO_MOVE, 1.0);
+    }
+    else
+      move = PASS_MOVE;
   }
 
   /* If we're instructed to play out the aftermath or capture all dead
