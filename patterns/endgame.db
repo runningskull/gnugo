@@ -556,7 +556,8 @@ OXO
 .*.
 ---
 
-:8,OXe,terri(2)
+:|,OXe,terri(2)
+#al1 revised symetry (3.7.11):8,OXe,terri(2)
 
 
 # first line corner moves
@@ -1009,7 +1010,8 @@ X*X       one point reverse sente
 O.O
 ---
 
-:8,OXe,terri(1),reverse_followup(2)
+:|,OXe,terri(1),reverse_followup(2)
+#al1 revised symetry (3.7.11) :8,OXe,terri(1),reverse_followup(2)
 
 ?a?
 X*X
@@ -1027,7 +1029,8 @@ O*O       one point sente
 X.X
 ---
 
-:8,OXe,terri(1),followup(2)
+:|,OXe,terri(1),followup(2)
+#al1 revised symetry (3.7.11) :8,OXe,terri(1),followup(2)
 
 ?a?
 O*O
@@ -1184,7 +1187,8 @@ Pattern CE3
 O*X           about 1 point gote
 ...
 
-:8,OXe,terri(1)
+:-,OXe,terri(1)
+#al1 revised symetry (3.7.11) :8,OXe,terri(1)
 
 
 Pattern CE4a
@@ -1256,7 +1260,8 @@ X.X      sometimes double sente endgame move
 .*.      one point gote
 O.O
 
-:8,OXe,terri(1)
+:|,OXe,terri(1)
+#al1 revised symetry (3.7.11) :8,OXe,terri(1)
 
 XbX
 .*.
@@ -1271,7 +1276,8 @@ X.X      sometimes double sente endgame move
 .*.      two points gote
 O.O
 
-:8,OXe,terri(2)
+:|,OXe,terri(2)
+#al1 revised symetry (3.7.11) :8,OXe,terri(2)
 
 XbX
 .*.
@@ -1462,7 +1468,8 @@ Pattern CE22
 O.O
 ooo
 
-:8,OXe
+:|,OXe
+#al1 revised symetry (3.7.11) :8,OXe
 
 
 Pattern CE23
@@ -1530,7 +1537,8 @@ Pattern CE27
 X*X
 ?O?
 
-:8,-,terri(3)
+:|,-,terri(3)
+#al1 revised symetry (3.7.11) :8,-,terri(3)
 
 .b.
 A*C
@@ -1632,22 +1640,22 @@ X.*
 #
 ######################################################################
 
-
-Pattern CF3
+#Pattern CF3
 # tm New Pattern (3.1.23) (see arend:36)
 # FIXME: Perhaps better in patterns.db?
 # gf This pattern is redundant because the followup has already been
 #    found by find_worm_threats(). (This was broken in 3.1.23 and 3.1.24.)
-
-O*.O  threaten to save
-
-:-,-
-
-b*ca
-
-; dead(a) && !dead(b) && oplay_disconnect(*,*,a) && !oplay_attack(*,?,c,a)
-
-> threaten_to_save(a)
+#al1 remove pattern
+#
+#O*.O  threaten to save
+#
+#:-,-
+#
+#b*ca
+#
+#; dead(a) && !dead(b) && oplay_disconnect(*,*,a) && !oplay_attack(*,?,c,a)
+#
+#> threaten_to_save(a)
 
 
 ######################################################################
