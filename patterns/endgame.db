@@ -551,13 +551,13 @@ X*
 
 
 Pattern EE303
+# al1 Revised symmetry. (3.7.11)
 
 OXO
 .*.
 ---
 
 :|,OXe,terri(2)
-#al1 revised symetry (3.7.11):8,OXe,terri(2)
 
 
 # first line corner moves
@@ -1004,6 +1004,7 @@ OX*
 
 
 Pattern EE901
+# al1 Revised symmetry. (3.7.11)
 
 ?.?       endgame move
 X*X       one point reverse sente
@@ -1011,7 +1012,6 @@ O.O
 ---
 
 :|,OXe,terri(1),reverse_followup(2)
-#al1 revised symetry (3.7.11) :8,OXe,terri(1),reverse_followup(2)
 
 ?a?
 X*X
@@ -1022,6 +1022,7 @@ O.O
 
 
 Pattern EE902
+# al1 Revised symmetry. (3.7.11)
 # Why does this have followup value? -ab
 
 ?.?       endgame move
@@ -1030,7 +1031,6 @@ X.X
 ---
 
 :|,OXe,terri(1),followup(2)
-#al1 revised symetry (3.7.11) :8,OXe,terri(1),followup(2)
 
 ?a?
 O*O
@@ -1182,13 +1182,13 @@ OX*A
 
 
 Pattern CE3
+# al1 Revised symmetry. (3.7.11)
 
 ...           push against opponent
 O*X           about 1 point gote
 ...
 
 :-,OXe,terri(1)
-#al1 revised symetry (3.7.11) :8,OXe,terri(1)
 
 
 Pattern CE4a
@@ -1255,13 +1255,13 @@ X*O                               worth a point in chinese rules
 
 
 Pattern CE13
+# al1 Revised symmetry. (3.7.11)
 
 X.X      sometimes double sente endgame move
 .*.      one point gote
 O.O
 
 :|,OXe,terri(1)
-#al1 revised symetry (3.7.11) :8,OXe,terri(1)
 
 XbX
 .*.
@@ -1271,13 +1271,13 @@ OaO
 
 
 Pattern CE14
+# al1 Revised symmetry. (3.7.11)
 
 X.X      sometimes double sente endgame move
 .*.      two points gote
 O.O
 
 :|,OXe,terri(2)
-#al1 revised symetry (3.7.11) :8,OXe,terri(2)
 
 XbX
 .*.
@@ -1462,6 +1462,7 @@ OaO
 
 Pattern CE22
 # gf Territory not guaranteed by pattern. Removed terri(1). (3.7.2)
+# al1 Revised symmetry. (3.7.11)
 
 ?X?
 .*.      one point gote
@@ -1469,7 +1470,6 @@ O.O
 ooo
 
 :|,OXe
-#al1 revised symetry (3.7.11) :8,OXe
 
 
 Pattern CE23
@@ -1532,13 +1532,13 @@ X.X
 
 Pattern CE27
 # tm New Pattern (3.1.18)
+# al1 Revised symmetry. (3.7.11)
 
 ...   moyo breakin worth a lot.
 X*X
 ?O?
 
 :|,-,terri(3)
-#al1 revised symetry (3.7.11) :8,-,terri(3)
 
 .b.
 A*C
@@ -1640,22 +1640,22 @@ X.*
 #
 ######################################################################
 
-#Pattern CF3
-# tm New Pattern (3.1.23) (see arend:36)
-# FIXME: Perhaps better in patterns.db?
-# gf This pattern is redundant because the followup has already been
-#    found by find_worm_threats(). (This was broken in 3.1.23 and 3.1.24.)
-#al1 remove pattern
-#
-#O*.O  threaten to save
-#
-#:-,-
-#
-#b*ca
-#
-#; dead(a) && !dead(b) && oplay_disconnect(*,*,a) && !oplay_attack(*,?,c,a)
-#
-#> threaten_to_save(a)
+# Pattern CF3
+# # tm New Pattern (3.1.23) (see arend:36)
+# # FIXME: Perhaps better in patterns.db?
+# # gf This pattern is redundant because the followup has already been
+# #    found by find_worm_threats(). (This was broken in 3.1.23 and 3.1.24.)
+# # al1 Remove pattern. (3.7.11)
+# 
+# O*.O  threaten to save
+# 
+# :-,-
+# 
+# b*ca
+# 
+# ; dead(a) && !dead(b) && oplay_disconnect(*,*,a) && !oplay_attack(*,?,c,a)
+# 
+# > threaten_to_save(a)
 
 
 ######################################################################

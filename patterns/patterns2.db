@@ -2987,9 +2987,8 @@ Pattern Sente11
 ;oplay_attack(*,A)
 
 
-Pattern RevSente13
+Pattern Sente13
 # gf Revised constraint. (3.1.20)
-# al1 revised symetry, (3.7.11)
 
 *O
 
@@ -3389,6 +3388,7 @@ b.*
 
 
 Pattern DD6
+# al1 Revised symmetry. (3.7.11)
 
 ?o?          Double attack
 X*X
