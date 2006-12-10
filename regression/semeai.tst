@@ -570,3 +570,10 @@ loadsgf games/cgos/25811.sgf 52
 #? [2 2 PASS]*
 146 analyze_semeai B8 E9
 #? [3 3 (A7|B9)]*
+
+# Underlying amalgation problem, see reading:232.
+loadsgf games/semeai/semeai6.sgf
+play white A15
+play black D13
+147 analyze_semeai A12 A14
+#? [1 1 (B15|C15|D15|E15)]

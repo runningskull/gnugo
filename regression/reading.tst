@@ -982,3 +982,10 @@ loadsgf games/cgos/25811.sgf 52
 loadsgf games/cgos/14198.sgf 53
 231 attack G2
 #? [2 E1]*
+
+# See also semeai:147.
+loadsgf games/semeai/semeai6.sgf
+play white A15
+play black D13
+232 defend A12
+#? [1 (B15|C15|D15|E15)]
