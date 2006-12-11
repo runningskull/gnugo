@@ -1,4 +1,3 @@
-
 # Q6 is too slow.
 loadsgf games/gifu2005/gnugo-katsu.sgf 24
 1010 reg_genmove white
@@ -61,3 +60,24 @@ play black S19
 1150 reg_genmove white
 #? [T14|P12|Q12]*
 
+# Nothing bad can happen in the upper left corner. The B16 cut leads
+# nowhere.
+# See also reading:233.
+loadsgf games/gifu2005/mfg-gnugo.sgf 195
+1200 restricted_genmove black B19 B18 B16 C16
+#? [C16]
+
+# Double threat to cut at E17. See also tactics1:108 regarding O6.
+loadsgf games/gifu2005/mfg-gnugo.sgf 204
+1210 reg_genmove white
+#? [E17]
+
+# Double threat to cut at E17.
+loadsgf games/gifu2005/mfg-gnugo.sgf 205
+1220 reg_genmove black
+#? [E17]
+
+# M6 is worth two points gote.
+loadsgf games/gifu2005/mfg-gnugo.sgf 259
+1230 reg_genmove black
+#? [M6]

@@ -989,3 +989,8 @@ play white A15
 play black D13
 232 defend A12
 #? [1 (B15|C15|D15|E15)]
+
+# See also gifu05:1200
+loadsgf games/gifu2005/mfg-gnugo.sgf 195
+233 attack C19
+#? [0]

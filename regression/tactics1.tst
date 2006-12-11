@@ -61,3 +61,10 @@ loadsgf games/tactics08.sgf
 loadsgf games/edge_defense1.sgf
 107 reg_genmove white
 #? [B13|B14]
+
+# Obviously P7 is effective.
+loadsgf games/gifu2005/mfg-gnugo.sgf 204
+trymove white O6
+108 defend_both O9 P6
+#? [1]
+popgo
