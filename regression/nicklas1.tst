@@ -261,7 +261,7 @@ loadsgf games/nicklas/nicklas15.sgf 224
 # #? [!F15]
 
 loadsgf games/nicklas/nicklas15.sgf 258
-1509 reg_genmove black
+1509 restricted_genmove black K4 L1 T14
 #? [T14]*
 
 loadsgf games/nicklas/nicklas15.sgf 284

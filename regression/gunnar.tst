@@ -458,7 +458,7 @@ loadsgf games/kgs/sade-GNU.sgf 265
 
 # P13 is clearly better than O13.
 loadsgf games/kgs/GNU-bassanio.sgf 164
-84 restricted_genmove black P13 O13
+84 restricted_genmove white P13 O13
 #? [P13]*
 
 # T6 can't be defended. R8 is globally too small but locally
@@ -503,15 +503,13 @@ loadsgf games/kgs/GNU-namascae.sgf 102
 92 restricted_genmove white G17 B15
 #? [B15]
 
-# S5 should be 2 points sente and T13 8 points gote. In the game S5
-# was overvalued while T13 was undervalued. (Other moves are bigger
-# here of course.)
-loadsgf games/kgs/GNU-namascae.sgf 118
-93 restricted_genmove white S5 T13
-#? [T13]
+# C11 blocks off better than D11.
+loadsgf games/kgs/GNU-namascae.sgf 110
+93 restricted_genmove white C11 D11
+#? [C11]*
 
 # Necessary to protect against J14 cut. L16 and N15 are ineffective.
-loadsgf games/kgs/GNU-namascae.sgf 118
+loadsgf games/kgs/GNU-namascae.sgf 154
 94 reg_genmove white
 #? [H15|K16]*
 
@@ -519,3 +517,34 @@ loadsgf games/kgs/GNU-namascae.sgf 118
 loadsgf games/gunnar/gunnar22.sgf
 95 reg_genmove white
 #? [P1|S1]
+
+# Connection intransitivity, connecting at D18 lets the top be cut
+# off. We accept all moves which solve the connection problem.
+loadsgf games/kgs/koketto-GNU.sgf 209
+96 reg_genmove black
+#? [E16|F15|F14|G15|H15]*
+
+# B8 is overvalued by 3.7.8.
+loadsgf games/kgs/GNU-goodluck.sgf 233
+97 restricted_genmove white N16 B8
+#? [N16]
+
+# F7 is mostly pointless as strategic defense.
+loadsgf games/kgs/GNU-ituyosi2.sgf 243
+98 restricted_genmove white A6 B6 F7
+#? [A6]
+
+# T2 is found by endgame move generator in 3.7.9 but has no effect.
+loadsgf games/kgs/GNU-ituyosi2.sgf 293
+99 restricted_genmove white T2 C11
+#? [C11]
+
+# Letting black cut at S6 gives major trouble.
+loadsgf games/kgs/GNU-ituyosi2.sgf 301
+100 reg_genmove white
+#? [S6]
+
+# T8 wins the semeai, T7 allows black to make seki.
+loadsgf games/kgs/GNU-ituyosi2.sgf 311
+101 reg_genmove white
+#? [T8]

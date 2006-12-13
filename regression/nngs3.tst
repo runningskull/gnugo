@@ -5,9 +5,10 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 6
 #? [Q13|P13|Q12|P12|P11|P8|P9]
 
 
-loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 14
-110 reg_genmove black
-#? [!G7]
+# # Retired.
+# loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 14
+# 110 reg_genmove black
+# #? [!G7]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 28

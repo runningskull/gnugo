@@ -372,12 +372,15 @@ play white C1
 
 undo
 play white B1
+# A2 is one point bigger than C1 regardless of scoring method.
 806 reg_genmove black
-#? [C1]
+#? [A2|C1]
 
 play black C1
+# A3 is one point bigger than A2 under japanese scoring and a half
+# point bigger under chinese scoring.
 807 reg_genmove white
-#? [A2|A3]
+#? [A3|A2]
 
 undo
 undo
