@@ -225,7 +225,7 @@ loadsgf games/trevor/auto/b28.sgf 64
 
 # See also reading:169.
 loadsgf games/trevor/auto/b28.sgf 80
-430 reg_genmove white
+430 reg_genmove black
 #? [F13]
 
 
