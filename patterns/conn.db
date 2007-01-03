@@ -136,6 +136,23 @@ O!a
 ;!xplay_connect(*,a,b)
 
 
+Pattern CB3c
+
+O!O
+.*.
+.OX
+
+:8,B
+
+c!a
+.*.
+.bX
+
+;!oplay_disconnect(a,c)
+;&& !oplay_disconnect(c,b)
+;&& !xplay_connect(*,a,b)
+
+
 Pattern CB7
 # This pattern is used to find potential cutting stones as defined by
 # the field cutstone2 in the worm data. The helper returns 0 so the
