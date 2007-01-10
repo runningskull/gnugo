@@ -243,9 +243,12 @@ loadsgf games/nngs/Minori-gnugo-3.5.2gf1-200312161433.sgf 132
 # The played move here was H13, caused by incorrect delta territory
 # but ultimately by a bug in break_through(). Naturally there is no
 # way for white to break through G13, H14, G15.
+#
+# Original problem solved, but there's a better move than just
+# filling dames at Q7|Q6|J16|J17|E7|N4 /nn
 loadsgf games/nngs/Minori-gnugo-3.5.2gf1-200312161433.sgf 254
 45 reg_genmove black
-#? [Q7|Q6|J16|J17|E7|N4]
+#? [K1]*
 
 # Don't leave aji around, capture the white stones solidly.
 loadsgf games/nngs/joshj-gnugo-3.5.2gf1-200312171536.sgf 140

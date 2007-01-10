@@ -219,12 +219,12 @@ XO?       descend to edge
 
 :8,OXe,terri(0.1)
 
-?ab
+eab
 XOc
 .*d
 ---
 
-;o_somewhere(a,b,c,d)
+;o_somewhere(a,b,c,d,e)
 
 
 Pattern EE6
