@@ -444,6 +444,25 @@ O*a
 ;marginal_eye(*) && proper_eye(a) && max_eye_value(a) > 0
 
 
+Pattern EE201b
+# nando New pattern. (3.7.11)
+
+?XX                     push deeper on first line.
+O.*
+---
+
+:8,sOXe
+
+?XX
+Oa*
+---
+
+;marginal_eye(a) && proper_eye(*) && max_eye_value(*) > 0
+;&& (safe_omove(*) || oplay_attack(*,a,a))
+
+>if (!safe_omove(*)) known_safe_move(*)
+
+
 Pattern EE202
 
 OXX.           endgame move
@@ -1578,16 +1597,19 @@ Pattern CE29
 # tm New Pattern (3.1.20)  (see trevord:950)
 # FIXME: this pattern better in patterns.db?
 # gf Added constraint. (3.3.13) (see gunnar:18)
+# nando Added s classification and action. (3.7.11)
 
 X*X	Wedge
 O.X
 
-:8,OXe
+:8,sOXe
 
 B*X
 OaX
 
 ;oplay_attack_either(*,a,a,B)
+
+>if (!safe_omove(*)) known_safe_move(*)
 
 
 Pattern CE31

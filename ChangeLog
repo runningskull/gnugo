@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- moves can be marked as known_safe_moves by patterns
 - bugfix in compute_surroundings()
 
 3.7.10 released May 21, 2006

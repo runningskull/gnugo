@@ -1068,6 +1068,7 @@ examine_move_safety(int color)
     int tactical_safety = 0;
     if (!ON_BOARD(pos))
       continue;
+    tactical_safety = is_known_safe_move(pos);
       
     for (k = 0; k < MAX_REASONS; k++) {
       int r = move[pos].reason[k];
@@ -2461,7 +2462,8 @@ estimate_territorial_value(int pos, int color, float our_score,
 
   mark_inessential_stones(OTHER_COLOR(color), safe_stones);
 
-  if (move[pos].move_safety == 1 && safe_move(pos, color) != 0) {
+  if (move[pos].move_safety == 1
+      && (is_known_safe_move(pos) || safe_move(pos, color) != 0)) {
     safe_stones[pos] = INFLUENCE_SAVED_STONE;
     strength[pos] = DEFAULT_STRENGTH;
     if (0)

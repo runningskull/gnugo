@@ -267,3 +267,9 @@ loadsgf games/endgame13.sgf 2
 #? [E5]
 993 reg_genmove white
 #? [E5]
+
+# E5 is two points gote, J3 one point sente, and J2 three points gote.
+# J2 wins the game by 0.5, all other moves lose.
+loadsgf games/endgame14.sgf
+1000 reg_genmove black
+#? [J2]

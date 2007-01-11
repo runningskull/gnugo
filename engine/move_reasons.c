@@ -74,6 +74,10 @@ int current_color;
 /* Attack threats that are known to be sente locally. */
 static int known_good_attack_threats[BOARDMAX][MAX_ATTACK_THREATS];
 
+/* Moves that are known to be safe (in the sense that played stones can
+ * be captured, but opponent loses much more when attempting to do so)
+ */
+static int known_safe_moves[BOARDMAX];
 
 /* Helper functions to check conditions in discard rules. */
 typedef int (*discard_condition_fn_ptr)(int pos, int what);
@@ -138,6 +142,7 @@ clear_move_reasons(void)
   }
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    known_safe_moves[pos] = 0;
     for (k = 0; k < MAX_ATTACK_THREATS; k++)
       known_good_attack_threats[pos][k] = NO_MOVE;
   }
@@ -2021,6 +2026,30 @@ is_known_good_attack_threat(int move, int target)
   }
 
   return 0;
+}
+
+/* Like documented in endgame:980, there are also moves which aren't
+ * safe by themselves, but attempting to capture these stones would
+ * result in a loss for the opponent (typically, by damezumari).
+ * Simple examples include snapbacks, but more complicated ones do
+ * exist. Following functions are helpers for the valuation processing
+ * which deal with such special cases.
+ */
+void
+register_known_safe_move(int move)
+{
+  ASSERT_ON_BOARD1(move);
+  
+  known_safe_moves[move] = 1;
+}
+
+
+int
+is_known_safe_move(int move)
+{
+  ASSERT_ON_BOARD1(move);
+  
+  return known_safe_moves[move];
 }
 
 

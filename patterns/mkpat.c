@@ -436,6 +436,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"adjacent_to_defendable_stone_in_atari", 1, 0, 1.0,
                 "adjacent_to_defendable_stone_in_atari(%s)"},
   {"good_attack_threat",	2, 0, 0.01, "register_good_attack_threat(%s, %s)"},
+  {"known_safe_move",		1, 0, 0.01, "register_known_safe_move(%s)"},
   {"break_mirror_helper",	1, 0, 0.01, "break_mirror_helper(%s, color)"}
 };
 

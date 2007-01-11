@@ -408,6 +408,9 @@ void compute_move_probabilities(float probabilities[BOARDMAX]);
 void register_good_attack_threat(int move, int target);
 int is_known_good_attack_threat(int move, int target);
 
+void register_known_safe_move(int move);
+int is_known_safe_move(int move);
+
 int get_attack_threats(int pos, int max_strings, int strings[]);
 int get_defense_threats(int pos, int max_strings, int strings[]);
 void get_saved_worms(int pos, signed char saved[BOARDMAX]);
