@@ -6501,6 +6501,8 @@ compute_owl_escape_values(struct local_owl_data *owl)
   int pos;
   int m, n;
   signed char safe_stones[BOARDMAX];
+  signed char mx[BOARDMAX];
+  memset(mx, 0, sizeof(mx));
   
   get_lively_stones(OTHER_COLOR(owl->color), safe_stones);
   compute_escape_influence(owl->color, safe_stones, NULL, NULL,
@@ -6517,23 +6519,31 @@ compute_owl_escape_values(struct local_owl_data *owl)
 	  if (DRAGON2(pos).moyo_size > 5)
 	    owl->escape_values[pos] = 4;
 	  else if (DRAGON2(pos).escape_route > 5) {
-	    if (pos != DRAGON2(pos).origin)
-	      owl->escape_values[pos] = owl->escape_values[DRAGON2(pos).origin];
+	    if (mx[dragon[pos].origin])
+	      owl->escape_values[pos] = owl->escape_values[dragon[pos].origin];
 	    else {
 	      int pos2;
 	      signed char escape_values[BOARDMAX];
-	      signed char dragon[BOARDMAX];
+	      signed char dragon_stones[BOARDMAX];
 
-	      compute_escape_influence(owl->color, safe_stones, owl->goal, NULL,
-				       escape_values);
+	      compute_escape_influence(owl->color, safe_stones, owl->goal,
+				       NULL, escape_values);
 
+	      /* mark_dragon() can't be used here in case a string of
+	       * the dragon was captured by the initial move in
+	       * owl_does_attack(). Actually it isn't really proper to
+	       * use is_same_dragon() at stackp>0 either but it's more
+	       * robust at least.
+	       */
 	      for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
 		if (ON_BOARD(pos2))
-		  dragon[pos2] = is_same_dragon(pos2, pos);
+		  dragon_stones[pos2] = is_same_dragon(pos2, pos);
 	      }
+	      
+	      if (dragon_escape(dragon_stones, owl->color, escape_values) > 5)
+		owl->escape_values[dragon[pos].origin] = 4;
 
-	      if (dragon_escape(dragon, owl->color, escape_values) > 5)
-		owl->escape_values[pos] = 4;
+	      mx[dragon[pos].origin] = 1;
 	    }
 	  }
 	}

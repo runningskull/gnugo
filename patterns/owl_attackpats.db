@@ -4372,22 +4372,24 @@ Y*.
 Pattern A1122
 # tm New Pattern (3.1.22)
 #   see -l games/trevor/auto/d02.sgf -L 142 --decide-dragon P2
+# gf Revised constraint. (3.7.11)
 
 Y.
 *.
 .X
 
-:8,C,value(75)
+:8,-,value(75)
 
 a.
 *.
 .b
 
-;!same_dragon(a,b) && !oplay_connect(*,a,b)
+;!owl_goal_dragon(b) && !oplay_connect(*,a,b)
 
 
 Pattern A1122a
 # same as A1122 - different anchor.
+# gf Revised constraint. (3.7.11)
 
 X.
 *.
@@ -4399,7 +4401,23 @@ a.
 *.
 .b
 
-;!same_dragon(a,b) && !oplay_connect(*,a,b)
+;!owl_goal_dragon(a) && !oplay_connect(*,a,b)
+
+
+Pattern A1122b
+# gf New Pattern. (3.7.11)
+
+Y.
+*.
+.X
+
+:8,C,value(76)
+
+a.
+*.
+.b
+
+;lib(a) == 2 && !oplay_connect(*,a,b)
 
 
 Pattern A1123
@@ -4859,6 +4877,42 @@ XO*o
 ----
 
 ;owl_escape_value(B) > 0 && xplay_disconnect(*,A,B) != WIN
+
+
+Pattern A1141
+# gf New Pattern. (3.7.11)
+
+OO?
+Y.O
+*.o
+.X?
+
+:8,C,value(76)
+
+OO?
+a.O
+*.o
+.b?
+
+;!oplay_connect(*,a,b)
+
+
+Pattern A1141b
+# gf New Pattern. (3.7.11)
+
+OO?
+X.O
+*.o
+.Y?
+
+:8,C,value(76)
+
+OO?
+a.O
+*.o
+.b?
+
+;!oplay_connect(*,a,b)
 
 
 #########################################################

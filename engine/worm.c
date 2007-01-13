@@ -1703,20 +1703,19 @@ defense_callback(int anchor, int color, struct pattern *pattern, int ll,
   }
 }
 
+
 void
 get_lively_stones(int color, signed char safe_stones[BOARDMAX])
 {
-  int ii;
+  int pos;
   memset(safe_stones, 0, BOARDMAX * sizeof(*safe_stones));
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    ASSERT1(safe_stones[ii] == 0, ii);
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (IS_STONE(board[ii])
-	&& worm[ii].origin == ii) {
-      if (worm[ii].attack_codes[0] == 0
-	  || (board[ii] == color
-	      && worm[ii].defense_codes[0] != 0))
-	mark_string(ii, safe_stones, 1);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (IS_STONE(board[pos]) && find_origin(pos) == pos) {
+      if ((stackp == 0 && worm[pos].attack_codes[0] == 0) || !attack(pos, NULL)
+	  || (board[pos] == color
+	      && ((stackp == 0 && worm[pos].defense_codes[0] != 0)
+		  || find_defense(pos, NULL))))
+	mark_string(pos, safe_stones, 1);
     }
 }
 
