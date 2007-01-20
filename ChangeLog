@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- detect unconditionally meaningless moves
 - get_lively_stones() revised to be valid also for stackp>0
 - bugfix in compute_owl_escape_values()
 - moves can be marked as known_safe_moves by patterns

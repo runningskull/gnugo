@@ -743,6 +743,7 @@ set_depth_values(int level, int report_levels)
    * reading.c:     >=  8: Use superstrings and do more backfilling.
    * value_moves.c: >=  6: try to find more owl attacks/defenses
    * breakin.c:     >= 10: try to find break-ins. (*)
+   * worm.c:        >= 10: detect unconditionally meaningless moves
    *
    * The break-in code (*) is particularly expensive. 
    *

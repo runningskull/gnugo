@@ -435,6 +435,13 @@ int owl_strong_dragon(int pos);
 void owl_reasons(int color);
 
 void unconditional_life(int unconditional_territory[BOARDMAX], int color);
+void clear_unconditionally_meaningless_moves(void);
+void find_unconditionally_meaningless_moves(int unconditional_territory[BOARDMAX],
+					    int color);
+int unconditionally_meaningless_move(int pos, int color,
+				     int *replacement_move);
+void unconditional_move_reasons(int color);
+
 void find_superstring(int str, int *num_stones, int *stones);
 void find_superstring_conservative(int str, int *num_stones, int *stones);
 void find_superstring_liberties(int str, int *liberties, int *libs,
@@ -834,6 +841,10 @@ struct worm_data {
 };
 
 extern struct worm_data worm[BOARDMAX];
+
+/* Unconditionally meaningless moves. */
+int meaningless_black_moves[BOARDMAX];
+int meaningless_white_moves[BOARDMAX];
 
 /* Surround cache (see surround.c) */
 

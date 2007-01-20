@@ -99,6 +99,11 @@ reset_engine()
 
   /* Set up depth values (see comments there for details). */
   set_depth_values(get_level(), 0);
+
+  /* Initialize arrays of moves which are meaningless due to
+   * static analysis of unconditional status.
+   */
+  clear_unconditionally_meaningless_moves();
 }
 
 /*
@@ -290,6 +295,7 @@ collect_move_reasons(int color)
   semeai_move_reasons(color);
   owl_reasons(color);
   break_in_move_reasons(color);
+  unconditional_move_reasons(color);
 }
 
 /* 

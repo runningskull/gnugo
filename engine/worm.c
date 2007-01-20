@@ -701,6 +701,8 @@ compute_unconditional_status()
   
   for (color = WHITE; color <= BLACK; color++) {
     unconditional_life(unconditional_territory, color);
+    if (get_level() >= 10)
+      find_unconditionally_meaningless_moves(unconditional_territory, color);
 
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (!ON_BOARD(pos) || !unconditional_territory[pos])

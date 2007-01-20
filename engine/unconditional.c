@@ -542,6 +542,160 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
 }
 
 
+/* By unconditional status analysis we can statically find some moves
+ * which there is never any need to play. Those belong to three
+ * different categories:
+ *
+ * 1. A move on a vertex which is already unconditional territory for
+ *    either color.
+ * 2. A move which after having been made ends up as unconditional
+ *    territory for the opponent.
+ * 3. If a move at vertex A makes vertex B become unconditional
+ *    territory, there is no need to consider a move at B, since A has
+ *    all the positive effects that B would have.
+ *
+ * Moves in categories 1 and 2 are never any better than passing and
+ * often worse (with territory scoring always worse). Moves in
+ * category three can be either better or worse than passing, but it's
+ * always true that a move at A is at least as good as a move at B.
+ * Occasionally they are identically good (A makes B unconditional
+ * territory and B makes A unconditional territory) but there is never
+ * any need to analyze both.
+ *
+ * In meaningless_black_moves[] and meaningless_white_moves[] a value
+ * of -1 means it is not meaningless, 0 (NO_MOVE) means it belongs to
+ * category 1 or 2, and a value greater than zero points to the
+ * preferred move in category 3.
+ *
+ * The parameter unconditional_territory should contain the result of
+ * calling unconditional_life() in the original position. Meaningless
+ * moves are computed for the given color.
+ */
+void
+find_unconditionally_meaningless_moves(int unconditional_territory[BOARDMAX],
+				       int color)
+{
+  int *meaningless_moves;
+  int other = OTHER_COLOR(color);
+  int friendly_unconditional[BOARDMAX];
+  int opponent_unconditional[BOARDMAX];
+  int pos;
+  int pos2;
+
+  gg_assert(color == BLACK || color == WHITE);
+
+  if (color == BLACK)
+    meaningless_moves = meaningless_black_moves;
+  else
+    meaningless_moves = meaningless_white_moves;
+
+  /* Initialize meaningless_moves and detect moves of category 1, but
+   * only for own unconditional territory.
+   *
+   * FIXME: We would save some time by detecting all category 1 moves
+   * here but then we would need to have the initial unconditional
+   * territory for the opponent as well. This can of course be done,
+   * the question is how we get it in the nicest way.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (board[pos] == EMPTY) {
+      if (unconditional_territory[pos])
+	meaningless_moves[pos] = NO_MOVE;
+      else
+	meaningless_moves[pos] = -1;
+    }
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] != EMPTY || meaningless_moves[pos] != -1)
+      continue;
+
+    if (!tryko(pos, color, "find_unconditionally_meaningless_moves"))
+      continue;
+
+    unconditional_life(opponent_unconditional, other);
+    if (opponent_unconditional[pos]) {
+      /* Move of category 1 or 2. */
+      meaningless_moves[pos] = NO_MOVE;
+    }
+    else {
+      unconditional_life(friendly_unconditional, color);
+      if (friendly_unconditional[pos])
+	for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
+	  if (board[pos2] == EMPTY
+	      && meaningless_moves[pos2] == -1
+	      && friendly_unconditional[pos2]) {
+	    /* Move of category 3. */
+	    meaningless_moves[pos2] = pos;
+	  }
+    }
+
+    popgo();
+  }
+
+  /* Meaningless moves of category 3 may have been found in multiple
+   * steps. Normalize to the final replacement move.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (board[pos] == EMPTY && meaningless_moves[pos] > 0)
+      while (meaningless_moves[meaningless_moves[pos]] > 0)
+	meaningless_moves[pos] = meaningless_moves[meaningless_moves[pos]];
+}
+
+/* Returns 1 if the move at pos by color is meaningless and 0
+ * otherwise. When it is meaningless, *replacement_move will contain a
+ * replacing move, which is NO_MOVE if passing is guaranteed to be no
+ * worse than making the move.
+ */
+int
+unconditionally_meaningless_move(int pos, int color, int *replacement_move)
+{
+  if (color == WHITE && meaningless_white_moves[pos] != -1) {
+    *replacement_move = meaningless_white_moves[pos];
+    return 1;
+  }
+  if (color == BLACK && meaningless_black_moves[pos] != -1) {
+    *replacement_move = meaningless_black_moves[pos];
+    return 1;
+  }
+
+  return 0;
+}
+
+void
+clear_unconditionally_meaningless_moves()
+{
+  int pos;
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos)) {
+      meaningless_black_moves[pos] = -1;
+      meaningless_white_moves[pos] = -1;
+    }
+}
+
+/* Pick up antisuji and replacement move reasons found by analysis
+ * of unconditional status.
+ */
+void
+unconditional_move_reasons(int color)
+{
+  int replacement_move;
+  int pos;
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (board[pos] == EMPTY
+	&& unconditionally_meaningless_move(pos, color, &replacement_move)) {
+      if (replacement_move == NO_MOVE) {
+	TRACE("%1m unconditional antisuji.\n", pos);
+	add_antisuji_move(pos);
+      }
+      else {
+	TRACE("%1m unconditionally replaced to %1m.\n", pos, replacement_move);
+	add_replacement_move(pos, replacement_move);
+      }
+    }
+}
+
 /*
  * Local Variables:
  * tab-width: 8
