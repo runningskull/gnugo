@@ -1,0 +1,15 @@
+(;GM[1]FF[3]
+CA[ASCII]
+GC[Ajago is symmetrical player, and passes when it cannot play symmetry.
+]
+BR[]WR[]
+PB[AjaGo]
+PW[GNU Go 3.7.10]
+AP[GoGui:0.9]SZ[9]KM[6.5]
+DT[2006-05-27]
+RE[W+5.5]
+;B[ee];W[cf];B[gd];W[eg];B[ec];W[gf];B[cd];W[be];B[he];W[bc];B[hg];
+W[gg];B[cc];W[hh];B[bb];W[hf];B[bd];W[df];B[fd];W[ae];B[ie];W[ad];
+B[if];W[ig];B[ac];W[ge];B[ce];W[bf];B[hd];W[de];B[fe];W[dd];B[ff];
+W[dc];B[fg];W[fh];B[db];W[ed];B[ef];W[tt];B[tt]
+)

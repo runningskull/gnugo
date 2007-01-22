@@ -1,0 +1,16 @@
+(;GM[1]FF[3]
+CA[ASCII]
+SO[]
+EV[Olympiad 2006]
+AP[GoGui:0.9]SZ[9]KM[6.5]
+PB[neurogo]
+PW[GNU Go 3.7.10 lev 16]
+DT[2006-05-28]
+RE[W+11.5]
+;B[df];W[ed];B[gg];W[cd];B[cf];W[ge];B[gf];W[he];B[dc];W[dd];B[cc];
+W[ec];B[bd];W[db];B[bc];W[ff];B[fg];W[ef];B[eg];W[ih];B[fb];W[eb];
+B[gb];W[hf];B[hc];W[hg];B[gh];W[fc];B[hd];W[gd];B[fa];W[hh];B[ce];
+W[ha];B[id];W[hb];B[gc];W[ib];B[fe];W[ee];B[cb];W[hi];B[da];W[ea];
+B[ca];W[gi];B[fi];W[ei];B[eh];W[di];B[de];W[fd];B[dh];W[fh];B[ci];
+W[fi];B[bh];W[tt]
+)

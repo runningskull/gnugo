@@ -1,0 +1,24 @@
+(;GM[1]FF[3]
+CA[ASCII]
+RE[W+1.5]
+SO[]
+EV[Olympiad 2006]
+BR[]WR[]
+PB[Atarist]
+PW[GNU Go 3.7.10]
+AP[GoGui:0.9]SZ[9]KM[6.5]
+DT[2006-05-27]
+;B[ee];W[ce];B[dd];W[cd];B[de];W[cf];B[cc];W[bc];B[dc];W[gc];B[gd];
+W[gg];B[hc];W[df];B[gb];W[cb];B[fg];W[fh];B[eg];W[eh];B[dg];W[bh];
+B[cg];W[bg];B[ef];W[db];B[gf];W[hg];B[hf];W[dh];B[eb];W[af];B[ch];
+W[ci];B[hh];W[gh];B[ig];W[hi];B[ih];W[bb]
+(;B[da];W[ca];B[ea];W[gi];B[fc];W[ii];B[if];W[tt];B[ei];W[di];B[ia];
+W[tt])
+
+(;B[di]
+C[This is a try to check if atarist could win... and it could.
+];W[ei]
+;B[gi];W[fi];B[if];W[ea];B[ii];W[bi];B[gi];W[di];B[fa];W[da];B[hi];
+W[tt])
+
+)

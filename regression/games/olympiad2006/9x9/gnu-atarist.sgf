@@ -1,0 +1,28 @@
+(;GM[1]FF[3]
+CA[ASCII]
+SO[]
+EV[Olympiad 2006]
+RE[B+32.5]
+BR[]WR[]
+PB[GNU Go 3.7.10]
+PW[Atarist]
+AP[GoGui:0.9]SZ[9]KM[6.5]
+DT[2006-05-27]
+;B[ee];W[df];B[ef];W[dg];B[cd];W[de];B[dd];W[ed];B[fd];W[ec];B[fc];
+W[eb];B[fb];W[cb];B[db];W[dc];B[cc];W[da];B[bb];W[fe];B[ff];W[bd];
+B[bc];W[fa];B[gb];W[eg];B[ba];W[ge];B[gf];W[hf];B[gg];W[gh];B[hg];
+W[fg];B[hh];W[hd];B[ca];W[hb];B[db]
+(;W[be]C[Correct branch.
+];B[if];W[he];B[hc];W[ic];B[gc];W[cb];B[ha];
+W[ib];B[db];W[hi];B[ea];W[bg];B[fh];W[gi];B[fi];W[bh];B[ce];W[ei];
+B[ii];W[cf];B[eh];W[dh];B[di];W[ci];B[ad];W[ae];B[ac];W[ig];B[ei];
+W[ec];B[eb];W[gi];B[gh];W[ab];B[ga];W[ia];B[gd];W[ai];B[tt];W[ah];
+B[tt];W[ie];B[ih];W[id];B[if];W[tt];B[tt])
+
+(;W[ce]
+C[This was a mistake from the operator who played a wrong move. So after concertation with the opponent and the referee, this branch was undone and the correct game finished, with 5 more minutes for the opponent (10 min for GNU 15 for Atarist)
+]
+;B[if];W[he];B[hc];W[ic];B[gc];W[cb];B[ha];W[ib];B[db];W[hi];B[ea];
+W[bg];B[fh];W[ig];B[fi];W[ih];B[ed];W[ie];B[be])
+
+)
