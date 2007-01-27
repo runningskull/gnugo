@@ -372,7 +372,7 @@ class GTP_game:
                     if string.lower(move[:4]) == "pass":
                         passes = passes + 1
                         if verbose >= 1:
-                            print "White passes"
+                            print "Black passes"
                     else:
                         passes = 0
                         self.whiteplayer.black(move)
@@ -395,7 +395,7 @@ class GTP_game:
                     if string.lower(move[:4]) == "pass":
                         passes = passes + 1
                         if verbose >= 1:
-                            print "Black passes"
+                            print "White passes"
                     else:
                         passes = 0
                         self.blackplayer.white(move)
