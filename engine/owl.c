@@ -893,13 +893,15 @@ do_owl_analyze_semeai(int apos, int bpos,
 				     shape_defensive_moves, 1, owla))
 	  break;
     }
-    owl_shapes(&shape_offensive_patterns, shape_offensive_moves, color, owlb, 
-	       &owl_attackpat_db);
-    for (k = 0; k < MAX_MOVES-1; k++)
-      if (!get_next_move_from_list(&shape_offensive_patterns, color,
-	                           shape_offensive_moves, 1, owla))
-	break;
-    
+    if (!you_look_alive) {
+      owl_shapes(&shape_offensive_patterns, shape_offensive_moves, color,
+		 owlb, &owl_attackpat_db);
+      for (k = 0; k < MAX_MOVES-1; k++)
+	if (!get_next_move_from_list(&shape_offensive_patterns, color,
+				     shape_offensive_moves, 1, owlb))
+	  break;
+    }
+
     /* Now we review the moves already considered, while collecting
      * them into a single list. 
      */

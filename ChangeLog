@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- performance tuning in do_owl_analyze_semeai()
 - detect unconditionally meaningless moves
 - get_lively_stones() revised to be valid also for stackp>0
 - bugfix in compute_owl_escape_values()
