@@ -23,8 +23,11 @@
 #ifndef _DFA_H_
 #define _DFA_H_
 
-
+#if MAX_BOARD > 11
 #define DFA_MAX_BOARD		MAX_BOARD
+#else
+#define DFA_MAX_BOARD 		11
+#endif
 #define DFA_MAX_ORDER		((2 * DFA_MAX_BOARD - 1)	\
 				 * (2 * DFA_MAX_BOARD - 1))
 #define DFA_BASE		(3 * DFA_MAX_BOARD)

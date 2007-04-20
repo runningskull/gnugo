@@ -29,7 +29,6 @@
 #include "hash.h"
 #include "gg_utils.h"
 
-#define MAX_BOARDSIZE 19
 #define BUFSIZE 160
 
 #define USAGE "\
@@ -113,7 +112,7 @@ const char *const c_output_strings[3] =
  * is sgf encoded.
  */
 static int
-set_boards(char board[MAX_BOARDSIZE + 2][MAX_BOARDSIZE + 2],
+set_boards(char board[MAX_BOARD + 2][MAX_BOARD + 2],
 	   Intersection board1d[BOARDSIZE],
 	   char *stones, char color, int boardsize)
 {
@@ -133,7 +132,7 @@ set_boards(char board[MAX_BOARDSIZE + 2][MAX_BOARDSIZE + 2],
 }
 
 static void
-write_pattern(char *name, char board[MAX_BOARDSIZE + 2][MAX_BOARDSIZE + 2],
+write_pattern(char *name, char board[MAX_BOARD + 2][MAX_BOARD + 2],
 	      int value, int boardsize)
 {
   int i, j;
@@ -190,7 +189,7 @@ main(int argc, char *argv[])
   char name[BUFSIZE];
   char stones[BUFSIZE];
   int value;
-  char board[MAX_BOARDSIZE + 2][MAX_BOARDSIZE + 2];
+  char board[MAX_BOARD + 2][MAX_BOARD + 2];
   Intersection board1d[BOARDSIZE];
   int boardsize;
   int i, j, k;
@@ -220,7 +219,14 @@ main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
-  assert(boardsize > 0 && boardsize <= MAX_BOARDSIZE);
+  assert(boardsize > 0);
+  if (boardsize > MAX_BOARD) {
+    printf(output_strings[PREAMBLE]);
+    printf(output_strings[HEADER], boardsize);
+    printf(output_strings[FOOTER]);
+    return EXIT_SUCCESS;
+  }
+  
   
   input_FILE = fopen(filename, "r");
   if (!input_FILE) {
@@ -244,6 +250,7 @@ main(int argc, char *argv[])
 
   printf(output_strings[PREAMBLE]);
   printf(output_strings[HEADER], boardsize);
+  
 
   /* Loop over the lines of the compressed database.
    * Each line is one pattern.

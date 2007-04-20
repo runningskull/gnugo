@@ -916,7 +916,8 @@ read_pattern_line(char *p)
     }
     
     /* Range checking. */
-    assert(el < (int) (sizeof(elements) / sizeof(elements[0])));
+    if (el >= (int) (sizeof(elements) / sizeof(elements[0])))
+      return 0;
     
     elements[el].x = maxi;
     elements[el].y = j;
@@ -1008,7 +1009,7 @@ read_constraint_diagram_line(char *p)
    * maxj was modified by find_extents() so we have to compensate for
    * this.
    */
-  if (j != maxj + 1) {
+  if (j != maxj + 1 && !discard_pattern) {
     fprintf(stderr, "%s(%d) : error : Mismatching width of constraint line in pattern %s\n", 
 	    current_file, current_line_number, pattern_names[patno]);
     fatal_errors++;
@@ -1032,7 +1033,7 @@ read_constraint_diagram_line(char *p)
 static void
 check_constraint_diagram_size(void)
 {
-  if (current_c_i != maxi + 1) {
+  if (current_c_i != maxi + 1 && !discard_pattern) {
     fprintf(stderr, "%s(%d) : error : Mismatching height of constraint diagram in pattern %s\n", 
 	    current_file, current_line_number, pattern_names[patno]);
     fatal_errors++;
@@ -1097,7 +1098,7 @@ finish_pattern(char *line)
     ci = 0;
     cj = 0;
   }
-  else if (choose_best_anchor) { 
+  else if (choose_best_anchor && !discard_pattern) { 
 
     /* Try to find a better anchor if
      * the -m option is set.
@@ -1126,7 +1127,7 @@ finish_pattern(char *line)
     pattern[patno].anchored_at_X = (elements[min_k].att == ATT_X) ? 3 : 0;
     
   }
-  else if (ci == -1 || cj == -1) {
+  else if ((ci == -1 || cj == -1) && !discard_pattern) {
     fprintf(stderr, "%s(%d) : No origin for pattern %s\n", 
 	    current_file, current_line_number, pattern_names[patno]);
     fatal_errors = 1;

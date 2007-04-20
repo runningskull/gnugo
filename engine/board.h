@@ -100,12 +100,13 @@ typedef unsigned char Intersection;
 
 /* Board sizes */
 
-#define DEFAULT_BOARD_SIZE 19
 
 #define MIN_BOARD          1       /* Minimum supported board size.   */
 #define MAX_BOARD         19       /* Maximum supported board size.   */
 #define MAX_HANDICAP       9       /* Maximum supported handicap.     */
 #define MAX_MOVE_HISTORY 500       /* Max number of moves remembered. */
+
+#define DEFAULT_BOARD_SIZE MAX_BOARD
 
 /* Colors and komaster states. */
 enum colors {
