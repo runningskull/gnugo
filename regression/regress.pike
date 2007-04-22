@@ -61,6 +61,8 @@ class Testsuite
   float walltime;
   float cputime;
   float uncertainty;
+  Process.create_process engine;
+  int quit_has_been_sent;
   
   array(int) pass;
   array(int) fail;
@@ -179,6 +181,8 @@ class Testsuite
   {
     while (1) {
       string s = write_queue->read();
+      if (has_value(s, "quit"))
+	quit_has_been_sent = 1;
       if (s == "")
 	break;
       f->write(s);
@@ -186,6 +190,17 @@ class Testsuite
     f->close();
     if (debug)
       werror("Writer closed down\n");
+  }
+
+  static void program_monitor()
+  {
+    while (!quit_has_been_sent) {
+      sleep(1);
+      if (engine->status() != 0 && !quit_has_been_sent) {
+       write("engine crashed in test suite %s.\n", name);
+       exit(1);
+      }
+    }
   }
   
   void send(string|void s)
@@ -201,12 +216,12 @@ class Testsuite
     }
   }
   
-  void run_testsuite(string suite_name, string engine,
+  void run_testsuite(string suite_name, string command,
 		     array(string) engine_options,
 		     mapping(string:mixed) options,
 		     array(int)|void test_numbers)
   {
-    array(string) program_start_array = ({engine}) + engine_options;
+    array(string) program_start_array = ({command}) + engine_options;
     
     string testsuite = Stdio.read_file(suite_name);
     if (!testsuite) {
@@ -227,10 +242,11 @@ class Testsuite
     object pipe1 = f1->pipe();
     object f2 = Stdio.FILE();
     object pipe2 = f2->pipe();
-    Process.create_process(program_start_array,
-			   (["stdin":pipe1, "stdout":pipe2]));
+    engine = Process.create_process(program_start_array,
+				    (["stdin":pipe1, "stdout":pipe2]));
     thread_create(program_reader, f2);
     thread_create(program_writer, f1);
+    thread_create(program_monitor);
     
     int number;
     string answer;
