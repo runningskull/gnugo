@@ -25,6 +25,23 @@
 #include "patterns.h"
 
 
+/* Test whether apos and bpos can be cut. If yes, return 1 and
+ * store it in the cut list of dragons.c.
+ */
+int
+disconnect_helper(int apos, int bpos)
+{
+  int color = board[apos];
+  int move;
+  ASSERT1(color == board[bpos] && IS_STONE(color), apos);
+
+  if (disconnect(apos, bpos, &move)) {
+    add_cut(apos, bpos, move);
+    return 1;
+  }
+  return 0;
+}
+
 /* Try to match all (permutations of) connection patterns at (m,n).
  * For each match, if it is a B pattern, set cutting point in
  * cutting_points array. If it is a C pattern, amalgamate the dragons

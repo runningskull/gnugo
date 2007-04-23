@@ -325,6 +325,7 @@ int adjacent_to_stone_in_atari(int str);
 int adjacent_to_defendable_stone_in_atari(int str);
 void backfill_replace(int move, int str);
 int break_mirror_helper(int str, int color);
+int disconnect_helper(int apos, int bpos);
 
 
 /* pattern arrays themselves */

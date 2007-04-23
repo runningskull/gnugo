@@ -602,7 +602,7 @@ c
 a
 b
 
-;!xcut(a) && !oplay_disconnect(b,c)
+;!xcut(a) && !disconnect_helper(b,c)
 
 
 Pattern CC504
@@ -615,7 +615,7 @@ O.
 Xb
 ca
 
-;!xcut(a) && !oplay_disconnect(b,c)
+;!xcut(a) && !disconnect_helper(b,c)
 
 
 Pattern CC505
@@ -628,7 +628,7 @@ OX
 Bc
 dA
 
-;(attack(A) || attack(B)) && !oplay_disconnect(c,d)
+;(attack(A) || attack(B)) && !disconnect_helper(c,d)
 
 
 Pattern CC506
@@ -645,7 +645,7 @@ a
 b
 d
 
-;!xcut(a) && !xcut(b) && !oplay_disconnect(c,d)
+;!xcut(a) && !xcut(b) && !disconnect_helper(c,d)
 
 
 Pattern CC506b
@@ -662,7 +662,7 @@ Eo
 ab
 d.
 
-;!xcut(a) && !xcut(b) && lib(E)<=2 && !oplay_disconnect(c,d)
+;!xcut(a) && !xcut(b) && lib(E)<=2 && !disconnect_helper(c,d)
 
 
 Pattern CC507
@@ -677,7 +677,7 @@ cx
 ab
 xd
 
-;!xcut(a) && !xcut(b) && !oplay_disconnect(c,d)
+;!xcut(a) && !xcut(b) && !disconnect_helper(c,d)
 
 
 Pattern CC508
@@ -692,7 +692,7 @@ b?
 aX
 xc
 
-;!xcut(a) && !oplay_disconnect(b,c)
+;!xcut(a) && !disconnect_helper(b,c)
 
 
 Pattern CC509
@@ -709,7 +709,7 @@ ab
 cd
 xf
 
-;!xcut(a) && !xcut(b) && !xcut(c) && !xcut(d) && !oplay_disconnect(e,f)
+;!xcut(a) && !xcut(b) && !xcut(c) && !xcut(d) && !disconnect_helper(e,f)
 
 
 Pattern CC511

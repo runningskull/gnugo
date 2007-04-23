@@ -70,6 +70,7 @@ static void connected_to_eye_recurse(int pos, int str, int color,
 static int compute_crude_status(int pos);
 static int compute_escape(int pos, int dragon_status_known);
 static void compute_surrounding_moyo_sizes(const struct influence_data *q);
+static void clear_cut_list(void);
 
 static int dragon2_initialized;
 static int lively_white_dragons;
@@ -655,6 +656,8 @@ initialize_dragon_data(void)
    * reach initialize_supplementary_dragon_data().
    */
   number_of_dragons = 0;
+
+  clear_cut_list();
 
   memset(black_vital_points, 0, BOARDMAX * sizeof(struct vital_eye_points));
   memset(white_vital_points, 0, BOARDMAX * sizeof(struct vital_eye_points));
@@ -2422,6 +2425,67 @@ size_of_biggest_critical_dragon(void)
   return max_size;
 }
 
+
+/************************************************************************
+ *         A list of all cuts found during connection matching          *
+ ************************************************************************/
+
+#define MAX_CUTS 	3 * MAX_BOARD * MAX_BOARD
+
+struct cut_data {
+  int apos;
+  int bpos;
+  int move;
+};
+
+static int num_cuts = 0;
+static struct cut_data cut_list[MAX_CUTS];
+
+static void
+clear_cut_list()
+{
+  num_cuts = 0;
+}
+
+/* Store in the list that (move) disconnects the two strings at
+ * apos and bpos.
+ */
+void
+add_cut(int apos, int bpos, int move)
+{
+  gg_assert(board[apos] == board[bpos]);
+  if (num_cuts == MAX_CUTS)
+    return;
+  if (apos > bpos) {
+    int tmp = apos;
+    apos = bpos;
+    bpos = tmp;
+  }
+  if (move == NO_MOVE)
+    return;
+  cut_list[num_cuts].apos = apos;
+  cut_list[num_cuts].bpos = bpos;
+  cut_list[num_cuts].move = move;
+  num_cuts++;
+  if (0)
+  gprintf("Added %d-th cut at %1m between %1m and %1m.\n", num_cuts,
+          move, apos, bpos);
+}
+
+/* For every move in the cut list disconnecting two of opponent's strings,
+ * test whether the two strings can be connected at all. If so, add a
+ * CUT_MOVE reason.
+ */
+void
+cut_reasons(int color)
+{
+  int k;
+  for (k = 0; k < num_cuts; k++)
+    if (board[cut_list[k].apos] == OTHER_COLOR(color)
+	&& !is_same_dragon(cut_list[k].apos, cut_list[k].bpos)
+	&& string_connect(cut_list[k].apos, cut_list[k].bpos, NULL) == WIN)
+      add_cut_move(cut_list[k].move, cut_list[k].apos, cut_list[k].bpos);
+}
 
 
 /* ================================================================ */

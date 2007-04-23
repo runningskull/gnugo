@@ -294,6 +294,7 @@ collect_move_reasons(int color)
   worm_reasons(color);
   semeai_move_reasons(color);
   owl_reasons(color);
+  cut_reasons(color);
   break_in_move_reasons(color);
   unconditional_move_reasons(color);
 }

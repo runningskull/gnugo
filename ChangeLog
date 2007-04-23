@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- Generate cut move reasons for cutting moves found during find_connections()
 - fix compilation with MAX_BOARD set to low boardsizes (>= 7 tested)
 - performance tuning in do_owl_analyze_semeai()
 - detect unconditionally meaningless moves
