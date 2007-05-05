@@ -994,3 +994,7 @@ play black D13
 loadsgf games/gifu2005/mfg-gnugo.sgf 195
 233 attack C19
 #? [0]
+
+loadsgf games/reading48.sgf
+234 attack C1
+#? [1 A1]
