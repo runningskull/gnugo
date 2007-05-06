@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- Look more ambitiously for back-capturing moves in attack1()	
 - Generate cut move reasons for cutting moves found during find_connections()
 - fix compilation with MAX_BOARD set to low boardsizes (>= 7 tested)
 - performance tuning in do_owl_analyze_semeai()
@@ -11,6 +12,7 @@
 - moves can be marked as known_safe_moves by patterns
 - bugfix in compute_surroundings()
 - owl tuning
+- new and revised tests
 
 3.7.10 released May 21, 2006
 

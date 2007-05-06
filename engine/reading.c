@@ -2917,7 +2917,9 @@ attack1(int str, int *move)
   int liberties;
   int libs[6];
   int k;
+  int r;
   int adjs[MAXCHAIN];
+  int adj;
   int apos;
   
   
@@ -2990,7 +2992,8 @@ attack1(int str, int *move)
   }
 
   /* If not yet successful, try backfilling and back-capturing.
-   * FIXME: Maybe only meaningful to do this in positions involving ko.
+   * An example of back-capturing can be found in reading:234.
+   * Backfilling is maybe only meaningful in positions involving ko.
    */
   liberties = approxlib(xpos, color, 6, libs);
   if (liberties <= 5)
@@ -3009,36 +3012,39 @@ attack1(int str, int *move)
 	popgo();
       }
     }
-  
-  if (chainlinks2(str, adjs, 1) == 1) {
-    int adjs2[MAXCHAIN];
-    int adj2;
-    adj2 = chainlinks2(adjs[0], adjs2, 1);
-    for (k = 0; k < adj2; k++) {
-      int ko_move;
-      if (adjs2[k] == str)
-	continue;
-      findlib(adjs2[k], 1, &apos);
-      if (komaster_trymove(apos, other, "attack1-D", str,
-			   &ko_move, stackp <= ko_depth && savecode == 0)) {
-	if (!ko_move) {
-	  int dcode = do_find_defense(str, NULL);
-	  if (dcode != WIN
-	      && do_attack(str, NULL)) {
-	    popgo();
-	    CHECK_RESULT(savecode, savemove, dcode, apos, move,
-			 "attack effective");
+
+  adj = chainlinks2(str, adjs, 1);
+  for (r = 0; r < adj; r++) {
+    if (liberty_of_string(xpos, adjs[r])) {
+      int adjs2[MAXCHAIN];
+      int adj2;
+      adj2 = chainlinks2(adjs[r], adjs2, 1);
+      for (k = 0; k < adj2; k++) {
+	int ko_move;
+	if (adjs2[k] == str)
+	  continue;
+	findlib(adjs2[k], 1, &apos);
+	if (komaster_trymove(apos, other, "attack1-D", str,
+			     &ko_move, stackp <= ko_depth && savecode == 0)) {
+	  if (!ko_move) {
+	    int dcode = do_find_defense(str, NULL);
+	    if (dcode != WIN
+		&& do_attack(str, NULL)) {
+	      popgo();
+	      CHECK_RESULT(savecode, savemove, dcode, apos, move,
+			   "attack effective");
+	    }
+	    else
+	      popgo();
 	  }
-	  else
+	  else {
+	    if (do_find_defense(str, NULL) != WIN
+		&& do_attack(str, NULL) != 0) {
+	      savemove = apos;
+	      savecode = KO_B;
+	    }
 	    popgo();
-	}
-	else {
-	  if (do_find_defense(str, NULL) != WIN
-	      && do_attack(str, NULL) != 0) {
-	    savemove = apos;
-	    savecode = KO_B;
 	  }
-	  popgo();
 	}
       }
     }
