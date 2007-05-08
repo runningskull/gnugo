@@ -284,6 +284,8 @@ static int semeai_move_value(int move, struct local_owl_data *owla,
 			     struct local_owl_data *owlb, int raw_value,
 			     int *critical_semeai_worms);
 static int semeai_is_riskless_move(int move, struct local_owl_data *owla);
+static void remove_eye_filling_moves(struct local_owl_data *our_owl,
+				     struct owl_move_data *moves);
 static int find_semeai_backfilling_move(int worm, int liberty);
 static int liberty_of_goal(int pos, struct local_owl_data *owl);
 static int second_liberty_of_goal(int pos, struct local_owl_data *owl);
@@ -670,6 +672,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   struct eyevalue probable_eyes_a;
   struct eyevalue probable_eyes_b;
   struct eyevalue dummy_eyes;
+  int I_have_more_eyes;
   
   SETUP_TRACE_INFO2("do_owl_analyze_semeai", apos, bpos);
 
@@ -804,6 +807,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   if (!owl_phase) {
     set_eyevalue(&probable_eyes_a, 0, 0, 0, 0);
     set_eyevalue(&probable_eyes_b, 0, 0, 0, 0);
+    I_have_more_eyes = 0;
   }
   else {
     /* First the vital moves. These include moves to attack or
@@ -893,6 +897,9 @@ do_owl_analyze_semeai(int apos, int bpos,
 				     shape_defensive_moves, 1, owla))
 	  break;
     }
+    else
+      shape_defensive_moves[0].pos = NO_MOVE;
+
     if (!you_look_alive) {
       owl_shapes(&shape_offensive_patterns, shape_offensive_moves, color,
 		 owlb, &owl_attackpat_db);
@@ -900,6 +907,16 @@ do_owl_analyze_semeai(int apos, int bpos,
 	if (!get_next_move_from_list(&shape_offensive_patterns, color,
 				     shape_offensive_moves, 1, owlb))
 	  break;
+    }
+    else
+      shape_offensive_moves[0].pos = NO_MOVE;
+
+    /* Filter out moves, which fill our eye (and not split it). */
+    if (eyemax_a > 0) {
+      remove_eye_filling_moves(owla, vital_defensive_moves);
+      remove_eye_filling_moves(owla, vital_offensive_moves);
+      remove_eye_filling_moves(owla, shape_defensive_moves);
+      remove_eye_filling_moves(owla, shape_offensive_moves);
     }
 
     /* Now we review the moves already considered, while collecting
@@ -956,6 +973,24 @@ do_owl_analyze_semeai(int apos, int bpos,
       include_semeai_worms_in_eyespace = 0;
     }
 
+    if (eyemin_a == eyemax_a)
+      /* We have stable number of eyes, so we can try to reduce
+       * opponent eyes.
+       */
+      I_have_more_eyes = (eyemin_a > min_eyes(&probable_eyes_b));
+    else {
+      if (min_eyes(&probable_eyes_a) == max_eyes(&probable_eyes_a))
+        /* If we can't increase our number of eyes, we try to reduce
+	 * opponent eyes.
+	 */
+        I_have_more_eyes = (max_eyes(&probable_eyes_a) > min_eyes(&probable_eyes_b));
+      else
+        /* If we can increase our number of eyes, we do it and let
+	 * opponent to increase his.
+	 */
+        I_have_more_eyes = (max_eyes(&probable_eyes_a) > max_eyes(&probable_eyes_b));
+    }
+
     if (get_level() < 8) {
       /* If no owl moves were found on two consecutive moves,
        * turn off the owl phase.
@@ -979,9 +1014,11 @@ do_owl_analyze_semeai(int apos, int bpos,
   
   /* Now we look for a move to fill a liberty. This is only
    * interesting if the opponent doesn't already have two eyes.
+   * If we have more eyes, always check for a backfilling move.
    */
   if (!you_look_alive
-      && !safe_outside_liberty_found && moves[0].value < 110) {
+      && !safe_outside_liberty_found
+      && (moves[0].value < 110 || I_have_more_eyes)) {
     int pos;
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (!ON_BOARD(pos))
@@ -1094,6 +1131,9 @@ do_owl_analyze_semeai(int apos, int bpos,
     int mpos = moves[k].pos;
     if (mpos == NO_MOVE)
       break;
+
+    if (moves[k].value == 0)
+      continue;
 
     /* Do not try too many moves. */
     if (tested_moves > 2
@@ -1283,8 +1323,61 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
   gg_assert(this_resulta != NULL && this_resultb != NULL);
   *this_resulta = 0;
   *this_resultb = 0;
-  if (!komaster_trymove(move, color, move_name, apos, &ko_move, ko_allowed))
+
+  if (!komaster_trymove(move, color, move_name, apos, &ko_move, ko_allowed)) {
+    int kpos;
+    if (is_ko(move, color, &kpos)) {
+      /* Move was not allowed because of komaster. We want to check
+       * if this situation is double ko and when it is, we won semeai.
+       */
+      int libs[MAX_LIBERTIES];
+      int n;
+      int nlib;
+      int sworm;
+      int worm_color;
+      int other = OTHER_COLOR(color);
+
+      for (sworm = 0; sworm < s_worms; sworm++) {
+	worm_color = board[semeai_worms[sworm]];
+	if (worm_color == color) {
+	  /* We only check up to MAX_LIBERTIES, due to performance
+	   * reasons. When we have more liberties we have some outside
+	   * liberties to fill and these moves will be tried later
+	   * (and double ko situation will be found).
+	   */
+	  nlib = findlib(semeai_worms[sworm], MAX_LIBERTIES, libs);
+	  if (nlib > MAX_LIBERTIES)
+	    return 0;
+
+	  for (n = 0; n < nlib; n++)
+	    if (is_ko(libs[n], other, NULL)) {
+	      /* Check if situation is not a nested ko capture. */
+	      if (DIAGONAL_NEIGHBORS(libs[n], kpos))
+	        return 0;
+
+	      /* Our dragon has double ko, but we have to check if
+	       * opponent dragon doesn't have outside liberties or
+	       * double ko.
+	       */
+	      *this_resulta = WIN;
+	      *this_resultb = WIN;
+	    }
+	}
+	else if (worm_color == other) {
+	  if (countlib(semeai_worms[sworm]) > 2)
+	    /* In double ko situation the opponent can have only a
+	     * single eye and a ko outside liberty to be sure that we
+	     * will always win double ko.
+	     */
+	    return 0;
+	}
+      }
+      if (*this_resulta == WIN)
+	return 1;
+    }
+
     return 0;
+  }
   
   semeai_add_sgf_comment(move_value, owl_phase);
   TRACE("Trying %C %1m. Current stack: ", color, move);
@@ -1453,6 +1546,9 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
     if (move == NO_MOVE)
       break;
 
+    if (owl_moves[k].value == 0)
+      continue;
+
     /* Does the move fill a liberty in the semeai? */
     if (liberty_of_goal(move, owlb)
 	&& safe_move(move, color)) {
@@ -1578,10 +1674,16 @@ semeai_move_value(int move, struct local_owl_data *owla,
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (IS_STONE(board[pos])
 	  && pos == find_origin(pos)) {
-	if (owla->goal[pos])
-	  net -= 75*countlib(pos);
-	if (owlb->goal[pos])
-	  net += 100*countlib(pos);	  
+	int count_lib = -1;
+	if (owla->goal[pos]) {
+	  count_lib = countlib(pos);
+	  net -= 75 * count_lib;
+	}
+	if (owlb->goal[pos]) {
+	  if (count_lib < 0)
+	    count_lib = countlib(pos);
+	  net += 100 * count_lib;
+	}
       }
     }
     if (!trymove(move, color, NULL, 0)) {
@@ -1591,11 +1693,17 @@ semeai_move_value(int move, struct local_owl_data *owla,
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (IS_STONE(board[pos])
 	  && pos == find_origin(pos)) {
+	int count_lib = -1;
 	if (owla->goal[pos]
-	    || (pos == move && liberty_of_goal(move, owla)))
-	  net += 75*countlib(pos);
-	if (owlb->goal[pos])
-	  net -= 100*countlib(pos);
+	    || (pos == move && liberty_of_goal(move, owla))) {
+	  count_lib = countlib(pos);
+	  net += 75 * count_lib;
+	}
+	if (owlb->goal[pos]) {
+	  if (count_lib < 0)
+	    count_lib = countlib(pos);
+	  net -= 100 * count_lib;
+	}
       }
     }
 
@@ -1627,6 +1735,32 @@ semeai_move_value(int move, struct local_owl_data *owla,
 }
 
 
+/* Remove all moves from the list that would fill our own eye. */
+static void
+remove_eye_filling_moves(struct local_owl_data *our_owl,
+			 struct owl_move_data *moves)
+{
+  int k;
+  int color = our_owl->color;
+
+  for (k = 0; k < MAX_MOVES; k++) {
+    if (moves[k].pos == NO_MOVE)
+      break;
+    else {
+      struct eye_data *eye = &our_owl->my_eye[moves[k].pos];
+
+      /* If esize==1 this eye must not be a real eye (at least one
+       * worm is capturable, otherwise this move would not be
+       * proposed).
+       */
+      if (eye->color == color && eye->msize == 0 && eye->neighbors <= 1
+	  && eye->esize != 1
+	  && our_owl->half_eye[moves[k].pos].type != HALF_EYE
+	  && !has_neighbor(moves[k].pos, OTHER_COLOR(color)))
+	moves[k].value = 0;
+    }
+  }
+}
 
 /* Is the vertex at pos adjacent to an element of the owl goal? */
 static int
