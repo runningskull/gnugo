@@ -1293,6 +1293,46 @@ do_owl_analyze_semeai(int apos, int bpos,
     }
   }
 
+  /* There are a few selected cases where we should try to see if it
+   * would be better to pass rather than playing any move in the semeai.
+   *
+   * A first simple example is the case of positions where there is nothing
+   * left to play but common liberties. In case the above analysis concluded
+   * the result is seki and if the best (and only) move happens to be a
+   * common liberty, we attempt to pass, so that the engine considers tenuki
+   * as a viable option in case it actually is.
+   *
+   * Another example is related to "disturbing" kos.
+   * 
+   * .OOOOOOOO.  In this position (similar to semeai:130), X has just taken
+   * OOXXXXXXOO  the ko on the left. The semeai code finds the ko recapture
+   * OX.XXOOXXO  as the only attacking move and concludes the result is KO_B.
+   * OOXX.OO.XO
+   * ----------
+   *
+   * In such cases too, we try to pass to see if it doesn't actually yield
+   * a better result.
+   *
+   * FIXME: there might be more cases where passing would be valuable. 
+   */
+  if (!pass && k == 1) {
+    if ((best_resulta == WIN && best_resultb == 0
+	 && best_move != NO_MOVE
+	 && best_move == common_liberty.pos)
+	|| (best_resulta == KO_B && best_resultb == KO_B
+	    && is_ko(best_move, owla->color, NULL))) {
+      do_owl_analyze_semeai(bpos, apos, owlb, owla, &this_resultb,
+			    &this_resulta, NULL, 1, owl_phase);
+      if (REVERSE_RESULT(this_resulta) >= best_resulta
+	  && REVERSE_RESULT(this_resultb) >= best_resultb) {
+	best_move = PASS_MOVE;
+	best_resulta = REVERSE_RESULT(this_resulta);
+	best_resultb = REVERSE_RESULT(this_resultb);
+	best_move_name = "Pass";
+      }
+    }
+  }
+
   *resulta = best_resulta;
   *resultb = best_resultb;
   if (best_resulta == 0)
