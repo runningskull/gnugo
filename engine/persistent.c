@@ -440,7 +440,7 @@ search_persistent_cache(struct persistent_cache *cache,
     print_persistent_cache_entry(entry);
   }
   /* FIXME: This is an ugly hack. */
-  if (cache->name == "reading cache"
+  if (strcmp(cache->name, "reading cache") == 0
       && (debug & DEBUG_READING_PERFORMANCE)
       && entry->cost >= MIN_READING_NODES_TO_REPORT) {
     if (entry->result != 0)
