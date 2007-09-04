@@ -14509,30 +14509,6 @@ OXOX?
 > replace(a,*)
 
 
-Pattern RE7
-# tm New Pattern (3.1.20) (see strategy4:173)
-# FIXME: This seems a little underhanded, prob. not best fix.
-
-|.??   better for ko threats
-|*.?
-|XO?
-|X.o
-|?O?
-
-:8,-
-
-|.??
-|*.?
-|bO?
-|bao
-|?O?
-
-; oplay_attack(a,b)
-; && (oplay_attack(a,b) == oplay_attack(*,b))
-
-> replace(a,*)
-
-
 Pattern RE8
 # db new pattern (3.3.6)
 # see century-2002:10
