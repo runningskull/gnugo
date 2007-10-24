@@ -3527,7 +3527,14 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
 		      "reevaluate_ko_threats", ko_move)) {
 	    switch (type) {
 	    case ATTACK_THREAT:
-	      threat_does_work = attack(what, NULL);
+	      /* In case the attack threat was a snapback move, there
+	       * is no stone on the board to attack now and we check
+	       * for a defense of the threatening move instead.
+	       */
+	      if (board[what] != EMPTY)
+		threat_does_work = attack(what, NULL);
+	      else
+		threat_does_work = find_defense(pos, NULL);
 	      break;
 	    case DEFEND_THREAT:
 	      threat_does_work = (board[what] != EMPTY

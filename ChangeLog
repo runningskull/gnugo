@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in reevaluate_ko_threats() to avoid a crash
 - more efficient aftermath moves
 - version 3 of GPL and update copyright for 2007
 - new static function remove_eye_filling_moves() in owl.c
