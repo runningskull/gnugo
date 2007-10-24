@@ -501,13 +501,7 @@ do_genmove(int color, float pure_threat_value,
     if (play_out_aftermath 
 	|| capture_all_dead 
 	|| (!doing_scoring && thrashing_dragon && pessimistic_score > 15.0))
-      move = aftermath_genmove(color, 0, allowed_moves);
-      
-    /* If we're instructed to capture all dead opponent stones, generate
-     * a capturing move.
-     */
-    if (move == PASS_MOVE && capture_all_dead) 
-      move = aftermath_genmove(color, 1, allowed_moves);
+      move = aftermath_genmove(color, capture_all_dead, allowed_moves);
 
     if (move != PASS_MOVE) {
       ASSERT1(is_legal(move, color), move);

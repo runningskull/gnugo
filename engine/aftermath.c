@@ -48,6 +48,46 @@ all_own_neighbors_inessential(int pos, int color)
   return 1;
 }
 
+/* Does a move by color at pos make one of the neighboring points into
+ * a solid one-point eye?
+ */
+static int make_solid_eye(int pos, int color)
+{
+  int k;
+  int r;
+  for (k = 0; k < 4; k++) {
+    int eyepos = pos + delta[k];
+    if (board[eyepos] == EMPTY
+	|| (board[eyepos] == OTHER_COLOR(color)
+	    && countlib(eyepos) == 1)) {
+      /* For a solid one-point eye all four neighbors must be own
+       * stones. But one is about to be played so we need three in the
+       * center, two on the edge and one in the corner.
+       *
+       * We also need a sufficient number of own diagonals; three in
+       * the center, two on the edge, and one in the corner.
+       *
+       * Notice that the same numbers are needed for both neighbors
+       * and diagonals and if we start counting at 2 in the corner and
+       * at 1 on the edge, we need to reach 3 everywhere on the board.
+       */
+      int own_neighbors = is_edge_vertex(pos) + is_corner_vertex(pos);
+      int own_diagonals = own_neighbors;
+      for (r = 0; r < 8; r++) {
+	if (board[eyepos + delta[r]] == color) {
+	  if (r < 4)
+	    own_neighbors++;
+	  else
+	    own_diagonals++;
+	}
+      }
+      if (own_neighbors == 3 && own_diagonals >= 3)
+	return 1;
+    }
+  }
+
+  return 0;
+}
 
 /* External interface to do_aftermath_genmove().
  *
@@ -84,18 +124,24 @@ aftermath_genmove(int color, int do_capture_dead_stones,
  * dead anyway.
  *
  * Moves are generated in the following order of priority:
- * 0. Play edge liberties in certain positions. This is not really
- *    necessary, but often it can simplify the tactical and strategical
- *    reading substantially, making subsequent moves faster to generate.
- * 1. Capture an opponent string in atari and adjacent to own
- *    invincible string. Moves leading to ko or snapback are excluded.
- * 2. Extend an invincible string to a liberty of an opponent string.
- * 3. Connect a non-invincible string to an invincible string.
- * 4. Extend an invincible string towards an opponent string or an own
- *    non-invincible string.
- * 5. Split a big eyespace of an alive own dragon without invincible
- *    strings into smaller pieces. Do not play self-atari here.
- * 6. Play a liberty of a dead opponent dragon.
+ * -1. Play a move which is listed as a replacement for an
+ *     unconditionally meaningless move. This is guaranteed to extend
+ *     the unconditionally settled part of the board.
+ * 0.  Play edge liberties in certain positions. This is not really
+ *     necessary, but often it can simplify the tactical and strategical
+ *     reading substantially, making subsequent moves faster to generate.
+ * 1a. If not do_capture_dead_stones, capture an opponent string in
+ *     atari and adjacent to own invincible string. Moves leading to ko
+ *     or snapback are excluded.
+ * 1b. If do_capture_dead_stones, play a non-self-atari move adjacent
+ *     to an unconditionally dead opponent string.
+ * 2.  Extend an invincible string to a liberty of an opponent string.
+ * 3.  Connect a non-invincible string to an invincible string.
+ * 4.  Extend an invincible string towards an opponent string or an own
+ *     non-invincible string.
+ * 5.  Split a big eyespace of an alive own dragon without invincible
+ *     strings into smaller pieces. Do not play self-atari here.
+ * 6.  Play a liberty of a dead opponent dragon.
  *
  * Steps 2--4 are interleaved to try to optimize the efficiency of the
  * moves. In step 5 too, efforts are made to play efficient moves.  By
@@ -155,6 +201,15 @@ do_aftermath_genmove(int color,
   int pos = NO_MOVE;
   int best_score;
   int best_scoring_move;
+
+  /* Case -1. */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int replacement_move;
+    if (board[pos] == EMPTY
+	&& unconditionally_meaningless_move(pos, color, &replacement_move)
+	&& replacement_move != NO_MOVE)
+      return replacement_move;
+  }
   
   owl_hotspots(owl_hotspot);
   reading_hotspots(reading_hotspot);
@@ -313,22 +368,63 @@ do_aftermath_genmove(int color,
     return best_scoring_move;
   }
 
-  /* Case 1. */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    int lib;
-    if (board[pos] == other
-	&& worm[pos].unconditional_status != DEAD
-	&& countlib(pos) == 1
-	&& ((ON_BOARD(SOUTH(pos))    && distance[SOUTH(pos)] == 0)
-	    || (ON_BOARD(WEST(pos))  && distance[WEST(pos)]  == 0)
-	    || (ON_BOARD(NORTH(pos)) && distance[NORTH(pos)] == 0)
-	    || (ON_BOARD(EAST(pos))  && distance[EAST(pos)]  == 0))) {
-      findlib(pos, 1, &lib);
-      /* Make sure we don't play into a ko or a (proper) snapback. */
-      if (countstones(pos) > 1 || !is_self_atari(lib, color)) {
-	return lib;
+  /* Case 1a. */
+  if (!do_capture_dead_stones) {
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      int lib;
+      if (board[pos] == other
+	  && worm[pos].unconditional_status != DEAD
+	  && countlib(pos) == 1
+	  && ((ON_BOARD(SOUTH(pos))    && distance[SOUTH(pos)] == 0)
+	      || (ON_BOARD(WEST(pos))  && distance[WEST(pos)]  == 0)
+	      || (ON_BOARD(NORTH(pos)) && distance[NORTH(pos)] == 0)
+	      || (ON_BOARD(EAST(pos))  && distance[EAST(pos)]  == 0))) {
+	findlib(pos, 1, &lib);
+	/* Make sure we don't play into a ko or a (proper) snapback. */
+	if (countstones(pos) > 1 || !is_self_atari(lib, color)) {
+	  return lib;
+	}
       }
     }
+  }
+
+  /* Case 1b. Play liberties of unconditionally dead stones, but never
+   * self-atari. For efficiency against stubborn opponents, we want to
+   * split up the empty space as much as possible. Therefore we look
+   * among this class of moves for one with a maximum number of
+   * adjacent empty spaces and opponent stones.
+   */
+  if (do_capture_dead_stones) {
+    best_score = 0;
+    best_scoring_move = NO_MOVE;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      /* Look at empty points which are connectable to some invincible
+       * string through empty space.
+       */
+      if (board[pos] == EMPTY
+	  && distance[pos] >= 0) {
+	int valid_move = 0;
+	int this_score = 0;
+	for (k = 0; k < 4; k++) {
+	  int pos2 = pos + delta[k];
+	  if (board[pos2] == EMPTY)
+	    this_score += 2;
+	  else if (board[pos2] == other
+		   && worm[pos2].unconditional_status == DEAD) {
+	    this_score++;
+	    valid_move = 1;
+	  }
+	}
+	if (valid_move
+	    && this_score > best_score
+	    && !is_self_atari(pos, color)) {
+	  best_score = this_score;
+	  best_scoring_move = pos;
+	}
+      }
+    }
+    if (best_score > 0)
+      return best_scoring_move;
   }
 
   /* Cases 2--4. */
@@ -541,7 +637,22 @@ do_aftermath_genmove(int color,
     
     if (bonus < 0)
       bonus = 0;
-      
+
+    /* Big bonus for making a small solid eye while splitting the
+     * eyespace. Don't bother optimizing for making two solid eyes,
+     * unconditional replacement moves (case -1) will take care of
+     * that.
+     *
+     * Additional bonus if adjacent to an opponent dragon and we are
+     * asked to remove all dead opponent stones.
+     */
+    if (eyespace_neighbors >= 2)
+      if (make_solid_eye(pos, color)) {
+	bonus += 20;
+	if (do_capture_dead_stones && opponent_dragons > 0)
+	  bonus += 10;
+      }
+    
     score[pos] = 4 * eyespace_neighbors + bonus;
     if (safety == INVINCIBLE) {
       score[pos] += own_neighbors;
