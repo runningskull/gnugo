@@ -2,12 +2,13 @@
  * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *
  * http://www.gnu.org/software/gnugo/ for more information.          *
  *                                                                   *
- * Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006       *
+ * Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 and 2007 *
  * by the Free Software Foundation.                                  *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *
  * modify it under the terms of the GNU General Public License as    *
- * published by the Free Software Foundation - version 2             *
+ * published by the Free Software Foundation - version 3 or          *
+ * (at your option) any later version.                               *
  *                                                                   *
  * This program is distributed in the hope that it will be useful,   *
  * but WITHOUT ANY WARRANTY; without even the implied warranty of    *
@@ -1543,13 +1544,14 @@ Informative Output:\n\
 "
 
 #define COPYRIGHT \
-"Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006\n\
-by the Free Software Foundation, Inc.\n\
+"Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 and 2007\n\
+the Free Software Foundation, Inc.\n\
 See http://www.gnu.org/software/gnugo/ or contact\n\
 gnugo@gnu.org for information about GNU Go. GNU Go comes with NO WARRANTY to\n\
 the extent permitted by law. This program is free software; you can\n\
 redistribute it and/or modify it under the terms of the GNU General Public\n\
-License as published by the Free Software Foundation - version 2.  For more\n\
+License as published by the Free Software Foundation - version 3 or\n\
+(at your option) any later version. For more\n\
 information about these matters, see the files named COPYING.\n"
 
 /* USAGE_DEBUG Split in half because of VC limit on constant string 

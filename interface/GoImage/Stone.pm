@@ -1,27 +1,28 @@
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# This program is distributed with GNU Go, a Go program.        #
-#                                                               #
-# Write gnugo@gnu.org or see http://www.gnu.org/software/gnugo/ #
-# for more information.                                         #
-#                                                               #
-# Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006   #
-# by the Free Software Foundation.                              #
-#                                                               #
-# This program is free software; you can redistribute it and/or #
-# modify it under the terms of the GNU General Public License   #
-# as published by the Free Software Foundation - version 2.     #
-#                                                               #
-# This program is distributed in the hope that it will be       #
-# useful, but WITHOUT ANY WARRANTY; without even the implied    #
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
-# PURPOSE.  See the GNU General Public License in file COPYING  #
-# for more details.                                             #
-#                                                               #
-# You should have received a copy of the GNU General Public     #
-# License along with this program; if not, write to the Free    #
-# Software Foundation, Inc., 51 Franklin Street, Fifth Floor,   #
-# Boston, MA 02111, USA.                                        #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This program is distributed with GNU Go, a Go program.            #
+#                                                                   #
+# Write gnugo@gnu.org or see http://www.gnu.org/software/gnugo/     #
+# for more information.                                             #
+#                                                                   #
+# Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 and 2007 #
+# by the Free Software Foundation.                                  #
+#                                                                   #
+# This program is free software; you can redistribute it and/or     #
+# modify it under the terms of the GNU General Public License       #
+# as published by the Free Software Foundation - version 3,         #
+# or (at your option) any later version.                            #
+#                                                                   #
+# This program is distributed in the hope that it will be           #
+# useful, but WITHOUT ANY WARRANTY; without even the implied        #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR           #
+# PURPOSE.  See the GNU General Public License in file COPYING      #
+# for more details.                                                 #
+#                                                                   #
+# You should have received a copy of the GNU General Public         #
+# License along with this program; if not, write to the Free        #
+# Software Foundation, Inc., 51 Franklin Street, Fifth Floor,       #
+# Boston, MA 02111, USA.                                            #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 # Uses Perl GB package to create mini-PNG files used by the
 # regression html views.
@@ -43,7 +44,7 @@ BEGIN {
       # set the version for version checking
       $VERSION     = 0.01;
       # if using RCS/CVS, this may be preferred (???-tm)
-      $VERSION = do { my @r = (q$Revision: 1.9 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+      $VERSION = do { my @r = (q$Revision: 1.10 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
       @ISA         = qw(Exporter);
       @EXPORT      = qw(&createPngFile &parseFileName);
       %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],

@@ -1,14 +1,16 @@
 #! /usr/bin/env pike
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
- * This program is distributed with GNU Go, a Go program.            *
+ * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *
+ * http://www.gnu.org/software/gnugo/ for more information.          *
  *                                                                   *
- * Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005 and 2006       *
+ * Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 and 2007 *
  * by the Free Software Foundation.                                  *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *
  * modify it under the terms of the GNU General Public License as    *
- * published by the Free Software Foundation - version 2             *
+ * published by the Free Software Foundation - version 3 or          *
+ * (at your option) any later version.                               *
  *                                                                   *
  * This program is distributed in the hope that it will be useful,   *
  * but WITHOUT ANY WARRANTY; without even the implied warranty of    *
@@ -20,7 +22,6 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor,       *
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 
 #define DUMP_GTP_PIPES		0
 

@@ -1,4 +1,4 @@
-;;; ID: $Id: gnugo.el,v 1.5 2006-02-09 18:50:10 arend Exp $
+;;; ID: $Id: gnugo.el,v 1.6 2007-10-24 01:56:04 bump Exp $
 ;;;
 ;;; This is GNU Go, a Go program. Contact gnugo@gnu.org, or see
 ;;; http://www.gnu.org/software/gnugo/ for more information.   
@@ -7,7 +7,8 @@
 ;;;                                                            
 ;;; This program is free software; you can redistribute it and/
 ;;; modify it under the terms of the GNU General Public License
-;;; as published by the Free Software Foundation - version 2.  
+;;; as published by the Free Software Foundation - version 3,
+;;; or (at your option) any later version.
 ;;;                                                            
 ;;; This program is distributed in the hope that it will be    
 ;;; useful, but WITHOUT ANY WARRANTY; without even the implied 
@@ -659,4 +660,4 @@ See also variable `gnugo-option-history'."
 
 (provide 'gnugo)
 
-;;; $RCSfile: gnugo.el,v $$Revision: 1.5 $ ends here
+;;; $RCSfile: gnugo.el,v $$Revision: 1.6 $ ends here
