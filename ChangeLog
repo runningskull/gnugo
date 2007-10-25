@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- don't play send-two-return-one in tactical reading attack moves
 - bugfix in reevaluate_ko_threats() to avoid a crash
 - more efficient aftermath moves
 - version 3 of GPL and update copyright for 2007

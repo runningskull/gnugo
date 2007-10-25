@@ -176,8 +176,10 @@
       int ko_move;							\
       int apos = moves.pos[k];						\
 									\
-      if (komaster_trymove(apos, other, moves.message[k], str,&ko_move,	\
-			   stackp <= ko_depth && savecode == 0)) {	\
+      if ((board_ko_pos != NO_MOVE || !send_two_return_one(apos, other))\
+	  && komaster_trymove(apos, other, moves.message[k],            \
+                              str, &ko_move,                            \
+			      stackp <= ko_depth && savecode == 0)) {	\
 	int dcode = do_find_defense(str, (defense_hint));		\
 									\
 	if (REVERSE_RESULT(dcode) > savecode				\
