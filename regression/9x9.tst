@@ -341,3 +341,13 @@ loadsgf games/cgos/42896.sgf 33
 loadsgf games/cgos/390115.sgf 28
 670 reg_genmove white
 #? [E7]
+
+# There's actually nothing difficult with this position, it's only
+# necessary to avoid a few obvious blunders. The real reason for this
+# test is that a fix for an atari-atari problem introduced a crash in
+# this position. Fixing the crash instead reintroduced an atari-atari
+# mistake in ninestones:220. Let's make sure we won't get a crash here
+# once more. See also tickets #77 and #161.
+loadsgf games/atari-crash.sgf
+680 reg_genmove white
+#? [H7]

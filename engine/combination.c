@@ -409,13 +409,13 @@ atari_atari_blunder_size(int color, int move,
   memset(forbidden, 0, sizeof(forbidden));
   memset(defense_points, 0, sizeof(defense_points));
 
+  compute_aa_status(other, safe_stones);
+  compute_aa_values(other);
+
   /* Accept illegal ko capture here. */
   if (!tryko(move, color, NULL))
     /* Really shouldn't happen. */
     abortgo(__FILE__, __LINE__, "trymove", move);
-
-  compute_aa_status(other, safe_stones);
-  compute_aa_values(other);
 
   increase_depth_values();
 
@@ -519,6 +519,8 @@ atari_atari_blunder_size(int color, int move,
 
 /* Helper function for computing the aa_status for all opponent's strings.
  * If safe_stones is given, we just copy the information from there.
+ * If called at stackp > 0, safe_stones must be provided since the
+ * dragon_data is not valid then.
  */
 
 static void
@@ -529,6 +531,9 @@ compute_aa_status(int color, const signed char safe_stones[BOARDMAX])
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
   int save_verbose = verbose;
+
+  gg_assert(safe_stones || stackp == 0);
+  
   sgf_dumptree = NULL;
   count_variations = 0;
   if (verbose)
@@ -573,8 +578,8 @@ compute_aa_status(int color, const signed char safe_stones[BOARDMAX])
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] == other
-	&& worm[pos].origin == pos
-	&& worm[pos].liberties == 2
+	&& find_origin(pos) == pos
+	&& countlib(pos) == 2
 	&& aa_status[pos] == ALIVE) {
       int libs[2];
       findlib(pos, 2, libs);
@@ -588,7 +593,7 @@ compute_aa_status(int color, const signed char safe_stones[BOARDMAX])
       if (!owl_substantial(pos)) {
 	int pos2;
 	for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
-	  if (ON_BOARD(pos2) && is_worm_origin(pos2, pos))
+	  if (board[pos2] == other && find_origin(pos2) == pos)
 	    aa_status[pos2] = INSUBSTANTIAL;
       }
     }

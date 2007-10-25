@@ -64,6 +64,7 @@ loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 64
 190 owl_defend J9
 #? [0]*
 
+# See also 9x9:680 and tickets #77 and #161.
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 108
 220 reg_genmove black
 #? [P9|P8]
