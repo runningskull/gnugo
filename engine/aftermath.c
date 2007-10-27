@@ -126,15 +126,18 @@ aftermath_genmove(int color, int do_capture_dead_stones,
  * Moves are generated in the following order of priority:
  * -1. Play a move which is listed as a replacement for an
  *     unconditionally meaningless move. This is guaranteed to extend
- *     the unconditionally settled part of the board.
+ *     the unconditionally settled part of the board. Only do this if
+ *     the meaningless move is not connected through open space to an
+ *     invincible string.
  * 0.  Play edge liberties in certain positions. This is not really
  *     necessary, but often it can simplify the tactical and strategical
  *     reading substantially, making subsequent moves faster to generate.
- * 1a. If not do_capture_dead_stones, capture an opponent string in
- *     atari and adjacent to own invincible string. Moves leading to ko
- *     or snapback are excluded.
+ * 1a. Capture an opponent string in atari and adjacent to own invincible
+ *     string. Moves leading to ko or snapback are excluded.
  * 1b. If do_capture_dead_stones, play a non-self-atari move adjacent
  *     to an unconditionally dead opponent string.
+ * 1c. If do_capture_dead_stones, play a liberty of an opponent string
+ *     where the liberty is adjacent to own invincible string.
  * 2.  Extend an invincible string to a liberty of an opponent string.
  * 3.  Connect a non-invincible string to an invincible string.
  * 4.  Extend an invincible string towards an opponent string or an own
@@ -202,15 +205,6 @@ do_aftermath_genmove(int color,
   int best_score;
   int best_scoring_move;
 
-  /* Case -1. */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    int replacement_move;
-    if (board[pos] == EMPTY
-	&& unconditionally_meaningless_move(pos, color, &replacement_move)
-	&& replacement_move != NO_MOVE)
-      return replacement_move;
-  }
-  
   owl_hotspots(owl_hotspot);
   reading_hotspots(reading_hotspot);
   
@@ -314,6 +308,19 @@ do_aftermath_genmove(int color,
       gprintf("\n");
   }
 
+  /* Case -1. */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int replacement_move;
+    if (board[pos] == EMPTY
+	&& distance[pos] == -1
+	&& unconditionally_meaningless_move(pos, color, &replacement_move)
+	&& replacement_move != NO_MOVE) {
+      DEBUG(DEBUG_AFTERMATH, "Replacement move for %1m at %1m\n", pos,
+	    replacement_move);
+      return replacement_move;
+    }
+  }
+  
   /* Case 0. This is a special measure to avoid a certain kind of
    * tactical reading inefficiency.
    *
@@ -369,21 +376,19 @@ do_aftermath_genmove(int color,
   }
 
   /* Case 1a. */
-  if (!do_capture_dead_stones) {
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      int lib;
-      if (board[pos] == other
-	  && worm[pos].unconditional_status != DEAD
-	  && countlib(pos) == 1
-	  && ((ON_BOARD(SOUTH(pos))    && distance[SOUTH(pos)] == 0)
-	      || (ON_BOARD(WEST(pos))  && distance[WEST(pos)]  == 0)
-	      || (ON_BOARD(NORTH(pos)) && distance[NORTH(pos)] == 0)
-	      || (ON_BOARD(EAST(pos))  && distance[EAST(pos)]  == 0))) {
-	findlib(pos, 1, &lib);
-	/* Make sure we don't play into a ko or a (proper) snapback. */
-	if (countstones(pos) > 1 || !is_self_atari(lib, color)) {
-	  return lib;
-	}
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int lib;
+    if (board[pos] == other
+	&& worm[pos].unconditional_status != DEAD
+	&& countlib(pos) == 1
+	&& ((ON_BOARD(SOUTH(pos))    && distance[SOUTH(pos)] == 0)
+	    || (ON_BOARD(WEST(pos))  && distance[WEST(pos)]  == 0)
+	    || (ON_BOARD(NORTH(pos)) && distance[NORTH(pos)] == 0)
+	    || (ON_BOARD(EAST(pos))  && distance[EAST(pos)]  == 0))) {
+      findlib(pos, 1, &lib);
+      /* Make sure we don't play into a ko or a (proper) snapback. */
+      if (countstones(pos) > 1 || !is_self_atari(lib, color)) {
+	return lib;
       }
     }
   }
@@ -427,9 +432,23 @@ do_aftermath_genmove(int color,
       return best_scoring_move;
   }
 
+  /* Case 1c. */
+  if (do_capture_dead_stones) {
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (board[pos] == EMPTY
+	  && distance[pos] == 1
+	  && has_neighbor(pos, other)) {
+	return pos;
+      }
+    }
+  }
+
   /* Cases 2--4. */
   if (closest_opponent != NO_MOVE || closest_own != NO_MOVE) {
-    if (closest_own == NO_MOVE)
+    if (closest_own == NO_MOVE
+	|| (capture_all_dead
+	    && closest_opponent != NO_MOVE
+	    && distance[closest_opponent] < distance[closest_own]))
       move = closest_opponent;
     else
       move = closest_own;
