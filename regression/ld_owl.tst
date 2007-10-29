@@ -500,10 +500,10 @@ loadsgf games/life_and_death/ld20.sgf
 
 loadsgf games/life_and_death/eye1.sgf
 530 owl_attack B9
-#? [1 D9]
+#? [1 D9]*
 531 owl_defend B9
 #? [1 (D9|E9|E8)]
 532 owl_attack F2
-#? [1 J2]
+#? [1 J2]*
 533 owl_defend F2
-#? [1 J2]
+#? [1 J2]*

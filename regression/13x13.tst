@@ -14,7 +14,7 @@
 #DESCRIPTION=M2 has the huge follow up of rescueing H3, not seen by GNU Go.
 loadsgf games/mertin13x13/goliath-gnugo1.B+11.sgf 22
 1 reg_genmove white
-#? [M2]*
+#? [M2]
 
 # E10 is a little better but the difference might not be worth regressing
 # for now. 
@@ -180,7 +180,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 82
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 102
 35 reg_genmove white
-#? [D2]*
+#? [D2]
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 110
 36 reg_genmove white

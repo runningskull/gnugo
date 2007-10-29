@@ -52,7 +52,7 @@ loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312041808.sgf 40
 #game move is B1, maybe a caching issue?
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312041808.sgf 58
 120 reg_genmove black
-#? [F1]*
+#? [F1]
 
 #large endgame, white will have to pick up.
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312041808.sgf 64
@@ -329,18 +329,18 @@ loadsgf games/cgos/25811.sgf 52
 # See also reading:231.
 loadsgf games/cgos/14198.sgf 53
 650 reg_genmove black
-#? [E1]*
+#? [E1]
 
 # D3 is the only possible move. Trying to kill all white stones with
 # F2 is an unreasonable overplay.
 loadsgf games/cgos/42896.sgf 33
 660 reg_genmove black
-#? [D3]
+#? [D3]*
 
 # E7 is the only way to live on the upper side.
 loadsgf games/cgos/390115.sgf 28
 670 reg_genmove white
-#? [E7]
+#? [E7]*
 
 # There's actually nothing difficult with this position, it's only
 # necessary to avoid a few obvious blunders. The real reason for this

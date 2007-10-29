@@ -62,7 +62,7 @@ loadsgf golois/Goemate990903-10.sgf
 
 loadsgf golois/Goemate990903-6.sgf
 16 reg_genmove black
-#? [O10]
+#? [O10]*
 
 #CATEGORY=CONNECTION
 #DESCRIPTION=

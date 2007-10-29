@@ -248,7 +248,7 @@ loadsgf games/nngs/Minori-gnugo-3.5.2gf1-200312161433.sgf 132
 # filling dames at Q7|Q6|J16|J17|E7|N4 /nn
 loadsgf games/nngs/Minori-gnugo-3.5.2gf1-200312161433.sgf 254
 45 reg_genmove black
-#? [K1]*
+#? [K1]
 
 # Don't leave aji around, capture the white stones solidly.
 loadsgf games/nngs/joshj-gnugo-3.5.2gf1-200312171536.sgf 140
@@ -462,7 +462,7 @@ loadsgf games/kgs/sade-GNU.sgf 265
 # P13 is clearly better than O13.
 loadsgf games/kgs/GNU-bassanio.sgf 164
 84 restricted_genmove white P13 O13
-#? [P13]*
+#? [P13]
 
 # T6 can't be defended. R8 is globally too small but locally
 # guaranteed to be better.
@@ -530,24 +530,24 @@ loadsgf games/kgs/koketto-GNU.sgf 209
 # B8 is overvalued by 3.7.8.
 loadsgf games/kgs/GNU-goodluck.sgf 233
 97 restricted_genmove white N16 B8
-#? [N16]
+#? [N16]*
 
 # F7 is mostly pointless as strategic defense.
 loadsgf games/kgs/GNU-ituyosi2.sgf 243
 98 restricted_genmove white A6 B6 F7
-#? [A6]
+#? [A6]*
 
 # T2 is found by endgame move generator in 3.7.9 but has no effect.
 loadsgf games/kgs/GNU-ituyosi2.sgf 293
 99 restricted_genmove white T2 C11
-#? [C11]
+#? [C11]*
 
 # Letting black cut at S6 gives major trouble.
 loadsgf games/kgs/GNU-ituyosi2.sgf 301
 100 reg_genmove white
-#? [S6]
+#? [S6]*
 
 # T8 wins the semeai, T7 allows black to make seki.
 loadsgf games/kgs/GNU-ituyosi2.sgf 311
 101 reg_genmove white
-#? [T8]
+#? [T8]*

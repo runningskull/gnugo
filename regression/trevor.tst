@@ -216,7 +216,7 @@ loadsgf games/trevor/trevor_21.sgf 22
 # Black seems not to see the cut coming.
 loadsgf games/trevor/trevor_22.sgf 23
 220 reg_genmove black
-#? [E8]*
+#? [E8]
 
 # F2 is not really sente, nor useful if it were!
 loadsgf games/trevor/trevor_23.sgf 27
@@ -661,7 +661,7 @@ loadsgf games/trevor/auto/c30.sgf 62
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 1060 owl_does_defend J4 E4
-#? [1]*
+#? [1]
 
 
 loadsgf games/trevor/trevor_20.sgf  14  

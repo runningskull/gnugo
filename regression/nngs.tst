@@ -157,7 +157,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 158
 #New failure GNU Go 3.7.3
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 240
 308 reg_genmove black
-#? [L3|M19]*
+#? [L3|M19]
 
 
 

@@ -441,7 +441,7 @@ loadsgf games/kgs/PsyDuck-GNU.sgf 76
 
 loadsgf games/kgs/GNU-higher.sgf 267
 372 owl_defend A17
-#? [1 D18]*
+#? [1 D18]
 
 # See also nngs2:580.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152

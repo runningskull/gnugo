@@ -103,7 +103,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 258
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 292
 270 reg_genmove black
-#? [!P5]*
+#? [!P5]
 
 loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 32
 280 restricted_genmove black F3 H3

@@ -119,7 +119,7 @@ loadsgf games/nando/auto015.sgf
 22 disconnect L3 N2
 #? [1 M3]
 23 same_dragon L3 N2
-#? [0]*
+#? [0]
 
 #CATEGORY=OWL
 loadsgf games/nando/auto016.sgf

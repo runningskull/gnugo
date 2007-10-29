@@ -255,7 +255,7 @@ loadsgf games/semeai/semeai9.sgf
 46 analyze_semeai Q12 S11
 #? [1 0 (PASS|R8|R9|T11|T9|R11|R10)]
 47 analyze_semeai S11 Q12
-#? [1 0 (PASS|T11|T9|R9|T10|R10|R11)]*
+#? [1 0 (PASS|T11|T9|R9|T10|R10|R11)]
 
 loadsgf games/nngs/gnugo-3.3.20-GoFuN-200306071813.sgf 234
 48 analyze_semeai E17 D17
@@ -511,7 +511,7 @@ loadsgf games/verybad.sgf 118
 
 loadsgf games/owl54.sgf
 130 analyze_semeai D3 G2
-#? [0 0 PASS]*
+#? [0 0 PASS]
 
 loadsgf games/kgs/GNU-minautore.sgf 80
 131 dragon_status P8
@@ -562,7 +562,7 @@ loadsgf games/semeai/semeai22.sgf 7
 143 analyze_semeai A4 E3
 #? [3 3 (F1|F3)]
 144 analyze_semeai E3 A4
-#? [2 2 PASS]*
+#? [2 2 PASS]
 
 # See also 9x9:640.
 loadsgf games/cgos/25811.sgf 52
@@ -576,4 +576,4 @@ loadsgf games/semeai/semeai6.sgf
 play white A15
 play black D13
 147 analyze_semeai A12 A14
-#? [1 1 (B15|C15|D15|E15)]
+#? [1 1 (B15|C15|D15|E15)]*

@@ -67,7 +67,7 @@ loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 64
 # See also 9x9:680 and tickets #77 and #161.
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 108
 220 reg_genmove black
-#? [P9|P8]
+#? [P9|P8]*
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 118
 230 restricted_genmove black P11 K2 H13
@@ -142,7 +142,7 @@ loadsgf games/nngs/juka-gnugo-3.3.16-200302072106.sgf 8
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 164
 490 restricted_genmove black S10 R10
-#? [R10]
+#? [R10]*
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 200
 500 reg_genmove black
@@ -283,7 +283,7 @@ loadsgf games/9handicap.sgf 290
 # Not D7 as in the game!
 loadsgf games/9handicap.sgf 328
 790 reg_genmove black
-#? [B1]
+#? [B1]*
 
 # Connect safely
 loadsgf games/9handicap.sgf 334

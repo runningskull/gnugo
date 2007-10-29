@@ -254,7 +254,7 @@ loadsgf games/endgame12.sgf
 
 loadsgf games/nando/auto025.sgf 226
 980 restricted_genmove white E4 F4 Q19
-#? [F4]*
+#? [F4]
 
 # E5 is about 2.5 points.
 loadsgf games/endgame13.sgf 1
@@ -264,7 +264,7 @@ loadsgf games/endgame13.sgf 1
 #? [C1]
 loadsgf games/endgame13.sgf 2
 992 reg_genmove black
-#? [E5]
+#? [E5]*
 993 reg_genmove white
 #? [E5]
 

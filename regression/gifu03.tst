@@ -181,7 +181,7 @@ loadsgf games/cgf2003/GnuGo-Haruka.sgf 118
 # The push through at G13 is prepared.
 loadsgf games/cgf2003/GnuGo-Haruka.sgf 168
 507 reg_genmove white
-#? [G13]
+#? [G13]*
 
 ## Q14 is not common in the Chinese fuseki. (But is it worth regressing over?)
 # dr deleted 2004-12-13 when reinserting pattern Fuseki488 / pre 0x220d654c

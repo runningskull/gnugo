@@ -107,7 +107,7 @@ loadsgf games/kgs/yagr-gab9.2.sgf 158
 # Connect the monkey jump instead of running nowhere!
 loadsgf games/kgs/yagr-Sapojnik.sgf 80
 220 reg_genmove white
-#? [T10]
+#? [T10]*
 
 # Win the semeai!
 loadsgf games/kgs/yagr-Kazik.sgf 149
@@ -163,7 +163,7 @@ loadsgf games/kgs/yagr-FKleolio.sgf 211
 
 loadsgf games/kgs/yagr-nigiri.sgf 121
 340 restricted_genmove white L2 L4
-#? [L4]*
+#? [L4]
 
 # Not L8
 loadsgf games/kgs/SURARIN-yagr.sgf 218
@@ -339,7 +339,7 @@ loadsgf games/kgs/20050408-GNU-mamassang.sgf 80
 
 loadsgf games/kgs/20050408-GNU-mamassang.sgf 160
 720 reg_genmove white
-#? [A15]*
+#? [A15]
 
 # This requires knowledge that we have no ko threats. Tough to solve, but
 # important. /ab

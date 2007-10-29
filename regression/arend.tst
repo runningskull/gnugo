@@ -48,7 +48,7 @@ loadsgf games/arend/gnugo-gnugo2.sgf 60
 # Must be a misread.
 loadsgf games/arend/gnugo-gnugo2.sgf 61
 9 reg_genmove black
-#? [S17]*
+#? [S17]
 
 #CATEGORY=STRATEGY
 # J7 is extremely overvalued. This is caused by pattern CB11.

@@ -66,5 +66,5 @@ loadsgf games/edge_defense1.sgf
 loadsgf games/gifu2005/mfg-gnugo.sgf 204
 trymove white O6
 108 defend_both O9 P6
-#? [1]
+#? [1]*
 popgo

@@ -482,7 +482,7 @@ loadsgf games/seki14.sgf
 1001 reg_genmove white
 #? [B2]
 1002 reg_genmove black
-#? [B2]*
+#? [B2]
 
 
 loadsgf games/seki15.sgf

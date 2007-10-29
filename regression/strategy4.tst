@@ -210,7 +210,7 @@ loadsgf games/pooo.sgf 50
 
 loadsgf games/pooo.sgf 52
 190 reg_genmove black
-#? [D13]
+#? [D13]*
 
 loadsgf games/pooo.sgf 56
 191 reg_genmove black
