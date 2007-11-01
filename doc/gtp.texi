@@ -384,7 +384,12 @@ or some status string (there are others).
 commands. If nothing else is specified it is a GNU Go private extension.
 @end itemize
 
-Without further ado, here is the big list (in no particular order):
+Without further ado, here is the big list (in no particular order).
+
+Note: if new commands are added by editing @file{interface/play_gtp.c} this
+list could become incomplete. You may rebuild this list in
+@file{doc/gtp-commands.texi} with the command @command{make gtp-commands}
+in the @file{doc/} directory. This may require GNU sed.
 
 @itemize @bullet
 @include gtp-commands.texi

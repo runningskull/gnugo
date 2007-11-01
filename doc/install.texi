@@ -57,8 +57,8 @@ command line by just typing:
 @end example
 
 @noindent
-but it is nicer to run it using CGoban 1 (under X Window System), Jago
-(on any platform with a Java Runtime Environment) or other
+but it is nicer to run it using CGoban 1 (under X Window System), 
+Quarry, Jago (on any platform with a Java Runtime Environment) or other
 client programs offering a GUI.
 
 You can get the most recent version of CGoban 1 from 
@@ -69,6 +69,8 @@ will not work.
 
 @xref{CGoban}, for instructions on how to run GNU Go from Cgoban, or
 @xref{Other Clients}, for Jago or other clients.
+
+Quarry is available at @url{http://home.gna.org/quarry/}.
 
 @node Configure Options
 @section Configure Options
@@ -217,7 +219,10 @@ level 9.
 oriented game and has a good winning rate against standard GNU Go,
 though it makes GNU Go weaker against other opponents.
 @item @code{large-scale}. Attempt to make large-scale captures.
-See @url{http://lists.gnu.org/archive/html/gnugo-devel/2003-07/msg00209.html}
+See:
+
+@url{http://lists.gnu.org/archive/html/gnugo-devel/2003-07/msg00209.html}
+
 for the philosophy of this option. This option makes the engine slower.
 @item @code{metamachine}. Enables the metamachine, which allows
 you to run the engine in an experimental mode whereby it forks

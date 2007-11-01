@@ -48,7 +48,9 @@ gnugo.pdf: gnugo.texi $(gnugo_TEXINFOS)
 gnugo.html: gnugo.texi $(gnugo_TEXINFOS)
 	$(TEXI2HTML) -split=chapter -nosec_nav -expand=tex $<
 
-gtp-commands.texi: $(cmdsrc)
+## Rebuild gtp-commands.texi from play_gtp.c:
+
+gtp-commands:
 	sed -e '1r '$(srcdir)/gtp-commands.sed				\
 	    -e '/static struct gtp_command commands/,/^}/!d'		\
 	    -e '/^ /!d' -e '/NULL/d'					\

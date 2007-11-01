@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.7.11 released November 1, 2007
+
+- gtp-commands.texi is not built automatically
+- updates texinfo.tex
+- minor doc revision
 - revised configure.in, aclocal.m4 and *Makefile.in for recent autotools
 - removed acconfig.h
 - don't play send-two-return-one in tactical reading attack moves

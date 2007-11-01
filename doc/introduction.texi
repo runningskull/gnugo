@@ -26,10 +26,7 @@ To be sure, existing Go programs are strong enough to be interesting
 as opponents, and the hope exists that some day soon a truly
 strong program can be written. 
 
-GNU Go is getting stronger. GNU Go 3.6 plays at about the level of
-9 kyu.
-
-Until now, Go programs have always been distributed as binaries
+Before GNU Go, Go programs have always been distributed as binaries
 only. The algorithms in these proprietary programs are secret. No-one
 but the programmer can examine them to admire or criticise. As a
 consequence, anyone who wished to work on a Go program usually had to
@@ -320,7 +317,7 @@ internet or in a cluster.
 This would probably be very slow and could only read 2 or 3 moves ahead.
 Still it could find fatal errors and improve the moves that GNU Go makes.
 @end quotation
-@item 
+@item  A strategic module
 @quotation
 A strategic module that identifies high-level goals and then gives
 these goals to the rest of the engine.  It should be able to
