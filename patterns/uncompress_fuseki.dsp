@@ -1,9 +1,3 @@
-# Microsoft Developer Studio Project File - Name="uncompress_fuseki" - Package Owner=<4>
-# Microsoft Developer Studio Generated Build File, Format Version 6.00
-# ** DO NOT EDIT **
-
-# TARGTYPE "Win32 (x86) Console Application" 0x0103
-
 CFG=uncompress_fuseki - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
@@ -42,42 +36,39 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /W3 /GX /O2 /I "." /I ".." /I "../sgf" /I "../engine" /I "../utils" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "HAVE_CONFIG_H" /FD /c
-# SUBTRACT CPP /nologo /YX
-# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD CPP /GX /Zi /I ".." /I "..\engine" /I "..\sgf" /I "..\utils" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "HAVE_CONFIG_H" /FD /c
+# SUBTRACT CPP /YX
+# ADD BASE RSC /l 0x407 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 sgf.lib engine.lib utils.lib /nologo /subsystem:console /machine:I386 /out:"Release/uncompress_fuseki.exe" /libpath:"../sgf/Release/" /libpath:"../engine/Release/" /libpath:"../utils/Release/" /libpath:"./Release/"
+# ADD LINK32 engine.lib /nologo /subsystem:console /incremental:yes /machine:I386 /libpath:"../engine/Release/"
 
 !ELSEIF  "$(CFG)" == "uncompress_fuseki - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "uncompress_fuseki___Win32_Debug"
-# PROP BASE Intermediate_Dir "uncompress_fuseki___Win32_Debug"
+# PROP BASE Output_Dir "Debug"
+# PROP BASE Intermediate_Dir "Debug"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
-# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /W3 /Gm /GX /Zi /Od /I "." /I ".." /I "../sgf" /I "../engine" /I "../utils" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "HAVE_CONFIG_H" /FR /FD /GZ /c
-# SUBTRACT CPP /nologo /YX
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I ".." /I "..\engine" /I "..\sgf" /I "..\utils" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
+# ADD BASE RSC /l 0x407 /d "_DEBUG"
+# ADD RSC /l 0x407 /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"Debug/uncompress_fuseki.exe" /pdbtype:sept
-# SUBTRACT LINK32 /incremental:no /nodefaultlib
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 
 !ENDIF 
 

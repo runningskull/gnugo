@@ -405,19 +405,6 @@ SOURCE=.\reading.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\score.c
-
-!IF  "$(CFG)" == "engine - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
-
-# ADD CPP /YX"gnugo.h"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=.\semeai.c
 
 !IF  "$(CFG)" == "engine - Win32 Release"
@@ -484,7 +471,6 @@ SOURCE=.\showbord.c
 # Begin Source File
 
 SOURCE=.\surround.c
-
 # End Source File
 # Begin Source File
 
