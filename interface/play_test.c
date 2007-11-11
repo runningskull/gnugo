@@ -91,7 +91,7 @@ play_replay(SGFTree *tree, int color_to_replay)
   }
 
   if (!quiet)
-    printf("Global score: %.2f / %.2f", replay_score, total_score);
+    printf("Global score: %.2f / %.2f\n", replay_score, total_score);
 
   if (showtime) {
     gprintf("SLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
