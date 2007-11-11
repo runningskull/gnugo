@@ -75,7 +75,7 @@
 
 /* terminfo attributes */
 static char *setaf;		/* terminfo string to set color */
-static int max_color;		/* terminfo max colour */
+static char *op;		/* terminfo string to reset colors */
 
 static int init = 0;
 
@@ -103,7 +103,7 @@ gg_init_color()
  */
 
   static char setaf_literal[] = "setaf";
-  static char colors_literal[] = "colors";
+  static char op_literal[] = "op";
   static char empty_literal[] = "";
 
   if (init)
@@ -115,12 +115,10 @@ gg_init_color()
   setaf = tigetstr(setaf_literal);
   if (!setaf)
     setaf = empty_literal;
-  max_color = tigetnum(colors_literal) - 1;
-  if (max_color < 1)
-    max_color = 1;
-  else if (max_color > 30)
-    max_color = 30;
-  
+  op = tigetstr(op_literal);
+  if (!op)
+    op = empty_literal;
+ 
 #endif /* TERMINFO */
 }
 
@@ -157,7 +155,7 @@ write_color_char_no_space(int c, int x)
 #ifdef TERMINFO
 
   fprintf(stderr, "%s%c", tparm(setaf, c, 0, 0, 0, 0, 0, 0, 0, 0), x);
-  fputs(tparm(setaf, max_color, 0, 0, 0, 0, 0, 0, 0, 0), stderr);
+  fputs(tparm(op, 0, 0, 0, 0, 0, 0, 0, 0, 0), stderr);
 
 #elif defined(ANSI_COLOR)
 

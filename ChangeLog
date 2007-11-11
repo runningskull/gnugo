@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in handling of foreground color with ncurses	
+
 3.7.11 released November 1, 2007
 
 - gtp-commands.texi is not built automatically
