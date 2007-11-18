@@ -100,27 +100,23 @@ hash_init(void)
 
 /* ---------------------------------------------------------------- */
 
-/* Calculate the compactboard and the hashvalues in one function.
- * They are always used together and it saves us a loop and a function 
- * call.
- */
-
+/* Calculate the hashvalue from scratch. */
 void 
-hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
+hashdata_recalc(Hash_data *hd, Intersection *p, int ko_pos)
 {
   int pos;
 
-  hashdata_clear(target);
+  hashdata_clear(hd);
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (p[pos] == WHITE)
-      hashdata_xor(*target, white_hash[pos]);
+      hashdata_xor(*hd, white_hash[pos]);
     else if (p[pos] == BLACK)
-      hashdata_xor(*target, black_hash[pos]);
+      hashdata_xor(*hd, black_hash[pos]);
   }
 
   if (ko_pos != 0)
-    hashdata_xor(*target, ko_hash[ko_pos]);
+    hashdata_xor(*hd, ko_hash[ko_pos]);
 }
 
 /* Clear hashdata. */
@@ -163,6 +159,31 @@ void
 hashdata_invert_kom_pos(Hash_data *hd, int kom_pos)
 {
   hashdata_xor(*hd, kom_pos_hash[kom_pos]);
+}
+
+/* Calculate a transformation invariant hashvalue. */
+void 
+hashdata_calc_orientation_invariant(Hash_data *hd, Intersection *p, int ko_pos)
+{
+  int pos;
+  int rot;
+  Hash_data hd_rot;
+
+  for (rot = 0; rot < 8; rot++) {
+    hashdata_clear(&hd_rot);
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (p[pos] == WHITE)
+	hashdata_xor(hd_rot, white_hash[rotate1(pos, rot)]);
+      else if (p[pos] == BLACK)
+	hashdata_xor(hd_rot, black_hash[rotate1(pos, rot)]);
+    }
+    
+    if (ko_pos != NO_MOVE)
+      hashdata_xor(hd_rot, ko_hash[rotate1(ko_pos, rot)]);
+
+    if (rot == 0 || hashdata_is_smaller(hd_rot, *hd))
+      *hd = hd_rot;
+  }
 }
 
 /* Compute hash value to identify the goal area. */
@@ -211,6 +232,19 @@ hashdata_is_equal_func(Hash_data *hd1, Hash_data *hd2)
       return 0;
 
   return 1;
+}
+
+int
+hashdata_is_smaller_func(Hash_data *hd1, Hash_data *hd2)
+{
+  int i;
+  for (i = 0; i < NUM_HASHVALUES; i++)
+    if (hd1->hashval[i] < hd2->hashval[i])
+      return 1;
+    else if (hd1->hashval[i] > hd2->hashval[i])
+      return 0;
+
+  return 0;
 }
 #endif
 

@@ -212,15 +212,6 @@ gameinfo_print(Gameinfo *gameinfo)
     printf("Nobody\n");
 }
 
-/* 1D interface to rotate(). */
-static int
-rotate1(int pos, int orientation)
-{
-  int ri, rj;
-  rotate(I(pos), J(pos), &ri, &rj, board_size, orientation);
-  return POS(ri, rj);
-}
-
 /*
  * Play the moves in an SGF tree. Walk the main variation, actioning
  * the properties into the playing board.

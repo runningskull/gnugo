@@ -307,11 +307,12 @@ int is_ko_point(int pos);
 int does_capture_something(int pos, int color);
 int is_self_atari(int pos, int color);
 
-/* Purely gemoetric functions */
+/* Purely geometric functions. */
 int is_edge_vertex(int pos);
 int is_corner_vertex(int pos);
 int edge_distance(int pos);
 int square_dist(int pos1, int pos2);
+int rotate1(int pos, int rot);
 
 /* Basic string information. */
 int find_origin(int str);

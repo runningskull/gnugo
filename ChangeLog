@@ -3,6 +3,7 @@
 -------------------------------------------------------------------------
 
 - bugfix in handling of foreground color with ncurses	
+- orientation invariant board hashes added
 
 3.7.11 released November 1, 2007
 

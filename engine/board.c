@@ -1452,6 +1452,42 @@ is_corner_vertex(int pos)
 }
 
 
+/* Reorientation of point pos. This function could have been
+ * implemented using the rotate() function in utils/gg_utils.c but we
+ * don't want to make libboard dependent on utils.
+ */
+int
+rotate1(int pos, int rot)
+{
+  int bs = board_size - 1;
+  int i = I(pos);
+  int j = J(pos);
+  gg_assert(rot >= 0 && rot < 8);
+
+  if (pos == PASS_MOVE)
+    return PASS_MOVE;
+
+  if (rot == 0)
+    return pos;                 /* identity map */
+  if (rot == 1)
+    return POS(bs - j, i);      /* rotation over 90 degrees */
+  if (rot == 2)
+    return POS(bs - i, bs - j); /* rotation over 180 degrees */
+  if (rot == 3)
+    return POS(j, bs - i);      /* rotation over 270 degrees */
+  if (rot == 4)
+    return POS(j, i);           /* flip along diagonal */
+  if (rot == 5)
+    return POS(bs - i, j);      /* flip */
+  if (rot == 6)
+    return POS(bs - j, bs - i); /* flip along diagonal */
+  if (rot == 7)
+    return POS(i, bs - j);      /* flip */
+
+  return PASS_MOVE;             /* unreachable */
+}
+
+
 /* Returns true if the empty vertex respectively the string at pos1 is
  * adjacent to the empty vertex respectively the string at pos2.
  */

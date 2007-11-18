@@ -94,6 +94,8 @@ void hashdata_invert_ko(Hash_data *hd, int pos);
 void hashdata_invert_stone(Hash_data *hd, int pos, int color);
 void hashdata_invert_komaster(Hash_data *hd, int komaster);
 void hashdata_invert_kom_pos(Hash_data *hd, int kom_pos);
+void hashdata_calc_orientation_invariant(Hash_data *hd, Intersection *board,
+					 int ko_pos);
 
 char *hashdata_to_string(Hash_data *hashdata);
 
@@ -115,6 +117,9 @@ char *hashdata_to_string(Hash_data *hashdata);
 #define hashdata_is_equal(hd1, hd2) \
    ((hd1).hashval[0] == (hd2).hashval[0])
 
+#define hashdata_is_smaller(hd1, hd2) \
+   ((hd1).hashval[0] < (hd2).hashval[0])
+
 #define hashdata_xor(hd1, hd2) \
     (hd1).hashval[0] ^= (hd2).hashval[0]
 
@@ -123,6 +128,11 @@ char *hashdata_to_string(Hash_data *hashdata);
 #define hashdata_is_equal(hd1, hd2) \
    ((hd1).hashval[0] == (hd2).hashval[0] \
     && (hd1).hashval[1] == (hd2).hashval[1])
+
+#define hashdata_is_smaller(hd1, hd2) \
+   ((hd1).hashval[0] < (hd2).hashval[0] \
+    || ((hd1).hashval[0] == (hd2).hashval[0] \
+	&& (hd1).hashval[1] < (hd2).hashval[1]))
 
 #define hashdata_xor(hd1, hd2) \
    do { \
@@ -133,9 +143,13 @@ char *hashdata_to_string(Hash_data *hashdata);
 #else
 
 int hashdata_is_equal_func(Hash_data *hd1, Hash_data *hd2);
+int hashdata_is_smaller_func(Hash_data *hd1, Hash_data *hd2);
 
 #define hashdata_is_equal(hd1, hd2) \
   hashdata_is_equal_func(&(hd1), &(hd2))
+
+#define hashdata_is_smaller(hd1, hd2) \
+  hashdata_is_smaller_func(&(hd1), &(hd2))
 
 #define hashdata_xor(hd1, hd2) \
    do { \

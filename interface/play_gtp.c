@@ -108,6 +108,8 @@ DECLARE(gtp_gg_undo);
 DECLARE(gtp_half_eye_data);
 DECLARE(gtp_increase_depths);
 DECLARE(gtp_initial_influence);
+DECLARE(gtp_invariant_hash);
+DECLARE(gtp_invariant_hash_for_moves);
 DECLARE(gtp_is_legal);
 DECLARE(gtp_is_surrounded);
 DECLARE(gtp_kgs_genmove_cleanup);
@@ -249,6 +251,8 @@ static struct gtp_command commands[] = {
   {"help",                    gtp_list_commands},
   {"increase_depths",  	      gtp_increase_depths},
   {"initial_influence",       gtp_initial_influence},
+  {"invariant_hash_for_moves",gtp_invariant_hash_for_moves},
+  {"invariant_hash",   	      gtp_invariant_hash},
   {"is_legal",         	      gtp_is_legal},
   {"is_surrounded",           gtp_is_surrounded},
   {"kgs-genmove_cleanup",     gtp_kgs_genmove_cleanup},
@@ -1131,6 +1135,59 @@ gtp_move_history(char *s)
   return GTP_OK;
 }
 
+
+/* Function:  Return the rotation/reflection invariant board hash.
+ * Arguments: none
+ * Fails:     never
+ * Returns:   Invariant hash for the board as a hexadecimal number.
+ */
+static int
+gtp_invariant_hash(char *s)
+{
+  Hash_data hash;
+  UNUSED(s);
+  hashdata_calc_orientation_invariant(&hash, board, board_ko_pos);
+  return gtp_success("%s", hashdata_to_string(&hash));
+}
+
+
+/* Function:  Return the rotation/reflection invariant board hash
+ *            obtained by playing all the possible moves for the
+ *            given color.
+ * Arguments: color
+ * Fails:     invalid color
+ * Returns:   List of moves + invariant hash as a hexadecimal number,
+ *            one pair of move + hash per line.
+ */
+static int
+gtp_invariant_hash_for_moves(char *s)
+{
+  Hash_data hash;
+  int color;
+  int pos;
+  int move_found = 0;
+  
+  if (!gtp_decode_color(s, &color))
+    return gtp_failure("invalid color");
+
+  gtp_start_response(GTP_SUCCESS);
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == EMPTY
+	&& trymove(pos, color, "gtp_invariant_hash_for_moves", NO_MOVE)) {
+      hashdata_calc_orientation_invariant(&hash, board, board_ko_pos);
+      gtp_mprintf("%m %s\n", I(pos), J(pos), hashdata_to_string(&hash));
+      popgo();
+      move_found = 1;
+    }
+  }
+
+  if (!move_found)
+    gtp_printf("\n");
+  
+  gtp_printf("\n");
+  return GTP_OK;
+}
 
 
 
