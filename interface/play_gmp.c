@@ -103,6 +103,9 @@ play_gmp(Gameinfo *gameinfo, int simplified)
   }
 
   gameinfo->handicap = gmp_handicap(ge);
+  if (!check_boardsize(gmp_size(ge), stderr))
+    exit(EXIT_FAILURE);
+  
   gnugo_clear_board(gmp_size(ge));
 
   /* Let's pretend GMP knows about komi in case something will ever change. */

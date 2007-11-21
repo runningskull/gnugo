@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- call check_boardsize() from play_gmp.c to avoid crashing on bad board sizes
+- new function check_boardsize()
 - bugfix in handling of foreground color with ncurses	
 - orientation invariant board hashes added
 

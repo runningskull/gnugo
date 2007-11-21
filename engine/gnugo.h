@@ -85,6 +85,7 @@ const char *result_to_string(int result);
 /* ================================================================ */
 
 
+int check_boardsize(int boardsize, FILE *out);
 void gnugo_clear_board(int boardsize);
 void gnugo_play_move(int move, int color);
 int gnugo_play_sgfnode(SGFNode *node, int to_move);

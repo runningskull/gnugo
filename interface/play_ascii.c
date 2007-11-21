@@ -715,10 +715,8 @@ do_play_ascii(Gameinfo *gameinfo)
 	    printf("\nInvalid command syntax!\n");
 	    break;
 	  }
-	  if (num < MIN_BOARD || num > MAX_BOARD) {
-	    printf("\nInvalid board size: %d\n", num);
+	  if (!check_boardsize(num, stdout))
 	    break;
-	  }
 	  /* Init board. */
 	  board_size = num;
 	  clear_board();

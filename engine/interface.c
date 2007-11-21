@@ -60,6 +60,27 @@ init_gnugo(float memory, unsigned int seed)
 
 /* ---------------------------------------------------------------- */
 
+/* Check whether we can accept a certain boardsize. Set out to NULL to
+ * suppress informative messages. Return 1 for an acceptable
+ * boardsize, 0 otherwise.
+ */
+int check_boardsize(int boardsize, FILE *out)
+{
+  if (boardsize < MIN_BOARD || boardsize > MAX_BOARD) {
+    if (out) {
+      fprintf(out, "Unsupported board size: %d. ", boardsize);
+      if (boardsize < MIN_BOARD)
+	fprintf(out, "Min size is %d.\n", MIN_BOARD);
+      else
+	fprintf(out, "Max size is %d.\n", MAX_BOARD);
+      fprintf(out, "Try `gnugo --help' for more information.\n");
+    }
+    return 0;
+  }
+
+  return 1;
+}
+
 /*
  * Clear the board.
  */
@@ -236,15 +257,9 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
   
   if (!sgfGetIntProperty(tree->root, "SZ", &bs))
     bs = 19;
-  
-  if (bs < MIN_BOARD || bs > MAX_BOARD) {
-    if (bs < MIN_BOARD)
-      gprintf("Boardsize too small.\n");
-    else
-      gprintf("Boardsize too large.\n");
-    
+
+  if (!check_boardsize(bs, stderr))
     return EMPTY;
-  }
   
   handicap = 0;
   if (sgfGetIntProperty(tree->root, "HA", &handicap) && handicap > 1)
