@@ -6,6 +6,7 @@
 - new function check_boardsize()
 - bugfix in handling of foreground color with ncurses	
 - orientation invariant board hashes added
+- new and revised tests
 
 3.7.11 released November 1, 2007
 
