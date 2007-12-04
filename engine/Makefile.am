@@ -35,6 +35,7 @@ libengine_a_SOURCES = \
       influence.c \
       interface.c \
       matchpat.c \
+      montecarlo.c \
       move_reasons.c \
       movelist.c \
       optics.c \

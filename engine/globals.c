@@ -127,6 +127,14 @@ int play_mirror_go      = 0;    /* try to play mirror go if possible */
 int mirror_stones_limit = -1;   /* but stop at this number of stones */
 
 int gtp_version         = 2;    /* Use GTP version 2 by default. */
+int use_monte_carlo_genmove = 0; /* Default is not to use Monte Carlo move
+				  * generation.
+				  */
+int mc_games_per_level = 8000;  /* By default, use 8000 times the current
+				 * level number of simulations
+				 * for each mmove when Monte Carlo
+				 * move generation is enabled.
+				 */
 
 float best_move_values[10];
 int   best_moves[10];

@@ -157,7 +157,9 @@ enum {OPT_BOARDSIZE = 127,
       OPT_MIRROR_LIMIT,
       OPT_METAMACHINE,
       OPT_RESIGN_ALLOWED,
-      OPT_NEVER_RESIGN
+      OPT_NEVER_RESIGN,
+      OPT_MONTE_CARLO,
+      OPT_MC_GAMES_PER_LEVEL
 };
 
 /* names of playing modes */
@@ -305,6 +307,8 @@ static struct gg_option const long_options[] =
   {"metamachine",    no_argument,       0, OPT_METAMACHINE},
   {"resign-allowed", no_argument,       0, OPT_RESIGN_ALLOWED},
   {"never-resign",   no_argument,       0, OPT_NEVER_RESIGN},
+  {"monte-carlo",    no_argument,       0, OPT_MONTE_CARLO},
+  {"mc-games-per-level", required_argument, 0, OPT_MC_GAMES_PER_LEVEL},
   {NULL, 0, NULL, 0}
 };
 
@@ -348,6 +352,8 @@ main(int argc, char *argv[])
    */
   int seed = 0;
   int seed_specified = 0;
+  
+  int requested_boardsize = -1;
 
   sgftree_clear(&sgftree);
   gameinfo_clear(&gameinfo);
@@ -508,15 +514,8 @@ main(int argc, char *argv[])
         break;
       
       case OPT_BOARDSIZE:
-        {
-	  int boardsize = atoi(gg_optarg);
-
-	  if (!check_boardsize(boardsize, stderr))
-	    exit(EXIT_FAILURE);
-	  
-	  gnugo_clear_board(boardsize);
-	  break;
-	}
+	requested_boardsize = atoi(gg_optarg);
+	break;
 	
       case OPT_KOMI: 
 	if (sscanf(gg_optarg, "%f", &komi) != 1) {
@@ -632,6 +631,14 @@ main(int argc, char *argv[])
 
       case OPT_NEVER_RESIGN:
 	resign_allowed = 0;
+	break;
+
+      case OPT_MONTE_CARLO:
+	use_monte_carlo_genmove = 1;
+	break;
+
+      case OPT_MC_GAMES_PER_LEVEL:
+	mc_games_per_level = atoi(gg_optarg);
 	break;
 
       case OPT_MODE: 
@@ -963,6 +970,12 @@ main(int argc, char *argv[])
       }
     }
 
+  if (requested_boardsize != -1) {
+    if (!check_boardsize(requested_boardsize, stderr))
+      exit(EXIT_FAILURE);
+    gnugo_clear_board(requested_boardsize);
+  }
+  
   /* Start random number seed. */
   if (!seed_specified)
     seed = time(0);
@@ -1517,6 +1530,8 @@ Experimental options:\n\
    --nojosekidb            turn off joseki database\n\
    --mirror                try to play mirror go\n\
    --mirror-limit <n>      stop mirroring when n stones on board\n\n\
+   --monte-carlo           enable Monte Carlo move generation (9x9 or smaller)\n\
+   --mc-games-per-level <n> number of Monte Carlo simulations per level\n\
    --alternate-connections\n\
    --experimental-connections\n\
    --experimental-owl-ext\n\

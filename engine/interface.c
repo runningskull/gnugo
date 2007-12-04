@@ -66,13 +66,21 @@ init_gnugo(float memory, unsigned int seed)
  */
 int check_boardsize(int boardsize, FILE *out)
 {
-  if (boardsize < MIN_BOARD || boardsize > MAX_BOARD) {
+  int max_board = MAX_BOARD;
+  if (use_monte_carlo_genmove && max_board > 9)
+    max_board = 9;
+  
+  if (boardsize < MIN_BOARD || boardsize > max_board) {
     if (out) {
       fprintf(out, "Unsupported board size: %d. ", boardsize);
       if (boardsize < MIN_BOARD)
 	fprintf(out, "Min size is %d.\n", MIN_BOARD);
-      else
-	fprintf(out, "Max size is %d.\n", MAX_BOARD);
+      else {
+	fprintf(out, "Max size is %d", max_board);
+	if (max_board < MAX_BOARD)
+	  fprintf(out, " (%d without --monte-carlo)", MAX_BOARD);
+	fprintf(out, ".\n");
+      }
       fprintf(out, "Try `gnugo --help' for more information.\n");
     }
     return 0;

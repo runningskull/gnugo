@@ -496,6 +496,10 @@ int aftermath_genmove(int color, int do_capture_dead_stones,
 		      int allowed_moves[BOARDMAX]);
 enum dragon_status aftermath_final_status(int color, int pos);
 
+void uct_genmove(int color, int *move, int *forbidden_moves,
+		 int *allowed_moves, int nodes, float *move_values,
+		 int *move_frequencies);
+
 int owl_attack(int target, int *attack_point, int *certain, int *kworm);
 int owl_defend(int target, int *defense_point, int *certain, int *kworm);
 int owl_threaten_attack(int target, int *attack1, int *attack2);

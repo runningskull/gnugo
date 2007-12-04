@@ -63,9 +63,9 @@ am_libengine_a_OBJECTS = aftermath.$(OBJEXT) board.$(OBJEXT) \
 	endgame.$(OBJEXT) filllib.$(OBJEXT) fuseki.$(OBJEXT) \
 	genmove.$(OBJEXT) globals.$(OBJEXT) handicap.$(OBJEXT) \
 	hash.$(OBJEXT) influence.$(OBJEXT) interface.$(OBJEXT) \
-	matchpat.$(OBJEXT) move_reasons.$(OBJEXT) movelist.$(OBJEXT) \
-	optics.$(OBJEXT) oracle.$(OBJEXT) owl.$(OBJEXT) \
-	persistent.$(OBJEXT) printutils.$(OBJEXT) \
+	matchpat.$(OBJEXT) montecarlo.$(OBJEXT) move_reasons.$(OBJEXT) \
+	movelist.$(OBJEXT) optics.$(OBJEXT) oracle.$(OBJEXT) \
+	owl.$(OBJEXT) persistent.$(OBJEXT) printutils.$(OBJEXT) \
 	readconnect.$(OBJEXT) reading.$(OBJEXT) semeai.$(OBJEXT) \
 	sgfdecide.$(OBJEXT) sgffile.$(OBJEXT) shapes.$(OBJEXT) \
 	showbord.$(OBJEXT) surround.$(OBJEXT) unconditional.$(OBJEXT) \

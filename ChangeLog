@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new file engine/montecarlo.c
+- new options --monte-carlo and --mc-games-per-level to use Monte Carlo UCT
+  search on 9x9 and smaller boards
 - call check_boardsize() from play_gmp.c to avoid crashing on bad board sizes
 - new function check_boardsize()
 - bugfix in handling of foreground color with ncurses	
