@@ -2728,6 +2728,65 @@ extended_chainlinks(int str, int adj[MAXCHAIN], int both_colors)
 }
 
 
+/* Returns true if a move by (color) fits a shape like:
+ *
+ *  -----
+ *  O.O*X        (O=color)
+ *  OOXXX
+ *
+ * More specifically the move should have the following properties:
+ * - The move is a self-atari
+ * - The move forms a string of exactly two stones
+ * - When the opponent captures, the capturing stone becomes a single
+ *   stone in atari
+ * - When capturing back the original position is repeated
+ */
+
+int
+send_two_return_one(int move, int color)
+{
+  int other = OTHER_COLOR(color);
+  int lib = NO_MOVE;
+  int friendly_neighbor = NO_MOVE;
+  int k;
+  
+  ASSERT1(board[move] == EMPTY, move);
+
+  for (k = 0; k < 4; k++) {
+    int pos = move + delta[k];
+    if (board[pos] == EMPTY)
+      return 0;
+    if (board[pos] == color) {
+      int s;
+      if (friendly_neighbor != NO_MOVE)
+	return 0;
+      friendly_neighbor = pos;
+      s = string_number[pos];
+      if (string[s].size != 1 || string[s].liberties != 2)
+	return 0;
+      lib = string_libs[s].list[0] + string_libs[s].list[1] - move;
+    }
+    else if (board[pos] == other
+	     && string[string_number[pos]].liberties == 1)
+      return 0;
+  }
+  
+  if (friendly_neighbor == NO_MOVE)
+    return 0;
+
+  for (k = 0; k < 4; k++) {
+    int pos = lib + delta[k];
+    if (board[pos] == EMPTY || board[pos] == other)
+      return 0;
+    if (board[pos] == color &&
+	string[string_number[pos]].liberties < 2)
+      return 0;
+  }
+  
+  return 1;
+}
+
+
 /*
  * Find the origin of a worm, i.e. the point with the
  * smallest 1D board coordinate. The idea is to have a canonical

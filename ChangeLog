@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- send_two_return_one() moved from utils.c to board.c and reimplemented
 - new file engine/montecarlo.c
 - new options --monte-carlo and --mc-games-per-level to use Monte Carlo UCT
   search on 9x9 and smaller boards

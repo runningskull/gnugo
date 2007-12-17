@@ -161,7 +161,7 @@ find_more_attack_and_defense_moves(int color)
   increase_depth_values();
   
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-    if (!ON_BOARD(ii))
+    if (board[ii] != EMPTY)
       continue;
 
     /* Don't consider send-two-return-one moves here. */

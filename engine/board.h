@@ -345,6 +345,9 @@ int countstones(int str);
 int findstones(int str, int maxstones, int *stones);
 int count_adjacent_stones(int str1, int str2, int maxstones);
 
+/* Detect a special shape. */
+int send_two_return_one(int move, int color);
+
 /* Special function for reading.c */
 void incremental_order_moves(int move, int color, int string,
 			     int *number_edges, int *number_same_string,

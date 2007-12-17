@@ -549,7 +549,6 @@ int does_attack(int move, int str);
 int does_defend(int move, int str);
 int double_atari(int move, int color, float *value,
 		 signed char safe_stones[BOARDMAX]);
-int send_two_return_one(int move, int color);
 int playing_into_snapback(int move, int color);
 int play_attack_defend_n(int color, int do_attack, int num_moves, ...);
 int play_attack_defend2_n(int color, int do_attack, int num_moves, ...);
