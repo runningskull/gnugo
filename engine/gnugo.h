@@ -127,8 +127,8 @@ extern int printdragons;	/* print full data on each dragon */
 extern int printboard;		/* print board each move */
 extern int showstatistics;	/* print statistics */
 extern int profile_patterns;	/* print statistics of pattern usage */
-extern char outfilename[128];  /* output file (-o option) */
-extern int output_flags;       /* amount of output to outfile */
+extern char outfilename[128];	/* output file (-o option) */
+extern int output_flags;	/* amount of output to outfile */
 
 /* output flag bits */
 #define OUTPUT_MARKDRAGONS         0x0001  /* mark dead and critical dragons */
@@ -222,7 +222,7 @@ extern int gtp_version;              /* version of Go Text Protocol */
 extern int use_monte_carlo_genmove;  /* use Monte Carlo move generation */
 extern int mc_games_per_level;       /* number of Monte Carlo simulations per level */
 
-/* Mandatory values of reading parameters. Normally -1, if set at 
+/* Mandatory values of reading parameters. Normally -1, if set
  * these override the values derived from the level. */
 extern int mandated_depth;
 extern int mandated_backfill_depth;
@@ -266,8 +266,6 @@ void draw_color_char(int m, int n, int c, int color);
 void draw_char(int m, int n, int c);
 void end_draw_board(void);
 void showboard(int xo);  /* ascii rep. of board to stderr */
-
-double gg_gettimeofday(void);
 
 
 /* influence.c */
@@ -327,7 +325,6 @@ int get_connection_node_counter(void);
 /* ================================================================ */
 
 /* utils.c */
-void change_dragon_status(int dr, int status);
 void who_wins(int color, FILE *outfile);
 
 /* high-level routine to generate the best move for the given color */
@@ -346,8 +343,8 @@ void compute_worm_influence(void);
 void make_dragons(int stop_before_owl);
 void initialize_dragon_data(void);
 void show_dragons(void);
-int crude_status(int pos);
-int dragon_status(int pos);
+enum dragon_status crude_status(int pos);
+enum dragon_status dragon_status(int pos);
 int same_dragon(int dr1, int dr2);
 
 /* debugging functions */

@@ -40,7 +40,7 @@
  */
 
 void
-change_dragon_status(int dr, int status)
+change_dragon_status(int dr, enum dragon_status status)
 {
   int pos;
   int origin = dragon[dr].origin;

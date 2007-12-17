@@ -7349,12 +7349,12 @@ Pattern CB105b
 
 :8,OE
 
-?a...?
+?O...?
 ?..*.?
-?b...?
+?a...?
 ??????
 
-;xarea(*) && oarea(b)
+;xarea(*) && oarea(a)
 
 
 Pattern CB106

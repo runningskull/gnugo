@@ -951,7 +951,7 @@ do_play_ascii(Gameinfo *gameinfo)
 	  tmpstring = strtok(NULL, " ");
 	  if (tmpstring) {
 	    /* discard newline */
-	    tmpstring[strlen(tmpstring)-1] = 0;
+	    tmpstring[strlen(tmpstring) - 1] = 0;
 	    /* make sure we are saving proper handicap */
 	    init_sgf(gameinfo);
 	    writesgf(sgftree.root, tmpstring);
@@ -968,7 +968,7 @@ do_play_ascii(Gameinfo *gameinfo)
 	  tmpstring = strtok(NULL, " ");
 	  if (tmpstring) {
 	    /* discard newline */
-	    tmpstring[strlen(tmpstring)-1] = 0;
+	    tmpstring[strlen(tmpstring) - 1] = 0;
 	    if (!sgftree_readfile(&sgftree, tmpstring)) {
 	      fprintf(stderr, "Cannot open or parse '%s'\n", tmpstring);
 	      break;
@@ -1070,7 +1070,7 @@ ascii_endgame(Gameinfo *gameinfo, int reason)
       tmpstring = strtok(NULL, " ");
       if (tmpstring) {
 	/* discard newline */
-	tmpstring[strlen(tmpstring)-1] = 0;
+	tmpstring[strlen(tmpstring) - 1] = 0;
 	init_sgf(gameinfo);
 	writesgf(sgftree.root, tmpstring);
       }
@@ -1160,7 +1160,7 @@ ascii_count(Gameinfo *gameinfo)
       if (pos == NO_MOVE || board[pos] == EMPTY)
 	printf("\ninvalid!\n");
       else {
-	int status = dragon_status(pos);
+	enum dragon_status status = dragon_status(pos);
 	status = (status == DEAD) ? ALIVE : DEAD;
 	change_dragon_status(pos, status);
 	ascii_showboard();

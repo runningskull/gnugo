@@ -246,26 +246,17 @@ gg_snprintf(char *dest, unsigned long len, const char *fmt, ...)
  * if available, otherwise substituting a workaround for portability.
  */
 
-static int
-gg_gettimeofday2(struct timeval *tv)
-{
-#ifdef HAVE_GETTIMEOFDAY
-  return gettimeofday(tv, NULL);
-#else
-  if (tv != NULL) {
-    tv->tv_sec  = time(NULL);
-    tv->tv_usec = 0;
-  }
-  return 1;
-#endif
-}
-
 double
 gg_gettimeofday(void)
 {
   struct timeval tv;
-  gg_gettimeofday2(&tv);
-  return tv.tv_sec + 1.e-6*tv.tv_usec;
+#ifdef HAVE_GETTIMEOFDAY
+  gettimeofday(&tv, NULL);
+#else
+  tv->tv_sec  = time(NULL);
+  tv->tv_usec = 0;
+#endif
+  return tv.tv_sec + 1.e-6 * tv.tv_usec;
 }
 
 const char *

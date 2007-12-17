@@ -26,7 +26,6 @@
 /* see also eyes.db, eyes.h and engine/optics.c */
 
 
-#define MAX_BOARD 19
 #define MAXLINE 80
 #define MAXDIMEN 20
 #define MAXSIZE 20

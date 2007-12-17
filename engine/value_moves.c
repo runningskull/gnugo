@@ -3080,7 +3080,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
   }
 
   /* Introduction of strategical_weight and territorial_weight, 
-     for automatic fitting (3.5.1) */
+   * for automatic fitting. (3.5.1)
+   */
   tot_value = territorial_weight * move[pos].territorial_value + 
               strategical_weight * move[pos].strategical_value;
 

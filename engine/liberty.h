@@ -291,6 +291,7 @@ int confirm_safety(int move, int color, int *defense_point,
 int dragon_weak(int pos);
 float dragon_weakness(int pos, int ignore_dead_dragons);
 int size_of_biggest_critical_dragon(void);
+void change_dragon_status(int dr, enum dragon_status status);
 float blunder_size(int move, int color, int *defense_point,
 		   signed char safe_stones[BOARDMAX]);
 void set_depth_values(int level, int report_levels);
@@ -897,10 +898,10 @@ struct dragon_data2 {
   int moyo_size;		      /* size of surrounding influence moyo, */
   float moyo_territorial_value;       /* ...and its territorial value        */
   enum dragon_status safety;          /* a more detailed status estimate     */
-  float weakness; /* A new (3.4) continuous estimate of the dragon's safety  */
-  float weakness_pre_owl;     /* Dragon safety based on pre-owl computations */
+  float weakness;           /* a continuous estimate of the dragon's safety  */
+  float weakness_pre_owl;   /* dragon safety based on pre-owl computations   */
   float strategic_size; /* An effective size including weakness of neighbors */
-  int escape_route; /* a measurement of likelihood of escape                 */
+  int escape_route;         /* a measurement of likelihood of escape         */
   struct eyevalue genus;    /* the number of eyes (approximately)            */
   int heye;     /* coordinates of a half eye                                 */
   int lunch;    /* if lunch != 0 then lunch points to a boundary worm which  */

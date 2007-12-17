@@ -96,7 +96,7 @@ timeval_print(FILE *outfile, double tv)
 void
 clock_print(int color)
 {
-  struct timer_data* const td
+  struct timer_data *const td
     = (color == BLACK) ? &black_time_data : &white_time_data;
 
   fprintf(stderr, "clock: "); 
@@ -181,7 +181,7 @@ init_timers()
 void
 update_time_left(int color, int time_left, int stones)
 {
-  struct timer_data* const td
+  struct timer_data *const td
     = ((color == BLACK) ? &black_time_data : &white_time_data);
   int time_used = td->official.time_left - time_left;
 
@@ -219,7 +219,7 @@ clock_push_button(int color)
 {
   static double last_time = -1.0;
   static int last_movenum = -1;
-  struct timer_data* const td
+  struct timer_data *const td
     = (color == BLACK) ? &black_time_data : &white_time_data;
   double now = gg_gettimeofday();
 
@@ -282,7 +282,7 @@ static int
 analyze_time_data(int color, double *time_for_last_move, double *time_left,
 		  int *stones_left)
 {
-  struct remaining_time_data * const timer
+  struct remaining_time_data *const timer
     = (color == BLACK) ? &black_time_data.estimated
 	               : &white_time_data.estimated;
 

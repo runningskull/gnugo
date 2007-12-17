@@ -1636,7 +1636,7 @@ defend2(int str, int *move)
 static int 
 defend3(int str, int *move)
 {
-  int color, other;
+  int color;
   int xpos = NO_MOVE;
   int liberties;
   int libs[3];
@@ -1650,7 +1650,6 @@ defend3(int str, int *move)
   reading_node_counter++;
 
   color = board[str];
-  other = OTHER_COLOR(color);
 
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 3, str);
@@ -1690,6 +1689,7 @@ defend3(int str, int *move)
 #if 0
   /* Look for backfilling moves. */
   if (stackp <= backfill_depth) {
+    int other = OTHER_COLOR(color);
     int liberties2;
     int libs2[6];
     int r;

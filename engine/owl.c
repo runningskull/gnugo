@@ -315,7 +315,7 @@ static int list_goal_worms(struct local_owl_data *owl,
     			   int goal_worm[MAX_GOAL_WORMS]);
 
 /* FIXME: taken from move_reasons.h */
-#define MAX_DRAGONS       2*MAX_BOARD*MAX_BOARD/3
+#define MAX_DRAGONS       2 * MAX_BOARD * MAX_BOARD / 3
 
 static int dragon_goal_worms[MAX_DRAGONS][MAX_GOAL_WORMS];
 
@@ -2759,7 +2759,7 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
   current_owl_data = owl;
   memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
 
-  /* First see whether we might already be alife. */
+  /* First see whether we might already be alive. */
   if (escape < MAX_ESCAPE) {
     if (owl_estimate_life(owl, NULL, vital_moves, &live_reason, 0,
 	  		  &probable_eyes, &eyemin, &eyemax)) {
@@ -4939,7 +4939,7 @@ owl_update_goal(int pos, enum same_dragon_value same_dragon, int lunch,
   count_variations = 0;
   
   if (same_dragon == SAME_DRAGON_NOT_CONNECTED)
-    num_stones = findstones(pos, MAX_BOARD*MAX_BOARD, stones);
+    num_stones = findstones(pos, MAX_BOARD * MAX_BOARD, stones);
   else if (semeai_call)
     find_superstring_conservative(pos, &num_stones, stones);
   else
@@ -6678,10 +6678,17 @@ compute_owl_escape_values(struct local_owl_data *owl)
   int pos;
   int m, n;
   signed char safe_stones[BOARDMAX];
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
   signed char mx[BOARDMAX];
   memset(mx, 0, sizeof(mx));
-  
+    
+  sgf_dumptree = NULL;
+  count_variations = 0;
   get_lively_stones(OTHER_COLOR(owl->color), safe_stones);
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+
   compute_escape_influence(owl->color, safe_stones, NULL, NULL,
 			   owl->escape_values);
 

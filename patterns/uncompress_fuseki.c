@@ -101,9 +101,9 @@ uncompress_fuseki boardsize filename db\n\
 #define C_HEADER "struct fullboard_pattern fuseki%d[] = {\n"
 #define C_FOOTER "};\n"
   
-const char *const db_output_strings[3] =
+static const char *const db_output_strings[3] =
   {DB_PREAMBLE, DB_HEADER, DB_FOOTER};
-const char *const c_output_strings[3] =
+static const char *const c_output_strings[3] =
   {C_PREAMBLE, C_HEADER, C_FOOTER};
 
 #define PREAMBLE 	0

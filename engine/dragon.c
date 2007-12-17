@@ -68,7 +68,7 @@ static void connected_to_eye_recurse(int pos, int str, int color,
 				     int eye_color, struct eye_data *eye,
 				     signed char *mx, signed char *me,
 				     int *halfeyes);
-static int compute_crude_status(int pos);
+static enum dragon_status compute_crude_status(int pos);
 static int compute_escape(int pos, int dragon_status_known);
 static void compute_surrounding_moyo_sizes(const struct influence_data *q);
 static void clear_cut_list(void);
@@ -1739,7 +1739,7 @@ join_dragons(int d1, int d2)
  * the genus is <2, it has no escape route, and no adjoining string can
  * be easily captured. Otherwise it is judged UNKNOWN.  */
 
-static int 
+static enum dragon_status
 compute_crude_status(int pos)
 {
   /* FIXME: We lose information when constructing true_genus. This
@@ -2363,14 +2363,14 @@ next_worm_in_dragon(int w)
  * the dragon structure to the external program.
  */
 
-int
+enum dragon_status
 crude_status(int pos)
 {
   return dragon[pos].crude_status;
 }
 
 
-int
+enum dragon_status
 dragon_status(int pos)
 {
   return dragon[pos].status;

@@ -62,8 +62,8 @@ print_profile(struct pattern *pattern, int *total_hits,
       *total_hits += pattern->hits;
       *total_nodes += pattern->reading_nodes;
       *total_dfa_hits += pattern->dfa_hits;
-      fprintf(stderr, "%6d ", pattern->dfa_hits);
-      fprintf(stderr, "%6d %9d %8.1f %s\n", 
+      fprintf(stderr, "%6d %6d %9d %8.1f %s\n",
+	      pattern->dfa_hits,
 	      pattern->hits,
 	      pattern->reading_nodes,
 	      pattern->reading_nodes / (float) pattern->hits, 

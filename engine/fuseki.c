@@ -286,7 +286,6 @@ search_fuseki_database(int color)
   struct fullboard_pattern *database;
   int q;
   int k;
-  int best_fuseki_value;
 
   /* Disable matching after a certain number of stones are placed on
    * the board.
@@ -315,7 +314,6 @@ search_fuseki_database(int color)
 
   /* Choose randomly with respect to relative weights for matched moves.
    */
-  best_fuseki_value = fuseki_value[0];
   q = gg_rand() % fuseki_total_value;
   for (k = 0; k < num_fuseki_moves; k++) {
     q -= fuseki_value[k];

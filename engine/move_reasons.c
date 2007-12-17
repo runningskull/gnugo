@@ -469,7 +469,7 @@ move_reason_known(int pos, int type, int what)
 int
 attack_move_reason_known(int pos, int what)
 {
-  ASSERT1(IS_STONE(board[what]), what);
+  ASSERT1(what < 0 || IS_STONE(board[what]), what);
   what = worm[what].origin;
   if (move_reason_known(pos, ATTACK_MOVE, what))
     return WIN;
@@ -487,7 +487,7 @@ attack_move_reason_known(int pos, int what)
 int
 defense_move_reason_known(int pos, int what)
 {
-  ASSERT1(IS_STONE(board[what]), what);
+  ASSERT1(what < 0 || IS_STONE(board[what]), what);
   what = worm[what].origin;
   if (move_reason_known(pos, DEFEND_MOVE, what))
     return WIN;

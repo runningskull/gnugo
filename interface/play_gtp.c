@@ -2002,10 +2002,10 @@ gtp_tactical_analyze_semeai(char *s)
   owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 0,
                      &result_certain);
   gtp_start_response(GTP_SUCCESS);
-  gtp_mprintf("%s %s %m", 
-	      status_to_string(resulta),
-	      status_to_string(resultb),
-	      I(move), J(move));
+  gtp_print_code(resulta);
+  gtp_printf(" ");
+  gtp_print_code(resultb);
+  gtp_mprintf(" %m", I(move), J(move));
   if (!result_certain && report_uncertainty)
     gtp_printf(" uncertain");
 

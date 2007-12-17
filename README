@@ -231,11 +231,6 @@ found in the file COPYING, with the following exceptions.
 * The files gmp.c and gmp.h are copyright Bill Shubert. These
   are free for unrestricted use.
 
-* The files interface/html/* are not part of GNU Go but are a separate
-  probram and are included in the distribution for the convenience of anyone
-  looking for a CGI interface to GNU Go. They were placed in the public domain
-  by their author, Douglas Ridgway, and are free for unrestricted use.
-
 * The files regression/golois/* and the tests vie.tst, connect.tst,
   capture.tst and global.tst are copyright Tristan Cazenave and are
   used with his permission

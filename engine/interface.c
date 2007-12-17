@@ -191,7 +191,7 @@ gnugo_estimate_score(float *upper, float *lower)
     *upper = white_score;
   if (lower != NULL)
     *lower = black_score;
-  return ((white_score + black_score)/2.0);
+  return ((white_score + black_score) / 2.0);
 }
 
 

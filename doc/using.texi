@@ -541,8 +541,7 @@ Create an SGF file containing a diagram of the board. Useful with
 @option{-l} and @option{-L} to create a diagram of the board from
 another sgf file. Illegal moves are indicated with the private
 @code{IL} property.  This property is not used in the FF4 SGF
-specification, so we are free to preempt it. This feature is used
-in the CGI interface in @file{interface/html/gg.cgi}.  
+specification, so we are free to preempt it.
 @end quotation
 @item @option{--options}
 @quotation 
@@ -621,7 +620,7 @@ is inhibited, so fewer variations are considered.  Below this
 depth (default 13), GNU Go still tries to attack strings with only
 3 liberties, but only tries one move at each node.
 @end quotation
-@item @option{--break_chain-cutoff @var{depth}}
+@item @option{--break-chain-depth @var{depth}}
 @quotation
 Set the @code{break_chain_depth}. Beyond this depth, GNU Go abandons
 some attempts to defend groups by trying to capture part of the surrounding

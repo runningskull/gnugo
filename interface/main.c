@@ -231,7 +231,7 @@ static struct gg_option const long_options[] =
   {"backfill-depth", required_argument, 0, 'B'},
   {"branch-depth",   required_argument, 0, OPT_BRANCH_DEPTH},
   {"backfill2-depth",   required_argument, 0, OPT_BACKFILL2_DEPTH},
-  {"break_chain-depth", required_argument, 0, OPT_BREAK_CHAIN_DEPTH},
+  {"break-chain-depth", required_argument, 0, OPT_BREAK_CHAIN_DEPTH},
   {"superstring-depth", required_argument, 0, OPT_SUPERSTRING_DEPTH},
   {"fourlib-depth",  required_argument, 0, 'F'},
   {"ko-depth",       required_argument, 0, 'K'},
@@ -391,6 +391,10 @@ main(int argc, char *argv[])
 	break;
 	
       case 'o':
+	if (strlen(gg_optarg) >= sizeof(outfilename)) {
+	  fprintf(stderr, "Too long filename given as value to -o option.\n");
+	  exit(EXIT_FAILURE);
+	}
 	outfile = gg_optarg;
 	strcpy(outfilename, gg_optarg);
 	break;
@@ -475,7 +479,7 @@ main(int argc, char *argv[])
 		  "configure option enabled: owl threats\n");
 	if (RESIGNATION_ALLOWED)
 	  fprintf(stdout,
-		  "configure option enabled: resination allowed\n");
+		  "configure option enabled: resignation allowed\n");
 	if (ORACLE)
 	  fprintf(stdout,
 		  "configure option enabled: oracle\n");
@@ -1749,7 +1753,7 @@ socket_connect_to(const char *host_name, unsigned int port,
   }
 
   if (! *address_pointer) {
-    fprintf(stderr, "Failed to connect to %s:%d\n", host_data->h_name, port);
+    fprintf(stderr, "Failed to connect to %s:%u\n", host_data->h_name, port);
     closesocket(connection_socket);
     exit(EXIT_FAILURE);
   }
@@ -1809,11 +1813,11 @@ socket_listen_at(const char *host_name, unsigned int port,
 
   if (verbose) {
     if (host_name) {
-      fprintf(stderr, "Waiting for a connection on %s:%d...\n",
+      fprintf(stderr, "Waiting for a connection on %s:%u...\n",
 	      host_name, port);
     }
     else
-      fprintf(stderr, "Waiting for a connection on port %d...\n", port);
+      fprintf(stderr, "Waiting for a connection on port %u...\n", port);
   }
 
   if (bind(listening_socket,
@@ -1821,9 +1825,9 @@ socket_listen_at(const char *host_name, unsigned int port,
       || listen(listening_socket, 0) == -1
       || (connection_socket = accept(listening_socket, NULL, NULL)) == -1) {
     if (host_name)
-      fprintf(stderr, "Failed to listen on %s:%d\n", host_name, port);
+      fprintf(stderr, "Failed to listen on %s:%u\n", host_name, port);
     else
-      fprintf(stderr, "Failed to listen on port %d\n", port);
+      fprintf(stderr, "Failed to listen on port %u\n", port);
 
     closesocket(listening_socket);
     exit(EXIT_FAILURE);

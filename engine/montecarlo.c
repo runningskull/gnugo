@@ -1117,7 +1117,7 @@ mc_generate_random_move(struct mc_game *game, int only_reactive_moves)
 }
 
 
-static int mc_play_random_move(struct mc_game *game, int move, int in_uct_tree)
+static int mc_play_random_move(struct mc_game *game, int move)
 {
   int result = mc_play_move(&game->mc, move, game->color_to_move);
 
@@ -1154,7 +1154,7 @@ static int mc_play_random_game(struct mc_game *game)
   /* First finish the game, if it isn't already. */
   while (game->consecutive_passes < 3) {
     move = mc_generate_random_move(game, 0);
-    result = mc_play_random_move(game, move, 0);
+    result = mc_play_random_move(game, move);
     ASSERT1(result, move);
   }
 
@@ -1421,20 +1421,20 @@ uct_play_move(struct uct_tree *tree, struct uct_node *node, float alpha,
 	    proper_small_eye = 0;
 	}
 	
-	if (!proper_small_eye && mc_play_random_move(&tree->game, *move, 1))
+	if (!proper_small_eye && mc_play_random_move(&tree->game, *move))
 	  return uct_find_node(tree, node, *move);
       }
     }
   }
   
   if (!next_arc) {
-    mc_play_random_move(&tree->game, PASS_MOVE, 1);
+    mc_play_random_move(&tree->game, PASS_MOVE);
     *move = PASS_MOVE;
     return uct_find_node(tree, node, PASS_MOVE);
   }
 
   *move = next_arc->move;
-  mc_play_random_move(&tree->game, next_arc->move, 1);
+  mc_play_random_move(&tree->game, next_arc->move);
   
   return next_arc->node;
 }

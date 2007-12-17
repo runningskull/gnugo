@@ -758,7 +758,7 @@ class GtpGame {
 
 	if (move_lower_case == "pass") {
 	  if (verbose)
-	    werror(player->capitalized_color + " passes\n");
+	    werror("play " + player->capitalized_color + " pass\n");
 
 	  if (++passes == 2)
 	    break;
@@ -769,7 +769,7 @@ class GtpGame {
 	    if (time_left == " ()")
 	      time_left = "";
 
-	    werror("%s plays %s%s\n", player->capitalized_color,
+	    werror("play %s %s%s\n", player->capitalized_color,
 		   move, time_left);
 	  }
 

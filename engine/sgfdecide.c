@@ -389,6 +389,10 @@ decide_tactical_semeai(int apos, int bpos)
   if (*outfilename)
     sgffile_begindump(&tree);
 
+  /* FIXME: Calling status_to_string() with a result code as argument
+   * doesn't make sense. It could be changed to result_to_string() but
+   * the overall formatting needs change as well.
+   */
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0, &dummy);
   gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
 	  color_to_string(color),

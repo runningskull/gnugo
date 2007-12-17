@@ -1079,7 +1079,7 @@ int
 is_legal(int pos, int color)
 {
   /* 0. A pass move is always legal. */
-  if (pos == 0)
+  if (pos == PASS_MOVE)
     return 1;
 
   /* 1. The move must be inside the board. */

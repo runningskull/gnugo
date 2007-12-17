@@ -34,16 +34,16 @@
  */
 
 struct eye_vertex {
-  char marginal;		  /* 1 if marginal vertex, 0 otherwise    */
-  char edge;			  /* 0 = center, 1 = edge, 2 = corner	   */
+  signed char marginal;		  /* 1 if marginal vertex, 0 otherwise     */
+  signed char edge;		  /* 0 = center, 1 = edge, 2 = corner	   */
   /* A corner vertex may only be matched at the corner.
    * An edge vertex may be matched at the corner or on the edge.
    * A center vertex may be matched anywhere.
    */
-  char flags;			  /* see the #defines above		   */
+  signed char flags;		  /* see the #defines above		   */
 
-  char neighbors;		  /* number of neighbors                   */
-  int n[4];			  /* position in array of vertex neighors */
+  signed char neighbors;	  /* number of neighbors                   */
+  signed char n[4];		  /* position in array of vertex neighbors */
 };
 
 
@@ -54,7 +54,7 @@ struct eye_vertex {
 
 struct eye_graph {
   struct eye_vertex *vertex;
-  int patnum;			  /* Number of pattern			    */
+  int patnum;			  /* number of pattern			   */
   int esize;                      /* number of vertices                    */
   int msize;                      /* number of marginal vertices           */
   int ends;                       /* number of vertices with one neighbor  */
