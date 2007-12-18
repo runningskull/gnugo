@@ -629,7 +629,8 @@ OX
 Bc
 dA
 
-;(attack(A) || attack(B)) && !disconnect_helper(c,d)
+;((attack(A) && lib(A) < 4) || (attack(B) && lib(B) < 4))
+;&& !disconnect_helper(c,d)
 
 
 Pattern CC506
