@@ -629,7 +629,8 @@ OX
 Bc
 dA
 
-;((attack(A) && lib(A) < 4) || (attack(B) && lib(B) < 4))
+;((attack(A) && !distrust_tactics_helper(A))
+; || (attack(B) && !distrust_tactics_helper(B)))
 ;&& !disconnect_helper(c,d)
 
 

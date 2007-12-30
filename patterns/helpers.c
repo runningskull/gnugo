@@ -808,6 +808,79 @@ break_mirror_helper(int str, int color)
 }
 
 
+/* This helper is intended to detect semeai kind of positions where
+ * the tactical reading can't be trusted enough to allow amalgamation
+ * over presumably tactically dead strings.
+ *
+ * It has turned out to be best not to trust tactical reading of three
+ * and four liberty strings at all. Not trusting two liberty strings
+ * leads to an underamalgamation and unnecessarily many dragons on the
+ * board. Therefore we try to detect two liberty strings with an
+ * enclosed nakade, which after capturing leads to an unreliable
+ * reading at three or four liberties.
+ *
+ * More specifically we check whether the string has a neighbor with
+ * the following properties:
+ * 1. At least three stones in size.
+ * 2. All its liberties are common liberties with the string.
+ * 3. It has no second order liberties.
+ * 4. Its liberties are adjacent to no other strings than itself and
+ *    the primary string.
+ *
+ * If we find such a neighbor 1 is returned, otherwise 0.
+ */
+int distrust_tactics_helper(int str)
+{
+  int color = board[str];
+  int adj;
+  int adjs[MAXCHAIN];
+  int k;
+  int r;
+  int s;
+  int lib = countlib(str);
+
+  ASSERT1(IS_STONE(board[str]), str);
+  
+  if (lib > 2)
+    return 1;
+  else if (lib == 1)
+    return 0;
+  
+  adj = chainlinks3(str, adjs, lib);
+  for (r = 0; r < adj; r++) {
+    int nakade = 1;
+    int adjlib;
+    int adjlibs[3];
+    if (countstones(adjs[r]) < 3)
+      continue;
+    adjlib = findlib(adjs[r], 3, adjlibs);
+    for (s = 0; s < adjlib; s++) {
+      int str_found = 0;
+      for (k = 0; k < 4; k++) {
+	int pos = adjlibs[s] + delta[k];
+	if (board[pos] == EMPTY
+	    && !liberty_of_string(pos, adjs[r]))
+	  nakade = 0;
+	else if (board[pos] == color) {
+	  if (same_string(pos, str))
+	    str_found = 1;
+	  else
+	    nakade = 0;
+	}
+	else if (board[pos] == OTHER_COLOR(color)
+		 && !same_string(pos, adjs[r]))
+	  nakade = 0;
+      }
+      if (!str_found)
+	nakade = 0;
+    }
+    if (nakade)
+      return 1;
+  }
+  
+  return 0;
+}
+
 /*
  * LOCAL Variables:
  * tab-width: 8
