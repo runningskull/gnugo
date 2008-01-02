@@ -508,6 +508,155 @@ play black C2
 #? [C1]
 
 
+loadsgf games/seki16.sgf
+1201 reg_genmove white
+#? [B2]
+1202 reg_genmove black
+#? [B2]
+
+# Black can make seki in sente with most moves but B1 and A2 lose one
+# point. Tenuki let's white kill with ko.
+play white B2
+1203 reg_genmove black
+#? [C2|B3|C1|A3]
+
+# B3, A2, and A1 fail to make seki.
+play black C2
+1204 reg_genmove white
+#? [B1|C1|A3]
+
+# A3, B3, and A2 all make seki, but B3 and A2 lose a point.
+play white C1
+1205 reg_genmove black
+#? [A3]
+
+play black A3
+1206 reg_genmove white
+#? [B3|A2|B1]
+
+play white B3
+1207 reg_genmove black
+#? [A2]
+
+play black A2
+1208 reg_genmove white
+#? [B1]
+
+undo
+undo
+play white A2
+1209 reg_genmove black
+#? [B3]
+
+play black B3
+1210 reg_genmove white
+#? [B1]
+
+# A3 gains a point compared to A2. B1 is two points worse.
+undo
+undo
+undo
+play black B3
+1211 reg_genmove white
+#? [A3]
+
+# A3 gains a point compared to B3. B1 is two points worse.
+undo
+play black A2
+1212 reg_genmove white
+#? [A3]
+
+play white A3
+1213 reg_genmove black
+#? [B3]
+
+play black B3
+1214 reg_genmove white
+#? [A1]
+
+undo
+undo
+undo
+undo
+
+# Tenuki leaves seki but loses a point.
+play white B1
+1215 reg_genmove black
+#? [C1|A3|B3|A2|C9]
+
+# B3 and A2 both fail.
+play black C1
+1216 reg_genmove white
+#? [A3]
+
+# A2 also gives seki but loses a point, as does tenuki.
+play white A3
+1217 reg_genmove black
+#? [B3]
+
+undo
+undo
+play black A3
+1218 reg_genmove white
+#? [C1]
+
+# Tenuki is fine.
+play white C1
+1219 reg_genmove black
+#? [B3|A2|C9]
+
+undo
+undo
+play black B3
+1220 reg_genmove white
+#? [A2|A3]
+
+undo
+play black A2
+1221 reg_genmove black
+#? [B3|A3]
+
+# B1 and B3 lose a point.
+undo
+undo
+play white A3
+1222 reg_genmove black
+#? [C1]
+
+play black C1
+1223 reg_genmove white
+#? [B1]
+
+# Only A3 works. If black gets both C1 and A3, white can't do anything
+# with two stones (in addition to B2).
+undo
+undo
+undo
+play black C1
+1224 reg_genmove white
+#? [A3]
+
+play white A3
+1225 reg_genmove black
+#? [B1|C2|B3]
+
+play black B1
+1226 reg_genmove white
+#? [C2]
+
+play white C2
+1227 reg_genmove black
+#? [B3]
+
+# C1 is one point better than C2 and A3.
+undo
+undo
+undo
+undo
+play black B1
+1228 reg_genmove white
+#? [C1]
+
 loadsgf games/FSGCBot-dr.sgf 234
 2010 reg_genmove white
 #? [A19|B17]
