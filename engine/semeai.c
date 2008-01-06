@@ -273,12 +273,24 @@ find_moves_to_make_seki()
        *        heuristics might still need improvement.
        */
       compute_dragon_genus(opponent, &reduced_genus, str);
-      if (DRAGON2(opponent).moyo_size > 10 || min_eyes(&reduced_genus) > 1)
+      
+      if (min_eyes(&reduced_genus) > 1
+	  || DRAGON2(opponent).moyo_size > 10
+	  || DRAGON2(opponent).moyo_territorial_value > 2.999
+	  || DRAGON2(opponent).escape_route > 0
+	  || DRAGON2(str).escape_route > 0)
 	continue;
 
       owl_analyze_semeai_after_move(defend_move, color, opponent, str,
 				    &resulta, &resultb, NULL, 1, &certain, 0);
 
+      if (resultb == WIN) {
+	owl_analyze_semeai(str, opponent, &resultb, &resulta,
+			   &defend_move, 1, &certain);
+	resulta = REVERSE_RESULT(resulta);
+	resultb = REVERSE_RESULT(resultb);
+      }
+      
       /* Do not trust uncertain results. In fact it should only take a
        * few nodes to determine the semeai result, if it is a proper
        * potential seki position.
@@ -289,7 +301,7 @@ find_moves_to_make_seki()
 	      defend_move, str, opponent);
 	dragon2[d].semeais++;
 	update_status(str, CRITICAL, CRITICAL);
-	dragon2[d].semeai_defense_code = resulta;
+	dragon2[d].semeai_defense_code = REVERSE_RESULT(resultb);
 	dragon2[d].semeai_defense_point = defend_move;
 	dragon2[d].semeai_defense_certain = certain;
 	gg_assert(board[opponent] == OTHER_COLOR(board[dragon2[d].origin]));

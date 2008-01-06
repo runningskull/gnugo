@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- try harder to find the right move to make seki in find_moves_to_make_seki()
+- better heuristics to avoid calling semeai reading in
+  find_moves_to_make_seki() in hopeless cases
 - never amalgamate dragons over three-liberty strings and sometimes not
   over two-liberty strings
 - send_two_return_one() moved from utils.c to board.c and reimplemented
