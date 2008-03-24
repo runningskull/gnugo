@@ -1,4 +1,4 @@
-noinst_PROGRAMS = mkpat joseki mkeyes uncompress_fuseki
+noinst_PROGRAMS = mkpat joseki mkeyes uncompress_fuseki mkmcpat
 EXTRA_PROGRAMS = extract_fuseki compress_fuseki
 
 DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
@@ -51,6 +51,9 @@ joseki_LDADD = ../engine/libboard.a ../sgf/libsgf.a ../utils/libutils.a
 joseki_AM_CPPFLAGS = $(GNU_GO_WARNINGS) -I$(top_srcdir)/sgf
 mkeyes_SOURCES = mkeyes.c
 mkeyes_LDADD = ../utils/libutils.a
+mkmcpat_SOURCES  = mkmcpat.c
+mkmcpat_LDADD = ../engine/libengine.a ../sgf/libsgf.a ../utils/libutils.a
+mkmcpat_AM_CPPFLAGS = $(GNU_GO_WARNINGS)
 extract_fuseki_SOURCES  = extract_fuseki.c
 # Yes, we currently need duplicate libengine.a and libpatterns.a.
 extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a\
@@ -69,13 +72,16 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  owl_attackpat.c\
 		 owl_vital_apat.c owl_defendpat.c fusekipat.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c\
-		 handipat.c oraclepat.c
+		 handipat.c oraclepat.c mcpat.c
 
 DBBUILT = gogo.db hoshi_keima.db hoshi_other.db komoku.db sansan.db \
 	  mokuhazushi.db takamoku.db
 
 DBBUILT_INPUT = -i gogo.db -i hoshi_keima.db -i hoshi_other.db -i komoku.db \
                -i sansan.db -i mokuhazushi.db -i takamoku.db
+
+MC_DB = $(srcdir)/mc_montegnu_classic.db $(srcdir)/mc_mogo_classic.db \
+        $(srcdir)/mc_uniform.db
 
 DB_TO_TAG = aa_attackpats.db attack.db barriers.db conn.db defense.db\
 	    endgame.db eyes.db fuseki.db fuseki9.dbz fuseki13.dbz fuseki19.dbz\
@@ -182,6 +188,9 @@ fuseki19.c : $(srcdir)/fuseki19.dbz uncompress_fuseki$(EXEEXT)
 
 handipat.c : $(srcdir)/handicap.db mkpat$(EXEEXT)
 	./mkpat -b handipat -i $(srcdir)/handicap.db -o handipat.c
+
+mcpat.c : $(MC_DB) mkmcpat$(EXEEXT)
+	./mkmcpat $(MC_DB) > mcpat.c
 
 
 ETAGS_ARGS = --language none --regex '/^Pattern[ \t]+[a-zA-Z0-9]+/' $(DB_TO_TAG)\

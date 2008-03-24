@@ -33,7 +33,7 @@
 #include "sgftree.h"
 #include "random.h"
 #include "gg_utils.h"
-
+#include "patterns.h"
 
 /*
  * Change the status of all the stones in the dragon at (dr).
@@ -1958,6 +1958,43 @@ showstats()
   gprintf("Trusted read result hits: %d\n", stats.trusted_read_result_hits);
 }
 
+
+/* Set up a compiled in pattern database for use by the Monte Carlo
+ * code. If name is NULL, the first pattern database is used.
+ *
+ * The reason why this function and the next are placed here rather
+ * than in montecarlo.c is to keep that file free from dependency on
+ * patterns.h.
+ */
+int
+choose_mc_patterns(char *name)
+{
+  int k;
+  for (k = 0; mc_pattern_databases[k].name; k++) {
+    if (!name || strcmp(name, mc_pattern_databases[k].name) == 0) {
+      mc_init_patterns(mc_pattern_databases[k].values);
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+/* List compiled in Monte Carlo pattern databases. */
+void
+list_mc_patterns(void)
+{
+  int k;
+  printf("Available builtin Monte Carlo local patterns:\n\n");
+  for (k = 0; mc_pattern_databases[k].name; k++) {
+    if (k == 0)
+      printf("* %s (default)\n", mc_pattern_databases[k].name);
+    else
+      printf("* %s\n", mc_pattern_databases[k].name);
+  }
+  printf("\nUse \"--mc-patterns name\" to choose one of these.\n");
+  printf("Use \"--mc-load-patterns filename\" to directly load a pattern database.\n");
+}
 
 /*
  * Local Variables:

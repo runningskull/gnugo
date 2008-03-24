@@ -1,0 +1,150 @@
+# This is an approximate adaptation to patterns of the original
+# simulation policy of GNU Go's Monte Carlo code.
+
+# Proper eyes.
+
+oOo
+O*O
+oO?
+
+:0
+
+oOo
+O*O
+---
+
+:0
+
+|Oo
+|*O
++--
+
+:0
+
+
+# If the opponent played self-atari, with high probability capture.
+# This also applies to capturing out of recent atari on own stones.
+
+?X%
+?*%
+%%%
+
+:10000,ocap1,near,osafe
+:13000,ocap2,near
+:20000,ocap3,near
+
+
+# Extend out of recent atari.
+
+?O%
+?*%
+%%%
+
+:2000,xcap1,osafe,near
+:4000,xcap2,osafe,near
+:6000,xcap3,osafe,near
+
+
+# If the opponent might cut, connect or at least try to connect.
+# 
+#  oYo
+#  o*o
+
+?XO
+O*?
+%%%
+
+:1000,near,osafe
+
+?X?
+O*O
+%%%
+
+:1000,near,osafe
+
+?X|
+O*|
+%%%
+
+:1000,near,osafe
+
+OX|
+?*|
+%%%
+
+:1000,near,osafe
+
+
+# If the opponent invited a cut, do cut.
+# 
+#   Y
+#  o*O
+#   X
+# 
+
+?X?
+o*O
+?X?
+
+:400,near,osafe
+
+|X?
+|*O
+|X?
+
+:400,near,osafe
+
+
+# Crosscut.
+# 
+#  YO
+# o*X
+#  o
+#
+
+?XO
+o*X
+?o?
+
+:100,near,osafe
+
+?XO
+o*X
+---
+
+:100,near,osafe
+
+|XO
+|*X
++--
+
+:100,near,osafe
+ 
+
+# Capturing stones is always fun.
+
+?X%
+?*%
+%%%
+
+:30,ocap1,far,osafe
+:40,ocap2,far
+:60,ocap3,far
+
+
+# Slightly prefer near moves.
+
+??%
+?*%
+%%%
+
+:3,near,osafe
+
+
+# Default move value.
+
+??%
+?*%
+%%%
+
+:1

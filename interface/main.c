@@ -159,7 +159,10 @@ enum {OPT_BOARDSIZE = 127,
       OPT_RESIGN_ALLOWED,
       OPT_NEVER_RESIGN,
       OPT_MONTE_CARLO,
-      OPT_MC_GAMES_PER_LEVEL
+      OPT_MC_GAMES_PER_LEVEL,
+      OPT_MC_PATTERNS,
+      OPT_MC_LIST_PATTERNS,
+      OPT_MC_LOAD_PATTERNS
 };
 
 /* names of playing modes */
@@ -309,6 +312,9 @@ static struct gg_option const long_options[] =
   {"never-resign",   no_argument,       0, OPT_NEVER_RESIGN},
   {"monte-carlo",    no_argument,       0, OPT_MONTE_CARLO},
   {"mc-games-per-level", required_argument, 0, OPT_MC_GAMES_PER_LEVEL},
+  {"mc-patterns",    required_argument, 0, OPT_MC_PATTERNS},
+  {"mc-list-patterns", no_argument,     0, OPT_MC_LIST_PATTERNS},
+  {"mc-load-patterns", required_argument, 0, OPT_MC_LOAD_PATTERNS},
   {NULL, 0, NULL, 0}
 };
 
@@ -343,6 +349,9 @@ main(int argc, char *argv[])
   int benchmark = 0;  /* benchmarking mode (-b) */
   FILE *output_check;
   int orientation = 0;
+
+  char mc_pattern_name[40] = "";
+  char mc_pattern_filename[320] = "";
 
   float memory = (float) DEFAULT_MEMORY; /* Megabytes used for hash table. */
 
@@ -643,6 +652,27 @@ main(int argc, char *argv[])
 
       case OPT_MC_GAMES_PER_LEVEL:
 	mc_games_per_level = atoi(gg_optarg);
+	break;
+
+      case OPT_MC_PATTERNS:
+	if (strlen(gg_optarg) >= sizeof(mc_pattern_name)) {
+	  fprintf(stderr, "Too long name given as value to --mc-patterns option.\n");
+	  exit(EXIT_FAILURE);
+	}
+	strcpy(mc_pattern_name, gg_optarg);
+	break;
+
+      case OPT_MC_LIST_PATTERNS:
+	list_mc_patterns();
+	return EXIT_SUCCESS;
+	break;
+
+      case OPT_MC_LOAD_PATTERNS:
+	if (strlen(gg_optarg) >= sizeof(mc_pattern_filename)) {
+	  fprintf(stderr, "Too long name given as value to --mc-load-patterns option.\n");
+	  exit(EXIT_FAILURE);
+	}
+	strcpy(mc_pattern_filename, gg_optarg);
 	break;
 
       case OPT_MODE: 
@@ -986,6 +1016,23 @@ main(int argc, char *argv[])
   
   /* Initialize the GNU Go engine. */
   init_gnugo(memory, seed);
+
+  /* Load Monte Carlo patterns if one has been specified. Either
+   * choose one of the compiled in ones or load directly from a
+   * database file.
+   */
+  if (strlen(mc_pattern_filename) > 0) {
+    if (!mc_load_patterns_from_db(mc_pattern_filename, NULL))
+      return EXIT_FAILURE;
+  }
+  else if (strlen(mc_pattern_name) > 0) {
+    if (!choose_mc_patterns(mc_pattern_name)) {
+      fprintf(stderr, "Unknown Monte Carlo pattern database name %s.\n",
+	      mc_pattern_name);
+      fprintf(stderr, "Use \"--mc-list-patterns\" to list the available databases.\n");
+      return EXIT_FAILURE;
+    }
+  }
 
   /* Read the infile if there is one. Also play up the position. */
   if (infilename) {
@@ -1536,6 +1583,9 @@ Experimental options:\n\
    --mirror-limit <n>      stop mirroring when n stones on board\n\n\
    --monte-carlo           enable Monte Carlo move generation (9x9 or smaller)\n\
    --mc-games-per-level <n> number of Monte Carlo simulations per level\n\
+   --mc-list-patterns      list names of builtin Monte Carlo patterns\n\
+   --mc-patterns <name>    choose a built in Monte Carlo pattern database\n\
+   --mc-load-patterns <filename> read Monte Carlo patterns from file\n\
    --alternate-connections\n\
    --experimental-connections\n\
    --experimental-owl-ext\n\

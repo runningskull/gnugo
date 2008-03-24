@@ -52,6 +52,7 @@ init_gnugo(float memory, unsigned int seed)
 
   transformation_init();
   dfa_match_init();
+  choose_mc_patterns(NULL);
 
   clear_approxlib_cache();
   clear_accuratelib_cache();

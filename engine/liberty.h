@@ -497,6 +497,12 @@ int aftermath_genmove(int color, int do_capture_dead_stones,
 		      int allowed_moves[BOARDMAX]);
 enum dragon_status aftermath_final_status(int color, int pos);
 
+int mc_get_size_of_pattern_values_table(void);
+int mc_load_patterns_from_db(const char *filename, unsigned int *values);
+void mc_init_patterns(const unsigned int *values);
+int choose_mc_patterns(char *name);
+void list_mc_patterns(void);
+
 void uct_genmove(int color, int *move, int *forbidden_moves,
 		 int *allowed_moves, int nodes, float *move_values,
 		 int *move_frequencies);

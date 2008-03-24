@@ -1,0 +1,23 @@
+# This is the so called "light playout" simulation policy where moves
+# are chosen with uniform probability over the legal moves, except for
+# playing into small proper eyes.
+
+# Proper eyes.
+
+oOo
+O*O
+oO?
+
+:0
+
+oOo
+O*O
+---
+
+:0
+
+|Oo
+|*O
++--
+
+:0

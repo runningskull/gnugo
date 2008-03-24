@@ -293,6 +293,11 @@ struct fullboard_pattern {
 };
 
 
+/* Monte Carlo local patterns. */
+struct mc_pattern_database {
+  const char *name;
+  const unsigned int *values;
+};
 
 
 /* helper functions */
@@ -351,6 +356,8 @@ extern struct corner_db joseki_db;
 extern struct fullboard_pattern fuseki19[];
 extern struct fullboard_pattern fuseki13[];
 extern struct fullboard_pattern fuseki9[];
+
+extern struct mc_pattern_database mc_pattern_databases[];
 
 struct corner_db;
 struct corner_variation;
