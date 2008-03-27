@@ -14468,26 +14468,27 @@ Pattern RE3
 # > replace(a,*)
 
 
-Pattern RE5
-# tm New pattern (3.1.18)  (see trevorb:440)
-
-OX?	threaten snapback
-X.X
-X.*
-?O.
-??o
-
-:8,-
-
-OX?
-B.X
-Xa*
-?O.
-??o
-
-; lib(B) == 2
-
-> replace(a,*)
+# Pattern RE5
+# # tm New pattern (3.1.18)  (see trevorb:440)
+# # gf This pattern can cause a crash, see ticket #203. Removed. (3.7.12)
+# 
+# OX?	threaten snapback
+# X.X
+# X.*
+# ?O.
+# ??o
+# 
+# :8,-
+# 
+# OX?
+# B.X
+# Xa*
+# ?O.
+# ??o
+# 
+# ; lib(B) == 2
+# 
+# > replace(a,*)
 
 
 Pattern RE6
