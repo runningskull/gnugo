@@ -1,0 +1,18 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-04]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+AW[jo][ko][lo][jp][mp][jq][mq][jr][mr][js][ms]
+AB[mo][no][kp][lp][np][kq][nq][kr][nr][or][ks][os]
+C[Class 0 semiai.
+White outside libs= 1
+Blackk outside libs= 0
+Shared libs= 3
+Seki unconditionally. None of them have to play. If white playes Mi, i=1..3 black must answer O1.
+Black to play pass.
+White has one kothread in either Mi of value 10 points.
+]
+)

@@ -1,0 +1,27 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-04]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)]
+C[Class 0 semiai.
+White outside libs= 3
+Black outside libs= 3
+Shared libs=1
+The one who plays first wins.
+Possible white moves: Mi, i=10..12
+Possible black moves: H11, H12, J13
+]
+;
+AW[kf][lf][mf][nf][of][jg][mg][ih][jh][mh][ii][mi][hj][ij][jj][mj][hk][lk][mk][il][jl][kl][ll][im][in][io]
+AB[hf][if][jf][gg][hg][kg][lg][gh][kh][gi][ki][gj][kj][gk][ik][jk][kk][gl][hl]
+C[Class 0 semiai.
+White outside libs= 3
+Black outside libs= 3
+Shared libs=1
+The one who plays first wins.
+Possible white moves: Mi, i=10..12
+Possible black moves: H11, H12, J13
+]
+)

@@ -1,0 +1,23 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-06-09]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)]C[
+];
+C[Corner t2222 eye
+
+A3 A4: Seki pass.
+
+T3 T4: White and black play S2 and win
+
+T17 T16 white P19|P18|P17 and win, black S19|S18|T18 and win.
+
+A17 A16: Black plays D19 ONLY and wins ( if plays A19 black captures winning liberties ). White plays F19|E16 and wins.
+
+]
+PL[B]
+AW[ca][ga][na][qa][cb][fb][nb][qb][ac][bc][cc][ec][nc][qc][rc][sc][fd][nd][od][ae][be][ce][de][ee][fe][oe][pe][qe][re][se][am][bm][cm][cn][pn][qn][rn][sn][co][do][eo][oo][ep][hp][op][aq][bq][cq][eq][fq][gq][oq][qq][rq][sq][cr][hr][or][qr][cs][ds][es][hs][os][qs][ss]
+AB[ea][pa][ab][bb][db][eb][pb][dc][pc][ad][bd][cd][dd][pd][qd][rd][sd][an][bn][bo][ap][bp][cp][dp][pp][qp][rp][sp][dq][pq][ar][dr][er][fr][gr][pr][bs][gs][ps]
+)

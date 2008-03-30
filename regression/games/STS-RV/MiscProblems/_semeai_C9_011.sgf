@@ -1,0 +1,21 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-07-25]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+C[Corner 4 against side 5.
+black J1 win, white D4 win
+]PL[W]
+AW[am][bm][an][cn][dn][en][ao][co][fo][fp][fq][hq][iq][jq][kq][gr][hr][kr][es][fs][gs][ks]
+AB[bo][do][io][jo][lo][bp][cp][gp][hp][ip][jp][kp][mp][aq][bq][cq][eq][gq][lq][mq][cr][dr][er][fr][ir][jr][lr][nr][cs][ms]
+(;B[tt])
+
+(;W[dp];B[is];W[ep];B[ls];W[ap];B[js];W[ar];B[ds];W[hs];B[is];W[dq];
+B[ir];W[bs];B[js];W[jr];B[is];W[bn])
+
+(;B[is]PL[W];W[dp];B[ls];W[ap];B[js];W[ep];B[ds];W[hs];B[is];W[ar];
+B[ir];W[bn];B[js];W[jr];B[is];W[bs];B[ir])
+
+)

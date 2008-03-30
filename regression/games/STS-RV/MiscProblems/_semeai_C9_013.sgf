@@ -1,0 +1,22 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-07-25]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];PL[B]C[White A9 seki black A9 win
+]
+AW[bb][ac][bc][cc][cd][ce][cf][ag][bg][cg][dh][eh][fh][ci][di][fi][ej][bk][ek][el][dm][em][an][bn][cn][dn][eo]
+AB[aa][ba][cb][db][dc][ad][dd][be][de][df][dg][bh][ch][ai][bi][bj][cj][dj][dk][bl][cl][dl][am][bm]
+(;B[tt])
+
+(;W[ak];B[af];W[cm];B[ca];W[al];B[ab];W[bf];B[ae];W[aj])
+
+(;B[ak]C[win
+])
+
+(;B[ca];W[ak];B[ab];W[cm];B[af];W[bf];B[ae];W[aj];B[ah];W[bd];B[ae];
+W[al];B[ck];W[ak];B[af]C[also wins though inferior
+])
+
+)

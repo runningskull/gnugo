@@ -1,0 +1,17 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-06-03]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+C[Eye size 6. Black always alive. can white achieve seki? 
+
+A19 E19: White alive both to play pass.
+L19 K19: Both to play N18
+R13 R7: White alive both to play pass.
+F7 F8: White alive both to play pass.
+]
+AW[aa][ba][ca][da][fa][ka][na][db][fb][kb][nb][ac][dc][fc][kc][lc][nc][ad][bd][dd][fd][ld][nd][be][ce][de][fe][ge][he][ie][le][me][ne][oe][ff][if][jf][of][eg][fg][jg][kg][og][qg][rg][sg][eh][lh][mh][nh][ph][qh][ai][bi][ci][di][ei][ki][ni][pi][kj][nj][pj][rj][sj][ck][dk][ek][fk][gk][hk][ik][jk][kk][nk][pk][qk][rk][cl][kl][nl][cm][fm][gm][hm][im][km][nm][om][cn][fn][in][kn][on][pn][qn][co][fo][io][ko][qo][cp][fp][ip][kp][qp][cq][gq][hq][iq][kq][qq][cr][kr][qr][rr][sr][cs][js][ks]
+AB[ea][ha][ja][la][oa][qa][ab][bb][eb][hb][ib][jb][lb][ob][rb][cc][ec][hc][jc][mc][oc][qc][sc][cd][ed][hd][id][jd][kd][od][pd][rd][ee][ke][pe][af][bf][cf][df][ef][kf][lf][mf][nf][pf][qf][rf][sf][bg][dg][ng][pg][ah][bh][ch][dh][oh][sh][oi][qi][ri][oj][ok][dl][el][fl][gl][hl][il][jl][ol][pl][sl][dm][jm][pm][qm][rm][sm][dn][hn][jn][rn][do][go][jo][ro][so][dp][gp][jp][rp][dq][jq][rq][sq][dr][er][fr][gr][hr][ir][jr][ds][fs][hs]
+)

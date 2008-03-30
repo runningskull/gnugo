@@ -1,0 +1,23 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-12]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+C[Semiai class 1. Same eye status. Eye size = 5
+
+NW: The one who plays first wins. Black to play B19 but NEVER B18. White to play B13 or A14.
+
+SW: Though playing C1 unsettles the nakade, the semiai is won for white. So black looses and plays pass and white wins unconditionally and plays pass.
+
+SE: White plays T3 and achieves seki. Black wins by living himself or by filling the eye espace. He should clearly live and avoid derived further ko threads of winning the semiai by killing. So black also to play T3
+
+NE: Black plays and seki (T16|T18|S17) S16 possible but not recommended. White plays and also seki. So both TO PLAY PASS.
+
+Center: Black plays and seki. White plays and seki. So both to play Pass.
+]
+PL[W]
+AW[aa][ea][ka][ra][sa][ab][db][eb][kb][mb][qb][rb][ac][bc][cc][dc][ec][kc][qc][dd][kd][qd][be][ee][fe][ge][he][ie][je][ke][pe][qe][re][se][bf][cf][ef][gf][kf][lf][mf][nf][of][eg][fg][gg][mg][dh][fh][nh][ai][bi][ci][di][ei][fi][ji][ni][dj][fj][nj][dk][fk][ik][jk][kk][nk][al][bl][cl][dl][gl][hl][il][kl][ll][ml][pl][ql][rl][sl][dm][em][hm][lm][pm][rm][en][hn][in][kn][ln][qn][rn][sn][bo][eo][fo][jo][ko][po][fp][np][op][pp][bq][cq][dq][eq][mq][nq][pq][ar][br][er][fr][mr][pr][as][es][ms][ps]
+AB[ca][da][fa][ha][la][oa][pa][cb][fb][gb][hb][lb][ob][fc][hc][lc][nc][oc][sc][ad][bd][cd][ed][fd][gd][hd][ld][md][nd][od][ae][ce][de][oe][df][pf][qf][rf][sf][ag][cg][dg][hg][ig][jg][kg][pg][rg][ah][bh][ch][hh][kh][lh][ph][qh][rh][sh][hi][li][gj][hj][ij][jj][kj][lj][mj][gk][mk][fl][nl][am][bm][cm][fm][jm][nm][cn][dn][fn][gn][nn][on][pn][do][go][ho][mo][no][oo][qo][ro][so][ap][bp][cp][dp][ep][gp][ip][lp][mp][qp][fq][gq][hq][iq][jq][kq][lq][qq][gr][ir][lr][or][qr][rr][gs][hs][ls][rs][ss]
+)

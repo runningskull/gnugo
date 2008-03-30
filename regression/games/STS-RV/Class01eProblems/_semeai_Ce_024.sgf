@@ -1,0 +1,23 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-06-09]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)]C[
+];
+C[Corner t2222 eye
+
+A3 A4: White plays A5|B5 and wins, black plays F1 and wins.
+
+T3 T4: White playsQ5|R5|S5|T5 and wins, black plays T2|S1 and wins.
+
+T17 T16 black wins unconditionally
+
+A17 A16: White plays A19 and wins, black plays D19 and wins
+
+]
+PL[B]
+AW[ca][ga][na][qa][cb][gb][nb][qb][ac][bc][cc][gc][nc][qc][rc][sc][ed][fd][nd][ae][be][ce][de][ee][fe][oe][pe][qe][re][se][an][bn][pn][qn][rn][sn][co][do][eo][oo][ep][hp][op][aq][bq][cq][eq][fq][gq][oq][qq][rq][sq][cr][hr][or][qr][cs][ds][es][hs][os][qs]
+AB[ba][ea][pa][ab][bb][db][eb][pb][rb][dc][ec][pc][ad][bd][cd][dd][pd][qd][rd][sd][ap][bp][cp][dp][pp][qp][rp][sp][dq][pq][ar][dr][er][fr][gr][pr][bs][gs][ps][ss]
+)

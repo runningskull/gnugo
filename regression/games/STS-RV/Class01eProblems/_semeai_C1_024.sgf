@@ -1,0 +1,24 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-13]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];C[
+];
+C[Semiai Class 1. Size eye = 7, Very important how to fill the eye if it is unsettled. This test is about unsettled 7 and how to fill the eye. Eye t1122224. t11112234alfa.
+
+NW: A15 A16  Black to play D17 and win. White to play B12 and win. Both should avoid seki. Check what seki value does the program give.
+
+SW: F1 G1 Black and white to play H2 and win or seki.
+
+SE: T8 T7 Both eyes unsettled The one who plays first kills so no way to choose seki.  Black to play S4 and white to play S11.
+
+NE: O19 N19 Black to play Q17 and seki. White to play Q17 and winner. Check status if pass.
+
+Center: J12 K12 Black and white to play J10 and win.
+]
+PL[B]
+AW[aa][ba][da][ia][ja][la][ma][ab][bb][db][eb][ib][mb][ob][pb][sb][ac][ec][ic][jc][mc][sc][ad][bd][ed][jd][ld][md][rd][sd][be][ce][de][ee][je][ke][le][me][se][df][nf][of][pf][qf][rf][sf][eg][fg][gg][hg][ig][og][eh][jh][kh][oh][ai][bi][ci][ei][hi][ki][oi][qi][bj][ej][gj][hj][kj][oj][qj][rj][ek][hk][ik][kk][ok][bl][cl][dl][el][fl][hl][kl][ml][nl][ol][bm][dm][fm][jm][mm][pm][qm][rm][sm][an][bn][cn][gn][hn][in][jn][kn][ln][mn][pn][qn][sn][ao][co][do][eo][fo][oo][po][gp][hp][ip][jp][pp][sp][gq][jq][kq][lq][oq][pq][qq][sq][br][cr][dr][er][gr][lr][qr][rr][sr][gs][hs][js][ks][ls]
+AB[ea][fa][ha][na][oa][qa][ra][cb][fb][gb][hb][kb][lb][nb][rb][cc][fc][hc][kc][nc][qc][rc][cd][fd][gd][hd][kd][nd][od][qd][ae][fe][he][ie][ne][oe][pe][qe][re][af][bf][cf][ef][ff][if][jf][kf][lf][mf][ag][cg][dg][jg][lg][mg][pg][qg][rg][sg][ah][ch][dh][fh][gh][hh][ih][mh][ph][qh][sh][di][fi][gi][ii][ji][li][mi][pi][aj][dj][fj][jj][lj][pj][sj][ak][bk][ck][dk][fk][gk][jk][lk][pk][qk][sk][gl][il][jl][ll][pl][ql][rl][sl][gm][hm][im][km][lm][nm][om][nn][on][rn][go][ho][io][jo][ko][lo][mo][no][qo][ro][ap][bp][cp][dp][ep][fp][kp][lp][np][op][qp][aq][bq][cq][fq][hq][iq][mq][nq][ar][fr][ir][jr][mr][or][pr][as][bs][cs][es][fs][ms][ps][qs][rs]
+)

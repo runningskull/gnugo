@@ -1,0 +1,20 @@
+(;GM[1]FF[3]
+RU[Japanese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-09-01]
+SY[Cgoban 1.9.12]TM[1:00+4:00/25];
+AW[bb][bc][ad][bd][be][ce][cf][cg][ah][bh][ch][di][ei][ej][ek][bl][cl][el][em][en][do][eo][ap][cp][dp][aq][bq][cq]
+AB[aa][ba][ca][da][db][dc][dd][ed][ee][af][ef][eg][dh][eh][ci][aj][bj][cj][dj][ak][dk][dl][am][cm][dm][an][bn][cn][bo][bp]
+PL[B]C[black and white A18 win
+]
+(;B[tt])
+
+(;W[ab])
+
+(;B[ab];W[bm];B[ac];W[bk];B[cb];W[al];B[cc];W[dn];B[cd];W[co];B[de];
+W[ao];B[df];W[bi];B[dg];W[ai];B[ck];W[bl];B[bf];W[cl];B[ag];W[bk];
+B[ae];W[bg];B[af];W[bm];B[al];W[bl])
+
+)

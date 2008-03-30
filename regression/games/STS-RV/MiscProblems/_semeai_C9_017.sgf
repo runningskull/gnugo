@@ -1,0 +1,22 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2004-03-30]
+SY[Cgoban 1.9.12]TM[30:00(5x1:00)];
+C[Black T19 S16 wins
+White S16 wins
+]PL[W]
+AW[ja][ka][la][ma][na][oa][pa][qa][ra][ab][bb][hb][ib][mb][ob][pb][qb][bc][dc][hc][mc][nc][oc][qc][ad][cd][dd][ed][fd][gd][hd][sd][ce][af][bf][cf][rk][sk][rl][rm][sm][on][pn][qn][rn][oo][ro][so][op][oq][or][os][ss]
+AB[ba][ca][da][ea][fa][ga][ha][ia][cb][eb][gb][jb][kb][lb][rb][sb][cc][ec][fc][gc][lc][pc][rc][ld][md][nd][od][pd][qd][qe][re][rf][sf][qj][rj][sj][ok][pk][qk][ol][ql][nm][om][pm][qm][nn][no][np][pp][sp][nq][pq][sq][nr][pr][sr][ns][ps]
+(;W[tt])
+
+(;W[rr];B[rq];W[rs];B[qp];W[rp];B[qr];W[qq];B[rq];W[sq];B[qs];W[sr];
+B[sp];W[sr];B[sq];W[rr])
+
+(;B[sa])
+
+(;W[rd];B[se];W[db];B[sc];W[aa])
+
+)

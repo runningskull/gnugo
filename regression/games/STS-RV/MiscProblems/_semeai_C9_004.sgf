@@ -1,0 +1,21 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-07-25]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];PL[B]
+AW[kd][je][le][me][oe][jf][nf][eg][fg][gg][hg][ig][og][eh][hh][kh][ph][ei][ii][li][pi][ej][fj][ij][lj][oj][fk][gk][hk][ik][ok][jl][ll][nl][jm][lm][mm][om]
+AB[hd][ee][fe][ge][cf][df][hf][if][jg][kg][lg][mg][ch][dh][gh][jh][mh][nh][fi][ji][ni][cj][dj][gj][jj][mj][jk][kk][lk][mk][dl][el][il][em][fm][gm][hm][im]
+C[This is a class e semeai.
+L11 point to play for both black to win white to seki
+]
+(;B[tt])
+
+(;W[ki];B[gf];W[mf];B[ff];W[lf];B[ef];W[kf];B[dg];W[ng];B[di];W[oh];
+B[ek];W[oi];B[fl];W[kl];B[gl];W[ml];B[hl];W[nk];B[hi];W[nj];B[gi];
+W[lh];B[hj];W[mi])
+
+(;B[ki];W[lh])
+
+)

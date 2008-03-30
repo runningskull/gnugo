@@ -1,0 +1,29 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-07-25]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)]C[
+];
+AW[od][qd][kg][lg][mg][ng][og][pg][qg][rg][sg][jh][ji][jj][mj][nj][oj][pj][qj][kk][lk][nk][ok][sk][kl][ol][rl][km][om][kn][ln][mn][nn][on][pn][po][qo][ro][so]
+AB[li][mi][ni][oi][pi][qi][ri][si][kj][lj][rj][jk][qk][rk][jl][ml][ql][jm][qm][jn][qn][rn][sn][ko][lo][mo][no][oo][jp][pp][qp][rp][sp][or][qr]
+C[Side 6 eye against side 7 center eye.
+
+Black 19 libs, White19 libs. Fight unsettled; white and black eyes unsettled
+]
+PL[W]
+(;B[tt])
+
+(;B[mm];W[sm];B[nl];W[sh];B[nm];W[rh];B[mk];W[qh];B[ll];W[ph];B[pk];
+W[oh];B[pl];W[nh];B[pm];W[lm];B[ml];W[mh];B[nl];W[lh];B[mm];W[ki];
+B[ll];W[sl];B[mk];W[nm];B[ml];W[rm];B[sj];W[sl])
+
+(;W[mm];B[sm]C[seki
+])
+
+(;W[sm];B[mm];W[ki];B[ll];W[lh];B[lm];W[mh];B[nl];W[nh];B[mk];W[oh];
+B[pk];W[ph];B[pl];W[qh];B[pm];W[nm];B[ml];W[rh];B[ll];W[sh];B[mm];
+W[sl];B[lm];W[rm];B[sj];W[sl];B[mk];W[nl];B[ml])
+
+)

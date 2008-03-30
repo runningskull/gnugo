@@ -1,0 +1,19 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-06-08]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];PL[W]
+C[Strange semiai involving ko inside the eye. 
+
+J1 K1: White plays G1 and wins. If black plays G1 its useless (not enough liberties) but if he plays G2 gets a ko then threatens at Q2 white makes two eyes and black scapes.
+So black G2 and seki, white G1 and win.
+
+A8 A7: Black to play B9 and win. White to play  A10 (gaining 8 liberties) and win.
+
+A10 A9: Black to play T15|S13|S11 and win. White to play S11, S13 and gets a ko. Since black has no threats, white wins the ko and the semiai. If black answers T12 white wins the semiai on liberties.
+]
+AW[ob][pb][nc][qc][rc][sc][bd][cd][dd][nd][od][pd][qd][ae][be][de][ne][ef][nf][qf][rf][sf][ag][bg][eg][ng][qg][bh][fh][nh][qh][bi][ci][fi][ni][qi][cj][fj][mj][oj][qj][rj][sj][ck][fk][mk][ok][al][bl][cl][fl][nl][ol][pl][ql][rl][sl][fm][an][bn][cn][dn][en][jp][kp][lp][mp][np][op][eq][fq][gq][hq][jq][oq][pq][er][hr][ir][mr][pr][es][is][ls][ms][ps]
+AB[rd][sd][pe][qe][re][af][bf][cf][pf][cg][pg][sg][ah][ch][dh][ph][rh][ai][di][pi][si][bj][dj][pj][ak][dk][pk][qk][rk][sk][dl][am][bm][cm][dm][dp][ep][fp][gp][hp][ip][cq][dq][iq][kq][lq][mq][nq][cr][dr][jr][kr][nr][cs][ds][fs][hs][js][ks][ns]
+)

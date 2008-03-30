@@ -1,0 +1,27 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-04]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)]
+C[Class 0 semiai.
+White outside libs= 3
+Black outside libs= 2
+Shared libs= 2
+If white goes first wins, if black goes first seki.
+White to play: M10, M12
+Black to play: H11, H12, J13
+]
+;
+AW[kf][lf][mf][nf][of][jg][mg][ih][jh][mh][ii][mi][hj][ij][mj][hk][lk][mk][il][jl][kl][ll][im][in][io]
+AB[hf][if][jf][gg][hg][kg][lg][gh][kh][gi][ki][li][gj][kj][gk][ik][jk][kk][gl][hl]
+C[Class 0 semiai.
+White outside libs= 3
+Black outside libs= 2
+Shared libs= 2
+If white goes first wins, if black goes first seki.
+White to play: M10, M12
+Black to play: H11, H12, J13
+]
+)

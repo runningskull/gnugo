@@ -1,0 +1,17 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-04]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+AW[ba][ca][da][ea][eb][ec][ad][bd][cd][ed][ce][ee][cf][ef][dg][eg]
+AB[aa][ab][ac][bc][cc][dc][dd][de][af][df][ag][bg][cg][ch][dh][eh][ei][ej][ek]
+C[Class 0 semiai.
+White outside libs= Black outside libs=3
+Shared libs=0
+The one who plays first wins.
+Possible black moves: A15, B15, B14
+Possible white moves: B18,C18,D18
+]
+)

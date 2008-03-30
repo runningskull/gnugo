@@ -1,0 +1,19 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-13]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];C[
+];
+C[Semiai Class 1. Same eye status. Size eye = 7, Very important how to fill the eye if it is unsettled. This test is about unsettled 7 and how to fill the eye.
+
+NW: Black wins if he unsettles the nakade. White wins if he achieves seki. Black to play 
+(C18|B17|D17) but NOT (B18|D16). White achieves seki in (C1|B17|D17) but NOT (B18|D16).
+
+SW: Black is alive in seki. White has only one eye and cant make seki. So Black wins the semiai unconditionally. Both to play pass.
+]
+PL[W]
+AW[aa][ba][ca][da][ab][db][eb][ac][ec][ad][bd][ed][be][ce][de][ee][df][bg][eg][bh][eh][bi][ei][ej][ek][al][bl][cl][dl][el][bm][dm][an][bn][cn][ao][co][do][eo][fp][gp][hp][ip][fq][iq][jq][cr][fr][jr][fs][gs][js]
+AB[ea][fa][ha][fb][gb][hb][cc][fc][hc][cd][fd][gd][hd][ae][fe][af][bf][cf][ef][ff][cg][dg][dh][ai][di][aj][bj][cj][dj][fo][go][ho][io][jo][bp][cp][dp][ep][jp][kp][aq][bq][eq][kq][ar][er][gr][hr][kr][as][ds][es][hs][ks]
+)

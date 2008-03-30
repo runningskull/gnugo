@@ -1,0 +1,29 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-04]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)]
+C[Class 0 semiai.
+White outside libs= 3
+Black outside libs= 3
+Shared libs= 2
+Seki unconditionally.
+If one fills one outside lib the other has to answer by doing the same.
+Black and white to play pass.
+Both have 3 ko threads of value 16 for white and 14 for black.
+]
+;
+AW[jf][kf][lf][mf][nf][ig][lg][hh][ih][lh][hi][li][gj][hj][lj][gk][kk][lk][hl][il][jl][kl][hm][hn][ho]
+AB[gf][hf][if][fg][gg][jg][kg][fh][jh][fi][ji][fj][jj][fk][hk][ik][jk][fl][gl]
+C[Class 0 semiai.
+White outside libs= 3
+Black outside libs= 3
+Shared libs= 2
+Seki unconditionally.
+If one fills one outside lib the other has to answer by doing the same.
+Black and white to play pass.
+Both have 3 ko threads of value 16 for white and 14 for black.
+]
+)

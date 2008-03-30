@@ -1,0 +1,17 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-20]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+C[Extreme nakade situations for size 6 eye. Strange eye Status.
+NW: White Alive in Atari, Black Alive. White to capture and seki. Black to capture and win.
+NE: White Alive in Atari Black nakade. White wins unconditionally both to play pass.
+SW: White wins unconditionally bot to play pass.
+SE: White is dead both to play pass.
+Center: White and black to play and win.
+]
+AW[aa][ba][ca][da][ja][pa][qa][ra][sa][db][jb][pb][cc][dc][ic][jc][kc][pc][qc][ad][cd][dd][gd][hd][id][ld][md][pd][qd][sd][ae][be][ce][ge][je][ke][le][me][qe][re][se][ff][gf][hf][if][mf][nf][eg][fg][ng][og][ah][bh][ch][dh][eh][jh][kh][lh][oh][ph][qh][ei][hi][ii][ki][li][oi][qi][ri][si][ej][hj][kj][lj][oj][ek][hk][lk][ok][el][hl][il][jl][kl][ll][ol][am][bm][cm][dm][em][nm][om][pm][qm][rm][sm][fn][ln][mn][nn][go][ho][ko][mo][bp][cp][dp][hp][ip][jp][lp][pp][qp][rp][sp][aq][bq][cq][dq][eq][jq][kq][lq][oq][pq][sq][ar][br][er][fr][kr][or][as][fs][ks][os][ps][qs][rs][ss]
+AB[ea][fa][ia][la][oa][bb][cb][eb][hb][ib][lb][mb][nb][ob][qb][rb][sb][ac][bc][ec][fc][gc][hc][oc][rc][bd][ed][od][rd][de][ee][oe][pe][af][bf][cf][df][pf][qf][rf][ig][jg][kg][lg][mg][rg][sg][gh][hh][ih][mh][gi][ji][mi][gj][jj][mj][gk][ik][jk][kk][mk][gl][ml][gm][hm][im][jm][km][lm][mm][ao][bo][co][do][eo][oo][po][qo][ro][so][ap][ep][fp][np][op][fq][gq][nq][qq][rq][gr][hr][ir][mr][nr][pr][qr][rr][bs][cs][ds][es][gs][is][ms]
+)

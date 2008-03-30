@@ -1,0 +1,20 @@
+This suite of semeai problems came from the package STS-RV
+available at http://gobase.org/reading/preview/Semeai/#STS
+
+It is a very comprehensive semeai problems suite
+compiled by Ricard Vilà. The associated tests are in GTP
+format but it's not a perfect match for GNU Go because
+it uses a custom command called solve_semeaiS.
+(More info at http://trac.gnugo.org/gnugo/ticket/41)
+
+
+The files STS-RV_*.tst instead are based on the normal GNU
+Go commands (analyze_semeai) and enable the execution
+of all the tests in the STS-RV suite of semeai problems.
+
+In the GNU Go distribution of STS-RV, the tests taken from "Get Strong
+at Tesuji" and "Counting Liberties and Winning Capturing Races" are
+for now excluded, due to missing knowledge about exactly how far the
+permissions given to Ricard Vilà by Richard Bozulich and Richard
+Hunter extend. The tests can still be found at the URL:s referred
+above, however.

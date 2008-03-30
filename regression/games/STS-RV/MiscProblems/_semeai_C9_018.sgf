@@ -1,0 +1,52 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[2]KM[0.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2004-03-28]
+SY[Cgoban 1.9.12]TM[30:00(5x1:00)]AB[pd][dp];W[dc]WL[1769];B[po]
+BL[1797];W[cn]WL[1758];B[cl]BL[1796];W[jq]WL[1756];B[pq]BL[1795];W[fq]
+WL[1750];B[dq]BL[1794];W[en]WL[1748];B[eo]BL[1785];W[bp]WL[1745];B[bq]
+BL[1782];W[cp]WL[1744];B[cq]BL[1781];W[do]WL[1741];B[fp]BL[1770];W[gq]
+WL[1740];B[fn]BL[1770];W[em]WL[1737];B[cm]BL[1737];W[dl]WL[1736];B[bn]
+BL[1735];W[bo]WL[1735];B[bm]BL[1735];W[dk]WL[1734];B[ck]BL[1735]
+(;W[cj]WL[1733];B[bj]BL[1734];W[ci]WL[1732];B[bi]BL[1733];W[ch]
+WL[1731];B[dm]BL[1725];W[dn]WL[1730];B[el]BL[1724];W[fm]WL[1730];B[ek]
+BL[1722];W[dj]WL[1730];B[fj]BL[1661];W[gn]WL[1728];B[fo]BL[1660];W[hm]
+WL[1727]
+(;B[pg]BL[1653]
+(;W[hj]WL[1722];B[qk]BL[1650];W[fg]WL[1720];B[lq]BL[1647];W[nc]
+WL[1717];B[nd]BL[1646];W[md]WL[1716];B[ne]BL[1644];W[oc]WL[1714];B[pc]
+BL[1643];W[jc]WL[1707];B[me]BL[1642];W[ld]WL[1707];B[if]BL[1633];W[kf]
+WL[1706];B[ic]BL[1623];W[gc]WL[1705];B[jb]BL[1617];W[kc]WL[1704];
+AW[oa][lb][pb][fc][lc][mc][hd][fe][ke][gf][hf][ig][jg][kg][lg][mg][ng][kh][ki][ij][jj][nj][pj][qj][rj][gk][jk][lk][mk][nk][ok][pk][kl][ll][ml][nl][pl][gm][jm][km][lm][jn][kn][go][io][hp][ip]
+AB[ib][kb][qb][id][jd][kd][ge][he][je][le][hg][og][gh][ih][jh][lh][mh][nh][rh][ji][li][kj][lj][mj][hk][kk][il][jl][ol][ql][im][mm][nm][om][pm][hn][in][ln][ho][jo][ko][ep][gp][er]
+PL[W]
+(;W[tt])
+
+(;W[hh]
+C[Correct sequence
+White H12 + F11 combination wins
+Black wins by connecting at H12 or filling an outside lib
+]
+;B[hi];W[fi]
+(;B[gj];W[gi];B[fh];W[ei];B[eh];W[eg];B[nf];W[dh];B[mf];W[gg])
+
+(;B[fh];W[ei];B[eh];W[eg])
+
+(;B[gi];W[gj];B[fh];W[ei];B[eh];W[eg])
+)
+
+(;W[fi]C[Not enough
+];B[hh];W[gi];B[nf];W[fh];B[mf])
+)
+
+(;W[ij]WL[1719];B[qk]BL[1642])
+)
+
+(;B[ql]BL[1641])
+)
+
+(;W[dj]WL[1723])
+
+)

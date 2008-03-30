@@ -1,0 +1,14 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-07]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+AW[aa][ba][ca][qa][ra][sa][ab][cb][qb][sb][cc][qc][cd][qd][ce][qe][cf][qf][sf][ag][bg][cg][qg][qh][rh][sh][ql][rl][sl][am][bm][cm][qm][cn][qn][sn][co][qo][cp][qp][cq][qq][ar][cr][qr][sr][as][bs][cs][qs][rs][ss]
+AB[ea][oa][bb][eb][ob][rb][bc][dc][ec][oc][pc][rc][ad][bd][dd][pd][rd][sd][be][de][pe][re][af][bf][df][pf][rf][dg][pg][rg][sg][ah][bh][ch][dh][ph][pi][qi][ri][si][pk][qk][rk][sk][al][bl][cl][dl][pl][dm][pm][rm][sm][an][bn][dn][pn][rn][bo][do][po][ro][ap][bp][dp][pp][rp][sp][bq][dq][pq][rq][br][dr][er][or][pr][rr][es][os]
+C[Semiai Class 1
+NE NW: The one who plays first wins
+SE SW: Black wins unconditionally. Both to play pass.
+]
+)

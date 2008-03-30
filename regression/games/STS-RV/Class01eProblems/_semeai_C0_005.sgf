@@ -1,0 +1,17 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-04]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+AW[eh][ai][bi][ci][di][ei][fi][gi][hi][ii][ji][ki][li][mi][ni][oi][pi][qi][ri][si][hk][lk][al][bl][cl][dl][el][fl][gl][hl][il][jl][kl][ll][ml][nl][ol][pl][ql][rl][sl]
+AB[ag][bg][cg][dg][eg][fg][gg][hg][ig][jg][kg][lg][mg][ng][og][pg][qg][rg][sg][hh][kh][nh][aj][bj][cj][dj][ej][fj][gj][hj][ij][jj][kj][lj][mj][nj][oj][pj][qj][rj][sj][nk]
+C[Class 0 semiai.
+White outside libs= 15
+Black outside libs= 16
+Black wins unconditionally and has only to play if white plays first.
+Black to play pass.
+White has 15 ko threads of value 40 points.
+]
+)

@@ -1,0 +1,21 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-06-09]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)]C[
+];PL[B]
+C[Does the program detect when its necessary to capture inside the eye?
+
+D1 E1: Black to play C2 and win, white to play C2 and win.
+
+T5 T6: Black to play R4 and win, white to play R4 and win.
+
+F19 G19: Black and white to play B19 and win.
+
+
+]
+AW[aa][fa][ia][ka][ab][bb][cb][db][eb][fb][kb][hc][ic][jc][bd][cd][dd][ed][fd][gd][hd][id][kd][ae][be][qi][ri][si][pj][pk][nl][pl][sl][am][bm][cm][dm][em][gm][om][en][nn][ao][bo][co][fo][go][ho][io][mo][no][po][qo][ro][so][ap][dp][ip][jp][mp][pp][sp][aq][dq][fq][gq][kq][mq][pq][ar][dr][fr][gr][jr][mr][pr][qr][as][bs][cs][ds][js][ms][qs][rs][ss]
+AB[ca][da][ea][ga][ja][gb][hb][ib][jb][ac][bc][cc][dc][ec][fc][gc][rj][sj][rk][rl][rm][an][bn][cn][dn][on][pn][qn][rn][sn][do][eo][oo][bp][cp][ep][fp][gp][hp][op][rp][bq][cq][eq][hq][oq][qq][rq][sq][br][er][hr][or][rr][sr][es][gs][hs][os][ps]
+)

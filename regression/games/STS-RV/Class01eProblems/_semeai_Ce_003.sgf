@@ -1,0 +1,20 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-05-21]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+C[Semiai class e. Size 6 center eyes with more than one nbNEBopp.
+Black is always alive. So the result will be seki if white reaches life or won for black in the
+other case.
+F19 M19 white to play H18 and seki black to play F16 and win
+T9 T10 white is unconditionally dead. both to play pass.
+D1 K1 white is alive both to play pass and seki.
+D12 C12 white is alive both to play pass. seki.
+J14 J11 white to play (K14|L13) and seki black to play the same and win.
+
+]
+AW[ba][fa][ga][ia][ja][ka][pa][bb][fb][kb][pb][bc][fc][gc][ic][jc][kc][pc][bd][gd][hd][id][pd][be][ce][de][je][ke][le][me][ne][pe][bf][ef][if][nf][pf][bg][eg][fg][gg][ig][lg][mg][ng][pg][bh][dh][gh][ih][jh][kh][lh][ph][bi][di][gi][hi][mi][ni][oi][pi][qi][ri][si][bj][dj][ej][hj][nj][bk][ek][fk][gk][hk][mk][nk][pk][qk][rk][sk][bl][ll][nl][pl][sl][bm][cm][lm][nm][pm][sm][cn][dn][en][fn][gn][hn][in][jn][kn][ln][nn][pn][sn][bo][co][lo][no][qo][ro][so][ap][bp][ep][fp][gp][hp][ip][lp][np][op][dq][eq][iq][lq][oq][pq][dr][hr][ir][lr][pr][ds][es][fs][gs][hs][ks][ls][ps][qs]
+AB[ca][ea][ha][la][na][cb][db][eb][gb][ib][jb][lb][mb][nb][cc][ec][hc][lc][nc][cd][dd][ed][jd][kd][ld][md][nd][od][ee][fe][ge][he][ie][oe][df][hf][kf][lf][of][cg][dg][hg][jg][og][ch][fh][hh][mh][nh][oh][ci][ei][ii][ji][ki][li][cj][fj][gj][jj][lj][oj][pj][qj][rj][sj][ck][dk][ik][jk][kk][lk][ok][dl][el][fl][gl][hl][il][kl][ol][ql][rl][jm][km][om][qm][on][rn][do][eo][fo][go][ho][io][jo][ko][oo][po][cp][dp][kp][pp][qp][rp][sp][aq][bq][cq][gq][jq][kq][qq][sq][br][cr][er][fr][jr][qr][rr][sr][as][cs][js][rs]
+)

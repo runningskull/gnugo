@@ -1,0 +1,16 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-06-03]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+C[Eye size 7 t1112234b. Black always alive, can white make seki? Semiai Class e.
+
+G19 F19: white alive
+A13 A8: black and white to play B11
+O7 O8: white alive
+]
+AW[ba][ca][ea][ga][ha][ia][ja][ka][la][pa][cb][eb][gb][hb][lb][pb][cc][dc][ec][gc][kc][lc][pc][cd][ed][hd][jd][kd][nd][pd][ce][de][ee][fe][he][ie][je][oe][pe][ff][nf][ag][bg][cg][dg][eg][gg][hg][ig][jg][kg][lg][mg][ng][pg][ah][eh][gh][di][ei][gi][aj][cj][dj][ej][gj][ak][bk][ck][gk][kk][mk][nk][ok][pk][qk][rk][sk][gl][ll][cm][dm][em][fm][gm][lm][nm][om][pm][qm][rm][sm][dn][ln][nn][on][sn][do][lo][no][ro][so][cp][jp][lp][np][op][qp][rp][aq][bq][cq][kq][pq][qq][jr][lr][js][ks][ls]
+AB[fa][ma][oa][ab][bb][fb][ib][kb][mb][nb][ob][bc][fc][ic][jc][mc][oc][ad][bd][fd][gd][md][od][be][ge][me][ne][af][bf][cf][df][ef][gf][hf][if][jf][kf][lf][mf][fg][bh][ch][fh][ai][ci][fi][bj][fj][ek][fk][al][bl][cl][dl][el][fl][ml][nl][ol][pl][ql][rl][sl][bm][mm][an][bn][mn][qn][bo][mo][po][ap][bp][mp][pp][lq][mq][sq][mr][nr][or][pr][qr][rr][sr][ms][qs]
+)

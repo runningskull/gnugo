@@ -1,0 +1,26 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-07-25]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];PL[B]
+AW[le][me][oe][jf][kf][lf][nf][eg][fg][gg][hg][ig][ng][og][eh][hh][oh][ei][ii][li][oi][ej][fj][ij][lj][oj][fk][gk][hk][ik][ok][jl][ll][nl][jm][km][lm][mm][om]
+AB[hd][ge][cf][df][ef][ff][hf][if][dg][jg][kg][lg][mg][ch][dh][jh][mh][ci][fi][gi][ji][ni][cj][dj][gj][jj][mj][dk][jk][kk][lk][mk][dl][el][fl][gl][il][gm][hm][im]
+C[White L11 seki
+black O12 O10 L11 win. L11 best
+]
+(;B[tt])
+
+(;W[ki];B[gf];W[nh];B[nj];W[mf]PL[B];B[di];W[nk];B[ek];W[ml];B[hl];
+W[kl];B[hi];W[mi];B[gh];W[lh];B[hj];W[kj])
+
+(;B[ki];W[mi];B[nh])
+
+(;B[nh];W[ki];B[gf];W[nj];B[di];W[nk];B[ek];W[ml];B[hl];W[mf];B[gh];
+W[kl];B[hi];W[lh];B[hj];W[mi];B[ih])
+
+(;B[nj];W[ki];B[gf];W[nh];B[di];W[mf];B[ek];W[kl];B[hl];W[ml];B[gh];
+W[nk];B[hi];W[lh];B[hj];W[mi];B[ih])
+
+)

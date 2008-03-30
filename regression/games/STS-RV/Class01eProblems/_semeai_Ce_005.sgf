@@ -1,0 +1,26 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-06-02]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)]C[
+];
+C[Eye Test for size 5. Black is always alive so the thing is to see if white can get a seki status.
+
+We start in the upper left coin and we number the white groups from one to ten in the occidental reading sense.
+
+Number 1: B18 vital point for both.
+Number 2: White alive. Status semiai: seki
+Number 3: White alive. Status semiai: seki
+Number 4: White alive. Status semiai: seki
+Number 5: White alive. Status semiai: seki.
+Number 6: both to play N10.
+Number 7: White alive. Status semiai: seki.
+Number 8: White alive in atari. White to play B7 and seki black to play D5 and win.
+Number 9: Vital point G6 for both. 
+Number10: O5 vital point for both.
+]
+AW[ga][ia][ma][fb][gb][ib][jb][lb][mb][nb][ob][fc][jc][lc][nc][fd][gd][hd][id][jd][ld][md][od][pd][qd][fe][me][qe][re][af][bf][cf][df][ef][lf][rf][dg][fg][kg][lg][mg][ng][rg][ch][dh][fh][gh][hh][ih][jh][lh][nh][rh][sh][ai][bi][ci][fi][hi][ji][li][ni][oi][si][ej][fj][gj][hj][ij][jj][lj][oj][sj][ck][dk][ek][lk][nk][ok][sk][cl][fl][gl][hl][ll][ml][nl][sl][cm][fm][hm][im][lm][rm][sm][cn][fn][jn][mn][nn][on][rn][ao][bo][co][fo][ho][io][jo][lo][mo][oo][qo][ro][fp][gp][hp][lp][np][op][pp][qp][cq][dq][eq][lq][nq][cr][er][fr][lr][mr][nr][cs][ds][fs][ls][ns]
+AB[ea][ha][ka][ab][bb][cb][db][eb][kb][cc][ec][gc][ic][kc][cd][ed][kd][ae][be][ce][de][ee][ge][he][ie][je][ke][le][ff][gf][if][kf][mf][nf][of][pf][ag][cg][eg][gg][hg][ig][jg][pg][ah][eh][kh][ph][di][ei][ki][mi][pi][qi][ri][aj][bj][cj][dj][kj][pj][rj][bk][fk][gk][hk][ik][jk][kk][mk][pk][qk][rk][al][bl][el][kl][ol][pl][ql][bm][em][gm][km][mm][nm][om][qm][an][bn][en][hn][kn][ln][pn][qn][eo][ko][ap][bp][cp][dp][ep][kp][bq][fq][gq][hq][iq][jq][kq][ar][br][gr][ir][kr][bs][gs][hs][is][js][ks]
+)

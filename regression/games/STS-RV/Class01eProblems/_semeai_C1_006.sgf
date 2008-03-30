@@ -1,0 +1,19 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-12]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+C[Class 1 semiai. Same eye status. Eye size=3
+NW: The one who plays first wins.
+SW: White plays and wins (C6|C7), Black plays and seki (E1|E2).
+SE: White plays and wins (T4), Black plays and seki (T2|R2).
+NE: Unexpected behaviour of the program. Black can kill in S18 and live in T13. S18 would be desirable.
+        White can live in S18 and make a seki in T13. Both options are equivalent for white.
+Center: Black can kill playing H12. White can kill by living playing also in H12. Unexpected result.
+]
+PL[B]
+AW[aa][ba][ca][da][qa][sa][db][qb][sb][ac][bc][cc][dc][qc][sc][ed][od][pd][qd][rd][sd][ce][de][ee][ie][je][ke][le][me][oe][af][cf][if][nf][cg][gg][hg][ig][jg][ng][og][pg][qg][ch][gh][jh][lh][ph][ci][di][ei][gi][ii][ji][oi][pi][aj][bj][cj][ej][gj][hj][ij][jj][pj][qj][rj][sj][ck][dk][ek][kk][lk][mk][nk][ok][qk][cl][el][pl][ql][am][dm][em][nm][om][qm][sm][an][dn][en][mn][on][pn][qn][sn][eo][mo][no][oo][bp][cp][ep][op][aq][bq][cq][dq][pq][qq][rq][sq][dr][pr][as][bs][cs][ds][ps][qs][rs][ss]
+AB[fa][ga][ma][pa][bb][fb][hb][mb][nb][pb][ec][fc][gc][ic][mc][oc][pc][ad][bd][cd][dd][fd][gd][hd][id][jd][kd][ld][md][nd][be][fe][he][ne][re][se][bf][ff][gf][kf][lf][mf][of][pf][qf][rf][bg][fg][kg][mg][rg][ah][bh][fh][kh][mh][rh][fi][ki][mi][ri][si][fj][kj][lj][mj][nj][ak][bk][fk][gk][hk][ik][jk][rk][sk][bl][fl][rl][bm][fm][rm][bn][fn][rn][ao][bo][co][do][fo][po][qo][ro][so][dp][fp][gp][pp][qp][rp][eq][fq][hq][mq][nq][oq][br][fr][gr][hr][lr][mr][or][rr][fs][hs][ls][ns][os]
+)

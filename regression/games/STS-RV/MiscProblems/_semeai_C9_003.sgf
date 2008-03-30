@@ -1,0 +1,23 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-07-25]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+C[Corner 4 against side 5.
+Both can make two eyes but both should try to kill. The liberty count is equal, the fight is unsettled.
+White to play D4 and win, black to play J1 and win
+]
+PL[W]
+AW[am][bm][an][cn][dn][en][ao][co][fo][ep][fp][fq][hq][iq][jq][kq][gr][hr][kr][es][fs][gs][ks]
+AB[bo][do][io][jo][lo][bp][cp][gp][hp][ip][jp][kp][mp][aq][bq][cq][eq][gq][lq][mq][cr][dr][er][fr][ir][jr][lr][nr][cs][ls][ms]
+(;B[tt])
+
+(;B[is];W[dp];B[js];W[ap];B[ds];W[hs];B[is];W[dq];B[ir];W[ar];B[js];
+W[jr];B[is];W[bs];B[ir];W[bn])
+
+(;W[dp];B[is];W[ap];B[js];W[dq];B[ds];W[hs];B[js];W[ar];B[is];W[bs];
+B[ir];W[jr];B[is];W[bn];B[ir];W[br])
+
+)

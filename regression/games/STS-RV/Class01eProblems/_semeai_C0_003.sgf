@@ -1,0 +1,18 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-04]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+AW[gm][hm][im][gn][jn][go][jo][ko][gp][kp][fq][gq][kq][fr][jr][kr][fs][js]
+AB[jm][km][lm][mm][in][mn][io][mo][ip][mp][hq][iq][mq][hr][mr][hs][ls][ms]
+C[Class 0 semiai.
+Blacks outside liberties=5, 
+Whites outside liberties=6. 
+Shared liberties= 4.
+If whites fills two outside liberties, black has to answer not before. If black fills four outside liberties white has to
+answer not before. Seki unconditionally. 
+Move to play for both: Pass.
+]
+)

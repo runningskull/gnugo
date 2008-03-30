@@ -1,0 +1,106 @@
+STS-RV 1.0
+
+1. What is STS-RV?
+2. How is it distributed?
+3. Who created it?
+4. How to use it?
+5. Structure of the STS-RV
+6. Acknowledgements
+
+
+1. WHAT IS STS-RV?
+-----------------
+STS-RV is a Semeai Test Suite that uses GTP regression features with
+722 semeai problems.
+
+
+2. HOW IS IT DISTRIBUTED?
+-------------------------
+STS-RV is distributed under GPL license.
+
+
+3. WHO CREATED IT?
+------------------
+STS-RV is part of the results of Ricard Vilà's master thesis. I worked
+on my master thesis during six months at the AI research group in 
+Université Paris VIII under the direction of Tristan Cazenave and
+Marco A. Peña.
+
+To contact me: ritx@ya.com
+
+
+4. HOW TO USE IT?
+-----------------
+If your program is compatible with GTP protocol you need to copy
+the whole STS-RV contents in the folder where your executable program
+is. The solve_semeaiS gtp command is not a standard one so probably
+you will have to define your own gtp command for that purpose.
+Then edit the file regression/evalSemeais.sh and change the name
+of the solver to the one you use. Once this is done call the shell
+script evalSemeaisAll.sh and all the tests will be tried. If you
+create debug sgf files they will be redirected to the Debug folders
+(change the name of the debug files in the evalSemeaisAll.sh to fit
+your own names).
+
+If your program is not compatible with GTP protocol check the official
+GTP site at http://www.lysator.liu.se/~gunnar/gtp/
+
+If you try the STS-RV i would like to hear from you, your opinions,
+suggestions, found bugs, etc are of great interest to me so please
+contact me at ritx@ya.com
+
+5. STRUCTURE OF THE STS_RV
+--------------------------
+STS-RV is divided into six tst files containing a total of 130 sgf
+files and 722 tests.
+Every test is twice checked (playing black and white first).
+Contents of the tst files:
+
+semeais_0.tst containing semeai tests of class 0.
+semeais_1.tst containing semeai tests of class 1 and 2.
+semeais_e.tst containing semeai tests of class e.
+
+All the tests in these files are created by me in order to check the
+performance of what my module was supposed to do
+correctly. Theoretically they are supposed to be passed statically (at
+the root node).
+
+If you are not familiar with this classification check Martin Müller's
+paper: "Race to Capture: Analyzing Semeai in Go" at
+http://www.cs.ualberta.ca/~mmueller/ or my master thesis "Desarrollo
+del módulo de resolucion de semeai Semeai_01es" at
+http://www.ai.univ-paris8.fr/~ritx/ (in Spanish).
+
+semeais_RH.tst containing semeai tests obtained from "Counting
+Liberties and Winning Capturing Races" written by Richard Hunter and
+published by Slate and Shell (SSRH003). These are the most difficult
+tests in the suite both for the number of possible moves at the root 
+node and for the depth of the winning sequence.
+
+semeais_GSAT.tst containing semeai tests involving tesuji obtained
+from "Get Strong at Tesuji" written by Richard Bozulich and published
+by Kiseido Publishing Company (K56).
+
+semeais_Misc.tst containing semeai tests over class 3 created by me
+from my own games or compositions created by me.
+
+6. ACKNOWLEDGEMENTS
+-------------------
+I would like to thank Martin Müller for settling the first stone of my
+work with his interesting classification of semeais.
+
+I thank Richard Hunter and Richard Bozulich for his express permission
+to use the problems in their books as tests for machines, for the
+benefit of the Computer Go community. 
+
+I would like to thank Gunnar Farnebäck for his valuable help
+during the process of creating the suite.
+
+I would also like to thank all the people in the AI research group at
+the Université Paris VIII that have helped me to complete my work.
+
+Finally i would like to thank the two researchers that co-directed my
+work, Tristan Cazenave and Marco A. Peña.
+
+
+

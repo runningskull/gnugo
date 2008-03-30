@@ -1,0 +1,24 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-13]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];C[
+];
+C[Semiai Class 1. Size eye = 7, Very important how to fill the eye if it is unsettled. This test is about unsettled 7 and how to fill the eye. Eye t1112234beta. Plus 1 test for t1222234.
+
+NW: A14 A15  Seki unconditionally both to play pass. Note: the semiai module will never realize that blaying B17 is worth 10 points.
+
+SW: F1 G1 Black to play K2 and win White to play D3 and win.
+
+SE: T8 T7 Black to play (T4|S3|T1) and win White to play R12|R10|S10 and win. 
+
+NE: O19 N19 White to play Q17 and win.Black to play  and Q17 and seki. For white status if pass should be seki.
+
+Center: J12 K12 Black and white to play H8 and win.
+]
+PL[W]
+AW[aa][ba][ca][da][ea][ia][ja][la][ma][ab][eb][ib][mb][ob][pb][qb][sb][dc][ec][ic][jc][mc][qc][sc][ad][cd][dd][ed][jd][kd][md][sd][ae][be][ce][de][ee][fe][je][ke][le][me][se][gf][nf][of][pf][qf][rf][sf][cg][eg][fg][gg][hg][ig][ng][bh][ch][eh][jh][kh][nh][rh][bi][ci][ei][ii][ki][ni][qi][ri][ej][hj][ij][kj][nj][ek][gk][hk][ik][kk][nk][al][bl][cl][dl][el][kl][ml][nl][ol][bm][dm][em][jm][mm][pm][qm][rm][sm][an][bn][cn][fn][gn][hn][in][jn][kn][ln][mn][pn][rn][sn][ao][co][do][eo][fo][oo][po][so][gp][hp][ip][jp][kp][lp][pp][cq][gq][hq][lq][oq][pq][qq][sq][br][cr][dr][gr][kr][lr][qr][rr][sr][gs][hs][js][ks][ls]
+AB[fa][ha][na][oa][qa][ra][bb][cb][db][fb][gb][hb][kb][lb][nb][rb][cc][fc][hc][kc][lc][nc][oc][rc][fd][gd][hd][ld][nd][od][pd][rd][ge][he][ie][ne][oe][pe][qe][re][af][bf][cf][df][ef][ff][if][jf][kf][lf][mf][ag][bg][dg][jg][lg][mg][og][pg][qg][rg][sg][ah][dh][fh][gh][hh][ih][mh][oh][ph][sh][di][fi][gi][hi][ji][li][mi][oi][si][aj][cj][dj][fj][gj][jj][lj][oj][pj][sj][ak][bk][ck][dk][fk][jk][lk][ok][pk][qk][rk][sk][fl][gl][il][jl][ll][pl][ql][rl][sl][fm][gm][hm][im][km][lm][nm][om][nn][on][go][ho][io][jo][ko][lo][mo][no][qo][ro][ap][bp][cp][dp][ep][fp][np][op][qp][rp][aq][bq][fq][iq][jq][mq][nq][ar][er][fr][hr][ir][mr][or][pr][as][bs][ds][es][fs][ms][ns][ps][qs][rs]
+)

@@ -1,0 +1,18 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-20]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+C[Extreme nakade situations for size 6, 5, 4 eye.
+NW: Both to G19 and seki or win (white).
+NE: Black (S18|T16) and wins white (N17|017|O16|O15|O14|R13|T12)
+SW: Black plays C2 and wins white plays C2 and wins.
+SE: Black plays R3 and wins. White plays (N3|O5|P6|Q6|R6|S6|T6)
+Center: White unconditionally dead.
+]
+PL[W]
+AW[aa][ba][ca][ja][la][qa][ra][sa][cb][db][jb][lb][pb][qb][bc][cc][dc][ic][jc][kc][lc][pc][qc][cd][dd][gd][hd][id][ld][md][pd][qd][ae][be][ce][ge][je][ke][le][me][qe][re][se][ff][gf][hf][if][mf][nf][eg][fg][ng][og][ah][bh][ch][dh][eh][jh][kh][lh][oh][ph][qh][ei][hi][ii][ji][li][oi][qi][ri][si][ej][hj][lj][oj][ek][hk][kk][lk][ok][el][hl][il][jl][kl][ol][am][bm][cm][dm][em][nm][om][pm][qm][rm][sm][en][fn][ln][mn][nn][fo][go][ho][ko][mo][gp][hp][ip][jp][lp][mp][np][pp][qp][rp][sp][bq][cq][dq][eq][iq][jq][kq][lq][nq][pq][sq][ar][br][er][jr][kr][pr][as][ds][es][js][ks][ls][ps][qs][rs]
+AB[da][ea][ia][ma][oa][pa][eb][fb][gb][hb][ib][mb][nb][ob][sb][ac][ec][oc][rc][sc][ed][od][rd][de][ee][oe][pe][af][bf][cf][df][pf][qf][rf][sf][ig][jg][kg][lg][mg][pg][rg][sg][gh][hh][ih][mh][rh][gi][mi][gj][ij][jj][kj][mj][gk][ik][mk][gl][ll][ml][gm][hm][im][jm][km][lm][ao][bo][co][do][eo][oo][po][qo][ro][so][ap][ep][fp][op][fq][oq][rq][fr][gr][hr][ir][lr][mr][nr][or][qr][rr][sr][cs][fs][is][ms][os]
+)

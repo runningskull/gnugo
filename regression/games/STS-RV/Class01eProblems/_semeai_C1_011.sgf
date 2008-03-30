@@ -1,0 +1,22 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-13]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];C[
+];
+C[Semiai Class 1. Same eye status. Size eye = 7, Very important how to fill the eye if it is unsettled. This test is not about unsettled 7 space eyes but about how to win those semiais regardless the eye. 
+
+NW: Black to play (E19|F18|F17), playing inside the eye or in the shared libs also works but not recommendable, and win. White to play T16(F12|F11|F10|F9|E8|D8) and seki, Playing inside the eye also works but not recommendable.
+
+SW: Black plays E1 and wins. White plays B2 and seki.
+
+SE: Black plays and seki. White plays and seki. Seki unconditionally. Both to play pass.
+
+NE: The one who plays first wins. Black to play (N17|L16) though in this case N18 would work it SHOULDNT play there. White to play (Q17|R16) though T18 would work it is NOT a good idea.
+]
+PL[B]
+AW[aa][ba][ca][da][ka][la][ma][na][oa][ab][db][eb][jb][kb][nb][qb][rb][ac][ec][jc][nc][qc][rc][ad][bd][ed][jd][md][nd][be][ce][de][ee][je][ke][le][me][ne][oe][se][bf][ff][mf][nf][qf][sf][fg][gg][og][pg][qg][rg][sg][gh][ph][ci][di][gi][pi][qi][ri][si][cj][dj][gj][pj][rj][gk][pk][qk][rk][sk][al][bl][cl][gl][pl][bm][dm][em][fm][gm][om][an][bn][cn][dn][on][eo][no][oo][qo][ro][so][ap][bp][ep][gp][hp][ip][jp][lp][mp][np][op][rp][sp][aq][bq][cq][eq][fq][gq][jq][lq][oq][pq][er][fr][jr][lr][pr][fs][gs][js][ls][os][ps][qs][rs][ss]
+AB[fa][ga][ia][ja][pa][qa][ra][sa][cb][gb][hb][ib][lb][ob][pb][cc][gc][ic][kc][lc][oc][sc][cd][fd][gd][hd][id][ld][od][pd][rd][sd][ae][fe][ie][pe][qe][re][af][ef][if][jf][kf][lf][of][pf][rf][ag][bg][cg][dg][eg][lg][mg][ng][ah][bh][dh][eh][ai][ei][aj][ej][ak][bk][ck][dk][ek][hk][ik][jk][hl][jl][ml][nl][ol][hm][im][jm][mm][pm][qm][rm][sm][en][fn][gn][hn][jn][kn][ln][mn][pn][sn][ao][bo][co][do][fo][go][ho][io][jo][ko][po][cp][dp][fp][kp][pp][qp][dq][hq][iq][kq][nq][qq][rq][sq][ar][dr][gr][hr][ir][kr][mr][nr][as][bs][cs][ds][hs][ks][ns]
+)

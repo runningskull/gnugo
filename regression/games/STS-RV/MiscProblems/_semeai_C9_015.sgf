@@ -1,0 +1,26 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-07-25]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+AW[aa][ea][ja][ab][eb][fb][ib][jb][dc][fc][gc][hc][ic][dd][de][af][df][ag][cg][bh][dh]
+AB[ga][ha][ka][bb][cb][db][gb][kb][bc][ec][jc][kc][ad][bd][ed][fd][gd][hd][id][jd][be][bf]
+PL[B]C[white D19 win black D19 F19 H18 win
+]
+(;B[tt])
+
+(;W[da];B[ca];W[cc];B[hb];W[cd];B[ia];W[fa];B[ha];W[ce];B[hb];W[cf];
+B[ga];W[ae];B[gb];W[ia];B[ha];W[bg];B[ga];W[ba];B[ac];W[aa];B[gb];
+W[hb];B[ga])
+
+(;B[da];W[ba];B[hb];W[cc];B[fa];W[ia];B[ga];W[cd];B[ha];W[ce];B[gb];
+W[cf];B[hb];W[fa];B[gb];W[bg];B[ga];W[ae];B[ha];W[hb];B[ga];W[ca];
+B[ac];W[ba];B[gb])
+
+(;B[hb];W[da];B[ca];W[cc];B[ia];W[fa];B[ha];W[cd];B[hb];W[ce];B[gb];
+W[cf];B[ga];W[ia];B[ga];W[bg];B[ha];W[ae];B[gb];W[hb];B[ga];W[ba];
+B[ac];W[aa];B[gb])
+
+)

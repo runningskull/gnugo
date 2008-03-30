@@ -1,0 +1,17 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-20]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+C[Testing eye shapes of size 6.
+NW: Black to play and kill, white to capture the eye.
+NE: Both to play T17 to win the semiai.
+SE White alive and winner. Both to play pass.
+SW: White has to realize that he kills by living. Black to kill. Both to play B3.
+Center: both to play J11.
+]
+AW[ca][ga][ja][ma][na][qa][ra][sa][ab][cb][db][gb][jb][mb][qb][ac][dc][fc][gc][jc][pc][qc][ad][cd][dd][fd][jd][pd][sd][ae][be][ce][fe][ge][he][ie][je][ke][le][me][pe][qe][re][se][ef][mf][ag][bg][cg][dg][eg][ng][dh][gh][hh][ih][jh][kh][nh][oh][ph][qh][rh][sh][di][gi][ki][ni][dj][gj][kj][nj][dk][gk][hk][ik][jk][kk][nk][dl][nl][ol][pl][ql][rl][sl][am][bm][cm][dm][em][mm][nm][en][fn][gn][hn][in][jn][kn][ln][mn][ao][bo][co][eo][mo][po][qo][ro][so][cp][ep][mp][pp][sp][cq][eq][fq][mq][pq][qq][cr][fr][mr][qr][as][bs][cs][fs][ms][qs][rs][ss]
+AB[aa][ba][da][ea][la][pa][bb][eb][lb][nb][ob][pb][rb][bc][ec][lc][mc][nc][oc][rc][bd][ed][od][rd][de][ee][oe][af][bf][cf][df][of][pf][qf][rf][sf][fg][gg][hg][ig][jg][kg][lg][fh][lh][fi][li][fj][ij][jj][lj][fk][lk][fl][gl][hl][il][jl][kl][ll][an][bn][cn][dn][on][pn][qn][rn][sn][do][oo][ap][bp][dp][op][qp][rp][aq][dq][oq][rq][ar][br][dr][or][rr][ds][os]
+)

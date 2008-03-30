@@ -1,0 +1,24 @@
+(;GM[1]FF[3]
+CA[UTF-8]AP[CGoban:2]ST[2]RU[Japanese]SZ[19]KM[0.5]TM[600]
+OT[5x30 byo-yomi]
+PW[ritx2001]
+PB[Magicspain]
+WR[1k]BR[3k]
+DT[2004-02-18]
+PC[The Kiseido Go Server (KGS) at http://kgs.kiseido.com/]
+RE[B+Resign]
+;
+AW[cb][db][gb][mb][dc][fc][gc][ic][jc][lc][mc][cd][dd][ed][jd][kd][nd][pd][rd][be][ce][fe][le][se][df][ff][gf][hf][mf][rf][sf][kg][lg][ng][og][pg][sg][hh][mh][hi][ni][oi][gj][hj][nj][hk][kk][lk][mk][ok][pk][dl][hl][kl][dm][fm][km][an][cn][dn][en][gn][jn][mn][ao][bo][co][jo][so][ap][ip][mp][pp][rp][sp][aq][fq][hq][jq][kq][mq][qq][cr][er][fr][ir][mr][nr][pr][rr][bs][cs][es][ms][os][qs]
+AB[ba][bb][hb][ib][jb][kb][lb][ac][bc][cc][hc][kc][bd][fd][gd][id][ae][ee][ge][he][ie][bf][cf][ef][nf][of][pf][qf][ag][cg][eg][fg][qg][rg][ch][dh][ph][sh][ai][di][fi][gi][mi][pi][ri][bj][ej][mj][oj][pj][ak][bk][dk][ek][gk][nk][qk][al][cl][el][il][ll][ml][nl][bm][cm][em][im][lm][qm][rm][bn][in][sn][ho][lo][mo][no][po][qo][ro][bp][cp][dp][fp][hp][lp][qp][bq][dq][eq][gq][lq][nq][oq][pq][ar][br][dr][gr][lr][or][ds]
+PL[W]
+(;B[tt])
+
+(;B[eb]C[H18 vs G18
+Black and white E18 and win
+];W[ha];B[ia];W[ga];
+B[fa];W[ec];B[ca];W[da];B[de];W[if];B[ea];W[fb];B[ea];W[je];B[hd];
+W[la];B[fa])
+
+(;W[eb];B[ga];W[fa])
+
+)

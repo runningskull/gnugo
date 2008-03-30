@@ -1,0 +1,15 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-20]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];
+AW[aa][ba][ca][ja][qa][ra][sa][cb][db][jb][pb][qb][dc][ic][jc][kc][pc][ad][cd][dd][gd][hd][id][kd][ld][md][pd][qd][sd][ae][be][ce][ge][je][me][qe][re][se][ff][gf][hf][if][mf][nf][eg][fg][ng][og][ah][bh][ch][dh][eh][oh][ph][qh][rh][sh][am][bm][cm][dm][em][fm][fn][gn][go][ho][bp][cp][dp][hp][ip][jp][aq][bq][dq][eq][jq][kq][ar][er][kr][as][ds][es][ks]
+AB[da][ea][ha][la][oa][pa][ab][eb][fb][gb][hb][lb][mb][nb][ob][rb][sb][bc][ec][oc][sc][ed][od][de][ee][oe][pe][af][bf][cf][df][pf][qf][rf][sf][ao][bo][co][do][eo][ap][ep][fp][fq][cr][fr][gr][hr][ir][bs][cs][fs][is]
+C[Extreme nakade situations for size 6 eye.
+NW: White is alive. Both to play pass. Not a class 2 semiai. Unexpected result
+NE: Both to play S17 and win.
+SE: Both to play B2 and win.
+]
+)

@@ -1,0 +1,52 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-04]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)]
+C[About detecting class e related to np liberties.
+];PL[B]
+AW[da][ha][oa][pa][qa][ra][bb][cb][db][hb][ib][lb][nb][dc][gc][ic][lc][nc][dd][gd][od][pd][qd][rd][sd][ee][fe][ge][pe][re][ah][bh][ch][dh][bi][bj][cj][dj][ek][dl][el][cm][an][cn][bo][co][ko][lo][mo][ro][kp][mp][op][pp][qp][rp][sp][bq][cq][jq][lq][nq][ar][br][jr][kr][lr][nr][os][ps][qs][rs]
+AB[ba][ea][ga][sa][ab][eb][fb][gb][ob][sb][bc][ec][oc][pc][qc][rc][sc][bd][ed][nd][be][ce][de][ne][df][nf][of][pf][qf][rf][ag][bg][cg][dg][eg][eh][fh][qh][rh][sh][fi][ej][gj][ak][bk][ck][dk][fk][bl][rl][sl][bm][bn][on][pn][qn][rn][ao][no][oo][ap][np][oq][pq][qq][rq][sq][or][rr]
+C[NW: black C17|C16 wins white F17|F16 wins
+NE: black P15|R15 wins white Q18|R18|S18 wins
+SW black and white D11|A10 win
+SE: black Q5|R5 wins white R2|Q2 wins
+]
+(;B[tt])
+
+(;B[cc];W[fc];B[cd];W[fd];B[ca])
+
+(;W[fd];B[cd];W[fc];B[cc];W[fa])
+
+(;W[pb];B[oe];W[qb];B[qe];W[rb])
+
+(;B[qe];W[pb];B[oe];W[qb];B[se])
+
+(;W[aj];B[di];W[am]
+(;B[ei];W[cl];B[al];W[an];B[ci];W[am])
+
+(;B[al];W[an];B[am];W[cl];B[an])
+)
+
+(;B[aj];W[cl];B[di];W[am];B[al];W[an];B[ei])
+
+(;W[qr]PL[B]
+(;B[qo];W[pr];B[po];W[sr])
+
+(;B[ss]
+(;W[sr];B[ll];W[kl];B[ss];W[kk];B[qo];W[sr];B[ol];W[nl];B[ss];W[nk];
+B[po])
+
+(;W[ns];B[qo];W[pr];B[po];W[sr])
+)
+)
+
+(;B[qo];W[qr];B[po];W[pr];B[so])
+
+(;W[di];B[aj];W[am];B[ei];W[cl];B[al];W[an];B[am];W[bp])
+
+(;B[di];W[aj];B[ei];W[am];B[ci])
+
+)

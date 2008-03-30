@@ -1,0 +1,24 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-13]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)];C[
+];
+C[Semiai Class 1. Size eye = 7, Very important how to fill the eye if it is unsettled. This test is about unsettled 7 and how to fill the eye. Eye t2222224. Also one test for eye t112233 unsettled.
+
+NW: A15 A16  Black to play  C18 and win. White to play C18 and seki.
+
+SW: E1 F1 Black and white to play D2 and win.
+
+SE: T8 T7 Both eyes unsettled The one who plays first kills so no way to choose seki.  Black to play T6 and white to play (T10|R10|S11). Check the status of the semiai if pass.
+
+NE: O19 N19 Black to play K18 and win, white to play K18 and seki.
+
+Center: J12 K12 Black and white to play J10 and win.
+]
+PL[B]
+AW[aa][ba][ca][da][ia][la][ma][pa][qa][ab][db][eb][ib][mb][ob][pb][sb][ac][ec][ic][jc][mc][oc][pc][sc][ad][bd][ed][jd][kd][ld][md][rd][sd][be][ce][de][ee][ne][oe][pe][qe][re][df][pf][rf][sf][bg][eg][fg][gg][hg][ig][og][qg][rg][sg][bh][eh][jh][kh][ph][bi][ci][ei][gi][hi][ki][oi][ej][gj][hj][kj][oj][rj][ek][fk][hk][ik][kk][ok][rk][al][bl][cl][dl][el][fl][kl][ol][bm][dm][fm][gm][hm][im][jm][pm][qm][rm][sm][an][bn][cn][pn][qn][ao][co][do][eo][po][fp][gp][hp][ip][pp][qp][rp][cq][dq][fq][iq][jq][rq][sq][br][cr][fr][jr][cs][fs][gs][js]
+AB[ea][fa][ha][ja][ka][na][oa][ra][bb][fb][gb][hb][kb][nb][rb][bc][cc][fc][hc][nc][qc][rc][cd][fd][gd][hd][nd][od][pd][qd][ae][fe][he][ie][je][ke][le][me][af][bf][cf][ef][ff][jf][kf][cg][dg][jg][lg][mg][dh][fh][gh][hh][ih][mh][qh][rh][sh][ai][di][fi][ii][ji][li][mi][pi][qi][aj][bj][cj][dj][fj][jj][lj][pj][gk][jk][lk][pk][sk][gl][hl][il][jl][ll][pl][ql][rl][sl][km][lm][nm][om][nn][fo][go][ho][io][jo][no][ro][so][bp][cp][dp][ep][jp][kp][np][sp][aq][bq][eq][kq][nq][ar][er][hr][ir][kr][or][pr][qr][rr][as][ds][es][hs][ks][rs][ss]
+)

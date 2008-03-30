@@ -1,0 +1,17 @@
+(;GM[1]FF[3]
+RU[Chinese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-03-12]
+SY[Cgoban 1.9.12]TM[10:00(5x1:00)]C[
+];PL[B]
+C[Semiai Class 1. Same eye status. Size eye=1
+NW: Seki unconditionally both to play pass.
+SW: White plays A5, B5 and wins. Black plays C3, C2 and seki.
+SE: The one who plays first captures and wins.
+NE: Seki unconditionally. Both to play pass. Never play T15.
+]
+AW[ab][bb][rb][sb][bc][rc][ad][bd][cd][rd][sd][de][qe][df][qf][dg][qg][dh][qh][ai][bi][ci][di][pi][qi][ri][si][bj][dj][pj][rj][ak][bk][ck][qk][rk][sk][cl][ql][cm][dm][pm][qm][dn][pn][do][po][ro][ap][bp][cp][qp][rp][sp][bq][rq][ar][br][rr][sr]
+AB[aa][ba][ca][da][fa][oa][qa][ra][sa][db][eb][fb][ob][pb][qb][dc][fc][oc][qc][dd][ed][pd][qd][ce][re][af][bf][cf][rf][sf][bg][rg][ah][bh][rh][sh][al][bl][rl][sl][bm][rm][an][bn][cn][qn][rn][sn][co][qo][so][dp][ep][pp][dq][fq][oq][pq][qq][dr][er][fr][nr][or][qr][as][bs][cs][ds][fs][ns][ps][qs][rs][ss]
+)
