@@ -13857,6 +13857,52 @@ Pattern S14b
 > replace(a,*);
 
 
+Pattern S15
+# gf New pattern. (3.7.12)
+# 9 points gote seki. See seki:1201.
+
+|XX???
+|.XX??
+|..XX?
+|.*.XX
+|....X
++-----
+
+:8,sXe,terri(9)
+
+|AA???
+|.AA??
+|..AA?
+|.*.AA
+|....A
++-----
+
+;lib(A)==4 && seki_helper(A)
+
+
+Pattern S16
+# gf New pattern. (3.7.12)
+# 9 points gote seki. Compare S15. See seki:1202.
+
+|OO???
+|.OO??
+|..OO?
+|.*.OO
+|....O
++-----
+
+:8,sXe,terri(9)
+
+|aa???
+|.aa??
+|..aa?
+|.*.aa
+|....a
++-----
+
+;lib(a)==4 && seki_helper(a)
+
+
 ######################################################################
 #
 # High handicap patterns.
