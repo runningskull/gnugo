@@ -20,7 +20,8 @@ TST = 13x13b.tst 13x13.tst arb.tst arend2.tst arend.tst \
       thrash.tst trevora.tst trevorb.tst trevorc.tst \
       trevord.tst trevor.tst vie.tst viking.tst gifu03.tst seki.tst \
       9x9.tst unconditional.tst cgf2004.tst kgs.tst olympiad2004.tst \
-      tiny.tst gifu05.tst 13x13c.tst
+      tiny.tst gifu05.tst 13x13c.tst STS-RV_0.tst STS-RV_1.tst \
+      STS-RV_e.tst STS-RV_Misc.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
 
@@ -235,6 +236,18 @@ strategy4: strategy4.tst
 strategy5: strategy5.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
+STS-RV_0: STS-RV_0.tst
+	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
+
+STS-RV_1: STS-RV_1.tst
+	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
+
+STS-RV_e: STS-RV_e.tst
+	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
+
+STS-RV_Misc: STS-RV_Misc.tst
+	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
+
 tactics: tactics.tst
 	env RD=$(srcdir) $(srcdir)/eval.sh $^ $(GG_OPTIONS)
 
@@ -324,6 +337,10 @@ fourth_batch:
 	$(srcdir)/regress.sh $(srcdir) arend.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) 13x13.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) semeai.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) STS-RV_0.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) STS-RV_1.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) STS-RV_e.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) STS-RV_Misc.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) trevord.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) strategy4.tst $(GG_OPTIONS)
 
