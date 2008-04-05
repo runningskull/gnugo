@@ -27,7 +27,8 @@ There are two approaches to building GNU Go on Microsoft platforms.
 2) The second approach is to use compilers such as Visual C
    developed specially for the Microsoft platform. Presently we 
    support Visual C through the project files which are supplied 
-   with the distribution.
+   with the distribution. There is also support for generating
+   project files with the help of cmake.
 
 The rest of this document gives more details on the various ways
 to compile GNU Go for Microsoft platforms.
@@ -41,6 +42,7 @@ to compile GNU Go for Microsoft platforms.
 2. Visual C:
 
    * D) Windows NT, Windows 95/98 using Visual C and project files
+   * E) Generating project files with cmake
 
 A) Windows 95/98, MS-DOS and Windows 3.x using DJGPP
 
@@ -142,6 +144,22 @@ d) This project was built and tested using VC version 6.0.
    the beginning.  This caused some intermediate output to be 
    deleted by later build steps.  To achieve the same, simply build 
    clean, then build all.
+
+
+E) Generating project files with cmake
+
+1) Download and install cmake from http://www.cmake.org
+
+2) Run CMakeSetup.exe with the top GNU Go directory as source and any
+   directory of your choice as build directory. Press 'configure' and
+   answer the question about type of project files with the version of
+   VC you have installed. Then wait until it finishes and press
+   'configure' a second time. Now the 'OK' button should be active.
+   Press it to build the project files.
+
+3) Build GNU Go as described above under D). Depending on VC version,
+   gnugo.dsw may be called something else but shouldn't be difficult
+   to locate.
 
 
          Running GNU Go on Windows NT and Windows 95/98
