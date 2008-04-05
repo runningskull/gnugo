@@ -986,9 +986,14 @@ propvalue(char *buffer, int size)
   }
   match(']');
   
-  /* Remove trailing whitespace */
+  /* Remove trailing whitespace. The double cast below is needed
+   * because "char" may be represented as a signed char, in which case
+   * characters between 128 and 255 would be negative and a direct
+   * cast to int would cause a negative value to be passed to isspace,
+   * possibly causing an assertion failure.
+   */
   --p;
-  while (p > buffer && isspace((int) *p))
+  while (p > buffer && isspace((int) (unsigned char) *p))
     --p;
   *++p = '\0';
 }

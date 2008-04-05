@@ -108,7 +108,7 @@ class Testsuite
       werror("Finished waiting for writing to be finished.\n");
     
     while (1) {
-      string s = f->gets();
+      string s = f->gets() - "\r";
       float current_time = time(timebase);
       if (!s)
 	break;

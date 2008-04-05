@@ -224,7 +224,7 @@ gg_vsnprintf(char *dest, unsigned long len, const char *fmt, va_list args)
   vsnprintf(dest, len, fmt, args);
 #elif HAVE_G_VSNPRINTF
   g_vsnprintf(dest, len, fmt, args);
-#elif HAVE_VISUAL_C
+#elif HAVE__VSNPRINTF
   _vsnprintf(dest, len, fmt, args);
 #else
   UNUSED(len);
@@ -253,8 +253,8 @@ gg_gettimeofday(void)
 #ifdef HAVE_GETTIMEOFDAY
   gettimeofday(&tv, NULL);
 #else
-  tv->tv_sec  = time(NULL);
-  tv->tv_usec = 0;
+  tv.tv_sec  = time(NULL);
+  tv.tv_usec = 0;
 #endif
   return tv.tv_sec + 1.e-6 * tv.tv_usec;
 }

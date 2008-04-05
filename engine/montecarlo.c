@@ -1929,11 +1929,11 @@ uct_play_move(struct uct_tree *tree, struct uct_node *node, float alpha,
     struct uct_node *child_node = child_arc->node;
     float winrate = (float) child_node->wins / child_node->games;
     float uct_value;
-    float log_games_ratio = logf(node->games) / child_node->games;
-    float x = winrate * (1.0 - winrate) + sqrtf(2.0 * log_games_ratio);
+    float log_games_ratio = log(node->games) / child_node->games;
+    float x = winrate * (1.0 - winrate) + sqrt(2.0 * log_games_ratio);
     if (x < 0.25)
       x = 0.25;
-    uct_value = winrate + sqrtf(2 * log_games_ratio * x / (1 + tree->game.depth));
+    uct_value = winrate + sqrt(2 * log_games_ratio * x / (1 + tree->game.depth));
     if (uct_value > best_uct_value) {
       next_arc = child_arc;
       best_uct_value = uct_value;
@@ -2209,7 +2209,7 @@ uct_genmove(int color, int *move, int *forbidden_moves, int *allowed_moves,
 	break;
       
       mean = most_games_node->sum_scores / most_games_node->games;
-      std = sqrtf((most_games_node->sum_scores2 - most_games_node->sum_scores * mean) / (most_games_node->games - 1));
+      std = sqrt((most_games_node->sum_scores2 - most_games_node->sum_scores * mean) / (most_games_node->games - 1));
       gprintf("%1m ", most_games_arc->move);
       fprintf(stderr, "%6d %6d %5.3f %5.3f %5.3f %5.3f\n",
 	      most_games_node->wins, most_games_node->games,

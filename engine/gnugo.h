@@ -38,8 +38,8 @@
 #include <config.h>
 #endif
 
-#ifdef HAVE_VISUAL_C
-# include <crtdbg.h>
+#ifdef HAVE_CRTDBG_H
+#include <crtdbg.h>
 #endif
 
 #include "sgftree.h"

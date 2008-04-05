@@ -55,7 +55,7 @@
 #include <io.h>
 #endif
 
-#ifdef HAVE_VISUAL_C
+#ifdef HAVE_WINSOCK_IO_H
 #include <winsock.h>
 #include <io.h>
 #endif
