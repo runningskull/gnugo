@@ -19,13 +19,12 @@ User documentation can be obtained by running 'gnugo --help' or 'man
 gnugo' from any terminal.
 
 Texinfo documentation includes instructions for users as well as
-documentation of GNU Go's algorithms and functions for programmers
-and developers. Use an info reader or emacs to read the info files,
-or `make gnugo.dvi' or `make gnugo.ps' to get printed documentation. 
-You can also make html documentation from the Texinfo. One method
-of making html documentation is to use the command:
-
-makeinfo --html gnugo.texi.
+documentation of GNU Go's algorithms and functions for programmers and
+developers. Use an info reader or emacs to read the info files, or run
+`make gnugo.dvi' or `make gnugo.ps' in the doc/ directory to get
+printed documentation. You can also make html documentation from the
+Texinfo files. One method of making html documentation is to run the
+command 'makeinfo --html gnugo.texi' in the doc/ directory.
 
 
 
