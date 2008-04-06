@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- cmake configuration files for generating MSVC project files
+- minor doc revision
+- new options --mc-patterns, --mc-list-patterns, and --mc-load-patterns
+- tunable local patterns for Monte Carlo simulations
 - try harder to find the right move to make seki in find_moves_to_make_seki()
 - better heuristics to avoid calling semeai reading in
   find_moves_to_make_seki() in hopeless cases
@@ -13,8 +17,10 @@
   search on 9x9 and smaller boards
 - call check_boardsize() from play_gmp.c to avoid crashing on bad board sizes
 - new function check_boardsize()
-- bugfix in handling of foreground color with ncurses	
+- bugfix in handling of foreground color with ncurses
 - orientation invariant board hashes added
+- tuning
+- add STS-RV semeai regression test suite
 - new and revised tests
 
 3.7.11 released November 1, 2007
