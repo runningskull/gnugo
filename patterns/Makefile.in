@@ -208,32 +208,42 @@ EXTRA_DIST = $(DSP)\
         $(DTR)\
 	dfa.c\
 	gnugo-db.el\
-	gogo.sgf\
-	hoshi_keima.sgf\
-	hoshi_other.sgf\
-	komoku.sgf\
-	mokuhazushi.sgf\
-	sansan.sgf\
-	takamoku.sgf\
-	patterns.db\
-	patterns2.db\
-	attack.db\
-	defense.db\
-	endgame.db\
-	aa_attackpats.db\
-	owl_attackpats.db\
-	owl_vital_apats.db\
-	owl_defendpats.db\
-	eyes.db\
-	conn.db\
-	influence.db\
-	barriers.db\
-	fuseki.db\
-	fuseki9.dbz\
+        hoshi_keima.sgf\
+        komoku.sgf\
+        gogo.sgf\
+        hoshi_other.sgf\
+        mokuhazushi.sgf\
+        takamoku.sgf\
+        sansan.sgf\
+        aa_attackpats.db\
+        attack.db\
+        barriers.db\
+        conn.db\
+        defense.db\
+        endgame.db\
+        eyes.db\
+        fuseki.db\
+        gogo.db\
+        handicap.db\
+        hoshi_keima.db\
+        hoshi_other.db\
+        influence.db\
+        komoku.db\
+        mc_mogo_classic.db\
+        mc_montegnu_classic.db\
+        mc_uniform.db\
+        mokuhazushi.db\
+        oracle.db\
+        owl_attackpats.db\
+        owl_defendpats.db\
+        owl_vital_apats.db\
+        patterns2.db\
+        patterns.db\
+        sansan.db\
+        takamoku.db\
 	fuseki13.dbz\
 	fuseki19.dbz\
-	handicap.db\
-	oracle.db
+	fuseki9.dbz
 
 mkpat_SOURCES = mkpat.c transform.c dfa.c
 mkpat_LDADD = ../utils/libutils.a
