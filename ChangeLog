@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.7.12 released April 7, 2008
+
 - cmake configuration files for generating MSVC project files
 - minor doc revision
 - new options --mc-patterns, --mc-list-patterns, and --mc-load-patterns

@@ -259,7 +259,7 @@ loadsgf games/semeai/semeai9.sgf
 
 loadsgf games/nngs/gnugo-3.3.20-GoFuN-200306071813.sgf 234
 48 analyze_semeai E17 D17
-#? [1 0 (D8|F8|G12|G10)]*
+#? [1 0 (D8|F8|G12|G10)]
 
 
 # The opposite semeai is not very interesting (black clearly can kill white).
@@ -576,4 +576,4 @@ loadsgf games/semeai/semeai6.sgf
 play white A15
 play black D13
 147 analyze_semeai A12 A14
-#? [1 1 (B15|C15|D15|E15)]*
+#? [1 1 (B15|C15|D15|E15)]

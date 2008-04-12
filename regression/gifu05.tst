@@ -39,7 +39,7 @@ loadsgf games/gifu2005/gnugo-katsu.sgf 110
 
 loadsgf games/gifu2005/gnugo-katsu.sgf 132
 1110 reg_genmove white
-#? [L5]*
+#? [L5]
 
 loadsgf games/gifu2005/gnugo-katsu.sgf 150
 1120 reg_genmove white

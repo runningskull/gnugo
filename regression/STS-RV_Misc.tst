@@ -36,7 +36,7 @@
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_001.sgf
 1 analyze_semeai K1 J1
-#? [3 3 G2]
+#? [3 3 G2]*
 
 2 analyze_semeai J1 K1
 #? [1 1 G1]
@@ -45,24 +45,24 @@ loadsgf games/STS-RV/MiscProblems/_semeai_C9_001.sgf
 #? [1 1 B9]
 
 4 analyze_semeai A8 A7
-#? [1 1 A10]
+#? [1 1 A10]*
 
 5 analyze_semeai T9 T10
 #? [1 1 (T15|S13|S11)]
 
 6 analyze_semeai T10 T9
-#? [2 2 (S11|S13)]
+#? [2 2 (S11|S13)]*
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_002.sgf
 7 analyze_semeai T6 T5
 #? [1 1 N7]
 
 8 analyze_semeai T5 T6
-#? [1 1 T7]
+#? [1 1 T7]*
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_003.sgf
 9 analyze_semeai F2 G2
-#? [1 1 J1]
+#? [1 1 J1]*
 
 10 analyze_semeai G2 F2
 #? [1 1 D4]
@@ -72,14 +72,14 @@ loadsgf games/STS-RV/MiscProblems/_semeai_C9_004.sgf
 #? [1 1 L11]
 
 12 analyze_semeai J9 K9
-#? [1 0 L11]
+#? [1 0 L11]*
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_005.sgf
 13 analyze_semeai B12 B13
 #? [1 1 B9]
 
 14 analyze_semeai B13 B12
-#? [1 0 B9]
+#? [1 0 B9]*
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_006.sgf
 15 analyze_semeai D18 D19
@@ -140,21 +140,21 @@ loadsgf games/STS-RV/MiscProblems/_semeai_C9_008.sgf
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_009.sgf
 33 analyze_semeai F2 G2
-#? [3 3 G1]
+#? [3 3 G1]*
 
 34 analyze_semeai G2 F2
 #? [1 1 G1]
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_010.sgf
 35 analyze_semeai F2 G2
-#? [1 1 J1]
+#? [1 1 J1]*
 
 36 analyze_semeai G2 F2
-#? [1 1 D4]
+#? [1 1 D4]*
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_011.sgf
 37 analyze_semeai F2 G2
-#? [1 1 J1]
+#? [1 1 J1]*
 
 38 analyze_semeai G2 F2
 #? [1 1 D4]
@@ -171,18 +171,18 @@ loadsgf games/STS-RV/MiscProblems/_semeai_C9_013.sgf
 #? [1 1 (A9|C19)]
 
 42 analyze_semeai B13 B12
-#? [1 0 A9]
+#? [1 0 A9]*
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_014.sgf
 43 analyze_semeai B12 B13
 #? [1 1 (B9|C19)]
 
 44 analyze_semeai B13 B12
-#? [1 0 B9]
+#? [1 0 B9]*
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_015.sgf
 45 analyze_semeai D18 E18
-#? [1 1 (D19|F19|H18)]
+#? [1 1 (D19|F19|H18)]*
 
 46 analyze_semeai E18 D18
 #? [1 1 D19]
@@ -206,13 +206,13 @@ loadsgf games/STS-RV/MiscProblems/_semeai_C9_018.sgf
 #? [1 1 (O14|N14|M14|K14|H12|F11)]
 
 52 analyze_semeai K13 K12
-#? [1 1 H12]
+#? [1 1 H12]*
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_019.sgf
 53 analyze_semeai H18 G18
-#? [1 1 E18]
+#? [1 1 E18]*
 
 54 analyze_semeai G18 H18
-#? [1 1 E18]
+#? [1 1 E18]*
 
 

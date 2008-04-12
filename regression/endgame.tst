@@ -210,7 +210,7 @@ loadsgf games/kgs/GNU-merlenoir.sgf 185
 930 restricted_genmove white O14 R16
 #? [O14]*
 931 restricted_genmove white R16 E4
-#? [R16]*
+#? [R16]
 932 restricted_genmove white E4 P4
 #? [E4]
 933 restricted_genmove white P4 C11
@@ -244,7 +244,7 @@ loadsgf games/kgs/GNU-merlenoir.sgf 209
 # H8 is one point reverse sente.
 loadsgf games/kgs/GNU-merlenoir.sgf 233
 960 restricted_genmove white J10 H8
-#? [J10]*
+#? [J10]
 
 # No point to gain at the top, fill ko. After white C6, black E6,
 # white has to defend and loses the ko.

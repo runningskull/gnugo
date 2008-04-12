@@ -528,7 +528,7 @@ play black C2
 # A3, B3, and A2 all make seki, but B3 and A2 lose a point.
 play white C1
 1205 reg_genmove black
-#? [A3]
+#? [A3]*
 
 play black A3
 1206 reg_genmove white
@@ -546,7 +546,7 @@ undo
 undo
 play white A2
 1209 reg_genmove black
-#? [B3]
+#? [B3]*
 
 play black B3
 1210 reg_genmove white
@@ -592,7 +592,7 @@ play black C1
 # A2 also gives seki but loses a point, as does tenuki.
 play white A3
 1217 reg_genmove black
-#? [B3]
+#? [B3]*
 
 undo
 undo
@@ -609,7 +609,7 @@ undo
 undo
 play black B3
 1220 reg_genmove white
-#? [A2|A3]
+#? [A2|A3]*
 
 undo
 play black A2
@@ -621,7 +621,7 @@ undo
 undo
 play white A3
 1222 reg_genmove black
-#? [C1]
+#? [C1]*
 
 play black C1
 1223 reg_genmove white
@@ -646,7 +646,7 @@ play black B1
 
 play white C2
 1227 reg_genmove black
-#? [B3]
+#? [B3]*
 
 # C1 is one point better than C2 and A3.
 undo
@@ -655,7 +655,7 @@ undo
 undo
 play black B1
 1228 reg_genmove white
-#? [C1]
+#? [C1]*
 
 loadsgf games/FSGCBot-dr.sgf 234
 2010 reg_genmove white
