@@ -1233,6 +1233,7 @@ propagate_worm2(int str)
 
 /* Report all known attack, defense, attack threat, and defense threat
  * moves. But limit this to the moves which can be made by (color).
+ * Exclude send-two-return-one moves.
  */
 void
 worm_reasons(int color)
@@ -1249,10 +1250,12 @@ worm_reasons(int color)
 
     if (board[pos] == OTHER_COLOR(color)) {
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
-	if (worm[pos].attack_codes[k] != 0)
+	if (worm[pos].attack_codes[k] != 0
+	    && !send_two_return_one(worm[pos].attack_points[k], color))
 	  add_attack_move(worm[pos].attack_points[k], pos,
 			  worm[pos].attack_codes[k]);
-	if (worm[pos].attack_threat_codes[k] != 0)
+	if (worm[pos].attack_threat_codes[k] != 0
+	    && !send_two_return_one(worm[pos].attack_threat_points[k], color))
 	  add_attack_threat_move(worm[pos].attack_threat_points[k], pos,
 				 worm[pos].attack_threat_codes[k]);
       }
@@ -1260,11 +1263,14 @@ worm_reasons(int color)
       
     if (board[pos] == color) {
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
-	if (worm[pos].defense_codes[k] != 0)
+	if (worm[pos].defense_codes[k] != 0
+	    && !send_two_return_one(worm[pos].defense_points[k], color))
 	  add_defense_move(worm[pos].defense_points[k], pos,
 			   worm[pos].defense_codes[k]);
 
-	if (worm[pos].defense_threat_codes[k] != 0)
+	if (worm[pos].defense_threat_codes[k] != 0
+	    && !send_two_return_one(worm[pos].defense_threat_points[k],
+				    color))
 	  add_defense_threat_move(worm[pos].defense_threat_points[k], pos,
 				  worm[pos].defense_threat_codes[k]);
       }
