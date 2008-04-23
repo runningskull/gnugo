@@ -539,3 +539,8 @@ loadsgf games/cgos/25811.sgf 52
 #? [3 (A7|B9)]*
 396 owl_defend E9
 #? [2 PASS]*
+
+# Incomprehensible mistake.
+loadsgf games/cgos/403788.sgf 65
+397 owl_does_attack A9 A8
+#? [0]

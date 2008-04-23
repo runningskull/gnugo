@@ -106,7 +106,7 @@ loadsgf games/life_and_death/ld11.sgf
 42 dragon_status R16
 #? [dead]
 43 dragon_status R3
-#? [critical (R1|S2|T7) S2]
+#? [critical (R1|S1|S2|T7) S2]
 # B2 lives but allows the opponent to make seki (or ko).
 44 dragon_status C4
 #? [critical D1 (A2|D1|B2)]

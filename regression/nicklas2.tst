@@ -53,7 +53,7 @@ loadsgf games/nicklas/nicklas7.sgf 29
 #
 loadsgf games/nicklas/nicklas9.sgf 28
 902 dragon_status E9
-#? [critical]*
+#? [critical (.*) (.*)]*
 
 903 dragon_status G7
 #? [critical (H8|F9) H8]

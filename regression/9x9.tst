@@ -351,3 +351,14 @@ loadsgf games/cgos/390115.sgf 28
 loadsgf games/atari-crash.sgf
 680 reg_genmove white
 #? [H7]
+
+# The only thing that matters is to kill the lower right corner.
+loadsgf games/9x9-5.sgf
+690 reg_genmove black
+#? [H1|J4]
+
+# Making life with B9 suffices to win. Connecting with A5 is an
+# overplay, leading to a difficult ko.
+loadsgf games/9x9-6.sgf 36
+700 reg_genmove white
+#? [B9]

@@ -3,6 +3,7 @@
 -------------------------------------------------------------------------
 
 - filter out send-two-return-one moves in worm_reasons()
+- new and revised tests
 	
 3.7.12 released April 7, 2008
 

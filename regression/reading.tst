@@ -998,3 +998,8 @@ loadsgf games/gifu2005/mfg-gnugo.sgf 195
 loadsgf games/reading48.sgf
 234 attack C1
 #? [1 A1]
+
+# Not ko.
+loadsgf games/cgos/471085.sgf 49
+235 attack B1
+#? [1 C1]

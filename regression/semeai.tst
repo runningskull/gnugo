@@ -577,3 +577,26 @@ play white A15
 play black D13
 147 analyze_semeai A12 A14
 #? [1 1 (B15|C15|D15|E15)]
+
+# Multiple semeai misunderstandings. First let the outer white stones
+# be safe.
+loadsgf games/kgs/Hosbodar-GNU.sgf 193
+play white N6
+play white O7
+148 analyze_semeai T7 S9
+#? [1 1 T9]
+
+# A big eye is worth lots of liberties. Let's eliminate the tiny ko
+# potential for simplicity.
+loadsgf games/kgs/Hosbodar-GNU.sgf 197
+play black N8
+149 analyze_semeai S9 R10
+#? [1 1 (PASS|T11|S11|R11|P9|P8|P7|P1|Q1|R1)]
+150 analyze_semeai R10 S9
+#? [0 0 PASS]
+151 dragon_status R10
+#? [dead]
+152 dragon_status S9
+#? [alive]
+153 dragon_status T7
+#? [dead]

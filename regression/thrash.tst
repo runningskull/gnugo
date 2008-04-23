@@ -110,7 +110,7 @@ loadsgf games/cgos/30527.sgf 73
 22 restricted_genmove black G9 J9
 #? [G9]
 
-# The ko at J6 is an irrelevant distration. Start with filling the
+# The ko at J6 is an irrelevant distraction. Start with filling the
 # safe outer liberties.
 loadsgf games/cgos/994.sgf 76
 23 reg_genmove white
@@ -129,16 +129,17 @@ loadsgf games/cgos/31446.sgf 88
 26 reg_genmove white
 #? [E1|A1]*
 
-# Fill a ko before taking another one.
+# Fill a ko before taking another one. Playing G3 or H2 first to make
+# the entire board unconditionally settled is also fine.
 loadsgf games/cgos/37169.sgf 86
 27 reg_genmove white
-#? [J6]*
+#? [J6|G3|H2]*
 loadsgf games/cgos/37169.sgf 88
 28 reg_genmove white
-#? [A2]*
+#? [A2|G3|H2]*
 loadsgf games/cgos/37169.sgf 90
 29 reg_genmove white
-#? [D3]*
+#? [D3|G3|H2]*
 
 loadsgf games/cgos/26449.sgf 47
 30 reg_genmove black
