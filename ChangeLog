@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- improve_lunch_attack() in owl.c revised
 - filter out send-two-return-one moves in worm_reasons()
 - new and revised tests
 	

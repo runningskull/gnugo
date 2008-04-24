@@ -6091,8 +6091,10 @@ improve_lunch_attack(int lunch, int attack_point)
 	for (k = 0; k < 4; k++) {
 	  int apos = attack_point + delta[k];
 	  if (!ON_BOARD(attack_point - delta[k]) && board[apos] == EMPTY) {
-	    if (does_attack(apos, lunch) && safe_move(apos, color))
+	    if (does_attack(apos, lunch) && safe_move(apos, color)
+		&& !defend_against(attack_point, color, apos)) {
 	      return apos;
+	    }
 	    break;
 	  }
 	}
