@@ -13903,6 +13903,44 @@ Pattern S16
 ;lib(a)==4 && seki_helper(a)
 
 
+Pattern S17
+# gf New pattern. (3.7.13)
+# 5 points gote seki. See seki:601.
+
+|XXX??
+|..XXX
+|.*..X
++-----
+
+:8,sXe,terri(5)
+
+|AAA??
+|..AAA
+|.*..A
++-----
+
+;lib(A)==4 && seki_helper(A)
+
+
+Pattern S18
+# gf New pattern. (3.7.13)
+# 5 points seki. Compare S17. See seki:602.
+
+|OOO??
+|..OOO
+|.*..O
++-----
+
+:8,sXe,terri(5)
+
+|aaa??
+|..aaa
+|.*..a
++-----
+
+;lib(a)==4 && seki_helper(a)
+
+
 ######################################################################
 #
 # High handicap patterns.

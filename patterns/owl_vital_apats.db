@@ -1017,4 +1017,42 @@ OX.*
 ;owl_mineye(a)==1
 
 
+Pattern VA57
+# gf New pattern. (3.7.13)
+
+OXXXX   only one eye without outer liberties
+X.*.X
+X...X
+-----
+
+:8,s,value(75)
+
+OAAAA
+X...A
+X...A
+-----
+
+;lib(A)==4
+
+
+Pattern VA58
+# gf New pattern. (3.7.13)
+# See ld_owl:321.
+
+X..x   squeeze eyespace
+OX*.
+?X..
+----
+
+:8,s,value(35)
+
+X..x
+bA*.
+?A..
+----
+
+;lib(A)==3 && proper_eye(*) && owl_mineye(*) > 0 && owl_maxeye(*) > 1
+;&& !attack(b)
+
+
 # END OF FILE

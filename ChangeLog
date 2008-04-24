@@ -2,8 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- guess_eye_space() revised
+- major revision of eyes.db
 - improve_lunch_attack() in owl.c revised
 - filter out send-two-return-one moves in worm_reasons()
+- owl tuning
+- tuning
 - new and revised tests
 	
 3.7.12 released April 7, 2008

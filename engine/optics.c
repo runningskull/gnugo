@@ -949,7 +949,10 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
 {
   if (effective_eyesize > 3) {
     set_eyevalue(value, 2, 2, 2, 2);
-    *pessimistic_min = 1;
+    if (margins > 0)
+      *pessimistic_min = 1;
+    else
+      *pessimistic_min = 2;
 
     if ((margins == 0 && effective_eyesize > 7)
 	|| (margins > 0 && effective_eyesize > 9)) {
