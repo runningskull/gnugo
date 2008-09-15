@@ -1352,10 +1352,11 @@ set_maximum_territorial_value(int pos, float value)
  * to (to). 
  */
 void
-add_replacement_move(int from, int to)
+add_replacement_move(int from, int to, int color)
 {
   int cc;
   int pos;
+  int dummy;
 
   ASSERT_ON_BOARD1(from);
   ASSERT_ON_BOARD1(to);
@@ -1365,6 +1366,13 @@ add_replacement_move(int from, int to)
   ASSERT1(board[to] == EMPTY, to);
 
   cc = replacement_map[to];
+  if (unconditionally_meaningless_move(to, color, &dummy)) {
+    /* Silently ignore replacement patterns which conflict with the
+     * unconditional analysis since the latter is always correct and
+     * it's difficult to anticipate such situations for the patterns.
+     */
+    return;
+  }
 
   /* First check for an incompatible redistribution rule. */
   if (replacement_map[from] != NO_MOVE) {

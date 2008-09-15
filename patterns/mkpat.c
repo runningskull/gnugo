@@ -411,7 +411,7 @@ static struct autohelper_func autohelper_functions[] = {
 		"connect_and_cut_helper2(%s, %s, %s, color)"},
   {"connect_and_cut_helper",	3, 0, 3.00, "connect_and_cut_helper(%s, %s, %s)"},
   {"owl_threatens",		2, 0, 0.01, "owl_threatens_attack(%s, %s)"},
-  {"replace",			2, 0, 0.0,  "add_replacement_move(%s, %s)"},
+  {"replace",			2, 0, 0.0,  "add_replacement_move(%s, %s, color)"},
   {"backfill_replace",		2, 0, 0.0,  "backfill_replace(%s, %s)"},
   {"non_oterritory",		1, 0, 0.0,
 		"influence_mark_non_territory(%s, color)"},
