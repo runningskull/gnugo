@@ -779,19 +779,19 @@ Pattern VA44
 # gf Fixed symmetry. (3.3.6)
 # nn Modified constraint (3.3.14)
 # gf Revised constraint. (3.5.3)
+# gf Revised constraint. (3.7.13)
 
 XoX
 o*o
 
 :|,s,value(57)
 
-XbX
+DbE
 a*c
 
 ; owl_proper_eye(*)
 ; && (owl_proper_eye(a) + owl_proper_eye(b) + owl_proper_eye(c) > 2)
-; && safe_xmove(*)
-; && ((owl_eye_size(*) <= 8 && owl_maxeye(*)>1) || !oplay_attack(*,*))
+; && (oplay_attack(*,a,E) || oplay_attack(*,c,D))
 
 
 Pattern VA45
