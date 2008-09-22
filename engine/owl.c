@@ -1017,7 +1017,7 @@ do_owl_analyze_semeai(int apos, int bpos,
    * interesting if the opponent doesn't already have two eyes.
    * If we have more eyes, always check for a backfilling move.
    */
-  if (!you_look_alive
+  if ((!you_look_alive || we_might_be_inessential)
       && !safe_outside_liberty_found
       && (moves[0].value < 110 || I_have_more_eyes)) {
     int pos;
@@ -1059,7 +1059,7 @@ do_owl_analyze_semeai(int apos, int bpos,
    * to fill a mutual liberty or play a corresponding backfilling
    * move.
    */
-  if (!you_look_alive) {
+  if (!you_look_alive || we_might_be_inessential) {
     if (safe_outside_liberty_found
 	&& outside_liberty.pos != NO_MOVE) {
       move_value = semeai_move_value(outside_liberty.pos,
@@ -5928,7 +5928,8 @@ owl_find_lunches(struct local_owl_data *owl)
 	already_checked[lunch] = 1;
 
 	attack_and_defend(lunch, &acode, &apos, &dcode, &dpos);
-	if (acode != 0) {
+	if (acode != 0
+	    && (!liberty_of_goal(apos, owl) || safe_move(apos, color))) {
 	  owl->lunch[lunches] = lunch;
 	  owl->lunch_attack_code[lunches]  = acode;
 	  owl->lunch_attack_point[lunches] = apos;

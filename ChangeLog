@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- avoid playing inside own eyespace to capture lunches in semeais
 - do not crash on replacement moves conflicting with unconditional analysis
 - guess_eye_space() revised
 - major revision of eyes.db
