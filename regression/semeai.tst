@@ -522,9 +522,13 @@ loadsgf games/CrazyStone1.sgf 50
 132 reg_genmove white
 #? [H9|J4]
 
+# After white H2 there's nothing black can do. Eventually white will
+# have to capture a ko but this can be postponed indefinitely so just
+# like the bent four in the corner, black is dead without further
+# moves, with Japanese rules.
 loadsgf games/CrazyStone1.sgf 56
 133 analyze_semeai D9 G3
-#? [1 2 H2]
+#? [1 1 H2]
 134 analyze_semeai G3 D9
 #? [1 1 H2]*
 

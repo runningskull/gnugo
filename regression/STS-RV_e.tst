@@ -195,7 +195,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_006.sgf
 #? [1 0 (.*)]
 
 52 analyze_semeai E19 A19
-#? [1 0 PASS]*
+#? [1 0 (.*)]*
 
 53 analyze_semeai L19 K19
 #? [1 0 N18]
@@ -270,7 +270,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_009.sgf
 #? [1 0 (.*)]
 
 76 analyze_semeai E19 A19
-#? [1 0 PASS]*
+#? [1 0 (.*)]*
 
 77 analyze_semeai M13 M14
 #? [1 0 (N11|O12)]
@@ -317,30 +317,30 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_011.sgf
 #? [1 1 H11]
 
 91 analyze_semeai A7 A8
-#? [1 0 C5]*
+#? [1 0 (C5|A6|C4)]*
 
 92 analyze_semeai A8 A7
 #? [1 1 C5]*
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_012.sgf
 93 analyze_semeai A19 E19
-#? [1 0 B16]*
+#? [1 0 (B16|A18|D17)]*
 
 94 analyze_semeai E19 A19
-#? [2 2 B16]*
+#? [1 2 B16]*
 
 95 analyze_semeai O13 O14
 #? [1 0 (Q11|Q12)]
 
 96 analyze_semeai O14 O13
-#? [2 2 Q12]*
+#? [1 2 Q12]*
 # GNU Go dont realize that w Q12 live seki
 
 97 analyze_semeai G7 G8
 #? [1 0 (J5|H5)]
 
 98 analyze_semeai G8 G7
-#? [2 2 H5]*
+#? [1 2 H5]*
 # GNU Go dont realize that w H5 live seki
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_013.sgf
@@ -367,7 +367,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_014.sgf
 #? [1 0 (Q18|P18)]
 
 106 analyze_semeai N19 O19
-#? [3 3 P18]*
+#? [1 3 P18]*
 # GNU Go dont realize that w P18 live seki
 
 107 analyze_semeai G13 G14
@@ -380,14 +380,14 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_014.sgf
 #? [1 0 (B5|C5)]
 
 110 analyze_semeai A8 A7
-#? [2 2 C5]*
+#? [1 2 C5]*
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_015.sgf
 111 analyze_semeai A19 E19
-#? [1 0 PASS]
+#? [1 0 (.*)]
 
 112 analyze_semeai E19 A19
-#? [1 0 PASS]
+#? [1 0 (.*)]
 
 113 analyze_semeai O13 O14
 #? [1 0 Q11]
@@ -668,10 +668,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_028.sgf
 #? [1 1 A3]
 
 201 analyze_semeai K1 H1
-#? [1 0 L2]*
+#? [1 0 (L2|M1)]*
 
 202 analyze_semeai H1 K1
-#? [1 1 (M1|L2)]*
+#? [1 1 M1]*
 
 203 analyze_semeai T10 T11
 #? [1 0 PASS]
