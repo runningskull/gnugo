@@ -782,6 +782,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   int effective_eyesize;
   int bulk_score = 0;
   signed char chainlinks[BOARDMAX];
+  int contains_inset = 0;
 
   /* Stones inside eyespace which do not coincide with a false eye or
    * a halfeye.
@@ -815,6 +816,46 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 	if (!chainlinks[neighbor]) {
 	  bulk_score += 4;
 	  mark_string(neighbor, chainlinks, 1);
+	  /* In a position like this
+	   *
+	   * |OOO
+	   * |X.O
+	   * |OXO
+	   * |.OO
+	   * |.O
+	   * |OO
+	   *
+	   * it would make sense to treat this as a single eyespace
+	   * but the stone in atari on the edge splits it up in two
+	   * separate eyespaces which are evaluated as 2222 and 1111
+	   * respectively. Since they together in fact are 1122 this
+	   * is way off. The best solution would be to to merge the
+	   * eyespaces but since support for evaluating such eyespaces
+	   * is missing we try to workaround it by setting pessimistic
+	   * min to zero for both detected eyespaces.
+	   *
+	   * The code below does the detection of such stones called
+	   * inset. Modification of pessimistic min is done later in
+	   * the function.
+	   */
+	  if (countlib(neighbor) == 1
+	      && attack(neighbor, NULL) != 0) {
+	    int is_inset = 1;
+	    int splits_eyespace = 0;
+	    int m;
+
+	    for (m = 0; m < 4; m++) {
+	      if (ON_BOARD(neighbor + delta[m])) {
+		if (eye[neighbor + delta[m]].color == eye[pos].color) {
+		  if (eye[neighbor + delta[m]].origin != pos)
+		    splits_eyespace = 1;
+		}
+		else
+		  is_inset = 0;
+	      }
+	    }
+	    contains_inset |= (is_inset & splits_eyespace);
+	  }
 	}
       }
       else if (!ON_BOARD(neighbor))
@@ -876,6 +917,11 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   if (*pessimistic_min < 1 && interior_stones >= 2) {
     *pessimistic_min = 1;
     DEBUG(DEBUG_EYES, "  pessimistic min revised to 1 (interior stones)\n");
+  }
+
+  if (contains_inset) {
+    *pessimistic_min = 0;
+    DEBUG(DEBUG_EYES, "  pessimistic min revised to 0 (contains inset)\n");
   }
 
   if (attack_point
