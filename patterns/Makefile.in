@@ -200,7 +200,7 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp uncompress_fuseki.dsp
+DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp uncompress_fuseki.dsp mkmcpat.dsp
 DTR = aa_attackpats.dtr owl_attackpats.dtr owl_defendpats.dtr \
        owl_vital_apats.dtr
 
