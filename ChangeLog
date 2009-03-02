@@ -4,6 +4,7 @@
 
 3.8rc1 released February 6, 2009
 
+- revisions to montecarlo.texi
 - revised .dsp files
 - Lee Fisher added to AUTHORS
 - WINDOWS doc and install.texi revised per Lee Fisher's changes

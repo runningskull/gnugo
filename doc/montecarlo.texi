@@ -2,8 +2,8 @@
 @cindex UCT algorithm
 In Monte Carlo Go the engine plays random games to the
 end, generating moves from a pattern database within
-the context of the algorithm UCT (upper bound
-confidence in trees).  This algorithm allowed the
+the context of the algorithm UCT (upper confidence
+bounds applied to trees).  This algorithm allowed the
 program MoGo (@uref{http://www.lri.fr/~gelly/MoGo.htm}, 
 to become the first computer program to defeat a
 professional while taking a 9 stone handicap
@@ -33,8 +33,8 @@ using the option @option{--mc-patterns <name>}, where
 @option{<name>} is one of
 
 @itemize
-@item @command{mc_mogo_classic}
 @item @command{mc_montegnu_classic}
+@item @command{mc_mogo_classic}
 @item @command{mc_uniform}
 @end itemize
 
@@ -187,10 +187,10 @@ The move would not be a self-atari for the opponent.
 The move would be a self-atari for the opponent.
 
 @item xsuicide
-he move would be suicide for the opponent
+The move would be suicide for the opponent
 
 @item xnosuicide
-move would not be suicide for the opponent.
+The move would not be suicide for the opponent.
 
 @item ocap0
 The move captures zero stones.
@@ -208,7 +208,7 @@ The move captures three or more stones.
 The move captures one or more stones.
 
 @item ocap1-
-The move captures at most one stones.
+The move captures at most one stone.
 
 @item ocap2+
 The move captures two or more stones.
@@ -232,7 +232,7 @@ An opponent move would capture three or more stones.
 An opponent move would capture one or more stones.
 
 @item xcap1-
-An opponent move would capture at most one stones.
+An opponent move would capture at most one stone.
 
 @item xcap2+
 An opponent move would capture two or more stones.
@@ -264,4 +264,3 @@ Nobody really knows how to tune the random playouts to get as strong
 engine as possible. Please play with this and report any interesting
 findings, especially if you're able to make it substantially stronger
 than the @file{montegnu_classic} patterns.
-
