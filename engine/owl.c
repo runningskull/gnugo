@@ -2,8 +2,8 @@
  * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *
  * http://www.gnu.org/software/gnugo/ for more information.          *
  *                                                                   *
- * Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 and 2007 *
- * by the Free Software Foundation.                                  *
+ * Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,   *
+ * 2008 and 2009 by the Free Software Foundation.                    *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *
  * modify it under the terms of the GNU General Public License as    *
@@ -5148,7 +5148,7 @@ owl_test_cuts(signed char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
       for (k = 0; k < num_cuts; k++)
 	if (component[k] == c_id) {
 	  mark_string(cuts[k], this_goal, 1);
-	  mark_string(cuts[k], component2, c_id);
+	  mark_string(cuts[k], component2, (signed char) c_id);
 	}
       init_connection_data(color, this_goal, NO_MOVE, FP(3.01),
 	  		   conn_data + c_id, 1);
@@ -5173,7 +5173,7 @@ owl_test_cuts(signed char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
       }
       /* FIXME: What to do if no close component found? */
       if (closest_component != -1) {
-	mark_string(pos, component2, closest_component);
+	mark_string(pos, component2, (signed char) closest_component);
 	component_size[closest_component] += countstones(pos);
       }
     }

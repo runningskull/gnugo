@@ -9,14 +9,14 @@
 * GNU Go: (gnugo).          The GNU Go program
 @end direntry
 
-@set EDITION 3.6
-@set VERSION 3.6
+@set EDITION 3.8
+@set VERSION 3.8
 
 @finalout
 @titlepage
 @subtitle Documentation for the GNU Go Project
 @subtitle Edition @value{EDITION}
-@subtitle July, 2003
+@subtitle February, 2009
 @vskip 0pt plus 1filll
 @image{logo-36}
 @vskip 0pt plus 1filll
@@ -26,10 +26,10 @@
 
 @sp 1
 @page
-@title{GNU Go 3.6}
+@title{GNU Go 3.8}
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
-and 2007 by the Free Software Foundation, Inc.
+Copyright @copyright{} 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 and 2009 @uref{http://www.fsf.org,Free Software Foundation}, Inc.
 @sp 2
 
 This is Edition @value{EDITION} of @cite{The GNU Go Project documentation}, @*
@@ -45,12 +45,12 @@ Tel: 617-542-5942 @*
 Permission is granted to make and distribute verbatim
 or modified copies of this manual is given provided
 that the terms of the GNU Free Documentation License
-(@pxref{GFDL}) are respected.
+(@pxref{GFDL}, version 1.3 or any later version) are respected.
 
 Permission is granted to make and distribute verbatim
 or modified copies of the program GNU Go is given provided
-the terms of the GNU General Public License (@pxref{GPL})
-are respected.
+the terms of the GNU General Public License (@pxref{GPL},
+version 3 or any later version) are respected.
 
 @end titlepage
 
@@ -64,18 +64,18 @@ are respected.
 This manual documents @code{GNU Go}, a Go program and its sources.
 This is Edition @value{EDITION} of the @cite{GNU Go Program Documentation}
 
-Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 and 2007
-The Free Software Foundation, Inc.
+Copyright @copyright{} 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 and 2009 @uref{http://www.fsf.org,Free Software Foundation}, Inc.
      
 Permission is granted to make and distribute verbatim
 or modified copies of this manual is given provided
 that the terms of the GNU Free Documentation License
-(@pxref{GFDL}) are respected.
+(@pxref{GFDL}, version 1.3 or any later version) are respected.
 
 Permission is granted to make and distribute verbatim
 or modified copies of the program GNU Go is given provided
-the terms of the GNU General Public License (@pxref{GPL})
-are respected.
+the terms of the GNU General Public License (@pxref{GPL},
+version 3 or any later version) are respected.
 
 @end ifinfo
 
@@ -95,7 +95,7 @@ An introduction to the GNU Go engine
 * Tactical Reading::             Tactical and Connection Reading
 * Pattern Based Reading::        Pattern Based Reading: Owl and Combinations
 * Influence::                    Influence Function
-* Alternative Moyo::             Another approach to Moyos : Bouzy's algorithm
+* Monte Carlo Go::               Monte Carlo GNU Go
 
 Infrastructure and Interfaces
 * Libboard::                     The basic go board library.
@@ -181,10 +181,9 @@ Indices
 
 @include influence.texi
 
-@node Alternative Moyo
-@chapter Another approach to Moyos : Bouzy's 5/21 algorithm
-
-@include moyo.texi
+@node Monte Carlo Go
+@chapter Monte Carlo Go
+@include montecarlo.texi
 
 @node Libboard
 @chapter The Board Library

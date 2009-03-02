@@ -2,8 +2,8 @@
  * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *
  * http://www.gnu.org/software/gnugo/ for more information.          *
  *                                                                   *
- * Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 and 2007 *
- * by the Free Software Foundation.                                  *
+ * Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,   *
+ * 2008 and 2009 by the Free Software Foundation.                    *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *
  * modify it under the terms of the GNU General Public License as    *
@@ -1607,8 +1607,8 @@ Informative Output:\n\
 "
 
 #define COPYRIGHT \
-"Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 and 2007\n\
-the Free Software Foundation, Inc.\n\
+"Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007\n\
+2008 and 2009 by the Free Software Foundation, Inc.\n\
 See http://www.gnu.org/software/gnugo/ or contact\n\
 gnugo@gnu.org for information about GNU Go. GNU Go comes with NO WARRANTY to\n\
 the extent permitted by law. This program is free software; you can\n\
@@ -1792,7 +1792,7 @@ socket_connect_to(const char *host_name, unsigned int port,
   }
 
   address.sin_family = AF_INET;
-  address.sin_port = htons(port);
+  address.sin_port = htons((unsigned short) port);
 
   for (address_pointer = host_data->h_addr_list; *address_pointer;
        address_pointer++) {
@@ -1859,7 +1859,7 @@ socket_listen_at(const char *host_name, unsigned int port,
   }
 
   address.sin_family = AF_INET;
-  address.sin_port = htons(port);
+  address.sin_port = htons((unsigned short) port);
 
   if (verbose) {
     if (host_name) {

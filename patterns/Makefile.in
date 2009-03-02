@@ -80,7 +80,7 @@ joseki_DEPENDENCIES = ../engine/libboard.a ../sgf/libsgf.a \
 am_mkeyes_OBJECTS = mkeyes.$(OBJEXT)
 mkeyes_OBJECTS = $(am_mkeyes_OBJECTS)
 mkeyes_DEPENDENCIES = ../utils/libutils.a
-am_mkmcpat_OBJECTS = mkmcpat.$(OBJEXT)
+am_mkmcpat_OBJECTS = mkmcpat.$(OBJEXT) globals.$(OBJEXT)
 mkmcpat_OBJECTS = $(am_mkmcpat_OBJECTS)
 mkmcpat_DEPENDENCIES = ../engine/libengine.a ../sgf/libsgf.a \
 	../utils/libutils.a
@@ -200,7 +200,7 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
+DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp uncompress_fuseki.dsp mkmcpat.dsp
 DTR = aa_attackpats.dtr owl_attackpats.dtr owl_defendpats.dtr \
        owl_vital_apats.dtr
 
@@ -243,7 +243,8 @@ EXTRA_DIST = $(DSP)\
         takamoku.db\
 	fuseki13.dbz\
 	fuseki19.dbz\
-	fuseki9.dbz
+	fuseki9.dbz\
+	CMakeLists.txt
 
 mkpat_SOURCES = mkpat.c transform.c dfa.c
 mkpat_LDADD = ../utils/libutils.a
@@ -254,7 +255,7 @@ joseki_LDADD = ../engine/libboard.a ../sgf/libsgf.a ../utils/libutils.a
 joseki_AM_CPPFLAGS = $(GNU_GO_WARNINGS) -I$(top_srcdir)/sgf
 mkeyes_SOURCES = mkeyes.c
 mkeyes_LDADD = ../utils/libutils.a
-mkmcpat_SOURCES = mkmcpat.c
+mkmcpat_SOURCES = mkmcpat.c ../engine/globals.c
 mkmcpat_LDADD = ../engine/libengine.a ../sgf/libsgf.a ../utils/libutils.a
 mkmcpat_AM_CPPFLAGS = $(GNU_GO_WARNINGS)
 extract_fuseki_SOURCES = extract_fuseki.c
@@ -393,6 +394,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fuseki19.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fuseki9.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fusekipat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globals.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/handipat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helpers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/influence.Po@am__quote@
@@ -423,6 +425,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+globals.o: ../engine/globals.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT globals.o -MD -MP -MF "$(DEPDIR)/globals.Tpo" -c -o globals.o `test -f '../engine/globals.c' || echo '$(srcdir)/'`../engine/globals.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/globals.Tpo" "$(DEPDIR)/globals.Po"; else rm -f "$(DEPDIR)/globals.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../engine/globals.c' object='globals.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o globals.o `test -f '../engine/globals.c' || echo '$(srcdir)/'`../engine/globals.c
+
+globals.obj: ../engine/globals.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT globals.obj -MD -MP -MF "$(DEPDIR)/globals.Tpo" -c -o globals.obj `if test -f '../engine/globals.c'; then $(CYGPATH_W) '../engine/globals.c'; else $(CYGPATH_W) '$(srcdir)/../engine/globals.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/globals.Tpo" "$(DEPDIR)/globals.Po"; else rm -f "$(DEPDIR)/globals.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../engine/globals.c' object='globals.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o globals.obj `if test -f '../engine/globals.c'; then $(CYGPATH_W) '../engine/globals.c'; else $(CYGPATH_W) '$(srcdir)/../engine/globals.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

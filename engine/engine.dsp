@@ -301,6 +301,10 @@ SOURCE=.\matchpat.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\montecarlo.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\move_reasons.c
 
 !IF  "$(CFG)" == "engine - Win32 Release"

@@ -44,7 +44,7 @@ BEGIN {
       # set the version for version checking
       $VERSION     = 0.01;
       # if using RCS/CVS, this may be preferred (???-tm)
-      $VERSION = do { my @r = (q$Revision: 1.10 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+      $VERSION = do { my @r = (q$Revision: 1.1.1.1 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
       @ISA         = qw(Exporter);
       @EXPORT      = qw(&createPngFile &parseFileName);
       %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],

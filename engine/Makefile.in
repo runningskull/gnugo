@@ -172,7 +172,7 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-EXTRA_DIST = engine.dsp board.dsp
+EXTRA_DIST = engine.dsp board.dsp CMakeLists.txt
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *~

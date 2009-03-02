@@ -150,6 +150,10 @@ SOURCE=.\josekidb.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\mcpat.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\owl_attackpat.c
 # End Source File
 # Begin Source File
@@ -202,11 +206,23 @@ SOURCE=.\patterns.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\gogo.db
+# End Source File
+# Begin Source File
+
 SOURCE=.\hoshi_other.db
 # End Source File
 # Begin Source File
 
 SOURCE=.\komoku.db
+# End Source File
+# Begin Source File
+
+SOURCE=.\mc_mogo_classic.db
+# End Source File
+# Begin Source File
+
+SOURCE=.\mc_montegnu_classic.db
 # End Source File
 # Begin Source File
 
@@ -223,10 +239,6 @@ SOURCE=.\sansan.db
 # Begin Source File
 
 SOURCE=.\takamoku.db
-# End Source File
-# Begin Source File
-
-SOURCE=.\gogo.db
 # End Source File
 # End Group
 # Begin Source File
@@ -665,6 +677,35 @@ InputPath=.\influence.db
 # End Source File
 # Begin Source File
 
+SOURCE=.\mc_uniform.db
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\mc_uniform.db
+
+"mcpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkmcpat mc_mogo_classic.db mc_montegnu_classic.db mc_uniform.db >mcpat.c
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\mc_uniform.db
+
+"mcpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkmcpat mc_mogo_classic.db mc_montegnu_classic.db mc_uniform.db >mcpat.c
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\owl_attackpats.db
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
@@ -791,6 +832,37 @@ InputPath=.\patterns.db
 # Begin Group "sgf files"
 
 # PROP Default_Filter "sgf"
+# Begin Source File
+
+SOURCE=.\gogo.sgf
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+USERDEP__GOGO_="$(IntDir)\joseki.exe"	
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\gogo.sgf
+
+"gogo.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\joseki JG gogo.sgf >gogo.db
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+USERDEP__GOGO_="$(IntDir)\joseki.exe"	
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\gogo.sgf
+
+"gogo.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\joseki JG gogo.sgf >gogo.db
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # Begin Source File
 
 SOURCE=.\hoshi_keima.sgf
@@ -975,37 +1047,6 @@ InputPath=.\takamoku.sgf
 
 "takamoku.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\joseki  JT takamoku.sgf > takamoku.db
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\gogo.sgf
-
-!IF  "$(CFG)" == "patterns - Win32 Release"
-
-USERDEP__KOMOK="$(IntDir)\joseki.exe"	
-# Begin Custom Build
-IntDir=.\Release
-InputPath=.\gogo.sgf
-
-"gogo.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\joseki JG gogo.sgf >gogo.db
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
-
-USERDEP__KOMOK="$(IntDir)\joseki.exe"	
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=.\gogo.sgf
-
-"gogo.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\joseki JG gogo.sgf >gogo.db
 
 # End Custom Build
 

@@ -1,0 +1,9 @@
+If you have Mac OS X you can build GNU Go using Apple's compiler, which
+is derived from GCC. You will need Xcode.
+
+   One issue is that the configure test for socket support is too
+conservative. On OS/X, the configure test fails, but actually socket
+support exists. So if you want to be able to connect to the engine
+through tcp/ip (using gtp) you may `configure --enable-socket-support'.
+There will be an error message but you may build the engine and socket
+support should work.

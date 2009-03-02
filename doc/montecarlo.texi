@@ -1,0 +1,266 @@
+@cindex Monte Carlo Go
+@cindex UCT algorithm
+In Monte Carlo Go the engine plays random games to the
+end, generating moves from a pattern database within
+the context of the algorithm UCT (upper confidence
+bounds applied to trees).  This algorithm allowed the
+program MoGo (@uref{http://www.lri.fr/~gelly/MoGo.htm}, 
+to become the first computer program to defeat a
+professional while taking a 9 stone handicap
+(@uref{http://senseis.xmp.net/?MoGo}).
+
+GNU Go 3.8 can play 9x9 Go with the option
+@option{--monte-carlo} using the UCT algorithm.
+For command line options, see @xref{Invoking GNU Go}.
+
+During reading, the engine makes incremental updates
+of local 3x3 neighborhood, suicide status, self-atari
+status, and number of stones captured, for each move.
+
+GNU Go's simulations (Monte Carlo games) are pattern generated.
+The random playout move generation is distributed
+strictly proportional to move values computed by table
+lookup from a local context consisting of 3x3
+neighborhood, opponent suicide status, own and
+opponent self-atari status, number of stones captured
+by own and opponent move, and closeness to the
+previous move. Let's call this local context simply "a
+pattern" and the table "pattern values" or simply
+"patterns".
+
+There are three built-in databases that you can select
+using the option @option{--mc-patterns <name>}, where
+@option{<name>} is one of
+
+@itemize
+@item @command{mc_montegnu_classic}
+@item @command{mc_mogo_classic}
+@item @command{mc_uniform}
+@end itemize
+
+The first of these is an approximation of the previous random move
+generation algorithm. The @command{mogo_classic} pattern values is an
+approximation of the simulation policy used by early versions of MoGo,
+as published in the report @uref{http://hal.inria.fr/inria-00117266,
+odification of UCT with Patterns in Monte-Carlo Go}
+RR-6062, by Sylvain Gelly, Yizao Wang, Rémi Munos, and
+Olivier Teytaud. The uniform pattern values is the so
+called "light" playout which chooses uniformly between
+all legal moves except single point proper eyes.
+
+If you're not satisfied with these you can also tune your own
+pattern values with a pattern database file and load it at runtime
+with @option{--mc-load-patterns <name>} adding your own
+pattern database.
+
+Let's start with the uniform pattern values. Those are defined by the
+file @file{patterns/mc_uniform.db}, which looks like this:
+
+@example
+
+oOo
+O*O
+oO?
+
+:0
+
+oOo
+O*O
+---
+
+:0
+
+|Oo
+|*O
++--
+
+:0
+@end example
+
+Patterns are always exactly 3x3 in size with the move at the center
+point. The symbols are the usual for GNU Go pattern databases:
+
+@example
+* move
+O own stone (i.e. the same color as the color to move)
+o own stone or empty
+X opponent stone
+x opponent stone or empty
+? own stone, opponent stone, or empty
+| vertical edge
+- horizontal edge
++ corner
+@end example
+
+There's also a new symbol:
+
+@example
+% own stone, opponent stone, empty, or edge
+@end example
+
+After the pattern comes a line starting with a colon. In all these
+patterns it says that the pattern has a move value of 0, i.e. must not
+be played. Unmatched patterns have a default value of 1. When all move
+values are zero for both players, the playout will stop. Including the
+three patterns above is important because otherwise the playouts would
+be likely to go on indefinitely, or as it actually happens be
+terminated at a hard-coded limit of 600 moves. Also place these
+patterns at the top of the database because when multiple patterns
+match, the first one is used, regardless of the values.
+
+When using only these patterns you will probably notice that it plays
+rather heavy, trying hard to be solidly connected. This is because
+uniform playouts are badly biased with a high probability of non-solid
+connections being cut apart. To counter this you could try a pattern
+like
+
+@example
+?X?
+O*O
+x.?
+
+:20,near
+@end example
+
+to increase the probability that the one-point jump is reinforced when
+threatened. Here we added the property "near", which means that the
+pattern only applies if the previous move was played "near" this move.
+Primarily "near" means within the surrounding 3x3 neighborhood but it
+also includes certain cases of liberties of low-liberty strings
+adjacent to the previous move, e.g. the move to extend out of an atari
+created by the previous move. You have to read the source to find out
+the exact rules for nearness.
+
+We could also be even more specific and say
+
+@example
+?X?
+O*O
+x.?
+
+:20,near,osafe,xsafe
+@end example
+
+to exclude the cases where this move is a self atari (osafe) or would
+be a self-atari for the opponent (xsafe).
+
+It may also be interesting to see the effect of capturing stones. A
+catch-all pattern for captures would be
+
+@example
+?X%
+?*%
+%%%
+
+:10,ocap1,osafe
+:20,ocap2
+:30,ocap3
+@end example
+
+where we have used multiple colon lines to specify different move
+values depending on the number of captured stones; value 10 for a
+single captured stone, value 20 for two captured stones, and value 30
+for three or more captured stones. Here we also excluded self-atari
+moves in the case of 1 captured stone in order to avoid getting stuck
+in triple-ko in the playouts (there's no superko detection in the
+playouts).
+
+The full set of pattern properties is as follows:
+
+@ftable @code
+@item near
+The move is "near" the previous move.
+
+@item far
+The move is not "near" the previous move.
+
+@item osafe
+The move is not a self-atari.
+
+@item ounsafe
+The move is a self-atari.
+
+@item xsafe
+The move would not be a self-atari for the opponent.
+
+@item xunsafe
+The move would be a self-atari for the opponent.
+
+@item xsuicide
+The move would be suicide for the opponent
+
+@item xnosuicide
+The move would not be suicide for the opponent.
+
+@item ocap0
+The move captures zero stones.
+
+@item ocap1
+The move captures one stone.
+
+@item ocap2
+The move captures two stones.
+
+@item ocap3
+The move captures three or more stones.
+
+@item ocap1+
+The move captures one or more stones.
+
+@item ocap1-
+The move captures at most one stone.
+
+@item ocap2+
+The move captures two or more stones.
+
+@item ocap2-
+The move captures at most two stones.
+
+@item xcap0
+An opponent move would capture zero stones.
+
+@item xcap1
+An opponent move would capture one stone.
+
+@item xcap2
+An opponent move would capture two stones.
+
+@item xcap3
+An opponent move would capture three or more stones.
+
+@item xcap1+
+An opponent move would capture one or more stones.
+
+@item xcap1-
+An opponent move would capture at most one stone.
+
+@item xcap2+
+An opponent move would capture two or more stones.
+
+@item xcap2-
+An opponent move would capture at most two stones.
+@end ftable
+
+These can be combined arbitrarily but all must be satisfied for the
+pattern to take effect. If contradictory properties are combined, the
+pattern will never match.
+
+@subsection Final Remarks
+
+@itemize
+@item  Move values are unsigned 32-bit integers. To avoid overflow in
+computations it is highly recommended to keep the values below
+10000000 or so.
+@item There is no speed penalty for having lots of patterns in the
+database. The average time per move is approximately constant
+(slightly dependent on how often stones are captured or become low
+on liberties) and the time per game mostly depends on the average
+game length.
+@item For more complex pattern databases, see
+@file{patterns/mc_montegnu_classic.db} and @file{patterns/mc_mogo_classic.db}.
+@end itemize
+
+Nobody really knows how to tune the random playouts to get as strong
+engine as possible. Please play with this and report any interesting
+findings, especially if you're able to make it substantially stronger
+than the @file{montegnu_classic} patterns.

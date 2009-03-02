@@ -1,7 +1,7 @@
 noinst_PROGRAMS = mkpat joseki mkeyes uncompress_fuseki mkmcpat
 EXTRA_PROGRAMS = extract_fuseki compress_fuseki
 
-DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
+DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp uncompress_fuseki.dsp mkmcpat.dsp
 DTR = aa_attackpats.dtr owl_attackpats.dtr owl_defendpats.dtr \
        owl_vital_apats.dtr
 
@@ -44,7 +44,8 @@ EXTRA_DIST = $(DSP)\
         takamoku.db\
 	fuseki13.dbz\
 	fuseki19.dbz\
-	fuseki9.dbz
+	fuseki9.dbz\
+	CMakeLists.txt
 
 mkpat_SOURCES  = mkpat.c transform.c dfa.c
 
@@ -61,7 +62,7 @@ joseki_LDADD = ../engine/libboard.a ../sgf/libsgf.a ../utils/libutils.a
 joseki_AM_CPPFLAGS = $(GNU_GO_WARNINGS) -I$(top_srcdir)/sgf
 mkeyes_SOURCES = mkeyes.c
 mkeyes_LDADD = ../utils/libutils.a
-mkmcpat_SOURCES  = mkmcpat.c
+mkmcpat_SOURCES  = mkmcpat.c ../engine/globals.c
 mkmcpat_LDADD = ../engine/libengine.a ../sgf/libsgf.a ../utils/libutils.a
 mkmcpat_AM_CPPFLAGS = $(GNU_GO_WARNINGS)
 extract_fuseki_SOURCES  = extract_fuseki.c

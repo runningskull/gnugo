@@ -4,7 +4,7 @@ TST = 13x13b.tst 13x13.tst arb.tst arend2.tst arend.tst \
       break_in.tst buzco.tst capture.tst century2002.tst \
       connection.tst connect.tst \
       dniwog.tst ego.tst \
-      endgame.tst filllib.tst global.tst \
+      endgame.tst endgame1.tst filllib.tst global.tst \
       golife.tst gunnar.tst handtalk.tst heikki.tst \
       joseki.tst lazarus.tst ld_owl.tst \
       manyfaces1.tst manyfaces.tst nando.tst neurogo.tst \
@@ -27,7 +27,7 @@ noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
 
 EXTRA_DIST = golois games $(TST) $(noinst_SCRIPTS) regress.awk \
              BREAKAGE regress.pl regress.plx regress.pike breakage2tst.py \
-	     view.pike benchmark/*gtp
+	     view.pike benchmark/*gtp regress.cmd
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *.orig *~
