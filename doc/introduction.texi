@@ -54,11 +54,12 @@ different aspects of GNU Go's internals.
 @node    Copyright
 @section Copyrights
 
-Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 and
-2008 by the Free Software Foundation except as noted below.
+Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
+and 2008 by the Free Software Foundation except as noted below.
 
-All files are under the GNU General Public License (@pxref{GPL}),
-except @file{gmp.c}, @file{gmp.h}, @file{gtp.c}, and @file{gtp.h}.
+All source files are distributed under the GNU General Public License
+(@pxref{GPL}, version 3 or any later version), except @file{gmp.c},
+@file{gmp.h}, @file{gtp.c}, and @file{gtp.h}.
 
 The files @file{gtp.c} and @file{gtp.h} are copyright the Free Software
 Foundation. In the interests of promoting the Go Text Protocol these

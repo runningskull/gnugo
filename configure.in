@@ -7,7 +7,7 @@ dnl *****************************************************************
 
 dnl this is to determine if the config script is running in the proper place
 dnl just give it one file relative to where it should be
-AC_INIT([gnugo], [3.7.12])
+AC_INIT([gnugo], [3.7.13])
 AC_CONFIG_SRCDIR([engine/dragon.c])
 
 AM_CONFIG_HEADER(config.h)

@@ -1607,8 +1607,8 @@ Informative Output:\n\
 "
 
 #define COPYRIGHT \
-"Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 and 2007\n\
-the Free Software Foundation, Inc.\n\
+"Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007\n\
+and 2008 the Free Software Foundation, Inc.\n\
 See http://www.gnu.org/software/gnugo/ or contact\n\
 gnugo@gnu.org for information about GNU Go. GNU Go comes with NO WARRANTY to\n\
 the extent permitted by law. This program is free software; you can\n\

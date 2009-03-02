@@ -2,6 +2,15 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.7.13 released December 23, 2008
+
+- restore cmake files that were missing from the 3.7.12 tarball
+- bring copyright date to 2008
+- doc revision
+- be forgiving with replacement moves conflicting with unconditional analysis
+- accept --enable-socket-support even if configure test fails
+- add globals.c to mkmcpat for OS/X build
+
 3.7.12 released April 7, 2008
 
 - cmake configuration files for generating MSVC project files
@@ -7916,8 +7925,8 @@ src/Makefile.am
 This is GNU Go, a Go program. Contact gnugo@gnu.org, or see    
 http://www.gnu.org/software/gnugo/ for more information.       
                                                                
-Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 and 2007
-by the Free Software Foundation.                               
+Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
+and 2008 by the Free Software Foundation.
                                                                
 This program is free software; you can redistribute it and/or  
 modify it under the terms of the GNU General Public License as 
