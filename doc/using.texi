@@ -14,16 +14,19 @@
 
 @section Getting Documentation
 
-You can obtain a printed copy of the manual by running
-@command{make gnugo.ps} in the @file{doc/}directory, then printing the
-resulting postscript file. The manual contains a great deal of information
-about the algorithms of GNU Go.
+You can obtain a printed copy of the manual by running @command{make
+gnugo.pdf} in the @file{doc/}directory, then printing the resulting file. The
+manual contains a great deal of information about the algorithms of GNU Go.
 
 On platforms supporting info documentation, you can usually
 install the manual by executing `make install' (running as
-root) from the @file{doc/} directory. The info documentation can
-be read conveniently from within Emacs by executing the
-command @command{Control-h i}.
+root) from the @file{doc/} directory. This will create a file
+called @file{gnugo.info} (and a few others) and copy them into
+a system directory such as @file{/usr/local/share/info}. You
+may then add them to your info directory tree with the command
+@command{install-info --info-file=[path to gnugo.info] --info-dir=[path to dir]}.
+The info documentation can be read conveniently from within Emacs by executing
+the command @command{Control-h i}.
 
 Documentation in @file{doc/} consists of a man page @file{gnugo.6}, the 
 info files @file{gnugo.info}, @file{gnugo.info-1}, ... and the 
@@ -92,8 +95,6 @@ CGoban.
 @section Other Clients
 @cindex jago
 @cindex quarry
-@cindex glGo
-@cindex gGo
 @cindex qGo
 
 In addition to CGoban (@pxref{CGoban}) there are a number of
@@ -103,13 +104,15 @@ list is part of a larger list of free Go programs that is maintained
 at @url{http://www.gnu.org/software/gnugo/free_go_software.html}.
 
 @itemize @bullet
+@item Quarry (@url{http://home.gna.org/quarry/}) is a GPL'd
+client that supports GTP.  Works under GNU/Linux and requires
+GTK+ 2.x and librsvg 2.5.  Supports GNU Go as well as other
+engines.  Can play not only Go, but also a few other board
+games.
 @item qGo (@url{http://sourceforge.net/projects/qgo/}) is a
 full featured Client for playing on the servers, SGF viewing/editing,
 and GNU Go client written in C++ for GNU/Linux, Windows and Mac OS X.
 Can play One Color Go. Licensed GPL and QPL.
-@item glGo (@url{http://ggo.sourceforge.net/}) is a C++ client
-by Peter Strempel, capable of playing against GNU Go or
-on IGS. Source code is available under the GPL.
 @item ccGo (@url{http://ccdw.org/~cjj/prog/ccgo/}) is a GPL'd client
 written in C++ capable of playing with GNU Go, or on IGS.
 @item RubyGo (@url{http://rubygo.rubyforge.org/}) is a GPL'd
@@ -131,33 +134,16 @@ is a Mac interface to GNU Go 2.6.
 @item Gogui (@url{http://sourceforge.net/projects/gogui/}) from
 Markus Enzenberger is a Java workbench that allows you to play
 with a gtp (@url{http://www.lysator.liu.se/~gunnar/gtp})
-engine such as GNU Go. Source code is in the
-CVS (@url{http://sourceforge.net/cvs/?group_id=59117}).
-Licence is GPL. Gogui does not yet support gmp or play on
-servers but is potentially very useful for programmers
+engine such as GNU Go. Licence is GPL. Gogui does not 
+support gmp or play on servers but is potentially very useful for programmers
 working on GNU Go or other engines.
-@item gGo is a Java program which was originally known as qGo for Java.
-Although the public source of the program is no longer maintained, it is
-still useful may be found at sourceforge
-here (@url{http://prdownloads.sourceforge.net/ggo/}) or here
-(@url{ftp://download.sourceforge.net/pub/sourceforge/g/gg/ggo/}).
-GGo can function as a client or sgf editor and supports the GTP,
-so you can play on the servers or with GNU Go. Licence is GPL.
-@item Quarry (@url{http://home.gna.org/quarry/}) is a GPL'd
-client that supports GTP.  Works under GNU/Linux and requires
-GTK+ 2.x and librsvg 2.5.  Supports GNU Go as well as other
-engines.  Can play not only Go, but also a few other board
-games.
-@item Goben (@url{http://www.waz.easynet.co.uk/software.html}),
-a GTP capable front end for GNU Go using GTK+ libraries from
-Wayne Myers. Licensed GPL.
 @end itemize
 
 @node Ascii
 @section Ascii Interface
 @cindex ascii interface
 
-Even if you do not have CGoban installed you can play with GNU Go
+Even if you do not have any client program, you can play with GNU Go
 using its default Ascii interface. Simply type @command{gnugo}
 at the command line, and GNU Go will draw a board. Typing
 @command{help} will give a list of options. At the end of the
@@ -172,169 +158,48 @@ the command @command{gnugo -l @var{filename} --mode ascii}. Reloading
 games is not supported when playing with CGoban. However you can
 use CGoban to save a file, then reload it in ascii mode.
 
+You may play games with a time limit against GNU Go in
+ascii mode. For this, the Canadian time control system
+is used. (See @uref{http://en.wikipedia.org/wiki/Byoyomi}
+and @uref{http://senseis.xmp.net/?CanadianByoyomi}.)
+That is, you have a main time to be followed by byo-yomi
+periods. After the main time is exhausted you have a certain
+number of moves to be made in a certain number of seconds.
+(@pxref{Invoking GNU Go})
+
 @node Emacs
 @section GNU Go mode in Emacs
 @cindex emacs mode
 
 You can run GNU Go from Emacs. This has the advantage 
 that you place the stones using the cursor arrow keys
-or with the mouse, and (provided you have Emacs version 21
-or later) you can have a nice graphical display of the
-board within emacs.
+or with the mouse, and you can have a nice graphical display of the board
+within emacs.
 
-Load the file @file{interface/gnugo.el} and (if you want
-the graphical board) @file{interface/gnugo-xpms.el}. You
-may do this using the Emacs @command{M-x load-file} command.
+You will need the file @file{interface/gnugo.el}. There is
+a version of this distributed with GNU Go but it only
+works with Emacs 21. Most Emacsen are Emacs 22 however.
+Therefore you should get the latest version of
+gnugo.el by Thien-Thi Nguyen, which you can find at
+@uref{http://www.gnuvola.org/software/j/gnugo/} or
+@uref{http://www.emacswiki.org/emacs/gnugo.el}.
 
-@strong{In detail:} Emacs uses Control and Meta keys. The
-``Meta'' key is the Alt key on the PC keyboard. The Control
-and Meta keys are denoted @command{C-} and
-@command{M-}. Thus the @command{M-x} is obtained by holding
-the Alt key and typing @samp{x}. In Emacs, this prompts you
-for another command. You can then type @command{load-file},
-hit the Enter key, then type the path to @file{gnugo.el} and
-hit Enter again. Then repeat the process for
-@file{gnugo-xpms.el}.
+You will also need some xpm files for the graphical
+display. You can either use those distributed by
+Thien-Thi Nguyen (at the first URL above) or those
+distributed with GNU Go, either the file
+@file{interface/gnugo-xpms.el} or (for high resolution
+displays) @file{interface/gnugo-big-xpms.el}.
 
-To have the files @file{gnugo.el} and @file{gnugo-xpms.el}
-loaded automatically each time you run emacs, copy the files
-into your @file{site-lisp} directory (often
-@file{/usr/share/emacs/site-lisp}) and add lines
+Load the file @file{interface/gnugo.el} and 
+@file{interface/gnugo-xpms.el}. You may do this using the 
+Emacs @command{M-x load-file} command.
 
-@example
-(autoload 'gnugo "gnugo" "GNU Go" t)
-(autoload 'gnugo-xpms "gnugo-xpms" "GNU Go" t)
-@end example
-
-@noindent
-in your @file{.emacs} file. 
-
-The @file{.xpm} bitmaps for the default size Go stones are 30 
-pixels. For a larger board, alternative 36 pixel stones
-may be found in @file{gnugo-big-xpms.el}.
-
-You may start GNU Go by @command{M-x gnugo}. You will be
-prompted for command line options (@pxref{Invoking GNU
-Go}). Using these, you may set the handicap, board size,
-color and komi. For example if you want to play white and
-give a nine-stone handicap, use the options
-@option{--handicap 9 --color white}.
-
-By default, Emacs gives you a graphical Go board. You can
-toggle an alternative ascii board (for example, if you
-want to paste a diagram into an email) with
-@command{gnugo-toggle-image-display}, which is bound to
-@samp{i}. If you want a grid, @samp{g} toggles the grid
-display on or off. The grid is not displayed by
-default.
-
-You play a move either by moving to the location with the
-arrow keys, then hitting the SPACE key, or by clicking on
-an empty location with the mouse. You can save or load a game,
-and undo moves.
-
-You can get help at any time by typing @samp{?}. This will
-give a description of the default keybindings. If you want
-to find out what a particular function does, you can use
-`C-h f <function-name>' to get documentation on it. For example,
-after examining the default keybindings with @samp{?} we
-learn that @samp{v} is bound to @code{gnugo-view-regression}.
-To find out more information about this function we type
-`C-h f gnugo-view-regression' to view the help string for
-the function.
-
-You may save the game you are playing as an sgf file
-with @command{gnugo-write-sgf-file}, which is bound to
-@samp{s}. You may also restore a saved game with
-@command{gnugo-read-sgf-file}, bound to @samp{l}.
-When the sgf file is loaded, it is assumed to be your
-move, since typically the game is saved on your move.
-You may resume play by entering a move.
-
-At the end of the game, after both players pass, GNU
-Go will run @command{gnugo-venerate} to render all
-dead stones as ghostly shades. You can then type
-@samp{F} to run @command{gnugo-display-final-score},
-which will tell you the score. (You may get a
-score estimate at any time before the end of the
-game with @command{gnugo-estimate-score}, bound
-to @samp{!}.
-
-You may undo your move with @command{gnugo-undo-two-moves},
-which is bound to @samp{u}. This takes back your move,
-and also the last computer move, so it goes back to
-the position two moves ago. If you undo one or many
-moves, you may redo them with @command{gnugo-redo-two-moves},
-which is bound to @samp{r}.
-
-Although if you are playing a game it is most
-natural to undo or redo two moves at a time, since
-this does not change the color of the player to
-move, you may also undo or redo a single move with
-@command{gnugo-undo} and @command{gnugo-redo},
-bound to @samp{b} and @samp{f}. This is convenient
-for scrolling forward or backward in a game to
-review the moves. Note that if you undo once,
-then play a move (by clicking on the board, or by
-hitting the space or enter key), you have changed
-the color of the player to move. GNU Go will
-begin to generate moves as soon as you play.
-
-You may also use @command{gnugo-jump-to-move}, bound
-to @samp{j} to jump to a particular move in the
-game. You will be prompted for the game move. After
-you type the number of the move, Emacs will undo
-back to that move number. You may then redo or
-further undo using @samp{f} and @samp{f}. You may
-also jump to the beginning or end of the game with
-@samp{<} and @samp{>}.
-
-Another way to undo back to a given move is to move
-the cursor to a stone (which must be one of your
-own), then execute @command{gnugo-magic-undo},
-bound to @samp{U}.
-
-As we have noted, GNU Go normally answers each move
-that you play by generating a move of its own.  If
-you want to suppress GNU Go's automatic generation
-of moves, you may toggle an `editing mode' with
-@command{gnugo-toggle-edit-mode}. In the editing
-mode, GNU Go does not automatically answer each
-move that you play. For example, you can use the
-editing mode to write an sgf file from scratch.
-If you are playing a game, you can turn off
-GNU Go's automatic responses, play a few moves
-in editing mode to see what the board position
-will look like, then back up to the last move,
-toggle the editing mode off, then resume the game.
-
-You may view a GNU Go regression test with 
-@command{gnugo-view-regression}, which will prompt you
-for the name of a test. You may type (for example)
-@command{strategy:6}. The first time you do this
-you will be prompted for the path to the
-@file{regression/} directory. (Once Emacs knows this
-path, you will not be prompted again.) This command
-takes a while to execute since GNU Go will run the
-regression. When it is completed, Emacs will display
-the board position (with the grid) and a message
-below the board such as:
-@example
- loadsgf games/incident104.sgf 63
- strategy:6 reg_genmove white
- #? [E10]*
- =6 J13
-@end example
-This gives the actual test followed by the move that GNU Go
-generates when running the test.
-
-You may also ask GNU Go to identify a dragon on the
-board. Click on one stone to move the cursor to that
-location. Then type @samp{d}. The dragon in question
-will then be marked flashing. You may also type
-@samp{D}, which will report the dragon data. You
-may run other gtp commands with @command{gnugo-command},
-which is bound to @samp{:}.
+When you start a game with @command{M-x gnugo},
+you will first see an ascii board. However typing `i'
+toggles a graphical board display which is very nice.
+This is a pleasant way to play GNU Go. You may get
+help by typing @command{C-x m}.
 
 @node GMP and GTP
 @section The Go Modem Protocol and Go Text Protocol
@@ -462,6 +327,43 @@ so this option has no effect in GMP mode.
 @quotation
 GNU Go will not resign games.
 @end quotation
+@item @option{--resign-allowed}
+@quotation
+GNU Go will resign lost games. This is the default.
+@end quotation
+@end itemize
+
+@subsection Monte Carlo Options
+
+GNU Go can play Monte Carlo Go on a 9x9 board.  (Not
+available for larger boards.) It makes quite a strong
+engine. Here are the command line options.
+
+@itemize
+@item @option{--monte-carlo}
+@quotation
+Use Monte Carlo move generation (9x9 or smaller).
+@end quotation
+@item @option{--mc-games-per-level <number>}
+@quotation
+Number of Monte Carlo simulations per level. Default 8000.
+Thus at level 10, GNU Go simulates 80,000 games in order
+to generate a move.
+@end quotation
+@item @option{--mc-list-patterns}
+@quotation
+list names of builtin Monte Carlo patterns
+@end quotation
+@item @option{--mc-patterns <name>}
+@quotation
+Choose a built in Monte Carlo pattern database. The
+argument can be @file{mc_mogo_classic}, @file{mc_montegnu_classic}
+or @file{mc_uniform}.
+@end quotation
+@item @option{--mc-load-patterns <filename>}
+@quotation
+read Monte Carlo patterns from file
+@end quotation
 @end itemize
 
 @subsection Other general options
@@ -495,6 +397,18 @@ game.
 @quotation
 Use Japanese Rules. This is the default unless you specify
 @option{--enable-chinese-rules} as a configure option.
+@end quotation
+@item @option{--play-out-aftermath} 
+@item @option{--capture-all-dead} 
+@quotation
+These options cause GNU Go to play out moves that are usually left
+unplayed after the end of the game. Such moves lose points under
+Japanese rules but not Chinese rules.  With
+@option{--play-out-aftermath}, GNU Go may play inside its
+territory in order to reach a position where it considers every
+group demonstrably alive or dead. The option
+@option{--capture-all-dead} causes GNU Go to play inside its own
+territory to remove dead stones.
 @end quotation
 @item @option{--forbid-suicide} 
 @quotation
@@ -575,10 +489,11 @@ individually at the command line.  The default values of
 these parameters may be found by running @command{gnugo --help}. 
 
 Unless you are working on the program you probably don't
-need these options. Instead, just adjust the single
-variable @option{--level}. The remaining options are of
-use to developers tuning the program for performance and
-accuracy. For completeness, here they are.
+need the remaining options in this category. Instead,
+just adjust the single variable @option{--level}. The
+following options are of use to developers tuning the
+program for performance and accuracy. For completeness,
+here they are.
 
 @itemize @bullet
 @item @option{-D}, @option{--depth @var{depth}}
@@ -674,6 +589,7 @@ Below this limit some owl reading is truncated.
 
 @subsection Ascii mode options
 @cindex ascii mode
+
 @itemize
 @item @option{--color @var{color}}
 @quotation
@@ -682,6 +598,23 @@ Choose your color ('black' or 'white').
 @item @option{--handicap @var{number}}
 @quotation
 Choose the number of handicap stones (0--9)
+@end quotation
+@end itemize
+
+For more information about the following clock options see @xref{Ascii}.
+
+@itemize
+@item @option{--clock @var{seconds}}
+@quotation
+Initialize the timer.
+@end quotation
+@item @option{--byo-time @var{seconds}}
+@quotation
+Number of seconds per (Canadian) byo-yomi period
+@end quotation
+@item @option{--byo-period @var{stones}}
+@quotation
+Number of stones per (Canadian) byo-yomi period
 @end quotation
 @end itemize
 
@@ -886,17 +819,10 @@ and "aftermath" scoring algorithms, the selfplayed moves completing the
 game are also stored.
 
 @itemize
-@item estimate
-@quotation
-Examine the status of all groups on the board, then give a quick
-estimate of the score using the Bouzy 5/21 algorithm 
-(@pxref{Alternative Moyo}).
-@end quotation
 @item finish
 @quotation
 Finish the game by selfplaying until two passes, then determine the
-status of all stones and estimate territory using the Bouzy 5/21
-algorithm (@pxref{Alternative Moyo}).
+status of all stones and compute territory.
 @end quotation
 @item aftermath
 @quotation

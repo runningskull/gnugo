@@ -15,7 +15,7 @@ about newer versions and get other information at
 @section GNU/Linux and Unix
 @cindex installation
 
-Untar the sources, change to the directory gnugo-3.6. Now do:
+Untar the sources, change to the directory gnugo-3.8. Now do:
 
 @example
    ./configure [OPTIONS]
@@ -166,7 +166,7 @@ experimental options.
 Moreover, some configure options were removed from the stable
 release. For example it is known that the owl extension code
 can cause crashes, so the configure option --enable-experimental-owl-ext
-was disabled for 3.6.
+was disabled for 3.8.
 
 The term ``default'' must be clarified, since there
 are really two sets of defaults at hand, runtime defaults
@@ -244,7 +244,7 @@ This is on by default.
 @section Compiling GNU Go on Microsoft platforms
 
 GNU Go is being developed on Unix variants. GNU Go is easy to build
-and install on those platforms. GNU Go 3.6 has support for building
+and install on those platforms. GNU Go 3.8 has support for building
 on MS-DOS, Windows 3.x, Windows NT/2000 and Windows 95/98.
 
 There are two approaches to building GNU Go on Microsoft platforms.
@@ -306,12 +306,12 @@ DJGPP ftp archive on simtel:
 @url{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/}
 
 Once you have a working DJGPP environment and you have downloaded
-the GNU Go source available as gnugo-3.6.tar.gz you can build the
+the GNU Go source available as gnugo-3.8.tar.gz you can build the
 executable as follows:
 
 @example
-       tar zxvf gnugo-3.6.tar.gz
-       cd gnugo-3.6
+       tar zxvf gnugo-3.8.tar.gz
+       cd gnugo-3.8
        ./configure
        make
 @end example
@@ -333,11 +333,11 @@ development.
 If you want to build GNU Go yourself make sure to download the ncurses packages
 prior to building GNU Go. GNU Go compiles out-of-the box using the standard
 Unix build procedure on the Cygwin environment. After installation of cygwin
-and fetching @file{gnugo-3.6.tar.gz} you can type:
+and fetching @file{gnugo-3.8.tar.gz} you can type:
 
 @example
-  tar zxvf gnugo-3.6.tar.gz
-  cd gnugo-3.6
+  tar zxvf gnugo-3.8.tar.gz
+  cd gnugo-3.8
   ./configure
   make
 @end example
@@ -356,8 +356,8 @@ the Cygwin executable. To build on cygwin an executable suitable for the win32
 platform type the following at your cygwin prompt:
 
 @example
-  tar zxvf gnugo-3.6.tar.gz
-  cd gnugo-3.6
+  tar zxvf gnugo-3.8.tar.gz
+  cd gnugo-3.8
   env CC='gcc -mno-cygwin' ./configure
   make
 @end example
