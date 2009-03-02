@@ -6,7 +6,7 @@
  * files gtp.c and gtp.h are licensed under less restrictive     *
  * terms than the rest of GNU Go.                                *
  *                                                               *
- * Copyright 2001, 2002, 2003, 2004, 2005, 2006 and 2007         *
+ * Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007 and 2008   *
  * by the Free Software Foundation.                              *
  *                                                               *
  * Permission is hereby granted, free of charge, to any person   *
