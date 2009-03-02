@@ -159,7 +159,7 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-EXTRA_DIST = gtp_examples gnugo.dsp gnugo.el make-xpms-file.el GoImage xpms \
+EXTRA_DIST = gtp_examples gnugo.dsp gnugo.el make-xpms-file.el GoImage xpms big-xpms \
 	   gnugo-xpms.el gnugo-big-xpms.el
 
 noinst_HEADERS = interface.h gmp.h gtp.h

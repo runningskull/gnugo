@@ -38,7 +38,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 noinst_PROGRAMS = mkpat$(EXEEXT) joseki$(EXEEXT) mkeyes$(EXEEXT) \
 	uncompress_fuseki$(EXEEXT) mkmcpat$(EXEEXT)
-EXTRA_PROGRAMS = extract_fuseki$(EXEEXT) compress_fuseki$(EXEEXT)
+EXTRA_PROGRAMS = extract_fuseki$(EXEEXT) compress_fuseki$(EXEEXT) \
+	CMakeLists.txt$(EXEEXT)
 subdir = patterns
 DIST_COMMON = README $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -65,6 +66,9 @@ am_libpatterns_a_OBJECTS = connections.$(OBJEXT) helpers.$(OBJEXT) \
 	transform.$(OBJEXT) $(am__objects_1)
 libpatterns_a_OBJECTS = $(am_libpatterns_a_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
+CMakeLists_txt_SOURCES = CMakeLists.c
+CMakeLists_txt_OBJECTS = CMakeLists.$(OBJEXT)
+CMakeLists_txt_LDADD = $(LDADD)
 am_compress_fuseki_OBJECTS = compress_fuseki.$(OBJEXT)
 compress_fuseki_OBJECTS = $(am_compress_fuseki_OBJECTS)
 compress_fuseki_LDADD = $(LDADD)
@@ -98,14 +102,14 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libpatterns_a_SOURCES) $(compress_fuseki_SOURCES) \
-	$(extract_fuseki_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) \
-	$(mkmcpat_SOURCES) $(mkpat_SOURCES) \
-	$(uncompress_fuseki_SOURCES)
-DIST_SOURCES = $(libpatterns_a_SOURCES) $(compress_fuseki_SOURCES) \
-	$(extract_fuseki_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) \
-	$(mkmcpat_SOURCES) $(mkpat_SOURCES) \
-	$(uncompress_fuseki_SOURCES)
+SOURCES = $(libpatterns_a_SOURCES) CMakeLists.c \
+	$(compress_fuseki_SOURCES) $(extract_fuseki_SOURCES) \
+	$(joseki_SOURCES) $(mkeyes_SOURCES) $(mkmcpat_SOURCES) \
+	$(mkpat_SOURCES) $(uncompress_fuseki_SOURCES)
+DIST_SOURCES = $(libpatterns_a_SOURCES) CMakeLists.c \
+	$(compress_fuseki_SOURCES) $(extract_fuseki_SOURCES) \
+	$(joseki_SOURCES) $(mkeyes_SOURCES) $(mkmcpat_SOURCES) \
+	$(mkpat_SOURCES) $(uncompress_fuseki_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -200,7 +204,7 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
+DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp uncompress_fuseki.dsp
 DTR = aa_attackpats.dtr owl_attackpats.dtr owl_defendpats.dtr \
        owl_vital_apats.dtr
 
@@ -350,6 +354,9 @@ libpatterns.a: $(libpatterns_a_OBJECTS) $(libpatterns_a_DEPENDENCIES)
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
+CMakeLists.txt$(EXEEXT): $(CMakeLists_txt_OBJECTS) $(CMakeLists_txt_DEPENDENCIES) 
+	@rm -f CMakeLists.txt$(EXEEXT)
+	$(LINK) $(CMakeLists_txt_LDFLAGS) $(CMakeLists_txt_OBJECTS) $(CMakeLists_txt_LDADD) $(LIBS)
 compress_fuseki$(EXEEXT): $(compress_fuseki_OBJECTS) $(compress_fuseki_DEPENDENCIES) 
 	@rm -f compress_fuseki$(EXEEXT)
 	$(LINK) $(compress_fuseki_LDFLAGS) $(compress_fuseki_OBJECTS) $(compress_fuseki_LDADD) $(LIBS)
@@ -378,6 +385,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CMakeLists.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aa_attackpat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apatterns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/barriers.Po@am__quote@
