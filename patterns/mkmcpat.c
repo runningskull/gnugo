@@ -127,7 +127,7 @@ main(int argc, char *argv[])
     printf("static const unsigned int %s_values[] = {\n", name);
     for (k = 0; k < N; k++) {
       printf("%u, ", values[k]);
-      if (k % 8 == 7)
+      if (k % 16 == 15)
 	printf("\n");
     }
     printf("\n};\n\n");

@@ -1792,7 +1792,7 @@ socket_connect_to(const char *host_name, unsigned int port,
   }
 
   address.sin_family = AF_INET;
-  address.sin_port = htons(port);
+  address.sin_port = htons((unsigned short) port);
 
   for (address_pointer = host_data->h_addr_list; *address_pointer;
        address_pointer++) {
@@ -1859,7 +1859,7 @@ socket_listen_at(const char *host_name, unsigned int port,
   }
 
   address.sin_family = AF_INET;
-  address.sin_port = htons(port);
+  address.sin_port = htons((unsigned short) port);
 
   if (verbose) {
     if (host_name) {
