@@ -99,8 +99,8 @@ Teun Burgers, Tanguy Urvoy, Thien-Thi Nguyen, Heikki Levanto,
 Mark Vytlacil, Adriaan van Kessel, Wolfgang Manner, Jens
 Yllman, Don Dailey, M@aa{}ns Ullerstam, Arend Bayer, Trevor
 Morris, Evan Berggren Daniel, Fernando Portela, Paul
-Pogonyshev, S.P. Lee and Stephane Nicolet, Martin Holters
-and Grzegorz Leszczynski.
+Pogonyshev, S.P. Lee and Stephane Nicolet, Martin Holters,
+Grzegorz Leszczynski and Lee Fisher.
 
 @node Thanks
 @section Thanks

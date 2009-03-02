@@ -16,7 +16,7 @@
 @titlepage
 @subtitle Documentation for the GNU Go Project
 @subtitle Edition @value{EDITION}
-@subtitle December, 2008
+@subtitle February, 2009
 @vskip 0pt plus 1filll
 @image{logo-36}
 @vskip 0pt plus 1filll
@@ -28,8 +28,8 @@
 @page
 @title{GNU Go 3.8}
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
-and 2008 @uref{http://www.fsf.org,Free Software Foundation}, Inc.
+Copyright @copyright{} 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 and 2009 @uref{http://www.fsf.org,Free Software Foundation}, Inc.
 @sp 2
 
 This is Edition @value{EDITION} of @cite{The GNU Go Project documentation}, @*
@@ -64,8 +64,8 @@ version 3 or any later version) are respected.
 This manual documents @code{GNU Go}, a Go program and its sources.
 This is Edition @value{EDITION} of the @cite{GNU Go Program Documentation}
 
-Copyright @copyright{} 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
-and 2008 @uref{http://www.fsf.org,Free Software Foundation}, Inc.
+Copyright @copyright{} 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 and 2009 @uref{http://www.fsf.org,Free Software Foundation}, Inc.
      
 Permission is granted to make and distribute verbatim
 or modified copies of this manual is given provided
