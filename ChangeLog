@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.8 released February 17, 2009
+
+- added Wietze Brandsma to THANKS
+- revised config.vc
+- revised NEWS
+- restored missing mkmcpat.dsp, regress.cmd
+
 3.8rc1 released February 6, 2009
 
 - revisions to montecarlo.texi
