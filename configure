@@ -6540,20 +6540,16 @@ _ACEOF
 
   else
     if test "$enable_socket_support" = "yes"; then
-      { { echo "$as_me:$LINENO: error:
-*** Socket support was requested, but cannot be compiled on your system. ***
-*** If you think this is a mistake, please report it to <gnugo@gnu.org>. ***" >&5
-echo "$as_me: error:
-*** Socket support was requested, but cannot be compiled on your system. ***
-*** If you think this is a mistake, please report it to <gnugo@gnu.org>. ***" >&2;}
-   { (exit 1); exit 1; }; };
-    else
       { echo "$as_me:$LINENO: WARNING:
-*** Unable to compile socket support on your system.  It will be disabled. ***
-***  If you think this is a mistake, please report it to <gnugo@gnu.org>.  ***" >&5
+*** Socket support was requested but does not pass configure test. ***
+*** Proceed only if you know what you are doing.                   ***" >&5
 echo "$as_me: WARNING:
-*** Unable to compile socket support on your system.  It will be disabled. ***
-***  If you think this is a mistake, please report it to <gnugo@gnu.org>.  ***" >&2;};
+*** Socket support was requested but does not pass configure test. ***
+*** Proceed only if you know what you are doing.                   ***" >&2;}
+    cat >>confdefs.h <<\_ACEOF
+#define ENABLE_SOCKET_SUPPORT 1
+_ACEOF
+
     fi
   fi
 fi
