@@ -1,191 +1,182 @@
-              COMPILING GNU GO ON MICROSOFT PLATFORMS
+               Building GNU Go on Windows Platforms
 
-GNU Go is being developed on Unix variants. GNU Go is easy to build
-and install on those platforms. GNU Go 3.2 has support for building
-on MS-DOS, Windows 3.x, Windows NT/2000 and Windows 95/98.
-
-There are two approaches to building GNU Go on Microsoft platforms.
-
-1) The first approach is to install a Unix-like environment based
-   on ports of GCC to Microsoft platforms. This approach is fully
-   supported by the GNU Go developers and works well. Several
-   high quality free Unix-environments for Microsoft platforms
-   are available.
-
-   One benefit of this approach is that it is easier to
-   participate in GNU Go's development. These unix environments
-   come for instance with the `diff' and `patch' programs
-   necessary to generate and apply patches.
-
-   Another benefit of the unix environments is that development
-   versions (which may be stronger than the latest stable
-   version) can be built too.  The supporting files for VC are
-   not always actively worked on and consequently are often out
-   of sync for development versions, so that VC will not build
-   cleanly.
-
-2) The second approach is to use compilers such as Visual C
-   developed specially for the Microsoft platform. Presently we 
-   support Visual C through the project files which are supplied 
-   with the distribution. There is also support for generating
-   project files with the help of cmake.
-
-The rest of this document gives more details on the various ways
-to compile GNU Go for Microsoft platforms.
-
-1. Using free Unix-environments and GCC
-
-    * A) Windows 95/98, MS-DOS and Windows 3.x using DJGPP
-    * B) Windows NT, Windows 95/98 using Cygwin
-    * C) Windows NT, Windows 95/98 using MINGW32
-
-2. Visual C:
-
-   * D) Windows NT, Windows 95/98 using Visual C and project files
-   * E) Generating project files with cmake
-
-A) Windows 95/98, MS-DOS and Windows 3.x using DJGPP
-
-On these platforms DJGPP can be used. GNU Go installation has been
-tested in a DOS-Box with long filenames on Windows 95/98. GNU Go
-compiles out-of-the box with the DJGPP port of GCC using the
-standard Unix build and install procedure.
-
-Some URLs for DJGPP:
-
-DJGPP home page: <http://www.delorie.com/djgpp/>
-
-DJGPP ftp archive on simtel:
-
-<ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/>
-<ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/>
-
-Once you have a working DJGPP environment and you have downloaded
-the gnugo source available as gnugo-3.2.tar.gz you can build the
-executable as follows:
-
-       tar zxvf gnugo-3.2.tar.gz
-       cd gnugo-3.2
-       ./configure
-       make
-
-Optionally you can download GLib for DJGPP to get a working version
-of snprintf.
-
-B) Windows NT, Windows 95/98 using Cygwin
-
-   On these platforms the Cygwin environment can be installed. Recent
-versions of Cygwin install very easily with the setup program available
-from the cygwin homepage.  (<http://sources.redhat.com/cygwin/>).
-GNU Go compiles out-of-the box using the standard Unix build procedure
-on the Cygwin environment. After installation of cygwin and fetching
-`gnugo-3.2.tar.gz' you can type:
-
-       tar zxvf gnugo-3.2.tar.gz
-       cd gnugo-3.2
-       ./configure
-       make
-
-   The generated executable is not a stand-alone executable: it needs
-cygwin1.dll that comes with the Cygwin environment. cygwin1.dll
-contains the emulation layer for Unix.
-
-   Cygwin Home page:
-
-   <http://cygwin.com/>
-
-   Optionally you can use GLib to get a working version of snprintf.
-GLib builds out of the box on cygwin.
-
-C) Windows NT, Windows 95/98 using MINGW32
-
-   The Cygwin environment also comes with MINGW32. This generates an
-executable that relies only on Microsoft DLLs. This executable is thus
-completely comparable to a Visual C executable and easier to distribute
-than the Cygwin executable. To build on cygwin an executable suitable
-for the win32 platform type the following at your cygwin prompt:
-
-        tar zxvf gnugo-3.2.tar.gz
-        cd gnugo-3.2
-        env CC='gcc -mno-cygwin' ./configure
-        make
-
-D) Windows NT, Windows 95/98 using Visual C and project files
-
-1) Open the VC++ 6 workspace file gnugo.dsw
-
-2) Set the gnugo project as the active project (right-click on it,
-   and select "Set as Active Project".  Select 'Build' from the main 
-   menu, then select 'Build gnugo.exe', this will make all of the 
-   runtime subprojects.
-
-Notes:
-
-a) The build can also be done from the command line:
-   
-    msdev gnugo.dsw /make "gnugo - Win32 Release"
-	   
-b) The default configuration is 'Debug', build the optimized
-   version by selecting 'Build' from the main menu , then select
-   'Set active Configuration' and click on 'gnugo - Win32 Release'.
-   See the Visual Studio help for more on project configurations.
-
-c) A custom build step in the first dependent subproject (utils)
-   copys config.vc to config.h in the root directory. If you want
-   to modify config.h, copy any changes to config.vc. In
-   particular if you want to change the default level
-   or default cache size, whose significance is discussed in
-   INSTALL, you must edit this file.
-
-d) This project was built and tested using VC version 6.0.
-   It can be successfully converted to Visual Studio.NET.  However, 
-   you may not rebuild all in .NET.  .NET cleans each project as it
-   builds on a rebuild, whereas in 6.0, all projects were cleaned at
-   the beginning.  This caused some intermediate output to be 
-   deleted by later build steps.  To achieve the same, simply build 
-   clean, then build all.
+==========================
 
 
-E) Generating project files with cmake
+             BUILDING WITH OLDER VISUAL STUDIO
 
-1) Download and install cmake from http://www.cmake.org
+The distribution directories contain some .dsp and .dsw files with
+GNU Go. These have been brought up to date in the sense that they
+should work if you have the older VC++ with Visual Studio 6
+but the distributed .dsp and .dsw files will only be of use with 
+older version of Visual Studio.
 
-2) Run CMakeSetup.exe with the top GNU Go directory as source and any
-   directory of your choice as build directory. Press 'configure' and
-   answer the question about type of project files with the version of
-   VC you have installed. Then wait until it finishes and press
-   'configure' a second time. Now the 'OK' button should be active.
-   Press it to build the project files.
+In most cases (unless you are building in Cygwin) the preferred way 
+to build GNU Go on Windows platforms is to use CMake. CMake
+understands about many versions of Visual C/Visual Studio, and will
+generate project/solution files for the tools installed on your
+system. So even if you have Visual Studio 6 you may use CMake
+and dispense with the distributed .dsp and .dsw files.
 
-3) Build GNU Go as described above under D). Depending on VC version,
-   gnugo.dsw may be called something else but shouldn't be difficult
-   to locate.
+==========================
 
+         BUILDING WITH VISUAL STUDIO PROJECT FILES
 
-         Running GNU Go on Windows NT and Windows 95/98
+Before you compile the GNU Go source, you need to run CMake first, to 
+generate the build files you'll give to Visual Studio.
 
-GNU Go does not come with its own graphical user interface. The Java
-client jago can be used.
+From the cmd.exe command prompt, CD into the GNU Go source directory. 
+To confirm you're in the right place, you should see the file 
+'CMakeLists.txt' in the top-level directory of the GNU Go code (as well 
+as others in lower subdirectories).
 
-To run Jago you need a Java Runtime Environment (JRE). This can
-be obtained from http://www.javasoft.com/.  This is the runtime
-part of the Java Development Kit (JDK) and consists of the Java
-virtual machine, Java platform core classes, and supporting files.
-The Java virtual machine that comes with I.E. 5.0 works also.
+Direct CMake to generate the new Visual Studio build files by typing:
 
-Jago: <http://www.rene-grothmann.de/jago>
+    cmake CMakeLists.txt
 
-1) Invoke GNU Go with `gnugo --quiet --mode gmp'
+Compile the code by invoking the newly-created Solution file:
 
-2) Run `gnugo --help' from a cygwin or DOS window for a list of
-   options
+    vcbuild GNUGo.sln
 
-3) optionally specify `--level <level>' to make the game faster
+This will take a few moments, as CMake generates 4 debug/retail targets:
 
-Jago works well with both the Cygwin and Mingw32 executables. The
-DJGPP executable also works, but has some problems in the interaction
-with jago after the game has been finished and scored.
+    debug
+    release
+    minsizerel
+    relwithdebinfo
 
+For each of these targets, Visual Studio is generating a version of 
+gnugo.exe:
+
+    interface\debug\gnugo.exe
+    interface\release\gnugo.exe
+    interface\minsizerel\gnugo.exe
+    interface\relwithdebinfo\gnugo.exe
+
+Additionally, there is an 'Install' target available, that will copy the 
+the gnugo.exe into the %ProgramFiles% directory. To do this, type:
+
+    vcbuild INSTALL.vcproj
+
+This should result in copying GNU/Go into:
+
+    "%ProgramFiles%\GNUGo\bin\gnugo.exe" --options
+
+In addition to command line use, CMake also has a GUI version. Users of 
+the Visual Studio GUI might prefer to use that.
+
+==========================
+
+              BUILDING WITH NMAKE MAKEFILES
+
+GNU Go will also build using NMake makefiles. Optionally, instead of 
+Visual Studio project/solution files, you may direct CMake to generate 
+NMake makefiles. To generate the makefiles:
+
+    cmake -G "NMake Makefiles" CMakeLists.txt
+
+The default rule for the makefile is 'all'. Use the 'help' rule to show 
+a list of available targets.
+
+    nmake -f Makefile help
+
+To compile GNU Go:
+
+    nmake -f Makefile all
+
+On some systems, GNU GO may fail to build when using NMake makefiles. It 
+only fails the first time run, run NMake again with the 'clean all' 
+targets, and it will compile the second and subsequent times.
+
+    nmake -f Makefile clean all
+
+Which will successfully generate a gnugo.exe.
+
+    interface\gnugo.exe --options
+
+==========================
+
+                 BUILDING WITH MINGW MAKEFILES:
+
+GNU Go can be built on Windows systems using MinGW.
+
+This development environment uses: the GCC compiler (gcc.exe, not 
+cl.exe), the Microsoft C runtime libraries (MSCRT, not GLibC), the GNU 
+Make build tool (mingw32-make.exe, not NMake), all from the Windows 
+shell (cmd.exe, not sh/bash).
+
+For CMake to work, in addition to the base MinGW installation, the C++ 
+compiler (g++.exe) and GNU Make (mingw32-make.exe) need to be installed. 
+This was tested using GCC v3, not the experimental v4. To debug, use 
+GDB, as the GCC-generated symbols won't work with NTSD/Windbg/Visual Studio.
+
+To create the makfiles, run CMake with the MinGW generator option:
+
+    cmake -G "MinGW Makefiles" CMakeLists.txt
+
+To build GNU Go, from a cmd.exe shell, run GNU Make (against the 
+newly-created 'Makefile' and it's default 'all' target):
+
+    mingw32-make
+    ..\interface\gnugo.exe --options
+
+==========================
+
+               BUILDING WITH MSYS MAKEFILES (MinGW)
+
+GNU Go can be built on Windows systems using MSYS.
+
+This development environment uses: the GCC compiler (gcc.exe, not 
+cl.exe), the Microsoft C runtime libraries (MSCRT, not GLibC), the GNU 
+Make build tool (make, not NMake), all from the GNU Bash (sh.exe, not 
+cmd.exe).
+
+To create the makfiles, run CMake with the MSYS generator option:
+
+    cmake -G "MSYS Makefiles" CMakeLists.txt
+
+Start MSYS's Bash shell, either clicking on a shortcut on from the 
+command line:
+
+    cd /d c:\msys\1.0
+    msys.bat
+
+To build GNU Go, from a Bash shell, run GNU Make (against the 
+newly-created 'Makefile' and it's default 'all' target):
+
+    make
+    ../interface/gnugo.exe --options
+
+To debug, use GDB, as the GCC-generated symbols won't work with 
+NTSD/Windbg/Visual Studio.
+
+==========================
+
+                      BUILDING ON CYGWIN
+
+With Cygwin, you should be able to 
+
+  tar zxvf gnugo-3.8.tar.gz
+  cd gnugo-3.8
+  env CC='gcc -mno-cygwin' ./configure
+  make
+
+==========================
+
+Testing on Windows:
+
+Regress.cmd is a simplified cmd.exe-centric port of the main gnugo Unix 
+shell script regress.sh. It can be used to help verify that the 
+generated binary might be operational. Read the script's comment header 
+for more information. For access to the full GNU Go tests, use Unix, not 
+Windows.
+
+To test:
+
+    cd regression
+    regress.cmd ..\interface\gnugo.exe
+
+==========================
 
 
 
