@@ -1,4 +1,9 @@
-New in 3.7
+New in 3.8 (since 3.6)
+
+- many small improvements and tuning since 3.6
+- experimental Monte Carlo mode (9x9 only)
+- support for tiny boards
+- GPL v3
 
 New in 3.6 (since 3.4)
 
