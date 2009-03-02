@@ -2,6 +2,16 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.8rc1 released February 6, 2009
+
+- revised .dsp files
+- Lee Fisher added to AUTHORS
+- WINDOWS doc and install.texi revised per Lee Fisher's changes
+- mkmcpat puts 16 items on a line instead of 8
+- (unsigned char) and (unsigned short) explicit typings
+- missing files added to EXTRA_DIST
+- copyrights updated to 2009
+
 3.7.13 released December 23, 2008
 
 - restore cmake files that were missing from the 3.7.12 tarball
