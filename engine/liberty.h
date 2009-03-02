@@ -386,7 +386,7 @@ void add_expand_moyo_move(int pos);
 void add_strategical_attack_move(int pos, int dr);
 void add_strategical_defense_move(int pos, int dr);
 void add_worthwhile_threat_move(int pos);
-void add_replacement_move(int from, int to);
+void add_replacement_move(int from, int to, int color);
 
 /* Parameters to add_either_move and add_all_move */
 #define ATTACK_STRING  1
