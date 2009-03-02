@@ -1317,10 +1317,10 @@ File: gnugo.info,  Node: Monte Carlo Go,  Next: Libboard,  Prev: Influence,  Up:
 
 In Monte Carlo Go the engine plays random games to the end, generating
 moves from a pattern database within the context of the algorithm UCT
-(upper bound confidence in trees).  This algorithm allowed the program
-MoGo (`http://www.lri.fr/~gelly/MoGo.htm', to become the first computer
-program to defeat a professional while taking a 9 stone handicap
-(`http://senseis.xmp.net/?MoGo').
+(upper confidence bounds applied to trees).  This algorithm allowed the
+program MoGo (`http://www.lri.fr/~gelly/MoGo.htm', to become the first
+computer program to defeat a professional while taking a 9 stone
+handicap (`http://senseis.xmp.net/?MoGo').
 
    GNU Go 3.8 can play 9x9 Go with the option `--monte-carlo' using the
 UCT algorithm.  For command line options, see *Note Invoking GNU Go::.
@@ -1340,9 +1340,9 @@ pattern" and the table "pattern values" or simply "patterns".
    There are three built-in databases that you can select using the
 option `--mc-patterns <name>', where `<name>' is one of
 
-   * `mc_mogo_classic'
-
    * `mc_montegnu_classic'
+
+   * `mc_mogo_classic'
 
    * `mc_uniform'
 
@@ -1480,10 +1480,10 @@ playouts).
      The move would be a self-atari for the opponent.
 
 `xsuicide'
-     he move would be suicide for the opponent
+     The move would be suicide for the opponent
 
 `xnosuicide'
-     move would not be suicide for the opponent.
+     The move would not be suicide for the opponent.
 
 `ocap0'
      The move captures zero stones.
@@ -1501,7 +1501,7 @@ playouts).
      The move captures one or more stones.
 
 `ocap1-'
-     The move captures at most one stones.
+     The move captures at most one stone.
 
 `ocap2+'
      The move captures two or more stones.
@@ -1525,7 +1525,7 @@ playouts).
      An opponent move would capture one or more stones.
 
 `xcap1-'
-     An opponent move would capture at most one stones.
+     An opponent move would capture at most one stone.
 
 `xcap2+'
      An opponent move would capture two or more stones.
