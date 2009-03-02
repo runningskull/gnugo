@@ -27,7 +27,7 @@ noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
 
 EXTRA_DIST = golois games $(TST) $(noinst_SCRIPTS) regress.awk \
              BREAKAGE regress.pl regress.plx regress.pike breakage2tst.py \
-	     view.pike benchmark/*gtp
+	     view.pike benchmark/*gtp regress.cmd
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *.orig *~
