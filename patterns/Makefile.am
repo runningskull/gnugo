@@ -1,7 +1,7 @@
 noinst_PROGRAMS = mkpat joseki mkeyes uncompress_fuseki mkmcpat
-EXTRA_PROGRAMS = extract_fuseki compress_fuseki
+EXTRA_PROGRAMS = extract_fuseki compress_fuseki CMakeLists.txt
 
-DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
+DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp uncompress_fuseki.dsp
 DTR = aa_attackpats.dtr owl_attackpats.dtr owl_defendpats.dtr \
        owl_vital_apats.dtr
 

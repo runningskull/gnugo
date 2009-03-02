@@ -153,6 +153,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "mkmcpat"=.\patterns\mkmcpat.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "mkpat"=.\patterns\mkpat.dsp - Package Owner=<4>
 
 Package=<5>
@@ -190,6 +202,9 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name uncompress_fuseki
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name mkmcpat
     End Project Dependency
 }}}
 

@@ -4,7 +4,7 @@ SUBDIRS = utils sgf engine patterns interface doc regression
 
 DISTCLEANFILES = *~
 
-EXTRA_DIST = gnugo.dsw config.vc makevcdist.pl WINDOWS
+EXTRA_DIST = gnugo.dsw config.vc makevcdist.pl WINDOWS OSX CMakeLists.txt config.h.cmake
 
 maintainer-check:
 

@@ -1,6 +1,6 @@
 bin_PROGRAMS = gnugo
 
-EXTRA_DIST = gtp_examples gnugo.dsp gnugo.el make-xpms-file.el GoImage xpms \
+EXTRA_DIST = gtp_examples gnugo.dsp gnugo.el make-xpms-file.el GoImage xpms big-xpms \
 	   gnugo-xpms.el gnugo-big-xpms.el
 
 noinst_HEADERS = interface.h gmp.h gtp.h
