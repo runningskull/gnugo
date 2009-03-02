@@ -1,5 +1,5 @@
 noinst_PROGRAMS = mkpat joseki mkeyes uncompress_fuseki mkmcpat
-EXTRA_PROGRAMS = extract_fuseki compress_fuseki CMakeLists.txt
+EXTRA_PROGRAMS = extract_fuseki compress_fuseki
 
 DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp uncompress_fuseki.dsp
 DTR = aa_attackpats.dtr owl_attackpats.dtr owl_defendpats.dtr \
@@ -44,7 +44,8 @@ EXTRA_DIST = $(DSP)\
         takamoku.db\
 	fuseki13.dbz\
 	fuseki19.dbz\
-	fuseki9.dbz
+	fuseki9.dbz\
+	CMakeLists.txt
 
 mkpat_SOURCES  = mkpat.c transform.c dfa.c
 
