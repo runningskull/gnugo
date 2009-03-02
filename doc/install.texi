@@ -439,6 +439,7 @@ To test:
     regress.cmd ..\interface\gnugo.exe
 @end example
 
+@node Macintosh
 @section Macintosh
 
 If you have Mac OS X you can build GNU Go using Apple's compiler, 
