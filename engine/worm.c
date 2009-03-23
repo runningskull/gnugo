@@ -44,7 +44,6 @@ static void change_tactical_point(int str, int move, int code,
 static void propagate_worm2(int str);
 static int genus(int str);
 static void markcomponent(int str, int pos, int mg[BOARDMAX]);
-static int examine_cavity(int pos, int *edge);
 static void cavity_recurse(int pos, int mx[BOARDMAX], 
 			   int *border_color, int *edge, int str);
 static void ping_cave(int str, int *result1,  int *result2,
@@ -1460,7 +1459,7 @@ markcomponent(int str, int pos, int mg[BOARDMAX])
  * edge in a point outside the removed string.  
  */
 
-static int
+int
 examine_cavity(int pos, int *edge)
 {
   int border_color = EMPTY;
@@ -1468,11 +1467,11 @@ examine_cavity(int pos, int *edge)
   int origin = NO_MOVE;
   
   ASSERT_ON_BOARD1(pos);
-  gg_assert(edge != NULL);
   
   memset(ml, 0, sizeof(ml));
 
-  *edge = 0;
+  if (edge)
+    *edge = 0;
 
   if (IS_STONE(board[pos]))
     origin = find_origin(pos);
@@ -1524,7 +1523,7 @@ cavity_recurse(int pos, int mx[BOARDMAX],
 
   mx[pos] = 1;
 
-  if (is_edge_vertex(pos) && board[pos] == EMPTY) 
+  if (edge && is_edge_vertex(pos) && board[pos] == EMPTY)
     (*edge)++;
 
   /* Loop over the four neighbors. */

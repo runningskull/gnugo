@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- score seki eyes correctly in aftermath scoring with Chinese rules
 - avoid overvaluation of eyespaces which are split by a single stone in atari
 - avoid playing inside own eyespace to capture lunches in semeais
 - do not crash on replacement moves conflicting with unconditional analysis

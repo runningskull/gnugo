@@ -333,6 +333,7 @@ void get_lively_stones(int color, signed char safe_stones[BOARDMAX]);
 int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
 void propagate_worm(int pos);
+int examine_cavity(int pos, int *edge);
 void find_cuts(void);
 void find_connections(void);
 

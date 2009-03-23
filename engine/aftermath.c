@@ -1143,8 +1143,14 @@ play_aftermath(int color, SGFTree *aftermath_sgftree)
 	a->final_status[pos] = ALIVE;
     }
     else {
-      if (board[pos] == EMPTY)
+      if (board[pos] == EMPTY) {
+	int enclosing_color = examine_cavity(pos, NULL);
 	a->final_status[pos] = DAME;
+	if (enclosing_color == BLACK)
+	  a->black_area++;
+	else if (enclosing_color == WHITE)
+	  a->white_area++;
+      }
       else {
 	a->final_status[pos] = ALIVE_IN_SEKI;
 	if (board[pos] == WHITE)
