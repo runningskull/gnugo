@@ -273,3 +273,8 @@ loadsgf games/endgame13.sgf 2
 loadsgf games/endgame14.sgf
 1000 reg_genmove black
 #? [J2]
+
+# A7 wins but A8 loses.
+loadsgf games/endgame15.sgf
+1010 reg_genmove white
+#? [A7]
