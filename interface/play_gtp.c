@@ -2474,6 +2474,10 @@ gtp_aa_confirm_safety(char *s)
   get_saved_dragons(POS(i, j), saved_dragons);
   get_saved_worms(POS(i, j), saved_worms);
   
+  if (!tryko(POS(i, j), color, NULL))
+    return gtp_failure("invalid move");
+  popgo();
+
   result = atari_atari_confirm_safety(color, POS(i, j),
 				      &defense_point, minsize,
 				      saved_dragons, saved_worms);
