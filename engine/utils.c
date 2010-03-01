@@ -677,6 +677,20 @@ play_lib_n(int color, int num_moves, ...)
 }
 
 
+/* Helper function to compute a * pow(b, e) with some safety nets to
+ * handle overflow robustly.
+ */
+static int
+exponential_level(int a, double b, double e)
+{
+  double x = pow(b, e);
+
+  if (x > (double) INT_MAX / (double) a)
+    return INT_MAX;
+
+  return (int) (a * x);
+}
+
 
 /* 
  * It is assumed in reading a ladder if stackp >= depth that
@@ -812,7 +826,7 @@ set_depth_values(int level, int report_levels)
     superstring_depth = 0;
 
   if (level >= 10)
-    owl_node_limit      = OWL_NODE_LIMIT * pow(1.5, depth_level);
+    owl_node_limit      = exponential_level(OWL_NODE_LIMIT, 1.5, depth_level);
   else {
     owl_node_limit      = (OWL_NODE_LIMIT * node_limits[10 - level] /
 			   node_limits[0]);
@@ -821,13 +835,13 @@ set_depth_values(int level, int report_levels)
 
   semeai_branch_depth  = gg_max(2, (2*SEMEAI_BRANCH_DEPTH  + depth_level) / 2);
   semeai_branch_depth2 = gg_max(2, (2*SEMEAI_BRANCH_DEPTH2 + depth_level) / 2);
-  semeai_node_limit    = SEMEAI_NODE_LIMIT * pow(1.5, depth_level);
+  semeai_node_limit    = exponential_level(SEMEAI_NODE_LIMIT, 1.5, depth_level);
 
   connect_depth         = gg_max(2, CONNECT_DEPTH  + 2 * depth_level);
   connect_depth2        = gg_max(2, CONNECT_DEPTH2 + 2 * depth_level);
-  connection_node_limit = CONNECT_NODE_LIMIT * pow(1.45, depth_level);
+  connection_node_limit = exponential_level(CONNECT_NODE_LIMIT, 1.45, depth_level);
   breakin_depth 	= gg_max(2, BREAKIN_DEPTH + 2 * depth_level);
-  breakin_node_limit 	= BREAKIN_NODE_LIMIT * pow(1.5, depth_level);
+  breakin_node_limit 	= exponential_level(BREAKIN_NODE_LIMIT, 1.5, depth_level);
 
   if (mandated_depth != -1)
     depth = mandated_depth;
