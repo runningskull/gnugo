@@ -115,6 +115,13 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   memset(mf, 0, sizeof(mf));
   memset(mn, 0, sizeof(mn));
   memset(sd, 0, sizeof(sd));
+
+  /* These should not be strictly necessary to clear but doing so
+   * avoids compiler warnings about possibly using uninitialized
+   * variables.
+   */
+  memset(left_corner, 0, sizeof(left_corner));
+  memset(right_corner, 0, sizeof(right_corner));
   
   mark_dragon(pos, mf, 1);
 
