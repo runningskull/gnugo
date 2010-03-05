@@ -3859,6 +3859,17 @@ Pattern D847
 :8,-,value(35)
 
 
+Pattern D848
+# gf New pattern. (3.9.1)
+
+|oxoo         stop eye with nakade shape
+|XXXO
+|.*.o
++----
+
+:8,s,value(35)
+
+
 #########################################################
 #                                                       #
 #                  Prevent intrusion                    #
