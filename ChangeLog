@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revision of dragon_looks_inessential
 - fix overflow in computation of node limits
 - do not crash if gtp_aa_confirm_safety is fed an illegal move
 - score seki eyes correctly in aftermath scoring with Chinese rules

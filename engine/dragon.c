@@ -1040,6 +1040,9 @@ dragon_looks_inessential(int origin)
   if (dragon[origin].size != worm[origin].size)
     return 0;
 
+  if (worm[origin].size >= 3 && worm[origin].liberties >= 4)
+    return 0;
+
   if (owl_substantial(origin))
     return 0;
 
