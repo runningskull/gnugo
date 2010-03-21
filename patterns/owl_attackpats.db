@@ -3939,6 +3939,22 @@ x*.A
 ;owl_strong_dragon(B) && !xplay_disconnect(*,A,B)
 
 
+Pattern A1025
+# gf New pattern. (3.9.1)
+
+YO.X       stop escape along edge
+OX*x
+----
+
+:8,-,value(75)
+
+AO.B
+OX*x
+----
+
+;owl_escape_value(B)>0 && !xplay_disconnect(*,A,B) && !oplay_connect(*,A,B)
+
+
 #########################################################
 #                                                       #
 #              Reinforce the perimeter                  #

@@ -12,7 +12,7 @@ loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 42
 
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 48
 40 reg_genmove black
-#? [!D2]
+#? [!(D2|C2)]
 
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 62
 50 reg_genmove black
