@@ -1853,6 +1853,28 @@ X.O
 :/,n,value(90)
 
 
+Pattern A426
+# mh New pattern. (3.9.1)
+# See e.g. arend2:10
+
+?..?        throw a net
+*..O
+..Y?
+.O??
+
+:8,-,value(80)
+
+?ab?
+*..O
+CDe?
+fG??
+
+; lib(G) == 3 && lib(e) > 2
+; && (owl_escape_value(a) > 0 || owl_escape_value(b) > 0
+;     || owl_escape_value(C) > 0)
+; && oplay_defend(*,D,C,f,G)
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves on the second line        #
