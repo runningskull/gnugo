@@ -34,61 +34,6 @@ the person assigned to task for further discussion.
    want to know what operating system and compiler you were using, in
    order to determine if the problem is platform dependent.
 
-//--------------------------------------------------------------
-// smaller projects
-//--------------------------------------------------------------
-
-These issues are of tactical nature, i.e. they concern some specific
-feature or the infrastructure of the engine.  Some of these are quiet
-small, maybe doable in a day for an experienced GNU Go programmer.
-They might also be useful project to start with for a new project
-member.  Some of them are bigger and demand a deeper knowledge of the
-engine internals.  The issues are presented here in an approximate
-order of perceived difficulty.
-
- * Add more checks in patterns/mkpat.c testing whether the main diagram and
-   the constraint diagram are consistent.
-
- * Break out handling of movelists into its own file and generalize it.
-   This is started in 3.1.16. Move lists are used, among other places, 
-   in worms.c where it is used to store moves that capture, save, 
-   threaten to capture and threaten to save the worm.
-
- * Implement move lists storing important moves for dragons and eyes
-   in the same way as it is used for worms.  Half eyes are already
-   halfway done.  The moves are stored, but not the attack and defend
-   codes (LOSE, KO_A, KO_B and WIN).
-
- * Make the cache not waste storage on 64 bit systems.
-
- * The dragon data is split into two arrays, dragon[] and dragon2[].
-   The dragon2 array only have one entry per dragon, in contrast to
-   the dragon array where all the data is stored once for every
-   intersection of the board.  Complete the conversion of eye_data,
-   half_eye_data, worm and dragon to use the same structure as the
-   dragon2 array.
-
- * Support for ko in eyes.db and optics.c.
-
- * Integrate the time handling code in play_gtp.c with the autolevel
-   code in clock.c. Alternatively, replace them both with something
-   better. Basing it on some solid system identification theory and/or
-   control theory wouldn't hurt.
-
- * Write a script which plays through the joseki databases and checks
-   that the engine really generates a joseki move for all positions in
-   the databases. This would also be interesting to run with the
-   --nojosekidb option.
-
-
-//--------------------------------------------------------------
-// long term issues
-//--------------------------------------------------------------
-
-
-These issues are strategic in nature. They will help us to improve the
-playing strength of the program and/or enhance certain aspects of it.
-
  * Extend the regression test suites.
    See the texinfo manual in the doc directory for a description of
    how to do this. In particular it would be useful with test suites
@@ -98,110 +43,121 @@ playing strength of the program and/or enhance certain aspects of it.
    square, and so on. Other areas where test suites would be most
    welcome are fuseki, tesuji, and endgame.
 
- * Tuning the pattern databases. These are under constant revision.  Tuning
-   them is a sort of art. It is not necessary to do any programming to do 
-   this since most of the patterns do not require helpers. We would like it if
-   a few more Dan level players would learn this skill.
+ * Tuning the pattern databases. These are under constant revision.
+   Tuning them is a sort of art. It is not necessary to do any
+   programming to do this since most of the patterns do not require
+   helpers. We would like it if a few more Dan level players would
+   learn this skill.
 
- * Extend and tune the Joseki database. It might be very useful to implement
-   a semi-automatic way of doing this. The current method based on sgf files
-   becomes difficult with existing tools.
+//--------------------------------------------------------------
+// Monte Carlo
+//--------------------------------------------------------------
 
- * The semeai module is still in need of improvement. (This is underway.)
+The main strength of recent computer go programs is coming from Monte
+Carlo simulation techniques. GNU Go has an implementation of UCT
+search but it is behind state of the art and in particular scales very
+badly to 19x19.
 
- * GNU Go does not have a move generator that tries explicitly to build
-   moyos, or reduce/invade opponent's moyos. Such a move generator could
-   be built using the same type of code that is used in the owl life and
-   death reader, or the connection reader mentioned in point 5 above.
+ * Implement RAVE (Rapid Action Value Estimation). [Medium difficulty]
 
- * A much improved combination module.  The combination module of
-   today only finds combinations of threats to capture enemy groups.
-   A more useful combination module would e.g. find combinations of
-   threats to capture a group or enter opponent territory.  It would
-   also be strong enough to find combinations of strategic moves and
-   more indirect threats (a threat to a threat).  Possibly it could
-   combine threats in AND-OR trees (DAGs?) that could be searched
-   using ordinary tree search algorithms.  (Revision of combination.c
-   is underway.)
+ * Implement progressive widening. [Easy to implement, proving that it
+   improves strength might be harder.]
 
- * Speed up the tactical reading. GNU Go is reasonably accurate when
-   it comes to tactical reading, but not always very fast.  The main
-   problem is that too many ineffective moves are tested, leading to
-   strange variations that shouldn't need consideration.  To improve
-   one could refine the move generation heuristics in the reading.
-   Also, one should implement some more of the standard tree search
-   optimizations used in alpha-beta readers.
+ * Reuse and prune the UCT search tree between moves. [Medium
+   difficulty]
+
+ * Implement other improvements that have been discussed on the
+   Computer Go mailing list.
+
+ * Tune the 3x3 pattern databases better. [Tuning is easy but doing it
+   well probably quite difficult.]
+
+ * Find a way to analyze the effectiveness of the random simulation
+   policy. It is in general very difficult to understand how the
+   details of the random simulations affect the strength of the UCT
+   search so anything that adds insight into this would be most
+   welcome. [Extremely difficult]
+
+ * Implement life and death reading with Monte Carlo simulations for
+   unclear leaf nodes. The life and death reading in owl.c tends to be
+   very uninformative when it runs out of nodes. [Difficult]
+
+ * Make the Monte Carlo search and/or simulations take advantage of
+   the tactical/connection/owl/semeai reading results. [Extremely
+   difficult]
+
+//--------------------------------------------------------------
+// Multithreading
+//--------------------------------------------------------------
+
+Most of the internal structures of GNU Go were developed in a time
+when computers generally were singlethreaded. This means lots of
+global data structures and in particular a global board implementation
+which would be very hard to adapt for multiple threads. However,
+additional computational power is most worthwhile in the Monte Carlo
+code, which has its own board code and data structures which were
+designed with multithreading in mind.
+
+ * Make the Monte Carlo code multithreaded. [Difficult]
+
+ * Make the GTP event loop multithreaded. [Medium difficulty]
+
+ * Implement pondering (thinking on the opponent's time) for the Monte
+   Carlo code. This requires at least that reuse of UCT search trees
+   has been implemented and one of items above. [Medium difficulty]
+
+ * Make other interfaces than GTP also use the GTP event loop. The
+   purpose of this would be to gain the benefits of multithreading
+   also for other interfaces without having to reimplement it for each
+   of them. [Difficult]
+
+//--------------------------------------------------------------
+// Utilities
+//--------------------------------------------------------------
+
+ * Improve tuning/development GUI. Today regression/view.pike provides
+   support for viewing some of the analysis going on inside the engine
+   but it is far from complete and also has a troublesome dependency
+   on GTK1. It would in particular be valuable to have a GUI which
+   could be used to inspect the UCT search tree and other details of
+   the Monte Carlo code. [Varying difficulty depending on ambition.]
+
+ * Infrastructure for evaluating Monte Carlo experiments. It takes
+   much time to evaluate changes in the Monte Carlo code. Usually
+   hundreds of games have to be run, preferrably against multiple
+   opponents, to gather sufficient statistics to determine the value
+   of the change.  This is both time consuming and bothersome to
+   organize for each developer. Thus it would help to have an
+   infrastructure that could organize the games and present the
+   results, and ideally also distribute the games to multiple
+   computers. [Big and difficult.]
+
+//--------------------------------------------------------------
+// Other
+//--------------------------------------------------------------
+
+ * Implement a proof number search version of tactical reading. The
+   current tactical reading does a fairly good job but it would be
+   interesting to see how an algorithm based on proof number search or
+   one of its variations would do. This could potentially also tie in
+   to the task of taking advantage of tactical reading for Monte Carlo
+   search. [Medium difficulty]
+
+ * Write a script which plays through the joseki databases and checks
+   that the engine really generates a joseki move for all positions in
+   the databases. This would also be interesting to run with the
+   --nojosekidb option. [Easy]
 
  * Improve the heuristics for assessment of the safety of a
-   group. This might take into account number of eyes / half eyes,
-   moyo in corners, moyo along the edge, moyo in the center, proximity
-   to living friendly groups, weak opponent groups etc. It is of
-   particular interest to be able to accurately determine how a move
-   affects the safety of all groups on the board.
+   group. This should probably involve some kind of Monte Carlo
+   analysis. [Difficult]
 
-
-//--------------------------------------------------------------
-// Ideas
-//--------------------------------------------------------------
-
-
-These are some ideas that have been floated on the mailing list.  Some
-of them are down-to-earth, and some are just blue sky ramblings.  They
-are presented here for inspiration.
-
- * A good GUI.
-   A start is being made with GoThic, a goban widget based on the Qt
-   toolkit.  This is linked from the GNU Go development web page on
-   gnu.org. Other starts have been made based on GTK+, but so far
-   nothing more than a start has been attempted.
-
- * A graphical pattern editor.
-   This would make it much easier for non-programmers to improve the
-   strength of GNU Go.  It could also be used as a debugging tool for
-   the programmers.  This project has the GUI as a prerequisite.
-   The challenge here is not to make a tool which makes it easier to
-   create patterns but to make it easier to overview and maintain the
-   database.
-
- * Make the engine thread safe and use multiple CPUs on an SMP
-   machine.
-
- * Making the engine use many machines loosely connected on the
-   internet or in a cluster.
-
- * Think on the opponent's time.
-
- * A global alpha-beta reader.  This would probably be very slow and
-   could only read 2 or 3 moves ahead.  Still it could find fatal
-   errors and improve the moves that GNU Go makes.
-
- * A strategic module that identifies high-level goals and then gives
-   these goals to the rest of the engine.  It should be able to
-   identify if we are ahead in territory or thickness, if we should
-   play safe or if we should play daringly (e.g. if behind).  It
-   should also identify weak areas where we can attack or where we
-   should defend.  Maybe this module doesn't have to be written in C.
-   Maybe PROLOG, LISP or some other AI language would be better.
-
- * A parameter that makes GNU Go play different styles.  Such styles
-   could be 'play for territory', 'play aggressively', 'play tricky
-   moves (hamete)', and so on.  It could be used to present human
-   users with different kinds of opponents or to tell GNU Go how to
-   play certain computer opponents in tournaments.
-
- * Generalize representation and handling of threats so that we have a
-   graph representation of threats that can be searched to see how
-   different threats interact.
-
- * An endgame module based on ideas from combinatorial game theory.
-   To be really useful this would have to deal with early endgame
-   positions.
-
- * Fuseki tuning by hand is difficult. People who are interested
-   in doing machine learning experiments with GNU Go could try
-   working with fuseki. This may be one of the areas with most
-   potential for substantial and reasonably quick improvements.
+ * Support for ko in eyes.db and optics.c. [Difficult]
 
  * Create a paradigm for handling other types of ko (approach move ko,
-   multi-step ko, etc) and then write code that handles them. 
+   multi-step ko, etc) and then write code that handles them. [Very
+   difficult]
 
+ * Reimplement patterns/mkpat.c. This code is quite messy after a long
+   time of evolutionary development and would benefit from a clean
+   redesign. [Medium difficulty but rather big.]
