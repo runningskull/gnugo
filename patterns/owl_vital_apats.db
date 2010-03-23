@@ -194,6 +194,23 @@ A*
 ;&& (owl_eye_size(*) <= 8 || !oplay_attack(*,*))
 
 
+Pattern VA9b
+# gf New pattern. (3.9.1)
+# See strategy5:290, upper right corner. Needed when the stone to be
+# ataried is not amalgamated with the goal dragon, otherwise VA9 applies.
+
+OX
+X*           atari inside eyespace
+
+:-,s,value(45)
+
+OX
+A*
+
+;!owl_goal_dragon(A) && lib(A)==2 && olib(*)>1 && owl_big_eyespace(*)
+;&& (owl_eye_size(*) <= 8 || !oplay_attack(*,*))
+
+
 Pattern VA10
 
 X*           atari inside eyespace with ko

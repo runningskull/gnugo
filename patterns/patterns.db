@@ -8186,13 +8186,22 @@ OO*.
 
 
 Pattern CB229
+# gf Added constraint and relaxed requirement on living O stones. (3.9.1)
+# FIXME: Consider merging with CB291
 
 xXO             extend after hane
 XO.
 .*.
 ...
 
-:8,OXed,reverse_followup(5)
+:8,Xed,reverse_followup(5)
+
+xXb
+Xac
+.*.
+...
+
+;(alive(a) || alive(b)) && oplay_attack(*,c,c)
 
 
 Pattern CB230
@@ -8732,20 +8741,22 @@ Pattern CB290
 
 Pattern CB291
 # gf Shape value removed. (3.1.9)
+# gf Relaxed requirement on living O stones. (3.9.1)
+# FIXME: Consider merging with CB229
 
 .OX??          extend
 ..OX?
 ..*.?
 ?..??
 
-:8,OXed
+:8,Xed
 
-.OX??
-.aOX?
+.cX??
+.abX?
 ..*.?
 ?..??
 
-; oplay_attack(*,a,a)
+;(alive(b) || alive(c)) && oplay_attack(*,a,a)
 
 
 Pattern CB292
