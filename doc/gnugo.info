@@ -1,4 +1,4 @@
-This is gnugo.info, produced by makeinfo version 4.11 from gnugo.texi.
+This is gnugo.info, produced by makeinfo version 4.13 from gnugo.texi.
 
 INFO-DIR-SECTION GNU games
 START-INFO-DIR-ENTRY
@@ -9,7 +9,7 @@ END-INFO-DIR-ENTRY
 Indirect:
 gnugo.info-1: 187
 gnugo.info-2: 298286
-gnugo.info-3: 585384
+gnugo.info-3: 584824
 
 Tag Table:
 (Indirect)
@@ -182,18 +182,18 @@ Node: GTP applications434508
 Node: The Metamachine436839
 Node: Adding new GTP commands440640
 Node: GTP command reference444573
-Node: Regression475144
-Node: Regression Testing476680
-Node: Test Suites477489
-Node: Running the Regressions479616
-Node: Running regress.pike482404
-Node: Viewing with Emacs484408
-Node: HTML Views485164
-Node: Copying488598
-Node: GPL489073
-Node: GFDL526318
-Node: GTP License551444
-Node: Concept Index553151
-Node: Functions Index585384
+Node: Regression474584
+Node: Regression Testing476120
+Node: Test Suites476929
+Node: Running the Regressions479056
+Node: Running regress.pike481844
+Node: Viewing with Emacs483848
+Node: HTML Views484604
+Node: Copying488038
+Node: GPL488513
+Node: GFDL525758
+Node: GTP License550884
+Node: Concept Index552591
+Node: Functions Index584824
 
 End Tag Table

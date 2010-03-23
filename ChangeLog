@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- analyze_eyegraph improvements
 - TODO completely rewritten
 - revision of dragon_looks_inessential
 - fix overflow in computation of node limits

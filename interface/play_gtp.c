@@ -3520,7 +3520,7 @@ gtp_test_eyeshape(char *s)
 
 
 /* Function:  Compute an eyevalue and vital points for an eye graph
- * Arguments: Eyeshape encoded in string
+ * Arguments: Eyeshape encoded in string OR two integers followed by eyeshape
  * Fails:     Bad eyeshape, analysis failed
  * Returns:   Eyevalue, vital points
  */
@@ -3528,8 +3528,19 @@ static int
 gtp_analyze_eyegraph(char *s)
 {
   struct eyevalue value;
+  int outer_liberties;
+  int ko_threats;
+  int n = 0;
   char analyzed_eyegraph[1024];
-  int result = analyze_eyegraph(s, &value, analyzed_eyegraph);
+  int result;
+
+  if (sscanf(s, "%d %d %n", &outer_liberties, &ko_threats, &n) < 2) {
+    outer_liberties = 4;
+    ko_threats = 1;
+  }
+
+  result = analyze_eyegraph(s + n, &value, analyzed_eyegraph,
+			    outer_liberties, ko_threats);
 
   if (result == 0)
     return gtp_failure("failed to analyze");

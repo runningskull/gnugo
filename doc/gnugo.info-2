@@ -1,4 +1,4 @@
-This is gnugo.info, produced by makeinfo version 4.11 from gnugo.texi.
+This is gnugo.info, produced by makeinfo version 4.13 from gnugo.texi.
 
 INFO-DIR-SECTION GNU games
 START-INFO-DIR-ENTRY
@@ -1351,9 +1351,9 @@ generation algorithm. The `mogo_classic' pattern values is an
 approximation of the simulation policy used by early versions of MoGo,
 as published in the report odification of UCT with Patterns in
 Monte-Carlo Go (http://hal.inria.fr/inria-00117266) RR-6062, by Sylvain
-Gelly, Yizao Wang, Rémi Munos, and Olivier Teytaud. The uniform pattern
-values is the so called "light" playout which chooses uniformly between
-all legal moves except single point proper eyes.
+Gelly, Yizao Wang, Rémi Munos, and Olivier Teytaud. The uniform
+pattern values is the so called "light" playout which chooses uniformly
+between all legal moves except single point proper eyes.
 
    If you're not satisfied with these you can also tune your own
 pattern values with a pattern database file and load it at runtime with
@@ -3772,112 +3772,97 @@ this list could become incomplete. You may rebuild this list in
 `doc/gtp-commands.texi' with the command `make gtp-commands' in the
 `doc/' directory. This may require GNU sed.
 
-   * quit: Quit
-     Arguments: none
+   * quit: Quit Arguments: none
      Fails:     never
      Returns:   nothing
 
      Status:    GTP version 2 standard command.
       
 
-   * protocol_version: Report protocol version.
-     Arguments: none
+   * protocol_version: Report protocol version.  Arguments: none
      Fails:     never
      Returns:   protocol version number
 
      Status:    GTP version 2 standard command.
       
 
-   * name: Report the name of the program.
-     Arguments: none
+   * name: Report the name of the program.  Arguments: none
      Fails:     never
      Returns:   program name
 
      Status:    GTP version 2 standard command.
       
 
-   * version: Report the version number of the program.
-     Arguments: none
+   * version: Report the version number of the program.  Arguments: none
      Fails:     never
      Returns:   version number
 
      Status:    GTP version 2 standard command.
       
 
-   * boardsize: Set the board size to NxN and clear the board.
-     Arguments: integer
+   * boardsize: Set the board size to NxN and clear the board.  Arguments: integer
      Fails:     board size outside engine's limits
      Returns:   nothing
 
      Status:    GTP version 2 standard command.
       
 
-   * query_boardsize: Find the current boardsize
-     Arguments: none
+   * query_boardsize: Find the current boardsize Arguments: none
      Fails:     never
      Returns:   board_size
       
 
-   * clear_board: Clear the board.
-     Arguments: none
+   * clear_board: Clear the board.  Arguments: none
      Fails:     never
      Returns:   nothing
 
      Status:    GTP version 2 standard command.
       
 
-   * orientation: Set the orienation to N and clear the board
-     Arguments: integer
+   * orientation: Set the orienation to N and clear the board Arguments: integer
      Fails:     illegal orientation
      Returns:   nothing
       
 
-   * query_orientation: Find the current orientation
-     Arguments: none
+   * query_orientation: Find the current orientation Arguments: none
      Fails:     never
      Returns:   orientation
       
 
-   * komi: Set the komi.
-     Arguments: float
+   * komi: Set the komi.  Arguments: float
      Fails:     incorrect argument
      Returns:   nothing
 
      Status:    GTP version 2 standard command.
       
 
-   * get_komi: Get the komi
-     Arguments: none
+   * get_komi: Get the komi Arguments: none
      Fails:     never
      Returns:   Komi
       
 
-   * black: Play a black stone at the given vertex.
-     Arguments: vertex
+   * black: Play a black stone at the given vertex.  Arguments: vertex
      Fails:     invalid vertex, illegal move
      Returns:   nothing
 
      Status:    Obsolete GTP version 1 command.
       
 
-   * playwhite: Play a white stone at the given vertex.
-     Arguments: vertex
+   * playwhite: Play a white stone at the given vertex.  Arguments: vertex
      Fails:     invalid vertex, illegal move
      Returns:   nothing
 
      Status:    Obsolete GTP version 1 command.
       
 
-   * play: Play a stone of the given color at the given vertex.
-     Arguments: color, vertex
+   * play: Play a stone of the given color at the given vertex.  Arguments: color, vertex
      Fails:     invalid vertex, illegal move
      Returns:   nothing
 
      Status:    GTP version 2 standard command.
       
 
-   * fixed_handicap: Set up fixed placement handicap stones.
-     Arguments: number of handicap stones
+   * fixed_handicap: Set up fixed placement handicap stones.  Arguments: number of handicap stones
      Fails:     invalid number of stones for the current boardsize
      Returns:   list of vertices with handicap stones
 
@@ -3885,72 +3870,62 @@ this list could become incomplete. You may rebuild this list in
       
 
    * place_free_handicap: Choose free placement handicap stones and put
-     them on the board.
-     Arguments: number of handicap stones
+     them on the board.  Arguments: number of handicap stones
      Fails:     invalid number of stones
      Returns:   list of vertices with handicap stones
 
      Status:    GTP version 2 standard command.
       
 
-   * set_free_handicap: Put free placement handicap stones on the board.
-     Arguments: list of vertices with handicap stones
+   * set_free_handicap: Put free placement handicap stones on the board.  Arguments: list of vertices with handicap stones
      Fails:     board not empty, bad list of vertices
      Returns:   nothing
 
      Status:    GTP version 2 standard command.
       
 
-   * get_handicap: Get the handicap
-     Arguments: none
+   * get_handicap: Get the handicap Arguments: none
      Fails:     never
      Returns:   handicap
       
 
    * loadsgf: Load an sgf file, possibly up to a move number or the
-     first occurence of a move.
-     Arguments: filename + move number, vertex, or nothing
+     first occurence of a move.  Arguments: filename + move number, vertex, or nothing
      Fails:     missing filename or failure to open or parse file
      Returns:   color to play
 
      Status:    GTP version 2 standard command.
       
 
-   * color: Return the color at a vertex.
-     Arguments: vertex
+   * color: Return the color at a vertex.  Arguments: vertex
      Fails:     invalid vertex
      Returns:   "black", "white", or "empty"
       
 
-   * list_stones: List vertices with either black or white stones.
-     Arguments: color
+   * list_stones: List vertices with either black or white stones.  Arguments: color
      Fails:     invalid color
      Returns:   list of vertices
       
 
-   * countlib: Count number of liberties for the string at a vertex.
-     Arguments: vertex
+   * countlib: Count number of liberties for the string at a vertex.  Arguments: vertex
      Fails:     invalid vertex, empty vertex
      Returns:   Number of liberties.
       
 
    * findlib: Return the positions of the liberties for the string at a
-     vertex.
-     Arguments: vertex
+     vertex.  Arguments: vertex
      Fails:     invalid vertex, empty vertex
      Returns:   Sorted space separated list of vertices.
       
 
    * accuratelib: Determine which liberties a stone of given color will
-     get if played at given vertex.
-     Arguments: move (color + vertex)
+     get if played at given vertex.  Arguments: move (color + vertex)
      Fails:     invalid color, invalid vertex, occupied vertex
      Returns:   Sorted space separated list of liberties
       
 
    * accurate_approxlib: Determine which liberties a stone of given
-     color will get if played at given vertex.
-     Arguments: move (color + vertex)
+     color will get if played at given vertex.  Arguments: move (color + vertex)
      Fails:     invalid color, invalid vertex, occupied vertex
      Returns:   Sorted space separated list of liberties
 
@@ -3958,176 +3933,149 @@ this list could become incomplete. You may rebuild this list in
      can be retired when this is confirmed.
       
 
-   * is_legal: Tell whether a move is legal.
-     Arguments: move
+   * is_legal: Tell whether a move is legal.  Arguments: move
      Fails:     invalid move
      Returns:   1 if the move is legal, 0 if it is not.
       
 
-   * all_legal: List all legal moves for either color.
-     Arguments: color
+   * all_legal: List all legal moves for either color.  Arguments: color
      Fails:     invalid color
      Returns:   Sorted space separated list of vertices.
       
 
-   * captures: List the number of captures taken by either color.
-     Arguments: color
+   * captures: List the number of captures taken by either color.  Arguments: color
      Fails:     invalid color
      Returns:   Number of captures.
       
 
-   * last_move: Return the last move.
-     Arguments: none
+   * last_move: Return the last move.  Arguments: none
      Fails:     no previous move known
      Returns:   Color and vertex of last move.
       
 
-   * move_history: Print the move history in reverse order
-     Arguments: none
+   * move_history: Print the move history in reverse order Arguments: none
      Fails:     never
      Returns:   List of moves played in reverse order in format:
                 color move (one move per line)
       
 
    * invariant_hash: Return the rotation/reflection invariant board
-     hash.
-     Arguments: none
+     hash.  Arguments: none
      Fails:     never
      Returns:   Invariant hash for the board as a hexadecimal number.
       
 
    * invariant_hash_for_moves: Return the rotation/reflection invariant
      board hash obtained by playing all the possible moves for the
-          given color.
-     Arguments: color
+          given color.  Arguments: color
      Fails:     invalid color
      Returns:   List of moves + invariant hash as a hexadecimal number,
                 one pair of move + hash per line.
       
 
-   * trymove: Play a stone of the given color at the given vertex.
-     Arguments: move (color + vertex)
+   * trymove: Play a stone of the given color at the given vertex.  Arguments: move (color + vertex)
      Fails:     invalid color, invalid vertex, illegal move
      Returns:   nothing
       
 
    * tryko: Play a stone of the given color at the given vertex,
-     allowing illegal ko capture.
-     Arguments: move (color + vertex)
+     allowing illegal ko capture.  Arguments: move (color + vertex)
      Fails:     invalid color, invalid vertex, illegal move
      Returns:   nothing
       
 
-   * popgo: Undo a trymove or tryko.
-     Arguments: none
+   * popgo: Undo a trymove or tryko.  Arguments: none
      Fails:     stack empty
      Returns:   nothing
 
-   * clear_cache: clear the caches.
-     Arguments: none.
+   * clear_cache: clear the caches.  Arguments: none.
      Fails:     never.
      Returns:   nothing.
       
 
-   * attack: Try to attack a string.
-     Arguments: vertex
+   * attack: Try to attack a string.  Arguments: vertex
      Fails:     invalid vertex, empty vertex
      Returns:   attack code followed by attack point if attack code nonzero.
       
 
-   * attack_either: Try to attack either of two strings
-     Arguments: two vertices
+   * attack_either: Try to attack either of two strings Arguments: two vertices
      Fails:     invalid vertex, empty vertex
      Returns:   attack code against the strings.  Guarantees there
                 exists a move which will attack one of the two
                 with attack_code, but does not return the move.
       
 
-   * defend: Try to defend a string.
-     Arguments: vertex
+   * defend: Try to defend a string.  Arguments: vertex
      Fails:     invalid vertex, empty vertex
      Returns:   defense code followed by defense point if defense code nonzero.
       
 
    * does_attack: Examine whether a specific move attacks a string
-     tactically.
-     Arguments: vertex (move), vertex (dragon)
+     tactically.  Arguments: vertex (move), vertex (dragon)
      Fails:     invalid vertex, empty vertex
      Returns:   attack code
       
 
    * does_defend: Examine whether a specific move defends a string
-     tactically.
-     Arguments: vertex (move), vertex (dragon)
+     tactically.  Arguments: vertex (move), vertex (dragon)
      Fails:     invalid vertex, empty vertex
      Returns:   attack code
       
 
-   * ladder_attack: Try to attack a string strictly in a ladder.
-     Arguments: vertex
+   * ladder_attack: Try to attack a string strictly in a ladder.  Arguments: vertex
      Fails:     invalid vertex, empty vertex
      Returns:   attack code followed by attack point if attack code nonzero.
       
 
-   * increase_depths: Increase depth values by one.
-     Arguments: none
+   * increase_depths: Increase depth values by one.  Arguments: none
      Fails:     never
      Returns:   nothing
       
 
-   * decrease_depths: Decrease depth values by one.
-     Arguments: none
+   * decrease_depths: Decrease depth values by one.  Arguments: none
      Fails:     never
      Returns:   nothing
       
 
-   * owl_attack: Try to attack a dragon.
-     Arguments: vertex
+   * owl_attack: Try to attack a dragon.  Arguments: vertex
      Fails:     invalid vertex, empty vertex
      Returns:   attack code followed by attack point if attack code nonzero.
       
 
-   * owl_defend: Try to defend a dragon.
-     Arguments: vertex
+   * owl_defend: Try to defend a dragon.  Arguments: vertex
      Fails:     invalid vertex, empty vertex
      Returns:   defense code followed by defense point if defense code nonzero.
       
 
-   * owl_threaten_attack: Try to attack a dragon in 2 moves.
-     Arguments: vertex
+   * owl_threaten_attack: Try to attack a dragon in 2 moves.  Arguments: vertex
      Fails:     invalid vertex, empty vertex
      Returns:   attack code followed by the two attack points if
                 attack code nonzero.
       
 
-   * owl_threaten_defense: Try to defend a dragon with 2 moves.
-     Arguments: vertex
+   * owl_threaten_defense: Try to defend a dragon with 2 moves.  Arguments: vertex
      Fails:     invalid vertex, empty vertex
      Returns:   defense code followed by the 2 defense points if
                 defense code nonzero.
       
 
-   * owl_does_attack: Examine whether a specific move attacks a dragon.
-     Arguments: vertex (move), vertex (dragon)
+   * owl_does_attack: Examine whether a specific move attacks a dragon.  Arguments: vertex (move), vertex (dragon)
      Fails:     invalid vertex, empty vertex
      Returns:   attack code
       
 
-   * owl_does_defend: Examine whether a specific move defends a dragon.
-     Arguments: vertex (move), vertex (dragon)
+   * owl_does_defend: Examine whether a specific move defends a dragon.  Arguments: vertex (move), vertex (dragon)
      Fails:     invalid vertex, empty vertex
      Returns:   defense code
       
 
    * owl_connection_defends: Examine whether a connection defends
-     involved dragons.
-     Arguments: vertex (move), vertex (dragon1), vertex (dragon2)
+     involved dragons.  Arguments: vertex (move), vertex (dragon1), vertex (dragon2)
      Fails:     invalid vertex, empty vertex
      Returns:   defense code
       
 
-   * defend_both: Try to defend both of two strings
-     Arguments: two vertices
+   * defend_both: Try to defend both of two strings Arguments: two vertices
      Fails:     invalid vertex, empty vertex
      Returns:   defend code for the strings.  Guarantees there
                 exists a move which will defend both of the two
@@ -4135,64 +4083,54 @@ this list could become incomplete. You may rebuild this list in
       
 
    * owl_substantial: Determine whether capturing a string gives a
-     living dragon
-     Arguments: vertex
+     living dragon Arguments: vertex
      Fails:     invalid vertex, empty vertex
      Returns:   1 if dragon can live, 0 otherwise
       
 
-   * analyze_semeai: Analyze a semeai
-     Arguments: dragona, dragonb
+   * analyze_semeai: Analyze a semeai Arguments: dragona, dragonb
      Fails:     invalid vertices, empty vertices
      Returns:   semeai defense result, semeai attack result, semeai move
       
 
    * analyze_semeai_after_move: Analyze a semeai after a move have been
-     made.
-     Arguments: color, vertex, dragona, dragonb
+     made.  Arguments: color, vertex, dragona, dragonb
      Fails:     invalid vertices
      Returns:   semeai defense result, semeai attack result, semeai move
       
 
-   * tactical_analyze_semeai: Analyze a semeai, not using owl
-     Arguments: dragona, dragonb
+   * tactical_analyze_semeai: Analyze a semeai, not using owl Arguments: dragona, dragonb
      Fails:     invalid vertices, empty vertices
      Returns:   status of dragona, dragonb assuming dragona moves first
       
 
-   * connect: Try to connect two strings.
-     Arguments: vertex, vertex
+   * connect: Try to connect two strings.  Arguments: vertex, vertex
      Fails:     invalid vertex, empty vertex, vertices of different colors
      Returns:   connect result followed by connect point if successful.
       
 
-   * disconnect: Try to disconnect two strings.
-     Arguments: vertex, vertex
+   * disconnect: Try to disconnect two strings.  Arguments: vertex, vertex
      Fails:     invalid vertex, empty vertex, vertices of different colors
      Returns:   disconnect result followed by disconnect point if successful.
       
 
-   * break_in: Try to break from string into area.
-     Arguments: vertex, vertices
+   * break_in: Try to break from string into area.  Arguments: vertex, vertices
      Fails:     invalid vertex, empty vertex.
      Returns:   result followed by break in point if successful.
       
 
-   * block_off: Try to block string from area.
-     Arguments: vertex, vertices
+   * block_off: Try to block string from area.  Arguments: vertex, vertices
      Fails:     invalid vertex, empty vertex.
      Returns:   result followed by block point if successful.
 
-   * eval_eye: Evaluate an eye space
-     Arguments: vertex
+   * eval_eye: Evaluate an eye space Arguments: vertex
      Fails:     invalid vertex
      Returns:   Minimum and maximum number of eyes. If these differ an
                 attack and a defense point are additionally returned.
                 If the vertex is not an eye space or not of unique color,
                 a single -1 is returned.
 
-   * dragon_status: Determine status of a dragon.
-     Arguments: optional vertex
+   * dragon_status: Determine status of a dragon.  Arguments: optional vertex
      Fails:     invalid vertex, empty vertex
      Returns:   status ("alive", "critical", "dead", or "unknown"),
                 attack point, defense point. Points of attack and
@@ -4204,14 +4142,12 @@ this list could become incomplete. You may rebuild this list in
             and independent life. Should also be able to identify ko.
 
    * same_dragon: Determine whether two stones belong to the same
-     dragon.
-     Arguments: vertex, vertex
+     dragon.  Arguments: vertex, vertex
      Fails:     invalid vertex, empty vertex
      Returns:   1 if the vertices belong to the same dragon, 0 otherwise
 
    * unconditional_status: Determine the unconditional status of a
-     vertex.
-     Arguments: vertex
+     vertex.  Arguments: vertex
      Fails:     invalid vertex
      Returns:   unconditional status ("undecided", "alive", "dead",
                 "white_territory", "black_territory"). Occupied vertices can
@@ -4219,34 +4155,29 @@ this list could become incomplete. You may rebuild this list in
                 undecided, white territory, or black territory.
 
    * combination_attack: Find a move by color capturing something
-     through a combination attack.
-     Arguments: color
+     through a combination attack.  Arguments: color
      Fails:     invalid color
      Returns:   Recommended move, PASS if no move found
 
    * combination_defend: If color can capture something through a
      combination attack, list moves by the opponent of color
-     to defend against this attack.
-     Arguments: color
+     to defend against this attack.  Arguments: color
      Fails:     invalid color
      Returns:   Recommended moves, PASS if no combination attack found.
 
-   * aa_confirm_safety: Run atari_atari_confirm_safety().
-     Arguments: move, optional int
+   * aa_confirm_safety: Run atari_atari_confirm_safety().  Arguments: move, optional int
      Fails:     invalid move
      Returns:   success code, if failure also defending move
       
 
-   * genmove_black: Generate and play the supposedly best black move.
-     Arguments: none
+   * genmove_black: Generate and play the supposedly best black move.  Arguments: none
      Fails:     never
      Returns:   a move coordinate or "PASS"
 
      Status:    Obsolete GTP version 1 command.
       
 
-   * genmove_white: Generate and play the supposedly best white move.
-     Arguments: none
+   * genmove_white: Generate and play the supposedly best white move.  Arguments: none
      Fails:     never
      Returns:   a move coordinate or "PASS"
 
@@ -4254,24 +4185,21 @@ this list could become incomplete. You may rebuild this list in
       
 
    * genmove: Generate and play the supposedly best move for either
-     color.
-     Arguments: color to move
+     color.  Arguments: color to move
      Fails:     invalid color
      Returns:   a move coordinate or "PASS" (or "resign" if resignation_allowed)
 
      Status:    GTP version 2 standard command.
       
 
-   * reg_genmove: Generate the supposedly best move for either color.
-     Arguments: color to move
+   * reg_genmove: Generate the supposedly best move for either color.  Arguments: color to move
      Fails:     invalid color
      Returns:   a move coordinate (or "PASS")
 
      Status:    GTP version 2 standard command.
       
 
-   * gg_genmove: Generate the supposedly best move for either color.
-     Arguments: color to move, optionally a random seed
+   * gg_genmove: Generate the supposedly best move for either color.  Arguments: color to move, optionally a random seed
      Fails:     invalid color
      Returns:   a move coordinate (or "PASS")
 
@@ -4279,16 +4207,14 @@ this list could become incomplete. You may rebuild this list in
       
 
    * restricted_genmove: Generate the supposedly best move for either
-     color from a choice of allowed vertices.
-     Arguments: color to move, allowed vertices
+     color from a choice of allowed vertices.  Arguments: color to move, allowed vertices
      Fails:     invalid color, invalid vertex, no vertex listed
      Returns:   a move coordinate (or "PASS")
       
 
    * kgs-genmove_cleanup: Generate and play the supposedly best move
      for either color, not passing until all dead opponent stones have
-     been removed.
-     Arguments: color to move
+     been removed.  Arguments: color to move
      Fails:     invalid color
      Returns:   a move coordinate (or "PASS")
 
@@ -4298,40 +4224,34 @@ this list could become incomplete. You may rebuild this list in
      to GTP version 3 at a later time.
       
 
-   * level: Set the playing level.
-     Arguments: int
+   * level: Set the playing level.  Arguments: int
      Fails:     incorrect argument
      Returns:   nothing
 
-   * undo: Undo one move
-     Arguments: none
+   * undo: Undo one move Arguments: none
      Fails:     If move history is too short.
      Returns:   nothing
 
      Status:    GTP version 2 standard command.
 
-   * gg-undo: Undo a number of moves
-     Arguments: optional int
+   * gg-undo: Undo a number of moves Arguments: optional int
      Fails:     If move history is too short.
      Returns:   nothing
 
-   * time_settings: Set time allowance
-     Arguments: int main_time, int byo_yomi_time, int byo_yomi_stones
+   * time_settings: Set time allowance Arguments: int main_time, int byo_yomi_time, int byo_yomi_stones
      Fails:     syntax error
      Returns:   nothing
 
      Status:    GTP version 2 standard command.
 
-   * time_left: Report remaining time
-     Arguments: color color, int time, int stones
+   * time_left: Report remaining time Arguments: color color, int time, int stones
      Fails:     syntax error
      Returns:   nothing
 
      Status:    GTP version 2 standard command.
       
 
-   * final_score: Compute the score of a finished game.
-     Arguments: Optional random seed
+   * final_score: Compute the score of a finished game.  Arguments: Optional random seed
      Fails:     never
      Returns:   Score in SGF format (RE property).
 
@@ -4339,16 +4259,14 @@ this list could become incomplete. You may rebuild this list in
       
 
    * final_status: Report the final status of a vertex in a finished
-     game.
-     Arguments: Vertex, optional random seed
+     game.  Arguments: Vertex, optional random seed
      Fails:     invalid vertex
      Returns:   Status in the form of one of the strings "alive", "dead",
                 "seki", "white_territory", "black_territory", or "dame".
       
 
    * final_status_list: Report vertices with a specific final status in
-     a finished game.
-     Arguments: Status in the form of one of the strings "alive", "dead",
+     a finished game.  Arguments: Status in the form of one of the strings "alive", "dead",
                 "seki", "white_territory", "black_territory", or "dame".
                 An optional random seed can be added.
      Fails:     missing or invalid status string
@@ -4360,14 +4278,12 @@ this list could become incomplete. You may rebuild this list in
                 However, "dame", "white_territory", and "black_territory"
                 are private extensions.
 
-   * estimate_score: Estimate the score
-     Arguments: None
+   * estimate_score: Estimate the score Arguments: None
      Fails:     never
      Returns:   upper and lower bounds for the score
 
    * experimental_score: Estimate the score, taking into account which
-     player moves next
-     Arguments: Color to play
+     player moves next Arguments: Color to play
      Fails:     Invalid color
      Returns:   Score.
 
@@ -4378,8 +4294,7 @@ this list could become incomplete. You may rebuild this list in
      in the value of the move generated.
       
 
-   * reset_life_node_counter: Reset the count of life nodes.
-     Arguments: none
+   * reset_life_node_counter: Reset the count of life nodes.  Arguments: none
      Fails:     never
      Returns:   nothing
 
@@ -4387,8 +4302,7 @@ this list could become incomplete. You may rebuild this list in
      compatibility.
       
 
-   * get_life_node_counter: Retrieve the count of life nodes.
-     Arguments: none
+   * get_life_node_counter: Retrieve the count of life nodes.  Arguments: none
      Fails:     never
      Returns:   number of life nodes
 
@@ -4396,91 +4310,77 @@ this list could become incomplete. You may rebuild this list in
      compatibility.
       
 
-   * reset_owl_node_counter: Reset the count of owl nodes.
-     Arguments: none
+   * reset_owl_node_counter: Reset the count of owl nodes.  Arguments: none
      Fails:     never
      Returns:   nothing
       
 
-   * get_owl_node_counter: Retrieve the count of owl nodes.
-     Arguments: none
+   * get_owl_node_counter: Retrieve the count of owl nodes.  Arguments: none
      Fails:     never
      Returns:   number of owl nodes
       
 
-   * reset_reading_node_counter: Reset the count of reading nodes.
-     Arguments: none
+   * reset_reading_node_counter: Reset the count of reading nodes.  Arguments: none
      Fails:     never
      Returns:   nothing
       
 
-   * get_reading_node_counter: Retrieve the count of reading nodes.
-     Arguments: none
+   * get_reading_node_counter: Retrieve the count of reading nodes.  Arguments: none
      Fails:     never
      Returns:   number of reading nodes
       
 
-   * reset_trymove_counter: Reset the count of trymoves/trykos.
-     Arguments: none
+   * reset_trymove_counter: Reset the count of trymoves/trykos.  Arguments: none
      Fails:     never
      Returns:   nothing
       
 
-   * get_trymove_counter: Retrieve the count of trymoves/trykos.
-     Arguments: none
+   * get_trymove_counter: Retrieve the count of trymoves/trykos.  Arguments: none
      Fails:     never
      Returns:   number of trymoves/trykos
       
 
-   * reset_connection_node_counter: Reset the count of connection nodes.
-     Arguments: none
+   * reset_connection_node_counter: Reset the count of connection nodes.  Arguments: none
      Fails:     never
      Returns:   nothing
       
 
    * get_connection_node_counter: Retrieve the count of connection
-     nodes.
-     Arguments: none
+     nodes.  Arguments: none
      Fails:     never
      Returns:   number of connection nodes
       
 
-   * test_eyeshape: Test an eyeshape for inconsistent evaluations
-     Arguments: Eyeshape vertices
+   * test_eyeshape: Test an eyeshape for inconsistent evaluations Arguments: Eyeshape vertices
      Fails:     Bad vertices
      Returns:   Failure reports on stderr.
       
 
    * analyze_eyegraph: Compute an eyevalue and vital points for an eye
-     graph
-     Arguments: Eyeshape encoded in string
+     graph Arguments: Eyeshape encoded in string
      Fails:     Bad eyeshape, analysis failed
      Returns:   Eyevalue, vital points
       
 
-   * cputime: Returns elapsed CPU time in seconds.
-     Arguments: none
+   * cputime: Returns elapsed CPU time in seconds.  Arguments: none
      Fails:     never
      Returns:   Total elapsed (user + system) CPU time in seconds.
       
 
-   * showboard: Write the position to stdout.
-     Arguments: none
+   * showboard: Write the position to stdout.  Arguments: none
      Fails:     never
      Returns:   nothing
 
      Status:    GTP version 2 standard command.
       
 
-   * dump_stack: Dump stack to stderr.
-     Arguments: none
+   * dump_stack: Dump stack to stderr.  Arguments: none
      Fails:     never
      Returns:   nothing
       
 
    * initial_influence: Return information about the initial influence
-     function.
-     Arguments: color to move, what information
+     function.  Arguments: color to move, what information
      Fails:     never
      Returns:   Influence data formatted like:
 
@@ -4518,37 +4418,32 @@ this list could become incomplete. You may rebuild this list in
       
 
    * move_influence: Return information about the influence function
-     after a move.
-     Arguments: move, what information
+     after a move.  Arguments: move, what information
      Fails:     never
      Returns:   Influence data formatted like for initial_influence.
       
 
    * move_probabilities: List probabilities of each move being played
      (when non-zero). If no previous genmove command has been issued,
-     the result            of this command will be meaningless.
-     Arguments: none
+     the result            of this command will be meaningless.  Arguments: none
      Fails:     never
      Returns:   Move, probabilty pairs, one per row.
       
 
    * move_uncertainty: Return the number of bits of uncertainty in the
      move. If no previous genmove command has been issued, the result
-             of this command will be meaningless.
-     Arguments: none
+             of this command will be meaningless.  Arguments: none
      Fails:     never
      Returns:   bits of uncertainty
       
 
    * followup_influence: Return information about the followup
-     influence after a move.
-     Arguments: move, what information
+     influence after a move.  Arguments: move, what information
      Fails:     never
      Returns:   Influence data formatted like for initial_influence.
       
 
-   * worm_data: Return the information in the worm data structure.
-     Arguments: optional vertex
+   * worm_data: Return the information in the worm data structure.  Arguments: optional vertex
      Fails:     never
      Returns:   Worm data formatted like:
 
@@ -4582,47 +4477,40 @@ this list could become incomplete. You may rebuild this list in
      If an intersection is specified, only data for this one will be returned.
       
 
-   * worm_stones: List the stones of a worm
-     Arguments: the location, "BLACK" or "WHITE"
+   * worm_stones: List the stones of a worm Arguments: the location, "BLACK" or "WHITE"
      Fails:     if called on an empty or off-board location
      Returns:   list of stones
       
 
    * worm_cutstone: Return the cutstone field in the worm data
-     structure.
-     Arguments: non-empty vertex
+     structure.  Arguments: non-empty vertex
      Fails:     never
      Returns:   cutstone
       
 
-   * dragon_data: Return the information in the dragon data structure.
-     Arguments: optional intersection
+   * dragon_data: Return the information in the dragon data structure.  Arguments: optional intersection
      Fails:     never
      Returns:   Dragon data formatted in the corresponding way to worm_data.
       
 
-   * dragon_stones: List the stones of a dragon
-     Arguments: the location
+   * dragon_stones: List the stones of a dragon Arguments: the location
      Fails:     if called on an empty or off-board location
      Returns:   list of stones
       
 
-   * eye_data: Return the information in the eye data structure.
-     Arguments: color, vertex
+   * eye_data: Return the information in the eye data structure.  Arguments: color, vertex
      Fails:     never
      Returns:   eye data fields and values, one pair per row
       
 
    * half_eye_data: Return the information in the half eye data
-     structure.
-     Arguments: vertex
+     structure.  Arguments: vertex
      Fails:     never
      Returns:   half eye data fields and values, one pair per row
       
 
    * start_sgftrace: Start storing moves executed during reading in an
-     sgf tree in memory.
-     Arguments: none
+     sgf tree in memory.  Arguments: none
      Fails:     never
      Returns:   nothing
 
@@ -4631,8 +4519,7 @@ this list could become incomplete. You may rebuild this list in
       
 
    * finish_sgftrace: Finish storing moves in an sgf tree and write it
-     to file.
-     Arguments: filename
+     to file.  Arguments: filename
      Fails:     never
      Returns:   nothing
 
@@ -4641,41 +4528,35 @@ this list could become incomplete. You may rebuild this list in
       
 
    * printsgf: Dump the current position as a static sgf file to
-     filename, or as output if filename is missing or "-"
-     Arguments: optional filename
+     filename, or as output if filename is missing or "-" Arguments: optional filename
      Fails:     never
      Returns:   nothing if filename, otherwise the sgf
       
 
    * tune_move_ordering: Tune the parameters for the move ordering in
-     the tactical reading.
-     Arguments: MOVE_ORDERING_PARAMETERS integers
+     the tactical reading.  Arguments: MOVE_ORDERING_PARAMETERS integers
      Fails:     incorrect arguments
      Returns:   nothing
       
 
-   * echo: Echo the parameter
-     Arguments: string
+   * echo: Echo the parameter Arguments: string
      Fails:     never
      Returns:   nothing
       
 
-   * echo_err: Echo the parameter to stdout AND stderr
-     Arguments: string
+   * echo_err: Echo the parameter to stdout AND stderr Arguments: string
      Fails:     never
      Returns:   nothing
       
 
-   * help: List all known commands
-     Arguments: none
+   * help: List all known commands Arguments: none
      Fails:     never
      Returns:   list of known commands, one per line
 
      Status:    GTP version 2 standard command.
       
 
-   * known_command: Tell whether a command is known.
-     Arguments: command name
+   * known_command: Tell whether a command is known.  Arguments: command name
      Fails:     never
      Returns:   "true" if command exists, "false" if not
 
@@ -4683,74 +4564,62 @@ this list could become incomplete. You may rebuild this list in
       
 
    * report_uncertainty: Turn uncertainty reports from owl_attack and
-     owl_defend on or off.
-     Arguments: "on" or "off"
+     owl_defend on or off.  Arguments: "on" or "off"
      Fails:     invalid argument
      Returns:   nothing
       
 
-   * get_random_seed: Get the random seed
-     Arguments: none
+   * get_random_seed: Get the random seed Arguments: none
      Fails:     never
      Returns:   random seed
       
 
-   * set_random_seed: Set the random seed
-     Arguments: integer
+   * set_random_seed: Set the random seed Arguments: integer
      Fails:     invalid data
      Returns:   nothing
       
 
-   * advance_random_seed: Advance the random seed by a number of games.
-     Arguments: integer
+   * advance_random_seed: Advance the random seed by a number of games.  Arguments: integer
      Fails:     invalid data
      Returns:   New random seed.
       
 
-   * is_surrounded: Determine if a dragon is surrounded
-     Arguments: vertex (dragon)
+   * is_surrounded: Determine if a dragon is surrounded Arguments: vertex (dragon)
      Fails:     invalid vertex, empty vertex
      Returns:   1 if surrounded, 2 if weakly surrounded, 0 if not
       
 
-   * does_surround: Determine if a move surrounds a dragon
-     Arguments: vertex (move), vertex (dragon)
+   * does_surround: Determine if a move surrounds a dragon Arguments: vertex (move), vertex (dragon)
      Fails:     invalid vertex, empty (dragon, nonempty (move)
      Returns:   1 if (move) surrounds (dragon)
 
-   * surround_map: Report the surround map for dragon at a vertex
-     Arguments: vertex (dragon), vertex (mapped location)
+   * surround_map: Report the surround map for dragon at a vertex Arguments: vertex (dragon), vertex (mapped location)
      Fails:     invalid vertex, empty dragon
      Returns:   value of surround map at (mapped location), or -1 if
                 dragon not surrounded.
       
 
-   * set_search_diamond: limit search, and establish a search diamond
-     Arguments: pos
+   * set_search_diamond: limit search, and establish a search diamond Arguments: pos
      Fails:     invalid value
      Returns:   nothing
       
 
-   * reset_search_mask: unmark the entire board for limited search
-     Arguments: none
+   * reset_search_mask: unmark the entire board for limited search Arguments: none
      Fails:     never
      Returns:   nothing
       
 
-   * limit_search: sets the global variable limit_search
-     Arguments: value
+   * limit_search: sets the global variable limit_search Arguments: value
      Fails:     invalid arguments
      Returns:   nothing
       
 
-   * set_search_limit: mark a vertex for limited search
-     Arguments: position
+   * set_search_limit: mark a vertex for limited search Arguments: position
      Fails:     invalid arguments
      Returns:   nothing
       
 
-   * draw_search_area: Draw search area. Writes to stderr.
-     Arguments: none
+   * draw_search_area: Draw search area. Writes to stderr.  Arguments: none
      Fails:     never
      Returns:   nothing
 
@@ -6367,460 +6236,460 @@ Concept Index
 * Menu:
 
 * aa_confirm_safety:                     GTP command reference.
-                                                             (line  492)
+                                                              (line 426)
 * accurate_approxlib:                    GTP command reference.
-                                                             (line  207)
+                                                              (line 183)
 * accuratelib:                           GTP command reference.
-                                                             (line  200)
-* adjacent dragons:                      Dragons.            (line  145)
+                                                              (line 177)
+* adjacent dragons:                      Dragons.             (line 145)
 * advance_random_seed:                   GTP command reference.
-                                                             (line  960)
+                                                              (line 838)
 * all_legal:                             GTP command reference.
-                                                             (line  223)
-* amalgamation of worms into dragons:    Amalgamation.       (line    6)
+                                                              (line 197)
+* amalgamation of worms into dragons:    Amalgamation.        (line   6)
 * analyze_eyegraph:                      GTP command reference.
-                                                             (line  710)
+                                                              (line 615)
 * analyze_semeai:                        GTP command reference.
-                                                             (line  400)
+                                                              (line 347)
 * analyze_semeai_after_move:             GTP command reference.
-                                                             (line  406)
-* API:                                   API.                (line   26)
-* area:                                  Territory and Moyo. (line    6)
-* ascii description of shapes:           Patterns Overview.  (line   27)
-* ascii interface:                       Ascii.              (line    6)
-* ascii mode:                            Invoking GNU Go.    (line  336)
+                                                              (line 352)
+* API:                                   API.                 (line  26)
+* area:                                  Territory and Moyo.  (line   6)
+* ascii description of shapes:           Patterns Overview.   (line  27)
+* ascii interface:                       Ascii.               (line   6)
+* ascii mode:                            Invoking GNU Go.     (line 336)
 * attack:                                GTP command reference.
-                                                             (line  288)
-* attack shapes database:                Patterns Overview.  (line    6)
+                                                              (line 252)
+* attack shapes database:                Patterns Overview.   (line   6)
 * attack_either:                         GTP command reference.
-                                                             (line  294)
-* autohelper actions:                    Autohelper Actions. (line    6)
+                                                              (line 257)
+* autohelper actions:                    Autohelper Actions.  (line   6)
 * Autohelpers:                           Autohelpers and Constraints.
-                                                             (line    6)
-* automaton:                             DFA.                (line   29)
+                                                              (line   6)
+* automaton:                             DFA.                 (line  29)
 * black:                                 GTP command reference.
-                                                             (line  111)
+                                                              (line 100)
 * block_off:                             GTP command reference.
-                                                             (line  437)
-* board_state:                           The Board State.    (line    6)
+                                                              (line 378)
+* board_state:                           The Board State.     (line   6)
 * boardsize:                             GTP command reference.
-                                                             (line   63)
+                                                              (line  59)
 * break_in:                              GTP command reference.
-                                                             (line  431)
-* cache:                                 Invoking GNU Go.    (line  119)
-* cache-size:                            Invoking GNU Go.    (line  119)
+                                                              (line 373)
+* cache:                                 Invoking GNU Go.     (line 119)
+* cache-size:                            Invoking GNU Go.     (line 119)
 * captures:                              GTP command reference.
-                                                             (line  229)
-* CGoban:                                CGoban.             (line    6)
+                                                              (line 202)
+* CGoban:                                CGoban.              (line   6)
 * clear_board:                           GTP command reference.
-                                                             (line   77)
+                                                              (line  71)
 * clear_cache:                           GTP command reference.
-                                                             (line  284)
+                                                              (line 249)
 * color:                                 GTP command reference.
-                                                             (line  175)
-* color (dragon):                        Dragons.            (line   98)
-* colored display <1>:                   Dragons in Color.   (line    6)
-* colored display:                       Colored Display.    (line    6)
+                                                              (line 156)
+* color (dragon):                        Dragons.             (line  98)
+* colored display <1>:                   Dragons in Color.    (line   6)
+* colored display:                       Colored Display.     (line   6)
 * combination_attack:                    GTP command reference.
-                                                             (line  479)
+                                                              (line 415)
 * combination_defend:                    GTP command reference.
-                                                             (line  485)
-* command line options:                  Invoking GNU Go.    (line    6)
+                                                              (line 420)
+* command line options:                  Invoking GNU Go.     (line   6)
 * connect:                               GTP command reference.
-                                                             (line  419)
+                                                              (line 363)
 * connection shapes database <1>:        Connections Database.
-                                                             (line    6)
-* connection shapes database:            Patterns Overview.  (line    6)
-* connections:                           Connection.         (line    6)
+                                                              (line   6)
+* connection shapes database:            Patterns Overview.   (line   6)
+* connections:                           Connection.          (line   6)
 * connections database:                  Connections Database.
-                                                             (line    6)
-* corner matcher:                        Corner Matcher.     (line    6)
+                                                              (line   6)
+* corner matcher:                        Corner Matcher.      (line   6)
 * countlib:                              GTP command reference.
-                                                             (line  187)
+                                                              (line 166)
 * cputime:                               GTP command reference.
-                                                             (line  717)
-* cutting stone:                         Worms.              (line  124)
-* cutting stone, potential:              Worms.              (line  133)
+                                                              (line 621)
+* cutting stone:                         Worms.               (line 124)
+* cutting stone, potential:              Worms.               (line 133)
 * data structures:                       Basic Data Structures.
-                                                             (line    6)
-* debugging on a graphical board:        view.pike.          (line    6)
-* debugging options:                     Invoking GNU Go.    (line  415)
-* Debugging the reading code:            Debugging.          (line    6)
-* decide-dragon:                         Decide dragon.      (line    6)
-* decide-string:                         Decide string.      (line    6)
+                                                              (line   6)
+* debugging on a graphical board:        view.pike.           (line   6)
+* debugging options:                     Invoking GNU Go.     (line 415)
+* Debugging the reading code:            Debugging.           (line   6)
+* decide-dragon:                         Decide dragon.       (line   6)
+* decide-string:                         Decide string.       (line   6)
 * decrease_depths:                       GTP command reference.
-                                                             (line  334)
-* defence shapes database:               Patterns Overview.  (line    6)
+                                                              (line 291)
+* defence shapes database:               Patterns Overview.   (line   6)
 * defend:                                GTP command reference.
-                                                             (line  302)
+                                                              (line 264)
 * defend_both:                           GTP command reference.
-                                                             (line  385)
-* depth:                                 Invoking GNU Go.    (line  242)
-* Depth of reading:                      Tactical Reading.   (line    6)
-* description of shapes:                 Patterns Overview.  (line   27)
-* dfa:                                   DFA.                (line   29)
-* dfa.c:                                 DFA.                (line   29)
-* dfa.h:                                 DFA.                (line   29)
+                                                              (line 334)
+* depth:                                 Invoking GNU Go.     (line 242)
+* Depth of reading:                      Tactical Reading.    (line   6)
+* description of shapes:                 Patterns Overview.   (line  27)
+* dfa:                                   DFA.                 (line  29)
+* dfa.c:                                 DFA.                 (line  29)
+* dfa.h:                                 DFA.                 (line  29)
 * disconnect:                            GTP command reference.
-                                                             (line  425)
-* distance from liberty to dragon:       Worms.              (line  109)
+                                                              (line 368)
+* distance from liberty to dragon:       Worms.               (line 109)
 * does_attack:                           GTP command reference.
-                                                             (line  308)
+                                                              (line 269)
 * does_defend:                           GTP command reference.
-                                                             (line  315)
+                                                              (line 275)
 * does_surround:                         GTP command reference.
-                                                             (line  972)
-* dragon:                                Worms and Dragons.  (line   27)
-* dragon escape_route:                   Dragons.            (line  207)
-* dragon genus:                          Dragons.            (line  213)
-* dragon lunch:                          Dragons.            (line  230)
-* dragon number:                         Dragons.            (line  100)
-* dragon origin:                         Dragons.            (line  104)
-* dragon safety:                         Dragons.            (line  176)
-* dragon size:                           Dragons.            (line  112)
-* dragon status:                         Dragons.            (line  131)
-* dragon weakness:                       Dragons.            (line  199)
+                                                              (line 848)
+* dragon:                                Worms and Dragons.   (line  27)
+* dragon escape_route:                   Dragons.             (line 207)
+* dragon genus:                          Dragons.             (line 213)
+* dragon lunch:                          Dragons.             (line 230)
+* dragon number:                         Dragons.             (line 100)
+* dragon origin:                         Dragons.             (line 104)
+* dragon safety:                         Dragons.             (line 176)
+* dragon size:                           Dragons.             (line 112)
+* dragon status:                         Dragons.             (line 131)
+* dragon weakness:                       Dragons.             (line 199)
 * dragon_data:                           GTP command reference.
-                                                             (line  854)
+                                                              (line 747)
 * dragon_status:                         GTP command reference.
-                                                             (line  452)
+                                                              (line 391)
 * dragon_stones:                         GTP command reference.
-                                                             (line  860)
-* dragons:                               Dragons.            (line    6)
+                                                              (line 752)
+* dragons:                               Dragons.             (line   6)
 * draw_search_area:                      GTP command reference.
-                                                             (line 1008)
+                                                              (line 878)
 * dump_stack:                            GTP command reference.
-                                                             (line  731)
+                                                              (line 633)
 * echo:                                  GTP command reference.
-                                                             (line  913)
+                                                              (line 798)
 * echo_err:                              GTP command reference.
-                                                             (line  919)
-* editing pattern database:              Editing Patterns.   (line    6)
-* editing patterns:                      Editing Patterns.   (line    6)
-* effective size:                        Dragons.            (line  116)
-* effective size (worm):                 Worms.              (line   48)
-* eliminate the randomness:              Tuning.             (line  155)
-* emacs mode:                            Emacs.              (line    6)
-* escape_route:                          Dragons.            (line  207)
+                                                              (line 803)
+* editing pattern database:              Editing Patterns.    (line   6)
+* editing patterns:                      Editing Patterns.    (line   6)
+* effective size:                        Dragons.             (line 116)
+* effective size (worm):                 Worms.               (line  48)
+* eliminate the randomness:              Tuning.              (line 155)
+* emacs mode:                            Emacs.               (line   6)
+* escape_route:                          Dragons.             (line 207)
 * estimate_score:                        GTP command reference.
-                                                             (line  621)
+                                                              (line 539)
 * eval_eye:                              GTP command reference.
-                                                             (line  444)
+                                                              (line 384)
 * experimental_score:                    GTP command reference.
-                                                             (line  626)
-* eye shapes database:                   Patterns Overview.  (line    6)
-* eye space display:                     Colored Display.    (line   48)
+                                                              (line 543)
+* eye shapes database:                   Patterns Overview.   (line   6)
+* eye space display:                     Colored Display.     (line  48)
 * eye_data:                              GTP command reference.
-                                                             (line  866)
-* false eye:                             Half Eyes.          (line    6)
-* fast pattern matching:                 DFA.                (line   29)
+                                                              (line 757)
+* false eye:                             Half Eyes.           (line   6)
+* fast pattern matching:                 DFA.                 (line  29)
 * final_score:                           GTP command reference.
-                                                             (line  589)
+                                                              (line 510)
 * final_status:                          GTP command reference.
-                                                             (line  597)
+                                                              (line 517)
 * final_status_list:                     GTP command reference.
-                                                             (line  605)
+                                                              (line 524)
 * findlib:                               GTP command reference.
-                                                             (line  193)
+                                                              (line 171)
 * finish_sgftrace:                       GTP command reference.
-                                                             (line  889)
-* finite state automaton:                DFA.                (line   29)
+                                                              (line 777)
+* finite state automaton:                DFA.                 (line  29)
 * fixed_handicap:                        GTP command reference.
-                                                             (line  135)
-* FIXME:                                 Coding Styles.      (line   83)
+                                                              (line 121)
+* FIXME:                                 Coding Styles.       (line  83)
 * followup_influence:                    GTP command reference.
-                                                             (line  799)
-* format of the pattern database:        Patterns Overview.  (line   27)
-* formatted printing:                    Print Utilities.    (line    6)
-* GDB <1>:                               Debugging.          (line   30)
+                                                              (line 696)
+* format of the pattern database:        Patterns Overview.   (line  27)
+* formatted printing:                    Print Utilities.     (line   6)
+* GDB <1>:                               Debugging.           (line  30)
 * GDB:                                   GTP and GDB techniques.
-                                                             (line    6)
+                                                              (line   6)
 * generation of helper functions:        Autohelpers and Constraints.
-                                                             (line    6)
+                                                              (line   6)
 * genmove:                               GTP command reference.
-                                                             (line  512)
+                                                              (line 443)
 * genmove_black:                         GTP command reference.
-                                                             (line  496)
+                                                              (line 429)
 * genmove_white:                         GTP command reference.
-                                                             (line  504)
-* genus:                                 Dragons.            (line  213)
-* genus (worm):                          Worms.              (line  155)
+                                                              (line 436)
+* genus:                                 Dragons.             (line 213)
+* genus (worm):                          Worms.               (line 155)
 * get_connection_node_counter:           GTP command reference.
-                                                             (line  697)
+                                                              (line 604)
 * get_handicap:                          GTP command reference.
-                                                             (line  160)
+                                                              (line 143)
 * get_komi:                              GTP command reference.
-                                                             (line  105)
+                                                              (line  95)
 * get_life_node_counter:                 GTP command reference.
-                                                             (line  646)
+                                                              (line 561)
 * get_owl_node_counter:                  GTP command reference.
-                                                             (line  661)
+                                                              (line 574)
 * get_random_seed:                       GTP command reference.
-                                                             (line  948)
+                                                              (line 828)
 * get_reading_node_counter:              GTP command reference.
-                                                             (line  673)
+                                                              (line 584)
 * get_trymove_counter:                   GTP command reference.
-                                                             (line  685)
+                                                              (line 594)
 * gg-undo:                               GTP command reference.
-                                                             (line  571)
+                                                              (line 495)
 * gg_genmove:                            GTP command reference.
-                                                             (line  529)
-* GMP:                                   GMP and GTP.        (line    6)
-* GNU Go's GDB commands:                 Debugging.          (line   82)
-* go position:                           Hash Calculation.   (line   10)
-* grid optimization:                     Details.            (line    6)
+                                                              (line 458)
+* GMP:                                   GMP and GTP.         (line   6)
+* GNU Go's GDB commands:                 Debugging.           (line  82)
+* go position:                           Hash Calculation.    (line  10)
+* grid optimization:                     Details.             (line   6)
 * GTP <1>:                               GTP and GDB techniques.
-                                                             (line    6)
-* GTP:                                   GMP and GTP.        (line    6)
+                                                              (line   6)
+* GTP:                                   GMP and GTP.         (line   6)
 * GTP command reference:                 GTP command reference.
-                                                             (line    6)
-* half eye:                              Half Eyes.          (line    6)
+                                                              (line   6)
+* half eye:                              Half Eyes.           (line   6)
 * half_eye_data:                         GTP command reference.
-                                                             (line  872)
-* Hash node:                             Hash Organization.  (line    8)
-* Hashing of positions:                  Hashing.            (line    6)
+                                                              (line 762)
+* Hash node:                             Hash Organization.   (line   8)
+* Hashing of positions:                  Hashing.             (line   6)
 * help:                                  GTP command reference.
-                                                             (line  925)
-* helper functions in pattern matching:  Helper Functions.   (line    6)
-* how GNU Go learns new joseki:          Joseki Compiler.    (line    6)
-* How to debug the reading code:         Debugging.          (line    6)
-* implementation of pattern matching <1>: Corner Matcher.    (line    6)
-* implementation of pattern matching:    PM Implementation.  (line    6)
+                                                              (line 808)
+* helper functions in pattern matching:  Helper Functions.    (line   6)
+* how GNU Go learns new joseki:          Joseki Compiler.     (line   6)
+* How to debug the reading code:         Debugging.           (line   6)
+* implementation of pattern matching <1>: Corner Matcher.     (line   6)
+* implementation of pattern matching:    PM Implementation.   (line   6)
 * increase_depths:                       GTP command reference.
-                                                             (line  328)
-* inessential string:                    Worms.              (line  165)
+                                                              (line 286)
+* inessential string:                    Worms.               (line 165)
 * initial_influence:                     GTP command reference.
-                                                             (line  737)
-* installation:                          GNU/Linux and Unix. (line    6)
+                                                              (line 638)
+* installation:                          GNU/Linux and Unix.  (line   6)
 * invariant_hash:                        GTP command reference.
-                                                             (line  248)
+                                                              (line 218)
 * invariant_hash_for_moves:              GTP command reference.
-                                                             (line  255)
-* invincible worm:                       Worms.              (line  178)
-* invoking GNU Go:                       Invoking GNU Go.    (line    6)
+                                                              (line 224)
+* invincible worm:                       Worms.               (line 178)
+* invoking GNU Go:                       Invoking GNU Go.     (line   6)
 * is_legal:                              GTP command reference.
-                                                             (line  217)
+                                                              (line 192)
 * is_surrounded:                         GTP command reference.
-                                                             (line  966)
-* jago:                                  Other Clients.      (line    6)
-* joseki <1>:                            Corner Matcher.     (line    6)
-* joseki:                                Joseki Compiler.    (line    6)
+                                                              (line 843)
+* jago:                                  Other Clients.       (line   6)
+* joseki <1>:                            Corner Matcher.      (line   6)
+* joseki:                                Joseki Compiler.     (line   6)
 * kgs-genmove_cleanup:                   GTP command reference.
-                                                             (line  544)
+                                                              (line 471)
 * known_command:                         GTP command reference.
-                                                             (line  933)
+                                                              (line 815)
 * komi:                                  GTP command reference.
-                                                             (line   97)
+                                                              (line  88)
 * ladder_attack:                         GTP command reference.
-                                                             (line  322)
+                                                              (line 281)
 * last_move:                             GTP command reference.
-                                                             (line  235)
+                                                              (line 207)
 * level <1>:                             GTP command reference.
-                                                             (line  557)
-* level:                                 Invoking GNU Go.    (line  225)
-* level of play:                         Invoking GNU Go.    (line   25)
-* liberties (worm):                      Worms.              (line   74)
-* liberties, higher order (worm):        Worms.              (line   74)
-* licence, documentation (GFDL):         GFDL.               (line    3)
-* licence, program (GPL):                GPL.                (line    3)
+                                                              (line 483)
+* level:                                 Invoking GNU Go.     (line 225)
+* level of play:                         Invoking GNU Go.     (line  25)
+* liberties (worm):                      Worms.               (line  74)
+* liberties, higher order (worm):        Worms.               (line  74)
+* licence, documentation (GFDL):         GFDL.                (line   3)
+* licence, program (GPL):                GPL.                 (line   3)
 * limit_search:                          GTP command reference.
-                                                             (line  996)
+                                                              (line 868)
 * list_stones:                           GTP command reference.
-                                                             (line  181)
+                                                              (line 161)
 * loadsgf:                               GTP command reference.
-                                                             (line  166)
-* lunch:                                 Dragons.            (line  230)
-* lunch (worm):                          Worms.              (line  114)
-* matchpat.c:                            DFA.                (line   29)
-* Monte Carlo Go:                        Monte Carlo Go.     (line    6)
-* move generation:                       Move Generators.    (line    6)
-* move generators:                       Move Generators.    (line    6)
-* move reasons <1>:                      Move Reasons.       (line    6)
-* move reasons:                          Move Generators.    (line    6)
+                                                              (line 148)
+* lunch:                                 Dragons.             (line 230)
+* lunch (worm):                          Worms.               (line 114)
+* matchpat.c:                            DFA.                 (line  29)
+* Monte Carlo Go:                        Monte Carlo Go.      (line   6)
+* move generation:                       Move Generators.     (line   6)
+* move generators:                       Move Generators.     (line   6)
+* move reasons <1>:                      Move Reasons.        (line   6)
+* move reasons:                          Move Generators.     (line   6)
 * move_history:                          GTP command reference.
-                                                             (line  241)
+                                                              (line 212)
 * move_influence:                        GTP command reference.
-                                                             (line  776)
+                                                              (line 676)
 * move_probabilities:                    GTP command reference.
-                                                             (line  783)
+                                                              (line 682)
 * move_uncertainty:                      GTP command reference.
-                                                             (line  791)
-* moyo:                                  Territory and Moyo. (line    6)
+                                                              (line 689)
+* moyo:                                  Territory and Moyo.  (line   6)
 * name:                                  GTP command reference.
-                                                             (line   47)
-* neighbor dragons:                      Dragons.            (line  145)
+                                                              (line  45)
+* neighbor dragons:                      Dragons.             (line 145)
 * orientation:                           GTP command reference.
-                                                             (line   85)
-* origin (worm):                         Worms.              (line   58)
-* output file:                           Output File.        (line    6)
+                                                              (line  78)
+* origin (worm):                         Worms.               (line  58)
+* output file:                           Output File.         (line   6)
 * owl_attack:                            GTP command reference.
-                                                             (line  340)
-* owl_attack_certain:                    Dragons.            (line  296)
-* owl_attack_code:                       Dragons.            (line  291)
-* owl_attack_point:                      Dragons.            (line  286)
+                                                              (line 296)
+* owl_attack_certain:                    Dragons.             (line 296)
+* owl_attack_code:                       Dragons.             (line 291)
+* owl_attack_point:                      Dragons.             (line 286)
 * owl_connection_defends:                GTP command reference.
-                                                             (line  378)
+                                                              (line 328)
 * owl_defend:                            GTP command reference.
-                                                             (line  346)
-* owl_defense_certain:                   Dragons.            (line  314)
-* owl_defense_code:                      Dragons.            (line  309)
-* owl_defense_point:                     Dragons.            (line  305)
+                                                              (line 301)
+* owl_defense_certain:                   Dragons.             (line 314)
+* owl_defense_code:                      Dragons.             (line 309)
+* owl_defense_point:                     Dragons.             (line 305)
 * owl_does_attack:                       GTP command reference.
-                                                             (line  366)
+                                                              (line 318)
 * owl_does_defend:                       GTP command reference.
-                                                             (line  372)
-* owl_second_attack_point:               Dragons.            (line  301)
-* owl_second_defense_point:              Dragons.            (line  319)
+                                                              (line 323)
+* owl_second_attack_point:               Dragons.             (line 301)
+* owl_second_defense_point:              Dragons.             (line 319)
 * owl_substantial:                       GTP command reference.
-                                                             (line  393)
+                                                              (line 341)
 * owl_threaten_attack:                   GTP command reference.
-                                                             (line  352)
+                                                              (line 306)
 * owl_threaten_defense:                  GTP command reference.
-                                                             (line  359)
+                                                              (line 312)
 * pattern attributes:                    Pattern Classification.
-                                                             (line    6)
-* pattern database <1>:                  DFA.                (line   29)
-* pattern database:                      Patterns Overview.  (line    6)
-* pattern matching <1>:                  DFA.                (line   29)
-* pattern matching:                      Patterns Overview.  (line    6)
-* pattern matching optimization:         Details.            (line    6)
-* pattern overview:                      Patterns Overview.  (line    6)
-* pattern.c:                             Patterns Overview.  (line    6)
-* pattern.h:                             Patterns Overview.  (line    6)
-* persistent cache:                      Persistent Cache.   (line    6)
+                                                              (line   6)
+* pattern database <1>:                  DFA.                 (line  29)
+* pattern database:                      Patterns Overview.   (line   6)
+* pattern matching <1>:                  DFA.                 (line  29)
+* pattern matching:                      Patterns Overview.   (line   6)
+* pattern matching optimization:         Details.             (line   6)
+* pattern overview:                      Patterns Overview.   (line   6)
+* pattern.c:                             Patterns Overview.   (line   6)
+* pattern.h:                             Patterns Overview.   (line   6)
+* persistent cache:                      Persistent Cache.    (line   6)
 * place_free_handicap:                   GTP command reference.
-                                                             (line  143)
+                                                              (line 128)
 * play:                                  GTP command reference.
-                                                             (line  127)
+                                                              (line 114)
 * playwhite:                             GTP command reference.
-                                                             (line  119)
+                                                              (line 107)
 * popgo:                                 GTP command reference.
-                                                             (line  277)
-* position:                              Hash Calculation.   (line   10)
+                                                              (line 243)
+* position:                              Hash Calculation.    (line  10)
 * position struct:                       Basic Data Structures.
-                                                             (line    6)
-* potential cutting stone:               Worms.              (line  133)
+                                                              (line   6)
+* potential cutting stone:               Worms.               (line 133)
 * printsgf:                              GTP command reference.
-                                                             (line  899)
-* product:                               DFA.                (line   29)
+                                                              (line 786)
+* product:                               DFA.                 (line  29)
 * protocol_version:                      GTP command reference.
-                                                             (line   39)
-* qGo:                                   Other Clients.      (line    6)
-* quarry:                                Other Clients.      (line    6)
+                                                              (line  38)
+* qGo:                                   Other Clients.       (line   6)
+* quarry:                                Other Clients.       (line   6)
 * query_boardsize:                       GTP command reference.
-                                                             (line   71)
+                                                              (line  66)
 * query_orientation:                     GTP command reference.
-                                                             (line   91)
+                                                              (line  83)
 * quit:                                  GTP command reference.
-                                                             (line   33)
-* Read result:                           Hash Organization.  (line    8)
-* Reading code:                          Tactical Reading.   (line    6)
-* Reading code debugging tools:          Debugging.          (line    6)
-* reading DEPTH:                         Tactical Reading.   (line    6)
-* Reading optimisation:                  Hashing.            (line    6)
-* Reading process:                       Tactical Reading.   (line    6)
-* reading return codes:                  Reading Basics.     (line   51)
-* reading shadow:                        Persistent Cache.   (line   50)
-* reading.c <1>:                         Reading Basics.     (line  122)
-* reading.c:                             Tactical Reading.   (line    6)
-* reading.h:                             Tactical Reading.   (line    6)
+                                                              (line  33)
+* Read result:                           Hash Organization.   (line   8)
+* Reading code:                          Tactical Reading.    (line   6)
+* Reading code debugging tools:          Debugging.           (line   6)
+* reading DEPTH:                         Tactical Reading.    (line   6)
+* Reading optimisation:                  Hashing.             (line   6)
+* Reading process:                       Tactical Reading.    (line   6)
+* reading return codes:                  Reading Basics.      (line  51)
+* reading shadow:                        Persistent Cache.    (line  50)
+* reading.c <1>:                         Reading Basics.      (line 122)
+* reading.c:                             Tactical Reading.    (line   6)
+* reading.h:                             Tactical Reading.    (line   6)
 * reg_genmove:                           GTP command reference.
-                                                             (line  521)
+                                                              (line 451)
 * report_uncertainty:                    GTP command reference.
-                                                             (line  941)
+                                                              (line 822)
 * reset_connection_node_counter:         GTP command reference.
-                                                             (line  691)
+                                                              (line 599)
 * reset_life_node_counter:               GTP command reference.
-                                                             (line  637)
+                                                              (line 553)
 * reset_owl_node_counter:                GTP command reference.
-                                                             (line  655)
+                                                              (line 569)
 * reset_reading_node_counter:            GTP command reference.
-                                                             (line  667)
+                                                              (line 579)
 * reset_search_mask:                     GTP command reference.
-                                                             (line  990)
+                                                              (line 863)
 * reset_trymove_counter:                 GTP command reference.
-                                                             (line  679)
+                                                              (line 589)
 * restricted_genmove:                    GTP command reference.
-                                                             (line  537)
-* return codes:                          Reading Basics.     (line   51)
+                                                              (line 465)
+* return codes:                          Reading Basics.      (line  51)
 * same_dragon:                           GTP command reference.
-                                                             (line  464)
-* scoring:                               Scoring.            (line    6)
-* semeai:                                Dragons.            (line  254)
-* semeai_attack_certain:                 Dragons.            (line  254)
-* semeai_attack_point:                   Dragons.            (line  254)
-* semeai_defense_certain:                Dragons.            (line  254)
-* semeai_defense_point:                  Dragons.            (line  254)
+                                                              (line 402)
+* scoring:                               Scoring.             (line   6)
+* semeai:                                Dragons.             (line 254)
+* semeai_attack_certain:                 Dragons.             (line 254)
+* semeai_attack_point:                   Dragons.             (line 254)
+* semeai_defense_certain:                Dragons.             (line 254)
+* semeai_defense_point:                  Dragons.             (line 254)
 * set_free_handicap:                     GTP command reference.
-                                                             (line  152)
+                                                              (line 136)
 * set_random_seed:                       GTP command reference.
-                                                             (line  954)
+                                                              (line 833)
 * set_search_diamond:                    GTP command reference.
-                                                             (line  984)
+                                                              (line 858)
 * set_search_limit:                      GTP command reference.
-                                                             (line 1002)
-* SGF (Smart Game Format):               SGF Support.        (line    6)
-* SGF files in memory:                   SGF.                (line    6)
+                                                              (line 873)
+* SGF (Smart Game Format):               SGF Support.         (line   6)
+* SGF files in memory:                   SGF.                 (line   6)
 * shape attributes:                      Pattern Classification.
-                                                             (line    6)
+                                                              (line   6)
 * showboard:                             GTP command reference.
-                                                             (line  723)
-* Smart Game Format:                     SGF Support.        (line    6)
-* Speedup of reading process:            Hashing.            (line    6)
+                                                              (line 626)
+* Smart Game Format:                     SGF Support.         (line   6)
+* Speedup of reading process:            Hashing.             (line   6)
 * start_sgftrace:                        GTP command reference.
-                                                             (line  879)
-* string:                                Worms and Dragons.  (line   27)
-* superstring:                           General Utilities.  (line  249)
-* surround:                              Dragons.            (line  238)
+                                                              (line 768)
+* string:                                Worms and Dragons.   (line  27)
+* superstring:                           General Utilities.   (line 249)
+* surround:                              Dragons.             (line 238)
 * surround_map:                          GTP command reference.
-                                                             (line  979)
-* surround_size:                         Dragons.            (line  238)
-* surround_status:                       Dragons.            (line  238)
+                                                              (line 854)
+* surround_size:                         Dragons.             (line 238)
+* surround_status:                       Dragons.             (line 238)
 * symmetry and transformations:          Symmetry & transformations.
-                                                             (line    6)
+                                                              (line   6)
 * symmetry and transformations of shapes: Symmetry & transformations.
-                                                             (line    6)
+                                                              (line   6)
 * tactical_analyze_semeai:               GTP command reference.
-                                                             (line  413)
-* teaching josekis to GNU Go:            Joseki Compiler.    (line    6)
-* territory:                             Territory and Moyo. (line    6)
+                                                              (line 358)
+* teaching josekis to GNU Go:            Joseki Compiler.     (line   6)
+* territory:                             Territory and Moyo.  (line   6)
 * test_eyeshape:                         GTP command reference.
-                                                             (line  704)
-* The Go Modem Protocol and Go Text Protocol: GMP and GTP.   (line    6)
-* the joseki compiler:                   Joseki Compiler.    (line    6)
+                                                              (line 610)
+* The Go Modem Protocol and Go Text Protocol: GMP and GTP.    (line   6)
+* the joseki compiler:                   Joseki Compiler.     (line   6)
 * time_left:                             GTP command reference.
-                                                             (line  583)
+                                                              (line 505)
 * time_settings:                         GTP command reference.
-                                                             (line  576)
-* timers:                                General Utilities.  (line  328)
-* traces:                                Traces.             (line    6)
-* Transposition table:                   Hashing.            (line    6)
-* Trying hypothetical moves:             Tactical Reading.   (line    6)
+                                                              (line 499)
+* timers:                                General Utilities.   (line 328)
+* traces:                                Traces.              (line   6)
+* Transposition table:                   Hashing.             (line   6)
+* Trying hypothetical moves:             Tactical Reading.    (line   6)
 * tryko:                                 GTP command reference.
-                                                             (line  270)
+                                                              (line 237)
 * trymove:                               GTP command reference.
-                                                             (line  264)
+                                                              (line 232)
 * tune_move_ordering:                    GTP command reference.
-                                                             (line  906)
-* tuning GNU Go:                         Traces.             (line    6)
-* tuning the pattern database:           Tuning.             (line    6)
-* tuning the shapes database:            Tuning.             (line    6)
-* UCT algorithm:                         Monte Carlo Go.     (line    6)
+                                                              (line 792)
+* tuning GNU Go:                         Traces.              (line   6)
+* tuning the pattern database:           Tuning.              (line   6)
+* tuning the shapes database:            Tuning.              (line   6)
+* UCT algorithm:                         Monte Carlo Go.      (line   6)
 * unconditional_status:                  GTP command reference.
-                                                             (line  470)
+                                                              (line 407)
 * undo:                                  GTP command reference.
-                                                             (line  564)
-* Usage of the stack in reading:         Tactical Reading.   (line    6)
+                                                              (line 489)
+* Usage of the stack in reading:         Tactical Reading.    (line   6)
 * version:                               GTP command reference.
-                                                             (line   55)
-* weakness:                              Dragons.            (line  199)
-* worm <1>:                              Worms.              (line    6)
-* worm:                                  Worms and Dragons.  (line   27)
+                                                              (line  52)
+* weakness:                              Dragons.             (line 199)
+* worm <1>:                              Worms.               (line   6)
+* worm:                                  Worms and Dragons.   (line  27)
 * worm_cutstone:                         GTP command reference.
-                                                             (line  847)
+                                                              (line 741)
 * worm_data:                             GTP command reference.
-                                                             (line  806)
+                                                              (line 702)
 * worm_stones:                           GTP command reference.
-                                                             (line  841)
-* Zobrist hashing algorithm:             Hashing.            (line    6)
+                                                              (line 736)
+* Zobrist hashing algorithm:             Hashing.             (line   6)
 
