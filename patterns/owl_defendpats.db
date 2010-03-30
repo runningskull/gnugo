@@ -4967,21 +4967,22 @@ AOCd
 ; && oplay_attack_either(*,d,B,A)
 
 
-Pattern D1139
-# tm New Pattern (3.1.20) (see nngs:110)
-# gf Added n classification. (3.3.20)
-
-?*
-XO
-OX
-
-:8,bEn,value(75)
-
-?*
-aO
-Ob
-
-; (owl_escape_value(*) > 0) && !oplay_defend_both(*,a,b)
+# Pattern D1139
+# # tm New Pattern (3.1.20) (see nngs:110)
+# # gf Added n classification. (3.3.20)
+# # gf Too general and ineffective. Removed. (3.9.1)
+# 
+# ?*
+# XO
+# OX
+# 
+# :8,bEn,value(75)
+# 
+# ?*
+# aO
+# Ob
+# 
+# ; (owl_escape_value(*) > 0) && !oplay_defend_both(*,a,b)
 
 
 Pattern D1140
