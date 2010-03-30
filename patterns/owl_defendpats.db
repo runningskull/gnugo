@@ -2885,6 +2885,11 @@ O.a
 
 
 Pattern D711
+# gf Revised constraint. (3.9.1)
+# This pattern is really only helpful for bent four in the corner
+# situations, see e.g. owl:223 and nicklas1:1902. In certain semeai
+# situations it is directly harmful to capture the nakade stones
+# prematurely.
 
 O?          capture nakade, might give new possibilities
 X*
@@ -2894,10 +2899,15 @@ X*
 O?
 A*
 
-;lib(A)==1 && wormsize(A)>=3
+;lib(A)==1 && wormsize(A)==4 && bent_four_helper(A)
 
 
 Pattern D712
+# gf Revised constraint. (3.9.1)
+# This pattern is really only helpful for bent four in the corner
+# situations, see e.g. owl:223 and nicklas1:1902. In certain semeai
+# situations it is directly harmful to capture the nakade stones
+# prematurely.
 
 ?O          capture nakade, might give new possibilities
 X*
@@ -2907,7 +2917,7 @@ X*
 ?O
 A*
 
-;lib(A)==1 && wormsize(A)>=3
+;lib(A)==1 && wormsize(A)==4 && bent_four_helper(A)
 
 
 Pattern D713

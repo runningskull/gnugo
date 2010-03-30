@@ -332,6 +332,7 @@ int adjacent_to_defendable_stone_in_atari(int str);
 void backfill_replace(int move, int str);
 int break_mirror_helper(int str, int color);
 int distrust_tactics_helper(int str);
+int bent_four_helper(int str);
 int disconnect_helper(int apos, int bpos);
 
 

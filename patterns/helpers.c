@@ -881,6 +881,52 @@ int distrust_tactics_helper(int str)
   return 0;
 }
 
+
+/*
+ * This helper returns 1 if str is part of a 4 stone string having a
+ * bent four in the corner shape.
+ *
+ * |x???
+ * |Oxx?
+ * |OOOx
+ * +----
+ *
+ */
+
+int
+bent_four_helper(int str)
+{
+  int stones[4];
+  int good_corner_found = 0;
+  int color = board[str];
+  int k;
+
+  if (!IS_STONE(color))
+    return 0;
+
+  if (findstones(str, 4, stones) != 4)
+    return 0;
+
+  /* All stones must be on the edge. Also detect the presence of a
+   * corner stone.
+   */
+  for (k = 0; k < 4; k++) {
+    if (!is_edge_vertex(stones[k]))
+      return 0;
+    if (is_corner_vertex(stones[k])) {
+      int corner = stones[k];
+      if ((board[EAST(corner)] == color)
+	  + (board[SOUTH(corner)] == color)
+	  + (board[WEST(corner)] == color)
+	  + (board[NORTH(corner)] == color) == 2)
+	good_corner_found = 1;
+    }
+  }
+
+  return good_corner_found;
+}
+
+
 /*
  * LOCAL Variables:
  * tab-width: 8
