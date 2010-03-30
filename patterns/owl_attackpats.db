@@ -3514,16 +3514,17 @@ Ba
 Pattern A1001b
 # Sometimes cut of small useless tail 
 # i.e.:  gq -l games/niki.sgf -L 158 --decide-dragon S8 -o x.sgf
+# gf Revised constraint. (3.9.1)
 
 YO          cut if safe
 *X
 
 :8,Cn,value(50)
 
-Ya
-*X
+Ba
+*C
 
-; !oplay_attack_either(*,*,a)
+;!same_string(B,C) && !oplay_attack_either(*,*,a)
 
 
 Pattern A1002

@@ -4106,16 +4106,17 @@ A*
 
 
 Pattern D1001
+# gf Revised constraint. (3.9.1)
 
 X*O       connect
 ?OX
 
 :8,n,value(70)
 
-X*O
-?Oa
+X*c
+?ba
 
-;!attack(a) || (wormsize(a)<=2 && does_attack(*,a))
+;!same_string(b,c) && (!attack(a) || (wormsize(a)<=2 && does_attack(*,a)))
 
 
 Pattern D1001b
@@ -4131,16 +4132,17 @@ x.O..
 Pattern D1002
 # Smaller value if opponent can't cut.
 # gf Revised constraint. (3.1.11)
+# gf Revised constraint. (3.9.1)
 
 X*O       connect
 ?OX
 
 :8,-,value(35)
 
-X*O
-?Oa
+X*c
+?ba
 
-; !attack(a) && xlib(*) > 1
+;!same_string(b,c) && !attack(a) && xlib(*) > 1
 
 
 Pattern D1003
