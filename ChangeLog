@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- do not consider also passing to get seki in semeai reading when stackp>0
 - new helper function bent_four_helper()
 - analyze_eyegraph improvements
 - TODO completely rewritten

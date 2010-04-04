@@ -1319,7 +1319,8 @@ do_owl_analyze_semeai(int apos, int bpos,
   if (!pass && k == 1) {
     if ((best_resulta == WIN && best_resultb == 0
 	 && best_move != NO_MOVE
-	 && best_move == common_liberty.pos)
+	 && best_move == common_liberty.pos
+	 && stackp == 0)
 	|| (best_resulta == KO_B && best_resultb == KO_B
 	    && is_ko(best_move, owla->color, NULL))) {
       do_owl_analyze_semeai(bpos, apos, owlb, owla, &this_resultb,
