@@ -6197,10 +6197,6 @@ owl_make_domains(struct local_owl_data *owla, struct local_owl_data *owlb)
     gg_assert(owla->color == OTHER_COLOR(owlb->color));
     if (!owlb->lunches_are_current)
       owl_find_lunches(owlb);
-    if (owlb->color == BLACK)
-      black_eye = owlb->my_eye;
-    else
-      white_eye = owlb->my_eye;
   }
   make_domains(black_eye, white_eye, 1);
 }

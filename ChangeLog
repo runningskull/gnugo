@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- do not make domains for second owl in owl_make_domains()
 - do not consider also passing to get seki in semeai reading when stackp>0
 - new helper function bent_four_helper()
 - analyze_eyegraph improvements
