@@ -209,7 +209,8 @@ static void owl_determine_life(struct local_owl_data *owl,
 			       int does_attack,
 			       struct owl_move_data *moves,
 			       struct eyevalue *probable_eyes,
-			       int *eyemin, int *eyemax);
+			       int *eyemin, int *eyemax,
+			       int eyefilling_points[BOARDMAX]);
 static void owl_find_relevant_eyespaces(struct local_owl_data *owl,
 					int mw[BOARDMAX], int mz[BOARDMAX]);
 static int owl_estimate_life(struct local_owl_data *owl,
@@ -218,7 +219,8 @@ static int owl_estimate_life(struct local_owl_data *owl,
 		  	     const char **live_reason,
 			     int does_attack,
 		  	     struct eyevalue *probable_eyes,
-			     int *eyemin, int *eyemax);
+			     int *eyemin, int *eyemax,
+			     int eyefilling_points[BOARDMAX]);
 static int modify_stupid_eye_vital_point(struct local_owl_data *owl,
 					 int *vital_point,
 					 int is_attack_point);
@@ -642,10 +644,12 @@ do_owl_analyze_semeai(int apos, int bpos,
   struct matched_patterns_list_data shape_defensive_patterns;
   struct owl_move_data moves[MAX_SEMEAI_MOVES];
   struct owl_move_data outside_liberty;
+  struct owl_move_data eyefilling_liberty;
   struct owl_move_data common_liberty;
   struct owl_move_data backfill_outside_liberty;
   struct owl_move_data backfill_common_liberty;
   int safe_outside_liberty_found = 0;
+  int eyefilling_liberty_found = 0;
   int safe_common_liberty_found = 0;
   int riskless_move_found = 0;
   signed char mw[BOARDMAX];  
@@ -674,6 +678,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   struct eyevalue probable_eyes_b;
   struct eyevalue dummy_eyes;
   int I_have_more_eyes;
+  int eyefilling_points[BOARDMAX];
   
   SETUP_TRACE_INFO2("do_owl_analyze_semeai", apos, bpos);
 
@@ -717,6 +722,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 #endif
   
   outside_liberty.pos = NO_MOVE;
+  eyefilling_liberty.pos = NO_MOVE;
   common_liberty.pos = NO_MOVE;
   backfill_outside_liberty.pos = NO_MOVE;
   backfill_common_liberty.pos = NO_MOVE;
@@ -847,16 +853,17 @@ do_owl_analyze_semeai(int apos, int bpos,
 
     if (owl_estimate_life(owla, owlb, vital_defensive_moves,
 			  &live_reasona, 0, &probable_eyes_a,
-			  &eyemin_a, &eyemax_a))
+			  &eyemin_a, &eyemax_a, NULL))
       I_look_alive = 1;
     else if (stackp > 2 && owl_escape_route(owla) >= 5) {
       live_reasona = "escaped";
       I_look_alive = 1;
     }
 
+    memset(eyefilling_points, 0, sizeof(eyefilling_points));
     if (owl_estimate_life(owlb, owla, vital_offensive_moves,
 			  &live_reasonb, 1, &probable_eyes_b,
-			  &eyemin_b, &eyemax_b))
+			  &eyemin_b, &eyemax_b, eyefilling_points))
       you_look_alive = 1;
     else if (stackp > 2 && owl_escape_route(owlb) >= 5) {
       live_reasonb = "escaped";
@@ -964,7 +971,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       include_semeai_worms_in_eyespace = 1;
       if (!owl_estimate_life(owlb, owla, vital_offensive_moves,
 			     &live_reasonb, 1, &dummy_eyes,
-			     &eyemin_b, &eyemax_b))
+			     &eyemin_b, &eyemax_b, NULL))
 	semeai_review_owl_moves(vital_offensive_moves, owla, owlb, color,
 				&safe_outside_liberty_found,
 				&safe_common_liberty_found,
@@ -1027,16 +1034,27 @@ do_owl_analyze_semeai(int apos, int bpos,
       
       if (board[pos] == EMPTY && !mw[pos]) {
 	if (liberty_of_goal(pos, owlb)) {
+	  int origin = owlb->my_eye[pos].origin;
 	  if (!liberty_of_goal(pos, owla)) {
-	    /* outside liberty */
-	    if (safe_move(pos, color) == WIN) {
-	      safe_outside_liberty_found = 1;
-	      outside_liberty.pos = pos;
-	      break;
+	    if (!(owlb->my_eye[origin].color == owlb->color
+		  && max_eyes(&owlb->my_eye[origin].value) > 0)) {
+	      /* outside liberty */
+	      if (safe_move(pos, color) == WIN) {
+		safe_outside_liberty_found = 1;
+		outside_liberty.pos = pos;
+		break;
+	      }
+	      else if (backfill_outside_liberty.pos == NO_MOVE)
+		backfill_outside_liberty.pos = find_semeai_backfilling_move(bpos,
+									    pos);
 	    }
-	    else if (backfill_outside_liberty.pos == NO_MOVE)
-	      backfill_outside_liberty.pos = find_semeai_backfilling_move(bpos,
-									  pos);
+	    else {
+	      /* eye-filling liberty */
+	      if (eyefilling_points[pos]) {
+		eyefilling_liberty_found = 1;
+		eyefilling_liberty.pos = pos;
+	      }
+	    }
 	  }
 	  else {
 	    /* common liberty */
@@ -1056,8 +1074,8 @@ do_owl_analyze_semeai(int apos, int bpos,
   /* Add the best liberty filling move available. We first want to
    * play outer liberties, second backfilling moves required before
    * filling an outer liberty. If no such moves are available we try
-   * to fill a mutual liberty or play a corresponding backfilling
-   * move.
+   * to locate an eyefilling move. After that we try to fill a mutual
+   * liberty or play a corresponding backfilling move.
    */
   if (!you_look_alive || we_might_be_inessential) {
     if (safe_outside_liberty_found
@@ -1080,6 +1098,17 @@ do_owl_analyze_semeai(int apos, int bpos,
 		   NO_MOVE, MAX_SEMEAI_MOVES, NULL);
       riskless_move_found = 1;
       TRACE("Added %1m %d (6)\n", backfill_outside_liberty.pos, move_value);
+    }
+    else if (eyefilling_liberty_found
+	     && eyefilling_liberty.pos != NO_MOVE) {
+      move_value = semeai_move_value(eyefilling_liberty.pos,
+				     owla, owlb, 30,
+				     critical_semeai_worms);
+      owl_add_move(moves, eyefilling_liberty.pos, move_value,
+		   "safe eyefilling liberty", SAME_DRAGON_NOT_CONNECTED,
+		   NO_MOVE, 0, NO_MOVE, MAX_SEMEAI_MOVES, NULL);
+      riskless_move_found = 1;
+      TRACE("Added %1m %d (5)\n", eyefilling_liberty.pos, move_value);
     }
     else if (safe_common_liberty_found
 	     && common_liberty.pos != NO_MOVE) {
@@ -1232,7 +1261,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       include_semeai_worms_in_eyespace = 1;
       if (!owl_estimate_life(owla, owlb, vital_defensive_moves,
 			     &live_reasona, 0, &dummy_eyes,
-			     &eyemin_a, &eyemax_a)
+			     &eyemin_a, &eyemax_a, NULL)
 	  && eyemax_a < 2) {
 	include_semeai_worms_in_eyespace = 0;
 	*resulta = 0;
@@ -1319,7 +1348,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   if (!pass && k == 1) {
     if ((best_resulta == WIN && best_resultb == 0
 	 && best_move != NO_MOVE
-	 && best_move == common_liberty.pos
+	 && (best_move == common_liberty.pos || best_move == eyefilling_liberty.pos)
 	 && stackp == 0)
 	|| (best_resulta == KO_B && best_resultb == KO_B
 	    && is_ko(best_move, owla->color, NULL))) {
@@ -2096,7 +2125,7 @@ do_owl_attack(int str, int *move, int *wormid,
 
   /* First see whether there is any chance to kill. */
   if (owl_estimate_life(owl, NULL, vital_moves, &live_reason, 1,
-			&probable_eyes, &eyemin, &eyemax)) {
+			&probable_eyes, &eyemin, &eyemax, NULL)) {
     /*
      * We need to check here if there's a worm under atari. If yes,
      * locate it and report a (gote) GAIN.
@@ -2763,7 +2792,7 @@ do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
   /* First see whether we might already be alive. */
   if (escape < MAX_ESCAPE) {
     if (owl_estimate_life(owl, NULL, vital_moves, &live_reason, 0,
-	  		  &probable_eyes, &eyemin, &eyemax)) {
+			  &probable_eyes, &eyemin, &eyemax, NULL)) {
       SGFTRACE(0, WIN, live_reason);
       TRACE("%oVariation %d: ALIVE (%s)\n",
 	    this_variation_number, live_reason);
@@ -3089,7 +3118,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
 /*
  * This function calls owl_determine_life() to get an eye estimate,
  * and matchpat() for vital attack moves, and decides according to
- * various policies (depth-dependant) whether the dragon should thus
+ * various policies (depth-dependent) whether the dragon should thus
  * be considered alive.
  */
 static int
@@ -3097,7 +3126,8 @@ owl_estimate_life(struct local_owl_data *owl,
 		  struct local_owl_data *second_owl,
     		  struct owl_move_data vital_moves[MAX_MOVES],
 		  const char **live_reason, int does_attack,
-		  struct eyevalue *probable_eyes, int *eyemin, int *eyemax)
+		  struct eyevalue *probable_eyes, int *eyemin, int *eyemax,
+		  int eyefilling_points[BOARDMAX])
 {
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
@@ -3108,7 +3138,7 @@ owl_estimate_life(struct local_owl_data *owl,
   count_variations = 0;
 
   owl_determine_life(owl, second_owl, does_attack, vital_moves,
-		     probable_eyes, eyemin, eyemax);
+		     probable_eyes, eyemin, eyemax, eyefilling_points);
 
   matches_found = 0;
   memset(found_matches, 0, sizeof(found_matches));
@@ -3204,6 +3234,10 @@ owl_estimate_life(struct local_owl_data *owl,
  *
  * For use in the semeai code, a second dragon can be provided. Set
  * this to NULL when only one dragon is involved.
+ *
+ * For use from the semeai code it is also possible to find eyefilling
+ * points, which adds stones to nakade shapes. Set eyefilling_points
+ * to NULL if this information is not of interest.
  */
 
 static void
@@ -3211,7 +3245,8 @@ owl_determine_life(struct local_owl_data *owl,
 		   struct local_owl_data *second_owl,
 		   int does_attack,
 		   struct owl_move_data *moves,
-		   struct eyevalue *probable_eyes, int *eyemin, int *eyemax)
+		   struct eyevalue *probable_eyes, int *eyemin, int *eyemax,
+		   int eyefilling_points[BOARDMAX])
 {
   int color = owl->color;
   struct eye_data *eye = owl->my_eye;
@@ -3290,7 +3325,7 @@ owl_determine_life(struct local_owl_data *owl,
       const char *reason = "";
       compute_eyes_pessimistic(pos, &eyevalue, &pessimistic_min,
 			       &attack_point, &defense_point,
-			       eye, owl->half_eye);
+			       eye, owl->half_eye, eyefilling_points);
 
       /* If the eyespace is more in contact with own stones not in the goal,
        * than with ones in the goal, there is a risk that we can be cut off

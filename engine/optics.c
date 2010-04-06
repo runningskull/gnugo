@@ -59,15 +59,25 @@ static int read_eye(int pos, int *attack_point, int *defense_point,
 		    struct eyevalue *value,
 		    struct eye_data eye[BOARDMAX],
 		    struct half_eye_data heye[BOARDMAX],
+		    int eyefilling_points[BOARDMAX],
 		    int add_moves);
 static int recognize_eye(int pos, int *attack_point, int *defense_point,
 			 struct eyevalue *value,
 			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX],
-			 struct vital_points *vp);
+			 struct vital_points *vp,
+			 int eyefilling_points[BOARDMAX]);
 static void guess_eye_space(int pos, int effective_eyesize, int margins,
 			    int bulk_score, struct eye_data eye[BOARDMAX],
 			    struct eyevalue *value, int *pessimistic_min);
+static struct eye_graph *optical_graph_matcher(int *vpos,
+					       signed char *marginal,
+					       signed char *edge,
+					       signed char *neighbors,
+					       signed char *stone,
+					       int eye_size, int num_marginals,
+					       int *map,
+					       struct half_eye_data *heye);
 static void reset_map(int size);
 static void first_map(int *map_value);
 static int next_map(int *q, int map[MAXEYE]);
@@ -743,7 +753,8 @@ compute_eyes(int pos, struct eyevalue *value,
   }
   
   /* Look up the eye space in the graphs database. */
-  if (read_eye(pos, attack_point, defense_point, value, eye, heye, add_moves))
+  if (read_eye(pos, attack_point, defense_point, value, eye, heye,
+	       NULL, add_moves))
     return;
 
   /* Ideally any eye space that hasn't been matched yet should be two
@@ -771,7 +782,8 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 			 int *pessimistic_min,
 			 int *attack_point, int *defense_point,
 			 struct eye_data eye[BOARDMAX],
-			 struct half_eye_data heye[BOARDMAX])
+			 struct half_eye_data heye[BOARDMAX],
+			 int eyefilling_points[BOARDMAX])
 {
   static int bulk_coefficients[5] = {-1, -1, 1, 4, 12};
 
@@ -882,7 +894,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   
   /* Look up the eye space in the graphs database. */
   if (read_eye(pos, attack_point, defense_point, value,
-	       eye, heye, 0)) {
+	       eye, heye, eyefilling_points, 0)) {
     *pessimistic_min = min_eyes(value) - margins;
 
     /* A single point eye which is part of a ko can't be trusted. */
@@ -1077,7 +1089,7 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
 static int
 read_eye(int pos, int *attack_point, int *defense_point,
 	 struct eyevalue *value, struct eye_data eye[BOARDMAX], 
-	 struct half_eye_data heye[BOARDMAX], 
+	 struct half_eye_data heye[BOARDMAX], int eyefilling_points[BOARDMAX],
 	 int add_moves)
 {
   int eye_color;
@@ -1093,7 +1105,7 @@ read_eye(int pos, int *attack_point, int *defense_point,
   struct vital_points *best_vp = &vp;
 
   eye_color = recognize_eye(pos, attack_point, defense_point, value,
-			    eye, heye, &vp);
+			    eye, heye, &vp, eyefilling_points);
   if (!eye_color)
     return 0;
 
@@ -1146,7 +1158,7 @@ read_eye(int pos, int *attack_point, int *defense_point,
 
     heye[combination_halfeye].type = 0;
     result = recognize_eye(pos, &apos, &dpos, &combination_value, eye,
-			   heye, &combination_vp);
+			   heye, &combination_vp, NULL);
     heye[combination_halfeye].type = HALF_EYE;
 
     if (result) {
@@ -1211,7 +1223,7 @@ read_eye(int pos, int *attack_point, int *defense_point,
 
     heye[ko_halfeye].type = 0;
     result = recognize_eye(pos, &apos, &dpos, &ko_value, eye,
-			   heye, &ko_vp);
+			   heye, &ko_vp, NULL);
     heye[ko_halfeye].type = HALF_EYE;
 
     if (result && max_eyes(value) < max_eyes(&ko_value)) {
@@ -1254,22 +1266,26 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	      struct eyevalue *value,
 	      struct eye_data eye[BOARDMAX], 
 	      struct half_eye_data heye[BOARDMAX], 
-	      struct vital_points *vp)
+	      struct vital_points *vp,
+	      int eyefilling_points[BOARDMAX])
 {
   int pos2;
   int eye_color;
   int eye_size = 0;
   int num_marginals = 0;
   int vpos[MAXEYE];
-  signed char marginal[MAXEYE], edge[MAXEYE], neighbors[MAXEYE];
-  int graph;
+  signed char marginal[MAXEYE];
+  signed char edge[MAXEYE];
+  signed char neighbors[MAXEYE];
+  signed char stone[MAXEYE];
+  struct eye_graph *graph;
   int map[MAXEYE];
   int best_score;
   int r;
 
   gg_assert(attack_point != NULL);
   gg_assert(defense_point != NULL);
-    
+
   /* Set `eye_color' to the owner of the eye. */
   eye_color = eye[pos].color;
 
@@ -1289,6 +1305,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
       if (marginal[eye_size])
 	num_marginals++;
       neighbors[eye_size] = eye[pos2].neighbors;
+      stone[eye_size] = IS_STONE(board[pos2]);
       if (0) {
 	if (marginal[eye_size])
 	  TRACE("(%1m)", vpos[eye_size]);
@@ -1317,22 +1334,292 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	num_marginals++;
 	edge[eye_size] = 0;
 	neighbors[eye_size] = 1;
+	stone[eye_size] = 0;
       }
       
       eye_size++;
     }
   }
-  
+
+  graph = optical_graph_matcher(vpos, marginal, edge, neighbors, stone,
+				eye_size, num_marginals, map, heye);
+
+  if (!graph)
+    return 0;
+
+  /* We have found a match! Now sort out the vital moves. */
+  *value = graph->value;
+  vp->num_attacks = 0;
+  vp->num_defenses = 0;
+
+  if (eye_move_urgency(value) > 0) {
+    /* Collect all attack and defense points in the pattern. */
+    int k;
+
+    for (k = 0; k < eye_size; k++) {
+      struct eye_vertex *ev = &graph->vertex[k];
+
+      if (ev->flags & EYE_ATTACK_POINT) {
+	/* Check for a marginal vertex matching a half eye virtual
+	 * marginal. This is the case if a half eye preceeds the
+	 * current vertex in the list.
+	 */
+	if (ev->marginal
+	    && map[k] > 0
+	    && vpos[map[k] - 1] != NO_MOVE
+	    && is_halfeye(heye, vpos[map[k] - 1])) {
+	  /* Add all diagonals as vital. */
+	  int ix;
+	  struct half_eye_data *he = &heye[vpos[map[k] - 1]];
+
+	  for (ix = 0; ix < he->num_attacks; ix++)
+	    vp->attacks[vp->num_attacks++] = he->attack_point[ix];
+	}
+	else
+	  vp->attacks[vp->num_attacks++] = vpos[map[k]];
+      }
+
+      if (ev->flags & EYE_DEFENSE_POINT) {
+	/* Check for a half eye virtual marginal vertex. */
+	if (ev->marginal
+	    && map[k] > 0
+	    && vpos[map[k] - 1] != NO_MOVE
+	    && is_halfeye(heye, vpos[map[k] - 1])) {
+	  /* Add all diagonals as vital. */
+	  int ix;
+	  struct half_eye_data *he = &heye[vpos[map[k] - 1]];
+
+	  for (ix = 0; ix < he->num_defenses; ix++)
+	    vp->defenses[vp->num_defenses++] = he->defense_point[ix];
+	}
+	else
+	  vp->defenses[vp->num_defenses++] = vpos[map[k]];
+      }
+    }
+
+    gg_assert(vp->num_attacks > 0 && vp->num_defenses > 0);
+
+    /* We now have all vital attack and defense points listed but
+     * we are also expected to single out of one of each to return
+     * in *attack_point and *defense_point. Since sometimes those
+     * are the only vital points considered, we want to choose the
+     * best ones, in the sense that they minimize the risk for
+     * error in the eye space analysis.
+     *
+     * One example is this position
+     *
+     * |..XXXX
+     * |XXX..X
+     * |..!O.X
+     * |OO.O.X
+     * |.O.!XX
+     * +------
+     *
+     * where O has an eyespace of the !..! type. The graph
+     * matching finds that both marginal vertices are vital points
+     * but here the one at 3-3 fails to defend. (For attack both
+     * points work but the 3-3 one is still worse since it leaves
+     * a ko threat.)
+     *
+     * In order to differentiate between the marginal points we
+     * count the number of straight and diagonal neighbors within
+     * the eye space. In the example above both have one straight
+     * neighbor each but the edge margin wins because it also has
+     * a diagonal margin.
+     */
+
+    best_score = -10;
+    for (k = 0; k < vp->num_attacks; k++) {
+      int apos = vp->attacks[k];
+      int score = 0;
+      for (r = 0; r < 8; r++)
+	if (ON_BOARD(apos + delta[r])
+	    && eye[apos + delta[r]].color == eye[pos].color
+	    && !eye[apos + delta[r]].marginal) {
+	  score++;
+	  if (r < 4) {
+	    score++;
+	    if (board[apos + delta[r]] != EMPTY)
+	      score++;
+	  }
+	}
+
+      /* If a vital point is not adjacent to any point in the eye
+       * space, it must be a move to capture or defend a string
+       * related to a halfeye, e.g. the move * in this position,
+       *
+       * ......|
+       * .XXXX.|
+       * .X.O..|
+       * .XO.OO|
+       * .*XO..|
+       * ------+
+       *
+       * Playing this is probably a good idea.
+       */
+      if (score == 0)
+	score += 2;
+
+      if (0)
+	gprintf("attack point %1m score %d\n", apos, score);
+
+      if (score > best_score) {
+	*attack_point = apos;
+	best_score = score;
+      }
+    }
+
+    best_score = -10;
+    for (k = 0; k < vp->num_defenses; k++) {
+      int dpos = vp->defenses[k];
+      int score = 0;
+      for (r = 0; r < 8; r++)
+	if (ON_BOARD(dpos + delta[r])
+	    && eye[dpos + delta[r]].color == eye[pos].color
+	    && !eye[dpos + delta[r]].marginal) {
+	  score++;
+	  if (r < 4) {
+	    score++;
+	    if (board[dpos + delta[r]] != EMPTY)
+	      score++;
+	  }
+	}
+
+      /* If possible, choose a non-sacrificial defense point.
+       * Compare white T8 and T6 in lazarus:21.
+       */
+      if (safe_move(dpos, eye_color) != WIN)
+	score -= 5;
+
+      /* See comment to the same code for attack points. */
+      if (score == 0)
+	score += 2;
+
+      if (0)
+	gprintf("defense point %1m score %d\n", dpos, score);
+
+      if (score > best_score) {
+	*defense_point = dpos;
+	best_score = score;
+      }
+    }
+
+    DEBUG(DEBUG_EYES, "  vital points: %1m (attack) %1m (defense)\n",
+	  *attack_point, *defense_point);
+    DEBUG(DEBUG_EYES, "  pattern matched:  %d\n", graph->patnum);
+
+  }
+
+  /* In certain types of semeais it is necessary to fill in nakade
+   * shapes, e.g. in a position like this:
+   *
+   * OOOOOXXXXXX
+   * OXXXXOOOOOX
+   * OX.OXXO..OX
+   * OX.OOXO..OX
+   * -----------
+   *
+   * However, only one of the lower left liberties leaves a nakade
+   * shape when O plays there. The code below tries adding a stone at
+   * each empty vertex in the eyespace and do graph matching to find
+   * the eyevalue of the resulting eyespace. If it's still only worth
+   * one eye it is a valid eyefilling point.
+   *
+   * In some positions a subset of the eyefilling points give the
+   * opponent a ko threat. If this can be avoided we prefer the points
+   * which don't. One example is
+   *
+   * XXXX
+   * XabXX
+   * XcOdX
+   * -----
+   *
+   * where playing at the empty vertices a and d leaves a ko threat to
+   * make two eyes, whereas b and c don't.
+   *
+   * We only do this analysis if the information is requested (when
+   * called from semeai reading), the eyeshape is worth exactly one
+   * eye, and there are no marginal points (then generally better to
+   * play those first).
+   */
+  if (eyefilling_points
+      && min_eyes(value) == 1 && max_eyes(value) == 1 && num_marginals == 0) {
+    int k;
+    int num_empty = 0;
+    /* Count the number of empty points in the eyespace. */
+    for (k = 0; k < eye_size; k++) {
+      if (!stone[k])
+	num_empty++;
+    }
+
+    /* We can't fill in an eyespace with only one liberty. It would
+     * either be suicide or capture the surrounding stones.
+     */
+    if (num_empty > 1) {
+      int valid_point[MAXEYE];
+      int threat[MAXEYE];
+      int min_threat = 2;
+      /* For each empty point, add a stone and do the graph matching
+       * again.
+       */
+      for (k = 0; k < eye_size; k++) {
+	if (!stone[k]) {
+	  struct eye_graph *graph2;
+	  stone[k] = 1;
+	  valid_point[k] = 0;
+	  graph2 = optical_graph_matcher(vpos, marginal, edge, neighbors, stone,
+					 eye_size, num_marginals, map, heye);
+	  if (graph2 && max_eyes(&graph2->value) < 2) {
+	    /* This is an effective eyefilling point. Also check
+	     * whether it leaves a ko threat.
+	     */
+	    valid_point[k] = 1;
+	    threat[k] = max_eye_threat(&graph2->value);
+	    if (threat[k] < min_threat)
+	      min_threat = threat[k];
+	  }
+	  stone[k] = 0;
+	}
+      }
+      /* Loop through the points once more to record those which are
+       * both effective eyefilling points and don't leave a ko threat
+       * if it can be avoided.
+       */
+      for (k = 0; k < eye_size; k++) {
+	if (!stone[k] && valid_point[k]) {
+	  int pos = vpos[k];
+	  if (threat[k] == min_threat) {
+	    eyefilling_points[pos] = 1;
+	    TRACE("Eyefilling point at %1m\n", pos);
+	  }
+	}
+      }
+    }
+  }
+
+  TRACE("eye space at %1m of type %d\n", pos, graph->patnum);
+  return eye_color;
+}
+
+
+/* Perform the actual matching of the graphs in eyes.db. */
+static struct eye_graph *
+optical_graph_matcher(int *vpos, signed char *marginal, signed char *edge,
+		      signed char *neighbors, signed char *stone, int eye_size,
+		      int num_marginals, int *map,
+		      struct half_eye_data *heye)
+{
   /* We attempt to construct a map from the graph to the eyespace
    * preserving the adjacency structure. If this can be done, we've
    * identified the eyeshape.
    */
+  int n;
 
-  for (graph = 0; graphs[graph].vertex != NULL; graph++) {
+  for (n = 0; graphs[n].vertex != NULL; n++) {
     int q;
 
-    if (graphs[graph].esize != eye_size
-	|| graphs[graph].msize != num_marginals)
+    if (graphs[n].esize != eye_size
+	|| graphs[n].msize != num_marginals)
       continue;
 
     reset_map(eye_size);
@@ -1340,7 +1627,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
     first_map(&map[0]);
 
     while (1) {
-      struct eye_vertex *gv = &graphs[graph].vertex[q];
+      struct eye_vertex *gv = &graphs[n].vertex[q];
       int mv = map[q];
       int ok = 1;
 
@@ -1354,7 +1641,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	ok = 0;
 
       if (ok) {
-        if (IS_STONE(board[vpos[mv]])) {
+        if (stone[mv]) {
 	  if (!(gv->flags & CAN_CONTAIN_STONE))
 	    ok = 0;
 	}
@@ -1411,176 +1698,12 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
       }
     }
 
-    if (q == eye_size) {
-      /* We have found a match! Now sort out the vital moves. */
-      *value = graphs[graph].value;
-      vp->num_attacks = 0;
-      vp->num_defenses = 0;
-      
-      if (eye_move_urgency(value) > 0) {
-	/* Collect all attack and defense points in the pattern. */
-	int k;
-
-	for (k = 0; k < eye_size; k++) {
-	  struct eye_vertex *ev = &graphs[graph].vertex[k];
-
-	  if (ev->flags & EYE_ATTACK_POINT) {
-	    /* Check for a marginal vertex matching a half eye virtual
-	     * marginal. This is the case if a half eye preceeds the
-	     * current vertex in the list.
-	     */
-	    if (ev->marginal
-		&& map[k] > 0
-		&& vpos[map[k] - 1] != NO_MOVE
-		&& is_halfeye(heye, vpos[map[k] - 1])) {
-	      /* Add all diagonals as vital. */
-	      int ix;
-	      struct half_eye_data *he = &heye[vpos[map[k] - 1]];
-	      
-	      for (ix = 0; ix < he->num_attacks; ix++)
-		vp->attacks[vp->num_attacks++] = he->attack_point[ix];
-	    }
-	    else
-	      vp->attacks[vp->num_attacks++] = vpos[map[k]];
-	  }
-	  
-	  if (ev->flags & EYE_DEFENSE_POINT) {
-	    /* Check for a half eye virtual marginal vertex. */
-	    if (ev->marginal
-		&& map[k] > 0
-		&& vpos[map[k] - 1] != NO_MOVE
-		&& is_halfeye(heye, vpos[map[k] - 1])) {
-	      /* Add all diagonals as vital. */
-	      int ix;
-	      struct half_eye_data *he = &heye[vpos[map[k] - 1]];
-	      
-	      for (ix = 0; ix < he->num_defenses; ix++)
-		vp->defenses[vp->num_defenses++] = he->defense_point[ix];
-	    }
-	    else
-	      vp->defenses[vp->num_defenses++] = vpos[map[k]];
-	  }
-	}
-	
-	gg_assert(vp->num_attacks > 0 && vp->num_defenses > 0);
-
-	/* We now have all vital attack and defense points listed but
-         * we are also expected to single out of one of each to return
-         * in *attack_point and *defense_point. Since sometimes those
-         * are the only vital points considered, we want to choose the
-         * best ones, in the sense that they minimize the risk for
-         * error in the eye space analysis.
-	 *
-	 * One example is this position
-	 *
-	 * |..XXXX
-	 * |XXX..X
-	 * |..!O.X
-	 * |OO.O.X
-	 * |.O.!XX
-	 * +------
-	 *
-	 * where O has an eyespace of the !..! type. The graph
-	 * matching finds that both marginal vertices are vital points
-	 * but here the one at 3-3 fails to defend. (For attack both
-	 * points work but the 3-3 one is still worse since it leaves
-	 * a ko threat.)
-	 *
-	 * In order to differentiate between the marginal points we
-	 * count the number of straight and diagonal neighbors within
-	 * the eye space. In the example above both have one straight
-	 * neighbor each but the edge margin wins because it also has
-	 * a diagonal margin.
-	 */
-
-	best_score = -10;
-	for (k = 0; k < vp->num_attacks; k++) {
-	  int apos = vp->attacks[k];
-	  int score = 0;
-	  for (r = 0; r < 8; r++)
-	    if (ON_BOARD(apos + delta[r])
-		&& eye[apos + delta[r]].color == eye[pos].color
-		&& !eye[apos + delta[r]].marginal) {
-	      score++;
-	      if (r < 4) {
-		score++;
-		if (board[apos + delta[r]] != EMPTY)
-		  score++;
-	      }
-	    }
-
-	  /* If a vital point is not adjacent to any point in the eye
-           * space, it must be a move to capture or defend a string
-           * related to a halfeye, e.g. the move * in this position,
-	   *
-	   * ......|
-	   * .XXXX.|
-	   * .X.O..|
-	   * .XO.OO|
-	   * .*XO..|
-	   * ------+
-	   *
-	   * Playing this is probably a good idea.
-	   */
-	  if (score == 0)
-	    score += 2;
-	  
-	  if (0)
-	    gprintf("attack point %1m score %d\n", apos, score);
-	  
-	  if (score > best_score) {
-	    *attack_point = apos;
-	    best_score = score;
-	  }
-	}
-
-	best_score = -10;
-	for (k = 0; k < vp->num_defenses; k++) {
-	  int dpos = vp->defenses[k];
-	  int score = 0;
-	  for (r = 0; r < 8; r++)
-	    if (ON_BOARD(dpos + delta[r])
-		&& eye[dpos + delta[r]].color == eye[pos].color
-		&& !eye[dpos + delta[r]].marginal) {
-	      score++;
-	      if (r < 4) {
-		score++;
-		if (board[dpos + delta[r]] != EMPTY)
-		  score++;
-	      }
-	    }
-
-	  /* If possible, choose a non-sacrificial defense point.
-	   * Compare white T8 and T6 in lazarus:21.
-	   */
-	  if (safe_move(dpos, eye_color) != WIN)
-	    score -= 5;
-
-	  /* See comment to the same code for attack points. */
-	  if (score == 0)
-	    score += 2;
-
-	  if (0)
-	    gprintf("defense point %1m score %d\n", dpos, score);
-	  
-	  if (score > best_score) {
-	    *defense_point = dpos;
-	    best_score = score;
-	  }
-	}
-	
-	DEBUG(DEBUG_EYES, "  vital points: %1m (attack) %1m (defense)\n",
-	      *attack_point, *defense_point);
-	DEBUG(DEBUG_EYES, "  pattern matched:  %d\n", graphs[graph].patnum);
-	
-      }
-      TRACE("eye space at %1m of type %d\n", pos, graphs[graph].patnum);
-      
-      return eye_color;
-    }
+    /* Successful match. */
+    if (q == eye_size)
+      return &graphs[n];
   }
 
-  return 0;
+  return NULL;
 }
 
 

@@ -1031,7 +1031,8 @@ void compute_eyes_pessimistic(int pos, struct eyevalue *value,
                               int *pessimistic_min,
                               int *attack_point, int *defense_point,
                               struct eye_data eye[BOARDMAX],
-                              struct half_eye_data heye[BOARDMAX]);
+                              struct half_eye_data heye[BOARDMAX],
+			      int eyefilling_points[BOARDMAX]);
 void propagate_eye(int pos, struct eye_data eye[BOARDMAX]);
 int find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
 		     int dragons[], int max_dragons);
