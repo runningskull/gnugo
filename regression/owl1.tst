@@ -544,3 +544,9 @@ loadsgf games/cgos/25811.sgf 52
 loadsgf games/cgos/403788.sgf 65
 397 owl_does_attack A9 A8
 #? [0]
+
+loadsgf games/owl56.sgf
+398 owl_attack E4
+#? [1 G6]
+399 owl_attack D16
+#? [1 D14]
