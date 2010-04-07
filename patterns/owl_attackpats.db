@@ -1875,6 +1875,22 @@ fG??
 ; && oplay_defend(*,D,C,f,G)
 
 
+Pattern A427
+# mh New pattern (3.9.1)
+
+??.O        hit on the nose
+.*YX
+??.O
+
+:-,-,value(60)
+
+??.C
+a*bX
+??.D
+
+;owl_escape_value(a) > 0 && lib(b)==3 && !oplay_attack_either(*,C,D)
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves on the second line        #
