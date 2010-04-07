@@ -547,6 +547,10 @@ attack_either(int astr, int bstr)
   ASSERT1(IS_STONE(color) , astr);
   ASSERT1(color == board[bstr], bstr);
 
+  /* If the two strings are in fact the same, revert to ordinary attack. */
+  if (same_string(astr, bstr))
+    return attack(astr, NULL);
+
   /* Start by attacking the string with the fewest liberties. On
    * average this seems to be slightly more efficient.
    */
@@ -646,6 +650,10 @@ defend_both(int astr, int bstr)
   int color = board[astr];
   ASSERT1(IS_STONE(color) , astr);
   ASSERT1(color == board[bstr], bstr);
+
+  /* If the two strings are in fact the same, revert to ordinary defense. */
+  if (same_string(astr, bstr))
+    return find_defense(astr, NULL);
 
   /* This probably helps here too...
    * (see attack_either)

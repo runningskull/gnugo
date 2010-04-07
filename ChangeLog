@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- fall back to ordinary reading in attack_either and defend_both if the
+  two strings are in fact the same
 - never consider backfilling move for common liberty inside own eyespace
   as risk free.
 - do_owl_analyze_semeai() can distinguish between outer liberties and
