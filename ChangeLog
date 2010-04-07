@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- never consider backfilling move for common liberty inside own eyespace
+  as risk free.
 - do_owl_analyze_semeai() can distinguish between outer liberties and
   eyefilling moves, also chooses the latter correctly
 - recognize_eye() can optionally find out at which points eyefilling can

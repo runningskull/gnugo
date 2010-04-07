@@ -1129,7 +1129,12 @@ do_owl_analyze_semeai(int apos, int bpos,
       owl_add_move(moves, backfill_common_liberty.pos, move_value,
 		   "backfilling move", SAME_DRAGON_NOT_CONNECTED, NO_MOVE, 0,
 		   NO_MOVE, MAX_SEMEAI_MOVES, NULL);
-      if (semeai_is_riskless_move(backfill_common_liberty.pos, owla))
+      /* Playing a backfilling move for common liberties inside own
+       * eyespace is not risk free, regardless of the tactical
+       * analysis.
+       */
+      if (semeai_is_riskless_move(backfill_common_liberty.pos, owla)
+	  && owla->my_eye[backfill_common_liberty.pos].color != owla->color)
 	riskless_move_found = 1;
       TRACE("Added %1m %d (6)\n", backfill_common_liberty.pos, move_value);
     }
