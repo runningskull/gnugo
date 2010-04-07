@@ -3978,6 +3978,23 @@ OX*x
 ;owl_escape_value(B)>0 && !xplay_disconnect(*,A,B) && !oplay_connect(*,A,B)
 
 
+Pattern A1026
+#mh New pattern. (3.9.1)
+
+??*.X       clamp to disconnect or block
+..X.Y
+??Oo?
+
+:8,C,value(85)
+
+??*.X
+abcdY
+??Oo?
+
+;(owl_escape_value(c) > 0 || (owl_goal_dragon(c) && owl_escape_value(a)))
+;&& !oplay_attack_either(*,d,b,b,*) && !oplay_attack_either(*,b,d,d,*)
+
+
 #########################################################
 #                                                       #
 #              Reinforce the perimeter                  #
