@@ -3514,6 +3514,7 @@ xO..x
 
 
 Pattern A1001
+# gf Revised constraint. (3.9.1)
 
 YO          cut if safe
 *X
@@ -3523,7 +3524,8 @@ YO          cut if safe
 Ba
 *C
 
-;(owl_escape_value(B)>0 || owl_escape_value(C)>0)
+;!same_string(B,C)
+;&& (owl_escape_value(B)>0 || owl_escape_value(C)>0)
 ;&& !oplay_attack_either(*,*,a)
 
 

@@ -4081,17 +4081,19 @@ acdo??
 
 Pattern D1000
 # tm modified (3.1.22)
+# gf Revised constraint. (3.9.1)
 
 O*          prevent opponent's safe cut
 XO
 
 :/,-,value(60)
 
-B*
-aC
+b*
+Ac
 
-; (wormsize(B) > 1 && wormsize(C) > 1)
-;  && safe_xmove(*) && !xplay_attack(*,a)
+;!same_string(b,c)
+;&& (wormsize(b) > 1 && wormsize(c) > 1)
+;&& safe_xmove(*) && !xplay_attack(*,A)
 
 
 Pattern D1000a
