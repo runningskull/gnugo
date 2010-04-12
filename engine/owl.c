@@ -271,8 +271,6 @@ static int semeai_trymove_and_recurse(int apos, int bpos,
 				      int *this_resulta, int *this_resultb);
 static void semeai_add_sgf_comment(int value, int owl_phase);
 static int semeai_trust_tactical_attack(int str);
-static int semeai_propose_eyespace_filling_move(struct local_owl_data *owla,
-						struct local_owl_data *owlb);
 static void semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
 				    struct local_owl_data *owla,
 				    struct local_owl_data *owlb, int color,
@@ -1140,24 +1138,9 @@ do_owl_analyze_semeai(int apos, int bpos,
     }
   }
 
-  if (moves[0].pos == NO_MOVE) {
-    /* If no move has been found yet, see if we can fill opponent's
-     * eye (i.e. put more stones in "bulky five" shape).
-     */
-    if (min_eyes(&probable_eyes_b) == 1) {
-      int move = semeai_propose_eyespace_filling_move(owla, owlb);
+  if (moves[0].pos == NO_MOVE)
+    TRACE("No move found\n");
 
-      if (move) {
-	owl_add_move(moves, move, 70, "eyespace filling",
-		     SAME_DRAGON_NOT_CONNECTED, NO_MOVE,
-	    	     0, NO_MOVE, MAX_SEMEAI_MOVES, NULL);
-      }
-    }
-
-    if (moves[0].pos == NO_MOVE)
-      TRACE("No move found\n");
-  }
-  
   /* Now we are ready to try moves. Turn on the sgf output ... */
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
@@ -1661,68 +1644,6 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
 		 NO_MOVE, MAX_SEMEAI_MOVES, pattern_data);
     TRACE("Added %1m %d\n", move, move_value);
   }
-}
-
-
-/* Propose an eyespace filling move.  Such a move can, for instance,
- * add a stone to opponent's "bulky five" shape.  We of course choose
- * a move that doesn't allow opponent to turn his dead eyeshape into a
- * two eyes eyeshape.  E.g. in this position, the function will
- * propose the move at '*', not at the '.':
- *
- *	 XXX
- *	XXOX
- *	XOOX
- *	X.*X
- *	----
- */
-static int
-semeai_propose_eyespace_filling_move(struct local_owl_data *owla,
-				     struct local_owl_data *owlb)
-{
-  int color = OTHER_COLOR(owlb->color);
-  int pos;
-  int mw[BOARDMAX];
-  int mz[BOARDMAX];
-
-  owl_find_relevant_eyespaces(owlb, mw, mz);
-
-  /* Never try to fill opponent's eyes which contain our dragon.  This
-   * is nothing else than suicide.
-   */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (ON_BOARD(pos) && owla->goal[pos])
-      mw[owlb->my_eye[pos].origin] = 0;
-  }
-
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == EMPTY) {
-      int origin = owlb->my_eye[pos].origin;
-
-      if (mw[origin] > 1
-	  && min_eyes(&owlb->my_eye[origin].value) == 1) {
-	int good_move = 0;
-
-	if (trymove(pos, color, "eyespace_filling", NO_MOVE)) {
-	  struct eyevalue new_value;
-	  int dummy_attack;
-	  int dummy_defense;
-
-	  compute_eyes(origin, &new_value, &dummy_attack, &dummy_defense,
-		       owlb->my_eye, owlb->half_eye, 0);
-	  if (max_eyes(&new_value) <= 1)
-	    good_move = 1;
-
-	  popgo();
-	}
-
-	if (good_move)
-	  return pos;
-      }
-    }
-  }
-
-  return NO_MOVE;
 }
 
 
