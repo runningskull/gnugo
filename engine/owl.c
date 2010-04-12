@@ -267,7 +267,7 @@ static int semeai_trymove_and_recurse(int apos, int bpos,
 				      int move_value, const char *move_name,
 				      enum same_dragon_value same_dragon,
 				      struct matched_pattern_data *pattern_data,
-				      int lunch, int *semeai_move,
+				      int lunch, int pass, int *semeai_move,
 				      int *this_resulta, int *this_resultb);
 static void semeai_add_sgf_comment(int value, int owl_phase);
 static int semeai_trust_tactical_attack(int str);
@@ -579,7 +579,7 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   else {
     semeai_trymove_and_recurse(bpos, apos, owlb, owla, owl,
 			       move, color, 1, 0, "mandatory move",
-			       SAME_DRAGON_MAYBE_CONNECTED, NULL, NO_MOVE,
+			       SAME_DRAGON_MAYBE_CONNECTED, NULL, NO_MOVE, 0,
 			       semeai_move, resultb, resulta);
     *resulta = REVERSE_RESULT(*resulta);
     *resultb = REVERSE_RESULT(*resultb);
@@ -1094,7 +1094,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 				     owla, owlb, 50,
 				     critical_semeai_worms);
       owl_add_move(moves, backfill_outside_liberty.pos, move_value,
-		   "backfilling move", SAME_DRAGON_NOT_CONNECTED, NO_MOVE, 0,
+		   "backfilling move for outer liberty", SAME_DRAGON_NOT_CONNECTED, NO_MOVE, 0,
 		   NO_MOVE, MAX_SEMEAI_MOVES, NULL);
       riskless_move_found = 1;
       TRACE("Added %1m %d (6)\n", backfill_outside_liberty.pos, move_value);
@@ -1110,7 +1110,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       riskless_move_found = 1;
       TRACE("Added %1m %d (5)\n", eyefilling_liberty.pos, move_value);
     }
-    else if (safe_common_liberty_found
+    else if (!(pass & color) && safe_common_liberty_found
 	     && common_liberty.pos != NO_MOVE) {
       move_value = semeai_move_value(common_liberty.pos,
 				     owla, owlb, 10,
@@ -1122,12 +1122,12 @@ do_owl_analyze_semeai(int apos, int bpos,
 	riskless_move_found = 1;
       TRACE("Added %1m %d (7)\n", common_liberty.pos, move_value);
     }
-    else if (backfill_common_liberty.pos != NO_MOVE) {
+    else if (!(pass & color) && backfill_common_liberty.pos != NO_MOVE) {
       move_value = semeai_move_value(backfill_common_liberty.pos,
 				     owla, owlb, 10,
 				     critical_semeai_worms);
       owl_add_move(moves, backfill_common_liberty.pos, move_value,
-		   "backfilling move", SAME_DRAGON_NOT_CONNECTED, NO_MOVE, 0,
+		   "backfilling move for common liberty", SAME_DRAGON_NOT_CONNECTED, NO_MOVE, 0,
 		   NO_MOVE, MAX_SEMEAI_MOVES, NULL);
       /* Playing a backfilling move for common liberties inside own
        * eyespace is not risk free, regardless of the tactical
@@ -1196,7 +1196,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 				   best_resulta == 0 || best_resultb == 0,
 				   moves[k].value, moves[k].name,
 				   moves[k].same_dragon, moves[k].pattern_data,
-				   moves[k].lunch, NULL,
+				   moves[k].lunch, pass, NULL,
 				   &this_resulta, &this_resultb)) {
       tested_moves++;
       if (this_resultb == WIN && this_resulta == WIN) {
@@ -1285,7 +1285,7 @@ do_owl_analyze_semeai(int apos, int bpos,
    */
   if (best_resulta == 0 && best_resultb == 0
       && !riskless_move_found) {
-    if (pass) {
+    if (pass & OTHER_COLOR(color)) {
       if (max_eyes(&probable_eyes_a) < min_eyes(&probable_eyes_b)) {
 	*resulta = 0;
 	*resultb = 0;
@@ -1317,7 +1317,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     else {
     /* No working move was found, but opponent hasn't passed. Then we pass. */
       do_owl_analyze_semeai(bpos, apos, owlb, owla,
-			    resultb, resulta, NULL, 1, owl_phase);
+			    resultb, resulta, NULL, pass | color, owl_phase);
       *resulta = REVERSE_RESULT(*resulta);
       *resultb = REVERSE_RESULT(*resultb);
       TRACE("No move found\n");
@@ -1358,7 +1358,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	|| (best_resulta == KO_B && best_resultb == KO_B
 	    && is_ko(best_move, owla->color, NULL))) {
       do_owl_analyze_semeai(bpos, apos, owlb, owla, &this_resultb,
-			    &this_resulta, NULL, 1, owl_phase);
+			    &this_resulta, NULL, pass | color, owl_phase);
       if (REVERSE_RESULT(this_resulta) >= best_resulta
 	  && REVERSE_RESULT(this_resultb) >= best_resultb) {
 	best_move = PASS_MOVE;
@@ -1391,7 +1391,7 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
 			   int move_value, const char *move_name,
 			   enum same_dragon_value same_dragon,
 			   struct matched_pattern_data *pattern_data,
-			   int lunch, int *semeai_move,
+			   int lunch, int pass, int *semeai_move,
 			   int *this_resulta, int *this_resultb)
 {
   int ko_move = 0;
@@ -1494,7 +1494,7 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
   else {
     do_owl_analyze_semeai(bpos, apos, owlb, owla,
 			  this_resultb, this_resulta, semeai_move,
-			  0, owl_phase);
+			  pass, owl_phase);
     *this_resulta = REVERSE_RESULT(*this_resulta);
     *this_resultb = REVERSE_RESULT(*this_resultb);
   }
