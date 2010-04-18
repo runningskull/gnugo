@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- play common liberties in semeai with sufficient remaining liberties,
+  even if tactical reading believes it is unsafe
 - remove redundant function semeai_propose_eyespace_filling_move
 - do not play common liberties after having already passed
 - fall back to ordinary reading in attack_either and defend_both if the

@@ -1056,7 +1056,9 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  }
 	  else {
 	    /* common liberty */
-	    if (safe_move(pos, color) == WIN) {
+	    if (safe_move(pos, color) == WIN
+		|| (!we_might_be_inessential
+		    && accuratelib(pos, color, 3, NULL) >= 3)) {
 	      safe_common_liberty_found = 1;
 	      common_liberty.pos = pos;
 	    }
