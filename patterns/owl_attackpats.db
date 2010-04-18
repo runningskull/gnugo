@@ -6235,6 +6235,7 @@ XYO?
 
 
 Pattern A1608
+# gf Added constraint. (3.9.1)
 
 XYO?      throw in to destroy eyespace
 .*XO
@@ -6243,15 +6244,23 @@ XYO?      throw in to destroy eyespace
 
 :8,s,value(45)
 
+XYO?
+.*Xa
+.X.a
+----
+
+;!oplay_attack(*,a)
+
 
 Pattern A1608b
+# gf Removed s classification. (3.9.1)
 
 xXYO?      atari to reduce eyespace, with further reduction as followup
 ...XO
 ..X*O
 -----
 
-:8,s,value(50)
+:8,-,value(50)
 
 
 # nn Removal candidate (3.3.13)
