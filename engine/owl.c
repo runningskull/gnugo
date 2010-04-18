@@ -799,6 +799,26 @@ do_owl_analyze_semeai(int apos, int bpos,
 	      	       0, NO_MOVE, MAX_SEMEAI_MOVES, NULL);
 	  TRACE("Added %1m %d (0)\n", upos, 85);
 	}
+	else if (countlib(semeai_worms[sworm]) == 1) {
+	  /* Overrule tactical reading if it looks like we are
+	   * capturing a big nakade to get out of atari.
+	   */
+	  int lib;
+	  int j;
+	  findlib(semeai_worms[sworm], 1, &lib);
+	  for (j = 0; j < 4; j++) {
+	    int pos = lib + delta[j];
+	    if (board[pos] == other
+		&& countlib(pos) == 1
+		&& countstones(pos) >= 4) {
+	      critical_semeai_worms[sworm] = 1;
+	      owl_add_move(moves, lib, 85, "defend semeai worm",
+			   SAME_DRAGON_MAYBE_CONNECTED, NO_MOVE,
+			   0, NO_MOVE, MAX_SEMEAI_MOVES, NULL);
+	      TRACE("Added %1m %d (0)\n", lib, 85);
+	    }
+	  }
+	}
       }
   }
 
