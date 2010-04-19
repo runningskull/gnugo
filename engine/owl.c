@@ -242,6 +242,8 @@ static void owl_test_cuts(signed char goal[BOARDMAX], int color,
 static void componentdump(const signed char component[BOARDMAX]);
 static void owl_update_boundary_marks(int pos, struct local_owl_data *owl);
 static void owl_find_lunches(struct local_owl_data *owl);
+static int test_lunch_essentiality(int lunch, signed char *goal, int color,
+				   int *num_stones, int *stones);
 static int improve_lunch_attack(int lunch, int attack_point);
 static int improve_lunch_defense(int lunch, int defense_point);
 static void owl_make_domains(struct local_owl_data *owla,
@@ -5793,7 +5795,102 @@ owl_connection_defends(int move, int target1, int target2)
  * (treated as invisible) during the running of make_domains.
  *
  * In certain cases we also need to identify tactically safe strings
- * which should be included in the eyespace, e.g. in this position:
+ * which should be included in the eyespace because they can't live
+ * independently without capturing the surrounding stones. We call
+ * such stones INESSENTIAL. The characteristics of those are described
+ * in the comments to the test_lunch_essentiality() function below.
+ */
+
+static void
+owl_find_lunches(struct local_owl_data *owl)
+{
+  int k;
+  int pos;
+  int lunches = 0;
+  int prevlunch;
+  int lunch;
+  int acode;
+  int apos;
+  int dcode;
+  int dpos;
+  int color = owl->color;
+  int other = OTHER_COLOR(color);
+  signed char already_checked[BOARDMAX];
+
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
+
+  sgf_dumptree = NULL;
+  count_variations = 0;
+  for (prevlunch = 0; prevlunch < MAX_LUNCHES; prevlunch++)
+    owl->lunch[prevlunch] = NO_MOVE;
+  memset(owl->inessential, 0, sizeof(owl->inessential));
+
+  memset(already_checked, 0, sizeof(already_checked));
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == color && owl->goal[pos]) {
+      /* Loop over the eight neighbors. */
+      for (k = 0; k < 8; k++) {
+	int pos2 = pos + delta[k];
+
+	/* If the immediate neighbor is empty, we look two steps away. */
+	if (k < 4 && board[pos2] == EMPTY)
+	  pos2 += delta[k];
+
+	if (board[pos2] != other)
+	  continue;
+
+	lunch = find_origin(pos2);
+	if (already_checked[lunch])
+	  continue;
+	already_checked[lunch] = 1;
+
+	attack_and_defend(lunch, &acode, &apos, &dcode, &dpos);
+	if (acode != 0
+	    && (!liberty_of_goal(apos, owl) || safe_move(apos, color))) {
+	  owl->lunch[lunches] = lunch;
+	  owl->lunch_attack_code[lunches]  = acode;
+	  owl->lunch_attack_point[lunches] = apos;
+	  owl->lunch_defend_code[lunches]  = dcode;
+	  ASSERT1(board[apos] == EMPTY, lunch);
+	  if (dcode != 0) {
+	    owl->lunch_defense_point[lunches] = dpos;
+	    ASSERT1(board[dpos] == EMPTY, lunch);
+	  }
+	  else
+	    owl->lunch_defense_point[lunches] = NO_MOVE;
+	  lunches++;
+	  if (lunches == MAX_LUNCHES) {
+	    sgf_dumptree = save_sgf_dumptree;
+	    count_variations = save_count_variations;
+	    owl->lunches_are_current = 1;
+	    return;
+	  }
+	}
+	else if (!owl->inessential[lunch]) {
+	  int num_stones;
+	  int stones[MAX_BOARD * MAX_BOARD];
+	  int essential = test_lunch_essentiality(lunch, owl->goal, color,
+						  &num_stones, stones);
+	  if (!essential) {
+	    int r;
+	    TRACE("Inessential string found at %1m.\n", lunch);
+	    for (r = 0; r < num_stones; r++)
+	      owl->inessential[stones[r]] = 1;
+	  }
+	}
+      }
+    }
+  }
+
+  owl->lunches_are_current = 1;
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+}
+
+/*
+ * This function determines whether tactically safe strings should be
+ * included in the eyespaces, e.g. in this position:
  *
  * -------
  * OXXOOXO
@@ -5867,176 +5964,81 @@ owl_connection_defends(int move, int target1, int target2)
  *      goal dragon and is adjacent to no empty vertex.
  */
 
-static void
-owl_find_lunches(struct local_owl_data *owl)
+static int
+test_lunch_essentiality(int lunch, signed char *goal, int color,
+			int *num_stones, int *stones)
 {
-  int k;
-  int pos;
-  int lunches = 0;
-  int prevlunch;
-  int lunch;
-  int acode;
-  int apos;
-  int dcode;
-  int dpos;
-  int color = owl->color;
-  int other = OTHER_COLOR(color);
-  signed char already_checked[BOARDMAX];
+  /* Test for inessentiality. */
+  int adj;
+  int adjs[MAXCHAIN];
+  int liberties;
+  int libs[MAXLIBS];
+  int r;
+  int superstring[BOARDMAX];
 
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
-    
-  sgf_dumptree = NULL;
-  count_variations = 0;
-  for (prevlunch = 0; prevlunch < MAX_LUNCHES; prevlunch++)
-    owl->lunch[prevlunch] = NO_MOVE;
-  memset(owl->inessential, 0, sizeof(owl->inessential));
-  
-  memset(already_checked, 0, sizeof(already_checked));
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == color && owl->goal[pos]) {
-      /* Loop over the eight neighbors. */
-      for (k = 0; k < 8; k++) {
-	int pos2 = pos + delta[k];
+  /* First check the neighbors of the string. */
+  adj = chainlinks(lunch, adjs);
+  for (r = 0; r < adj; r++)
+    if (!goal[adjs[r]] || attack(adjs[r], NULL) != 0)
+      return 1;
 
-	/* If the immediate neighbor is empty, we look two steps away. */
-	if (k < 4 && board[pos2] == EMPTY)
-	  pos2 += delta[k];
+  find_superstring_stones_and_liberties(lunch, num_stones, stones,
+					&liberties, libs, 0);
 
-	if (board[pos2] != other)
-	  continue;
+  memset(superstring, 0, sizeof(superstring));
+  for (r = 0; r < *num_stones; r++)
+    superstring[stones[r]] = 1;
 
-	lunch = find_origin(pos2);
-	if (already_checked[lunch])
-	  continue;
-	already_checked[lunch] = 1;
+  for (r = 0; r < liberties; r++) {
+    int bpos = libs[r];
+    int goal_found = 0;
+    int s;
 
-	attack_and_defend(lunch, &acode, &apos, &dcode, &dpos);
-	if (acode != 0
-	    && (!liberty_of_goal(apos, owl) || safe_move(apos, color))) {
-	  owl->lunch[lunches] = lunch;
-	  owl->lunch_attack_code[lunches]  = acode;
-	  owl->lunch_attack_point[lunches] = apos;
-	  owl->lunch_defend_code[lunches]  = dcode;
-	  ASSERT1(board[apos] == EMPTY, lunch);
-	  if (dcode != 0) {
-	    owl->lunch_defense_point[lunches] = dpos;
-	    ASSERT1(board[dpos] == EMPTY, lunch);
-	  }
-	  else
-	    owl->lunch_defense_point[lunches] = NO_MOVE;
-	  lunches++;
-	  if (lunches == MAX_LUNCHES) {
-	    sgf_dumptree = save_sgf_dumptree;
-	    count_variations = save_count_variations;
-	    owl->lunches_are_current = 1;
-	    return;
-	  }
-	}
-	else if (!owl->inessential[lunch]) {
-	  /* Test for inessentiality. */
-	  int adj;
-	  int adjs[MAXCHAIN];
-	  int num_stones;
-	  int stones[MAX_BOARD * MAX_BOARD];
-	  int liberties;
-	  int libs[MAXLIBS];
-	  int r;
-	  int essential = 0;
-	  int superstring[BOARDMAX];
+    for (s = 0; s < 4; s++) {
+      int cpos = bpos + delta[s];
 
-	  /* First check the neighbors of the string. */
-	  adj = chainlinks(lunch, adjs);
-	  for (r = 0; r < adj; r++) {
-	    if (!owl->goal[adjs[r]] || attack(adjs[r], NULL) != 0) {
-	      essential = 1;
-	      break;
-	    }
-	  }
+      if (!ON_BOARD(cpos))
+	continue;
 
-	  if (essential)
-	    continue;
+      if (board[cpos] == color) {
+	if (attack(cpos, NULL) != 0)
+	  return 1;
+	else if (goal[cpos])
+	  goal_found = 1;
+	else
+	  return 1;
+      }
+      else if (board[cpos] == OTHER_COLOR(color) && !superstring[cpos])
+	return 1;
+    }
 
-	  find_superstring_stones_and_liberties(lunch, &num_stones, stones,
-						&liberties, libs, 0);
-
-	  memset(superstring, 0, sizeof(superstring));
-	  for (r = 0; r < num_stones; r++)
-	    superstring[stones[r]] = 1;
-
-	  for (r = 0; r < liberties; r++) {
-	    int bpos = libs[r];
-	    int goal_found = 0;
-	    int s;
-
-	    for (s = 0; s < 4; s++) {
-	      int cpos = bpos + delta[s];
-
-	      if (!ON_BOARD(cpos))
-		continue;
-	      if (board[cpos] == color) {
-		if (attack(cpos, NULL) != 0) {
-		  essential = 1;
-		  break;
-		}
-		else if (owl->goal[cpos])
-		  goal_found = 1;
-		else {
-		  essential = 1;
-		  break;
-		}
-	      }
-	      else if (board[cpos] == other
-		       && !superstring[cpos]) {
-		essential = 1;
-		break;
-	      }
-	    }
-	    if (!goal_found) {
-	      /* Requirement 1 not satisfied. Test requirement 1b.
-	       * N.B. This is a simplified topological eye test.
-	       * The simplification may be good, bad, or neutral.
-	       */
-	      int off_board = 0;
-	      int diagonal_goal = 0;
-	      for (s = 4; s < 8; s++) {
-		if (!ON_BOARD(bpos + delta[s]))
-		  off_board++;
-		else if (owl->goal[bpos + delta[s]])
-		  diagonal_goal++;
-	      }
-	      if (diagonal_goal + (off_board >= 2) < 2)
-		essential = 1;
-	      else {
-		/* Check that the liberty is adjacent to no empty
-		 * vertex, as required by 1b'.
-		 */
-		for (s = 0; s < 4; s++) {
-		  if (board[bpos + delta[s]] == EMPTY) {
-		    essential = 1;
-		    break;
-		  }
-		}
-	      }
-	    }
-
-	    if (essential)
-	      break;
-	  }
-
-	  if (!essential) {
-	    TRACE("Inessential string found at %1m.\n", lunch);
-	    for (r = 0; r < num_stones; r++)
-	      owl->inessential[stones[r]] = 1;
-	  }
-	}
+    if (!goal_found) {
+      /* Requirement 1 not satisfied. Test requirement 1b.
+       * N.B. This is a simplified topological eye test.
+       * The simplification may be good, bad, or neutral.
+       */
+      int off_board = 0;
+      int diagonal_goal = 0;
+      for (s = 4; s < 8; s++) {
+	if (!ON_BOARD(bpos + delta[s]))
+	  off_board++;
+	else if (goal[bpos + delta[s]])
+	  diagonal_goal++;
+      }
+      if (diagonal_goal + (off_board >= 2) < 2)
+	return 1;
+      else {
+	/* Check that the liberty is adjacent to no empty
+	 * vertex, as required by 1b'.
+	 */
+	for (s = 0; s < 4; s++)
+	  if (board[bpos + delta[s]] == EMPTY)
+	    return 1;
       }
     }
   }
 
-  owl->lunches_are_current = 1;
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
+  return 0;
 }
 
 

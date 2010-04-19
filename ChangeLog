@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- break out new static function test_lunch_essentiality() from
+  owl_find_lunches()
 - capture big nakade to get out of atari in semeai even if tactical
   reading disagrees
 - play common liberties in semeai with sufficient remaining liberties,
