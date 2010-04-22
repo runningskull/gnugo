@@ -244,6 +244,8 @@ static void owl_update_boundary_marks(int pos, struct local_owl_data *owl);
 static void owl_find_lunches(struct local_owl_data *owl);
 static int test_lunch_essentiality(int lunch, signed char *goal, int color,
 				   int *num_stones, int *stones);
+static int test_unstable_lunch_essentiality(int lunch, int dcode, int apos,
+					    int dpos, int color);
 static int improve_lunch_attack(int lunch, int attack_point);
 static int improve_lunch_defense(int lunch, int defense_point);
 static void owl_make_domains(struct local_owl_data *owla,
@@ -5832,6 +5834,8 @@ owl_find_lunches(struct local_owl_data *owl)
       /* Loop over the eight neighbors. */
       for (k = 0; k < 8; k++) {
 	int pos2 = pos + delta[k];
+	int valid_lunch;
+	int essential;
 
 	/* If the immediate neighbor is empty, we look two steps away. */
 	if (k < 4 && board[pos2] == EMPTY)
@@ -5841,13 +5845,44 @@ owl_find_lunches(struct local_owl_data *owl)
 	  continue;
 
 	lunch = find_origin(pos2);
-	if (already_checked[lunch])
+	if (already_checked[lunch] || owl->inessential[lunch])
 	  continue;
 	already_checked[lunch] = 1;
 
 	attack_and_defend(lunch, &acode, &apos, &dcode, &dpos);
+
+	valid_lunch = 0;
 	if (acode != 0
-	    && (!liberty_of_goal(apos, owl) || safe_move(apos, color))) {
+	    && (!liberty_of_goal(apos, owl) || safe_move(apos, color)))
+	  valid_lunch = 1;
+
+	essential = 0;
+	if (valid_lunch)
+	  essential = test_unstable_lunch_essentiality(lunch, dcode,
+						       apos, dpos, color);
+
+	if (!essential) {
+	  int num_stones;
+	  int stones[MAX_BOARD * MAX_BOARD];
+	  essential = test_lunch_essentiality(lunch, owl->goal, color,
+					      &num_stones, stones);
+	  if (!essential && valid_lunch) {
+	    /* If the lunch is part of a larger superstring it cannot
+	     * be trusted as inessential.
+	     */
+	    if (countstones(lunch) != num_stones)
+	      essential = 1;
+	  }
+
+	  if (!essential) {
+	    int r;
+	    TRACE("Inessential string found at %1m.\n", lunch);
+	    for (r = 0; r < num_stones; r++)
+	      owl->inessential[stones[r]] = 1;
+	  }
+	}
+
+	if (valid_lunch && essential) {
 	  owl->lunch[lunches] = lunch;
 	  owl->lunch_attack_code[lunches]  = acode;
 	  owl->lunch_attack_point[lunches] = apos;
@@ -5867,18 +5902,6 @@ owl_find_lunches(struct local_owl_data *owl)
 	    return;
 	  }
 	}
-	else if (!owl->inessential[lunch]) {
-	  int num_stones;
-	  int stones[MAX_BOARD * MAX_BOARD];
-	  int essential = test_lunch_essentiality(lunch, owl->goal, color,
-						  &num_stones, stones);
-	  if (!essential) {
-	    int r;
-	    TRACE("Inessential string found at %1m.\n", lunch);
-	    for (r = 0; r < num_stones; r++)
-	      owl->inessential[stones[r]] = 1;
-	  }
-	}
       }
     }
   }
@@ -5887,6 +5910,7 @@ owl_find_lunches(struct local_owl_data *owl)
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
 }
+
 
 /*
  * This function determines whether tactically safe strings should be
@@ -6041,6 +6065,105 @@ test_lunch_essentiality(int lunch, signed char *goal, int color,
   return 0;
 }
 
+
+/* Lunch essentiality is mainly relevant for tactically safe stones.
+ * Tactically dead stones are included in eyespaces anyway and
+ * tactically critical stones need to be captured in order for the
+ * eyespace to exist at all. The latter is not entirely true,
+ * however.
+ *
+ * In this kind of position, based on STS-RV_1:65,
+ *
+ * .OOOOOOO
+ * .OXXXXOO
+ * .OX..XXO
+ * OOX*O.XO
+ * OXXXXXXO
+ * OX..OOOX
+ * XOOO.OOX
+ * XXO.X.OX
+ * .XOOXOOX
+ * .XOOOOOX
+ * .XXXXXXX
+ *
+ * it is of vital importance not to play inside your own eye. Thus it
+ * is critical that the stones inside the eyes are either tactically
+ * dead or considered as inessential lunches so that the eyes are
+ * really found as eyes.
+ *
+ * At low depths, the white nakade stone is tactically dead since it
+ * can't obtain more than three liberties and black has sufficient
+ * outer liberties to be able to capture. At sufficiently high depths
+ * it is considered tactically safe because three liberties are
+ * enough. However, at exactly the right depth it is tactically
+ * unstable because four liberties are required so that it can be
+ * attacked but after trying * as defense stackp is one higher and
+ * the three liberties it retains suffice it can no longer be
+ * attacked. It is still true that it cannot live independently
+ * without killing the surrounding stones so it does match the
+ * definition of essentiality and test_lunch_essentiality() will
+ * correctly detect this, if called.
+ *
+ * The problem with calling test_lunch_essentiality() for any
+ * tactically unstable lunch is that it will give too many false
+ * positives, typically for lunches which can defend themselves by
+ * somehow breaking out of the eyespace.
+ *
+ * What we would need is a way to distinguish between tactical
+ * defenses which are successful solely by obtaining liberties inside
+ * the eyespace and defenses which manage to connect or break out to
+ * the outside. Unfortunately the tactical reading functions don't
+ * provide any support for that so the function below implements
+ * heuristics guessing when a tactically unstable lunch cannot be
+ * considered inessential. In addition to this screening it must also
+ * pass the test_lunch_essentiality() function before it can count as
+ * inessential.
+ */
+
+static int
+test_unstable_lunch_essentiality(int lunch, int dcode, int apos,
+				 int dpos, int color)
+{
+  int other = OTHER_COLOR(color);
+  int k;
+
+  if (dcode != WIN || dpos == PASS_MOVE)
+    return 1;
+
+  if (!liberty_of_string(dpos, lunch)
+      && !liberty_of_string(apos, lunch))
+    return 1;
+
+  if (!liberty_of_string(dpos, lunch))
+    return 0;
+
+  if (approxlib(dpos, other, 5, NULL) < countlib(lunch))
+    return 1;
+
+  for (k = 0; k < 8; k++) {
+    int pos2 = dpos + delta[k];
+    if (board[pos2] == other
+	&& !same_string(pos2, lunch))
+      return 1;
+  }
+
+  for (k = 0; k < 4; k++) {
+    int pos2 = dpos + delta[k];
+    if (board[pos2] == EMPTY
+	&& !liberty_of_string(pos2, lunch)) {
+      int n;
+      for (n = 0; n < 4; n++) {
+	int pos3 = pos2 + delta[n];
+	if (board[pos3] == EMPTY
+	    && !liberty_of_string(pos3, lunch)) {
+	  return 1;
+	}
+      }
+    }
+  }
+
+  return 0;
+}
 
 /* Try to improve the move to attack a lunch. Essentially we try to avoid
  * unsafe moves when there are less risky ways to attack.
