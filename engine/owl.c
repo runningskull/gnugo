@@ -3335,6 +3335,10 @@ owl_determine_life(struct local_owl_data *owl,
 	  value = 70;
 	else if (max_eyes(&eyevalue) - pessimistic_min == 2)
 	  value = 60;
+	/* Prefer attack over defense to avoid settling with mutual
+	 * life when both dragons have 1.5 eyes.
+	 */
+	value += 5 * does_attack;
 	reason = "vital move";
       }
       else if (max_eyes(&eyevalue) != pessimistic_min) {
