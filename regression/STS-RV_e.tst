@@ -42,10 +42,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_001.sgf
 #? [1 1 B17]*
 
 3 analyze_semeai A6 A5
-#? [1 0 (.*)]
+#? [1 0 (PASS|B8|B3)]
 
 4 analyze_semeai A5 A6
-#? [1 0 (.*)]
+#? [1 0 (PASS|B3|B8)]
 
 5 analyze_semeai T4 T3
 #? [1 1 (S2|R1)]
@@ -91,7 +91,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_002.sgf
 #? [1 1 O2]
 
 19 analyze_semeai O6 O5
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 20 analyze_semeai O5 O6
 #? [1 0 PASS]
@@ -102,7 +102,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_003.sgf
 #? [0 0 PASS]
 
 22 analyze_semeai T10 T9
-#? [1 1 (.*)]
+#? [1 1 (PASS|S7)]
 
 23 analyze_semeai F19 M19
 #? [1 0 H18]
@@ -117,10 +117,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_003.sgf
 #? [1 0 PASS]*
 
 27 analyze_semeai D12 C12
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 28 analyze_semeai C12 D12
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 29 analyze_semeai J14 J11
 #? [1 0 (K14|L13)]
@@ -136,13 +136,13 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_004.sgf
 #? [1 1 B18]
 
 33 analyze_semeai M19 L19
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 34 analyze_semeai L19 M19
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 35 analyze_semeai H10 H9
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 36 analyze_semeai H9 H10
 #? [1 0 PASS]
@@ -167,10 +167,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_004.sgf
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_005.sgf
 43 analyze_semeai G19 L19
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 44 analyze_semeai L19 G19
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 45 analyze_semeai A14 A10
 #? [1 0 PASS]
@@ -192,10 +192,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_005.sgf
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_006.sgf
 51 analyze_semeai A19 E19
-#? [1 0 (.*)]
+#? [1 0 (PASS|C18|B17)]
 
 52 analyze_semeai E19 A19
-#? [1 0 (.*)]*
+#? [1 0 (PASS|A15)]*
 
 53 analyze_semeai L19 K19
 #? [1 0 N18]
@@ -229,10 +229,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_007.sgf
 #? [1 0 PASS]*
 
 63 analyze_semeai M13 P13
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 64 analyze_semeai P13 M13
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 65 analyze_semeai R6 P5
 #? [1 0 S4]
@@ -267,10 +267,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_008.sgf
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_009.sgf
 75 analyze_semeai A19 E19
-#? [1 0 (.*)]
+#? [1 0 (PASS|B18|A17|C16|C16)]
 
 76 analyze_semeai E19 A19
-#? [1 0 (.*)]*
+#? [1 0 (PASS|D19|B18|A17)]*
 
 77 analyze_semeai M13 M14
 #? [1 0 (N11|O12)]
@@ -289,7 +289,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_010.sgf
 #? [0 0 PASS]
 
 82 analyze_semeai E19 G19
-#? [1 1 (.*)]
+#? [1 1 (PASS|H17|H16)]
 
 83 analyze_semeai A13 A14
 #? [1 0 PASS]*
@@ -351,7 +351,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_013.sgf
 #? [1 1 J17]
 
 101 analyze_semeai A13 A14
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 102 analyze_semeai A14 A13
 #? [1 0 PASS]*
@@ -384,10 +384,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_014.sgf
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_015.sgf
 111 analyze_semeai A19 E19
-#? [1 0 (.*)]
+#? [1 0 (PASS|C16)]
 
 112 analyze_semeai E19 A19
-#? [1 0 (.*)]
+#? [1 0 (PASS|A17|E18|E17|E16|E15)]
 
 113 analyze_semeai O13 O14
 #? [1 0 Q11]
@@ -399,7 +399,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_015.sgf
 #? [0 0 PASS]
 
 116 analyze_semeai G8 G7
-#? [1 1 (.*)]
+#? [1 1 (PASS|J4)]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_016.sgf
 117 analyze_semeai G19 L19
@@ -418,7 +418,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_016.sgf
 #? [0 0 PASS]
 
 122 analyze_semeai O8 O7
-#? [1 1 (.*)]
+#? [1 1 (PASS|Q4)]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_017.sgf
 123 analyze_semeai O19 L19
@@ -428,10 +428,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_017.sgf
 #? [1 1 (Q19|P18)]
 
 125 analyze_semeai G13 G14
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 126 analyze_semeai G14 G13
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 127 analyze_semeai A7 A8
 #? [1 0 (B4|C6)]
@@ -488,7 +488,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_020.sgf
 #? [0 0 PASS]
 
 144 analyze_semeai G14 G13
-#? [1 1 (.*)]
+#? [1 1 (PASS|K12)]
 
 145 analyze_semeai A7 A9
 #? [1 0 C5]
@@ -504,10 +504,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_021.sgf
 #? [1 0 PASS]
 
 149 analyze_semeai O13 N13
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 150 analyze_semeai N13 O13
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 151 analyze_semeai G7 G8
 #? [1 0 J5]
@@ -517,10 +517,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_021.sgf
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_022.sgf
 153 analyze_semeai G19 F19
-#? [1 0 (.*)]
+#? [1 0 (PASS|K18)]
 
 154 analyze_semeai F19 G19
-#? [1 0 PASS]
+#? [1 0 (PASS|K18)]
 
 155 analyze_semeai A13 A8
 #? [1 0 B11]
@@ -548,10 +548,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_023.sgf
 #? [1 1 J11]
 
 163 analyze_semeai A7 A8
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 164 analyze_semeai A8 A7
-#? [1 0 (.*)]
+#? [1 0 PASS]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_024.sgf
 165 analyze_semeai A3 A4
@@ -576,7 +576,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_024.sgf
 #? [0 0 PASS]
 
 172 analyze_semeai T16 T17
-#? [1 1 (.*)]
+#? [1 1 (PASS|T18|S19)]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_025.sgf
 173 analyze_semeai A3 A4
@@ -611,8 +611,11 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_026.sgf
 182 analyze_semeai A4 A3
 #? [1 1 A1]
 
+# Starting directly with T1 gives a ko where white has to find the
+# first ko threat. Better to start with the outer liberties. Black is
+# too short on liberties to destroy the eye with T1.
 183 analyze_semeai T4 T5
-#? [3 3 T1]*
+#? [2 2 (P1|Q5|R6|S6|T6)]*
 
 184 analyze_semeai T5 T4
 #? [1 1 T1]
@@ -637,7 +640,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_027.sgf
 #? [1 1 F1]
 
 191 analyze_semeai T3 T4
-#? [1 1 (.*)]
+#? [1 1 (PASS|Q5|R5|S5|T5)]
 
 192 analyze_semeai T4 T3
 #? [0 0 PASS]
@@ -674,10 +677,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_028.sgf
 #? [1 1 M1]*
 
 203 analyze_semeai T10 T11
-#? [1 0 PASS]
+#? [1 0 (PASS|T8)]
 
 204 analyze_semeai T11 T10
-#? [1 0 PASS]
+#? [1 0 (PASS|T8)]
 
 205 analyze_semeai Q19 R18
 #? [1 0 O19]
@@ -705,10 +708,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_029.sgf
 #? [1 1 T14]
 
 213 analyze_semeai K19 L19
-#? [1 0 (.*)]
+#? [1 0 (PASS|H18)]
 
 214 analyze_semeai L19 K19
-#? [1 0 PASS]
+#? [1 0 (PASS|H18)]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_030.sgf
 215 analyze_semeai A15 A14
@@ -802,7 +805,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_033.sgf
 #? [0 0 PASS]
 
 244 analyze_semeai A8 A9
-#? [1 1 (.*)]
+#? [1 1 (PASS|A11|D12|D11|D10|D9)]
 
 245 analyze_semeai J1 K1
 #? [1 0 (H1|G2|F2)]
@@ -814,7 +817,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_Ce_033.sgf
 #? [0 0 PASS]
 
 248 analyze_semeai T6 T5
-#? [1 1 (.*)]
+#? [1 1 (PASS|S3)]
 
 249 analyze_semeai T17 T18
 #? [1 0 S16]

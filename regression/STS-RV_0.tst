@@ -36,23 +36,23 @@
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C0_001.sgf
 1 analyze_semeai A11 A10
-#? [1 1 (.*)]
+#? [1 1 (PASS|A9|C9)]
 2 analyze_semeai A10 A11
 #? [0 0 PASS]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C0_002.sgf
 3 analyze_semeai L1 N1
-#? [1 0 (.*)]
+#? [1 0 (PASS|O1)]
 
 4 analyze_semeai N1 L1
 #? [1 0 PASS]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C0_003.sgf
 5 analyze_semeai H1 K1
-#? [1 0 (.*)]
+#? [1 0 (PASS|L1|M2|M3|M4|M5|L6)]
 
 6 analyze_semeai K1 H1
-#? [1 0 (.*)]
+#? [1 0 (PASS|G1|G2|H4|H5|H6)]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C0_004.sgf
 7 analyze_semeai A11 A10
@@ -66,7 +66,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C0_005.sgf
 #? [0 0 PASS]
 
 10 analyze_semeai A10 A11
-#? [1 1 (.*)]
+#? [1 1 (PASS|A12|B12|C12|D12|F12|G12|J12|K12|M12|N12|P12|Q12|R12|S12|T12)]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C0_006.sgf
 11 analyze_semeai A16 A17
@@ -77,10 +77,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C0_006.sgf
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C0_007.sgf
 13 analyze_semeai H9 G9
-#? [1 0 (.*)]
+#? [1 0 (PASS|G11|G12|H13)]
 
 14 analyze_semeai G9 H9
-#? [1 0 (.*)]
+#? [1 0 (PASS|L10|L11|L12)]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C0_008.sgf
 15 analyze_semeai K13 L13
@@ -98,7 +98,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C0_009.sgf
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C0_010.sgf
 19 analyze_semeai J14 H14
-#? [1 1 (.*)]
+#? [1 1 (PASS|G12|G13|G14)]
 
 20 analyze_semeai H14 J14
 #? [0 0 PASS]
