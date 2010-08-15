@@ -550,3 +550,9 @@ loadsgf games/owl56.sgf
 #? [1 G6]
 399 owl_attack D16
 #? [1 D14]
+
+# There are nine handicap stones but black can't just kill white's
+# first stone right away. Not even with the capping move G15.
+loadsgf games/disaster.sgf 2
+400 owl_attack G17
+#? [0]
