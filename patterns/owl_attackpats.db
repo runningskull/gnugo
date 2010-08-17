@@ -1200,6 +1200,7 @@ o.*o
 
 Pattern A242
 # gf New pattern. (3.5.3).
+# gf Increased value slightly to come before A607b. (3.9.1)
 # See e.g. nngs:1090.
 
 ...o?
@@ -1207,7 +1208,7 @@ Pattern A242
 ...Yx
 -----
 
-:8,-,value(35)
+:8,-,value(37)
 
 ...o?
 ba*c?
