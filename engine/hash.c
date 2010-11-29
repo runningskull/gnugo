@@ -53,15 +53,42 @@ static Hash_data kom_pos_hash[BOARDMAX];
 static Hash_data goal_hash[BOARDMAX];
 
 
-/* Get a random Hashvalue, where all bits are used. */
+/* Fill a Hashvalue with n random bits. Make use of every random bit
+ * obtained from gg_urand(), also between calls.
+ */
 static Hashvalue
-hash_rand(void)
+hash_rand(int n)
 {
-  int i;
   Hashvalue h = 0;
+  static unsigned int random_bits = 0;
+  static int num_random_bits = 0;
+  int k;
 
-  for (i = 0; 32*i < (int) (CHAR_BIT*sizeof(Hashvalue)); i++)
-    h |= (Hashvalue) gg_urand() << 32*i;
+  while (n > 0) {
+    /* Obtain new random bits if the old ones are gone. */
+    if (num_random_bits == 0) {
+      random_bits = gg_urand();
+      num_random_bits = 32;
+    }
+
+    /* Decide how many bits to add to the Hashvalue. Either all that are
+     * available or the number remaining in the Hashvalue, whichever
+     * is lower.
+     */
+    if (n >= num_random_bits)
+      k = num_random_bits;
+    else
+      k = n;
+
+    /* Shift in k random bits in the Hashvalue and remove them from
+     * random_bits.
+     */
+    h <<= k;
+    h |= (Hashvalue) (random_bits >> (num_random_bits - k));
+    random_bits &= (1 << (num_random_bits - k)) - 1;
+    n -= k;
+    num_random_bits -= k;
+  }
 
   return h;
 }
@@ -70,10 +97,18 @@ hash_rand(void)
 void
 hash_init_zobrist_array(Hash_data *array, int size)
 {
-  int i, j;
-  for (i = 0; i < size; i++)
-    for (j = 0; j < NUM_HASHVALUES; j++)
-      array[i].hashval[j] = hash_rand();
+  int i;
+  for (i = 0; i < size; i++) {
+    int remaining_bits = NUM_HASHBITS;
+    int N = CHAR_BIT * SIZEOF_HASHVALUE;
+    int j = 0;
+    while (remaining_bits >= N) {
+      array[i].hashval[j++] = hash_rand(N);
+      remaining_bits -= N;
+    }
+    if (remaining_bits > 0)
+      array[i].hashval[j++] = hash_rand(remaining_bits) << (N - remaining_bits);
+  }
 }
 
 /*

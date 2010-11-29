@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- cross-compilation support added to uncompress_fuseki.c
+- revised generation of hashvalues.
 - give small bonus to attacking vital moves in owl_determine_life()
 - allow tactically unstable owl lunches to be inessential
 - new static function test_unstable_lunch_essentiality()

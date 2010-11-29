@@ -61,15 +61,19 @@ typedef unsigned long Hashvalue;
 /* Dump (almost) all read results. */
 #define TRACE_READ_RESULTS 0
 
-/* How many bits should be used at least for hashing? Set this to 32 for
- * some memory save and speedup, at the cost of occasional irreproducable
- * mistakes (and possibly assertion failures). 
+/* How many bits should be used for hashing? Set this to 32 for some
+ * memory save and speedup, at the cost of occasional difficult to
+ * explain mistakes (and possibly assertion failures).
  * With 64 bits, there should be less than one such mistake in 10^9 games.
  * Set this to 96 if this is not safe enough for you.
+ *
+ * Note, exactly the number of bits given by NUM_HASHBITS are used,
+ * regardless of how many bits fit into struct Hash_data. Additional
+ * bits are set to zero.
  */
-#define MIN_HASHBITS   64
+#define NUM_HASHBITS 64
 
-#define NUM_HASHVALUES (1 + (MIN_HASHBITS - 1) / (CHAR_BIT * SIZEOF_HASHVALUE))
+#define NUM_HASHVALUES (1 + (NUM_HASHBITS - 1) / (CHAR_BIT * SIZEOF_HASHVALUE))
 
 /* This struct is maintained by the machinery that updates the board
  * to provide incremental hashing. Examples: trymove(), play_move(), ...
@@ -108,37 +112,45 @@ char *hashdata_to_string(Hash_data *hashdata);
  * random bits are sufficient to get an even distribution within any
  * hashtable of reasonable size. By never using more than 32 bits we
  * also reduce the platform dependency of the GNU Go engine.
-*/
+ */
+#if CHAR_BIT * SIZEOF_HASHVALUE <= 32
 #define hashdata_remainder(hd, num) \
-  (((hd).hashval[0] & 0xffffffffU) % (num))
+  ((hd).hashval[0] % (num))
+#elif CHAR_BIT * SIZEOF_HASHVALUE == 64
+#define hashdata_remainder(hd, num) \
+  (((hd).hashval[0] >> 32) % (num))
+#else
+#define hashdata_remainder(hd, num) \
+  (((hd).hashval[0] >> (CHAR_BIT * SIZEOF_HASHVALUE - 32)) % (num))
+#endif
 
 #if NUM_HASHVALUES == 1
 
 #define hashdata_is_equal(hd1, hd2) \
-   ((hd1).hashval[0] == (hd2).hashval[0])
+  ((hd1).hashval[0] == (hd2).hashval[0])
 
 #define hashdata_is_smaller(hd1, hd2) \
-   ((hd1).hashval[0] < (hd2).hashval[0])
+  ((hd1).hashval[0] < (hd2).hashval[0])
 
 #define hashdata_xor(hd1, hd2) \
-    (hd1).hashval[0] ^= (hd2).hashval[0]
+  (hd1).hashval[0] ^= (hd2).hashval[0]
 
 #elif NUM_HASHVALUES == 2
 
 #define hashdata_is_equal(hd1, hd2) \
-   ((hd1).hashval[0] == (hd2).hashval[0] \
-    && (hd1).hashval[1] == (hd2).hashval[1])
+  ((hd1).hashval[0] == (hd2).hashval[0] \
+   && (hd1).hashval[1] == (hd2).hashval[1])
 
 #define hashdata_is_smaller(hd1, hd2) \
-   ((hd1).hashval[0] < (hd2).hashval[0] \
-    || ((hd1).hashval[0] == (hd2).hashval[0] \
-	&& (hd1).hashval[1] < (hd2).hashval[1]))
+  ((hd1).hashval[0] < (hd2).hashval[0] \
+   || ((hd1).hashval[0] == (hd2).hashval[0] \
+       && (hd1).hashval[1] < (hd2).hashval[1]))
 
 #define hashdata_xor(hd1, hd2) \
-   do { \
+  do { \
     (hd1).hashval[0] ^= (hd2).hashval[0]; \
     (hd1).hashval[1] ^= (hd2).hashval[1]; \
-   } while (0)
+  } while (0)
 
 #else
 
@@ -152,11 +164,11 @@ int hashdata_is_smaller_func(Hash_data *hd1, Hash_data *hd2);
   hashdata_is_smaller_func(&(hd1), &(hd2))
 
 #define hashdata_xor(hd1, hd2) \
-   do { \
+  do { \
     int i; \
     for (i = 0; i < NUM_HASHVALUES; i++) \
       (hd1).hashval[i] ^= (hd2).hashval[i]; \
-   } while (0)
+  } while (0)
 
 #endif
 
