@@ -452,10 +452,9 @@ int main(int argc, array(string) argv)
 	return 1;
     }
 
-    GTK.setup_gtk(argv);
+    GTK2.setup_gtk(argv);
     Controller controller = Controller(engine, argv[1..]);
-
-    GTK.main();
+    GTK2.main();
 
     return 0;
 }
@@ -526,13 +525,14 @@ class RegressionViewer
     SimpleGtp engine;
     array(string) traces;
 
-    GTK.Widget goban_widget;
-    GTK.Widget data_widget;
+    GTK2.Widget goban_widget;
+    GTK2.Widget data_widget;
 
-    GTK.ScrolledWindow scrolled_data_window;
-    GTK.Image gtk_image;
-    GDK.Image gdk_image;
-    GTK.Clist clist;
+    GTK2.ScrolledWindow scrolled_data_window;
+    GTK2.Image gtk_image;
+    GTK2.GdkImage gdk_image;
+    GTK2.TextView clistview;
+    GTK2.TextBuffer clist;
 
     Controller parent; //Evil. Used for callbacks.
 
@@ -566,12 +566,16 @@ class RegressionViewer
 
 	setup_board(boardsize);
 
-	scrolled_data_window = GTK.ScrolledWindow();
-	scrolled_data_window->set_policy(GTK.POLICY_AUTOMATIC,
-					 GTK.POLICY_AUTOMATIC);
+	scrolled_data_window = GTK2.ScrolledWindow();
+	scrolled_data_window->set_policy(GTK2.POLICY_AUTOMATIC,
+					 GTK2.POLICY_AUTOMATIC);
 
-	clist = GTK.Clist(3);
-	scrolled_data_window->add(clist);
+	clist = GTK2.TextBuffer();
+	clistview = GTK2.TextView(clist);
+	clistview->set_editable(0);
+	clistview->set_cursor_visible(0);
+	clistview->modify_font(GTK2.PangoFontDescription("Monospace 7"));
+	scrolled_data_window->add(clistview);
 	handle_testcase();
     }
 
@@ -582,15 +586,15 @@ class RegressionViewer
 	goban->add_stones("BLACK", send_command("list_stones black") / " ");
 	Image.Image im = goban->draw_board();
 
-	gdk_image = GDK.Image(0)->set(im);
-	gtk_image = GTK.Image(gdk_image);
-	goban_widget = GTK.EventBox()->add(gtk_image);
-	goban_widget->add_events(GDK.ButtonPressMask);
-	goban_widget->add_events(GDK.KeyPressMask);
-	goban_widget->signal_connect_new("button_press_event",
-					 button_pressed_on_board);
-	goban_widget->signal_connect_new("key_press_event",
-					 key_pressed_on_board);
+	gdk_image = GTK2.GdkImage(0)->set(im);
+	gtk_image = GTK2.Image(gdk_image);
+	goban_widget = GTK2.EventBox()->add(gtk_image);
+	goban_widget->add_events(GTK2.GdkButtonPressMask);
+	goban_widget->add_events(GTK2.GdkKeyPressMask);
+	goban_widget->signal_connect("button_press_event",
+				     button_pressed_on_board);
+	goban_widget->signal_connect("key_press_event",
+				     key_pressed_on_board);
     }
 
 
@@ -789,10 +793,10 @@ class RegressionViewer
 		 && parent->delta_territory_move != "PASS")
 	{
 	    goban->add_symbol(parent->delta_territory_move, "stone", "gray");
-	    parent->delta_territory_button_text
-	    		->set_text("delta territory for "
-				   + parent->delta_territory_move);
-	    clist->clear();
+	    parent->delta_territory_button
+		  ->set_label("delta territory for "
+			      + parent->delta_territory_move);
+	    array(string) text_lines = ({});
 
 	    int k;
 	    for (k = sizeof(traces) - 1; k >= 0; k--)
@@ -804,13 +808,13 @@ class RegressionViewer
 	    }
 	    if (k >= 0)
 	    {
-		clist->append(({traces[k], "", ""}));
+		text_lines += ({traces[k]});
 		for (k--; k >= 0; k--)
 		{
 		    if (sscanf(traces[k], "    %*s:   - %*s") < 2)
 			break;
 
-		    clist->prepend(({traces[k], "", ""}));
+		    text_lines = ({traces[k]}) + text_lines;
 		    if (sscanf(traces[k],
 			       "    %*s:   - %s territory change %s ",
 			       string vertex, string value) == 3)
@@ -820,7 +824,7 @@ class RegressionViewer
 		    }
 		}
 	    }
-	    clist->columns_autosize();
+	    clist->set_text(text_lines * "\n", -1);
 	    parent->set_title(this_object(),
 			      ("Delta territory for "
 			       + parent->delta_territory_move));
@@ -1016,27 +1020,33 @@ class RegressionViewer
     
     void redraw_board()
     {
+	// Temporary workaround for Pike bug.
+#if 0
 	gdk_image->set(goban->draw_board());
+#else
+	gdk_image = GTK2.GdkImage(0)->set(goban->draw_board());
+	gtk_image->set_from_image(gdk_image);
+#endif
 	gtk_image->queue_draw();
     }
 
     void show_worm_data(string vertex)
     {
 	string worm_data = send_command("worm_data " + vertex);
-	clist->clear();
+	array(string) text_lines = ({});
 	foreach ((worm_data / "\n")[1..], string data_item)
 	{
 	    sscanf(data_item, "%s%*[ ]%s", string field, string value);
-	    clist->append(({field, value, ""}));
+	    text_lines += ({sprintf("%-20s\t%s", field, value)});
 	}
-	clist->columns_autosize();
+	clist->set_text(text_lines * "\n", -1);
 	parent->set_title(this_object(), "Worm data for " + vertex);
     }
 
     void show_dragon_data(string vertex, int part)
     {
 	string dragon_data = send_command("dragon_data " + vertex);
-	clist->clear();
+	array(string) text_lines = ({});
 	
 	array(string) selected_data;
 	if (part == 1)
@@ -1047,19 +1057,19 @@ class RegressionViewer
 	foreach (selected_data, string data_item)
 	{
 	    sscanf(data_item, "%s%*[ ]%s", string field, string value);
-	    clist->append(({field, value, ""}));
+	    text_lines += ({sprintf("%-20s\t%s", field, value)});
 	}
-	clist->columns_autosize();
+	clist->set_text(text_lines * "\n", -1);
 	parent->set_title(this_object(), "Dragon data for " + vertex);
     }
 
     void show_move_reasons(string vertex)
     {
 	string move_reasons = send_command("move_reasons " + vertex);
-	clist->clear();
+	array(string) text_lines = ({});
 
 	foreach ((move_reasons / "\n"), string move_reason)
-	    clist->append(({move_reason, "", ""}));
+	    text_lines += ({move_reason});
 
 	int k;
 	for (k = sizeof(traces) - 1; k >= 0; k--)
@@ -1078,9 +1088,9 @@ class RegressionViewer
 		else if (sscanf(traces[k], "    " + vertex + ": %*s") != 1)
 		    break;
 	    }
-	    clist->append(({"", "", ""}));
+	    text_lines += ({""});
 	    foreach (reverse(interesting_lines), string line)
-		clist->append(({line, "", ""}));
+		text_lines += ({line});
 	}
 
 	int first_pattern = 1;
@@ -1093,14 +1103,14 @@ class RegressionViewer
 	    {
 		if (first_pattern)
 		{
-		    clist->append(({"", "", ""}));
+		    text_lines += ({""});
 		    first_pattern = 0;
 		}
 		add_continuation_lines = 1;
-		clist->append(({line, "", ""}));
+		text_lines += ({line});
 	    }
 	    else if (has_prefix(line, "...") && add_continuation_lines)
-		clist->append(({line, "", ""}));
+		text_lines += ({line});
 	    else
 		add_continuation_lines = 0;
 	}
@@ -1108,15 +1118,15 @@ class RegressionViewer
 	/* Look for blunder devaluation */
 	foreach (traces, string line) 
 	    if (has_prefix(line, "Move at " + vertex + " is"))
-		clist->append(({line, "", ""}));
+		text_lines += ({line});
 
-	clist->columns_autosize();
+	clist->set_text(text_lines * "\n", -1);
 	parent->set_title(this_object(), "Move reasons for " + vertex);
     }
     
     void show_eye_data(string vertex)
     {
-	clist->clear();
+	array(string) text_lines = ({});
 
 	string color;
 	if (parent->white_eyes_button->get_active())
@@ -1129,34 +1139,34 @@ class RegressionViewer
 	    foreach (eye_data[color][vertex] / "\n", string data_item)
 	    {
 		sscanf(data_item, "%s%*[ ]%s", string field, string value);
-		clist->append(({field, value, ""}));
+		text_lines += ({sprintf("%-20s\t%s", field, value)});
 	    }
 	    if (half_eye_data[vertex])
 	    {
-		clist->append(({"", "", ""}));
+		text_lines += ({""});
 		foreach (half_eye_data[vertex] / "\n", string data_item)
 		{
 		    sscanf(data_item, "%s%*[ ]%s", string field, string value);
-		    clist->append(({field, value, ""}));
+		    text_lines += ({sprintf("%-20s\t%s", field, value)});
 		}
 	    }
 	}
 	
-	clist->columns_autosize();
+	clist->set_text(text_lines * "\n", -1);
 	parent->set_title(this_object(), color + " eye data for " + vertex);
     }
 
    
-    static void button_pressed_on_board(GDK.Event event)
+    static void button_pressed_on_board(GTK2.Object o, GTK2.GdkEvent event)
     {
-//	werror("Button: %O\n", (mapping) event);
-	string vertex = goban->pixel_coord_to_vertex(event->x, event->y);
+//	werror("Button: %f %f\n", event->x[0], event->y[0]);
+	string vertex = goban->pixel_coord_to_vertex(event->x[0], event->y[0]);
         on_board_click_callback(vertex);
     }
 
-    static void key_pressed_on_board(GDK.Event event)
+    static void key_pressed_on_board(GTK2.Object o, GTK2.GdkEvent event)
     {
-//	werror("Key: %O\n", (mapping) event);
+//	werror("Key: %O\n", event);
 	// First thing to find out is what the event object contains and
 	// how we can get the mouse position when the key was pressed.
     }
@@ -1204,22 +1214,23 @@ class RegressionViewer
 
 	send_command(reset_counter);
 	result = send_command(first_command);
-	clist->append(({first_command, result,
-			"(" + send_command(get_counter) + " nodes)"}));
+	array(string) text_lines = ({});
+	text_lines += ({first_command + "\t" + result
+			+ "\t(" + send_command(get_counter) + " nodes)"});
 	
 	if (result[0..0] != "0" && second_command != "")
 	{
 	    send_command(reset_counter);
 	    string result = send_command(second_command);
-	    clist->append(({second_command, result,
-			    "(" + send_command(get_counter) + " nodes)"}));
+	    text_lines += ({second_command + "\t" + result
+			    + "\t(" + send_command(get_counter) + " nodes)"});
 	}
 	if (sgffilename != "")
 	    send_command("finish_sgftrace " + sgffilename);
         if (sgf_viewer_cmd != "")
             Process.create_process(sprintf(sgf_viewer_cmd, sgffilename)
                                    / " ");
-	clist->columns_autosize();
+	clist->set_text(text_lines * "\n", -1);
 	parent->set_title(this_object(), "Reading result");
      }
 }
@@ -1228,63 +1239,60 @@ class RegressionViewer
 class Controller
 {
     array(RegressionViewer) viewers = ({});
-    array(GTK.Widget) viewer_title_widgets = ({});
+    array(GTK2.Widget) viewer_title_widgets = ({});
 
     string current_move_color = "";
     
-    GTK.Window main_window;
-    GTK.Notebook controller_notebook;
-    GTK.Notebook gobans_notebook;
-    GTK.Notebook data_notebook;
-    GTK.Notebook selector_notebook;
+    GTK2.Window main_window;
+    GTK2.Notebook controller_notebook;
+    GTK2.Notebook gobans_notebook;
+    GTK2.Notebook data_notebook;
+    GTK2.Notebook selector_notebook;
 
-    GTK.ScrolledWindow scrolled_testcase_text;
-    GTK.Label testcase_text;
+    GTK2.ScrolledWindow scrolled_testcase_text;
+    GTK2.Label testcase_text;
 
-    GTK.RadioButton worm_data_button;
-    GTK.RadioButton dragon_data1_button;
-    GTK.RadioButton dragon_data2_button;
-    GTK.RadioButton worm_status_button;
-    GTK.RadioButton dragon_status_button;
-    GTK.RadioButton dragon_safety_button;
+    GTK2.RadioButton worm_data_button;
+    GTK2.RadioButton dragon_data1_button;
+    GTK2.RadioButton dragon_data2_button;
+    GTK2.RadioButton worm_status_button;
+    GTK2.RadioButton dragon_status_button;
+    GTK2.RadioButton dragon_safety_button;
     
-    GTK.RadioButton top_moves_button;
-    GTK.RadioButton all_moves_button;
-    GTK.RadioButton delta_territory_button;
-    GTK.Label delta_territory_button_text;
+    GTK2.RadioButton top_moves_button;
+    GTK2.RadioButton all_moves_button;
+    GTK2.RadioButton delta_territory_button;
     
-//    GTK.RadioButton initial_w_influence_dragons_unknown_button;
-//    GTK.RadioButton initial_b_influence_dragons_unknown_button;
-    GTK.RadioButton initial_w_influence_dragons_known_button;
-    GTK.RadioButton initial_b_influence_dragons_known_button;
-    GTK.RadioButton after_move_influence_button;
-    GTK.Label after_move_influence_button_text;
-    GTK.RadioButton followup_influence_button;
-    GTK.Label followup_influence_button_text;
-    GTK.RadioButton influence_regions_button;
-    GTK.RadioButton territory_value_button;
-    GTK.RadioButton white_influence_button;
-    GTK.RadioButton black_influence_button;
-    GTK.RadioButton white_strength_button;
-    GTK.RadioButton black_strength_button;
-    GTK.RadioButton white_permeability_button;
-    GTK.RadioButton black_permeability_button;
-    GTK.RadioButton white_attenuation_button;
-    GTK.RadioButton black_attenuation_button;
-    GTK.RadioButton non_territory_button;
+//    GTK2.RadioButton initial_w_influence_dragons_unknown_button;
+//    GTK2.RadioButton initial_b_influence_dragons_unknown_button;
+    GTK2.RadioButton initial_w_influence_dragons_known_button;
+    GTK2.RadioButton initial_b_influence_dragons_known_button;
+    GTK2.RadioButton after_move_influence_button;
+    GTK2.RadioButton followup_influence_button;
+    GTK2.RadioButton influence_regions_button;
+    GTK2.RadioButton territory_value_button;
+    GTK2.RadioButton white_influence_button;
+    GTK2.RadioButton black_influence_button;
+    GTK2.RadioButton white_strength_button;
+    GTK2.RadioButton black_strength_button;
+    GTK2.RadioButton white_permeability_button;
+    GTK2.RadioButton black_permeability_button;
+    GTK2.RadioButton white_attenuation_button;
+    GTK2.RadioButton black_attenuation_button;
+    GTK2.RadioButton non_territory_button;
 
-    GTK.RadioButton white_eyes_button;
-    GTK.RadioButton black_eyes_button;
+    GTK2.RadioButton white_eyes_button;
+    GTK2.RadioButton black_eyes_button;
     
-    GTK.RadioButton tactical_reading_button, owl_reading_button,
+    GTK2.RadioButton tactical_reading_button, owl_reading_button,
 	owl_does_attack_button, owl_does_defend_button,
 	connection_reading_button, semeai_reading_button;
-    GTK.CheckButton sgf_traces_button, sgf_viewer_button;
-    GTK.Entry sgf_filename_entry, sgf_viewer_entry;
-    GTK.Table sgf_stuff;
-    GTK.Button new_testcase_button, new_engine_button;
-    GTK.Button next_testcase_button, prev_testcase_button;
-    GTK.Entry new_testcase_entry, engine_path_entry, engine_name_entry;
+    GTK2.CheckButton sgf_traces_button, sgf_viewer_button;
+    GTK2.Entry sgf_filename_entry, sgf_viewer_entry;
+    GTK2.Table sgf_stuff;
+    GTK2.Button new_testcase_button, new_engine_button;
+    GTK2.Button next_testcase_button, prev_testcase_button;
+    GTK2.Entry new_testcase_entry, engine_path_entry, engine_name_entry;
     
     string delta_territory_move = "PASS";
     string move_influence_move = "PASS";
@@ -1318,46 +1326,43 @@ class Controller
 	testcase_name = testcases[0];
 
 	scrolled_testcase_text
-	     = GTK.ScrolledWindow(GTK.Adjustment(), GTK.Adjustment())
-		->set_policy(GTK.POLICY_AUTOMATIC, GTK.POLICY_AUTOMATIC)
-                ->set_usize(450, 100);
-        testcase_text = GTK.Label(full_testcase * "\n")
-                	->set_justify(GTK.JUSTIFY_LEFT)
-			->set_alignment(0.0, 0.0);
+	    = GTK2.ScrolledWindow(GTK2.Adjustment(), GTK2.Adjustment())
+		->set_policy(GTK2.POLICY_AUTOMATIC, GTK2.POLICY_AUTOMATIC)
+	        ->set_size_request(450, 100);
+        testcase_text = GTK2.Label(full_testcase * "\n")
+	                          ->set_justify(GTK2.JUSTIFY_LEFT)
+			          ->set_alignment(0.0, 0.0);
  	scrolled_testcase_text->add(testcase_text);
 
-	main_window = GTK.Window(GTK.WindowToplevel);
-	controller_notebook = GTK.Notebook();
-	controller_notebook->set_tab_pos(GTK.POS_LEFT);
+	main_window = GTK2.Window(GTK2.WindowToplevel);
+	controller_notebook = GTK2.Notebook();
+	controller_notebook->set_tab_pos(GTK2.POS_LEFT);
 
-	gobans_notebook   = (GTK.Notebook()
-			     ->set_show_tabs(0));
-	data_notebook     = (GTK.Notebook()
-			     ->set_show_tabs(0)
-			     ->set_show_border(0));
-	selector_notebook = (GTK.Notebook()
-			     ->set_tab_pos(GTK.POS_TOP));
-	selector_notebook->signal_connect_new("switch_page", change_engine);
+	gobans_notebook   = GTK2.Notebook()->set_show_tabs(0);
+	data_notebook     = GTK2.Notebook()->set_show_tabs(0)
+	                                   ->set_show_border(0);
+	selector_notebook = GTK2.Notebook()->set_tab_pos(GTK2.POS_TOP);
+	selector_notebook->signal_connect("switch_page", change_engine);
 
-	GTK.Widget main_window_contents
-	    = (GTK.Vbox(0, 0)
-	       ->pack_start(GTK.Hbox(0, 24)
+	GTK2.Widget main_window_contents
+	    = (GTK2.Vbox(0, 0)
+	       ->pack_start(GTK2.Hbox(0, 24)
 			    ->pack_start(scrolled_testcase_text, 0, 0, 24)
-			    ->pack_start(GTK.Alignment(0.0, 0.5, 0.0, 0.0)
+			    ->pack_start(GTK2.Alignment(0.0, 0.5, 0.0, 0.0)
 					 ->add(selector_notebook),
 					 0, 0, 0),
 			    0, 0, 0)
-	       ->add(GTK.Hbox(0, 2)
-		     ->add(GTK.Vbox(0, 6)
+	       ->add(GTK2.Hbox(0, 2)
+		     ->add(GTK2.Vbox(0, 6)
 			   ->pack_start(controller_notebook, 0, 0, 0)
 			   ->add(data_notebook))
-		     ->pack_start(GTK.Alignment(0.0, 0.0, 0.0, 0.0)
+		     ->pack_start(GTK2.Alignment(0.0, 0.0, 0.0, 0.0)
 				  ->add(gobans_notebook),
 				  0, 0, 0)));
 	main_window->add(main_window_contents);
 
 	main_window->set_title(testcases[0]);
-	main_window->signal_connect_new("destroy", quit);
+	main_window->signal_connect("destroy", quit);
 
 	if (has_prefix(testcase_command, "reg_genmove")
 	    || has_prefix(testcase_command, "restricted_genmove"))
@@ -1369,85 +1374,76 @@ class Controller
 		current_move_color = "black";
 	}
 
-	worm_data_button = GTK.RadioButton("worm data");
-	dragon_data1_button = GTK.RadioButton("dragon data, part 1",
-					      worm_data_button);
-	dragon_data2_button = GTK.RadioButton("dragon data, part 2",
-					      worm_data_button);
+	worm_data_button = GTK2.RadioButton("worm data");
+	dragon_data1_button = GTK2.RadioButton("dragon data, part 1",
+					       worm_data_button);
+	dragon_data2_button = GTK2.RadioButton("dragon data, part 2",
+					       worm_data_button);
 
-	worm_status_button = GTK.RadioButton("worm status");
-	dragon_status_button = GTK.RadioButton("dragon status",
-					       worm_status_button);
-	dragon_safety_button = GTK.RadioButton("dragon safety",
-					       worm_status_button);
-	worm_status_button->signal_connect_new("clicked",
+	worm_status_button = GTK2.RadioButton("worm status");
+	dragon_status_button = GTK2.RadioButton("dragon status",
+						worm_status_button);
+	dragon_safety_button = GTK2.RadioButton("dragon safety",
+						worm_status_button);
+	worm_status_button->signal_connect("clicked", markup_button_pressed);
+	dragon_status_button->signal_connect("clicked", markup_button_pressed);
+	dragon_safety_button->signal_connect("clicked", markup_button_pressed);
+
+	top_moves_button = GTK2.RadioButton("top moves");
+	all_moves_button = GTK2.RadioButton("all moves", top_moves_button);
+	delta_territory_button = GTK2.RadioButton("delta territory for PASS",
+						  top_moves_button);
+	delta_territory_button->set_alignment(0.0, 0.0);
+
+	top_moves_button->signal_connect("clicked", markup_button_pressed);
+	all_moves_button->signal_connect("clicked", markup_button_pressed);
+	delta_territory_button->signal_connect("clicked",
 					       markup_button_pressed);
-	dragon_status_button->signal_connect_new("clicked",
-						 markup_button_pressed);
-	dragon_safety_button->signal_connect_new("clicked",
-						 markup_button_pressed);
 
-	top_moves_button = GTK.RadioButton("top moves");
-	all_moves_button = GTK.RadioButton("all moves", top_moves_button);
-	delta_territory_button_text = GTK.Label("delta territory for PASS");
-	delta_territory_button_text->set_alignment(0.0, 0.0);
-	delta_territory_button = GTK.RadioButton(0, top_moves_button);
-	delta_territory_button->add(delta_territory_button_text);
-	top_moves_button->signal_connect_new("clicked", markup_button_pressed);
-	all_moves_button->signal_connect_new("clicked", markup_button_pressed);
-	delta_territory_button->signal_connect_new("clicked",
-						   markup_button_pressed);
-
-	white_eyes_button = GTK.RadioButton("white eyes");
-	black_eyes_button = GTK.RadioButton("black eyes", white_eyes_button);
-	white_eyes_button->signal_connect_new("clicked",
-					      markup_button_pressed);
-	black_eyes_button->signal_connect_new("clicked",
-					      markup_button_pressed);
+	white_eyes_button = GTK2.RadioButton("white eyes");
+	black_eyes_button = GTK2.RadioButton("black eyes", white_eyes_button);
+	white_eyes_button->signal_connect("clicked", markup_button_pressed);
+	black_eyes_button->signal_connect("clicked", markup_button_pressed);
 	
 //	  initial_w_influence_dragons_unknown_button =
-//	      GTK.RadioButton("white influence, dragons unknown");
+//	      GTK2.RadioButton("white influence, dragons unknown");
 //	  initial_b_influence_dragons_unknown_button =
-//	      GTK.RadioButton("black influence, dragons unknown",
+//	      GTK2.RadioButton("black influence, dragons unknown",
 //			      initial_w_influence_dragons_unknown_button);
 	initial_w_influence_dragons_known_button =
-	    GTK.RadioButton("white influence, dragons known");
+	    GTK2.RadioButton("white influence, dragons known");
 	initial_b_influence_dragons_known_button =
-	    GTK.RadioButton("black influence, dragons known",
-			    initial_w_influence_dragons_known_button);
-	after_move_influence_button_text =
-	    GTK.Label("after move influence for PASS");
-	after_move_influence_button_text->set_alignment(0.0, 0.0);
+	    GTK2.RadioButton("black influence, dragons known",
+			     initial_w_influence_dragons_known_button);
 	after_move_influence_button =
-	    GTK.RadioButton(0, initial_w_influence_dragons_known_button);
-	after_move_influence_button->add(after_move_influence_button_text);
-	followup_influence_button_text =
-	    GTK.Label("followup influence for PASS");
-	followup_influence_button_text->set_alignment(0.0, 0.0);
+	    GTK2.RadioButton("after move influence for PASS",
+			     initial_w_influence_dragons_known_button);
+	after_move_influence_button->set_alignment(0.0, 0.0);
 	followup_influence_button =
-	    GTK.RadioButton(0, initial_w_influence_dragons_known_button);
-	followup_influence_button->add(followup_influence_button_text);
-	influence_regions_button = GTK.RadioButton("influence regions");
-	territory_value_button = GTK.RadioButton("territory value",
+	    GTK2.RadioButton("followup influence for PASS",
+			     initial_w_influence_dragons_known_button);
+	followup_influence_button->set_alignment(0.0, 0.0);
+	influence_regions_button = GTK2.RadioButton("influence regions");
+	territory_value_button = GTK2.RadioButton("territory value",
+						  influence_regions_button);
+	white_influence_button = GTK2.RadioButton("white influence",
+						  influence_regions_button);
+	black_influence_button = GTK2.RadioButton("black influence",
+						  influence_regions_button);
+	white_strength_button = GTK2.RadioButton("white strength",
 						 influence_regions_button);
-	white_influence_button = GTK.RadioButton("white influence",
+	black_strength_button = GTK2.RadioButton("black strength",
 						 influence_regions_button);
-	black_influence_button = GTK.RadioButton("black influence",
-						 influence_regions_button);
-	white_strength_button = GTK.RadioButton("white strength",
-						influence_regions_button);
-	black_strength_button = GTK.RadioButton("black strength",
-						influence_regions_button);
-	white_permeability_button = GTK.RadioButton("white permeability",
+	white_permeability_button = GTK2.RadioButton("white permeability",
+						     influence_regions_button);
+	black_permeability_button = GTK2.RadioButton("black permeability",
+						     influence_regions_button);
+	white_attenuation_button = GTK2.RadioButton("white attenuation",
 						    influence_regions_button);
-	black_permeability_button = GTK.RadioButton("black permeability",
+	black_attenuation_button = GTK2.RadioButton("black attenuation",
 						    influence_regions_button);
-	white_attenuation_button = GTK.RadioButton("white attenuation",
-						   influence_regions_button);
-	black_attenuation_button = GTK.RadioButton("black attenuation",
-						   influence_regions_button);
-	non_territory_button = GTK.RadioButton("non-territory",
-					       influence_regions_button);
+	non_territory_button = GTK2.RadioButton("non-territory",
+						influence_regions_button);
 	({initial_w_influence_dragons_known_button,
 	  initial_b_influence_dragons_known_button,
 	  after_move_influence_button,
@@ -1462,106 +1458,106 @@ class Controller
 	  black_permeability_button,
 	  white_attenuation_button,
 	  black_attenuation_button,
-	  non_territory_button})->signal_connect_new("clicked",
-						     markup_button_pressed);
+	  non_territory_button})->signal_connect("clicked",
+						 markup_button_pressed);
 	
 	
-	tactical_reading_button = GTK.RadioButton("tactical reading");
-	owl_reading_button = GTK.RadioButton("owl reading",
-					     tactical_reading_button);
-        owl_does_attack_button = GTK.RadioButton("owl_does_attack",
-                                                 tactical_reading_button);
-        owl_does_defend_button = GTK.RadioButton("owl_does_defend",
-                                                 tactical_reading_button);
-	connection_reading_button = GTK.RadioButton("connection reading",
-						    tactical_reading_button);
-	semeai_reading_button = GTK.RadioButton("semeai reading",
-						tactical_reading_button);
-	sgf_traces_button = (GTK.CheckButton("save sgf traces to")
+	tactical_reading_button = GTK2.RadioButton("tactical reading");
+	owl_reading_button = GTK2.RadioButton("owl reading",
+					      tactical_reading_button);
+        owl_does_attack_button = GTK2.RadioButton("owl_does_attack",
+						  tactical_reading_button);
+        owl_does_defend_button = GTK2.RadioButton("owl_does_defend",
+						  tactical_reading_button);
+	connection_reading_button = GTK2.RadioButton("connection reading",
+						     tactical_reading_button);
+	semeai_reading_button = GTK2.RadioButton("semeai reading",
+						 tactical_reading_button);
+	sgf_traces_button = (GTK2.CheckButton("save sgf traces to")
 			     ->set_active(1));
-	sgf_filename_entry = GTK.Entry();
+	sgf_filename_entry = GTK2.Entry();
 	sgf_filename_entry->set_text("vars.sgf");
 	sgf_filename_entry->set_editable(1);
 
-	sgf_viewer_button = GTK.CheckButton("start sgf viewer as");
-        sgf_viewer_entry = GTK.Entry()->set_text(sgf_viewer_command)
-                           ->set_editable(1);
+	sgf_viewer_button = GTK2.CheckButton("start sgf viewer as");
+        sgf_viewer_entry = GTK2.Entry()->set_text(sgf_viewer_command)
+                                       ->set_editable(1);
         sgf_viewer_button->signal_connect("toggled", sgf_viewer_button_toggled);
         sgf_traces_button->signal_connect("toggled", sgf_traces_button_toggled);
-        sgf_stuff = GTK.Table(2, 2, 0)
-                    ->attach_defaults(sgf_traces_button, 0, 1, 0, 1)
-                    ->attach_defaults(sgf_filename_entry, 1, 2, 0, 1)
-                    ->attach_defaults(sgf_viewer_button, 0, 1, 1, 2)
-                    ->attach_defaults(sgf_viewer_entry, 1, 2, 1, 2);
+        sgf_stuff = (GTK2.Table(2, 2, 0)
+		     ->attach_defaults(sgf_traces_button, 0, 1, 0, 1)
+		     ->attach_defaults(sgf_filename_entry, 1, 2, 0, 1)
+		     ->attach_defaults(sgf_viewer_button, 0, 1, 1, 2)
+		     ->attach_defaults(sgf_viewer_entry, 1, 2, 1, 2));
 
-	new_testcase_entry = GTK.Entry();
+	new_testcase_entry = GTK2.Entry();
         new_testcase_entry->set_text(testcases[0]);
         new_testcase_entry->set_editable(1);
-        new_testcase_button = GTK.Button("Load new testcase");
-        new_testcase_button->signal_connect_new("clicked", new_testcase);
-	new_testcase_entry->signal_connect_new("activate", new_testcase);
+        new_testcase_button = GTK2.Button("Load new testcase");
+        new_testcase_button->signal_connect("clicked", new_testcase);
+	new_testcase_entry->signal_connect("activate", new_testcase);
 	if (sizeof(testcases)) {
-	    prev_testcase_button = GTK.Button("Previous testcase");
-	    prev_testcase_button->signal_connect_new("clicked", prev_testcase);
+	    prev_testcase_button = GTK2.Button("Previous testcase");
+	    prev_testcase_button->signal_connect("clicked", prev_testcase);
 	    prev_testcase_button->set_sensitive(0);
-	    next_testcase_button = GTK.Button("Next testcase");
-	    next_testcase_button->signal_connect_new("clicked", next_testcase);
+	    next_testcase_button = GTK2.Button("Next testcase");
+	    next_testcase_button->signal_connect("clicked", next_testcase);
 	}
-	engine_path_entry = GTK.Entry();
+	engine_path_entry = GTK2.Entry();
 	engine_path_entry->set_text("../interface/gnugo");
 	engine_path_entry->set_editable(1);
 
-	engine_name_entry = GTK.Entry();
+	engine_name_entry = GTK2.Entry();
 	engine_name_entry->set_text("Engine 2");
 	engine_name_entry->set_editable(1);
 
-	engine_path_entry->signal_connect_new("activate", select_new_engine);
-	new_engine_button = GTK.Button("Start new engine");
-	new_engine_button->signal_connect_new("clicked", select_new_engine);
+	engine_path_entry->signal_connect("activate", select_new_engine);
+	new_engine_button = GTK2.Button("Start new engine");
+	new_engine_button->signal_connect("clicked", select_new_engine);
 
-	GTK.Widget worms_and_dragons_page
-	    = (GTK.Vbox(0, 0)
+	GTK2.Widget worms_and_dragons_page
+	    = (GTK2.Vbox(0, 0)
 	       ->pack_start(worm_data_button, 0, 0, 0)
 	       ->pack_start(dragon_data1_button, 0, 0, 0)
 	       ->pack_start(dragon_data2_button, 0, 0, 0)
-	       ->pack_start(GTK.Label(""), 0, 0, 0)
+	       ->pack_start(GTK2.Label(""), 0, 0, 0)
 	       ->pack_start(worm_status_button, 0, 0, 0)
 	       ->pack_start(dragon_status_button, 0, 0, 0)
 	       ->pack_start(dragon_safety_button, 0, 0, 0));
 	controller_notebook->append_page(worms_and_dragons_page,
-					 GTK.Label("worms and dragons"));
+					 GTK2.Label("worms and dragons"));
 
-	GTK.Widget move_generation_page
-	    = (GTK.Vbox(0, 0)
+	GTK2.Widget move_generation_page
+	    = (GTK2.Vbox(0, 0)
 	       ->pack_start(top_moves_button, 0, 0, 0)
 	       ->pack_start(all_moves_button, 0, 0, 0)
 	       ->pack_start(delta_territory_button, 0, 0, 0));
 	controller_notebook->append_page(move_generation_page,
-					 GTK.Label("move generation"));
+					 GTK2.Label("move generation"));
 
-	GTK.Widget eyes_page = (GTK.Vbox(0, 0)
-				->pack_start(white_eyes_button, 0, 0, 0)
-				->pack_start(black_eyes_button, 0, 0, 0));
-	controller_notebook->append_page(eyes_page, GTK.Label("eyes"));
+	GTK2.Widget eyes_page = (GTK2.Vbox(0, 0)
+				 ->pack_start(white_eyes_button, 0, 0, 0)
+				 ->pack_start(black_eyes_button, 0, 0, 0));
+	controller_notebook->append_page(eyes_page, GTK2.Label("eyes"));
 
-	GTK.Widget influence_page
-	    = (GTK.Vbox(0, 0)
-	       ->pack_start(GTK.Vbox(0,0)
+	GTK2.Widget influence_page
+	    = (GTK2.Vbox(0, 0)
+	       ->pack_start(GTK2.Vbox(0,0)
 // 			    ->add(initial_w_influence_dragons_unknown_button)
 // 			    ->add(initial_b_influence_dragons_unknown_button)
 			    ->add(initial_w_influence_dragons_known_button)
 			    ->add(initial_b_influence_dragons_known_button)
 			    ->add(after_move_influence_button)
 			    ->add(followup_influence_button), 0, 0, 0)
-	       ->pack_start(GTK.Label(""), 0, 0, 0)
-	       ->pack_start(GTK.Hbox(0,12)
-			    ->add(GTK.Vbox(0,0)
+	       ->pack_start(GTK2.Label(""), 0, 0, 0)
+	       ->pack_start(GTK2.Hbox(0,12)
+			    ->add(GTK2.Vbox(0,0)
 				  ->pack_start(influence_regions_button, 0, 0, 0)
 				  ->pack_start(territory_value_button, 0, 0, 0)
 				  ->pack_start(non_territory_button, 0, 0, 0)
 				  ->pack_start(white_influence_button, 0, 0, 0)
 				  ->pack_start(black_influence_button, 0, 0, 0))
-			    ->add(GTK.Vbox(0,0)
+			    ->add(GTK2.Vbox(0,0)
 				  ->pack_start(white_strength_button, 0, 0, 0)
 				  ->pack_start(black_strength_button, 0, 0, 0)
 				  ->pack_start(white_permeability_button, 0, 0, 0)
@@ -1570,44 +1566,44 @@ class Controller
 				  ->pack_start(black_attenuation_button, 0, 0, 0)),
 			    0, 0, 0));
 	controller_notebook->append_page(influence_page,
-					 GTK.Label("influence"));
+					 GTK2.Label("influence"));
 
-	GTK.Widget reading_page
-	    = (GTK.Vbox(0, 0)
+	GTK2.Widget reading_page
+	    = (GTK2.Vbox(0, 0)
 	       ->pack_start(tactical_reading_button, 0, 0, 0)
 	       ->pack_start(owl_reading_button, 0, 0, 0)
 	       ->pack_start(owl_does_attack_button, 0, 0, 0)
                ->pack_start(owl_does_defend_button, 0, 0, 0)
 	       ->pack_start(connection_reading_button, 0, 0, 0)
 	       ->pack_start(semeai_reading_button, 0, 0, 0)
-	       ->pack_start(GTK.Label(""), 0, 0, 0)
+	       ->pack_start(GTK2.Label(""), 0, 0, 0)
 	       ->pack_start(sgf_stuff, 0, 0, 0));
-	controller_notebook->append_page(reading_page, GTK.Label("reading"));
+	controller_notebook->append_page(reading_page, GTK2.Label("reading"));
 
-	GTK.Widget engines_page
-	    = (GTK.Vbox(0, 12)
+	GTK2.Widget engines_page
+	    = (GTK2.Vbox(0, 12)
 	       ->pack_start(engine_path_entry, 0, 0, 0));
 	engines_page->pack_start(engine_name_entry, 0, 0, 0);
-	engines_page->pack_start(GTK.Alignment(1.0, 0.0, 0.0, 0.0)
+	engines_page->pack_start(GTK2.Alignment(1.0, 0.0, 0.0, 0.0)
 				 ->add(new_engine_button), 0, 0, 0)
 		     ->pack_start(new_testcase_entry, 0, 0, 0)
 		     ->pack_start(new_testcase_button, 0, 0, 0);
 	if  (sizeof(testcases) > 1) {
-	    GTK.Widget next_prev
-	    	= (GTK.Hbox(0, 12)->pack_start(prev_testcase_button, 0, 0, 0)
-				  ->pack_start(next_testcase_button, 0, 0, 0));
+	    GTK2.Widget next_prev
+		= (GTK2.Hbox(0, 12)->pack_start(prev_testcase_button, 0, 0, 0)
+				   ->pack_start(next_testcase_button, 0, 0, 0));
 	    engines_page->pack_start(next_prev, 0, 0, 0);
 	}
 	controller_notebook->append_page(engines_page->set_border_width(12),
-					 GTK.Label("engines"));
+					 GTK2.Label("engines"));
 
-	nasty_signal_id = controller_notebook->signal_connect_new("switch_page",
-								  add_markup);
+	nasty_signal_id = controller_notebook->signal_connect("switch_page",
+							      markup_button_pressed);
 
 	if (has_prefix(testcase_command, "reg_genmove")
 	    || has_prefix(testcase_command, "restricted_genmove")) {
 	    controller_notebook->show_all();
-	    controller_notebook->set_page(1);
+	    controller_notebook->set_current_page(1);
 	}
 
 	main_window->show_all();
@@ -1625,8 +1621,7 @@ class Controller
     {
 	string new_engine_path = engine_path_entry->get_text();
 	if (!Stdio.is_file(new_engine_path)) {
-	    viewers->clist->clear();
-	    viewers->clist->append(({"The engine path does not point to a file.\n", "", ""}));
+	    viewers->clist->set_text("The engine path does not point to a file.", -1);
 	    return;
 	}
 	
@@ -1650,22 +1645,22 @@ class Controller
 	viewer->goban_widget->show_all();
 	gobans_notebook->append_page(viewer->goban_widget, 0);
 
-	GTK.Widget title_label = GTK.Label("");
+	GTK2.Widget title_label = GTK2.Label("");
 	viewer_title_widgets += ({ title_label });
 
-	GTK.Widget data_page = (GTK.Vbox(0, 2)
+	GTK2.Widget data_page = (GTK2.Vbox(0, 2)
 				->pack_start(title_label, 0, 0, 0)
 				->add(viewer->scrolled_data_window)
 				->show_all());
 	data_notebook->append_page(data_page, 0);
 
 	selector_notebook
-	    ->append_page((GTK.Alignment(0.0, 0.5, 0.0, 0.0)
+	    ->append_page((GTK2.Alignment(0.0, 0.5, 0.0, 0.0)
 			   ->set_border_width(4)
-			   ->add(GTK.Label(viewer->engine->command_line))),
-			  GTK.Label(viewer->name));
+			   ->add(GTK2.Label(viewer->engine->command_line))),
+			  GTK2.Label(viewer->name));
 	selector_notebook->show_all();
-	selector_notebook->set_page(sizeof(viewers) - 1);
+	selector_notebook->set_current_page(sizeof(viewers) - 1);
     }
 
     void set_title(RegressionViewer viewer, string title)
@@ -1688,8 +1683,8 @@ class Controller
 
     static void change_engine(int engine_index)
     {
-	gobans_notebook->set_page(engine_index);
-	data_notebook->set_page(engine_index);
+	gobans_notebook->set_current_page(engine_index);
+	data_notebook->set_current_page(engine_index);
     }
     
     void button_pressed_on_a_board(string vertex)
@@ -1730,10 +1725,10 @@ class Controller
 		|| followup_influence_button->get_active())
 	    {
 		move_influence_move = vertex;
-		after_move_influence_button_text
-		    ->set_text("after move influence for " + vertex);
-		followup_influence_button_text
-		    ->set_text("followup influence for " + vertex);
+		after_move_influence_button
+		    ->set_label("after move influence for " + vertex);
+		followup_influence_button
+		    ->set_label("followup influence for " + vertex);
 		markup_button_pressed();
 	    }
 	    break;
@@ -1764,8 +1759,6 @@ class Controller
 		
 	    viewers->goban->add_symbol(vertex, "big_dot", "green");
 	    viewers->redraw_board();
-
-	    viewers->clist->clear();
 
 	    if (tactical_reading_button->get_active()
 		|| owl_reading_button->get_active())
@@ -1863,7 +1856,7 @@ class Controller
 	if (has_prefix(testcase_command, "reg_genmove")
 	    || has_prefix(testcase_command, "restricted_genmove")) {
 	    controller_notebook->show_all();
-	    controller_notebook->set_page(1);
+	    controller_notebook->set_current_page(1);
 	}
     }
 
@@ -1943,7 +1936,7 @@ class Controller
 		    complete_testcase = ({ testline });
 	    }
 	    else if (sscanf(testline, "%d %s", this_number, testline) == 2
-		&& this_number == number)
+		     && this_number == number)
 	    {
 		testcase_command = testline;
 		sscanf(testlines[k + 1], "#? [%s]", expected_result);
@@ -1982,7 +1975,7 @@ class Controller
     {
 	// Otherwise Pike errors occur.
 	controller_notebook->signal_disconnect(nasty_signal_id);
-	GTK.main_quit();
+	GTK2.main_quit();
     }
 }
 

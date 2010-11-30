@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- view.pike updated from GTK 1 to GTK 2
 - cross-compilation support added to uncompress_fuseki.c
 - revised generation of hashvalues.
 - give small bonus to attacking vital moves in owl_determine_life()
