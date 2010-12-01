@@ -937,9 +937,6 @@ void
 influence_erase_territory(struct influence_data *q, int pos, int color)
 {
   int k;
-  ASSERT1((color == WHITE && q->territory_value[pos] >= 0.0)
-          || (color == BLACK && q->territory_value[pos] <= 0.0), pos);
-
   current_influence = q;
 
   q->territory_value[pos] = 0.0;
