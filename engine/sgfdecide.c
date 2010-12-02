@@ -215,11 +215,6 @@ decide_owl(int pos)
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf("finished examine_position\n");
 
-  /* We want to see the reading performed, not just a result picked
-   * from the cache. Thus we clear the cache here.
-   */
-  reading_cache_clear();
-  
   if (*outfilename)
     sgffile_begindump(&tree);
 
@@ -251,7 +246,6 @@ decide_owl(int pos)
   else
     gprintf(" result uncertain\n");
 
-  reading_cache_clear();
   count_variations = 1;
   dcode = owl_defend(pos, &move, &result_certain, &kworm);
 
@@ -329,10 +323,6 @@ decide_semeai(int apos, int bpos)
   gprintf("finished examine_position\n");
   count_variations = 1;
 
-  /* We want to see the reading performed, not just a result picked
-   * from the cache. Thus we clear the cache here. */
-  reading_cache_clear();
-  
   if (*outfilename)
     sgffile_begindump(&tree);
 
@@ -382,10 +372,6 @@ decide_tactical_semeai(int apos, int bpos)
   gprintf("finished examine_position\n");
   count_variations = 1;
 
-  /* We want to see the reading performed, not just a result picked
-   * from the cache. Thus we clear the cache here. */
-  reading_cache_clear();
-  
   if (*outfilename)
     sgffile_begindump(&tree);
 
@@ -432,10 +418,6 @@ decide_position()
   reset_engine();
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-
-  /* We want to see the reading performed, not just a result picked
-   * from the cache. Thus we clear the cache here. */
-  reading_cache_clear();
 
   if (*outfilename)
     sgffile_begindump(&tree);

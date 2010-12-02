@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- remove reading_cache_clear() calls between silent_examine_position() and
+  owl reading functions.
 - remove assertion from influence_erase_territory() to avoid crashing
 - view.pike updated from GTK 1 to GTK 2
 - cross-compilation support added to uncompress_fuseki.c

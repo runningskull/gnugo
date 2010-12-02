@@ -1532,10 +1532,6 @@ gtp_owl_attack(char *s)
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
-  /* to get the variations into the sgf file, clear the reading cache */
-  if (sgf_dumptree)
-    reading_cache_clear();
-  
   attack_code = owl_attack(POS(i, j), &attack_point, &result_certain, &kworm);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(attack_code);
@@ -1571,10 +1567,6 @@ gtp_owl_defend(char *s)
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
-  /* to get the variations into the sgf file, clear the reading cache */
-  if (sgf_dumptree)
-    reading_cache_clear();
-
   defend_code = owl_defend(POS(i, j), &defense_point, &result_certain, &kworm);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(defend_code);
@@ -1608,10 +1600,6 @@ gtp_owl_threaten_attack(char *s)
     return gtp_failure("vertex must not be empty");
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
-  /* to get the variations into the sgf file, clear the reading cache */
-  if (sgf_dumptree)
-    reading_cache_clear();
   
   attack_code = owl_threaten_attack(POS(i, j), &attack_point1, &attack_point2);
   gtp_start_response(GTP_SUCCESS);
@@ -1648,10 +1636,6 @@ gtp_owl_threaten_defense(char *s)
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
-  /* to get the variations into the sgf file, clear the reading cache */
-  if (sgf_dumptree)
-    reading_cache_clear();
-
   defend_code = owl_threaten_defense(POS(i, j), &defense_point1,
 				     &defense_point2);
   gtp_start_response(GTP_SUCCESS);
@@ -1696,10 +1680,6 @@ gtp_owl_does_attack(char *s)
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
-  /* to get the variations into the sgf file, clear the reading cache */
-  if (sgf_dumptree)
-    reading_cache_clear();
-  
   attack_code = owl_does_attack(POS(ti, tj), POS(i, j), &kworm);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(attack_code);
@@ -1736,10 +1716,6 @@ gtp_owl_does_defend(char *s)
     return gtp_failure("dragon vertex must not be empty");
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
-  /* to get the variations into the sgf file, clear the reading cache */
-  if (sgf_dumptree)
-    reading_cache_clear();
   
   defense_code = owl_does_defend(POS(ti, tj), POS(i, j), &kworm);
   gtp_start_response(GTP_SUCCESS);
@@ -1786,10 +1762,6 @@ gtp_owl_connection_defends(char *s)
     return gtp_failure("dragon vertices must have the same color");
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
-  /* to get the variations into the sgf file, clear the reading cache */
-  if (sgf_dumptree)
-    reading_cache_clear();
   
   defense_code = owl_connection_defends(POS(ti, tj), POS(ai, aj), POS(bi, bj));
   gtp_start_response(GTP_SUCCESS);
@@ -1855,10 +1827,6 @@ gtp_owl_substantial(char *s)
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
   
-  /* to get the variations into the sgf file, clear the reading cache */
-  if (sgf_dumptree)
-    reading_cache_clear();
-
   result = owl_substantial(POS(i, j));
   return gtp_success("%d", result);
 }  
@@ -1892,9 +1860,6 @@ gtp_analyze_semeai(char *s)
     return gtp_failure("vertex must not be empty");
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  /* to get the variations into the sgf file, clear the reading cache */
-  if (sgf_dumptree)
-    reading_cache_clear();
 
   owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 1,
   		     &result_certain);
@@ -1948,9 +1913,6 @@ gtp_analyze_semeai_after_move(char *s)
     return gtp_failure("dragon vertex must not be empty");
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  /* to get the variations into the sgf file, clear the reading cache */
-  if (sgf_dumptree)
-    reading_cache_clear();
 
   owl_analyze_semeai_after_move(move, color, dragona, dragonb,
 				&resulta, &resultb, &semeai_move, 1,
@@ -1995,9 +1957,6 @@ gtp_tactical_analyze_semeai(char *s)
     return gtp_failure("vertex must not be empty");
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  /* to get the variations into the sgf file, clear the reading cache */
-  if (sgf_dumptree)
-    reading_cache_clear();
 
   owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 0,
                      &result_certain);
