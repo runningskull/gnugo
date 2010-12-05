@@ -216,16 +216,17 @@ gnugo --help.
                    Copyrights and License
 
 All files Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-2007, 2008 and 2009 by the Free Software Foundation except as noted below.
+2007, 2008, 2009 and 2010 by the Free Software Foundation except as
+noted below.
 
 All files are under the GNU General Public License, which may be
 found in the file COPYING, with the following exceptions.
 
-* The files interface/gtp.c and gtp.h are copyright 2001 by
-  the Free Software Foundation. In the interests of promoting 
-  the Go Text Protocol these two files are licensed under a less 
-  restrictive license than the GPL and are free for unrestricted use.
-  The GTP license appears in each file.
+* The files interface/gtp.c and gtp.h are copyright the Free Software
+  Foundation. In the interests of promoting the Go Text Protocol these
+  two files are licensed under a less restrictive license than the GPL
+  and are free for unrestricted use. The GTP license appears in each
+  file.
 
 * The files gmp.c and gmp.h are copyright Bill Shubert. These
   are free for unrestricted use.

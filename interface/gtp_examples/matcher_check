@@ -6,8 +6,8 @@
 # Write gnugo@gnu.org or see http://www.gnu.org/software/gnugo/     #
 # for more information.                                             #
 #                                                                   #
-# Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007    #
-# 2008 and 2009 by the Free Software Foundation.                    #
+# Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,   #
+# 2008, 2009 and 2010 by the Free Software Foundation.              #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -28,7 +28,7 @@
 #
 # matcher_check info:
 #
-# Plays one gtp program against itself or lets it analzye a saved .sgf-file,
+# Plays one gtp program against itself or lets it analyze a saved .sgf-file,
 # and watches for bad status transitions.
 #
 # FIXME: if the vertex by which a dragon is named ever changes,
