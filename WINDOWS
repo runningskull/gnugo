@@ -1,22 +1,10 @@
                Building GNU Go on Windows Platforms
 
-==========================
-
-
-             BUILDING WITH OLDER VISUAL STUDIO
-
-The distribution directories contain some .dsp and .dsw files with
-GNU Go. These have been brought up to date in the sense that they
-should work if you have the older VC++ with Visual Studio 6
-but the distributed .dsp and .dsw files will only be of use with 
-older version of Visual Studio.
-
 In most cases (unless you are building in Cygwin) the preferred way 
 to build GNU Go on Windows platforms is to use CMake. CMake
 understands about many versions of Visual C/Visual Studio, and will
 generate project/solution files for the tools installed on your
-system. So even if you have Visual Studio 6 you may use CMake
-and dispense with the distributed .dsp and .dsw files.
+system.
 
 ==========================
 
@@ -131,7 +119,7 @@ cl.exe), the Microsoft C runtime libraries (MSCRT, not GLibC), the GNU
 Make build tool (make, not NMake), all from the GNU Bash (sh.exe, not 
 cmd.exe).
 
-To create the makfiles, run CMake with the MSYS generator option:
+To create the makefiles, run CMake with the MSYS generator option:
 
     cmake -G "MSYS Makefiles" CMakeLists.txt
 
@@ -160,6 +148,8 @@ With Cygwin, you should be able to
   cd gnugo-3.8
   env CC='gcc -mno-cygwin' ./configure
   make
+
+Replace 3.8 with the version number of the release you're building.
 
 ==========================
 

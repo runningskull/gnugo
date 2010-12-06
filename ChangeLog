@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- visual studio project files and config.vc removed in favor of cmake build
 - copyright notices updated for 2010
 - remove reading_cache_clear() calls between silent_examine_position() and
   owl reading functions.
