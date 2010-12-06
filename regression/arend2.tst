@@ -2,7 +2,7 @@
 # M3 is overplay
 loadsgf games/nngs/bconwil-gnugo-3.3.11-200211182313.sgf 18
 10 reg_genmove black
-#? [G3|F4]*
+#? [G3|F4]
 
 # This is of course too hard for GNU Go at the moment.
 loadsgf games/nngs/bconwil-gnugo-3.3.11-200211182313.sgf 20
@@ -89,7 +89,7 @@ loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 44
 # Cut off the white group!
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 106
 210 reg_genmove black
-#? [K2]
+#? [K2]*
 
 # K11 should kill the white dragon. L11 might kill, too, so we accept it,
 # although K11 is better.

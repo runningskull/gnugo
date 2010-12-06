@@ -174,7 +174,7 @@ loadsgf games/mertin13x13/GIGN3.sgf 92
 # J13 fails right out.
 loadsgf games/mertin13x13/GIGN3.sgf 94
 21 restricted_genmove white K11 J13
-#? [K11]
+#? [K11]*
 
 # A6 bad shape.
 loadsgf games/mertin13x13/GIGN3.sgf 100

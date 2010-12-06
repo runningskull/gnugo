@@ -163,7 +163,7 @@ loadsgf games/trevor/auto/a015.sgf 20
 
 loadsgf games/trevor/auto/a017.sgf 20
 290 reg_genmove white
-#? [!C8]
+#? [!C8]*
 
 
 #B8 makes better eye space, at least one point better here, in reverse sente.
@@ -352,7 +352,7 @@ loadsgf games/trevor/auto/a035.sgf 28
 #Have to try.
 loadsgf games/trevor/auto/a035.sgf 42
 530 reg_genmove white
-#? [H4]
+#? [H4]*
 
 #Excellent simple semeai problem.
 loadsgf games/trevor/auto/a035.sgf 42

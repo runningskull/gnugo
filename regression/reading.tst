@@ -1002,4 +1002,4 @@ loadsgf games/reading48.sgf
 # Not ko.
 loadsgf games/cgos/471085.sgf 49
 235 attack B1
-#? [1 C1]
+#? [1 C1]*

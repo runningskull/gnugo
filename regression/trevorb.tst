@@ -348,7 +348,7 @@ loadsgf games/trevor/auto/b52.sgf 14
 
 loadsgf games/trevor/auto/b52.sgf 18
 590 reg_genmove white
-#? [H12|M9]*
+#? [H12|M9]
 
 
 loadsgf games/trevor/auto/b52.sgf 42

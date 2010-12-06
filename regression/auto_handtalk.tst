@@ -1,7 +1,7 @@
 
 loadsgf games/handtalk/handtalk1.sgf 113
 3 owl_attack q19
-#? [2 T15]
+#? [2 T15]*
 
 loadsgf games/handtalk/handtalk2.sgf 35
 4 owl_defend R8

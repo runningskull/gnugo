@@ -65,7 +65,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 100
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 168
 170 reg_genmove black
-#? [S6]*
+#? [S6]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 184
 190 reg_genmove black
@@ -87,7 +87,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 204
 # Kill the whole thing, not just a piece.
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 222
 230 reg_genmove black
-#? [Q18]*
+#? [Q18]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 242
 240 reg_genmove black
@@ -388,7 +388,7 @@ loadsgf games/nngs/gnugo-3.5.2gf1-guest-200312260740.sgf 34
 
 loadsgf games/nngs/chuck-gnugo-3.5.2gf1-200312261847.sgf 88
 900 reg_genmove black
-#? [!Q18]*
+#? [!Q18]
 
 loadsgf games/nngs/evand-gnugo-3.5.2gf1-200401072036.sgf 48
 910 owl_attack M11

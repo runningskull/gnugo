@@ -179,7 +179,7 @@ loadsgf games/semeai/semeai9.sgf
 46 analyze_semeai Q12 S11
 #? [1 0 (PASS|R8|R9|T11|T9|R11|R10)]
 47 analyze_semeai S11 Q12
-#? [1 0 (PASS|T11|T9|R9|T10|R10|R11)]
+#? [1 0 (PASS|T11|T9|R9|T10|R10|R11)]*
 
 loadsgf games/nngs/gnugo-3.3.20-GoFuN-200306071813.sgf 234
 48 analyze_semeai E17 D17
@@ -353,7 +353,7 @@ loadsgf games/semeai/semeai17.sgf 52
 
 # Doubtful whether C7 should be accepted even if it kills all white.
 107 reg_genmove black
-#? [D6|C7]*
+#? [D6|C7]
 
 loadsgf games/semeai/semeai17.sgf 60
 108 analyze_semeai G8 H2
@@ -396,7 +396,7 @@ play white H2
 # A14 is strictly correct since C19 allows W an unfavorable ko.
 loadsgf games/semeai/semeai19.sgf
 120 analyze_semeai C18 C17
-#? [0 0 PASS]
+#? [0 0 PASS]*
 
 # There is a complication that B18 and C17 are not amalgamated.
 # If B plays first C19 gives a favorable ko; A15 allows seki.
@@ -452,9 +452,9 @@ loadsgf games/CrazyStone1.sgf 50
 # moves, with Japanese rules.
 loadsgf games/CrazyStone1.sgf 56
 133 analyze_semeai D9 G3
-#? [1 1 H2]
-134 analyze_semeai G3 D9
 #? [1 1 H2]*
+134 analyze_semeai G3 D9
+#? [1 1 H2]
 
 # See also strategy3:146
 loadsgf games/incident209.sgf 259
@@ -523,9 +523,9 @@ play black N8
 150 analyze_semeai R10 S9
 #? [0 0 PASS]
 151 dragon_status R10
-#? [dead]
+#? [dead]*
 152 dragon_status S9
-#? [alive]
+#? [alive]*
 153 dragon_status T7
 #? [dead]
 

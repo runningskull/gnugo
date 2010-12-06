@@ -63,7 +63,7 @@ loadsgf games/nando/auto009.sgf
 # Note that K12 connects out (sacrificing L11 if necessary).
 loadsgf games/nando/auto010.sgf
 12 owl_attack L17
-#? [0]*
+#? [0]
 
 #CATEGORY=OWL/OPTICS
 # (If white B2 in reply to B1, Black A1 kills cleanly. /ab)

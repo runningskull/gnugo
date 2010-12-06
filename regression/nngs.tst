@@ -102,7 +102,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 24
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 30
 240 restricted_genmove black T6 T5 R4 S4 T4 S3 T3 Q2
-#? [R4|S4|Q2]
+#? [R4|S4|Q2]*
 
 # Desperate situation, no clear best move. /ab
 #loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 56
@@ -389,7 +389,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 241
 #J11 is terrible.
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 257
 820 reg_genmove white
-#? [J13|L9]
+#? [J13|L9]*
 
 
 

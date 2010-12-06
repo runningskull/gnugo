@@ -277,4 +277,4 @@ loadsgf games/endgame14.sgf
 # A7 wins but A8 loses.
 loadsgf games/endgame15.sgf
 1010 reg_genmove white
-#? [A7]
+#? [A7]*

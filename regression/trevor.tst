@@ -194,7 +194,7 @@ loadsgf games/trevor/trevor_19.sgf 12
 # W should connect his two dragons.
 loadsgf games/trevor/trevor_20.sgf 14
 200 reg_genmove white
-#? [D7|D4]
+#? [D7|D4]*
 
 # W can live on the right pretty easily (i.e. G8)
 loadsgf games/trevor/trevor_20.sgf
@@ -259,7 +259,7 @@ loadsgf games/trevor/trevor_26.sgf 33
 #Move at F9 would be a blunder.
 loadsgf games/trevor/trevor_26.sgf 39
 261 reg_genmove black
-#? [F9]
+#? [F9]*
 
 loadsgf games/trevor/trevor_26.sgf 33
 trymove black C1
@@ -666,7 +666,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 
 loadsgf games/trevor/trevor_20.sgf  14  
 1070 owl_attack G5
-#? [0]
+#? [0]*
 
 
 loadsgf games/nngs/theDoor-gnugo-3.3.11-200211130142.sgf 72

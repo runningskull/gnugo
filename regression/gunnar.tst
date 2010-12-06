@@ -550,4 +550,4 @@ loadsgf games/kgs/GNU-ituyosi2.sgf 301
 # T8 wins the semeai, T7 allows black to make seki.
 loadsgf games/kgs/GNU-ituyosi2.sgf 311
 101 reg_genmove white
-#? [T8]*
+#? [T8]

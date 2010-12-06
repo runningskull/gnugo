@@ -36,7 +36,7 @@
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C0_001.sgf
 1 analyze_semeai A11 A10
-#? [1 1 (PASS|A9|C9)]
+#? [1 1 (PASS|A9|C9)]*
 2 analyze_semeai A10 A11
 #? [0 0 PASS]
 

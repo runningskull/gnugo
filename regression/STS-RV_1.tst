@@ -42,13 +42,13 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_001.sgf
 #? [1 1 (PASS|F19|G18)]
 
 3 analyze_semeai C10 C9
-#? [1 1 (D8|C3|B3|A3)]*
+#? [1 1 (D8|C3|B3|A3)]
 
 4 analyze_semeai C9 C10
 #? [1 1 (A10|A12|B11|A8|B8|B12)]
 
 5 analyze_semeai K3 L3
-#? [1 1 (M4|N4|R3|R2|R1)]*
+#? [1 1 (M4|N4|R3|R2|R1)]
 
 6 analyze_semeai L3 K3
 #? [1 1 (J2|K1|H1|M2|M1|H2)]
@@ -96,7 +96,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_003.sgf
 #? [1 1 (R7|Q7|P6|O5|O4|O3|N3|M3|L3|K2)]
 
 20 analyze_semeai T6 T5
-#? [1 1 (R3|S4|S2|T3)]*
+#? [1 1 (R3|S4|S2|T3)]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C1_004.sgf
 21 analyze_semeai C15 C16
@@ -131,7 +131,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_005.sgf
 #? [1 1 (A15|A14)]
 
 31 analyze_semeai C4 C3
-#? [1 0 (PASS|C1|C2)]*
+#? [1 0 (PASS|C1|C2)]
 
 32 analyze_semeai C3 C4
 #? [1 0 (PASS|A6|A7|A4|B4)]
@@ -205,13 +205,13 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_007.sgf
 #? [1 1 R6]
 
 54 analyze_semeai S4 S3
-#? [1 0 (O2|O1|R2|Q1|S1)]*
+#? [1 0 (O2|O1|R2|Q1|S1)]
 
 55 analyze_semeai K14 L14
 #? [1 1 (P12|P11|O10|M9)]
 
 56 analyze_semeai L14 K14
-#? [1 0 (J15|H15|F14|E13|E12|F10)]*
+#? [1 0 (J15|H15|F14|E13|E12|F10)]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C1_008.sgf
 57 analyze_semeai A16 A17
@@ -221,7 +221,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_008.sgf
 #? [1 1 (B13|A14)]
 
 59 analyze_semeai B4 B3
-#? [0 0 PASS]*
+#? [0 0 PASS]
 
 60 analyze_semeai B3 B4
 #? [1 1 (PASS|C1|C2|D1)]
@@ -233,13 +233,13 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_008.sgf
 #? [1 0 T3]
 
 63 analyze_semeai P15 Q15
-#? [1 0 (PASS|S17|T16)]*
+#? [1 0 (PASS|S17|T16)]
 
 64 analyze_semeai Q15 P15
-#? [1 0 (PASS|M15|N15|O15)]*
+#? [1 0 (PASS|M15|N15|O15)]
 
 65 analyze_semeai K10 K9
-#? [1 0 (PASS|G7|J5|K4|L4|M5|N6|N7)]*
+#? [1 0 (PASS|G7|J5|K4|L4|M5|N6|N7)]
 
 66 analyze_semeai K9 K10
 #? [1 0 (PASS|G11|G12|H14|J14|K14|M13|N12|N11)]
@@ -249,13 +249,13 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_009.sgf
 #? [1 1 (B14|C14|A17|B17|C17|B16)]
 
 68 analyze_semeai D18 E18
-#? [1 0 (G15|H15|K19|K18|G17|G19|F18|H18)]*
+#? [1 0 (G15|H15|K19|K18|G17|G19|F18|H18)]
 
 69 analyze_semeai A5 A6
 #? [1 1 D6]
 
 70 analyze_semeai A6 A5
-#? [1 0 (C3|B4)]*
+#? [1 0 (C3|B4)]
 
 71 analyze_semeai S4 S5
 #? [0 0 PASS]
@@ -264,14 +264,14 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_009.sgf
 #? [1 1 (PASS|O2|O3)]
 
 73 analyze_semeai N16 N15
-#? [1 0 (PASS|M11|N10|O10|S14|T15)]*
+#? [1 0 (PASS|M11|N10|O10|S14|T15)]
 
 74 analyze_semeai N15 N16
-#? [1 0 (PASS|M18|M19)]*
+#? [1 0 (PASS|M18|M19)]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C1_010.sgf
 75 analyze_semeai A15 A16
-#? [1 1 (C18|B17|D17)]*
+#? [1 1 (C18|B17|D17)]
 
 76 analyze_semeai A16 A15
 #? [1 1 (C18|B17|D17)]
@@ -284,38 +284,38 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_010.sgf
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C1_011.sgf
 79 analyze_semeai A15 A16
-#? [1 1 (E19|F18|F17)]*
+#? [1 1 (E19|F18|F17)]
 
 80 analyze_semeai A16 A15
-#? [1 0 (F12|F11|F10|F9|E8|D8)]*
+#? [1 0 (F12|F11|F10|F9|E8|D8)]
 
 81 analyze_semeai D2 E2
-#? [1 1 E1]*
+#? [1 1 E1]
 
 82 analyze_semeai E2 D2
-#? [1 0 B2]*
+#? [1 0 B2]
 
 83 analyze_semeai R3 Q3
-#? [1 0 (PASS|M5|N5|O6|O7)]*
+#? [1 0 (PASS|M5|N5|O6|O7)]
 
 84 analyze_semeai Q3 R3
-#? [1 0 (PASS|R8|S8|T8)]*
+#? [1 0 (PASS|R8|S8|T8)]
 
 85 analyze_semeai Q19 P19
-#? [1 1 (N17|L16)]*
+#? [1 1 (N17|L16)]
 
 86 analyze_semeai P19 Q19
-#? [1 1 (Q17|R16)]*
+#? [1 1 (Q17|R16)]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C1_012.sgf
 87 analyze_semeai E19 D19
-#? [1 1 (B17|D17)]*
+#? [1 1 (B17|D17)]
 
 88 analyze_semeai D19 E19
 #? [1 1 (G19|J17|K17|L17|M17|G16|G15|G14|F13|E13|D13|C13|B13|A13)]
 
 89 analyze_semeai O5 P5
-#? [1 1 (T5|S6)]*
+#? [1 1 (T5|S6)]
 
 90 analyze_semeai P5 O5
 #? [1 1 (B3|C3|D3|D4|D5|E6|F5|F4|F3|G3|H3|J3|J1|K4|L4)]
@@ -335,16 +335,16 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_013.sgf
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C1_014.sgf
 95 analyze_semeai E19 D19
-#? [1 1 (PASS|B17|D17)]*
+#? [1 1 (PASS|B17|D17)]
 
 96 analyze_semeai D19 E19
-#? [0 0 PASS]*
+#? [0 0 PASS]
 
 97 analyze_semeai O5 P5
-#? [1 1 (PASS|S6|T5)]*
+#? [1 1 (PASS|S6|T5)]
 
 98 analyze_semeai P5 O5
-#? [0 0 PASS]*
+#? [0 0 PASS]
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C1_015.sgf
 99 analyze_semeai E18 F18
@@ -411,7 +411,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_018.sgf
 #? [1 1 (PASS|L19|L18|M17|N17|N16|N15|O14|P14|Q13|R13|S13|T13)]
 
 119 analyze_semeai A4 A3
-#? [1 1 C2]*
+#? [1 1 C2]
 
 120 analyze_semeai A3 A4
 #? [1 1 C2]
@@ -473,10 +473,10 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_020.sgf
 #? [1 1 R3]
 
 139 analyze_semeai T13 T15
-#? [1 1 (PASS|T17|T18)]*
+#? [1 1 (PASS|T17|T18)]
 
 140 analyze_semeai T15 T13
-#? [0 0 PASS]*
+#? [0 0 PASS]
 
 141 analyze_semeai G10 H10
 #? [1 1 (PASS|J10)]
@@ -532,7 +532,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_022.sgf
 #? [1 1 R3]
 
 158 analyze_semeai T4 T5
-#? [1 1 (N3|O5|P6|Q6|R6|S6|T6)]*
+#? [1 1 (N3|O5|P6|Q6|R6|S6|T6)]
 
 159 analyze_semeai T13 T15
 #? [1 1 (S18|T16)]
@@ -548,26 +548,26 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_022.sgf
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C1_023.sgf
 163 analyze_semeai A15 A16
-#? [1 1 (C18|D17)]*
+#? [1 1 (C18|D17)]
 
 164 analyze_semeai A16 A15
-#? [1 0 C18]*
+#? [1 0 C18]
 
 165 analyze_semeai E1 F1
 #? [1 1 D2]
 
 166 analyze_semeai F1 E1
-#? [1 1 D2]*
+#? [1 1 D2]
 
 167 analyze_semeai T8 T7
 #? [1 1 T6]
 
 168 analyze_semeai T7 T8
-#? [1 1 (T10|R10|S11)]*
+#? [1 1 (T10|R10|S11)]
 #Check the status of semiai if pass. Should be looser not seki. Checked and OK.
 
 169 analyze_semeai O19 N19
-#? [1 1 K18]*
+#? [1 1 K18]
 
 170 analyze_semeai N19 O19
 #? [1 0 (K18|L17|M18)]
@@ -581,14 +581,14 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_023.sgf
 
 loadsgf games/STS-RV/Class01eProblems/_semeai_C1_024.sgf
 173 analyze_semeai A15 A16
-#? [1 1 D17]*
+#? [1 1 D17]
 
 174 analyze_semeai A16 A15
 #? [1 1 B12]
 #Check what is the seki value for the program. Checked: winning= 96, seki = 34 for each. Not very accurate. For black should be 44.
 
 175 analyze_semeai F1 G1
-#? [1 1 H2]*
+#? [1 1 H2]
 
 176 analyze_semeai G1 F1
 #? [1 0 H2]
@@ -601,7 +601,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_024.sgf
 #Check the status of semiai if pass. Should be looser not seki. Checked and OK
 
 179 analyze_semeai O19 N19
-#? [1 0 Q17]*
+#? [1 0 Q17]
 
 180 analyze_semeai N19 O19
 #? [1 1 Q17]
@@ -618,26 +618,26 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_025.sgf
 #? [1 1 C11]
 
 184 analyze_semeai A15 A14
-#? [1 1 C11]*
+#? [1 1 C11]
 
 185 analyze_semeai F1 G1
 #? [1 1 J2]
 
 186 analyze_semeai G1 F1
-#? [1 1 (J2|B2|B3|D3)]*
+#? [1 1 (J2|B2|B3|D3)]
 #Though B2 is also possible it leaves more ko threads and should be avoded
 
 187 analyze_semeai T8 T7
-#? [1 1 R4]*
+#? [1 1 R4]
 
 188 analyze_semeai T7 T8
-#? [1 0 R4]*
+#? [1 0 R4]
 
 189 analyze_semeai O19 N19
-#? [1 1 L18]*
+#? [1 1 L18]
 
 190 analyze_semeai N19 O19
-#? [1 0 L18]*
+#? [1 0 L18]
 #Check status if pass. Should be looser for White and seki for Black.
 
 191 analyze_semeai J12 J13
@@ -651,16 +651,16 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_026.sgf
 #? [1 0 (PASS|B17)]
 
 194 analyze_semeai A15 A14
-#? [1 0 (PASS|B17)]*
+#? [1 0 (PASS|B17)]
 
 195 analyze_semeai F1 G1
-#? [1 1 K2]*
+#? [1 1 K2]
 
 196 analyze_semeai G1 F1
-#? [1 1 D3]*
+#? [1 1 D3]
 
 197 analyze_semeai T8 T7
-#? [1 1 (T4|S3|T1)]*
+#? [1 1 (T4|S3|T1)]
 
 198 analyze_semeai T7 T8
 #? [1 1 (R12|R10|S10)]
@@ -686,7 +686,7 @@ loadsgf games/STS-RV/Class01eProblems/_semeai_C1_027.sgf
 #? [1 1 B19]
 
 205 analyze_semeai D1 E1
-#? [1 1 C2]*
+#? [1 1 C2]
 
 206 analyze_semeai E1 D1
 #? [1 1 C2]

@@ -70,7 +70,7 @@ loadsgf games/owl39a.sgf
 # GNU Go tries to "eat lunch" at B1 instead of recognizing this as seki.
 loadsgf games/owl40.sgf
 279 owl_defend A3
-#? [1 PASS]*
+#? [1 PASS]
 
 loadsgf games/nngs/gnugo-3.3.8-Joorin-200209251541.sgf 169
 280 owl_attack F6
@@ -236,7 +236,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 258
 # Problem with bogus escape potential in GNU Go 3.3.22.
 loadsgf games/owl48.sgf
 319 owl_attack S10
-#? [1 S6]*
+#? [1 S6]
 
 loadsgf games/nngs/takeda-gnugo-3.4-200308142205.sgf 60
 320 owl_attack R4
@@ -248,7 +248,7 @@ loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 79
 
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 81
 322 owl_defend F3
-#? [0]
+#? [0]*
 
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 85
 323 owl_defend F3
@@ -388,7 +388,7 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 242
 355 owl_attack Q3
 #? [1 (K3|L3|L1|J2)]
 356 owl_defend Q3
-#? [1 L3]*
+#? [1 L3]
 
 loadsgf games/owl54.sgf
 357 owl_defend D3
@@ -441,7 +441,7 @@ loadsgf games/kgs/PsyDuck-GNU.sgf 76
 
 loadsgf games/kgs/GNU-higher.sgf 267
 372 owl_defend A17
-#? [1 D18]
+#? [1 D18]*
 
 # See also nngs2:580.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
@@ -511,7 +511,7 @@ loadsgf games/owl55.sgf 20
 
 loadsgf games/9x9-2.sgf 28
 388 owl_attack C3
-#? [1 A2]*
+#? [1 A2]
 
 loadsgf games/9x9-3.sgf 37
 389 owl_attack E3
@@ -543,7 +543,7 @@ loadsgf games/cgos/25811.sgf 52
 # Incomprehensible mistake.
 loadsgf games/cgos/403788.sgf 65
 397 owl_does_attack A9 A8
-#? [0]
+#? [0]*
 
 loadsgf games/owl56.sgf
 398 owl_attack E4

@@ -19,7 +19,7 @@ loadsgf games/wing-yuhiko-gnugo.sgf 62
 #CATEGORY=STRATEGY
 loadsgf games/wing-yuhiko-gnugo.sgf 86
 225 reg_genmove black
-#? [O12]
+#? [O12]*
 
 #CATEGORY=CONNECTION
 loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 54

@@ -458,7 +458,7 @@ loadsgf games/strategy20.sgf 236
 #? [1 (A6|A5|A4|A3|B1|C5)]
 # The defense at B1 doesn't work due to black A6.
 123 owl_defend B6
-#? [1 C5]*
+#? [1 C5]
 
 loadsgf games/strategy21.sgf 96
 124 owl_defend F4

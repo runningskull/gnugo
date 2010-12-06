@@ -177,7 +177,7 @@ loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 272
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 274
 570 reg_genmove black
-#? [A9|B10|D11|F11|J15|A16]
+#? [A9|B10|D11|F11|J15|A16]*
 
 # L3 just loses a point, as do K1 and H1.
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 300
@@ -270,7 +270,7 @@ loadsgf games/9handicap.sgf 214
 
 loadsgf games/9handicap.sgf 274
 760 reg_genmove black
-#? [J10]
+#? [J10]*
 
 loadsgf games/9handicap.sgf 278
 770 restricted_genmove black T9 Q19

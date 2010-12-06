@@ -145,7 +145,7 @@ loadsgf games/kgs/yagr-czarny.sgf 16
 
 loadsgf games/kgs/yagr-czarny.sgf 24
 300 restricted_genmove white H4 H5
-#? [H4]*
+#? [H4]
 
 # N15 as played in the game is off-topic.
 loadsgf games/kgs/yagr-awf.sgf 191

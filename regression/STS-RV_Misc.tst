@@ -45,7 +45,7 @@ loadsgf games/STS-RV/MiscProblems/_semeai_C9_001.sgf
 #? [1 1 B9]
 
 4 analyze_semeai A8 A7
-#? [1 1 A10]*
+#? [1 1 A10]
 
 5 analyze_semeai T9 T10
 #? [1 1 (T15|S13|S11)]
@@ -79,7 +79,7 @@ loadsgf games/STS-RV/MiscProblems/_semeai_C9_005.sgf
 #? [1 1 B9]
 
 14 analyze_semeai B13 B12
-#? [1 0 B9]*
+#? [1 0 B9]
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_006.sgf
 15 analyze_semeai D18 D19
@@ -185,7 +185,7 @@ loadsgf games/STS-RV/MiscProblems/_semeai_C9_015.sgf
 #? [1 1 (D19|F19|H18)]*
 
 46 analyze_semeai E18 D18
-#? [1 1 D19]
+#? [1 1 D19]*
 
 loadsgf games/STS-RV/MiscProblems/_semeai_C9_016.sgf
 47 analyze_semeai C11 C12
