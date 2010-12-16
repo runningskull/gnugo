@@ -1,6 +1,6 @@
 noinst_LIBRARIES = libutils.a
 
-EXTRA_DIST = utils.dsp CMakeLists.txt
+EXTRA_DIST = CMakeLists.txt
 
 libutils_a_SOURCES = getopt.c getopt1.c random.c gg_utils.c winsocket.c
 

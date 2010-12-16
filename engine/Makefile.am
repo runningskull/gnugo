@@ -1,4 +1,4 @@
-EXTRA_DIST = engine.dsp board.dsp CMakeLists.txt
+EXTRA_DIST = CMakeLists.txt
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *~

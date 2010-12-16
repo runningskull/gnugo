@@ -243,21 +243,6 @@ This is on by default.
 @node Windows and MS-DOS, Macintosh, Configure Options, Installation
 @section Compiling GNU Go on Microsoft platforms
 
-@subsection Building with older visual studio
-
-The distribution directories contain some .dsp and .dsw files with
-GNU Go. These have been brought up to date in the sense that they
-should work if you have the older VC++ with Visual Studio 6
-but the distributed .dsp and .dsw files will only be of use with 
-older version of Visual Studio.
-
-In most cases (unless you are building in Cygwin) the preferred way 
-to build GNU Go on Windows platforms is to use CMake. CMake
-understands about many versions of Visual C/Visual Studio, and will
-generate project/solution files for the tools installed on your
-system. So even if you have Visual Studio 6 you may use CMake
-and dispense with the distributed .dsp and .dsw files.
-
 @subsection Building with Visual Studio project files
 
 Before you compile the GNU Go source, you need to run CMake first, to 

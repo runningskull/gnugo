@@ -2,7 +2,7 @@ noinst_PROGRAMS = sgfgen
 
 sgfgen_SOURCES = sgfgen.c
 
-EXTRA_DIST = sgf_extras.def sgf_properties.def sgfgen.dsp sgf.dsp CMakeLists.txt
+EXTRA_DIST = sgf_extras.def sgf_properties.def CMakeLists.txt
 
 noinst_HEADERS = \
 	sgftree.h\
