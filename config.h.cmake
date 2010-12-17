@@ -123,7 +123,7 @@
 #undef USE_VALGRIND
 
 /* Version number of package */
-#define VERSION "3.8"
+#define VERSION "3.9.1"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
