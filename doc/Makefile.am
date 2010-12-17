@@ -26,7 +26,7 @@ JPG = cdfa.jpg dfa.jpg dfa2.jpg oldlogo.jpg path.jpg sync-prod1.jpg \
 PDF = cdfa.pdf dfa2.pdf dfa.pdf logo-34.pdf path.pdf sync-prod1.pdf \
       sync-prod2.pdf logo-36.pdf
 
-EXTRA_DIST = automake-1.4.patch gnugo.6 gnugo.pod gtp-commands.sed \
+EXTRA_DIST = gnugo.6 gnugo.pod gtp-commands.sed \
 	$(EPS) $(FIG) $(PNG) $(JPG) $(PDF)
 
 CLEANFILES = *.log *.dvi *.aux *.vr *.tp *.ky *.pg *.cps *.fns *.toc \

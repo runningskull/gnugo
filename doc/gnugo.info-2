@@ -1351,9 +1351,9 @@ generation algorithm. The `mogo_classic' pattern values is an
 approximation of the simulation policy used by early versions of MoGo,
 as published in the report odification of UCT with Patterns in
 Monte-Carlo Go (http://hal.inria.fr/inria-00117266) RR-6062, by Sylvain
-Gelly, Yizao Wang, Rémi Munos, and Olivier Teytaud. The uniform
-pattern values is the so called "light" playout which chooses uniformly
-between all legal moves except single point proper eyes.
+Gelly, Yizao Wang, Rémi Munos, and Olivier Teytaud. The uniform pattern
+values is the so called "light" playout which chooses uniformly between
+all legal moves except single point proper eyes.
 
    If you're not satisfied with these you can also tune your own
 pattern values with a pattern database file and load it at runtime with
@@ -6200,7 +6200,8 @@ A.3 The Go Text Protocol License
 In order to facilitate the use of the Go Text Protocol, the two files
 `gtp.c' and `gtp.h' are licensed under the following terms.
 
-   Copyright 2001 by the Free Software Foundation.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 and
+2010 by the Free Software Foundation.
 
    Permission is hereby granted, free of charge, to any person
 obtaining a copy of this file `gtp.x', to deal in the Software without

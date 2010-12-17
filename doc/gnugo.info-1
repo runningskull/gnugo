@@ -18,7 +18,7 @@ This manual documents `GNU Go', a Go program and its sources.  This is
 Edition 3.8 of the `GNU Go Program Documentation'
 
    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-2008 and 2009 Free Software Foundation (http://www.fsf.org), Inc.
+2008, 2009 and 2010 Free Software Foundation (http://www.fsf.org), Inc.
 
    Permission is granted to make and distribute verbatim or modified
 copies of this manual is given provided that the terms of the GNU Free
@@ -133,8 +133,8 @@ File: gnugo.info,  Node: Copyright,  Next: Authors,  Prev: About,  Up: Introduct
 1.2 Copyrights
 ==============
 
-Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 and 2008
-by the Free Software Foundation except as noted below.
+Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+2009 and 2010 by the Free Software Foundation except as noted below.
 
    All source files are distributed under the GNU General Public License
 (*note GPL::, version 3 or any later version), except `gmp.c', `gmp.h',
@@ -489,23 +489,7 @@ File: gnugo.info,  Node: Windows and MS-DOS,  Next: Macintosh,  Prev: Configure 
 2.3 Compiling GNU Go on Microsoft platforms
 ===========================================
 
-2.3.1 Building with older visual studio
----------------------------------------
-
-The distribution directories contain some .dsp and .dsw files with GNU
-Go. These have been brought up to date in the sense that they should
-work if you have the older VC++ with Visual Studio 6 but the
-distributed .dsp and .dsw files will only be of use with older version
-of Visual Studio.
-
-   In most cases (unless you are building in Cygwin) the preferred way
-to build GNU Go on Windows platforms is to use CMake. CMake understands
-about many versions of Visual C/Visual Studio, and will generate
-project/solution files for the tools installed on your system. So even
-if you have Visual Studio 6 you may use CMake and dispense with the
-distributed .dsp and .dsw files.
-
-2.3.2 Building with Visual Studio project files
+2.3.1 Building with Visual Studio project files
 -----------------------------------------------
 
 Before you compile the GNU Go source, you need to run CMake first, to
@@ -552,7 +536,7 @@ the the gnugo.exe into the %ProgramFiles% directory. To do this, type:
    In addition to command line use, CMake also has a GUI version. Users
 of the Visual Studio GUI might prefer to use that.
 
-2.3.3 Building with Nmake makefiles
+2.3.2 Building with Nmake makefiles
 -----------------------------------
 
 GNU Go will also build using NMake makefiles. Optionally, instead of
@@ -581,7 +565,7 @@ times.
 
          interface\gnugo.exe --options
 
-2.3.4 Building with MinGW Makefiles
+2.3.3 Building with MinGW Makefiles
 -----------------------------------
 
 GNU Go can be built on Windows systems using MinGW.
@@ -607,7 +591,7 @@ newly-created 'Makefile' and it's default 'all' target):
          mingw32-make
          ..\interface\gnugo.exe --options
 
-2.3.5 Building with MSYS makefiles (MinGW)
+2.3.4 Building with MSYS makefiles (MinGW)
 ------------------------------------------
 
 GNU Go can be built on Windows systems using MSYS.
@@ -636,7 +620,7 @@ newly-created 'Makefile' and it's default 'all' target):
    To debug, use GDB, as the GCC-generated symbols won't work with
 NTSD/Windbg/Visual Studio.
 
-2.3.6 Building on cygwin
+2.3.5 Building on cygwin
 ------------------------
 
 With Cygwin, you should be able to
@@ -646,7 +630,7 @@ With Cygwin, you should be able to
        env CC='gcc -mno-cygwin' ./configure
        make
 
-2.3.7 Testing on Windows:
+2.3.6 Testing on Windows:
 -------------------------
 
 `regression/regress.cmd' is a simplified cmd.exe-centric port of the
