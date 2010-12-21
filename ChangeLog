@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.9.1 released December 21, 2010
+
+- removed automake-1.4.patch from doc/Makefile.am
 - visual studio project files and config.vc removed in favor of cmake build
 - copyright notices updated for 2010
 - remove reading_cache_clear() calls between silent_examine_position() and
