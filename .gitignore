@@ -1,0 +1,18 @@
+# Ignore these everywhere.
+Makefile
+.deps
+*.o
+*.a
+gmon.out
+
+# Ignore sgf files, except below regression/games. The exception is
+# implemented by a rule in regression/games/.gitignore
+*.sgf
+
+# Build files in the top directory.
+config.log
+config.status
+config.h
+stamp-h
+stamp-h1
+autom4te.cache

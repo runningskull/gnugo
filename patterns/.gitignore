@@ -1,5 +1,3 @@
-Makefile
-.deps
 mkpat
 conn.c
 patterns.c
@@ -26,8 +24,7 @@ extract_fuseki
 uncompress_fuseki
 owl_vital_apat.c
 owl_defendpat.c
-read_attack.c
-read_defend.c
 handipat.c
 oraclepat.c
-gmon.out
+mkmcpat
+mcpat.c

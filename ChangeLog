@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- replaced .cvsignore files with .gitignore files
+
 3.9.1 released December 21, 2010
 
 - removed automake-1.4.patch from doc/Makefile.am
