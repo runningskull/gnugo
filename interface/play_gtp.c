@@ -166,7 +166,6 @@ DECLARE(gtp_set_search_limit);
 DECLARE(gtp_showboard);
 DECLARE(gtp_start_sgftrace);
 DECLARE(gtp_surround_map);
-DECLARE(gtp_tactical_analyze_semeai);
 DECLARE(gtp_test_eyeshape);
 DECLARE(gtp_time_left);
 DECLARE(gtp_time_settings);
@@ -306,7 +305,6 @@ static struct gtp_command commands[] = {
   {"showboard",        	      gtp_showboard},
   {"start_sgftrace",  	      gtp_start_sgftrace},
   {"surround_map",            gtp_surround_map},
-  {"tactical_analyze_semeai", gtp_tactical_analyze_semeai},
   {"test_eyeshape",           gtp_test_eyeshape},
   {"time_left",               gtp_time_left},
   {"time_settings",           gtp_time_settings},
@@ -1861,7 +1859,7 @@ gtp_analyze_semeai(char *s)
 
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
 
-  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 1,
+  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move,
   		     &result_certain);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(resulta);
@@ -1915,56 +1913,13 @@ gtp_analyze_semeai_after_move(char *s)
   silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
 
   owl_analyze_semeai_after_move(move, color, dragona, dragonb,
-				&resulta, &resultb, &semeai_move, 1,
+				&resulta, &resultb, &semeai_move,
 				&result_certain, 0);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(resulta);
   gtp_printf(" ");
   gtp_print_code(resultb);
   gtp_mprintf(" %m", I(semeai_move), J(semeai_move));
-  if (!result_certain && report_uncertainty)
-    gtp_printf(" uncertain");
-
-  return gtp_finish_response();
-}  
-
-
-/* Function:  Analyze a semeai, not using owl
- * Arguments: dragona, dragonb
- * Fails:     invalid vertices, empty vertices
- * Returns:   status of dragona, dragonb assuming dragona moves first
- */
-static int
-gtp_tactical_analyze_semeai(char *s)
-{
-  int i, j;
-  int k;
-  int dragona, dragonb;
-  int resulta, resultb, move, result_certain;
-  
-  k = gtp_decode_coord(s, &i, &j);
-
-  if (k == 0)
-    return gtp_failure("invalid coordinate");
-  dragona = POS(i, j);
-  if (BOARD(i, j) == EMPTY)
-    return gtp_failure("vertex must not be empty");
-
-  if (!gtp_decode_coord(s+k, &i, &j))
-    return gtp_failure("invalid coordinate");
-  dragonb = POS(i, j);
-  if (BOARD(i, j) == EMPTY)
-    return gtp_failure("vertex must not be empty");
-
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-
-  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 0,
-                     &result_certain);
-  gtp_start_response(GTP_SUCCESS);
-  gtp_print_code(resulta);
-  gtp_printf(" ");
-  gtp_print_code(resultb);
-  gtp_mprintf(" %m", I(move), J(move));
   if (!result_certain && report_uncertainty)
     gtp_printf(" uncertain");
 

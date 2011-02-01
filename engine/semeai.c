@@ -116,7 +116,7 @@ semeai()
       owl_analyze_semeai(apos, bpos,
 			 &(semeai_results_first[d1][d2]), 
 			 &(semeai_results_second[d1][d2]),
-			 &(semeai_move[d1][d2]), 1, &result_certain);
+			 &(semeai_move[d1][d2]), &result_certain);
       DEBUG(DEBUG_SEMEAI, "results if %s moves first: %s %s, %1m%s\n",
 	    board[apos] == BLACK ? "black" : "white",
 	    result_to_string(semeai_results_first[d1][d2]),
@@ -282,11 +282,11 @@ find_moves_to_make_seki()
 	continue;
 
       owl_analyze_semeai_after_move(defend_move, color, opponent, str,
-				    &resulta, &resultb, NULL, 1, &certain, 0);
+				    &resulta, &resultb, NULL, &certain, 0);
 
       if (resultb == WIN) {
 	owl_analyze_semeai(str, opponent, &resultb, &resulta,
-			   &defend_move, 1, &certain);
+			   &defend_move, &certain);
 	resulta = REVERSE_RESULT(resulta);
 	resultb = REVERSE_RESULT(resultb);
       }
@@ -313,7 +313,7 @@ find_moves_to_make_seki()
 	 */
 	owl_analyze_semeai_after_move(defend_move, OTHER_COLOR(color),
 				      str, opponent, &resulta, NULL,
-				      NULL, 1, NULL, 0);
+				      NULL, NULL, 0);
 	if (resulta != WIN) {
 	  dragon2[d].semeai_attack_code = REVERSE_RESULT(resulta);
 	  dragon2[d].semeai_attack_point = defend_move;
@@ -326,7 +326,7 @@ find_moves_to_make_seki()
 	  for (k = 0; k < liberties; k++) {
 	    owl_analyze_semeai_after_move(libs[k], OTHER_COLOR(color),
 					  str, opponent, &resulta, NULL,
-					  NULL, 1, NULL, 0);
+					  NULL, NULL, 0);
 	    if (resulta != WIN) {
 	      dragon2[d].semeai_attack_code = REVERSE_RESULT(resulta);
 	      dragon2[d].semeai_attack_point = libs[k];
@@ -392,7 +392,7 @@ find_moves_to_make_seki()
 	continue;
 
       owl_analyze_semeai(str, opponent, &resulta, &resultb,
-			 &defend_move, 1, &certain);
+			 &defend_move, &certain);
 
       /* Do not trust uncertain results. In fact it should only take a
        * few nodes to determine the semeai result, if it is a proper
@@ -416,7 +416,7 @@ find_moves_to_make_seki()
 	 */
 	owl_analyze_semeai_after_move(defend_move, OTHER_COLOR(color),
 				      str, opponent, &resulta, NULL,
-				      NULL, 1, NULL, 0);
+				      NULL, NULL, 0);
 	if (resulta != WIN) {
 	  dragon2[d].semeai_attack_code = REVERSE_RESULT(resulta);
 	  dragon2[d].semeai_attack_point = defend_move;
@@ -429,7 +429,7 @@ find_moves_to_make_seki()
 	  for (k = 0; k < liberties; k++) {
 	    owl_analyze_semeai_after_move(libs[k], OTHER_COLOR(color),
 					  str, opponent, &resulta, NULL,
-					  NULL, 1, NULL, 0);
+					  NULL, NULL, 0);
 	    if (resulta != WIN) {
 	      dragon2[d].semeai_attack_code = REVERSE_RESULT(resulta);
 	      dragon2[d].semeai_attack_point = libs[k];

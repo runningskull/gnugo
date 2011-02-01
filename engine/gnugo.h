@@ -366,7 +366,6 @@ void decide_connection(int apos, int bpos);
 void decide_owl(int pos);
 void decide_dragon_data(int pos);
 void decide_semeai(int apos, int bpos);
-void decide_tactical_semeai(int apos, int bpos);
 void decide_position(void);
 void decide_eye(int pos);
 void decide_combination(int color);

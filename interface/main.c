@@ -97,7 +97,6 @@ enum {OPT_BOARDSIZE = 127,
       OPT_DECIDE_DRAGON_DATA,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_SURROUNDED,
-      OPT_DECIDE_TACTICAL_SEMEAI,
       OPT_DECIDE_ORACLE,
       OPT_EXPERIMENTAL_SEMEAI,
       OPT_EXPERIMENTAL_OWL_EXT,
@@ -184,7 +183,6 @@ enum mode {
   MODE_DECIDE_OWL,
   MODE_DECIDE_DRAGON_DATA,
   MODE_DECIDE_SEMEAI,
-  MODE_DECIDE_TACTICAL_SEMEAI,
   MODE_DECIDE_POSITION,
   MODE_DECIDE_EYE,
   MODE_DECIDE_COMBINATION,
@@ -290,7 +288,6 @@ static struct gg_option const long_options[] =
   {"decide-owl",     required_argument, 0, OPT_DECIDE_OWL},
   {"decide-dragon-data",  required_argument, 0, OPT_DECIDE_DRAGON_DATA},
   {"decide-semeai",  required_argument, 0, OPT_DECIDE_SEMEAI},
-  {"decide-tactical-semeai", required_argument, 0, OPT_DECIDE_TACTICAL_SEMEAI},
   {"decide-position", no_argument,      0, OPT_DECIDE_POSITION},
   {"decide-surrounded",  required_argument, 0, OPT_DECIDE_SURROUNDED},
   {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
@@ -753,23 +750,6 @@ main(int argc, char *argv[])
 	}
 
 	playmode = MODE_DECIDE_SEMEAI;
-	break;
-	
-      case OPT_DECIDE_TACTICAL_SEMEAI:
-	if (strlen(gg_optarg) > 7) {
-	  fprintf(stderr, 
-		  "usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
-	  return EXIT_FAILURE;
-	}
-	strcpy(decide_this, gg_optarg);
-	strtok(decide_this, "/");
-	decide_that = strtok(NULL, "/");
-	if (!decide_that) {
-	  fprintf(stderr, 
-		  "usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
-	  return EXIT_FAILURE;
-	}
-	playmode = MODE_DECIDE_TACTICAL_SEMEAI;
 	break;
 	
       case OPT_DECIDE_POSITION:
@@ -1276,34 +1256,6 @@ main(int argc, char *argv[])
     break;
     
 
-  case MODE_DECIDE_TACTICAL_SEMEAI:
-    {
-      int pos1, pos2;
-      
-      if (!infilename) {
-	fprintf(stderr, "gnugo: --decide-tactical-semeai must be used with -l\n");
-	return EXIT_FAILURE;
-      }
-
-      pos1 = string_to_location(board_size, decide_this);
-      if (pos1 == NO_MOVE) {
-	fprintf(stderr, 
-		"usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
-	return EXIT_FAILURE;
-      }
-
-      pos2 = string_to_location(board_size, decide_that);
-      if (pos2 == NO_MOVE) {
-	fprintf(stderr, 
-		"usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
-	return EXIT_FAILURE;
-      }
-
-      decide_tactical_semeai(pos1, pos2);
-    }
-    break;
-    
-
   case MODE_DECIDE_POSITION:
     {
       if (!infilename) {
@@ -1683,7 +1635,6 @@ Options providing detailed reading results etc.:\n\
    --decide-combination         search for combination attack (try with -o)\n\
    --decide-oracle\n\
    --decide-semeai\n\
-   --decide-tactical-semeai\n\
    --decide-surrounded\n\
    --limit-search\n\
 \n\

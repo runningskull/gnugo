@@ -1430,11 +1430,6 @@ Ascii::.
           (capturing race).  Decide what happens.  Useful in connection
           with `-o' to write the variations to an SGF file.
 
-   * `--decide-tactical-semeai LOCATION1/LOCATION2'
-
-          Similar to `--decide-semeai', except that moves proposed by
-          the owl code are not considered.
-
    * `--decide-position'
 
           Try to attack and defend every dragon with dragon.escape<6. If

@@ -424,13 +424,6 @@ Arguments: color, vertex, dragona, dragonb
 Fails:     invalid vertices
 Returns:   semeai defense result, semeai attack result, semeai move
 @end verbatim
-@cindex tactical_analyze_semeai
-@item tactical_analyze_semeai: Analyze a semeai, not using owl
-@verbatim
-Arguments: dragona, dragonb
-Fails:     invalid vertices, empty vertices
-Returns:   status of dragona, dragonb assuming dragona moves first
-@end verbatim
 @cindex connect
 @item connect: Try to connect two strings.
 @verbatim

@@ -328,8 +328,7 @@ decide_semeai(int apos, int bpos)
 
   gprintf("Analyzing semeai between %1m and %1m, %C moves first\n",
 	  apos, bpos, board[apos]);
-  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 1,
-		     &result_certain);
+  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, &result_certain);
   gprintf("Semeai defense of %1m: result %s %1m\n",
 	  apos, result_to_string(resulta), move);
   gprintf("Semeai attack of %1m: result %s %1m\n",
@@ -339,60 +338,13 @@ decide_semeai(int apos, int bpos)
   
   gprintf("Analyzing semeai between %1m and %1m, %C moves first\n",
 	  bpos, apos, board[bpos]);
-  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 1,
-		     &result_certain);
+  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, &result_certain);
   gprintf("Semeai defense of %1m: result %s %1m\n",
 	  bpos, result_to_string(resultb), move);
   gprintf("Semeai attack of %1m: result %s %1m\n",
 	  apos, result_to_string(resulta), move);
   gprintf("%d nodes%s\n", count_variations,
 	  result_certain ? "" : ", uncertain result");
-
-  sgffile_enddump(outfilename);
-  count_variations = 0;
-}
-
-
-void
-decide_tactical_semeai(int apos, int bpos)
-{
-  SGFTree tree;
-  int resulta, resultb, move, dummy;
-  int color = board[apos];
-
-  if (color == EMPTY || board[bpos] != OTHER_COLOR(color)) {
-    gprintf("gnugo: --decide-semeai called on invalid data\n");
-    return;
-  }
-
-  /* Prepare pattern matcher and reading code. */
-  reset_engine();
-
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  gprintf("finished examine_position\n");
-  count_variations = 1;
-
-  if (*outfilename)
-    sgffile_begindump(&tree);
-
-  /* FIXME: Calling status_to_string() with a result code as argument
-   * doesn't make sense. It could be changed to result_to_string() but
-   * the overall formatting needs change as well.
-   */
-  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0, &dummy);
-  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
-	  color_to_string(color),
-	  move,
-	  apos, status_to_string(resulta),
-  	  bpos, status_to_string(resultb),
-	  count_variations);
-  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 0, &dummy);
-  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
-	  color_to_string(color),
-	  move,
-	  apos, status_to_string(resulta),
-  	  bpos, status_to_string(resultb),
-	  count_variations);
 
   sgffile_enddump(outfilename);
   count_variations = 0;

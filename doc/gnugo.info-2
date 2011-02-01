@@ -1351,9 +1351,9 @@ generation algorithm. The `mogo_classic' pattern values is an
 approximation of the simulation policy used by early versions of MoGo,
 as published in the report odification of UCT with Patterns in
 Monte-Carlo Go (http://hal.inria.fr/inria-00117266) RR-6062, by Sylvain
-Gelly, Yizao Wang, Rémi Munos, and Olivier Teytaud. The uniform pattern
-values is the so called "light" playout which chooses uniformly between
-all legal moves except single point proper eyes.
+Gelly, Yizao Wang, Rémi Munos, and Olivier Teytaud. The uniform
+pattern values is the so called "light" playout which chooses uniformly
+between all legal moves except single point proper eyes.
 
    If you're not satisfied with these you can also tune your own
 pattern values with a pattern database file and load it at runtime with
@@ -4099,11 +4099,6 @@ this list could become incomplete. You may rebuild this list in
      Returns:   semeai defense result, semeai attack result, semeai move
       
 
-   * tactical_analyze_semeai: Analyze a semeai, not using owl Arguments: dragona, dragonb
-     Fails:     invalid vertices, empty vertices
-     Returns:   status of dragona, dragonb assuming dragona moves first
-      
-
    * connect: Try to connect two strings.  Arguments: vertex, vertex
      Fails:     invalid vertex, empty vertex, vertices of different colors
      Returns:   connect result followed by connect point if successful.
@@ -6237,19 +6232,19 @@ Concept Index
 * Menu:
 
 * aa_confirm_safety:                     GTP command reference.
-                                                              (line 426)
+                                                              (line 421)
 * accurate_approxlib:                    GTP command reference.
                                                               (line 183)
 * accuratelib:                           GTP command reference.
                                                               (line 177)
 * adjacent dragons:                      Dragons.             (line 145)
 * advance_random_seed:                   GTP command reference.
-                                                              (line 838)
+                                                              (line 833)
 * all_legal:                             GTP command reference.
                                                               (line 197)
 * amalgamation of worms into dragons:    Amalgamation.        (line   6)
 * analyze_eyegraph:                      GTP command reference.
-                                                              (line 615)
+                                                              (line 610)
 * analyze_semeai:                        GTP command reference.
                                                               (line 347)
 * analyze_semeai_after_move:             GTP command reference.
@@ -6271,12 +6266,12 @@ Concept Index
 * black:                                 GTP command reference.
                                                               (line 100)
 * block_off:                             GTP command reference.
-                                                              (line 378)
+                                                              (line 373)
 * board_state:                           The Board State.     (line   6)
 * boardsize:                             GTP command reference.
                                                               (line  59)
 * break_in:                              GTP command reference.
-                                                              (line 373)
+                                                              (line 368)
 * cache:                                 Invoking GNU Go.     (line 119)
 * cache-size:                            Invoking GNU Go.     (line 119)
 * captures:                              GTP command reference.
@@ -6292,12 +6287,12 @@ Concept Index
 * colored display <1>:                   Dragons in Color.    (line   6)
 * colored display:                       Colored Display.     (line   6)
 * combination_attack:                    GTP command reference.
-                                                              (line 415)
+                                                              (line 410)
 * combination_defend:                    GTP command reference.
-                                                              (line 420)
+                                                              (line 415)
 * command line options:                  Invoking GNU Go.     (line   6)
 * connect:                               GTP command reference.
-                                                              (line 363)
+                                                              (line 358)
 * connection shapes database <1>:        Connections Database.
                                                               (line   6)
 * connection shapes database:            Patterns Overview.   (line   6)
@@ -6308,7 +6303,7 @@ Concept Index
 * countlib:                              GTP command reference.
                                                               (line 166)
 * cputime:                               GTP command reference.
-                                                              (line 621)
+                                                              (line 616)
 * cutting stone:                         Worms.               (line 124)
 * cutting stone, potential:              Worms.               (line 133)
 * data structures:                       Basic Data Structures.
@@ -6332,14 +6327,14 @@ Concept Index
 * dfa.c:                                 DFA.                 (line  29)
 * dfa.h:                                 DFA.                 (line  29)
 * disconnect:                            GTP command reference.
-                                                              (line 368)
+                                                              (line 363)
 * distance from liberty to dragon:       Worms.               (line 109)
 * does_attack:                           GTP command reference.
                                                               (line 269)
 * does_defend:                           GTP command reference.
                                                               (line 275)
 * does_surround:                         GTP command reference.
-                                                              (line 848)
+                                                              (line 843)
 * dragon:                                Worms and Dragons.   (line  27)
 * dragon escape_route:                   Dragons.             (line 207)
 * dragon genus:                          Dragons.             (line 213)
@@ -6351,20 +6346,20 @@ Concept Index
 * dragon status:                         Dragons.             (line 131)
 * dragon weakness:                       Dragons.             (line 199)
 * dragon_data:                           GTP command reference.
-                                                              (line 747)
+                                                              (line 742)
 * dragon_status:                         GTP command reference.
-                                                              (line 391)
+                                                              (line 386)
 * dragon_stones:                         GTP command reference.
-                                                              (line 752)
+                                                              (line 747)
 * dragons:                               Dragons.             (line   6)
 * draw_search_area:                      GTP command reference.
-                                                              (line 878)
+                                                              (line 873)
 * dump_stack:                            GTP command reference.
-                                                              (line 633)
+                                                              (line 628)
 * echo:                                  GTP command reference.
-                                                              (line 798)
+                                                              (line 793)
 * echo_err:                              GTP command reference.
-                                                              (line 803)
+                                                              (line 798)
 * editing pattern database:              Editing Patterns.    (line   6)
 * editing patterns:                      Editing Patterns.    (line   6)
 * effective size:                        Dragons.             (line 116)
@@ -6373,33 +6368,33 @@ Concept Index
 * emacs mode:                            Emacs.               (line   6)
 * escape_route:                          Dragons.             (line 207)
 * estimate_score:                        GTP command reference.
-                                                              (line 539)
+                                                              (line 534)
 * eval_eye:                              GTP command reference.
-                                                              (line 384)
+                                                              (line 379)
 * experimental_score:                    GTP command reference.
-                                                              (line 543)
+                                                              (line 538)
 * eye shapes database:                   Patterns Overview.   (line   6)
 * eye space display:                     Colored Display.     (line  48)
 * eye_data:                              GTP command reference.
-                                                              (line 757)
+                                                              (line 752)
 * false eye:                             Half Eyes.           (line   6)
 * fast pattern matching:                 DFA.                 (line  29)
 * final_score:                           GTP command reference.
-                                                              (line 510)
+                                                              (line 505)
 * final_status:                          GTP command reference.
-                                                              (line 517)
+                                                              (line 512)
 * final_status_list:                     GTP command reference.
-                                                              (line 524)
+                                                              (line 519)
 * findlib:                               GTP command reference.
                                                               (line 171)
 * finish_sgftrace:                       GTP command reference.
-                                                              (line 777)
+                                                              (line 772)
 * finite state automaton:                DFA.                 (line  29)
 * fixed_handicap:                        GTP command reference.
                                                               (line 121)
 * FIXME:                                 Coding Styles.       (line  83)
 * followup_influence:                    GTP command reference.
-                                                              (line 696)
+                                                              (line 691)
 * format of the pattern database:        Patterns Overview.   (line  27)
 * formatted printing:                    Print Utilities.     (line   6)
 * GDB <1>:                               Debugging.           (line  30)
@@ -6408,33 +6403,33 @@ Concept Index
 * generation of helper functions:        Autohelpers and Constraints.
                                                               (line   6)
 * genmove:                               GTP command reference.
-                                                              (line 443)
+                                                              (line 438)
 * genmove_black:                         GTP command reference.
-                                                              (line 429)
+                                                              (line 424)
 * genmove_white:                         GTP command reference.
-                                                              (line 436)
+                                                              (line 431)
 * genus:                                 Dragons.             (line 213)
 * genus (worm):                          Worms.               (line 155)
 * get_connection_node_counter:           GTP command reference.
-                                                              (line 604)
+                                                              (line 599)
 * get_handicap:                          GTP command reference.
                                                               (line 143)
 * get_komi:                              GTP command reference.
                                                               (line  95)
 * get_life_node_counter:                 GTP command reference.
-                                                              (line 561)
+                                                              (line 556)
 * get_owl_node_counter:                  GTP command reference.
-                                                              (line 574)
+                                                              (line 569)
 * get_random_seed:                       GTP command reference.
-                                                              (line 828)
+                                                              (line 823)
 * get_reading_node_counter:              GTP command reference.
-                                                              (line 584)
+                                                              (line 579)
 * get_trymove_counter:                   GTP command reference.
-                                                              (line 594)
+                                                              (line 589)
 * gg-undo:                               GTP command reference.
-                                                              (line 495)
+                                                              (line 490)
 * gg_genmove:                            GTP command reference.
-                                                              (line 458)
+                                                              (line 453)
 * GMP:                                   GMP and GTP.         (line   6)
 * GNU Go's GDB commands:                 Debugging.           (line  82)
 * go position:                           Hash Calculation.    (line  10)
@@ -6446,11 +6441,11 @@ Concept Index
                                                               (line   6)
 * half eye:                              Half Eyes.           (line   6)
 * half_eye_data:                         GTP command reference.
-                                                              (line 762)
+                                                              (line 757)
 * Hash node:                             Hash Organization.   (line   8)
 * Hashing of positions:                  Hashing.             (line   6)
 * help:                                  GTP command reference.
-                                                              (line 808)
+                                                              (line 803)
 * helper functions in pattern matching:  Helper Functions.    (line   6)
 * how GNU Go learns new joseki:          Joseki Compiler.     (line   6)
 * How to debug the reading code:         Debugging.           (line   6)
@@ -6460,7 +6455,7 @@ Concept Index
                                                               (line 286)
 * inessential string:                    Worms.               (line 165)
 * initial_influence:                     GTP command reference.
-                                                              (line 638)
+                                                              (line 633)
 * installation:                          GNU/Linux and Unix.  (line   6)
 * invariant_hash:                        GTP command reference.
                                                               (line 218)
@@ -6471,14 +6466,14 @@ Concept Index
 * is_legal:                              GTP command reference.
                                                               (line 192)
 * is_surrounded:                         GTP command reference.
-                                                              (line 843)
+                                                              (line 838)
 * jago:                                  Other Clients.       (line   6)
 * joseki <1>:                            Corner Matcher.      (line   6)
 * joseki:                                Joseki Compiler.     (line   6)
 * kgs-genmove_cleanup:                   GTP command reference.
-                                                              (line 471)
+                                                              (line 466)
 * known_command:                         GTP command reference.
-                                                              (line 815)
+                                                              (line 810)
 * komi:                                  GTP command reference.
                                                               (line  88)
 * ladder_attack:                         GTP command reference.
@@ -6486,7 +6481,7 @@ Concept Index
 * last_move:                             GTP command reference.
                                                               (line 207)
 * level <1>:                             GTP command reference.
-                                                              (line 483)
+                                                              (line 478)
 * level:                                 Invoking GNU Go.     (line 225)
 * level of play:                         Invoking GNU Go.     (line  25)
 * liberties (worm):                      Worms.               (line  74)
@@ -6494,7 +6489,7 @@ Concept Index
 * licence, documentation (GFDL):         GFDL.                (line   3)
 * licence, program (GPL):                GPL.                 (line   3)
 * limit_search:                          GTP command reference.
-                                                              (line 868)
+                                                              (line 863)
 * list_stones:                           GTP command reference.
                                                               (line 161)
 * loadsgf:                               GTP command reference.
@@ -6510,11 +6505,11 @@ Concept Index
 * move_history:                          GTP command reference.
                                                               (line 212)
 * move_influence:                        GTP command reference.
-                                                              (line 676)
+                                                              (line 671)
 * move_probabilities:                    GTP command reference.
-                                                              (line 682)
+                                                              (line 677)
 * move_uncertainty:                      GTP command reference.
-                                                              (line 689)
+                                                              (line 684)
 * moyo:                                  Territory and Moyo.  (line   6)
 * name:                                  GTP command reference.
                                                               (line  45)
@@ -6571,7 +6566,7 @@ Concept Index
                                                               (line   6)
 * potential cutting stone:               Worms.               (line 133)
 * printsgf:                              GTP command reference.
-                                                              (line 786)
+                                                              (line 781)
 * product:                               DFA.                 (line  29)
 * protocol_version:                      GTP command reference.
                                                               (line  38)
@@ -6595,26 +6590,26 @@ Concept Index
 * reading.c:                             Tactical Reading.    (line   6)
 * reading.h:                             Tactical Reading.    (line   6)
 * reg_genmove:                           GTP command reference.
-                                                              (line 451)
+                                                              (line 446)
 * report_uncertainty:                    GTP command reference.
-                                                              (line 822)
+                                                              (line 817)
 * reset_connection_node_counter:         GTP command reference.
-                                                              (line 599)
+                                                              (line 594)
 * reset_life_node_counter:               GTP command reference.
-                                                              (line 553)
+                                                              (line 548)
 * reset_owl_node_counter:                GTP command reference.
-                                                              (line 569)
+                                                              (line 564)
 * reset_reading_node_counter:            GTP command reference.
-                                                              (line 579)
+                                                              (line 574)
 * reset_search_mask:                     GTP command reference.
-                                                              (line 863)
+                                                              (line 858)
 * reset_trymove_counter:                 GTP command reference.
-                                                              (line 589)
+                                                              (line 584)
 * restricted_genmove:                    GTP command reference.
-                                                              (line 465)
+                                                              (line 460)
 * return codes:                          Reading Basics.      (line  51)
 * same_dragon:                           GTP command reference.
-                                                              (line 402)
+                                                              (line 397)
 * scoring:                               Scoring.             (line   6)
 * semeai:                                Dragons.             (line 254)
 * semeai_attack_certain:                 Dragons.             (line 254)
@@ -6624,44 +6619,42 @@ Concept Index
 * set_free_handicap:                     GTP command reference.
                                                               (line 136)
 * set_random_seed:                       GTP command reference.
-                                                              (line 833)
+                                                              (line 828)
 * set_search_diamond:                    GTP command reference.
-                                                              (line 858)
+                                                              (line 853)
 * set_search_limit:                      GTP command reference.
-                                                              (line 873)
+                                                              (line 868)
 * SGF (Smart Game Format):               SGF Support.         (line   6)
 * SGF files in memory:                   SGF.                 (line   6)
 * shape attributes:                      Pattern Classification.
                                                               (line   6)
 * showboard:                             GTP command reference.
-                                                              (line 626)
+                                                              (line 621)
 * Smart Game Format:                     SGF Support.         (line   6)
 * Speedup of reading process:            Hashing.             (line   6)
 * start_sgftrace:                        GTP command reference.
-                                                              (line 768)
+                                                              (line 763)
 * string:                                Worms and Dragons.   (line  27)
 * superstring:                           General Utilities.   (line 249)
 * surround:                              Dragons.             (line 238)
 * surround_map:                          GTP command reference.
-                                                              (line 854)
+                                                              (line 849)
 * surround_size:                         Dragons.             (line 238)
 * surround_status:                       Dragons.             (line 238)
 * symmetry and transformations:          Symmetry & transformations.
                                                               (line   6)
 * symmetry and transformations of shapes: Symmetry & transformations.
                                                               (line   6)
-* tactical_analyze_semeai:               GTP command reference.
-                                                              (line 358)
 * teaching josekis to GNU Go:            Joseki Compiler.     (line   6)
 * territory:                             Territory and Moyo.  (line   6)
 * test_eyeshape:                         GTP command reference.
-                                                              (line 610)
+                                                              (line 605)
 * The Go Modem Protocol and Go Text Protocol: GMP and GTP.    (line   6)
 * the joseki compiler:                   Joseki Compiler.     (line   6)
 * time_left:                             GTP command reference.
-                                                              (line 505)
+                                                              (line 500)
 * time_settings:                         GTP command reference.
-                                                              (line 499)
+                                                              (line 494)
 * timers:                                General Utilities.   (line 328)
 * traces:                                Traces.              (line   6)
 * Transposition table:                   Hashing.             (line   6)
@@ -6671,15 +6664,15 @@ Concept Index
 * trymove:                               GTP command reference.
                                                               (line 232)
 * tune_move_ordering:                    GTP command reference.
-                                                              (line 792)
+                                                              (line 787)
 * tuning GNU Go:                         Traces.              (line   6)
 * tuning the pattern database:           Tuning.              (line   6)
 * tuning the shapes database:            Tuning.              (line   6)
 * UCT algorithm:                         Monte Carlo Go.      (line   6)
 * unconditional_status:                  GTP command reference.
-                                                              (line 407)
+                                                              (line 402)
 * undo:                                  GTP command reference.
-                                                              (line 489)
+                                                              (line 484)
 * Usage of the stack in reading:         Tactical Reading.    (line   6)
 * version:                               GTP command reference.
                                                               (line  52)
@@ -6687,10 +6680,10 @@ Concept Index
 * worm <1>:                              Worms.               (line   6)
 * worm:                                  Worms and Dragons.   (line  27)
 * worm_cutstone:                         GTP command reference.
-                                                              (line 741)
-* worm_data:                             GTP command reference.
-                                                              (line 702)
-* worm_stones:                           GTP command reference.
                                                               (line 736)
+* worm_data:                             GTP command reference.
+                                                              (line 697)
+* worm_stones:                           GTP command reference.
+                                                              (line 731)
 * Zobrist hashing algorithm:             Hashing.             (line   6)
 

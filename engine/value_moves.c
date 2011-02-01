@@ -722,16 +722,14 @@ try_potential_semeai_move(int pos, int color, struct move_reason *reason)
   switch (reason->type) {
     case POTENTIAL_SEMEAI_ATTACK:
       owl_analyze_semeai_after_move(pos, color, dr1, dr2,
-				    &resulta, &resultb, NULL,
-				    1, &certain, 0);
+				    &resulta, &resultb, NULL, &certain, 0);
       old_certain = DRAGON2(dr1).semeai_attack_certain;
       break;
     case POTENTIAL_SEMEAI_DEFENSE:
       old_certain = DRAGON2(dr1).semeai_defense_certain;
       /* In this case other dragon gets to move first after forced move. */
       owl_analyze_semeai_after_move(pos, color, dr2, dr1,
-				    &resulta, &resultb, NULL,
-				    1, &certain, 0);
+				    &resulta, &resultb, NULL, &certain, 0);
       break;
     default:
       ASSERT1(0, pos);

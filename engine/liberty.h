@@ -519,10 +519,10 @@ int owl_connection_defends(int move, int target1, int target2);
 int owl_substantial(int str);
 void owl_analyze_semeai(int apos, int bpos, 
 			int *resulta, int *resultb, int *semeai_move,
-			int owl, int *semeai_result_certain);
+			int *semeai_result_certain);
 void owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
 				   int *resulta, int *resultb,
-				   int *semeai_move, int owl,
+				   int *semeai_move,
 				   int *semeai_result_certain,
 				   int recompute_dragons);
 

@@ -771,11 +771,6 @@ dead or seki) depends on the outcome of a semeai (capturing race).
 Decide what happens.  Useful in connection with @option{-o} to
 write the variations to an SGF file.
 @end quotation
-@item @option{--decide-tactical-semeai @var{location1}/@var{location2}}
-@quotation
-Similar to @option{--decide-semeai}, except that moves proposed by the
-owl code are not considered.
-@end quotation
 @item @option{--decide-position}
 @quotation
 Try to attack and defend every dragon with dragon.escape<6. If
