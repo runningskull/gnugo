@@ -22,24 +22,17 @@ EXTRA_DIST = $(DTR)\
         endgame.db\
         eyes.db\
         fuseki.db\
-        gogo.db\
         handicap.db\
-        hoshi_keima.db\
-        hoshi_other.db\
         influence.db\
-        komoku.db\
         mc_mogo_classic.db\
         mc_montegnu_classic.db\
         mc_uniform.db\
-        mokuhazushi.db\
         oracle.db\
         owl_attackpats.db\
         owl_defendpats.db\
         owl_vital_apats.db\
         patterns2.db\
         patterns.db\
-        sansan.db\
-        takamoku.db\
 	fuseki13.dbz\
 	fuseki19.dbz\
 	fuseki9.dbz\
