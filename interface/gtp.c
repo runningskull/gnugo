@@ -7,7 +7,7 @@
  * terms than the rest of GNU Go.                                *
  *                                                               *
  * Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,     *
- * 2009 and 2010 by the Free Software Foundation.                *
+ * 2009, 2010 and 2011 by the Free Software Foundation.          *
  *                                                               *
  * Permission is hereby granted, free of charge, to any person   *
  * obtaining a copy of this file gtp.c, to deal in the Software  *

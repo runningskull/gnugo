@@ -1,10 +1,10 @@
 #!/usr/bin/env pike
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
- * This distributed with GNU Go, a go program.			     * 
+ * This distributed with GNU Go, a go program.                       *
  *                                                                   *
  * Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,   *
- * 2008, 2009 and 2010 by the Free Software Foundation.              *
+ * 2008, 2009, 2010 and 2011 by the Free Software Foundation.        *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *
  * modify it under the terms of the GNU General Public License as    *
