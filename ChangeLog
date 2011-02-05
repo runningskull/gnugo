@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- change pieces to stones in board output in ascii mode
 - copyright notices updated for 2011
 - removed tactical semeai reading, avoiding a crash
 - removed built joseki *.db files from EXTRA_DIST

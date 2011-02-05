@@ -202,8 +202,10 @@ ascii_showboard(void)
   set_handicap_spots(board_size);
 
   printf("\n");
-  printf("    White (O) has captured %d pieces\n", black_captured);
-  printf("    Black (X) has captured %d pieces\n", white_captured);
+  printf("    White (O) has captured %d stone%s\n", black_captured,
+	 black_captured == 1 ? "" : "s");
+  printf("    Black (X) has captured %d stone%s\n", white_captured,
+	 white_captured == 1 ? "" : "s");
   if (showscore) {
     if (current_score_estimate == NO_SCORE)
       printf("    No score estimate is available yet.\n");
@@ -999,9 +1001,8 @@ do_play_ascii(Gameinfo *gameinfo)
 	  state = ascii_endgame(gameinfo, 0);
       }
 #if READLINE
-	free(line_ptr);
+      free(line_ptr);
 #endif
-
     }
 
     sgffile_output(&sgftree);
