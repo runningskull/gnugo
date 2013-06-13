@@ -383,7 +383,7 @@ do_find_more_owl_attack_and_defense_moves(int color, int pos,
       int dcode = owl_does_defend(pos, dd, &kworm);
 
       if (dcode >= DRAGON2(dd).owl_defense_code) {
-	if (dcode == LOSS)
+	if (dcode == LOSS && kworm != NO_MOVE)
 	  add_loss_move(pos, dd, kworm);
 	else
 	  add_owl_defense_move(pos, dd, dcode);
